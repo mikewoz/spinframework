@@ -2,6 +2,8 @@
 #define LIBLOUTIL_H
 
 #include "lo/lo.h"
+#include "stdlib.h"
+#include "string.h"
 
 typedef struct _lo_method {
         const char        *path;

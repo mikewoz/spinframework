@@ -2,10 +2,10 @@
 include ../../Makefile.include
 
 all: $(OS)
-	@echo "OS=${OS}";
-	@echo "curdir=${CURDIR}";
-	@echo "pwd="${PWD};
-	@echo "SPIN_PATH=${SPIN_PATH}";
+#	@echo "OS=${OS}";
+#	@echo "curdir=${CURDIR}";
+#	@echo "pwd="${PWD};
+#	@echo "SPIN_PATH=${SPIN_PATH}";
 
 # choose names of binaries:
 Linux: vessServer asViewer vessServerWX
@@ -42,7 +42,6 @@ SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus -DASDEBUG
 #SPIN_FLAGS += -DOSCDEBUG
 
-SPIN_LIBS += -rpath=${SPIN_LIBDIR}
 
 ###################################################################
 # WX VARS:
