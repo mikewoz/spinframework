@@ -1,0 +1,542 @@
+// ===================================================================
+// Audioscape library for PureData
+// Copyright (c) 2007
+//
+// Collaborators:
+//    Shared Reality Lab (SRE), McGill University Centre for Intelligent Machines (CIM)
+//       www.cim.mcgill.ca/sre
+//    La Société des Arts Technologiques (SAT)
+//       www.sat.qc.ca
+//
+// Project Directors:
+//    Science - Jeremy R. Cooperstock (SRE/CIM)
+//    Arts - Zack Settel
+//
+// Conception:
+//    Zack Settel
+//
+// Development Team:
+//    Mike Wozniewski (SRE/CIM): Researcher, Head Developer
+//    Zack Settel: Artist, Researcher, Audio/DSP programming
+//    Jean-Michel Dumas (SAT): Assistant Researcher
+//    Mitchel Benovoy (SRE/CIM): Video Texture Programming
+//    Stéphane Pelletier (SRE/CIM): Video Texture Programming
+//    Pierre-Olivier Charlebois (SRE/CIM): Former Developer
+//
+// Funding by / Souventionné par:
+//    Natural Sciences and Engineering Research Council of Canada (NSERC)
+//    Canada Council for the Arts
+//    NSERC/Canada Council for the Arts - New Media Initiative
+//
+// ===================================================================
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+// ===================================================================
+
+#include "asConnection.h"
+#include "asNode_manager.h"
+
+using namespace std;
+
+extern asNode_manager *nodeManager;
+
+// *****************************************************************************
+// constructors:
+
+asConnection::asConnection (osg::ref_ptr<asSoundNode> src, osg::ref_ptr<asSoundNode> snk)
+{
+	src_as_node = src;
+	snk_as_node = snk;
+	connectionType = NORMAL;
+
+	src->connectTO.push_back(this);
+	snk->connectFROM.push_back(this);
+	
+	initialize();
+}
+
+asConnection::asConnection (osg::ref_ptr<asSoundNode> src, osg::ref_ptr<asSoundSpace> snk)
+{
+	src_as_node = src;
+	snk_as_space = snk;
+	connectionType = NODE_TO_SPACE;
+	
+	src->connectTO.push_back(this);
+	snk->connectFROM.push_back(this);
+	
+	initialize();
+}
+
+asConnection::asConnection (osg::ref_ptr<asSoundSpace> src, osg::ref_ptr<asSoundNode> snk)
+{
+	src_as_space = src;
+	snk_as_node = snk;
+	connectionType = SPACE_TO_NODE;
+	
+	src->connectTO.push_back(this);
+	snk->connectFROM.push_back(this);
+	
+	initialize();
+}
+
+asConnection::initialize()
+{
+	srcMatrix = osg::Matrix();
+	snkMatrix = osg::Matrix();
+	
+	sharedSpaces.clear();
+	updateSharedSpaces();
+	
+	// set default parameter values:
+	thru = false;
+	distanceEffect = 100.0;
+	rolloffEffect = 100.0;
+	dopplerEffect = 100.0;
+	diffractionEffect = 0.0;
+	proximityEffect = 0.0;
+	headEffect = 0.0;
+	
+	connection_vector = osg::Vec3(0.0,0.0,0.0);
+	
+	isInside = 0;
+	isSeparated = 0;
+	occludingSpace = gensym("NULL");
+	
+	distanceScaler = 1;
+	rolloffScaler = 1;
+
+	srcIncidence = 0;
+	srcIncidenceAzim = 0;
+	srcIncidenceElev = 0;
+	snkIncidence = 0;
+	snkIncidenceAzim = 0;
+	snkIncidenceElev = 0;
+}
+
+
+
+
+
+// *****************************************************************************
+// destructor
+
+asConnection::~asConnection()
+{
+	vector<asConnection*>::iterator iter;	
+	
+	// Remove this connection pointer from the connectTO and connectFROM lists:
+	if (src_as_node.valid())
+	{
+		for (iter = src_as_node->connectTO.begin(); iter != src_as_node->connectTO.end(); iter++)
+		{
+			if ((*iter) == this)
+			{
+				src_as_node->connectTO.erase(iter);
+				break;
+			}
+		}
+	}
+	if (src_as_space.valid())
+	{
+		for (iter = src_as_space->connectTO.begin(); iter != src_as_space->connectTO.end(); iter++)
+		{
+			if ((*iter) == this)
+			{
+				src_as_space->connectTO.erase(iter);
+				break;
+			}
+		}
+	}		
+	if (snk_as_node.valid())
+	{
+		for (iter = snk_as_node->connectFROM.begin(); iter != snk_as_node->connectFROM.end(); iter++)
+		{
+			if ((*iter) == this)
+			{
+				snk_as_node->connectFROM.erase(iter);
+				break;
+			}
+		}
+	}
+	if (snk_as_space.valid())
+	{
+		for (iter = snk_as_space->connectFROM.begin(); iter != snk_as_space->connectFROM.end(); iter++)
+		{
+			if ((*iter) == this)
+			{
+				snk_as_space->connectFROM.erase(iter);
+				break;
+			}
+		}
+	}
+		
+	// If this connection involves a soundSpace, then we need to refresh the sharedSpaces
+	// lists for every NORMAL connection that the soundNode of this connection may have.
+	if (this->connectionType == SPACE_TO_NODE)
+	{
+		for (iter = src_as_space->connectTO.begin(); iter != src_as_space->connectTO.end(); iter++)
+		{
+			if ((*iter)->connectionType==NORMAL)
+			{
+				(*iter)->sharedSpaces.clear();
+				(*iter)->updateSharedSpaces();
+			}
+		}
+	} else if (this->connectionType == NODE_TO_SPACE)
+	{
+		for (iter = snk_as_space->connectFROM.begin(); iter != snk_as_space->connectFROM.end(); iter++)
+		{
+			if ((*iter)->connectionType==NORMAL)
+			{
+				(*iter)->sharedSpaces.clear();
+				(*iter)->updateSharedSpaces();
+			}
+		}
+	}
+	
+}
+
+
+
+// *****************************************************************************
+// Computation of physical modelling:
+
+void asConnection::updateSharedSpaces()
+{
+	vector<asConnection*>::iterator iter1, iter2;
+	asConnection *conn;
+	
+
+	// build list of sharedSpaces:
+	
+	if (connectionType==NODE_TO_SPACE)
+	{
+		
+		// If this is a NODE_TO_SPACE, then we need to check all the sinks that the
+		// space is connected to in or to see if a connection exist from the node.
+		// If a connection does exist, then we add the space to the list of sharedSpaces
+		// contained 
+		for (iter1 = snk_as_space->connectTO.begin(); iter1 != snk_as_space->connectTO.end(); iter1++) // for each node that the space is connected to
+		{
+			if ((*iter1)->connectionType == SPACE_TO_NODE) // if the space is connected to a sink soundNode
+			{
+				for (iter2 = (*iter1)->snk_as_node->connectFROM.begin(); iter2 != (*iter1)->snk_as_node->connectFROM.end(); iter2++) // look at all the source nodes for that sink
+				{
+					if ((*iter2)->src_as_node == this->source) // if the source node is the same as the node in this connection
+					{
+						conn = nodeManager->getConnection(src_as_node->id, (*iter1)->snk_as_node->id);
+						conn->sharedSpaces.push_back( snk_as_space.get() ); // add the shared space
+						break;
+					}
+				}
+			}
+		}
+		
+	} else if (connectionType==SPACE_TO_NODE)
+	{
+		
+		for (iter1 = src_as_space->connectFROM.begin(); iter1 != src_as_space->connectFROM.end(); iter1++) // for each node that the space is connected from
+		{
+			if ((*iter1)->connectionType == NODE_TO_SPACE) // if the connection comes from a source soundNode
+			{
+				for (iter2 = (*iter1)->src_as_node->connectTO.begin(); iter2 != (*iter1)->src_as_node->connectTO.end(); iter2++) // look at all the sink nodes for that source
+				{
+					if ((*iter2)->snk_as_node == this->sink) // if any of those sink nodes is the same as this connection's sink
+					{
+						conn = nodeManager->getConnection( (*iter1)->src_as_node->id, snk_as_node->id );
+						conn->sharedSpaces.push_back( src_as_space.get() ); // add the shared space
+						break;
+					}
+				}
+			}
+		}
+		
+	} else {
+		
+		// For a NORMAL connection, we'll just look at all the nodes that the source
+		// is connected to. If it's a soundspace, then we'll look at all the 
+
+		for (iter1 = src_as_node->connectTO.begin(); iter1 != src_as_node->connectTO.end(); iter1++) // look at all the nodes that the source is connected to
+		{
+			if ((*iter1)->connectionType == NODE_TO_SPACE) // if it's connected to a soundspace
+			{
+				for (iter2 = (*iter1)->snk_as_space->connectTO.begin(); iter2 != (*iter1)->snk_as_space->connectTO.end(); iter2++) // look at all the nodes that the soundspace is connected to
+				{
+					if ((*iter2)->snk_as_node == this->snk_as_node) // if a soundspace is connected to a sink that is the same as this connection's sink
+					{
+						sharedSpaces.push_back( (*iter1)->snk_as_space.get() ); // add it
+					}
+				}
+			}
+		}
+
+		
+	}
+	
+	if (0) {
+		std::cout << "Found " << sharedSpaces.size() << " sharedSpaces between source (" << source->id->s_name << ") and sink (" << sink->id->s_name << ")" << std::endl;
+		vector< osg::ref_ptr<asNode> >::iterator iter;
+		for (iter = sharedSpaces.begin(); iter != sharedSpaces.end(); iter++)
+		{
+			std::cout << "  sharedSpace: " << (*iter)->id->s_name << std::endl;
+		}
+	}	
+}
+	
+
+
+void asConnection::computeWorldMatrices()
+{
+	osg::NodePath p;
+	
+	
+	p.clear();
+	if ((connectionType==NORMAL) || (connectionType==NODE_TO_SPACE))
+	{	
+		if (src_as_node->parent != WORLD_SYMBOL)
+			p = src_as_node->parentNode->currentNodePath;
+		p.push_back(src_as_node->srcTransform.get());
+		
+	} else if (connectionType==SPACE_TO_NODE)
+	{
+		if (src_as_space->parent != WORLD_SYMBOL)
+		{
+			p = src_as_space->parentNode->currentNodePath;
+			p.push_back(src_as_space->parentNode->orientationTransform.get());
+			p.push_back(src_as_space->parentNode->modelTransform.get());
+		}
+	}
+	srcMatrix = osg::computeLocalToWorld(p);	
+	
+	
+	p.clear();
+	if ((connectionType==NORMAL) || (connectionType==SPACE_TO_NODE))
+	{
+		if (snk_as_node->parent != WORLD_SYMBOL)
+			p = snk_as_node->parentNode->currentNodePath;
+		p.push_back(snk_as_node->snkTransform.get());
+		
+	} else if (connectionType==NODE_TO_SPACE)
+	{
+		if (snk_as_space->parent != WORLD_SYMBOL)
+		{
+			p = snk_as_space->parentNode->currentNodePath;
+			p.push_back(snk_as_space->parentNode->orientationTransform.get());
+			p.push_back(snk_as_space->parentNode->modelTransform.get());
+		}
+	}
+	snkMatrix = osg::computeLocalToWorld(p);
+
+}
+
+	
+void asConnection::computeDistance()
+{	
+	
+	// translation components from matrices:
+	osg::Vec3 srcPos = srcMatrix.getTrans();
+	osg::Vec3 snkPos = snkMatrix.getTrans();
+	
+	// get a pointer to the space (if there is one):
+	osg::ref_ptr<asSoundSpace> space;
+	if (connectionType==NODE_TO_SPACE) space = snk_as_space;
+	else if (connectionType==SPACE_TO_NODE) space = src_as_space;
+	
+	if (space.valid())
+	{
+		// create a line segment between the source and sink:
+		osg::LineSegment* connectionLineSegment = new osg::LineSegment();
+		connectionLineSegment->set( srcPos, snkPos );
+
+		// Reset the IntersectVisitor, add line segment to test for intersections, and
+		// then start traversal by calling the accept() method:
+		space->soundSpaceIntersectVisitor.reset();
+		space->soundSpaceIntersectVisitor.addLineSegment(connectionLineSegment);
+		//space->soundSpaceIntersectVisitor.setTraversalMask(2);
+		space->mainTransform->accept(space->soundSpaceIntersectVisitor);
+		osgUtil::IntersectVisitor::HitList hits = space->soundSpaceIntersectVisitor.getHitList(connectionLineSegment);
+
+		// find distance by examining intersections:
+
+		//std::cout << "intersect test: " << source->id->s_name << "=(" << srcPos.x() << "," << srcPos.y() << "," << srcPos.z() << "), " << sink->id->s_name << "=(" << snkPos.x() << "," << snkPos.y() << "," << snkPos.z() << ")" << std::endl;
+		
+		if (hits.empty()) // this means that the node is inside the space
+		{
+			isInside = 1.0;
+			connection_vector = osg::Vec3(0.0, 0.0, 0.0);
+			//std::cout << "  no intersection; node is inside space" << std::endl;
+			
+		} else { // this means we are outside the space
+			
+			isInside = 0.0;
+			osgUtil::Hit hit = hits.front();
+			osg::Vec3d hitPoint = hit.getWorldIntersectPoint();
+			//std::cout << "  hitPoint=(" << hitPoint.x() << "," << hitPoint.y() << "," << hitPoint.z() << ")" << std::endl;
+			//osg::Vec3d hitNormal = hit.getWorldIntersectNormal();
+			if (connectionType==NODE_TO_SPACE) connection_vector = hitPoint - srcPos;
+			else connection_vector = snkPos - hitPoint;
+
+		}
+
+	} else { // this is just a regular connection between two spaces
+		connection_vector = snkPos - srcPos;
+	}
+	
+	// final computation:
+	//distance = connection_vector.length();
+	distanceScaler = 1 / (1.0 + pow((double)connection_vector.length(),(double)distanceEffect*.01));
+	
+}
+
+void asConnection::computeRolloff()
+{
+	
+	//std::cout << " asConnection::computeRolloff (" << source->id->s_name << " - " << sink->id->s_name << ")" << std::endl;
+	// A rolloff table contains gain values for different angles of incidence.
+	//
+	// Incidence, for that matter, is the angular between an object's direction
+	// vector, and the vector connecting the two nodes.
+	//
+	// Incidence of 0 means that the connection_vector is perfectly aligned with
+	// the direction vector (ie, source is pointing directly at the sink, or vice versa).
+
+	// get matrices:
+	//osg::Matrix srcMatrix = source->getWorldCoords();
+	//osg::Matrix snkMatrix = sink->getWorldCoords();
+	
+	// Let's start by getting quaternion representations for the source and sink nodes:
+	osg::Quat srcQuat, snkQuat;
+	srcMatrix.get(srcQuat); // should be srcQuat=srcMatrix.getRotate(), shouldn't it? nope. don't think so.
+	snkMatrix.get(snkQuat);
+	
+	// let's also compute the orientations projected on the (local) horizontal and vertical plane:
+	// (ie, azimuth and elevation respectively)
+	osg::Vec3 src_dir   = srcQuat * osg::Vec3(0,1,0);
+	osg::Vec3 src_right = srcQuat * osg::Vec3(1,0,0);
+	osg::Vec3 src_up    = srcQuat * osg::Vec3(0,0,1);
+	osg::Vec3 snk_dir   = snkQuat * osg::Vec3(0,1,0);
+	osg::Vec3 snk_right = snkQuat * osg::Vec3(1,0,0);
+	osg::Vec3 snk_up    = snkQuat * osg::Vec3(0,0,1);
+	
+	// THOUGHT: the incidence with spaces is NOT CORRECT... we need to consider the bound
+	
+	// incidence (radians) between source and the connection_vector:
+	srcIncidence = (t_float) AngleBetweenVectors(src_dir, connection_vector);
+	srcIncidenceAzim = (t_float) (osg::PI/2) - AngleBetweenVectors(src_right, connection_vector);
+	srcIncidenceElev = (t_float) (osg::PI/2) - AngleBetweenVectors(src_up, connection_vector);
+
+	// incidence (radians) between sink and the connection_vector:
+	snkIncidence = (t_float) AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector);		
+	snkIncidenceAzim = (t_float) (osg::PI/2) - AngleBetweenVectors(snk_right, -connection_vector);
+	snkIncidenceElev = (t_float) (osg::PI/2) - AngleBetweenVectors(snk_up, -connection_vector);
+	
+	// Now, note that rolloff & incidence only applies to soundNodes (not soundSpaces),
+	// so we check if this connection involves any soundSpaces, and if so, we will set
+	// their rolloffScaler to 1.0 (unity). Whereas the soundNodes will have a
+	// rolloffScaler based on their incidence and rolloff table.
+
+	// Note: the spread parameter is used to distort the sampling of the rolloff
+	// table. A spread of 1.0 means we sample it precisely, while a spread
+	// of 2.0 means we sample twice as fast (see ss_rolloffTable for more info).
+	
+	t_float srcGain, snkGain;
+	
+	if (connectionType==NODE_TO_SPACE) {
+		srcGain = src_as_node->srcRolloff->getValue( (srcIncidence * src_as_node->_srcSpread) / osg::PI );
+		snkGain = 1.0;
+	} else if (connectionType==SPACE_TO_NODE) {
+		snkGain = snk_as_node->snkRolloff->getValue( (snkIncidence * snk_as_node->_snkSpread) / osg::PI );
+		srcGain = 1.0;
+	} else {
+		srcGain = src_as_node->srcRolloff->getValue( (srcIncidence * src_as_node->_srcSpread) / osg::PI );
+		snkGain = snk_as_node->snkRolloff->getValue( (snkIncidence * snk_as_node->_snkSpread) / osg::PI );
+	}
+	
+	rolloffScaler = (double) (1.0 - (.01*rolloffEffect  * (1.0 - srcGain*snkGain)));
+	
+}
+
+void asConnection::computeSeparation()
+{
+	//std::cout << " asConnection::computeSeparation (" << source->id->s_name << " - " << sink->id->s_name << ")" << std::endl;
+	// Here we go through the list of sharedSpaces, and see if the source and sink
+	// are on opposite sides of any space (ie, isInside flag is opposite). Hence,
+	// this should ideally be called AFTER the computeDistance() function.
+	isSeparated = 0.0;
+	occludingSpace = gensym("NULL");
+	
+	vector< osg::ref_ptr<asSoundSpace> >::iterator iter;
+	asConnection *space2node, *node2space;
+	
+	//std::cout << "testing " << sharedSpaces.size() << " spaces to see if source (" << source->id->s_name << ") is separated from sink (" << sink->id->s_name << ")" << std::endl;
+	for (iter = sharedSpaces.begin(); iter != sharedSpaces.end(); iter++)
+	{
+		//std::cout << "testing space [" << (*iter)->id->s_name << "]:" << std::endl;
+		node2space = nodeManager->getConnection(source->id, (*iter)->id);
+		space2node = nodeManager->getConnection((*iter)->id, sink->id);
+		if ( (node2space!=NULL) && (space2node!=NULL) )
+		{
+			if (space2node->isInside != node2space->isInside)
+			{
+				isSeparated = 1.0;
+				occludingSpace = (*iter)->id;
+				break;
+			}
+			//std::cout << "  sourceInside=" << node2space->isInside << ", sinkInside=" << space2node->isInside << ", thus separated=" << isSeparated << std::endl;
+		}
+	}
+	
+}
+
+// ***********************************************************
+// ***********************************************************
+// ********************* SET METHODS: ************************
+// ***********************************************************
+// ***********************************************************
+
+void asConnection::setThru (t_floatarg newvalue)
+{
+	if (newvalue > 0) this->thru = true;
+	else this->thru = false;
+}
+// ***********************************************************
+void asConnection::setDistanceEffect (t_floatarg newvalue)
+{
+	this->distanceEffect = newvalue;
+}
+// ***********************************************************
+void asConnection::setRolloffEffect (t_floatarg newvalue)
+{
+	this->rolloffEffect = newvalue;
+}
+// ***********************************************************
+void asConnection::setDopplerEffect (t_floatarg newvalue)
+{
+	this->dopplerEffect = newvalue;
+}
+// ***********************************************************
+void asConnection::setDiffractionEffect (t_floatarg newvalue)
+{
+	this->diffractionEffect = newvalue;
+}
+// ***********************************************************
+void asConnection::setProximityEffect (t_floatarg newvalue)
+{
+	this->proximityEffect = newvalue;
+}
+// ***********************************************************
+void asConnection::setHeadEffect (t_floatarg newvalue)
+{
+	this->headEffect = newvalue;
+}

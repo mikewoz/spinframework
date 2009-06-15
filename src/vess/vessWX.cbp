@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="vessWX" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="vessServerWX">
+				<Option output="vessWX" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+				<ExtraCommands>
+					<Add after="/Developer/Tools/Rez -d __DARWIN__ -t APPL Carbon.r -o $(TARGET_OUTPUT_FILE)" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-g" />
+			<Add option="`wx-config --cflags`" />
+		</Compiler>
+		<Linker>
+			<Add option="`wx-config --libs`" />
+		</Linker>
+		<Unit filename="../../include/DebugVisitor.h" />
+		<Unit filename="../../include/EventDispatcher.h" />
+		<Unit filename="../../include/asBasicNode.h" />
+		<Unit filename="../../include/asCameraManager.h" />
+		<Unit filename="../../include/asCameraView.h" />
+		<Unit filename="../../include/asContour.h" />
+		<Unit filename="../../include/asDSPnode.h" />
+		<Unit filename="../../include/asGlobals.h" />
+		<Unit filename="../../include/asLightSource.h" />
+		<Unit filename="../../include/asMeasurementNode.h" />
+		<Unit filename="../../include/asMediaManager.h" />
+		<Unit filename="../../include/asModel.h" />
+		<Unit filename="../../include/asRay.h" />
+		<Unit filename="../../include/asRayIntersector.h" />
+		<Unit filename="../../include/asReferenced.h" />
+		<Unit filename="../../include/asSceneManager.h" />
+		<Unit filename="../../include/asShape.h" />
+		<Unit filename="../../include/asSoundNode.h" />
+		<Unit filename="../../include/asSoundSpace.h" />
+		<Unit filename="../../include/asToggle.h" />
+		<Unit filename="../../include/asUtil.h" />
+		<Unit filename="../../include/asVideo.h" />
+		<Unit filename="../../include/asWindow.h" />
+		<Unit filename="../../include/findNodeVisitor.h" />
+		<Unit filename="../../include/mainpage.h" />
+		<Unit filename="../../include/msgUtil.h" />
+		<Unit filename="../../include/oscParser.h" />
+		<Unit filename="../../include/osgUtil.h" />
+		<Unit filename="../../include/pdUtil.h" />
+		<Unit filename="../../include/vessLog.h" />
+		<Unit filename="../../include/vessThreads.h" />
+		<Unit filename="DebugVisitor.cpp" />
+		<Unit filename="asBasicNode.cpp" />
+		<Unit filename="asCameraManager.cpp" />
+		<Unit filename="asCameraManager_sly.cpp" />
+		<Unit filename="asCameraView.cpp" />
+		<Unit filename="asConstraints.cpp" />
+		<Unit filename="asContour.cpp" />
+		<Unit filename="asDSPnode.cpp" />
+		<Unit filename="asGlobals.cpp" />
+		<Unit filename="asLightSource.cpp" />
+		<Unit filename="asMeasurementNode.cpp" />
+		<Unit filename="asMediaManager.cpp" />
+		<Unit filename="asModel.cpp" />
+		<Unit filename="asRay.cpp" />
+		<Unit filename="asRayIntersector.cpp" />
+		<Unit filename="asReferenced.cpp" />
+		<Unit filename="asSceneManager.cpp" />
+		<Unit filename="asShape.cpp" />
+		<Unit filename="asSoundNode.cpp" />
+		<Unit filename="asSoundSpace.cpp" />
+		<Unit filename="asToggle.cpp" />
+		<Unit filename="asUtil.cpp" />
+		<Unit filename="asVideo.cpp" />
+		<Unit filename="asViewer.cpp" />
+		<Unit filename="asWindow.cpp" />
+		<Unit filename="findNodeVisitor.cpp" />
+		<Unit filename="msgUtil.cpp" />
+		<Unit filename="old/EventDispatcher.cpp" />
+		<Unit filename="osgUtil.cpp" />
+		<Unit filename="pdUtil.cpp" />
+		<Unit filename="soundConnection.cpp" />
+		<Unit filename="soundConnection.h" />
+		<Unit filename="test/introspectionExample.cpp" />
+		<Unit filename="test/osgintrospection.cpp" />
+		<Unit filename="testViewer.cpp" />
+		<Unit filename="vess.cpp" />
+		<Unit filename="vessLog.cpp" />
+		<Unit filename="vessServer.cpp" />
+		<Unit filename="vessThreads.cpp" />
+		<Unit filename="vessWX.cpp" />
+		<Unit filename="vessWX.h" />
+		<Unit filename="viewer.cpp" />
+		<Unit filename="wxBasicNode.cpp" />
+		<Unit filename="wxBasicNode.h" />
+		<Unit filename="wxNewNode.cpp" />
+		<Unit filename="wxNewNode.h" />
+		<Unit filename="wxVessConfig.cpp" />
+		<Unit filename="wxVessConfig.h" />
+		<Unit filename="wxVessEditor.cpp" />
+		<Unit filename="wxVessEditor.h" />
+		<Unit filename="wxVessMain.cpp" />
+		<Unit filename="wxVessMain.h" />
+		<Unit filename="wxVessPropGrid.cpp" />
+		<Unit filename="wxVessPropGrid.h" />
+		<Unit filename="wxVessRenderer.cpp" />
+		<Unit filename="wxVessRenderer.h" />
+		<Unit filename="wxVessTreeCtrl.cpp" />
+		<Unit filename="wxVessTreeCtrl.h" />
+		<Unit filename="wxVessTreeVisitor.cpp" />
+		<Unit filename="wxVessTreeVisitor.h" />
+		<Unit filename="wxVessViewer.h" />
+		<Unit filename="wxsmith/wxBasicNode.wxs" />
+		<Unit filename="wxsmith/wxNewNode.wxs" />
+		<Unit filename="wxsmith/wxVessConfig.wxs" />
+		<Unit filename="wxsmith/wxVessMain.wxs" />
+		<Unit filename="wxsmith/wxVessRenderer.wxs" />
+		<Unit filename="../wxOSG/wxOsg.h" />
+		<Unit filename="../wxOSG/wxOsgArrayEditorDlgs.cpp" />
+		<Unit filename="../wxOSG/wxOsgArrayEditorDlgs.h" />
+		<Unit filename="../wxOSG/wxOsgMatrixDlg.h" />
+		<Unit filename="../wxOSG/wxOsgMessageDlg.h" />
+		<Unit filename="../wxOSG/wxOsgOptimizeDlg.h" />
+		<Unit filename="../wxOSG/wxOsgPGValueType.cpp" />
+		<Unit filename="../wxOSG/wxOsgPGValueType.h" />
+		<Unit filename="../wxOSG/wxOsgPropGrid.cpp" />
+		<Unit filename="../wxOSG/wxOsgPropGrid.h" />
+		<Unit filename="../wxOSG/wxOsgSceneTreeVisitor.cpp" />
+		<Unit filename="../wxOSG/wxOsgSceneTreeVisitor.h" />
+		<Unit filename="../wxOSG/wxOsgTreeCtrl.cpp" />
+		<Unit filename="../wxOSG/wxOsgTreeCtrl.h" />
+		<Unit filename="../wxOSG/wxOsgUtils.cpp" />
+		<Unit filename="../wxOSG/wxOsgUtils.h" />
+		<Unit filename="../wxOSG/wxOsgViewerWindow.cpp" />
+		<Unit filename="../wxOSG/wxOsgViewerWindow.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="vessWX.cpp" main="wxVessMain" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxFrame wxs="wxsmith/wxVessMain.wxs" src="wxVessMain.cpp" hdr="wxVessMain.h" name="wxVessMain" language="CPP" />
+					<wxFrame wxs="wxsmith/wxVessEditor.wxs" src="wxVessEditor.cpp" hdr="wxVessEditor.h" name="wxVessEditor" language="CPP" />
+					<wxPanel wxs="wxsmith/wxBasicNode.wxs" src="wxBasicNode.cpp" hdr="wxBasicNode.h" name="wxBasicNode" language="CPP" />
+					<wxDialog wxs="wxsmith/wxNewNode.wxs" src="wxNewNode.cpp" hdr="wxNewNode.h" name="wxNewNode" language="CPP" />
+					<wxFrame wxs="wxsmith/wxVessRenderer.wxs" src="wxVessRenderer.cpp" hdr="wxVessRenderer.h" name="wxVessRenderer" language="CPP" />
+					<wxPanel wxs="wxsmith/wxVessConfig.wxs" src="wxVessConfig.cpp" hdr="wxVessConfig.h" name="wxVessConfig" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,93 @@
+# Makefile.include
+#
+# This is a global include file that sets up various parameters for
+# all Audioscape code.
+#
+# Note: the Audioscape build system assumes that you have sourced the
+#       asConfig file and defined variables such as $AS_PATH
+#
+#
+
+###################################################################
+# Some paths need to be manually defined here:
+
+AS_INCDIR = $(AS_PATH)/include
+AS_LIBDIR = $(AS_PATH)/lib/$(AS_OS)$(AS_ARCH)
+
+GENWRAPPER_BIN := $(HOME)/svn/genwrapper/genwrapper
+
+
+###################################################################
+# Generic compilation stuff:
+
+CC = cc 
+CXX = g++
+LD = ld
+
+AS_FLAGS += -DAUDIOSCAPE
+AS_FLAGS += -fPIC
+AS_LIBS += -L$(AS_LIBDIR) -L/usr/local/lib -L/usr/lib
+AS_INCLUDE += -I. -I$(AS_INCDIR) -I/usr/local/include -I/usr/include -I/$(AS_PATH)/src/tinyxml -I/$(AS_PATH)/src
+
+
+###################################################################
+# Some customizations needed for Darwin:
+
+ifeq ($(AS_OS),Darwin)
+
+  AS_INCLUDE += -I/usr/X11R6/include -I/opt/local/include 
+  ifeq ($(AS_ARCH),_i386)
+    AS_FLAGS += -arch i386
+  endif
+
+endif
+
+
+###################################################################
+# For OpenSceneGraph (OSG):
+
+ifdef OSG_BLD_PATH
+  OSG_LIBS += -L$(OSG_BLD_PATH)/lib
+endif
+
+ifdef OSG_SRC_PATH
+  OSG_INCLUDE += -I$(OSG_SRC_PATH)/include
+endif
+
+ifeq ($(AS_OS),Darwin)
+  #export MACOSX_DEPLOYMENT_TARGET=10.4
+  export MACOSX_DEPLOYMENT_TARGET=10.5
+  export SDKROOT=/Developer/SDKs/MacOSX10.5.sdk
+  
+  OSG_FLAGS += -D__USE_OSX_AGL_IMPLEMENTATION__
+  FRAMEWORKS = OpenThreads osg osgGA osgSim osgDB \
+	       osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
+  OSG_LIBS += -llo -lpthread $(patsubst %,-framework %,$(FRAMEWORKS)) 
+  OSG_LIBS += -isysroot $(SDKROOT)
+  OSG_LIBS += -F/Library/Frameworks -L/opt/local/lib -L$(SDKROOT)/usr/X11R6/lib
+
+else
+  OSG_LIBS += -lc -lm -ldl -lGL -lX11 -llo -lpthread \
+	      -lOpenThreads -losg -losgGA -losgSim -losgDB -losgIntrospection \
+	      -losgManipulator -losgText -losgUtil -losgFX -losgParticle -losgViewer
+  OSG_LIBS += -L/usr/local/lib/osgPlugins \
+	      -L/usr/local/lib64\
+	      -L/usr/local/lib64/osgPlugins \
+	      -L/usr/X11R6/lib 
+endif
+
+
+
+###################################################################
+# For Pure Data (Pd):
+ifdef PD_PATH
+  AS_INCLUDE += -I$(PD_PATH)/src -I$(AS_RESOURCES)/include
+else
+  #AS_INCLUDE += -I$(AS_RESOURCES)/include
+endif
+
+
+###################################################################
+
+
+

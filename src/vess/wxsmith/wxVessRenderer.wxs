@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="wxVessRenderer">
+		<title>SpIF :: Renderer</title>
+		<size>720,480</size>
+		<pos_arg>1</pos_arg>
+		<size_arg>1</size_arg>
+		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVessRenderer_ToolBar" member="yes">
+			<object class="tool" name="vessRenderer_grid" variable="ToolBarItem1" member="yes">
+				<label>Grid</label>
+				<bitmap>../bitmaps/grid.gif</bitmap>
+				<bitmap2>../bitmaps/grid.gif</bitmap2>
+				<tooltip>Enable/Disable Grid</tooltip>
+				<longhelp>Enable/Disable Grid</longhelp>
+				<handler function="OnGridToggle" entry="EVT_TOOL" />
+				<check>1</check>
+			</object>
+			<object class="tool" name="vessRenderer_trackNode" variable="ToolBarItem2" member="yes">
+				<label>trackNode</label>
+				<bitmap stock_id="wxART_GO_TO_PARENT" stock_client="wxART_TOOLBAR" />
+				<bitmap2 stock_id="wxART_GO_TO_PARENT" stock_client="wxART_TOOLBAR" />
+				<tooltip>Choose a node to track</tooltip>
+				<longhelp>The camera will attach to this node and show the view from the local perspective. This allows for dynamic camera control via any node in the scene.</longhelp>
+			</object>
+		</object>
+	</object>
+</wxsmith>
