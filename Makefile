@@ -34,4 +34,7 @@ clean:
 	$(MAKE) -C src/osgWrappers clean
 	$(MAKE) -C src/vess clean
 
+install:
+	$(MAKE) -C src/osgWrappers install
+	$(MAKE) -C src/vess install
 

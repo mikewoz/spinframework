@@ -34,7 +34,8 @@ Darwin: $(WRAPPER_OBJ)
 
 ########################################################
 install:
-	@echo "make install NOT YET DONE. Where do we install to??"
+	@echo "INSTALLING ${LIBNAME} to ${SPIN_INSTALL_PREFIX}";
+	-cp $(LIBNAME).* ${SPIN_INSTALL_PREFIX}/lib
 
 ########################################################
 clean:

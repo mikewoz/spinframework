@@ -27,3 +27,6 @@ $(EXEFILE): $(OBJ_FILES)
 
 .cpp.o:
 	${CXX} -Wall $(CFLAGS) -c $<
+
+install:
+	@echo "genwrapper will not be installed; the build system uses it locally";

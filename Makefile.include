@@ -10,9 +10,9 @@
 
 SPIN_PATH := ../..
 
+GENWRAPPER_BIN = src/genwrapper/genwrapper
 
-GENWRAPPER_BIN := src/genwrapper/genwrapper
-
+SPIN_INSTALL_PREFIX = /usr/local
 
 ###################################################################
 # Create variables for OS and architecture:
