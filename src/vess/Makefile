@@ -1,7 +1,11 @@
 # the following file must be included:
 include ../../Makefile.include
 
-all: $(AS_OS)
+all: $(OS)
+	@echo "OS=${OS}";
+	@echo "curdir=${CURDIR}";
+	@echo "pwd="${PWD};
+	@echo "SPIN_PATH=${SPIN_PATH}";
 
 # choose names of binaries:
 Linux: vessServer asViewer vessServerWX
@@ -26,8 +30,6 @@ OBJS =  vessThreads.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
 	asConstraints.o asRayIntersector.o asPointer.o asMeasurementNode.o asToggle.o \
 	asDSPnode.o asSoundNode.o asSoundSpace.o asSoundConnection.o \
 	asCameraView.o asCameraManager.o asWindow.o
-	
-	#ss_rolloff_table.o ss_rolloff_manager.o \
 
 WX_OBJS = vessWX.o wxVessMain.o wxVessEditor.o wxVessRenderer.o wxVessConfig.o \
 	  wxVessPropGrid.o wxVessTreeVisitor.o wxVessTreeCtrl.o
@@ -37,9 +39,12 @@ SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o
 
 
 
-AS_CFLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus -DASDEBUG
-#AS_CFLAGS += -DOSCDEBUG
+SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus -DASDEBUG
+#SPIN_FLAGS += -DOSCDEBUG
 
+SPIN_LIBS += -rpath=${SPIN_LIBDIR}
+
+###################################################################
 # WX VARS:
 ifndef WXCONFIG
   WXCONFIG = "wx-config"
@@ -53,23 +58,12 @@ endif
 WX_CXXFLAGS = $(shell $(WXCONFIG) --cxxflags)
 WX_VERSION = $(shell $(WXCONFIG) --version)
 
-
-
-ifdef OSG22
-	AS_CFLAGS += -DOSG22
-endif
-
-AS_INCLUDE += -I../tinyxml -I..
-
-
-#AS_LIBS += -lAudioscape
-
 ###################################################################
 # GENERIC COMPILATION RULE
 
 %.o: %.cpp
 	@echo "--------------- compiling $@ ---------------" 
-	$(CXX) $(OSG_INCLUDE) $(WX_CXXFLAGS) $(AS_CFLAGS) $(AS_INCLUDE) -c $< -o $@
+	$(CXX) $(OSG_INCLUDE) $(WX_CXXFLAGS) $(SPIN_FLAGS) $(SPIN_INCLUDE) -c $< -o $@
 
 ###################################################################
 # TARGETS:
@@ -78,23 +72,23 @@ ALLTARGETS = vess_old asViewer viewer vessServer vessServerWX
 
 vess_old: $(OBJS) vess.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(AS_LIBS) -lAudioscape $(OSG_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 
 asViewer: $(OBJS) asViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(AS_LIBS) -lAudioscape $(OSG_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 
 viewer: $(SIMPLEVIEWER_OBJ)
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $(SIMPLEVIEWER_OBJ) $(AS_LIBS) $(OSG_LIBS)
+	$(CXX) -o $@ $(SIMPLEVIEWER_OBJ) $(SPIN_LIBS) $(OSG_LIBS)
 
 vessServer: $(OBJS) vessServer.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(AS_LIBS) -lAudioscape $(OSG_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 
 vessServerWX: $(OBJS) $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ -lAudioscape $(WX_LIBS) $(OSG_LIBS) $(AS_LIBS)
+	$(CXX) -o $@ $^ -lSPIN $(WX_LIBS) $(OSG_LIBS) $(SPIN_LIBS)
 
 vess.app: vessServerWX
 	@echo "\n--------------- Building $@: ---------------" 
@@ -109,7 +103,7 @@ vess.app: vessServerWX
 	Info.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp vessServerWX $@/Contents/MacOS
-	#cp ../../lib/Darwin_i386/libAudioscape.dylib $@/Contents/Resources
+	#cp ../../lib/Darwin_i386/libSPIN.dylib $@/Contents/Resources
 	cp vess.icns $@/Contents/Resources/vessServerWX.icns
 
 

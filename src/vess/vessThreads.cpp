@@ -92,16 +92,16 @@ vessMaster::~vessMaster()
 vessListener::vessListener()
 {
 	
-	// Load the libAudioscape library:
+	// Load the SPIN library:
 	osgDB::Registry *reg = osgDB::Registry::instance();
-	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libAudioscape"));
+	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
 
 	// Make sure that our OSG wrapper library is loaded
 	// (by checking for existance of asReferenced type):
 	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
 	if (!asReferencedType.isDefined())
 	{
-		std::cout << "ERROR: libAudioscape was not found. Please check dynamic libraries. Could not start VESS." << std::endl;
+		std::cout << "ERROR: libSPIN was not found. Please check dynamic libraries. Could not start VESS." << std::endl;
 		exit(1);
 	}
 	

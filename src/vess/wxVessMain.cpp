@@ -24,8 +24,8 @@
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 
-#include "images/icon_tree.xpm"
-#include "images/icon_3Dsphere.xpm"
+#include "../images/icon_tree.xpm"
+#include "../images/icon_3Dsphere.xpm"
 
 extern vessMaster *vess;
 

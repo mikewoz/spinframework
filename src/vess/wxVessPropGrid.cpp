@@ -45,10 +45,10 @@
 #include "DebugVisitor.h"
 #include "libloUtil.h"
 
-#include "images/icon_D.xpm"
-//#include "images/nav_prev.xpm"
-//#include "images/nav_next.xpm"
-//#include "images/nav_reload.xpm"
+#include "../images/icon_D.xpm"
+//#include "../images/nav_prev.xpm"
+//#include "../images/nav_next.xpm"
+//#include "../images/nav_reload.xpm"
 
 //#include <osgField/Manager>
 

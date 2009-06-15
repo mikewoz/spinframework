@@ -1,22 +1,27 @@
 include ./Makefile.include
 
 # note: order is important:
-all: wrappers libAudioscape doc vess
+all: genwrapper osgWrappers libSPIN vess
+
+genwrapper:
+	@echo ""; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Building genwrapper <<<<<<<<<<<<<<<<<<<<<"; \
+	$(MAKE) -C src/genwrapper
 
 doc:
 	@echo ""; \
 	echo ">>>>>>>>>>>>>>>>>>>>> Generating Documentation <<<<<<<<<<<<<<<<<<<<<"; \
 	doxygen ./doxygen_config	
 
-wrappers:
+osgWrappers:
 	@echo ""; \
-	echo ">>>>>>>>>>>>>>>>>>>>> Generating Wrappers <<<<<<<<<<<<<<<<<<<<<"; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Generating osgWrappers <<<<<<<<<<<<<<<<<<<<<"; \
 	$(GENWRAPPER_BIN) -d . doxygen | doxygen -
-	$(GENWRAPPER_BIN) -v DEBUG doxygen .
+	$(GENWRAPPER_BIN) -v QUIET -c genwrapper.conf doxygen .
 	
-libAudioscape:
+libSPIN:
 	@echo ""; \
-	echo ">>>>>>>>>>>>>>>>>>>>> Building libAudioscape <<<<<<<<<<<<<<<<<<<<<"; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Building libSPIN <<<<<<<<<<<<<<<<<<<<<"; \
 	$(MAKE) -C src/osgWrappers
 
 vess:

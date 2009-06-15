@@ -16,7 +16,7 @@ SRC_FILES = \
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
 #LIBS += -lxml2 -lc -lboost_regex -L/opt/local/lib
 LIBS += -lxml2 -lc -lboost_regex-mt-1_35
-CFLAGS += -I/usr/include/libxml2 -I/usr/include/boost -I/opt/local/include/boost-1_35
+CFLAGS += -I/usr/include/libxml2 -I/usr/include/boost -I/opt/local/include/boost-1_35 -I/opt/local/include
 
 all: $(EXEFILE)
 

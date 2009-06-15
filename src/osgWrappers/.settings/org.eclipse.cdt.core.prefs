@@ -1,3 +1,3 @@
 #Fri Sep 12 17:55:45 EDT 2008
 eclipse.preferences.version=1
-environment/project/cdt.managedbuild.toolchain.gnu.macosx.base.1622920105=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="AS_OS" operation\="append" value\="Darwin"/>\n<variable delimiter\=";" name\="AS_RESOURCES" operation\="append" value\="$(HOME)/svn/audioscape/audioscape_resources"/>\n<variable delimiter\=";" name\="AS_PATH" operation\="append" value\="$(HOME)/svn/audioscape/trunk"/>\n</environment>\n
+environment/project/cdt.managedbuild.toolchain.gnu.macosx.base.1622920105=<?xml version\="1.0" encoding\="UTF-8"?>\n<environment append\="true" appendContributed\="true">\n<variable delimiter\=";" name\="OS" operation\="append" value\="Darwin"/>\n<variable delimiter\=";" name\="SPIN_PATH" operation\="append" value\="$(HOME)/svn/spinframework/trunk"/>\n</environment>\n

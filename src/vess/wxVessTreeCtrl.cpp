@@ -32,13 +32,6 @@
 
 #include "wxVessEditor.h"
 
-#include "images/tree_object.xpm"
-#include "images/tree_geode.xpm"
-#include "images/tree_group.xpm"
-#include "images/tree_node.xpm"
-#include "images/tree_drawable.xpm"
-#include "images/tree_stateset.xpm"
-#include "images/tree_stateatt.xpm"
 
 #include "vessThreads.h"
 extern vessMaster *vess;
@@ -59,6 +52,7 @@ END_EVENT_TABLE()
 wxVessTreeCtrl::wxVessTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
     long style, const wxValidator& validator, const wxString& name) : wxTreeCtrl(parent, id, pos, size, style, validator, name)
 {
+	/*
     int iconSize = 15;
     m_pImages = new wxImageList(iconSize, iconSize, true);
 
@@ -71,6 +65,7 @@ wxVessTreeCtrl::wxVessTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& p
     m_pImages->Add(wxBitmap(tree_stateatt_xpm));
 
     AssignImageList(m_pImages);
+    */
 
 
     //Connect(id,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&wxVessEditor::OnVessSelectionChange);
