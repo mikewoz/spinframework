@@ -25,11 +25,9 @@ SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus -DASDEBUG
 
 Linux: $(WRAPPER_OBJ)
 	$(CXX) --export-dynamic -shared -Wl,-soname,$(LIBNAME).so -o $(LIBNAME).so $(WRAPPER_OBJ) $(SPIN_LIBS) $(OSG_LIBS)
-	-cp $(LIBNAME).* $(SPIN_LIBDIR)
 
 Darwin: $(WRAPPER_OBJ)
 	$(CXX) -dynamiclib -undefined suppress -flat_namespace -o $(LIBNAME).dylib $(WRAPPER_OBJ) $(SPIN_LIBS) $(OSG_LIBS)
-	-cp $(LIBNAME).* $(SPIN_LIBDIR)
 
 
 ########################################################

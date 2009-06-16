@@ -46,10 +46,9 @@ CC = cc
 CXX = g++
 LD = ld
 
-SPIN_LIBDIR = ${SPIN_PATH}/lib/${OS}${ARCH}
 
 SPIN_FLAGS += -fPIC
-SPIN_LIBS += -L${SPIN_LIBDIR} -L/usr/local/lib -L/usr/lib
+SPIN_LIBS += -L/usr/local/lib -L/usr/lib
 SPIN_INCLUDE += -I${SPIN_PATH}/include -I${SPIN_PATH}/src/tinyxml -I/usr/local/include -I/usr/include
 
 
