@@ -14,7 +14,11 @@ SRC_FILES = \
 	WrapperGenerator.cpp
 
 OBJ_FILES = $(SRC_FILES:.cpp=.o)
-LIBS += -lxml2 -lc -lboost_regex -L/opt/local/lib
+ifeq ($(shell uname -s),Darwin)
+	LIBS += -lxml2 -lc -lboost_regex-mt -L/opt/local/lib
+else
+	LIBS += -lxml2 -lc -lboost_regex -L/opt/local/lib
+endif
 CFLAGS += -I/usr/include/libxml2 -I/usr/include/boost -I/opt/local/include/boost-1_35 -I/opt/local/include
 
 all: $(EXEFILE)
