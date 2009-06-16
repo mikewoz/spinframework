@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxFrame" name="wxVessEditor">
-		<title>SpiF :: Editor</title>
+		<title>SPIN :: Editor</title>
 		<size>-1,600</size>
 		<id_arg>0</id_arg>
 		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="vessEditor_splitter" member="yes">
 			<sashpos>150</sashpos>
 			<minsize>50</minsize>
-			<minsize>10,10</minsize>
-			<object class="wxPanel" name="ID_PANEL1" variable="treePanel" member="yes">
+			<minsize>50,50</minsize>
+			<object class="wxPanel" name="ID_treePanel" variable="treePanel" member="yes">
 				<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 					<orient>wxVERTICAL</orient>
 					<object class="sizeritem">

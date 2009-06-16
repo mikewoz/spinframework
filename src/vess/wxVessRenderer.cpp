@@ -38,7 +38,7 @@ END_EVENT_TABLE()
 wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
 	//(*Initialize(wxVessRenderer)
-	Create(parent, id, _("SpIF :: Renderer"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
+	Create(parent, id, _("SPIN :: Renderer"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
 	SetClientSize(wxSize(720,480));
 	Move(wxDefaultPosition);
 	wxVessRenderer_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
@@ -46,7 +46,7 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	ToolBarItem2 = wxVessRenderer_ToolBar->AddTool(vessRenderer_trackNode, _("trackNode"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_GO_TO_PARENT")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_GO_TO_PARENT")),wxART_TOOLBAR), wxITEM_NORMAL, _("Choose a node to track"), _("The camera will attach to this node and show the view from the local perspective. This allows for dynamic camera control via any node in the scene."));
 	wxVessRenderer_ToolBar->Realize();
 	SetToolBar(wxVessRenderer_ToolBar);
-
+	
 	Connect(vessRenderer_grid,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessRenderer::OnGridToggle);
 	//*)
 

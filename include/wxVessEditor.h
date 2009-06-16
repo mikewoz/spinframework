@@ -39,7 +39,7 @@ class wxVessEditor: public wxFrame
 
 		//(*Identifiers(wxVessEditor)
 		static const long ID_VESS_TREE;
-		static const long ID_PANEL1;
+		static const long ID_treePanel;
 		static const long ID_CUSTOM1;
 		static const long ID_PANEL2;
 		static const long ID_SPLITTERWINDOW1;

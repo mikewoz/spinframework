@@ -14,6 +14,7 @@ Darwin: vessServer asViewer vessServerWX vess.app
 # if you have a custom verion of wxWidgets:
 #WXCONFIG = $(HOME)/svn/wxMac-2.8.9/wx-config
 #WXCONFIG = /usr/local/bin/wx-config
+#WXCONFIG = /usr/bin/wx-config
 
 ########################################################
 ## YOU SHOULDN'T NEED TO CHANGE ANYTHING BEYONG HERE! ##
@@ -49,7 +50,7 @@ ifndef WXCONFIG
   WXCONFIG = "wx-config"
 endif
 WX_LIBS = $(shell $(WXCONFIG) --libs --gl-libs)
-ifeq ($(AS_OS),Darwin)
+ifeq ($(OS),Darwin)
   WX_LIBS += -lwxcode_macu_propgrid-2.8 
 else
   WX_LIBS += -lwxcode_gtk2u_propgrid-2.8

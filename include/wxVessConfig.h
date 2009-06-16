@@ -6,10 +6,9 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/panel.h>
-#include <wx/frame.h>
 //*)
 
-class wxVessConfig: public wxFrame
+class wxVessConfig: public wxPanel
 {
 	public:
 
@@ -21,13 +20,13 @@ class wxVessConfig: public wxFrame
 		wxTextCtrl* rxAddr;
 		wxTextCtrl* txAddr;
 		wxStaticText* StaticText2;
-		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxStaticText* StaticText5;
 		wxTextCtrl* vessID;
 		wxTextCtrl* txPort;
 		wxStaticText* StaticText4;
+		wxPanel* vessConfigPanel;
 		//*)
 
 	private:

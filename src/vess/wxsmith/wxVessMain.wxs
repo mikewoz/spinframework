@@ -154,16 +154,16 @@
 			</object>
 			<object class="tool" name="wxVess_showEditor" variable="ToolBarItem4" member="yes">
 				<label>Editor</label>
-				<bitmap>../bitmaps/icon_tree.xpm</bitmap>
-				<bitmap2>../bitmaps/icon_tree.xpm</bitmap2>
+				<bitmap>../images/icon_tree.xpm</bitmap>
+				<bitmap2>../images/icon_tree.xpm</bitmap2>
 				<tooltip>Show the editor</tooltip>
 				<longhelp>Show the editor</longhelp>
 				<handler function="OnShowEditor" entry="EVT_TOOL" />
 			</object>
 			<object class="tool" name="wxVess_showRenderer" variable="ToolBarItem5" member="yes">
 				<label>Renderer</label>
-				<bitmap>../bitmaps/icon_3Dsphere.xpm</bitmap>
-				<bitmap2>../bitmaps/icon_3Dsphere.xpm</bitmap2>
+				<bitmap>../images/icon_3Dsphere.xpm</bitmap>
+				<bitmap2>../images/icon_3Dsphere.xpm</bitmap2>
 				<tooltip>Show the rendered 3D view</tooltip>
 				<longhelp>Show the rendered 3D view</longhelp>
 				<handler function="OnShowRenderer" entry="EVT_TOOL" />

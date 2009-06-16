@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxFrame" name="wxVessConfig">
-		<title>SpIF :: Configuration</title>
+	<object class="wxPanel" name="wxVessConfig">
 		<pos_arg>1</pos_arg>
 		<size_arg>1</size_arg>
-		<handler function="OnClose" entry="EVT_CLOSE" />
-		<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+		<object class="wxPanel" name="ID_PANEL1" variable="vessConfigPanel" member="yes">
 			<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 				<orient>wxVERTICAL</orient>
 				<object class="sizeritem">
@@ -34,7 +32,7 @@
 				</object>
 				<object class="sizeritem">
 					<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
-						<label>Listening Channel:</label>
+						<label>VESS Channel:</label>
 						<object class="sizeritem">
 							<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 								<cols>4</cols>
@@ -91,7 +89,7 @@
 				</object>
 				<object class="sizeritem">
 					<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-						<label>Broadcasting Channel:</label>
+						<label>Broadcast Channel:</label>
 						<object class="sizeritem">
 							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 								<cols>4</cols>

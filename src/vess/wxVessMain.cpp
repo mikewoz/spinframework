@@ -101,7 +101,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer1;
     wxMenu* Menu2;
     wxMenuBar* wxVess_MenuBar;
-
+    
     Create(parent, wxID_ANY, _("SPIN Framework"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(500,400));
     {
@@ -168,11 +168,11 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
     ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
     ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_REPORT_VIEW")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_REPORT_VIEW")),wxART_TOOLBAR), wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
-    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxBitmap(wxImage(_T("../bitmaps/icon_tree.xpm"))), wxBitmap(wxImage(_T("../bitmaps/icon_tree.xpm"))), wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
-    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxBitmap(wxImage(_T("../bitmaps/icon_3Dsphere.xpm"))), wxBitmap(wxImage(_T("../bitmaps/icon_3Dsphere.xpm"))), wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
+    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxBitmap(wxImage(_T("../images/icon_tree.xpm"))), wxBitmap(wxImage(_T("../images/icon_tree.xpm"))), wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
+    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxBitmap(wxImage(_T("../images/icon_3Dsphere.xpm"))), wxBitmap(wxImage(_T("../images/icon_3Dsphere.xpm"))), wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
     wxVess_ToolBar->Realize();
     SetToolBar(wxVess_ToolBar);
-
+    
     Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&wxVessMain::OnStartStopToggle);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnLoadScene);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnSaveScene);

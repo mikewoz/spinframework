@@ -18,7 +18,7 @@ extern pthread_mutex_t pthreadLock;
 
 //(*IdInit(wxVessEditor)
 const long wxVessEditor::ID_VESS_TREE = wxNewId();
-const long wxVessEditor::ID_PANEL1 = wxNewId();
+const long wxVessEditor::ID_treePanel = wxNewId();
 const long wxVessEditor::ID_CUSTOM1 = wxNewId();
 const long wxVessEditor::ID_PANEL2 = wxNewId();
 const long wxVessEditor::ID_SPLITTERWINDOW1 = wxNewId();
@@ -39,13 +39,13 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	//(*Initialize(wxVessEditor)
 	wxBoxSizer* BoxSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
-
-	Create(parent, wxID_ANY, _("SpiF :: Editor"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
+	
+	Create(parent, wxID_ANY, _("SPIN :: Editor"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(-1,600));
 	vessEditor_splitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
-	vessEditor_splitter->SetMinSize(wxSize(10,10));
+	vessEditor_splitter->SetMinSize(wxSize(50,50));
 	vessEditor_splitter->SetMinimumPaneSize(50);
-	treePanel = new wxPanel(vessEditor_splitter, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	treePanel = new wxPanel(vessEditor_splitter, ID_treePanel, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_treePanel"));
 	BoxSizer1 = new wxBoxSizer(wxVERTICAL);
 	vessTree = new wxVessTreeCtrl(treePanel,ID_VESS_TREE,wxDefaultPosition,wxDefaultSize,wxTR_DEFAULT_STYLE,wxDefaultValidator,_T("ID_VESS_TREE"));
 	BoxSizer1->Add(vessTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -67,7 +67,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	ToolBarItem4 = wxVessEditor_ToolBar->AddTool(vessEditor_debugPrint, _("DebugPrint"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
 	wxVessEditor_ToolBar->Realize();
 	SetToolBar(wxVessEditor_ToolBar);
-
+	
 	Connect(vessEditor_newNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnNewNode);
 	Connect(vessEditor_clear,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnClear);
 	Connect(vessEditor_refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnRefresh);

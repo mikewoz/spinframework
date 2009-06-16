@@ -2,111 +2,36 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="vessServerWX" />
 	<File name="../../include/asReferenced.h" open="0" top="0" tabpos="0">
-		<Cursor position="5758" topLine="148" />
+		<Cursor position="916" topLine="3" />
 	</File>
-	<File name="../../include/asSceneManager.h" open="0" top="0" tabpos="7">
-		<Cursor position="2720" topLine="79" />
+	<File name="../../include/wxVessConfig.h" open="1" top="0" tabpos="3">
+		<Cursor position="172" topLine="0" />
 	</File>
-	<File name="../../include/asUtil.h" open="0" top="0" tabpos="0">
-		<Cursor position="266" topLine="0" />
+	<File name="../../include/wxVessEditor.h" open="0" top="0" tabpos="8">
+		<Cursor position="0" topLine="17" />
 	</File>
-	<File name="../../include/asVideo.h" open="0" top="0" tabpos="0">
-		<Cursor position="3242" topLine="78" />
+	<File name="../../include/wxVessRenderer.h" open="0" top="0" tabpos="0">
+		<Cursor position="0" topLine="92" />
 	</File>
-	<File name="../../include/mainpage.h" open="0" top="0" tabpos="9">
-		<Cursor position="870" topLine="0" />
+	<File name="NewPanel.h" open="1" top="0" tabpos="5">
+		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../include/osgUtil.h" open="0" top="0" tabpos="0">
-		<Cursor position="1906" topLine="33" />
+	<File name="asUtil.cpp" open="0" top="0" tabpos="1">
+		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../include/vessLog.h" open="0" top="0" tabpos="0">
-		<Cursor position="208" topLine="0" />
+	<File name="vessThreads.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="4435" topLine="95" />
 	</File>
-	<File name="../../include/vessThreads.h" open="1" top="0" tabpos="2">
-		<Cursor position="530" topLine="22" />
+	<File name="wxVessConfig.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="85" topLine="7" />
 	</File>
-	<File name="asConstraints.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="2101" topLine="51" />
+	<File name="wxVessEditor.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="243" topLine="0" />
 	</File>
-	<File name="asRayIntersector.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="528" topLine="0" />
-	</File>
-	<File name="asReferenced.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="3700" topLine="328" />
-	</File>
-	<File name="asSceneManager.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="148" topLine="180" />
-	</File>
-	<File name="asUtil.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="212" topLine="1" />
-	</File>
-	<File name="asVideo.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="4781" topLine="181" />
-	</File>
-	<File name="asViewer.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="2049" topLine="55" />
-	</File>
-	<File name="vess.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="3948" topLine="69" />
-	</File>
-	<File name="vessLog.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="163" topLine="0" />
-	</File>
-	<File name="vessServer.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="5888" topLine="92" />
-	</File>
-	<File name="vessThreads.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="2996" topLine="55" />
-	</File>
-	<File name="vessWX.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="599" topLine="16" />
-	</File>
-	<File name="wxVessEditor.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="259" topLine="6" />
-	</File>
-	<File name="wxVessEditor.h" open="0" top="0" tabpos="2">
-		<Cursor position="381" topLine="19" />
-	</File>
-	<File name="wxVessMain.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="8688" topLine="151" />
-	</File>
-	<File name="wxVessMain.h" open="1" top="0" tabpos="4">
-		<Cursor position="3089" topLine="75" />
-	</File>
-	<File name="wxVessPropGrid.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="16321" topLine="398" />
-	</File>
-	<File name="wxVessPropGrid.h" open="1" top="0" tabpos="2">
-		<Cursor position="1597" topLine="38" />
+	<File name="wxVessMain.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="2948" topLine="80" />
 	</File>
 	<File name="wxVessRenderer.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="2469" topLine="178" />
-	</File>
-	<File name="wxVessTreeCtrl.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="8946" topLine="202" />
-	</File>
-	<File name="wxVessTreeCtrl.h" open="0" top="0" tabpos="5">
-		<Cursor position="2648" topLine="61" />
-	</File>
-	<File name="wxVessTreeVisitor.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="6007" topLine="186" />
-	</File>
-	<File name="wxVessTreeVisitor.h" open="0" top="0" tabpos="4">
-		<Cursor position="1828" topLine="23" />
-	</File>
-	<File name="../wxOSG/wxOsgPropGrid.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="2434" topLine="0" />
-	</File>
-	<File name="../wxOSG/wxOsgSceneTreeVisitor.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="1252" topLine="9" />
-	</File>
-	<File name="../wxOSG/wxOsgSceneTreeVisitor.h" open="0" top="0" tabpos="2">
-		<Cursor position="1570" topLine="30" />
-	</File>
-	<File name="../wxOSG/wxOsgTreeCtrl.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="2564" topLine="158" />
-	</File>
-	<File name="../wxOSG/wxOsgTreeCtrl.h" open="0" top="0" tabpos="4">
-		<Cursor position="1182" topLine="24" />
+		<Cursor position="401" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>
