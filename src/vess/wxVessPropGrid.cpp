@@ -1,28 +1,49 @@
-/*
- * original file: wxOsgPropGrid.cpp
- *
- *   This file is a part of Orihalcon Framework Library.
- *
- *   Copyright (C) 2005 by Toshiyuki Takahei <takahei@orihalcon.jp>
- *
- *   All rights reserved.
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License (LGPL) as
- * published by the Free Software Foundation; either version 2.1 of the
- * License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
- * License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA or go to
- * http://www.gnu.org/copyleft/lesser.txt
- *
- */
+// -----------------------------------------------------------------------------
+// |    ___  ___  _  _ _     ___                                        _      |
+// |   / __>| . \| || \ |   | __>_ _  ___ ._ _ _  ___  _ _ _  ___  _ _ | |__   |
+// |   \__ \|  _/| ||   |   | _>| '_><_> || ' ' |/ ._>| | | |/ . \| '_>| / /   |
+// |   <___/|_|  |_||_\_|   |_| |_|  <___||_|_|_|\___.|__/_/ \___/|_|  |_\_\   |
+// |                                                                           |
+// |---------------------------------------------------------------------------|
+//
+// http://spinframework.sourceforge.net
+// Copyright (C) 2009 Mike Wozniewski, Zack Settel
+//
+// Developed/Maintained by:
+//    Mike Wozniewski (http://www.mikewoz.com)
+//    Zack Settel (http://www.sheefa.net/zack)
+// 
+// Principle Partners:
+//    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
+//    La SociŽtŽ des Arts Technologiques (http://www.sat.qc.ca)
+//
+// Funding by:
+//    NSERC/Canada Council for the Arts - New Media Initiative
+//    Heritage Canada
+//    Ministere du Developpement economique, de l'Innovation et de l'Exportation
+//
+// -----------------------------------------------------------------------------
+//  This file is part of the SPIN Framework.
+//
+//  SPIN Framework is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  SPIN Framework is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the Lesser GNU General Public License
+//  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
+// -----------------------------------------------------------------------------
+//
+//  NOTE: This file is based on source code from the Orihalcon Framework Library
+//  Copyright (C) 2005 by Toshiyuki Takahei <takahei@orihalcon.jp>
+//  (Released under the GNU Lesser General Public License)
+//
+// -----------------------------------------------------------------------------
 
 #include <osgIntrospection/Value>
 #include <osgIntrospection/Type>
@@ -103,18 +124,27 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
     //pToolBar->Realize();
 
 
-    // we'll set up an OSC receiver to listen to messages for the currently
-    // selected node:
-    /*
-	if (isMulticastAddress(vess->txAddr))
-	{
-		this->rxServ = lo_server_thread_new_multicast(vess->txAddr.c_str(), vess->txPort.c_str(), oscParser_error);
-		std::cout << "propGrid is listening on " << vess->txAddr << ":" << vess->txPort << std::endl;
-	} else {
-		this->rxServ = lo_server_thread_new(vess->txPort.c_str(), oscParser_error);
-	}
-	lo_server_thread_start(rxServ);
-    */
+    // We'll set up an OSC receiver to listen to messages for the currently
+    // selected node. Note that we MUST listen to the broadcast channel and not
+    // to vessChannel directly. This is because VESS might broadcast different
+    // messages than it receives (eg, it receives a 'move' message, but will
+    // transmit a 'setTranslation' message).
+    if (vess->sceneManager->isSlave())
+    {
+        // if this sceneManager is already a listener, then we can just hijack
+        // the rxServ and add our own method callbacks.
+        listeningServer = vess->sceneManager->rxServ;
+    }
+    else
+    {
+        // if this sceneManager is a server, then we have to create a new server
+        // that listens to the meassages it is broadcasting
+        if (isMulticastAddress(vess->sceneManager->txAddr))
+            listeningServer = lo_server_thread_new_multicast(vess->txAddr.c_str(), vess->txPort.c_str(), oscParser_error);
+        else
+            listeningServer = lo_server_thread_new(vess->txPort.c_str(), oscParser_error);
+        lo_server_thread_start(listeningServer);
+    }
 }
 
 /*!
@@ -166,28 +196,9 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
         // Parse this class:
         GenerateProperties(classType, newNode);
 
-/*
-        // set  the OSC receiver to listen for messages related to the new node:
-        if (rxServ)
-        {
-            std::string oscPattern;
-
-            // remove previously selected method:
-            if (currentNode.valid())
-            {
-                oscPattern = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
-                lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
-            }
-
-            // add the method with the new
-            oscPattern = "/vess/" + vess->id + "/" + std::string(newNode->id->s_name);
-            lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, wxVessPropGrid_liblo_callback, (void*)this);
-        }
-*/
-
-        // Add a callback method to the sceneManager's OSC receiving server that
-        // willi listen for messages related to the new node, and update props:
-        if (vess->sceneManager->rxServ)
+        // Add a callback method to the listeningServer that will listen for
+        // messages related to the new node, and update props:
+        if (listeningServer)
         {
             std::string oscPattern;
 
@@ -195,12 +206,12 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
             if (currentNode.valid())
             {
                 oscPattern = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
-                lo_server_del_method_with_userdata(lo_server_thread_get_server(vess->sceneManager->rxServ), oscPattern.c_str(), NULL, (void*)this);
+                lo_server_del_method_with_userdata(lo_server_thread_get_server(listeningServer), oscPattern.c_str(), NULL, (void*)this);
             }
 
             // add the new method:
             oscPattern = "/vess/" + vess->id + "/" + std::string(newNode->id->s_name);
-            lo_server_thread_add_method(vess->sceneManager->rxServ, oscPattern.c_str(), NULL, wxVessPropGrid_liblo_callback, (void*)this);
+            lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessPropGrid_liblo_callback, (void*)this);
         }
 
         // finally, update our internal pointer:
@@ -264,7 +275,7 @@ void wxVessPropGrid::UpdateFromVess()
 void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType, asReferenced* pObject)
 {
 
-	std::cout << "wxVessPropGrid::GenerateProperties for class=" << classType.getQualifiedName() << ", id=" << pObject->id->s_name << std::endl;
+	//std::cout << "wxVessPropGrid::GenerateProperties for class=" << classType.getQualifiedName() << ", id=" << pObject->id->s_name << std::endl;
 
     wxString className = wxString(classType.getQualifiedName().c_str(), wxConvUTF8);
 
@@ -280,7 +291,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
         const MethodInfo* method = *methodIter;
         const ParameterInfoList& params = method->getParameters();
 
-        std::cout << "  Found method: " << method->getName() << ", numParams=" << params.size() << ", virtual?=" << method->isVirtual() << ", void?=" << method->getReturnType().isVoid() << std::endl;
+        //std::cout << "  Found method: " << method->getName() << ", numParams=" << params.size() << ", virtual?=" << method->isVirtual() << ", void?=" << method->getReturnType().isVoid() << std::endl;
         wxString methodName = wxString(method->getName().c_str(), wxConvUTF8);
 
         // We look for all void methods which take at least 1 argument. However,
@@ -310,7 +321,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
 
                 if (param->getParameterType().isDefined())
                 {
-                    std::cout << "    param: " << param->getName() << ", type: " << param->getParameterType().getQualifiedName() << std::endl;
+                    //std::cout << "    param: " << param->getName() << ", type: " << param->getParameterType().getQualifiedName() << std::endl;
 
                     // If it's just one param, display the method as the label,
                     // otherwise the method is already displayed as a parent so
@@ -436,7 +447,7 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 
     wxPGId parent = event.GetMainParent();
 
-    std::cout << "OnPropertyChanged: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << id->GetValueAsString().mb_str() << std::endl;
+    //std::cout << "OnPropertyChanged: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << id->GetValueAsString().mb_str() << std::endl;
 
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, parent->GetBaseName().mb_str());
@@ -454,7 +465,18 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
     }
 
 	std::string OSCpath = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
-	lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
+
+	// If this sceneManager is just a listener, then we nees to send to the
+	// broadcastChannel. Otherwise, we send to the (unicast) rxAddr of this
+	// server.
+    if (vess->sceneManager->isSlave())
+    {
+        //lo_send_message(???, OSCpath.c_str(), msg);
+    }
+    else
+        lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
+
+
 	lo_message_free(msg);
 
 	//event.Veto();
@@ -486,7 +508,7 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId )
 {
     std::string t = std::string(propId->GetValueType().mb_str());
 
-    std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << propId->GetValueAsString().mb_str() << std::endl;
+    //std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << propId->GetValueAsString().mb_str() << std::endl;
 
     if ( t=="string" || t=="std::string" || t=="char *" || t=="const char *" )
     {
@@ -531,7 +553,7 @@ void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_
             if (parentId->GetChildCount()) propId = parentId->Item(i-1);
             else propId = parentId;
 
-
+            /*
             std::cout << " setting wxProp: " << propId->GetBaseName().mb_str() << " (type=" << propId->GetValueType().mb_str() << ") from lo_arg:";
             if (lo_is_numerical_type((lo_type)argTypes[i]))
             {
@@ -540,7 +562,7 @@ void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_
                 std::cout << " " << (char*) argv[i];
             }
             std::cout << " (type=" << argTypes[i] << ")" << std::endl;
-
+            */
 
 
             if (argTypes[i]=='s')
@@ -575,7 +597,7 @@ void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_
 
 int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
-    	// make sure there is at least one argument (ie, a method to call):
+    // make sure there is at least one argument (ie, a method to call):
 	if (!argc) return 0;
 
     wxVessPropGrid *propGrid = (wxVessPropGrid*) user_data;
@@ -584,6 +606,8 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
 
     std::string parentString = propGrid->GetCurrentNode()->nodeType + "." + std::string((char*)argv[0]);
     wxPGId parentId = propGrid->GetGrid()->GetRoot()->GetPropertyByName( wxString(parentString.c_str(), wxConvUTF8) );
+
+    std::cout << "Got update for current propgrid node: " << parentString << std::endl;
 
     if (parentId)
     {

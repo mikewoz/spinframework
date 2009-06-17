@@ -1,48 +1,43 @@
-// ===================================================================
-// Audioscape library for PureData
-// Copyright (c) 2007
+// -----------------------------------------------------------------------------
+// |    ___  ___  _  _ _     ___                                        _      |
+// |   / __>| . \| || \ |   | __>_ _  ___ ._ _ _  ___  _ _ _  ___  _ _ | |__   |
+// |   \__ \|  _/| ||   |   | _>| '_><_> || ' ' |/ ._>| | | |/ . \| '_>| / /   |
+// |   <___/|_|  |_||_\_|   |_| |_|  <___||_|_|_|\___.|__/_/ \___/|_|  |_\_\   |
+// |                                                                           |
+// |---------------------------------------------------------------------------|
 //
-// Collaborators:
-//    Shared Reality Lab (SRE), McGill University Centre for Intelligent Machines (CIM)
-//       www.cim.mcgill.ca/sre
-//    La Société des Arts Technologiques (SAT)
-//       www.sat.qc.ca
+// http://spinframework.sourceforge.net
+// Copyright (C) 2009 Mike Wozniewski, Zack Settel
 //
-// Project Directors:
-//    Science - Jeremy R. Cooperstock (SRE/CIM)
-//    Arts - Zack Settel
+// Developed/Maintained by:
+//    Mike Wozniewski (http://www.mikewoz.com)
+//    Zack Settel (http://www.sheefa.net/zack)
+// 
+// Principle Partners:
+//    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
+//    La Soci�t� des Arts Technologiques (http://www.sat.qc.ca)
 //
-// Conception:
-//    Zack Settel
-//
-// Development Team:
-//    Mike Wozniewski (SRE/CIM): Researcher, Head Developer
-//    Zack Settel: Artist, Researcher, Audio/DSP programming
-//    Jean-Michel Dumas (SAT): Assistant Researcher
-//    Mitchel Benovoy (SRE/CIM): Video Texture Programming
-//    Stéphane Pelletier (SRE/CIM): Video Texture Programming
-//    Pierre-Olivier Charlebois (SRE/CIM): Former Developer
-//
-// Funding by / Souventionné par:
-//    Natural Sciences and Engineering Research Council of Canada (NSERC)
-//    Canada Council for the Arts
+// Funding by:
 //    NSERC/Canada Council for the Arts - New Media Initiative
+//    Heritage Canada
+//    Ministere du Developpement economique, de l'Innovation et de l'Exportation
 //
-// ===================================================================
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+// -----------------------------------------------------------------------------
+//  This file is part of the SPIN Framework.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+//  SPIN Framework is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
 //
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ===================================================================
+//  SPIN Framework is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the Lesser GNU General Public License
+//  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
+// -----------------------------------------------------------------------------
 
 #include <string>
 #include <stdio.h>

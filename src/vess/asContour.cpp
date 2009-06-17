@@ -1,48 +1,43 @@
-// =============================================================================
-//                    .___.__                                                 //
-//   _____   __ __  __| _/|__| ____  ______ ____ _____  ______   ____         //
-//   \__  \ |  |  \/ __ | |  |/  _ \/  ___// ___\\__  \ \____ \_/ __ \        //
-//    / __ \|  |  / /_/ | |  (  <_> )___ \\  \___ / __ \|  |_> >  ___/        //
-//   (____  /____/\____ | |__|\____/____  >\___  >____  /   __/ \___  >       //
-//        \/           \/               \/     \/     \/|__|        \/  .ORG  //
-//                                                                            //
-// =============================================================================
-// The Audioscape Project :: www.audioscape.org
-// Copyright (c) 2009
+// -----------------------------------------------------------------------------
+// |    ___  ___  _  _ _     ___                                        _      |
+// |   / __>| . \| || \ |   | __>_ _  ___ ._ _ _  ___  _ _ _  ___  _ _ | |__   |
+// |   \__ \|  _/| ||   |   | _>| '_><_> || ' ' |/ ._>| | | |/ . \| '_>| / /   |
+// |   <___/|_|  |_||_\_|   |_| |_|  <___||_|_|_|\___.|__/_/ \___/|_|  |_\_\   |
+// |                                                                           |
+// |---------------------------------------------------------------------------|
 //
+// http://spinframework.sourceforge.net
+// Copyright (C) 2009 Mike Wozniewski, Zack Settel
 //
-// Organizations:
-// - McGill University, Shared Reality Lab (SRE) :: www.cim.mcgill.ca/sre
-// - La Societe des Arts Technologiques (SAT) :: www.sat.qc.ca
-// - Universite de Montreal :: www.umontreal.ca
+// Developed/Maintained by:
+//    Mike Wozniewski (http://www.mikewoz.com)
+//    Zack Settel (http://www.sheefa.net/zack)
+// 
+// Principle Partners:
+//    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
+//    La SociŽtŽ des Arts Technologiques (http://www.sat.qc.ca)
 //
-// Development Team:
-// - Mike Wozniewski (www.mikewoz.com): Head Developer, Researcher
-// - Zack Settel (www.sheefa.net/zack): Conception, Research, Artist, Programmer
-// - Jeremy Cooperstock (cim.mcgill.ca/~jer): Project Coordinator
-// - Sylvain Cormier: Programmer, Tester
-// - Jean-Michel Dumas: Assistant, Programmer
-// - Pierre-Olivier Charlebois: Programmer
+// Funding by:
+//    NSERC/Canada Council for the Arts - New Media Initiative
+//    Heritage Canada
+//    Ministere du Developpement economique, de l'Innovation et de l'Exportation
 //
-// Funding by / Subventionne par:
-//    Natural Sciences and Engineering Research Council of Canada (NSERC)
-//    Canada Council for the Arts
+// -----------------------------------------------------------------------------
+//  This file is part of the SPIN Framework.
 //
-// =============================================================================
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+//  SPIN Framework is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
+//  SPIN Framework is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// =============================================================================
+//  You should have received a copy of the Lesser GNU General Public License
+//  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
+// -----------------------------------------------------------------------------
 
 #include <osg/Geometry>
 #include <osgUtil/Optimizer>

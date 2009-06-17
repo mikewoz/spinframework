@@ -1,30 +1,49 @@
-/*
- *
- *
- * original file: wxOsgPropGrid.h
- *
- *   This file is a part of Orihalcon Framework Library.
- *
- *   Copyright (C) 2005 by Toshiyuki Takahei <takahei@orihalcon.jp>
- *
- *   All rights reserved.
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License (LGPL) as
- * published by the Free Software Foundation; either version 2.1 of the
- * License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
- * License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA or go to
- * http://www.gnu.org/copyleft/lesser.txt
- *
- */
+// -----------------------------------------------------------------------------
+// |    ___  ___  _  _ _     ___                                        _      |
+// |   / __>| . \| || \ |   | __>_ _  ___ ._ _ _  ___  _ _ _  ___  _ _ | |__   |
+// |   \__ \|  _/| ||   |   | _>| '_><_> || ' ' |/ ._>| | | |/ . \| '_>| / /   |
+// |   <___/|_|  |_||_\_|   |_| |_|  <___||_|_|_|\___.|__/_/ \___/|_|  |_\_\   |
+// |                                                                           |
+// |---------------------------------------------------------------------------|
+//
+// http://spinframework.sourceforge.net
+// Copyright (C) 2009 Mike Wozniewski, Zack Settel
+//
+// Developed/Maintained by:
+//    Mike Wozniewski (http://www.mikewoz.com)
+//    Zack Settel (http://www.sheefa.net/zack)
+// 
+// Principle Partners:
+//    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
+//    La SociŽtŽ des Arts Technologiques (http://www.sat.qc.ca)
+//
+// Funding by:
+//    NSERC/Canada Council for the Arts - New Media Initiative
+//    Heritage Canada
+//    Ministere du Developpement economique, de l'Innovation et de l'Exportation
+//
+// -----------------------------------------------------------------------------
+//  This file is part of the SPIN Framework.
+//
+//  SPIN Framework is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  SPIN Framework is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the Lesser GNU General Public License
+//  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
+// -----------------------------------------------------------------------------
+//
+//  NOTE: This file is based on source code from the Orihalcon Framework Library
+//  Copyright (C) 2005 by Toshiyuki Takahei <takahei@orihalcon.jp>
+//  (Released under the GNU Lesser General Public License)
+//
+// -----------------------------------------------------------------------------
 
 #ifndef _WXVESSPROPGRID_H_
 #define _WXVESSPROPGRID_H_
@@ -87,6 +106,8 @@ protected:
     void OnToolbarClicked(wxCommandEvent& event);
 
     osg::ref_ptr<asReferenced> currentNode;    //!< Current osg object
+
+    lo_server_thread listeningServer;
 
     DECLARE_EVENT_TABLE()
 };
