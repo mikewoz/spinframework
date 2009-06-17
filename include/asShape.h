@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Société des Arts Technologiques (http://www.sat.qc.ca)
@@ -77,7 +77,7 @@ public:
 	void setShape			(shapeType s);
 	//void setShape			(char* newShape);
 
-	void setColor			(float r, float g, float b, float a);
+	void setColor			(float red, float green, float blue, float alpha);
 	void setTexture			(int newTexture);
 	void setTextureFromFile	(char* newTexture);
 	void setRenderBin		(int i);

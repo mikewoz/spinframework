@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Socit des Arts Technologiques (http://www.sat.qc.ca)
@@ -139,7 +139,7 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
     {
         // if this sceneManager is a server, then we have to create a new server
         // that listens to the meassages it is broadcasting
-        if (isMulticastAddress(vess->sceneManager->txAddr))
+        if (isMulticastAddress(vess->txAddr))
             listeningServer = lo_server_thread_new_multicast(vess->txAddr.c_str(), vess->txPort.c_str(), oscParser_error);
         else
             listeningServer = lo_server_thread_new(vess->txPort.c_str(), oscParser_error);
@@ -342,7 +342,6 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                         wxArrayString arrLabels;
                         wxArrayInt arrIDs;
 
-
                         for (EnumLabelMap::const_iterator enumIter=enumLabels.begin(); enumIter!=enumLabels.end(); enumIter++)
                         {
                             arrLabels.Add(wxString((*enumIter).second.c_str(), wxConvUTF8));
@@ -386,8 +385,10 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                         }
                         else
                         {
+                            /*
                             propId = AppendIn(parentId, new wxStringProperty(propName, wxPG_LABEL, wxT("[unkown type]") ));
                             EnableProperty(propId, false);
+                            */
                         }
                     }
 
@@ -410,6 +411,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                             }
                             helpText += wxT(" >\n");
                         }
+                        helpText += wxString(method->getBriefHelp().c_str(), wxConvUTF8) + wxT("\n");
                         helpText += wxString(method->getDetailedHelp().c_str(), wxConvUTF8) + wxT("\n");
                         SetPropertyHelpString(propId, helpText);
                     }
@@ -471,7 +473,7 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 	// server.
     if (vess->sceneManager->isSlave())
     {
-        //lo_send_message(???, OSCpath.c_str(), msg);
+        lo_send_message(vess->lo_infoServ, OSCpath.c_str(), msg);
     }
     else
         lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
@@ -611,10 +613,10 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
 
     if (parentId)
     {
-        //propGrid->GetGrid()->Freeze();
+        propGrid->GetGrid()->Freeze();
         wxProp_from_lo_message(parentId, types, argc, argv);
-        propGrid->GetGrid()->RefreshProperty(parentId);
-        //propGrid->GetGrid()->Thaw();
+        //propGrid->GetGrid()->RefreshProperty(parentId);
+        propGrid->GetGrid()->Thaw();
     }
 
 	return 1;
