@@ -15,7 +15,7 @@
 // 
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
-//    La Société des Arts Technologiques (http://www.sat.qc.ca)
+//    La Societe des Arts Technologiques (http://www.sat.qc.ca)
 //
 // Funding by:
 //    NSERC/Canada Council for the Arts - New Media Initiative

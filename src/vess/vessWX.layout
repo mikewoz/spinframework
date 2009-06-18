@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="vessServerWX" />
-	<File name="../../include/asReferenced.h" open="1" top="1" tabpos="8">
-		<Cursor position="0" topLine="0" />
+	<File name="../../include/asReferenced.h" open="0" top="0" tabpos="8">
+		<Cursor position="1250" topLine="9" />
 	</File>
 	<File name="../../include/asSceneManager.h" open="1" top="0" tabpos="5">
 		<Cursor position="2955" topLine="86" />
 	</File>
 	<File name="../../include/asShape.h" open="1" top="0" tabpos="2">
-		<Cursor position="4143" topLine="50" />
+		<Cursor position="2901" topLine="67" />
 	</File>
-	<File name="../../include/vessThreads.h" open="1" top="0" tabpos="6">
-		<Cursor position="376" topLine="0" />
+	<File name="../../include/vessThreads.h" open="0" top="0" tabpos="6">
+		<Cursor position="3357" topLine="70" />
 	</File>
 	<File name="../../include/wxVessConfig.h" open="0" top="0" tabpos="3">
 		<Cursor position="172" topLine="0" />
@@ -25,14 +25,14 @@
 	<File name="../../include/wxVessPropGrid.h" open="1" top="0" tabpos="4">
 		<Cursor position="2586" topLine="62" />
 	</File>
-	<File name="../../include/wxVessRenderer.h" open="0" top="0" tabpos="0">
-		<Cursor position="0" topLine="92" />
+	<File name="../../include/wxVessRenderer.h" open="1" top="0" tabpos="5">
+		<Cursor position="3289" topLine="77" />
 	</File>
 	<File name="NewPanel.h" open="1" top="0" tabpos="5">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="asShape.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="5197" topLine="55" />
+		<Cursor position="9212" topLine="43" />
 	</File>
 	<File name="asUtil.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="0" topLine="0" />
@@ -40,8 +40,8 @@
 	<File name="asViewer.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="3153" topLine="64" />
 	</File>
-	<File name="vessThreads.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="5185" topLine="0" />
+	<File name="vessThreads.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="3981" topLine="102" />
 	</File>
 	<File name="wxVessConfig.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="85" topLine="7" />
@@ -53,7 +53,7 @@
 		<Cursor position="2948" topLine="80" />
 	</File>
 	<File name="wxVessPropGrid.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="17982" topLine="434" />
+		<Cursor position="16230" topLine="573" />
 	</File>
 	<File name="wxVessRenderer.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="401" topLine="0" />
