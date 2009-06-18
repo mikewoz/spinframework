@@ -51,14 +51,14 @@ SPIN_LIBS += -L../osgWrappers
 ifndef WXCONFIG
   WXCONFIG = "wx-config"
 endif
+WX_LIBTYPE = $(patsubst wx_%,%,$(shell $(WXCONFIG) --basename))
+
 WX_LIBS = $(shell $(WXCONFIG) --libs --gl-libs)
-ifeq ($(OS),Darwin)
-  WX_LIBS += -lwxcode_macu_propgrid-2.8 
-else
-  WX_LIBS += -lwxcode_gtk2u_propgrid-2.8
-endif
 WX_CXXFLAGS = $(shell $(WXCONFIG) --cxxflags)
 WX_VERSION = $(shell $(WXCONFIG) --version)
+
+# wxPropGrid library:
+WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 
 ###################################################################
 # GENERIC COMPILATION RULE
