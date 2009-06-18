@@ -2,7 +2,7 @@
 <wxsmith>
 	<object class="wxFrame" name="wxVessMain">
 		<title>SPIN Framework</title>
-		<icon>/Users/mikewoz/svn/audioscape/trunk/src/images/logo_SPIN_simple.tif</icon>
+		<icon>../images/logo_SPIN_simple.png</icon>
 		<size>500,400</size>
 		<id_arg>0</id_arg>
 		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="mainSplitter" member="yes">

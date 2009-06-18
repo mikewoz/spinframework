@@ -138,7 +138,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     SetClientSize(wxSize(500,400));
     {
     	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("/Users/mikewoz/svn/audioscape/trunk/src/images/logo_SPIN_simple.tif"))));
+    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("../images/logo_SPIN_simple.png"))));
     	SetIcon(FrameIcon);
     }
     mainSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER|wxNO_BORDER, _T("ID_SPLITTERWINDOW1"));
