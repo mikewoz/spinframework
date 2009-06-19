@@ -93,10 +93,10 @@ asCameraView::asCameraView(const char *id, osgViewer::CompositeViewer &viewer, o
 	//osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator();
 	
 	osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
-	manipulator->setTrackerMode( osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
+	//manipulator->setTrackerMode( osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	//manipulator->setTrackerMode( osgGA::NodeTrackerManipulator::NODE_CENTER_AND_AZIM );
 	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
-	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::TRACKBALL );
+	manipulator->setRotationMode( osgGA::NodeTrackerManipulator::TRACKBALL );
     
 	manipulator->setTrackNode(this);
 	view->setCameraManipulator(manipulator);
