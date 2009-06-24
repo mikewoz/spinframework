@@ -72,6 +72,10 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 
 ALLTARGETS = vess_old asViewer viewer vessServer vessServerWX
 
+doc: $(OBJS) docGenerator.o
+	@echo "\n------------- Generating Method Documentation: -------------" 
+	$(CXX) -o docGenerator $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
+
 vess_old: $(OBJS) vess.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
