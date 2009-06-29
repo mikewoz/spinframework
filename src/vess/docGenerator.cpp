@@ -67,7 +67,179 @@ using namespace osgIntrospection;
 using namespace std;
 
 
-#define OUTPUT_FILE "OSCprotocol.tmp"
+#define OUTPUT_FILE "oscprotocol.html"
+#define DEBUG 0
+
+
+static bool IsGoodParam(const ParameterInfo& param)
+{
+	/*
+	vector<string> validParams;
+	validParams.push_back("const char *");
+	validParams.push_back("char *");
+	validParams.push_back("int");
+	validParams.push_back("float");
+	validParams.push_back("double");
+	validParams.push_back("bool");
+	*/
+	
+	if ( !param.getParameterType().isDefined() )
+	{
+		if (DEBUG) cout << "  bad param: " << param.getName() << endl;
+		return false;
+	}
+	
+	return true;
+}
+
+static bool IsGoodMethod(const MethodInfo& method)
+{
+
+    // must return void (ie, be a set method)
+    if ( !method.getReturnType().isVoid() ) return false;
+	
+    // virtual methods will eventually be parsed in base class:
+    if ( method.isVirtual() ) return false;
+    
+    // must take at least param??
+    //if ( !method.getNumParams() ) return false
+    
+	// look for some particular method names to ignore:
+	if (method.getName()=="registerNode") return false;
+	if (method.getName()=="attach") return false;
+	if (method.getName()=="detach") return false;
+	if (method.getName()=="updateChildNodePaths") return false;
+	//if (method.getName()=="updateNodePath") return false;
+	//if (method.getName()=="callbackUpdate") return false;
+    
+	
+	return true;
+}
+	
+
+static void GenerateHTML(const osgIntrospection::Type &classType, ofstream& output)
+{
+
+	
+	
+	
+	/*
+	output << "<code>\n";
+	output << "  /vess/{vessID}/{nodeID} <strong>setParent</strong>  <<font color='gray'>(char *)</font> <strong>newParent</strong>>\n";
+	output << "</code><br>\n";
+	output << "&nbsp;&nbsp;&nbsp;&rarr; <small>This method sets the location of the node in the scene graph, adopting the local coordinate system of the newParent.</small><br><br>\n";
+	*/
+
+	if (DEBUG) cout << "TYPE: " << classType.getName() << endl;
+
+	
+	// Look through all methods
+	const MethodInfoList& methods = classType.getMethods();
+	//MethodInfoList methods;
+	//classType.getAllMethods(methods);
+    
+    for (MethodInfoList::const_iterator methodIter=methods.begin(); methodIter!=methods.end(); methodIter++)
+    {
+        const MethodInfo* method = *methodIter;
+        const ParameterInfoList& params = method->getParameters();
+
+        // We look for all void methods which take at least 1 argument. However,
+        // we need to ignore virtual methods, since they are catergorized in the
+        // base class property set.
+        
+        
+        if (DEBUG) cout << "  METHOD: " << method->getName() << "  (virtual=" << method->isVirtual() << ", void=" << method->getReturnType().isVoid() << ", numParams=" << params.size() << ")\t\t";
+
+
+        if (IsGoodMethod(*method))
+        {
+       
+        	output << "<div class='memitem'>\n";
+        	
+        	//output << "<div class='memproto'>\n";
+        	output << "<div>\n";
+        	//output << "<code>\n";
+        	output << "  /vess/{vessID}/{nodeID} <strong>" << method->getName() << "</strong>\n";
+        	
+        	
+        	if (DEBUG) cout << "  PARAMS: ";
+        	
+            // add all param names
+        	for (ParameterInfoList::const_iterator paramIter=params.begin(); paramIter!=params.end(); paramIter++)
+        	{
+        		const ParameterInfo* param = *paramIter;
+        		
+        		if (!IsGoodParam(*param)) continue;
+        		
+        		output << "    &lt;";
+
+        		if (param->getParameterType().isEnum())
+        		{
+        			// paramter is a enum, so just provide all choices
+        			const EnumLabelMap enumLabels = param->getParameterType().getEnumLabels();
+        			for (EnumLabelMap::const_iterator enumIter=enumLabels.begin(); enumIter!=enumLabels.end(); enumIter++)
+        			{
+        				if (enumIter!=enumLabels.begin()) output << ",";
+        				output << "'" << (*enumIter).second.c_str() << "'";
+        			}
+        		}
+        		else
+        		{
+        			//vector<string>::const_iterator it = find(validParams.begin(), validParams.end(), param->getParameterType().getQualifiedName());
+        			//if (it != validParams.end())
+        			//{
+            			// parameter type is standard:
+            			output << "<font color='gray'>(" << param->getParameterType().getQualifiedName() << ")</font> <strong>" << param->getName() << "</strong>";
+        			//}
+            			
+            		if (DEBUG) cout << "(" << param->getParameterType().getQualifiedName() << ") " << param->getName() << ", ";
+        		}
+        		
+        		output << "&gt;\n";
+        	}
+        	
+        	//output << "</code>\n";
+        	output << "</div>\n";
+        	
+        	
+        	// output description:
+        	
+        	output << "<div class='memdoc'>\n";
+        	output << "<blockquote>\n";
+            if (!method->getBriefHelp().empty())
+            {
+            	output << "<small>" << method->getBriefHelp() << "</small>\n";
+            } else {
+            	output << "<font color='gray'><small>&lt;no description available&gt;</small></font>\n";
+            }
+            /*
+            if (!method->getDetailedHelp().empty())
+            {
+            	output << "Details: " << method->getDetailedHelp() << "<br>\n";
+            }
+            */
+            output << "</blockquote>\n";
+            output << "</div>\n";
+            
+
+
+        	output << "</div>\n";
+        	output << "<br>\n";
+            output << "\n";
+            
+            if (DEBUG) cout << endl;
+            
+        } // if desired method
+        
+        else if (DEBUG) cout << "  (rejected)" << endl;
+
+    } // method iterator
+    
+
+}
+
+
+
 
 
 int main()
@@ -83,17 +255,6 @@ int main()
 	
 	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
 	
-	/*
-	vector<string> validParams;
-	validParams.push_back("const char *");
-	validParams.push_back("char *");
-	validParams.push_back("int");
-	validParams.push_back("float");
-	validParams.push_back("double");
-	validParams.push_back("bool");
-	*/
-	
-	/*
 	output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
 	output << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n";
 	output << "<title>SpIF: SPIN (Spatial Interaction) Framework</title>\n";
@@ -103,7 +264,8 @@ int main()
 	output << "<div class=\"navigation\" id=\"top\">\n";
 	output << "  <div class=\"tabs\">\n";
 	output << "    <ul>\n";
-	output << "      <li class=\"current\"><a href=\"index.html\"><span>Main&nbsp;Page</span></a></li>\n";
+	output << "      <li><a href=\"index.html\"><span>Main&nbsp;Page</span></a></li>\n";
+	output << "      <li class=\"current\"><a href=\"pages.html\"><span>Related&nbsp;Pages</span></a></li>\n";
 	output << "      <li><a href=\"annotated.html\"><span>Classes</span></a></li>\n";
 	output << "      <li><a href=\"files.html\"><span>Files</span></a></li>\n";
 	output << "    </ul>\n";
@@ -112,127 +274,80 @@ int main()
 	output << "<div class=\"contents\">\n";
 	output << "<h1>OSC Protocol for SPIN Framework</h1>\n";
 	output << "<p>\n";
-	*/
 	
+	output << "<p>The SPIN Framework is designed so multiple processes can "
+		   << "share state over a network via OpenSoundControl (OSC) messages. "
+		   << "By default, these messages are sent using multicast UDP to the "
+		   << "address of 224.0.0.1, which is known as the the all-hosts group. "
+		   << "Most network interfaces are already members of this multicast "
+		   << "group, so a typical client application need only to start a UDP "
+		   << "listener on the appropriate port to discover messages related to "
+		   << "SPIN.<p>\n";
+		   
+	output << "<p>VESS (the Virtual Environment State Server) multicasts all "
+		   << "state information in a specific OSC format. Furthermore, if a "
+		   << "client wishes to update or modify state on the server, it must "
+		   << "send a properly formatted message. In most cases, the message "
+		   << "will be multicasted back out once it has been processed. This "
+		   << "allows several clients to maintain a synchronous state with the "
+		   << "server, while operating in a distributed fashion.</p>\n";
+	
+	output << "<p>Below is the complete list of accepted OSC messages for the "
+		   << "following nodes:</p>\n";
+		   
 	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-	for ( osgIntrospection::TypeMap::const_iterator it=allTypes.begin(); it!=allTypes.end(); it++)
+	osgIntrospection::TypeMap::const_iterator it;
+	
+	output << "<ul>\n";
+	for (it=allTypes.begin(); it!=allTypes.end(); it++)
 	{
-		const osgIntrospection::Type *classType = (*it).second;
+		const osgIntrospection::Type *classType = ((*it).second);
 		
 		if (classType->isDefined())
 		{
+		
 			if ( classType->isSubclassOf(asReferencedType) )
 			{
-				output << "<h3>" << classType->getName() << "</h3>\n";
+				output << "  <li><a href='#" << classType->getName() << "'>" << classType->getName() << "</a></li>\n";
 				
-				output << "<blockquote>\n";
+			}
+		}
+	}
+	output << "</ul>\n";
+	
+	
+	for (it=allTypes.begin(); it!=allTypes.end(); it++)
+	{
+		const osgIntrospection::Type *classType = ((*it).second);
+		
+		if (classType->isDefined())
+		{
+		
+			if ( classType->isSubclassOf(asReferencedType) )
+			{
 
-				if (!classType->getBriefHelp().empty())
-				{
-					output << "<p><i>" << classType->getBriefHelp() << "</i></p>\n";
-				}
-				
-				if (!classType->getDetailedHelp().empty())
-				{
-					output << "<p><i>" << classType->getDetailedHelp() << "</i></p>\n";
-				}
-				
-				
-				
-			    // Look through all methods
-				//const MethodInfoList& methods = classType->getMethods();
-				
-				MethodInfoList methods;
-				classType->getAllMethods(methods);
-							    
-			    
-			    for (MethodInfoList::const_iterator methodIter=methods.begin(); methodIter!=methods.end(); methodIter++)
-			    {
-			        const MethodInfo* method = *methodIter;
-			        const ParameterInfoList& params = method->getParameters();
-			
-			        // We look for all void methods which take at least 1 argument. However,
-			        // we need to ignore virtual methods, since they are catergorized in the
-			        // base class property set.
-			
-			        if ( !method->isVirtual() && method->getReturnType().isVoid() && params.size() )
-			        {
-			        	ParameterInfoList::const_iterator paramIter;
-			
-			        	// make sure all parameters are defined:
-			        	bool goodParams = true;
-			        	for (paramIter=params.begin(); paramIter!=params.end(); paramIter++)
-			        	{
-			        		if (!(*paramIter)->getParameterType().isDefined())
-			        		{
-			        			goodParams = false;
-			        			break;
-			        		}
-			        	}
-			        	
-			        	if (!goodParams) break;
-			        	
-			        	output << "<p>\n";
-			        	output << "<code>\n";
-			        	output << "  /vess/{vessID}/{nodeID} <strong>" << method->getName() << "</strong>";
-			
-			            // add all param names
-			        	for (paramIter=params.begin(); paramIter!=params.end(); paramIter++)
-			        	{
-			        		const ParameterInfo* param = *paramIter;
-			        		
-			        		output << "  <";
+				output << "<hr\n";
+				output << "<h2><a class='anchor' name='" << classType->getName() << "'>" << classType->getName() << ":</a></h2>\n";
+				output << "<blockquote>\n\n";
 
-		            		if (param->getParameterType().isEnum())
-		            		{
-		            			// paramter is a enum, so just provide all choices
-		            			const EnumLabelMap enumLabels = param->getParameterType().getEnumLabels();
-		            			for (EnumLabelMap::const_iterator enumIter=enumLabels.begin(); enumIter!=enumLabels.end(); enumIter++)
-		            			{
-		            				if (enumIter!=enumLabels.begin()) output << ",";
-		            				output << "'" << (*enumIter).second.c_str() << "'";
-		            			}
-		            		}
-		            		else
-		            		{
-		            			//vector<string>::const_iterator it = find(validParams.begin(), validParams.end(), param->getParameterType().getQualifiedName());
-		            			//if (it != validParams.end())
-		            			//{
-			            			// parameter type is standard:
-			            			output << "<font color='gray'>(" << param->getParameterType().getQualifiedName() << ")</font> <strong>" << param->getName() << "</strong>";
-		            			//}
-		            		}
-			        		
-			        		output << ">";
-			        	}
-			        	
-			        	output << "\n</code>\n";
-			        	
+				
+		        // First go through all base classes and generateHTML:
+				if (DEBUG) cout << endl << classType->getQualifiedName() << " has " << classType->getNumBaseTypes() << " base classes:" << endl;
+		        for (int i=0; i<classType->getNumBaseTypes(); i++)
+		        {
+		            const Type &BaseClassType = classType->getBaseType(i);
+		            
+		            if ((BaseClassType==asReferencedType) || (BaseClassType.isSubclassOf(asReferencedType)))
+		            {
+		            	GenerateHTML(BaseClassType, output);
+		            }
+		        }
+		        
+		        // Then do this class:
+		        GenerateHTML(*classType, output);
+		        
+		    	output << "</blockquote>\n";	
 
-			            if (!method->getBriefHelp().empty())
-			            {
-			            	output << "<blockquote>\n";
-			            	output << "" << method->getBriefHelp() << "<br>\n";
-			            	output << "</blockquote>\n";
-			            }
-			            
-			            /*
-			            if (!method->getDetailedHelp().empty())
-			            {
-			            	output << "<blockquote>\n";
-			            	output << "Details: " << method->getDetailedHelp() << "<br>\n";
-			            	output << "</blockquote>\n";
-			            }
-			            */
-			            
-			            output << "</p>\n";
-			            
-			            
-			        } // if desired method
-			
-			    } // method iterator
-			    
-				output << "</blockquote>\n";
 
 			} // if asReferenced
 		} // if class is defined

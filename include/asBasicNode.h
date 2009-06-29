@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -47,7 +47,7 @@
 #include "asReferenced.h"
 
 #include <osg/Group>
-#include <osg/PositionAttitudeTransform> 
+#include <osg/PositionAttitudeTransform>
 #include <osg/NodeVisitor>
 
 #include <string>
@@ -57,7 +57,7 @@
 /**
  * \brief A basic node to manage translation/orientation/scale of a subgraph.
  *        Allows for grouping of nodes.
- * 
+ *
  * Most nodes in the scene do not have a method to offset their position in the
  * scene. This node provides a mechanism to group and offset nodes.
  */
@@ -65,7 +65,7 @@ class asBasicNode : public asReferenced
 {
 
 public:
-	
+
 	/**
 	 * The constructor takes a string id that will be converted to a t_symbol,
 	 * which contains a pointer to this object. Thus functions will be able to
@@ -75,42 +75,62 @@ public:
 
 	asBasicNode(asSceneManager *sceneManager, char *initID);
 	virtual ~asBasicNode();
-	
+
 	virtual void callbackUpdate();
 
-	
+
 	/**
 	 * IMPORTANT:
 	 * subclasses of asReferenced are allowed to contain complicated subgraphs,
 	 * and can also change their attachmentNode so that children are attached
-	 * anywhere in this subgraph. If that is the case, the updateNodePath()
+	 * anywhere in that subgraph. If that is the case, the updateNodePath()
 	 * function MUST be overridden, and extra nodes must be manually pushed onto
-	 * the currentNodePath.
+	 * currentNodePath.
 	 */
 	virtual void updateNodePath();
-	
+
+	/**
+	 * The reportGlobals flag means that every time this node's matrix changes
+	 * (either directly, or because a parent changed), the translation and
+	 * orientation in the global coordinate system will be reported.
+	 * OSC message format: /vess/nodeID/global6DOF x y z p r y
+	 */
 	void reportGlobals (int b);
+
+	/**
+	 * The local translation offset for this node with respect to it's parent
+	 */
 	void setTranslation (float x, float y, float z);
+
+	/**
+	 * The local orientation offset for this node with respect to it's parent
+	 */
 	void setOrientation (float p, float r, float y);
-	void move (float x, float y, float z);
+
+	/**
+	 * The move command creates a relative translation with respect to the
+	 * node's current orientation. That is, the node will translate along it's
+	 * direction vector (Y-axis) by the supplied number of units
+	 */
+    void move (float x, float y, float z);
 	void rotate (float p, float r, float y);
-	
+
 	int getReportGlobals() { return (int)_reportGlobals; };
 	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
-	
-	
+
+
 	// extra method for globals:
 	void dumpGlobals(bool forced);
-	
-	
+
+
 	/**
 	 * For each subclass of asReferenced, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();
-	
+
 	/**
 	 * We must include a stateDump() method that simply invokes the base class
 	 * method. Simple C++ inheritance is not enough, because osg::Introspection
@@ -119,22 +139,22 @@ public:
 	virtual void stateDump() { asReferenced::stateDump(); dumpGlobals(true); };
 
 
-	
+
 	// ***********************************************************
 	// data:
-	
+
 	osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
 
-	
+
 private:
 	bool _reportGlobals;
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 	osg::Matrix _globalMatrix;
 	osg::Vec3 _globalScale;
 	float _globalRadius;
-		
+
 };
 
 
-	
+
 #endif

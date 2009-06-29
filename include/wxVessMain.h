@@ -58,6 +58,7 @@
 //*)
 
 #include "wxVessConfig.h"
+#include "vessLog.h"
 #include <streambuf>
 
 class wxVessMain: public wxFrame
@@ -140,6 +141,7 @@ class wxVessMain: public wxFrame
         //wxStreamToTextRedirector *redirector;
         std::streambuf *oldstdout;
 #endif
+
 
         DECLARE_EVENT_TABLE()
 };

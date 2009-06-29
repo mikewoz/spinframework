@@ -24,7 +24,7 @@ Darwin: vessServer asViewer vessServerWX vess.app
 vpath %.cpp .  ../tinyxml
 
 OBJS =  vessThreads.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
- 	findNodeVisitor.o DebugVisitor.o \
+ 	findNodeVisitor.o DebugVisitor.o  \
 	tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \
 	asSceneManager.o asMediaManager.o asReferenced.o \
 	asBasicNode.o asShape.o asModel.o asVideo.o asLightSource.o asRay.o asContour.o \
@@ -73,8 +73,10 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ALLTARGETS = vess_old asViewer viewer vessServer vessServerWX
 
 doc: $(OBJS) docGenerator.o
-	@echo "\n------------- Generating Method Documentation: -------------" 
+	@echo "\n------------- Generating OSC Documentation: -------------" 
 	$(CXX) -o docGenerator $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
+	./docGenerator
+	-cp *.html ../../doxygen/html
 
 vess_old: $(OBJS) vess.o
 	@echo "\n--------------- linking $@: ---------------" 

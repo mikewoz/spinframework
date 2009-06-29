@@ -48,6 +48,7 @@
 
 #include "asUtil.h"
 #include "vessThreads.h"
+#include "vessLog.h"
 
 using namespace std;
 
@@ -139,6 +140,10 @@ vessListener::vessListener()
 	std::cout << "  INFO channel: " << lo_address_get_url(lo_infoAddr) << std::endl;
 
 	//lo_server_thread_start(lo_infoServ);
+	
+
+
+
 
 
 	running = false;

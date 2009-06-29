@@ -449,7 +449,7 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 
     wxPGId parent = event.GetMainParent();
 
-    //std::cout << "OnPropertyChanged: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << id->GetValueAsString().mb_str() << std::endl;
+    std::cout << "OnPropertyChanged: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << id->GetValueAsString().mb_str() << std::endl;
 
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, parent->GetBaseName().mb_str());
@@ -609,7 +609,7 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
     std::string parentString = propGrid->GetCurrentNode()->nodeType + "." + std::string((char*)argv[0]);
     wxPGId parentId = propGrid->GetGrid()->GetRoot()->GetPropertyByName( wxString(parentString.c_str(), wxConvUTF8) );
 
-    std::cout << "Got update for current propgrid node: " << parentString << std::endl;
+    //std::cout << "Got update for current propgrid node: " << parentString << std::endl;
 
     if (parentId)
     {
@@ -617,6 +617,7 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
         wxProp_from_lo_message(parentId, types, argc, argv);
         //propGrid->GetGrid()->RefreshProperty(parentId);
         propGrid->GetGrid()->Thaw();
+        //propGrid->GetGrid()->RefreshProperty(parentId);
     }
 
 	return 1;

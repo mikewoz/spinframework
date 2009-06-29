@@ -106,8 +106,7 @@ public:
 	virtual void stateDump() { asReferenced::stateDump(); };
 
 
-	void drawShape();
-	void drawTexture();
+
 
 	// asShape supports simple graphical primitives (ie, spheres, boxes,
 	// cylinders, cones, etc). The shape is attached to a shapeGeode, which
@@ -147,6 +146,8 @@ public:
 
 private:
 
+	void drawShape();
+	void drawTexture();
 
 };
 

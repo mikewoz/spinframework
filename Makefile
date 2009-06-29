@@ -12,6 +12,7 @@ doc:
 	@echo ""; \
 	echo ">>>>>>>>>>>>>>>>>>>>> Generating Documentation <<<<<<<<<<<<<<<<<<<<<"; \
 	doxygen ./doxygen_config	
+	$(MAKE) -C src/vess doc
 
 osgWrappers:
 	@echo ""; \
@@ -31,6 +32,7 @@ vess:
 
 clean:
 	-rm src/osgWrappers/*.cpp
+	-rm -rf doxygen/xml
 	$(MAKE) -C src/osgWrappers clean
 	$(MAKE) -C src/vess clean
 

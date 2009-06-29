@@ -122,30 +122,7 @@ public:
 	 */
 	void updateChildNodePaths();
 
-	/**
-	 * TO BE DEPRECATED?
-	 * It used to be that we wanted to keep a list of all child asReferenced
-	 * nodes that are attached. Was this so that we could differentiate VESS
-	 * nodes from other scene graph node? That seems silly, since one can always
-	 * try a dynamic_cast or use osgIntrospection
-	 */
-	asReferenced *as_getChild(asReferenced *child);
-	/**
-	 * TO BE DEPRECATED?
-	 */
-	void as_addChild(asReferenced *child);
-	/**
-	 * TO BE DEPRECATED?
-	 */
-	void as_removeChild(asReferenced *child);
 
-	/**
-	 * TO BE DEPRECATED?
-	 * The idea is that one type of node can only be attached to certain types
-	 * of other nodes, but that has not been implemented. Currently, the only
-	 * illegal parents include the node itself, or any children.
-	 */
-	bool legalParent (t_symbol *newParent);
 
 	/**
 	 * This method schedules a change in parent for this node. The setParent()
@@ -229,6 +206,32 @@ public:
 
 
 private:
+	
+	/**
+	 * TO BE DEPRECATED?
+	 * It used to be that we wanted to keep a list of all child asReferenced
+	 * nodes that are attached. Was this so that we could differentiate VESS
+	 * nodes from other scene graph node? That seems silly, since one can always
+	 * try a dynamic_cast or use osgIntrospection
+	 */
+	asReferenced *as_getChild(asReferenced *child);
+	/**
+	 * TO BE DEPRECATED?
+	 */
+	void as_addChild(asReferenced *child);
+	/**
+	 * TO BE DEPRECATED?
+	 */
+	void as_removeChild(asReferenced *child);
+
+	/**
+	 * TO BE DEPRECATED?
+	 * The idea is that one type of node can only be attached to certain types
+	 * of other nodes, but that has not been implemented. Currently, the only
+	 * illegal parents include the node itself, or any children.
+	 */
+	bool legalParent (t_symbol *newParent);
+	
 
 };
 

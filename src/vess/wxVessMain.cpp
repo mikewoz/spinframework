@@ -228,18 +228,29 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     // sash position doesn't seem to work in wxSmith, so do it manually:
     mainSplitter->SetSashPosition(30);
 
-    vessConfigFrame = new wxVessConfig(this);
+    vessConfigFrame = new wxVessConfig(0);
     vessConfigFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
     vessConfigFrame->rxAddr->SetValue( wxString( vess->rxAddr.c_str(), wxConvUTF8 ));
     vessConfigFrame->rxPort->SetValue( wxString( vess->rxPort.c_str(), wxConvUTF8 ));
     vessConfigFrame->txAddr->SetValue( wxString( vess->txAddr.c_str(), wxConvUTF8 ));
     vessConfigFrame->txPort->SetValue( wxString( vess->txPort.c_str(), wxConvUTF8 ));
 
-
-    wxFFile logFile(wxT("vessWX.log"),wxT("w+"));
+    
+    //wxFFile logFile(wxT("vessWX.log"),wxT("w+"));
+    //wxLogTextCtrl w = new wxLogTextCtrl(logTextCtrl);
+    //wxLog::SetActiveTarget(w);
     wxLog::SetActiveTarget(new wxLogTextCtrl(logTextCtrl));
-    wxLogChain *LC = new wxLogChain(new wxLogStderr(logFile.fp()));
+    //wxLogChain *LC = new wxLogChain(new wxLogStderr(logFile.fp()));
 
+    
+    vessLog log("vess.log");
+    log.enable_wxlog(true);
+    log.enable_cout(false);
+
+    log << "Started vessLog" << std::endl;
+    
+    
+    
 #if wxUSE_STD_IOSTREAM
     //redirector = new wxStreamToTextRedirector(logTextCtrl);
     oldstdout = std::cout.rdbuf();
@@ -292,16 +303,49 @@ void wxVessMain::OnAbout(wxCommandEvent& event)
 
 void wxVessMain::OnLoadScene(wxCommandEvent& event)
 {
+    if (vess->isRunning())
+    {
+		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
+	 
+		if ( openFileDialog->ShowModal() == wxID_OK )
+		{
+	
+		    std::cout << "Loading scene from file: " << openFileDialog->GetPath().mb_str() << std::endl;
+		   	vess->sceneManager->loadXML( openFileDialog->GetPath().mb_str() );
+		}
+    }
+    else {
+	    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The VESS server needs to be started before you can load scenes."), wxT("VESS not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
+	    dlg->ShowModal();
+	}
 
 }
 
 void wxVessMain::OnSaveScene(wxCommandEvent& event)
 {
-
+    if (vess->isRunning())
+    {
+		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
+	 
+		if ( openFileDialog->ShowModal() == wxID_OK )
+		{
+		   	if (vess->sceneManager->saveXML( openFileDialog->GetPath().mb_str() ))
+		   	{
+		   		std::cout << "Loading scene from file: " << openFileDialog->GetPath().mb_str() << std::endl;
+		   	} else {
+		   		std::cout << "Error when loading " << openFileDialog->GetPath().mb_str() << std::endl;
+		   	}
+		}
+    }
+    else {
+	    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("VESS server is not running, so no scene to save."), wxT("VESS not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
+	    dlg->ShowModal();
+	}
 }
 
 void wxVessMain::OnShowConfig(wxCommandEvent& event)
 {
+	std::cout << "sgda" << std::endl;
     vessConfigFrame->Show();
 }
 

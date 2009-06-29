@@ -55,17 +55,20 @@
 * typically include edit/display programs, motion tracking systems, and mapping
 * applications, which map the geometric events on to actions to control lights,
 * sound, graphics, etc., and audio and graphic renderers.
-*
-*
+* 
 * For more information and more detailed documentation, visit:
 * http://spinframework.sourceforge.net/
 *
 * For code documentation, see the
 * @htmlonly <a href="annotated.html">Class List</a>@endhtmlonly
 *
+* For the full list of OSC messages accepted by VESS, see the
+* @htmlonly <a href="oscprotocol.html">OSC Protocol Documentation</a>@endhtmlonly
+* 
 */
 
-
+/** @page oscprotocol OSC Protocol
+ */
 
 
 #endif

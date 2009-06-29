@@ -122,7 +122,7 @@ void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
     }
 
     Thaw();
-
+    
     ExpandAll();
 
 }
@@ -169,29 +169,25 @@ void wxVessTreeCtrl::addNode(const char *id, const char *type)
 }
 
 
-
 void wxVessTreeCtrl::removeNode(const char *id)
 {
-
+	
+	// if the node to be removed is currently selected, then select NULL (root)
+	if (strcmp(GetSelectedNode()->id->s_name,id)==0)
+	{
+		SelectNode(NULL);
+	}
+	
+	// We need to find the node based on the string id provided:
+	wxTreeItemId nodeInTree = GetTreeItem(id, GetRootItem());
+	if (nodeInTree)
+	{
+		Freeze();
+		Delete(nodeInTree);
+		Thaw();
+	}
 }
 
-/*
-void wxVessTreeCtrl::SetVisitor(wxVessTreeVisitor* pVisitor)
-{
-    if (!pVisitor) return;
-    m_pSceneTreeVisitor = pVisitor;
-}
-
-wxVessTreeVisitor* wxVessTreeCtrl::GetVisitor()
-{
-    return m_pSceneTreeVisitor.get();
-}
-
-const wxVessTreeVisitor* wxVessTreeCtrl::GetVisitor() const
-{
-    return m_pSceneTreeVisitor.get();
-}
-*/
 
 void wxVessTreeCtrl::SetPropGrid(wxVessPropGrid *PG)
 {
@@ -199,72 +195,28 @@ void wxVessTreeCtrl::SetPropGrid(wxVessPropGrid *PG)
     VessPropGrid = PG;
 }
 
+
 bool wxVessTreeCtrl::SelectNode(asReferenced* pNode)
 {
     if (pNode == GetSelectedNode()) return true;
 
+    // there should always be at least one node (the scene root). If not, return
+    // because this is a problem.
     if (GetCount() == 0) return false;
 
     wxTreeItemId id = GetTreeItem(pNode, GetRootItem());
     if (id)
     {
-        SelectItem(id, true);
+        SelectItem(id);
         return true;
     }
-
-    return false;
-
-    /*
-
-    // if the root is selected
-    wxVessTreeItemData *itemData = (wxVessTreeItemData*)GetItemData(GetRootItem());
-    if (itemData)
-    {
-        if (itemData->m_pNode == pNode) {
-            SelectItem(GetRootItem(), true);
-            //** if the object found, jump out from this recursive loop!
-            return true;
-        }
+    else {
+    	SelectItem(GetRootItem());
+    	return false;
     }
 
-    if (pNode)
-        return SelectNode(pNode, GetRootItem());
-
-    return false;
-
-    */
 }
 
-/*
-bool wxVessTreeCtrl::SelectNode(asReferenced* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
-{
-
-    wxTreeItemId id;
-
-    if (!cookie)
-        id = GetFirstChild(idParent, cookie);
-    else
-        id = GetNextChild(idParent, cookie);
-
-    if (!id.IsOk())
-        return false;
-
-    wxVessTreeItemData *pNode = (wxVessTreeItemData*)GetItemData(id);
-    if (pNode)
-    {
-        if (pNode->m_pNode == pNode) {
-            SelectItem(id, true);
-            return true;
-        }
-    }
-
-    if (ItemHasChildren(id))
-        if (SelectNode(pNode, id))
-            return true;
-
-    return SelectNode(pNode, idParent, cookie);
-}
-*/
 
 wxTreeItemId wxVessTreeCtrl::GetTreeItem(asReferenced* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
@@ -297,6 +249,39 @@ wxTreeItemId wxVessTreeCtrl::GetTreeItem(asReferenced* pNode, wxTreeItemId idPar
 
 }
 
+
+wxTreeItemId wxVessTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie)
+{
+    if (!idParent.IsOk())
+        return NULL;
+
+    wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(idParent);
+    if (treeData)
+    {
+        if (strcmp(treeData->m_pNode->id->s_name,nodeId) == 0)
+            return idParent;
+    }
+
+    wxTreeItemId child;
+
+    if (!cookie)
+        child = GetFirstChild(idParent, cookie);
+    else
+        child = GetNextChild(idParent, cookie);
+
+    if (!child.IsOk())
+        return NULL;
+
+    if (ItemHasChildren(child))
+    {
+        wxTreeItemId nextChild = GetTreeItem(nodeId, child);
+        if (nextChild) return nextChild;
+    }
+    return GetTreeItem(nodeId, child, cookie);
+
+}
+
+
 asReferenced* wxVessTreeCtrl::GetSelectedNode() const
 {
    if (!GetSelection())
@@ -309,6 +294,7 @@ asReferenced* wxVessTreeCtrl::GetSelectedNode() const
     return treeData->m_pNode.get();
 }
 
+
 asReferenced* wxVessTreeCtrl::GetNode(const wxTreeItemId& item) const
 {
     wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(item);
@@ -318,15 +304,6 @@ asReferenced* wxVessTreeCtrl::GetNode(const wxTreeItemId& item) const
     return treeData->m_pNode.get();
 }
 
-/*
-wxTreeItemId wxVessTreeCtrl::AppendOSGItem(wxTreeItemId parentId, const wxString& name, osg::Referenced* pNode)
-{
-    wxVessTreeItemData* pNode = new wxVessTreeItemData;
-    pNode->m_pNode = pNode;
-    wxTreeItemId id = AppendItem(parentId, name, -1, -1, pNode);
-    return id;
-}
-*/
 
 void wxVessTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
 {
@@ -343,7 +320,6 @@ void wxVessTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
 }
 
 
-
 void wxVessTreeCtrl::OnVessSelectionChange(wxTreeEvent &event)
 {
     asReferenced *n = GetSelectedNode();
@@ -351,8 +327,10 @@ void wxVessTreeCtrl::OnVessSelectionChange(wxTreeEvent &event)
     {
         if (VessPropGrid) VessPropGrid->SetNode(n);
         else std::cout << "wxVessTreeCtrl: Oops. VessPropGrid does not exist. Cannot populate the property editor." << std::endl;
-    } else {
-        std::cout << "wxVessTreeCtrl: Selected node could not be cast as asReferenced ?!" << std::endl;
+    } else if (VessPropGrid)
+    {
+    	// This will empty the propgrid editor:
+    	VessPropGrid->SetNode(NULL);
     }
 
     //event.Skip();
@@ -386,9 +364,20 @@ int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **
 		}
 	}
 	else if ((theMethod=="createNode") && (argc==3))
+	{
 		treeCtrl->addNode((char*)argv[1], (char*)argv[2]);
+	}
 	else if ((theMethod=="deleteNode") && (argc==2))
+	{
+		std::cout << "vessTreeCtrl got 'deleteNode " << (char*)argv[1] << "'" << std::endl;
 		treeCtrl->removeNode((char*)argv[1]);
+	}
+	else if (theMethod=="clear")
+	{
+		std::cout << "vessTreeCtrl got 'clear'" << std::endl;
+		treeCtrl->Refresh();
+		treeCtrl->SelectNode(NULL);
+	}
 
 	return 1;
 }

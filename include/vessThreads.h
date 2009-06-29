@@ -47,6 +47,7 @@
 #include "asSceneManager.h"
 #include "asMediaManager.h"
 
+
 /**
  * \brief A class to facilitate communication with VESS from any application.
  * 
