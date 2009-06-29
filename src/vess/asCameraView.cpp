@@ -90,16 +90,23 @@ asCameraView::asCameraView(const char *id, osgViewer::CompositeViewer &viewer, o
 	// *************************************************************************
 	// set up the Manipulator:
 
-	//osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator();
 	
+	//osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator();
 	osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
+
+	//manipulator->setTrackerMode( osgGA::NodeTrackerManipulator::NODE_CENTER );
 	manipulator->setTrackerMode( osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	//manipulator->setTrackerMode( osgGA::NodeTrackerManipulator::NODE_CENTER_AND_AZIM );
-	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
+
+	manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
 	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::TRACKBALL );
-    
+
+	manipulator->setMinimumDistance ( 0.0001 );
+	manipulator->setHomePosition( osg::Vec3(0,-1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+	
 	manipulator->setTrackNode(this);
 	view->setCameraManipulator(manipulator);
+	
 
     
 	
@@ -189,10 +196,14 @@ void asCameraView::setOrientation (float p, float r, float y)
 	_orientation = osg::Vec3(p,r,y);
 	
 	// note: args are passed in degrees; must convert to radians:
-	osg::Quat q = osg::Quat( osg::DegreesToRadians(-p), osg::Vec3d(1,0,0),
-							 osg::DegreesToRadians(-r), osg::Vec3d(0,1,0),
-							 osg::DegreesToRadians(-y + 180), osg::Vec3d(0,0,1));
+	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
+							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
+							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
 	this->setAttitude(q);
+
+
+	//osg::Matrix m;
+	//view->getCamera()->
 
 }
 
