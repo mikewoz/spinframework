@@ -228,7 +228,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     // sash position doesn't seem to work in wxSmith, so do it manually:
     mainSplitter->SetSashPosition(30);
 
-    vessConfigFrame = new wxVessConfig();
+    vessConfigFrame = new wxVessConfig(this);
     vessConfigFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
     vessConfigFrame->rxAddr->SetValue( wxString( vess->rxAddr.c_str(), wxConvUTF8 ));
     vessConfigFrame->rxPort->SetValue( wxString( vess->rxPort.c_str(), wxConvUTF8 ));

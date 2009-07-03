@@ -100,6 +100,8 @@ protected:
     //! Create a category and properties of the given object.
     void GenerateProperties(const osgIntrospection::Type& type, asReferenced* pObject);
 
+	void OnPropertyChanging(wxPropertyGridEvent& event);
+	
     //! Property value changed event. Set the change to the osg object.
     void OnPropertyChanged(wxPropertyGridEvent& event);
 
@@ -113,6 +115,8 @@ protected:
 };
 
 void lo_message_add_wxProp( lo_message msg, wxPGId propId );
+void lo_message_add_wxProp( lo_message msg, wxPGId propId, wxVariant val );
+
 void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_arg **args);
 
 int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);

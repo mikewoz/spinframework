@@ -90,6 +90,7 @@ DEFINE_EVENT_TYPE(EVT_WXPG_OBJECT_SELECTED);
 DEFINE_EVENT_TYPE(EVT_WXPG_TOOLBAR_CLICKED);
 
 BEGIN_EVENT_TABLE(wxVessPropGrid, wxPropertyGridManager)
+	EVT_PG_CHANGING(wxID_ANY, wxVessPropGrid::OnPropertyChanging)
     EVT_PG_CHANGED(wxID_ANY, wxVessPropGrid::OnPropertyChanged)
     EVT_MENU(wxID_ANY, wxVessPropGrid::OnToolbarClicked)
 END_EVENT_TABLE()
@@ -438,8 +439,62 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
     } // method iterator
 }
 
+
 /*!
     Property value changed event. Set the change to the osg object.
+    @param[in] event Event data.
+*/
+void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
+{
+    wxPGId id = event.GetProperty();
+    if (!id) return;
+
+    wxPGId parent = event.GetMainParent();
+
+    std::cout << "OnPropertyChanging: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << event.GetValue().GetString().mb_str() << std::endl;
+
+/*
+
+    lo_message msg = lo_message_new();
+    lo_message_add_string(msg, parent->GetBaseName().mb_str());
+
+    if (parent->GetChildCount())
+    {
+        for (int i=0; i<parent->GetChildCount(); i++)
+        {
+            lo_message_add_wxProp( msg, parent->Item(i), event.GetValue() );
+        }
+    }
+
+    else {
+        lo_message_add_wxProp( msg, id, event.GetValue() );
+    }
+
+	std::string OSCpath = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
+
+	// If this sceneManager is just a listener, then we nees to send to the
+	// broadcastChannel. Otherwise, we send to the (unicast) rxAddr of this
+	// server.
+    if (vess->sceneManager->isSlave())
+    {
+        lo_send_message(vess->lo_infoServ, OSCpath.c_str(), msg);
+    }
+    else
+        lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
+
+
+	lo_message_free(msg);
+	
+	
+	// prevent event from propagating:
+	event.Veto();
+
+	*/
+
+}
+
+/*!
+    Property value is about to change.
     @param[in] event Event data.
 */
 void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
@@ -481,6 +536,7 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 
 	lo_message_free(msg);
 
+	// prevent event from propagating:
 	//event.Veto();
 	//event.Skip();
 }
@@ -510,7 +566,7 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId )
 {
     std::string t = std::string(propId->GetValueType().mb_str());
 
-    //std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << propId->GetValueAsString().mb_str() << std::endl;
+    std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << propId->GetValueAsString().mb_str() << std::endl;
 
     if ( t=="string" || t=="std::string" || t=="char *" || t=="const char *" )
     {
@@ -529,6 +585,7 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId )
     */
     else if ( t=="int" || t=="long" )
     {
+		std::cout << "changing int/long prop " << propId->GetBaseName().mb_str() << " to value: " << (int) propId->GetValue().GetInteger() << std::endl;
         lo_message_add_int32( msg, (int) propId->GetValue().GetInteger() );
     }
     else if ( t=="bool" )
@@ -538,6 +595,43 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId )
 
 }
 
+void lo_message_add_wxProp( lo_message msg, wxPGId propId, wxVariant val )
+{
+    std::string t = std::string(propId->GetValueType().mb_str());
+
+    std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << val.GetString().mb_str(wxConvUTF8) << std::endl;
+
+
+    if ( t=="string" || t=="std::string" || t=="char *" || t=="const char *" )
+    {
+        lo_message_add_string( msg, (const char*) val.GetString().mb_str(wxConvUTF8) );
+    }
+    else if ( t=="float" || t=="double" )
+    {
+        lo_message_add_float( msg, (float) val.GetDouble() );
+    }
+    /*
+    else if ( t=="double" )
+    {
+        lo_message_add_double( msg, (double) val.GetDouble() );
+    }
+    */
+    else if ( t=="int" || t=="long" )
+    {
+		std::cout << "changing int/long prop " << propId->GetBaseName().mb_str() << " to value: " << (int) propId->GetValue().GetInteger() << std::endl;
+        lo_message_add_int32( msg, (int) val.GetInteger() );
+    }
+    else if ( t=="bool" )
+    {
+        lo_message_add_int32( msg, (int) val.GetBool() );
+    }
+
+}
+
+	
+/**
+ *
+ */
 void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_arg **argv)
 {
     int i;
@@ -597,6 +691,9 @@ void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_
 }
 
 
+/**
+ * The propGrid should only be updated by OSC messages - never from VESS directly.
+ */
 int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     // make sure there is at least one argument (ie, a method to call):
@@ -622,3 +719,4 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
 
 	return 1;
 }
+
