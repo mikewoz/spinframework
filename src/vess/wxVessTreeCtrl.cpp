@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -122,7 +122,7 @@ void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
     }
 
     Thaw();
-    
+
     ExpandAll();
 
 }
@@ -171,13 +171,12 @@ void wxVessTreeCtrl::addNode(const char *id, const char *type)
 
 void wxVessTreeCtrl::removeNode(const char *id)
 {
-	
 	// if the node to be removed is currently selected, then select NULL (root)
 	if (strcmp(GetSelectedNode()->id->s_name,id)==0)
 	{
 		SelectNode(NULL);
 	}
-	
+
 	// We need to find the node based on the string id provided:
 	wxTreeItemId nodeInTree = GetTreeItem(id, GetRootItem());
 	if (nodeInTree)
@@ -188,33 +187,32 @@ void wxVessTreeCtrl::removeNode(const char *id)
 	}
 }
 
-
-void wxVessTreeCtrl::SetPropGrid(wxVessPropGrid *PG)
-{
-    if (!PG) return;
-    VessPropGrid = PG;
-}
-
-
 bool wxVessTreeCtrl::SelectNode(asReferenced* pNode)
 {
-    if (pNode == GetSelectedNode()) return true;
-
     // there should always be at least one node (the scene root). If not, return
     // because this is a problem.
     if (GetCount() == 0) return false;
+
+    // if pNode is NULL, we select the scene root
+    if (!pNode)
+    {
+    	SelectItem(GetRootItem());
+        UpdatePropGrid();
+    }
+
+    // if the node is already selected, don't do anything
+    if (pNode == GetSelectedNode()) return true;
 
     wxTreeItemId id = GetTreeItem(pNode, GetRootItem());
     if (id)
     {
         SelectItem(id);
+        UpdatePropGrid();
         return true;
     }
-    else {
-    	SelectItem(GetRootItem());
-    	return false;
-    }
 
+    // couldn't find the node, so return false
+    return false;
 }
 
 
@@ -319,23 +317,31 @@ void wxVessTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
         SetItemImage(id, 0, wxTreeItemIcon_Normal);
 }
 
-
 void wxVessTreeCtrl::OnVessSelectionChange(wxTreeEvent &event)
 {
-    asReferenced *n = GetSelectedNode();
-    if (n)
-    {
-        if (VessPropGrid) VessPropGrid->SetNode(n);
-        else std::cout << "wxVessTreeCtrl: Oops. VessPropGrid does not exist. Cannot populate the property editor." << std::endl;
-    } else if (VessPropGrid)
-    {
-    	// This will empty the propgrid editor:
-    	VessPropGrid->SetNode(NULL);
-    }
-
-    //event.Skip();
+    UpdatePropGrid();
 }
 
+
+void wxVessTreeCtrl::SetPropGrid(wxVessPropGrid *PG)
+{
+    if (!PG) return;
+    VessPropGrid = PG;
+}
+
+void wxVessTreeCtrl::UpdatePropGrid()
+{
+    if (!VessPropGrid)
+    {
+        std::cout << "wxVessTreeCtrl: Oops. VessPropGrid does not exist. Cannot populate the property editor." << std::endl;
+        return;
+    }
+
+    asReferenced *n = GetSelectedNode();
+    if (n) VessPropGrid->SetNode(n);
+    else VessPropGrid->SetNode(NULL); // This will empty the propgrid editor
+
+}
 
 int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
@@ -369,12 +375,10 @@ int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **
 	}
 	else if ((theMethod=="deleteNode") && (argc==2))
 	{
-		std::cout << "vessTreeCtrl got 'deleteNode " << (char*)argv[1] << "'" << std::endl;
 		treeCtrl->removeNode((char*)argv[1]);
 	}
 	else if (theMethod=="clear")
 	{
-		std::cout << "vessTreeCtrl got 'clear'" << std::endl;
 		treeCtrl->Refresh();
 		treeCtrl->SelectNode(NULL);
 	}

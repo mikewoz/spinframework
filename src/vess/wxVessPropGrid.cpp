@@ -156,6 +156,9 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
 void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
 {
 
+    if (newNode) std::cout << "setting node for propGrid to: " << newNode->id->s_name << std::endl;
+    else std::cout << "setting node for propGrid to: NULL" << std::endl;
+
     if (currentNode == newNode && !forceUpdate) return;
 
     GetGrid()->Freeze();
@@ -222,9 +225,9 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
 
     GetGrid()->Thaw();
 
-
     if (newNode) UpdateFromVess();
 
+    GetGrid()->RefreshEditor();
 
 
 
@@ -453,7 +456,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 
     std::cout << "OnPropertyChanging: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << event.GetValue().GetString().mb_str() << std::endl;
 
-/*
+    //GetGrid()->Freeze();
 
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, parent->GetBaseName().mb_str());
@@ -462,7 +465,13 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
     {
         for (int i=0; i<parent->GetChildCount(); i++)
         {
-            lo_message_add_wxProp( msg, parent->Item(i), event.GetValue() );
+            if (parent->Item(i) == event.GetProperty())
+            {
+                lo_message_add_wxProp( msg, parent->Item(i), event.GetValue() );
+            }
+            else {
+                lo_message_add_wxProp( msg, parent->Item(i), parent->Item(i)->GetValue() );
+            }
         }
     }
 
@@ -484,12 +493,12 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 
 
 	lo_message_free(msg);
-	
-	
-	// prevent event from propagating:
-	event.Veto();
 
-	*/
+
+	// prevent event from propagating:
+	//event.Veto();
+
+    //GetGrid()->Thaw();
 
 }
 
@@ -501,6 +510,8 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 {
     wxPGId id = event.GetProperty();
     if (!id) return;
+
+    /*
 
     wxPGId parent = event.GetMainParent();
 
@@ -539,6 +550,8 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 	// prevent event from propagating:
 	//event.Veto();
 	//event.Skip();
+
+	*/
 }
 
 
@@ -628,7 +641,7 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId, wxVariant val )
 
 }
 
-	
+
 /**
  *
  */
@@ -710,11 +723,28 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
 
     if (parentId)
     {
-        propGrid->GetGrid()->Freeze();
+
         wxProp_from_lo_message(parentId, types, argc, argv);
+
+        // note: refreshing the property here can cause crashing, but it seems
+        //       to only happen for particular properties (eg, enums), and maybe
+        //       only if they are currently selected. Thus, we will refresh only
+        //       properties that are not currently selected...
         //propGrid->GetGrid()->RefreshProperty(parentId);
-        propGrid->GetGrid()->Thaw();
-        //propGrid->GetGrid()->RefreshProperty(parentId);
+
+        wxPGId selectedProp = propGrid->GetGrid()->GetSelectedProperty();
+        if (selectedProp)
+        {
+            if ( (parentId==selectedProp) || (parentId==selectedProp->GetMainParent()) )
+            {
+                //propGrid->GetGrid()->SelectProperty(selectedProp, false);
+                //propGrid->GetGrid()->RefreshProperty(selectedProp);
+                //propGrid->GetGrid()->SelectProperty(selectedProp, true);
+            }
+            else {
+                propGrid->GetGrid()->RefreshProperty(parentId);
+            }
+        }
     }
 
 	return 1;

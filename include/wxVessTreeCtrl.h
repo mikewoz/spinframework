@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -95,12 +95,12 @@ public:
                   const wxString& name = wxT("treeCtrl"));
     virtual ~wxVessTreeCtrl();
 
-    
+
     /**
      * Build the tree based on the contents of the sceneManager
      */
     void BuildTree(osg::Node* pRoot);
-    
+
     /**
      * Refresh the tree based on the contents of the sceneManager
      */
@@ -112,14 +112,14 @@ public:
     void addToTree(asReferenced *n, wxTreeItemId parentID);
 
     /**
-     * This adds a node to the tree. Note that this function will typicall be 
+     * This adds a node to the tree. Note that this function will typicall be
      * called as a result of a createNode message broadcasted from vess AFTER
      * the node is actually instantiated in memory, so we don't need to actually
      * create it. We should be able to find it in the sceneManager, and just
      * create a tree item (using the addToTree() method).
      */
     void addNode(const char *id, const char *type);
-    
+
     /**
      * Remove a node from the tree. Note that the node may not exist in the VESS
      * scene any more, so we need to perform all searches and comparisons only with
@@ -137,20 +137,20 @@ public:
      * GetTreeItem returns the wxTreeItemId given an asReferenced node pointer
      */
     wxTreeItemId GetTreeItem(asReferenced* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
-    
+
     /**
      * GetTreeItem returns the wxTreeItemId given an id. This is useful in the case
      * when the node might not exist any more in the scene (eg, the node was deleted
-     * and the deleteNode message was broadcasted, and now it must be removed from 
+     * and the deleteNode message was broadcasted, and now it must be removed from
      * the TreeCtrl.
      */
     wxTreeItemId GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
-    
+
     /**
      * Get the current asReferenced node that the user has selected in the tree
      */
     asReferenced* GetSelectedNode() const;
-    
+
     /**
      * Get the asReferenced node stored in a TreeCtrl leaf
      */
@@ -161,11 +161,15 @@ public:
      */
     void UpdateTreeItemIcon(wxTreeItemId id);
 
-    /**
-     * When a user selects a node in the TreeCtrl, this event will populate the 
-     * propgrid with that node's properties.
+     /**
+     * When a user selects a node in the TreeCtrl, this event is produced.
      */
     void OnVessSelectionChange(wxTreeEvent &event);
+
+    /**
+     * this will cause propgrid to populate with the selected node's properties.
+     */
+    void UpdatePropGrid();
 
     /**
      * Sets the internal VessPropGrid pointer. This is needed because when a
@@ -185,8 +189,8 @@ protected:
 };
 
 /**
- * For VessTreeCtrl, we need to listen to OSC messages for high level events 
- * such as the creation/deletion of nodes so that we may update the tree 
+ * For VessTreeCtrl, we need to listen to OSC messages for high level events
+ * such as the creation/deletion of nodes so that we may update the tree
  * accordingly.
  */
 int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);

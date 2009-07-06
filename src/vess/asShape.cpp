@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -55,6 +55,8 @@ using namespace std;
 
 //extern asSceneManager *sceneManager;
 //extern asMediaManager *mediaManager;
+
+extern pthread_mutex_t pthreadLock;
 
 
 // ===================================================================
@@ -255,6 +257,8 @@ void asShape::setRenderBin (int i)
 void asShape::drawShape()
 {
 
+    pthread_mutex_lock(&pthreadLock);
+
 	// remove the old shape:
 	if (shapeTransform->containsNode(shapeGeode.get()))
 	{
@@ -354,6 +358,8 @@ void asShape::drawShape()
 		optimizer.optimize(shapeGeode.get()); // ?
 		drawTexture();
 	}
+
+	pthread_mutex_unlock(&pthreadLock);
 
 }
 
