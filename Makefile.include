@@ -8,7 +8,9 @@
 # Some paths need to be manually defined here:
 
 
-SPIN_PATH := ../..
+ifndef $(SPIN_PATH)
+	SPIN_PATH := ../..
+endif
 
 GENWRAPPER_BIN = src/genwrapper/genwrapper
 
