@@ -9,7 +9,7 @@
 
 
 ifndef $(SPIN_PATH)
-	SPIN_PATH := ../..
+	SPIN_PATH = ../..
 endif
 
 GENWRAPPER_BIN = src/genwrapper/genwrapper
