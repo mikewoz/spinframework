@@ -73,7 +73,6 @@
 		<Unit filename="../../include/wxVessTreeCtrl.h" />
 		<Unit filename="../../include/wxVessTreeVisitor.h" />
 		<Unit filename="DebugVisitor.cpp" />
-		<Unit filename="NewPanel.cpp" />
 		<Unit filename="NewPanel.h" />
 		<Unit filename="asBasicNode.cpp" />
 		<Unit filename="asCameraManager.cpp" />
