@@ -93,7 +93,7 @@ public:
 	 * The reportGlobals flag means that every time this node's matrix changes
 	 * (either directly, or because a parent changed), the translation and
 	 * orientation in the global coordinate system will be reported.
-	 * OSC message format: /vess/nodeID/global6DOF x y z p r y
+	 * OSC message format: /vess/vessID/nodeID global6DOF x y z p r y
 	 */
 	void reportGlobals (int b);
 
@@ -105,15 +105,22 @@ public:
 	/**
 	 * The local orientation offset for this node with respect to it's parent
 	 */
-	void setOrientation (float p, float r, float y);
+	void setOrientation (float pitch, float roll, float yaw);
 
 	/**
-	 * The move command creates a relative translation with respect to the
+	 * The move command adds a relative translation with respect to the
 	 * node's current orientation. That is, the node will translate along it's
 	 * direction vector (Y-axis) by the supplied number of units
 	 */
     void move (float x, float y, float z);
-	void rotate (float p, float r, float y);
+
+
+	/**
+	 * The rotate command adds a relative rotation to the node's current
+	 * orientation.
+	 */
+	void rotate (float pitch, float roll, float yaw);
+
 
 	int getReportGlobals() { return (int)_reportGlobals; };
 	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
@@ -121,8 +128,18 @@ public:
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
 
 
-	// extra method for globals:
-	void dumpGlobals(bool forced);
+	/**
+	* The dumpGlobals method results in a broadcast of this node's translation
+	* and orientation. It is called by callbackUpdate() every frame, however the
+	* 'forced' flag will be set to false, so it will only send a message if the
+	* node's matrix has changed. If the 'forced' flag is set to true, it will
+	* definitely result in a message broadcast. This should only be used when
+    * necessary (eg, when a stateDump is requested).
+    *
+    * Note: the return value is only to fool wx so that it doesn't consider this
+    * as an editable property.
+    */
+	bool dumpGlobals(bool forced);
 
 
 	/**

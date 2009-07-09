@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -63,15 +63,15 @@ public:
 	asLightSource(asSceneManager *sceneManager, char *initID);
 	virtual ~asLightSource();
 
-	void setVisible		(int b);
-	void setCutoff		(float cut);
-	void setExponent	(float exp);
-	void setAttenuation	(float att);
-	
-	void setAmbient		(float r, float g, float b, float a);
-	void setDiffuse		(float r, float g, float b, float a);
-	void setSpecular	(float r, float g, float b, float a);
-	
+	void setVisible		(int visibilityFlag);
+	void setCutoff		(float cutoff);
+	void setExponent	(float exponent);
+	void setAttenuation	(float attenuation);
+
+	void setAmbient		(float red, float green, float blue, float alpha);
+	void setDiffuse		(float red, float green, float blue, float alpha);
+	void setSpecular	(float red, float green, float blue, float alpha);
+
 	int getVisible() 		{ return (int) this->_visible; }
 	float getCutoff()		{ return this->_cutoff; };
 	float getExponent()		{ return this->_exponent; };
@@ -79,39 +79,39 @@ public:
 	osg::Vec4 getAmbient()	{ return this->_ambient; };
 	osg::Vec4 getDiffuse()	{ return this->_diffuse; };
 	osg::Vec4 getSpecular()	{ return this->_specular; };
-	
-	
+
+
 	/**
 	 * For each subclass of asReferenced, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();
-	
+
 	/**
 	 * We must include a stateDump() method that simply invokes the base class
 	 * method. Simple C++ inheritance is not enough, because osg::Introspection
 	 * won't see it.
 	 */
 	virtual void stateDump() { asReferenced::stateDump(); };
-	
-	
+
+
 private:
-	
-	void drawLight();	
-	
+
+	void drawLight();
+
 	int lightNum;
 	osg::ref_ptr<osg::LightSource> lightSource;
-	
+
 	bool _visible;
 	float _cutoff;
 	float _exponent;
 	float _attenuation;
-	
+
 	// lighting color parameters:
 	osg::Vec4 _ambient;
 	osg::Vec4 _diffuse;
 	osg::Vec4 _specular;
-	
+
 };
 
 

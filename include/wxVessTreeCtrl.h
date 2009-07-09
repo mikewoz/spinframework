@@ -96,6 +96,8 @@ public:
     virtual ~wxVessTreeCtrl();
 
 
+    void setListeningServer(lo_server_thread t);
+
     /**
      * Build the tree based on the contents of the sceneManager
      */
@@ -161,11 +163,6 @@ public:
      */
     void UpdateTreeItemIcon(wxTreeItemId id);
 
-     /**
-     * When a user selects a node in the TreeCtrl, this event is produced.
-     */
-    void OnVessSelectionChange(wxTreeEvent &event);
-
     /**
      * this will cause propgrid to populate with the selected node's properties.
      */
@@ -178,12 +175,28 @@ public:
     void SetPropGrid(wxVessPropGrid *PG);
 
 
+     /**
+     * When a user selects a node in the TreeCtrl, this event is produced.
+     */
+    void OnVessSelectionChange(wxTreeEvent &event);
+
+    void OnVessTreeDragBegin(wxTreeEvent &event);
+    void OnVessTreeDragEnd(wxTreeEvent &event);
+
+
+
+
+
 protected:
 
     wxImageList* m_pImages;
     osg::ref_ptr<wxVessTreeVisitor> m_pSceneTreeVisitor;
 
     wxVessPropGrid* VessPropGrid;
+
+    lo_server_thread listeningServer;
+
+    wxTreeItemId draggedItem;
 
     DECLARE_EVENT_TABLE()
 };

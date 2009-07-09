@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -63,12 +63,12 @@ asBasicNode::asBasicNode (asSceneManager *sceneManager, char *initID) : asRefere
 	this->setName(string(id->s_name) + ".asBasicNode");
 
 	_reportGlobals = false;
-	
+
 	mainTransform = new osg::PositionAttitudeTransform();
 	mainTransform->setName(string(id->s_name) + ".mainTransform");
 	this->addChild(mainTransform.get());
 
-	  
+
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
 	attachmentNode = mainTransform.get();
@@ -90,9 +90,9 @@ asBasicNode::~asBasicNode()
 
 void asBasicNode::callbackUpdate()
 {
-	
+
 	dumpGlobals(false); // never force globals here
-	
+
 }
 
 
@@ -107,14 +107,14 @@ void asBasicNode::updateNodePath()
 			currentNodePath = parentNode->currentNodePath;
 		}
 	}
-	
+
 	// here, the nodePath includes the base osg::group, PLUS the mainTransform
 	currentNodePath.push_back(this);
 	currentNodePath.push_back(mainTransform.get());
-	
+
 	// now update NodePaths for all children:
 	updateChildNodePaths();
-	
+
 }
 
 
@@ -126,30 +126,30 @@ void asBasicNode::reportGlobals (int b)
 	if (this->_reportGlobals != (bool)b)
 	{
 		this->_reportGlobals = (bool) b;
-		BROADCAST(this, "si", "reportGlobals", (int) this->_reportGlobals);	
+		BROADCAST(this, "si", "reportGlobals", (int) this->_reportGlobals);
 	}
 }
 
 
 void asBasicNode::setTranslation (float x, float y, float z)
-{	
+{
 	mainTransform->setPosition(osg::Vec3d(x,y,z));
-	
+
 	BROADCAST(this, "sfff", "setTranslation", x, y, z);
 }
 
 
 void asBasicNode::setOrientation (float p, float r, float y)
 {
-	
+
 	_orientation = osg::Vec3(p, r, y);
-	
+
 	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
 							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
 							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-	
+
 	mainTransform->setAttitude(q);
-	
+
 	BROADCAST(this, "sfff", "setOrientation", p, r, y);
 }
 
@@ -173,10 +173,10 @@ std::vector<lo_message> asBasicNode::getState ()
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = asReferenced::getState();
-	
+
 	lo_message msg;
 	osg::Vec3 v;
-	
+
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "reportGlobals",(int) this->_reportGlobals);
@@ -186,29 +186,29 @@ std::vector<lo_message> asBasicNode::getState ()
 	v = this->getTranslation();
 	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
 	ret.push_back(msg);
-	
+
 	msg = lo_message_new();
 	v = this->getOrientation();
 	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
 	ret.push_back(msg);
-	
-	
+
+
 	//lo_message_free(msg);
-	
+
 	return ret;
 }
 
 // *****************************************************************************
-void asBasicNode::dumpGlobals(bool forced)
+bool asBasicNode::dumpGlobals(bool forced)
 {
 	// The "forced" parameter means that we do the dump even if there has been
 	// no change. This method is called in the updateCallback, which occurs
 	// very frequently and should NEVER be forced. The stateDump() method will
 	// however force an update of the current global parameters
-	
+
 	if (this->_reportGlobals)
 	{
-		
+
 		// position & rotation: (should we get position from centre of boundingsphere?
 		osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
 		if ((myMatrix != this->_globalMatrix) || forced)
@@ -216,10 +216,10 @@ void asBasicNode::dumpGlobals(bool forced)
 			this->_globalMatrix = myMatrix;
 			osg::Vec3 myPos = myMatrix.getTrans();
 			osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
-			
+
 			BROADCAST(this, "sffffff", "global6DOF", myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z());
-		
-		
+
+
 			osg::ComputeBoundsVisitor *vst = new osg::ComputeBoundsVisitor;
 			this->accept(*vst);
 			osg::BoundingBox bb = vst->getBoundingBox();
@@ -230,9 +230,9 @@ void asBasicNode::dumpGlobals(bool forced)
 				BROADCAST(this, "sfff", "globalScale", _globalScale.x(), _globalScale.y(), _globalScale.z());
 			}
 		}
-		
-		
-			
+
+
+
 		const osg::BoundingSphere& bs = this->getBound();
 		if ((bs.radius() != _globalRadius) || forced)
 		{
@@ -240,5 +240,8 @@ void asBasicNode::dumpGlobals(bool forced)
 			BROADCAST(this, "sf", "globalRadius", _globalRadius);
 		}
 
+		return true;
+
 	}
+	return false;
 }

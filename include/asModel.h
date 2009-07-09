@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -59,7 +59,7 @@ enum animationModeType { OFF, SWITCH, SEQUENCE };
 
 /**
  * \brief Node for including 3D models of popular formats in the scene.
- * 
+ *
  * This class allows us to attach an external 3D model from a file. Popular
  * formats (.3ds, .obj, .osg, etc) are supported as long as an OSG plugin exists
  * to read it. The model can be offset and scaled. Animations are also supported
@@ -73,66 +73,72 @@ public:
 
 	asModel (asSceneManager *sceneManager, char *initID);
 	virtual ~asModel();
-	
+
+	/**
+	 * IMPORTANT:
+	 * subclasses of asReferenced are allowed to contain complicated subgraphs,
+	 * and can also change their attachmentNode so that children are attached
+	 * anywhere in that subgraph. If that is the case, the updateNodePath()
+	 * function MUST be overridden, and extra nodes must be manually pushed onto
+	 * currentNodePath.
+	 */
 	virtual void updateNodePath();
 
 	void setTranslation		(float x, float y, float z);
-	void setOrientation		(float p, float r, float y);
+	void setOrientation		(float pitch, float roll, float yaw);
 	void setScale			(float x, float y, float z);
-	
-	void setModel			(int newModel);
-	void setModelFromFile	(char *f);
-	
+
+	void setModelFromFile	(char *filename);
+
 	osg::Vec3 getTranslation() { return modelTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
 	osg::Vec3 getScale() { return modelTransform->getScale(); };
-	
+
 	/**
 	 * For each subclass of asReferenced, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();
-	
+
 	/**
 	 * We must include a stateDump() method that simply invokes the base class
 	 * method. Simple C++ inheritance is not enough, because osg::Introspection
 	 * won't see it.
 	 */
 	virtual void stateDump() { asReferenced::stateDump(); };
-	
-	
+
+
 private:
-	
-	void drawModel();	
-	
+
+	void drawModel();
+
 	// asModel supports simple loading of 3D models (eg, those that
 	// have been designed in 3DSMax, Maya, Blender, etc.)
-	// 
+	//
 	// The model is attached to a modelTransform, allowing it to be
 	// offset from it's parent.
 
 	osg::ref_ptr<osg::PositionAttitudeTransform> modelTransform;
 
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
-	
-	// the model id from the database:
-	int modelID;
+
+	// the model:
 	std::string modelName;
 	std::string modelPath;
-	
+
 	osg::ref_ptr<osg::Group> model;
-	
+
 	// animation stuff for gfx:
 	t_float state[ASMODEL_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
 	int animationNumFrames[ASMODEL_NUM_ANIM_CONTROLS]; // number of keyframes
 	animationModeType animationMode[ASMODEL_NUM_ANIM_CONTROLS]; // type of animation (switch vs. sequence vs. ??)
 	osg::ref_ptr<osg::Switch> switcher[ASMODEL_NUM_ANIM_CONTROLS];
 	osg::ref_ptr<osg::Sequence> sequencer[ASMODEL_NUM_ANIM_CONTROLS];
-	
+
 	osgUtil::Optimizer optimizer;
-	
-	
-	
+
+
+
 };
 
 

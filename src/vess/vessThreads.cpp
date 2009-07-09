@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -140,7 +140,7 @@ vessListener::vessListener()
 	std::cout << "  INFO channel: " << lo_address_get_url(lo_infoAddr) << std::endl;
 
 	//lo_server_thread_start(lo_infoServ);
-	
+
 
 
 
@@ -197,6 +197,27 @@ void vessListener::stop()
 	std::cout << "Stopping VESS" << std::endl;
 	this->running = false;
 }
+
+void vessListener::sendMessage(const char *OSCpath, lo_message msg)
+{
+    // If the sceneManager is a listener, then we need to send message from a
+    // multicast-enabled socket. We can hijack the info channel socket, and use
+    // the lo_send_message_from method to send to the rxAddr of the vess server.
+
+    if (sceneManager->isSlave())
+        lo_send_message_from( lo_infoServ, sceneManager->rxAddr, OSCpath, msg);
+
+    // Otherwise, we can send directly to the (unicast) rxAddr of this vess
+    // server instance:
+
+    else
+        lo_send_message(sceneManager->rxAddr, OSCpath, msg);
+
+    // Let's free the message after (not sure if this is necessary):
+    lo_message_free(msg);
+
+}
+
 
 // *****************************************************************************
 

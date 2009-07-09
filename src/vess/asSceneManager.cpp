@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -706,6 +706,9 @@ void asSceneManager::refresh()
 			(*iter)->stateDump();
 		}
 	}
+
+    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneID).c_str(), "s", "refresh");
+
 }
 
 // ***********************************************************

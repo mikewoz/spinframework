@@ -48,12 +48,9 @@
 
 #include "wxVessTreeCtrl.h"
 #include "wxVessTreeVisitor.h"
-
-
 #include "wxVessEditor.h"
-
-
 #include "vessThreads.h"
+
 extern vessMaster *vess;
 extern pthread_mutex_t pthreadLock;
 
@@ -88,16 +85,15 @@ wxVessTreeCtrl::wxVessTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& p
     */
 
 
-    //Connect(id,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&wxVessEditor::OnVessSelectionChange);
     Connect(id,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&wxVessTreeCtrl::OnVessSelectionChange);
+    Connect(id,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&wxVessTreeCtrl::OnVessTreeDragBegin);
+    Connect(id,wxEVT_COMMAND_TREE_END_DRAG,  (wxObjectEventFunction)&wxVessTreeCtrl::OnVessTreeDragEnd);
 
-    // Add an OSC callback that listens to scene messages (add/delete) so that
-    // we can dynamically update the tree based on OSC messages:
-    if (vess->sceneManager->rxServ)
-    {
-        std::string oscPattern = "/vess/" + vess->id;
-        lo_server_thread_add_method(vess->sceneManager->rxServ, oscPattern.c_str(), NULL, wxVessTreeCtrl_liblo_callback, (void*)this);
-    }
+/*
+    Connect(id, wxEVT_COMMAND_TREE_SEL_CHANGED, (wxObjectEventFunction)&wxVessTreeCtrl::OnVessSelectionChange);
+    Connect(id, wxEVT_COMMAND_TREE_BEGIN_DRAG,  (wxObjectEventFunction)&wxVessEditor::OnVessTreeDragBegin);
+    Connect(id, wxEVT_COMMAND_TREE_END_DRAG,    (wxObjectEventFunction)&wxVessEditor::OnVessTreeDragEnd);
+*/
 
     // create and store and instance of wxVessTreeVisitor:
     m_pSceneTreeVisitor = new wxVessTreeVisitor(this);
@@ -107,9 +103,24 @@ wxVessTreeCtrl::~wxVessTreeCtrl()
 {
 }
 
+void wxVessTreeCtrl::setListeningServer(lo_server_thread t)
+{
+    this->listeningServer = t;
+
+    // Add an OSC callback that listens to scene messages (add/delete) so that
+    // we can dynamically update the tree based on OSC messages:
+    if (listeningServer)
+    {
+        std::string oscPattern = "/vess/" + vess->id;
+        lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessTreeCtrl_liblo_callback, (void*)this);
+    }
+}
+
+
+
 void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
 {
-    Freeze();
+    //Freeze();
     DeleteAllItems();
 
     if (pRoot)
@@ -121,7 +132,7 @@ void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
         pRoot->accept(*m_pSceneTreeVisitor.get());
     }
 
-    Thaw();
+    //Thaw();
 
     ExpandAll();
 
@@ -218,8 +229,13 @@ bool wxVessTreeCtrl::SelectNode(asReferenced* pNode)
 
 wxTreeItemId wxVessTreeCtrl::GetTreeItem(asReferenced* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
+    return GetTreeItem(pNode->id->s_name, idParent, cookie);
+
+    /*
     if (!idParent.IsOk())
         return NULL;
+
+    std::cout << "lookging for node '" << pNode->id->s_name "' in tree ... " << std::endl;
 
     wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(idParent);
     if (treeData)
@@ -244,38 +260,34 @@ wxTreeItemId wxVessTreeCtrl::GetTreeItem(asReferenced* pNode, wxTreeItemId idPar
         if (nextChild) return nextChild;
     }
     return GetTreeItem(pNode, child, cookie);
-
+*/
 }
 
 
 wxTreeItemId wxVessTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
-    if (!idParent.IsOk())
-        return NULL;
+    if (!idParent.IsOk()) return NULL;
 
     wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(idParent);
     if (treeData)
     {
         if (strcmp(treeData->m_pNode->id->s_name,nodeId) == 0)
+        {
             return idParent;
+        }
     }
 
-    wxTreeItemId child;
-
-    if (!cookie)
-        child = GetFirstChild(idParent, cookie);
-    else
-        child = GetNextChild(idParent, cookie);
-
-    if (!child.IsOk())
-        return NULL;
-
-    if (ItemHasChildren(child))
+    if (ItemHasChildren(idParent))
     {
-        wxTreeItemId nextChild = GetTreeItem(nodeId, child);
-        if (nextChild) return nextChild;
+        wxTreeItemId child;
+        for (child = GetFirstChild(idParent, cookie); child.IsOk(); child = GetNextChild(idParent, cookie))
+        {
+            wxTreeItemId targetItem = GetTreeItem(nodeId, child, cookie);
+            if (targetItem.IsOk()) return targetItem;
+        }
     }
-    return GetTreeItem(nodeId, child, cookie);
+
+    return GetTreeItem(nodeId, GetNextSibling(idParent), cookie);
 
 }
 
@@ -317,12 +329,6 @@ void wxVessTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
         SetItemImage(id, 0, wxTreeItemIcon_Normal);
 }
 
-void wxVessTreeCtrl::OnVessSelectionChange(wxTreeEvent &event)
-{
-    UpdatePropGrid();
-}
-
-
 void wxVessTreeCtrl::SetPropGrid(wxVessPropGrid *PG)
 {
     if (!PG) return;
@@ -342,6 +348,54 @@ void wxVessTreeCtrl::UpdatePropGrid()
     else VessPropGrid->SetNode(NULL); // This will empty the propgrid editor
 
 }
+
+void wxVessTreeCtrl::OnVessSelectionChange(wxTreeEvent &event)
+{
+    UpdatePropGrid();
+}
+
+void wxVessTreeCtrl::OnVessTreeDragBegin(wxTreeEvent &event)
+{
+    draggedItem = event.GetItem();
+	event.Allow();
+}
+
+void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
+{
+
+    if (asReferenced *child = this->GetNode(draggedItem))
+    {
+        std::string parentString;
+
+        // if dragged onto the root, we setParent to "world"
+        if (event.GetItem() == GetRootItem())
+        {
+            parentString = "world";
+        }
+
+        // otherwise, we get the node that this was dropped on, and set the
+        // parent to that symbol:
+        else if (asReferenced *parent = this->GetNode(event.GetItem()))
+        {
+            parentString = parent->id->s_name;
+        }
+
+        if (!parentString.empty())
+        {
+
+            lo_message msg = lo_message_new();
+            lo_message_add_string(msg, "setParent");
+            lo_message_add_string(msg, parentString.c_str());
+
+            std::string OSCpath = "/vess/" + vess->id + "/" + std::string(child->id->s_name);
+
+            vess->sendMessage(OSCpath.c_str(), msg);
+
+
+        }
+    }
+}
+
 
 int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
@@ -376,6 +430,10 @@ int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **
 	else if ((theMethod=="deleteNode") && (argc==2))
 	{
 		treeCtrl->removeNode((char*)argv[1]);
+	}
+    else if (theMethod=="refresh")
+	{
+	    treeCtrl->Refresh();
 	}
 	else if (theMethod=="clear")
 	{

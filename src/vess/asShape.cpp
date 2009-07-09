@@ -77,7 +77,6 @@ asShape::asShape (asSceneManager *sceneManager, char *initID) : asReferenced(sce
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);
 
 	shape = NONE; //"NULL";
-	textureID = 0;
 	textureName = "NULL";
 	renderBin = 11;
 
@@ -205,28 +204,12 @@ void asShape::setColor (float r, float g, float b, float a)
 }
 
 // ===================================================================
-void asShape::setTexture (int newTexture)
-{
-	// don't do anything if the current texture is already loaded:
-	if (textureID == newTexture) return;
-
-	textureID = newTexture;
-	textureName = mediaManager->getImageName(textureID);
-	texturePath = mediaManager->getImagePath(textureID);
-
-	drawTexture();
-
-	BROADCAST(this, "si", "setTexture", textureID);
-}
-
-// ===================================================================
 void asShape::setTextureFromFile (char* s)
 {
 	// don't do anything if the current texture is already loaded:
 	if (string(s)==textureName) return;
 	else textureName=string(s);
 
-	textureID = 0;
 	texturePath = mediaManager->getImagePath(textureName);
 
 	drawTexture();
@@ -469,10 +452,6 @@ std::vector<lo_message> asShape::getState ()
 	msg = lo_message_new();
 	v4 = this->getColor();
 	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg,  "si", "setTexture", getTexture());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

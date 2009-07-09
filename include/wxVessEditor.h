@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -72,10 +72,6 @@ class wxVessEditor: public wxFrame
 		wxToolBarToolBase* ToolBarItem2;
 		//*)
 
-        void OnVessSelectionChange(wxTreeEvent &event);
-        void OnDragBegin(wxTreeEvent &event);
-        void OnDragEnd(wxTreeEvent &event);
-
 	protected:
 
 		//(*Identifiers(wxVessEditor)
@@ -108,6 +104,8 @@ class wxVessEditor: public wxFrame
 		//*)
 
 		DECLARE_EVENT_TABLE()
+
+		lo_server_thread listeningServer;
 };
 
 

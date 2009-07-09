@@ -112,6 +112,9 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
     // (required for text-save/load support)
     RegisterAdvancedPropertyClasses();
 
+    // Need to register additional editors to get SpinCtrl:
+    RegisterAdditionalEditors();
+
 
     GetGrid()->SetVerticalSpacing(2);
 
@@ -124,7 +127,7 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
 
     //pToolBar->Realize();
 
-
+/*
     // We'll set up an OSC receiver to listen to messages for the currently
     // selected node. Note that we MUST listen to the broadcast channel and not
     // to vessChannel directly. This is because VESS might broadcast different
@@ -146,6 +149,12 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
             listeningServer = lo_server_thread_new(vess->txPort.c_str(), oscParser_error);
         lo_server_thread_start(listeningServer);
     }
+*/
+}
+
+
+void wxVessPropGrid::setListeningServer(lo_server_thread t) {
+    this->listeningServer = t;
 }
 
 /*!
@@ -155,10 +164,6 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
 */
 void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
 {
-
-    if (newNode) std::cout << "setting node for propGrid to: " << newNode->id->s_name << std::endl;
-    else std::cout << "setting node for propGrid to: NULL" << std::endl;
-
     if (currentNode == newNode && !forceUpdate) return;
 
     GetGrid()->Freeze();
@@ -261,12 +266,19 @@ void wxVessPropGrid::UpdateFromVess()
             int argc = lo_message_get_argc(*nodeStateIterator);
             lo_arg **args = lo_message_get_argv(*nodeStateIterator);
 
-            // get the parent property (should be in the form "nodeType.methodName")
-            std::string parentString = currentNode->nodeType + "." + std::string((char*)args[0]);
-            wxPGId parentId = this->GetGrid()->GetRoot()->GetPropertyByName( wxString(parentString.c_str(), wxConvUTF8) );
+            // get the parent property (should be in the form "baseClass.methodName")
+            //std::string parentString = currentNode->nodeType + "." + std::string((char*)args[0]);
+            //wxPGId parentId = this->GetGrid()->GetRoot()->GetPropertyByName( wxString(parentString.c_str(), wxConvUTF8) );
 
-            wxProp_from_lo_message(parentId, argTypes, argc, args);
-
+            for (int i = 0; i < GetGrid()->GetRoot()->GetChildCount(); i++)
+            {
+                wxPGId parentId = GetGrid()->GetRoot()->Item(i)->GetPropertyByName( wxString((char*)args[0], wxConvUTF8) );
+                if (parentId)
+                {
+                    wxProp_from_lo_message(parentId, argTypes, argc, args);
+                    break;
+                }
+            }
             lo_message_free(*nodeStateIterator);
             nodeState.erase(nodeStateIterator); //note: iterator automatically advances after erase()
         }
@@ -274,7 +286,6 @@ void wxVessPropGrid::UpdateFromVess()
 
     GetGrid()->Thaw();
 }
-
 
 void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType, asReferenced* pObject)
 {
@@ -287,6 +298,15 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
     // Create a category for the object
     wxPGId categoryId = Append(new wxPropertyCategory(className));
     wxPGId parentId = categoryId;
+
+    wxString helpText;
+    if (!classType.getBriefHelp().empty())
+    {
+        helpText = wxT("DESCRIPTION: ") + wxString(classType.getBriefHelp().c_str(), wxConvUTF8) + wxT("\n");
+        helpText += wxString(classType.getDetailedHelp().c_str(), wxConvUTF8) + wxT("\n");
+        SetPropertyHelpString(parentId, helpText);
+    }
+
 
     // Look through all methods
     const MethodInfoList& methods = classType.getMethods();
@@ -325,7 +345,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
 
                 if (param->getParameterType().isDefined())
                 {
-                    //std::cout << "    param: " << param->getName() << ", type: " << param->getParameterType().getQualifiedName() << std::endl;
+                    //std::cout << "    param: " << param->getName()  << ", real type: " << param->getParameterType().getName() << ", qualified type: " << param->getParameterType().getQualifiedName() << std::endl;
 
                     // If it's just one param, display the method as the label,
                     // otherwise the method is already displayed as a parent so
@@ -362,30 +382,33 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                         // appropriate property:
 
                         if (t=="bool") {
-                            //propId = AppendIn(parentId, new wxBoolProperty(propName, wxPG_LABEL, variant_cast<bool>(propValue)));
                             propId = AppendIn(parentId, new wxBoolProperty(propName, wxPG_LABEL, false));
+                            SetPropertyAttribute( propId, wxPG_BOOL_USE_CHECKBOX, true );
                         }
                         else if (t=="int") {
-                            //propId = AppendIn(parentId, new wxIntProperty(propName, wxPG_LABEL, variant_cast<int>(propValue)));
                             propId = AppendIn(parentId, new wxIntProperty(propName, wxPG_LABEL, 0));
                         }
-                        else if (t=="float") {
-                            //propId = AppendIn(parentId, new wxFloatProperty(propName, wxPG_LABEL, variant_cast<float>(propValue)));
+                        else if (t=="float" || t=="double") {
                             propId = AppendIn(parentId, new wxFloatProperty(propName, wxPG_LABEL, 0.0));
-                        }
-                        else if (t=="double") {
-                            //propId = AppendIn(parentId, wxFloatProperty(propName, wxPG_LABEL, variant_cast<double>(propValue)));
-                            propId = AppendIn(parentId, new wxFloatProperty(propName, wxPG_LABEL, 0.0));
+                            SetPropertyEditor(propId, wxPG_EDITOR(SpinCtrl));
+                            SetPropertyAttribute(propId, wxPG_ATTR_SPINCTRL_MOTIONSPIN, true);
+                            SetPropertyAttribute(propId, wxPG_ATTR_SPINCTRL_STEP, 0.1);
                         }
                         else if (t=="std::string")
                         {
-                            //propId = AppendIn(parentId, wxStringProperty(propName, wxPG_LABEL, (variant_cast<std::string>(propValue)).c_str()));
                             propId = AppendIn(parentId, new wxStringProperty(propName, wxPG_LABEL, wxT("default") ));
                         }
                         else if (t=="char *" || t=="const char *")
                         {
-                            //propId = AppendIn(parentId, wxStringProperty(propName, wxPG_LABEL, (variant_cast<std::string>(propValue)).c_str()));
-                            propId = AppendIn(parentId, new wxStringProperty(propName, wxPG_LABEL, wxT("default") ));
+                            if (param->getName()=="filename")
+                            {
+                                propId = AppendIn(parentId, new wxFileProperty(propName, wxPG_LABEL, wxT("NULL") ));
+                                //SetPropertyAttribute( propId, wxPG_FILE_WILDCARD, wxT("All files (*.*)|*.*") );
+                                //SetPropertyAttribute( propId, wxPG_FILE_WILDCARD, wxT("All files (*.*)|*.*") );
+
+                            } else {
+                                propId = AppendIn(parentId, new wxStringProperty(propName, wxPG_LABEL, wxT("default") ));
+                            }
                         }
                         else
                         {
@@ -399,15 +422,14 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                     // Make a description.
                     if (propId)
                     {
-                        wxString helpText;
-                        helpText += wxT("Type: ") + wxString(t.c_str(), wxConvUTF8) + wxT("\n");
+                        helpText = wxT("");
                         if (!IsPropertyEnabled(propId))
                         {
-                            helpText += wxT("Read-only");
+                            helpText += wxT("(Read-only)\n");
                         }
                         else
                         {
-                            helpText += wxT("Full OSC message: /vess/") + wxString(vess->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
+                            helpText += wxT("OSC: /vess/") + wxString(vess->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
                             helpText += wxT(" ") + methodName + wxT(" <");
                             for (ParameterInfoList::const_iterator paramIter2=params.begin(); paramIter2!=params.end(); paramIter2++)
                             {
@@ -415,15 +437,18 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                             }
                             helpText += wxT(" >\n");
                         }
-                        helpText += wxString(method->getBriefHelp().c_str(), wxConvUTF8) + wxT("\n");
-                        helpText += wxString(method->getDetailedHelp().c_str(), wxConvUTF8) + wxT("\n");
+                        if (!method->getBriefHelp().empty())
+                        {
+                            helpText += wxT("DESCRIPTION: ") + wxString(method->getBriefHelp().c_str(), wxConvUTF8) + wxT("\n");
+                            helpText += wxString(method->getDetailedHelp().c_str(), wxConvUTF8) + wxT("\n");
+                        }
                         SetPropertyHelpString(propId, helpText);
                     }
 
                 } // if param type isDefined
                 else
                 {
-                    std::cout << "    param: " << param->getName() << ", type: [undefined]" << std::endl;
+                    //std::cout << "    param: " << param->getName() << ", type: [undefined]" << std::endl;
                 }
 
             } // param iterator
@@ -435,6 +460,22 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                 parentId->GenerateComposedValue(composedValue);
                 parentId->SetValueFromString(composedValue);
                 //std::cout << "composed value for " << methodName.mb_str() << "= " << composedValue.mb_str() << std::endl;
+
+                helpText = wxT("");
+                helpText += wxT("OSC: /vess/") + wxString(vess->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
+                helpText += wxT(" ") + methodName + wxT(" <");
+                for (ParameterInfoList::const_iterator paramIter2=params.begin(); paramIter2!=params.end(); paramIter2++)
+                {
+                    helpText += wxT(" ") + wxString((*paramIter2)->getParameterType().getQualifiedName().c_str(), wxConvUTF8);
+                }
+                helpText += wxT(" >\n");
+                if (!method->getBriefHelp().empty())
+                {
+                    helpText += wxT("DESCRIPTION: ") + wxString(method->getBriefHelp().c_str(), wxConvUTF8) + wxT("\n");
+                    helpText += wxString(method->getDetailedHelp().c_str(), wxConvUTF8) + wxT("\n");
+                }
+                SetPropertyHelpString(parentId, helpText);
+
             }
 
         } // if desired method
@@ -454,7 +495,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 
     wxPGId parent = event.GetMainParent();
 
-    std::cout << "OnPropertyChanging: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << event.GetValue().GetString().mb_str() << std::endl;
+    //std::cout << "OnPropertyChanging: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << event.GetValue().GetString().mb_str() << std::endl;
 
     //GetGrid()->Freeze();
 
@@ -481,19 +522,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 
 	std::string OSCpath = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
 
-	// If this sceneManager is just a listener, then we nees to send to the
-	// broadcastChannel. Otherwise, we send to the (unicast) rxAddr of this
-	// server.
-    if (vess->sceneManager->isSlave())
-    {
-        lo_send_message(vess->lo_infoServ, OSCpath.c_str(), msg);
-    }
-    else
-        lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
-
-
-	lo_message_free(msg);
-
+    vess->sendMessage(OSCpath.c_str(), msg);
 
 	// prevent event from propagating:
 	//event.Veto();
@@ -579,7 +608,7 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId )
 {
     std::string t = std::string(propId->GetValueType().mb_str());
 
-    std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << propId->GetValueAsString().mb_str() << std::endl;
+    //std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << propId->GetValueAsString().mb_str() << std::endl;
 
     if ( t=="string" || t=="std::string" || t=="char *" || t=="const char *" )
     {
@@ -598,7 +627,6 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId )
     */
     else if ( t=="int" || t=="long" )
     {
-		std::cout << "changing int/long prop " << propId->GetBaseName().mb_str() << " to value: " << (int) propId->GetValue().GetInteger() << std::endl;
         lo_message_add_int32( msg, (int) propId->GetValue().GetInteger() );
     }
     else if ( t=="bool" )
@@ -612,7 +640,7 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId, wxVariant val )
 {
     std::string t = std::string(propId->GetValueType().mb_str());
 
-    std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << val.GetString().mb_str(wxConvUTF8) << std::endl;
+    //std::cout << "  propId: " << propId->GetBaseName().mb_str() << ", type=" << t << ", value=" << val.GetString().mb_str(wxConvUTF8) << std::endl;
 
 
     if ( t=="string" || t=="std::string" || t=="char *" || t=="const char *" )
@@ -631,7 +659,6 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId, wxVariant val )
     */
     else if ( t=="int" || t=="long" )
     {
-		std::cout << "changing int/long prop " << propId->GetBaseName().mb_str() << " to value: " << (int) propId->GetValue().GetInteger() << std::endl;
         lo_message_add_int32( msg, (int) val.GetInteger() );
     }
     else if ( t=="bool" )
@@ -661,18 +688,6 @@ void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_
             wxPGId propId;
             if (parentId->GetChildCount()) propId = parentId->Item(i-1);
             else propId = parentId;
-
-            /*
-            std::cout << " setting wxProp: " << propId->GetBaseName().mb_str() << " (type=" << propId->GetValueType().mb_str() << ") from lo_arg:";
-            if (lo_is_numerical_type((lo_type)argTypes[i]))
-            {
-                std::cout << " " << (float) lo_hires_val((lo_type)argTypes[i], argv[i]);
-            } else {
-                std::cout << " " << (char*) argv[i];
-            }
-            std::cout << " (type=" << argTypes[i] << ")" << std::endl;
-            */
-
 
             if (argTypes[i]=='s')
             {
@@ -716,34 +731,39 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
 
     if (!propGrid) return 0;
 
-    std::string parentString = propGrid->GetCurrentNode()->nodeType + "." + std::string((char*)argv[0]);
-    wxPGId parentId = propGrid->GetGrid()->GetRoot()->GetPropertyByName( wxString(parentString.c_str(), wxConvUTF8) );
 
-    //std::cout << "Got update for current propgrid node: " << parentString << std::endl;
+    //std::string parentString = propGrid->GetCurrentNode()->nodeType + "." + std::string((char*)argv[0]);
+    //wxPGId parentId = propGrid->GetGrid()->GetRoot()->GetPropertyByName( wxString(parentString.c_str(), wxConvUTF8) );
 
-    if (parentId)
+    for (int i = 0; i < propGrid->GetGrid()->GetRoot()->GetChildCount(); i++)
     {
-
-        wxProp_from_lo_message(parentId, types, argc, argv);
-
-        // note: refreshing the property here can cause crashing, but it seems
-        //       to only happen for particular properties (eg, enums), and maybe
-        //       only if they are currently selected. Thus, we will refresh only
-        //       properties that are not currently selected...
-        //propGrid->GetGrid()->RefreshProperty(parentId);
-
-        wxPGId selectedProp = propGrid->GetGrid()->GetSelectedProperty();
-        if (selectedProp)
+        wxPGId parentId = propGrid->GetGrid()->GetRoot()->Item(i)->GetPropertyByName( wxString((char*)argv[0], wxConvUTF8) );
+        if (parentId)
         {
-            if ( (parentId==selectedProp) || (parentId==selectedProp->GetMainParent()) )
+
+            wxProp_from_lo_message(parentId, types, argc, argv);
+
+            // note: refreshing the property here can cause crashing, but it seems
+            //       to only happen for particular properties (eg, enums), and maybe
+            //       only if they are currently selected. Thus, we will refresh only
+            //       properties that are not currently selected...
+            //propGrid->GetGrid()->RefreshProperty(parentId);
+
+            wxPGId selectedProp = propGrid->GetGrid()->GetSelectedProperty();
+            if (selectedProp)
             {
-                //propGrid->GetGrid()->SelectProperty(selectedProp, false);
-                //propGrid->GetGrid()->RefreshProperty(selectedProp);
-                //propGrid->GetGrid()->SelectProperty(selectedProp, true);
+                if ( (parentId==selectedProp) || (parentId==selectedProp->GetMainParent()) )
+                {
+                    //propGrid->GetGrid()->SelectProperty(selectedProp, false);
+                    //propGrid->GetGrid()->RefreshProperty(selectedProp);
+                    //propGrid->GetGrid()->SelectProperty(selectedProp, true);
+                }
+                else {
+                    propGrid->GetGrid()->RefreshProperty(parentId);
+                }
             }
-            else {
-                propGrid->GetGrid()->RefreshProperty(parentId);
-            }
+
+            break;
         }
     }
 

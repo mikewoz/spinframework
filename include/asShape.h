@@ -66,30 +66,48 @@ public:
 	asShape(asSceneManager *sceneManager, char *initID);
 	virtual ~asShape();
 
+	/**
+	 * IMPORTANT:
+	 * subclasses of asReferenced are allowed to contain complicated subgraphs,
+	 * and can also change their attachmentNode so that children are attached
+	 * anywhere in that subgraph. If that is the case, the updateNodePath()
+	 * function MUST be overridden, and extra nodes must be manually pushed onto
+	 * currentNodePath.
+	 */
 	virtual void updateNodePath();
 
+    /**
+     * This is a local translational offset from the parent
+     */
 	void setTranslation (float x, float y, float z);
+
+    /**
+     * This is a local orientation offset from the parent
+     */
 	void setOrientation (float pitch, float roll, float yaw);
+
+	 /**
+     * Allows for scaling in each axis
+     */
 	void setScale (float x, float y, float z);
 
+    /**
+     * We provide several possible shapes
+     */
     enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
 
 	void setShape			(shapeType s);
-	//void setShape			(char* newShape);
 
 	void setColor			(float red, float green, float blue, float alpha);
-	void setTexture			(int newTexture);
-	void setTextureFromFile	(char* newTexture);
+	void setTextureFromFile	(char* filename);
 	void setRenderBin		(int i);
+
 
 	osg::Vec3 getTranslation() { return shapeTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
 	osg::Vec3 getScale() { return shapeTransform->getScale(); };
-
-	//char* getShape() { return (char*)shape.c_str(); }
 	int getShape() { return (int)shape; }
 	osg::Vec4 getColor() { return _color; };
-	int getTexture() { return textureID; }
 	int getRenderBin() { return renderBin; }
 
 	/**
@@ -122,10 +140,7 @@ public:
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 
 
-	// We can have a texture on the shape, either from the database (given an id),
-	// or loaded from a local file. Note that both methods cannot be valid at
-	// the same time. ie, either textureID is 0, or textureFile is ""
-	int textureID;
+	// We can have a texture on the shape, loaded from a local file
 	std::string textureName;
 	std::string texturePath;
 

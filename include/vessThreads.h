@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -50,19 +50,19 @@
 
 /**
  * \brief A class to facilitate communication with VESS from any application.
- * 
+ *
  * An instance of this class should be included in any process that needs to
  * maintain scene state or communicate to a VESS server.
- * 
+ *
  * By instantiating this class, we load the VESS NodeKit library, and create all
- * the proper network handlers to receive OSC messages from VESS and update 
+ * the proper network handlers to receive OSC messages from VESS and update
  * internal state.
- * 
+ *
  * Be sure to start the listener with start().
- * 
+ *
  * The vessMaster class should be used if the process is to act as a server
  * rather than a client.
- * 
+ *
 */
 class vessListener
 {
@@ -74,6 +74,8 @@ class vessListener
 
 		virtual void start();
 		virtual void stop();
+
+		void sendMessage(const char *OSCpath, lo_message msg);
 
 		bool isRunning() { return running; }
 
@@ -107,9 +109,9 @@ class vessListener
 /**
  * \brief The vessMaster class is an extension of vessListener, which broadcasts
  * all received messages for other listeners on the network.
- * 
+ *
  * Be careful to only have one vessMaster per network, or infinite update loops
- * can occur. Of course, one can get around this by giving each vessMaster a 
+ * can occur. Of course, one can get around this by giving each vessMaster a
  * unique id via the setID() method
  */
 class vessMaster : public vessListener

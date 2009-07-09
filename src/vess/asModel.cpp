@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -72,12 +72,11 @@ asModel::asModel (asSceneManager *sceneManager, char *initID) : asReferenced(sce
 {
 	this->setName(string(id->s_name) + ".asModel");
 	nodeType = "asModel";
-	
-	modelTransform = new osg::PositionAttitudeTransform();	
+
+	modelTransform = new osg::PositionAttitudeTransform();
 	modelTransform->setName(string(id->s_name) + ".modelTransform");
 	this->addChild(modelTransform.get());
-	
-	modelID = 0;
+
 	modelName = "NULL";
 
 	// When children are attached to this, they get added to the attachNode:
@@ -111,14 +110,14 @@ void asModel::updateNodePath()
 			currentNodePath = parentNode->currentNodePath;
 		}
 	}
-	
+
 	// here, the nodePath includes the base osg::group, PLUS the modelTransform
 	currentNodePath.push_back(this);
 	currentNodePath.push_back(modelTransform.get());
-	
+
 	// now update NodePaths for all children:
 	updateChildNodePaths();
-	
+
 }
 
 
@@ -135,11 +134,11 @@ void asModel::setTranslation (float x, float y, float z)
 void asModel::setOrientation (float p, float r, float y)
 {
 	_orientation = osg::Vec3(p, r, y);
-	
+
 	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
 							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
 							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-	
+
 	modelTransform->setAttitude(q);
 	BROADCAST(this, "sfff", "setOrientation", p, r, y);
 }
@@ -147,37 +146,21 @@ void asModel::setOrientation (float p, float r, float y)
 void asModel::setScale (float x, float y, float z)
 {
 	modelTransform->setScale(osg::Vec3(x,y,z));
-	BROADCAST(this, "sfff", "setScale", x, y, z);	
+	BROADCAST(this, "sfff", "setScale", x, y, z);
 }
 
-void asModel::setModel (int newModel)
-{	
-	// don't do anything if the current model is already loaded:
-	if (modelID == newModel) return;
-	
-	modelID = newModel;
-	modelName = mediaManager->getModelName(modelID);
-	modelPath = mediaManager->getModelPath(modelID);
-
-	drawModel();
-	
-	BROADCAST(this, "si", "setModel", modelID);
-
-}
-
-void asModel::setModelFromFile (char* s)
+void asModel::setModelFromFile (char* filename)
 {
 	// don't do anything if the current model is already loaded:
-	if (string(s)==modelName) return;
-	
-	modelID = 0;
-	modelName = string(s);
-	modelPath = mediaManager->getModelPath(s);
+	if (string(filename)==modelName) return;
+
+	modelName = string(filename);
+	modelPath = mediaManager->getModelPath(filename);
 
 	drawModel();
-	
+
 	BROADCAST(this, "ss", "setModelFromFile", modelName.c_str());
-	
+
 }
 
 
@@ -186,11 +169,11 @@ void asModel::setModelFromFile (char* s)
 // ===================================================================
 void asModel::drawModel()
 {
-	int i,j; 
+	int i,j;
 
 	if (model.valid())
 	{
-			
+
 		modelTransform->removeChild(model.get());
 		model = NULL;
 		for (i=0; i<ASMODEL_NUM_ANIM_CONTROLS; i++)
@@ -203,7 +186,7 @@ void asModel::drawModel()
 			state[i] = 0;
 		}
 	}
-		
+
 	if (!modelPath.empty())
 	{
 
@@ -214,12 +197,12 @@ void asModel::drawModel()
 		{
 			findNodeVisitor getAnimInterface;
 			char buf[16];
-					
+
 			for (i=0; i<ASMODEL_NUM_ANIM_CONTROLS; i++)
 			{
-						
+
 				sprintf( buf, "%02d", i );
-						
+
 				// Check if there are multiple states available from a osg::Switch
 				// note: from 3DS exporter, switch nodes are called: OSG_Switch01, etc.
 				getAnimInterface.searchNode(model.get(), "OSG_Switch"+string(buf));
@@ -232,7 +215,7 @@ void asModel::drawModel()
 					// initialize so only first frame is visible:
 					switcher[i]->setValue(0, true);
 					for (j=1; j<animationNumFrames[i]; j++) switcher[i]->setValue(j, false);
-							
+
 				}
 
 				// Check if there is an osg::Sequence node.
@@ -246,7 +229,7 @@ void asModel::drawModel()
 					sequencer[i]->setValue(0);
 					sequencer[i]->setMode(osg::Sequence::PAUSE);
 				}
-						
+
 			}
 			optimizer.optimize(model.get());
 			modelTransform->addChild(model.get());
@@ -255,12 +238,12 @@ void asModel::drawModel()
 			//osg::StateSet *modelStateSet = new osg::StateSet();
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);
 			//model->setStateSet(modelStateSet);
-			
+
 			std::cout << "Created model " << modelName << std::endl;
 			osg::BoundingSphere bound = model->computeBound();
 			osg::Vec3 c = bound.center();
 			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << std::endl;
-					
+
 		} else {
 			std::cout << "ERROR [asModel::drawModel]: Could not find \"" << modelPath << "\". Make sure file exists, and that it is a valid 3D model." << std::endl;
 		}
@@ -272,30 +255,26 @@ std::vector<lo_message> asModel::getState ()
 
 	// inherit state from base class
 	std::vector<lo_message> ret = asReferenced::getState();
-	
+
 	lo_message msg;
 	osg::Vec3 v;
-	
-	
+
+
 	msg = lo_message_new();
 	v = this->getTranslation();
 	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
 	ret.push_back(msg);
-	
+
 	msg = lo_message_new();
 	v = this->getOrientation();
 	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
 	ret.push_back(msg);
-	
+
 	msg = lo_message_new();
 	v = this->getScale();
 	lo_message_add(msg, "sfff", "setScale", v.x(), v.y(), v.z());
 	ret.push_back(msg);
-	
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setModel", modelID);
-	ret.push_back(msg);
-	
+
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setModelFromFile", modelName.c_str());
 	ret.push_back(msg);

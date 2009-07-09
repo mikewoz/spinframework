@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -83,6 +83,8 @@ public:
                   long style = wxPG_SPLITTER_AUTO_CENTER | wxTAB_TRAVERSAL | wxPG_TOOLBAR | wxPG_DESCRIPTION,
                   const wxChar* name = wxT("propGrid"));
 
+    void setListeningServer(lo_server_thread t);
+
     //! Set a new node to show.
     void SetNode(asReferenced* pObject, bool forceUpdate=false);
 
@@ -93,15 +95,13 @@ public:
     //! Updates all the properties based on getState() of currentNode
     void UpdateFromVess();
 
-
-
 protected:
 
     //! Create a category and properties of the given object.
     void GenerateProperties(const osgIntrospection::Type& type, asReferenced* pObject);
 
 	void OnPropertyChanging(wxPropertyGridEvent& event);
-	
+
     //! Property value changed event. Set the change to the osg object.
     void OnPropertyChanged(wxPropertyGridEvent& event);
 

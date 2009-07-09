@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -80,7 +80,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	//(*Initialize(wxVessEditor)
 	wxBoxSizer* BoxSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
-	
+
 	Create(parent, wxID_ANY, _("SPIN :: Editor"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(-1,600));
 	vessEditor_splitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
@@ -108,7 +108,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	ToolBarItem4 = wxVessEditor_ToolBar->AddTool(vessEditor_debugPrint, _("DebugPrint"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
 	wxVessEditor_ToolBar->Realize();
 	SetToolBar(wxVessEditor_ToolBar);
-	
+
 	Connect(vessEditor_newNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnNewNode);
 	Connect(vessEditor_clear,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnClear);
 	Connect(vessEditor_refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnRefresh);
@@ -124,22 +124,36 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
     pFont.SetPointSize(9.0f);
     vessTree->SetFont(pFont);
 
-	//wxTreeItemId vessTreeRoot = vessTree->AddRoot(wxT("root"));
-
-    //wxTreeItemId vessTreeRoot = osgTree->AddRoot(wxT("root"));
-
 	vessTree->BuildTree(vess->sceneManager->worldNode.get());
-
 
 	// provide VessTree with a pointer to VessPropGrid so that it can fill it:
 	vessTree->SetPropGrid(VessPropGrid);
 
-/*
-    wxTreeItemId vessTreeNode;
-	vessTreeNode = osgTree->AppendItem(osgTree, wxT("foo"));
-	vessTreeNode = osgTree->AppendItem(osgTree, wxT("sheefa"));
-	osgTree->Expand(vessTreeRoot);
-*/
+
+    // We'll set up an OSC receiver to listen to messages so that we can update
+    // vessTree and vessPropGrid. Note that we MUST listen to the broadcast
+    // channel and not to vessChannel directly. This is because VESS might
+    // broadcast different messages than it receives (eg, it receives a 'move'
+    // message, but will transmit a 'setTranslation' message).
+    if (vess->sceneManager->isSlave())
+    {
+        // if this sceneManager is already a listener, then we can just hijack
+        // the rxServ and add our own method callbacks.
+        listeningServer = vess->sceneManager->rxServ;
+    }
+    else
+    {
+        // if this sceneManager is a server, then we have to create a new server
+        // that listens to the messages it is broadcasting
+        if (isMulticastAddress(vess->txAddr))
+            listeningServer = lo_server_thread_new_multicast(vess->txAddr.c_str(), vess->txPort.c_str(), oscParser_error);
+        else
+            listeningServer = lo_server_thread_new(vess->txPort.c_str(), oscParser_error);
+        lo_server_thread_start(listeningServer);
+    }
+
+    vessTree->setListeningServer(this->listeningServer);
+    VessPropGrid->setListeningServer(this->listeningServer);
 
 }
 
@@ -187,9 +201,11 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
             lo_message_add_string(msg, "createNode");
             lo_message_add_string(msg, nodeID.mb_str());
             lo_message_add_string(msg, nodeType.mb_str());
+
             std::string OSCpath = "/vess/" + vess->id;
-            lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
-            lo_message_free(msg);
+            vess->sendMessage(OSCpath.c_str(), msg);
+            //lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
+            //lo_message_free(msg);
 
             done = true;
 
@@ -216,60 +232,33 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
 void wxVessEditor::OnRefresh(wxCommandEvent& event)
 {
-	vessTree->BuildTree(vess->sceneManager->worldNode.get());
-}
+    //vessTree->BuildTree(vess->sceneManager->worldNode.get());
 
+    lo_message msg = lo_message_new();
+    lo_message_add_string(msg, "refresh");
 
-void wxVessEditor::OnVessSelectionChange(wxTreeEvent &event)
-{
-    //vessTree->SelectItem(event.GetItem());
-
-    std::cout << "OnVessSelectionChange: " << std::string(event.GetLabel().mb_str()) << std::endl;
-
-    std::cout << "VessTree has " << vessTree->GetChildrenCount(vessTree->GetRootItem(), true) << " children" << std::endl;
-
-    //wxTreeItemId id = vessTree->GetSelection();
-    //std::cout << "getSelection=" << std::string( vessTree->GetItemText(id).mb_str() ) << std::endl;
-
-    wxTreeItemId id = event.GetItem();
-    std::cout << "IsOk item? " << id.IsOk() << std::endl;
-    //std::cout << "itemText=" << std::string( vessTree->GetItemText(event.GetItem()).mb_str() ) << std::endl;
-
-    //SceneNodeData* pNode = (SceneNodeData*) vessTree->GetItemData(event.GetItem());
-    //if (!pNode) std::cout << "asReferenced id: " << pNode->m_pObject->id << std::endl;
-
-
-/*
-    asReferenced* n = vessTree->GetSelectedObject();
-    if (n)
-    {
-        std::cout << "clicked on " << n->id << std::endl;
-    }
-
-    else std::cout << "couldn't cast tree click as asReferenced" << std::endl;
-*/
-
-    event.Skip();
-}
-
-
-void wxVessEditor::OnDragBegin(wxTreeEvent &event)
-{
-	//iDraggedItem = oEvent.GetItem();
-	event.Allow();
-}
-
-void wxVessEditor::OnDragEnd(wxTreeEvent &event)
-{
-    // TODO: change parents
+    std::string OSCpath = "/vess/" + vess->id;
+    vess->sendMessage(OSCpath.c_str(), msg);
 }
 
 void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
 {
-    vess->sceneManager->debug();
+    //vess->sceneManager->debug();
+
+    lo_message msg = lo_message_new();
+    lo_message_add_string(msg, "debug");
+
+    std::string OSCpath = "/vess/" + vess->id;
+    vess->sendMessage(OSCpath.c_str(), msg);
 }
 
 void wxVessEditor::OnClear(wxCommandEvent& event)
 {
-    vess->sceneManager->clear();
+    //vess->sceneManager->clear();
+
+    lo_message msg = lo_message_new();
+    lo_message_add_string(msg, "clear");
+
+    std::string OSCpath = "/vess/" + vess->id;
+    vess->sendMessage(OSCpath.c_str(), msg);
 }
