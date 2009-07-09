@@ -8,8 +8,8 @@
 # Some paths need to be manually defined here:
 
 
-ifndef $(SPIN_PATH)
-	SPIN_PATH = ../..
+ifndef SPIN_PATH
+    SPIN_PATH = ../..
 endif
 
 GENWRAPPER_BIN = src/genwrapper/genwrapper
@@ -104,4 +104,20 @@ else
 	      -L/usr/X11R6/lib 
 endif
 
+
+
+###################################################################
+# For WX:
+
+ifndef WXCONFIG
+  WXCONFIG = "wx-config"
+endif
+WX_LIBTYPE = $(patsubst wx_%,%,$(shell $(WXCONFIG) --basename))
+
+WX_LIBS = $(shell $(WXCONFIG) --libs --gl-libs)
+WX_CXXFLAGS = $(shell $(WXCONFIG) --cxxflags)
+WX_VERSION = $(shell $(WXCONFIG) --version)
+
+# wxPropGrid library:
+WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 
