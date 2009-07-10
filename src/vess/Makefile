@@ -27,8 +27,9 @@ OBJS =  vessThreads.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
  	findNodeVisitor.o DebugVisitor.o  \
 	tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \
 	asSceneManager.o asMediaManager.o asReferenced.o \
-	asBasicNode.o asShape.o asModel.o asVideo.o asLightSource.o asRay.o asContour.o \
-	asConstraints.o asRayIntersector.o asPointer.o asMeasurementNode.o asToggle.o \
+	asBasicNode.o asShape.o asModel.o asVideo.o asLightSource.o asRay.o \
+	asContour.o asConstraints.o asRayIntersector.o asPointer.o \
+	asMeasurementNode.o asToggle.o userNode.o \
 	asDSPnode.o asSoundNode.o asSoundSpace.o asSoundConnection.o \
 	asCameraView.o asCameraManager.o asWindow.o
 
