@@ -149,7 +149,7 @@ void asModel::setScale (float x, float y, float z)
 	BROADCAST(this, "sfff", "setScale", x, y, z);
 }
 
-void asModel::setModelFromFile (char* filename)
+void asModel::setModelFromFile (const char* filename)
 {
 	// don't do anything if the current model is already loaded:
 	if (string(filename)==modelName) return;
