@@ -152,6 +152,15 @@ public:
 	int  getTextFlag () { return (int) this->textFlag; }
 
 	/**
+	 * subclasses of asReferenced may contain complicated subgraphs, and any
+	 * children get attached not to the node pointer itself, but to an
+	 * attachmentNode. This attachmentNode essentially defines the origin of the
+	 * local coordinate system of this node (according to the subgraph). This
+	 * function returns a pointer to this node.
+	 */
+	osg::Group *getAttachmentNode() { return attachmentNode; }
+	
+	/**
 	 * Debug print (to log/console)
 	 */
 	void debug();

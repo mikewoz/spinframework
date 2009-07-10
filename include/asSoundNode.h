@@ -105,17 +105,16 @@ class asSoundNode : public asDSPnode
 		 * method. Simple C++ inheritance is not enough, because osg::Introspection
 		 * won't see it.
 		 */
-		virtual void stateDump() { asReferenced::stateDump(); };
+		//virtual void stateDump() { asReferenced::stateDump(); };
 		
 		/**
 		 * Same goes shared functions from asDSPnode. We must redefine them here
 		 * so that osg::Introspection will see them:
 		 */
-		virtual void connect(char *snk) { asDSPnode::connect(snk); };
-		virtual void disconnect(char *snk) { asDSPnode::disconnect(snk); };
-		virtual void setActive(int i) { asDSPnode::setActive(i); };
-		virtual void setDSP(char *newDSP) {asDSPnode::setDSP(newDSP); };
-		//virtual void connectionMsg (char *snkName, char *method, float value) { asDSPnode::connectionMsg(snkName,method,value); };
+		//virtual void connect(char *snk) { asDSPnode::connect(snk); };
+		//virtual void disconnect(char *snk) { asDSPnode::disconnect(snk); };
+		//virtual void setActive(int i) { asDSPnode::setActive(i); };
+		//virtual void setDSP(char *newDSP) {asDSPnode::setDSP(newDSP); };
 		
 	private:
 		

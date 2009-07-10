@@ -162,6 +162,7 @@ class asSceneManager
 	private:
 		std::vector< osg::ref_ptr<asReferenced> > nodeList;
 		nodeMapType nodeMap; // the nodeList arranged by type
+		
 
 
 };
@@ -171,6 +172,7 @@ class asSceneManager
 static bool nodeSortFunction (osg::ref_ptr<asReferenced> n1, osg::ref_ptr<asReferenced> n2);
 
 int oscCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+//static int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, ValueList theArgs);
 int oscCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 void oscParser_error(int num, const char *msg, const char *path);
 

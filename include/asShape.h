@@ -99,7 +99,7 @@ public:
 	void setShape			(shapeType s);
 
 	void setColor			(float red, float green, float blue, float alpha);
-	void setTextureFromFile	(char* filename);
+	void setTextureFromFile	(const char* filename);
 	void setRenderBin		(int i);
 
 
@@ -121,7 +121,7 @@ public:
 	 * method. Simple C++ inheritance is not enough, because osg::Introspection
 	 * won't see it.
 	 */
-	virtual void stateDump() { asReferenced::stateDump(); };
+	//virtual void stateDump() { asReferenced::stateDump(); };
 
 
 

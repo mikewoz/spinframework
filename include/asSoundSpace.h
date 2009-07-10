@@ -82,7 +82,7 @@ class asSoundSpace : public asDSPnode
 		 * method. Simple C++ inheritance is not enough, because osg::Introspection
 		 * won't see it.
 		 */
-		virtual void stateDump() { asReferenced::stateDump(); };
+		//virtual void stateDump() { asReferenced::stateDump(); };
 
 #ifdef AS_GRAPHICAL
 		osgUtil::IntersectVisitor soundSpaceIntersectVisitor;

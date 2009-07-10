@@ -1330,6 +1330,42 @@ int oscCallback_conn(const char *path, const char *types, lo_arg **argv, int arg
 
 }
 
+/**
+ * Recursive function to invoke a method for a particular class, that will try
+ * all base classes as well
+ */
+static int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, ValueList theArgs)
+{
+	
+	// TODO: we should try to store this globally somewhere, so that we don't do
+	// a lookup every time there is a message:
+	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
+	
+
+	if ((classType==asReferencedType) || (classType.isSubclassOf(asReferencedType)))
+    {
+    	try {	
+    		classType.invokeMethod(method, classInstance, theArgs, true);
+    		// if we get this far, then the method invocation succeeded and
+    		// we can return:
+    		return 1;
+    	}
+    	catch (osgIntrospection::Exception & ex)
+    	{
+   			std::cerr << "catch exception: " << ex.what() << std::endl;
+  		}
+    	
+        // If the method wasn't found in the classInstance, then we need to go
+    	// through all base classes to see if method is contained in a parent class:
+    	for (int i=0; i<classType.getNumBaseTypes(); i++)
+    	{
+    		if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs)) return 1;
+    	}
+    }
+	
+	return 0;
+}
+
 int oscCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
 	int i;
@@ -1364,6 +1400,88 @@ int oscCallback_node(const char *path, const char *types, lo_arg **argv, int arg
 	// TODO: split this function into two, to give a generic method calling fn:
 	//this->invokeNodeMethod(n, theMethod, theArgs)
 
+	
+	// get node as an osgInrospection::Value (note that type will be asReferenced pointer):
+	const osgIntrospection::Value classInstance = osgIntrospection::Value(n.get());
+
+
+	// the getInstanceType() method however, gives us the real type being pointed at:
+	const osgIntrospection::Type &classType = classInstance.getInstanceType();
+
+	
+    if (!classType.isDefined())
+    {
+        std::cout << "ERROR: oscParser cound not process message '" << path << ". osgIntrospection has no data for that node." << std::endl;
+        return 0;
+    }
+
+	//introspect_print_type(classType);
+
+    
+	// If we have found a valid Type, then let's build an argument list and see
+	// if we can find a method that takes this list of argumets:
+	for (i=1; i<argc; i++)
+	{
+		if (lo_is_numerical_type((lo_type)types[i]))
+		{
+			theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
+		} else {
+			theArgs.push_back( (const char*) argv[i] );
+		}
+	}
+    
+	return invokeMethod(classInstance, classType, theMethod, theArgs);
+	
+	
+	/*
+	// TODO: we should try to store this globally somewhere, so that we don't do
+	// a lookup every time there is a message:
+	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
+	
+    // Try to invoke the method (and arglist) using the current classInstance:
+    try
+    {
+    	classType.invokeMethod(theMethod, classInstance, theArgs, true);
+    	// if we get this far, then the method invocation succeeded and
+    	// we can return:
+    	return 1;
+    	
+    }
+	catch (osgIntrospection::Exception & ex)
+	{
+		std::cerr << "catch exception: " << ex.what() << std::endl;
+	}	
+		
+    // If the method wasn't found in the classInstance, then we need to go
+	// through all base classes to see if method is contained in a parent class:
+	const Type& baseClassType = classType;
+	while ((baseClassType==asReferencedType) || (baseClassType.isSubclassOf(asReferencedType)))
+	{
+    for (int i=0; i<classType.getNumBaseTypes(); i++)
+    {
+        const Type& baseClassType = classType.getBaseType(i);
+        if ((baseClassType==asReferencedType) || (baseClassType.isSubclassOf(asReferencedType)))
+        {
+        	try
+        	{
+        		baseClassType.invokeMethod(theMethod, classInstance, theArgs, true);
+        		// if we get this far, then the method invocation succeeded and
+        		// we can return:
+        		return 1;
+        	}
+        	catch (osgIntrospection::Exception & ex)
+        	{
+       			std::cerr << "catch exception: " << ex.what() << std::endl;
+        		continue;
+      		}
+        }
+    }
+    */
+    
+
+
+
+	/*
 
 	// special case if theMethod is debug():
 	if ((theMethod) == "debug")
@@ -1405,32 +1523,6 @@ int oscCallback_node(const char *path, const char *types, lo_arg **argv, int arg
 			// get rid of special case setParent() above
 
 
-			/*
-			osgIntrospection::Value value;
-
-			if (n->nodeType == "asBasicNode") {
-					value = osgIntrospection::Value( (dynamic_cast<asBasicNode*> (n.get())) );
-			}
-
-			else if (n->nodeType == "asSoundNode") {
-					value = osgIntrospection::Value( (dynamic_cast<asSoundNode*> (n.get())) );
-			}
-
-			else if (n->nodeType == "asSoundSpace") {
-					value = osgIntrospection::Value( (dynamic_cast<asSoundSpace*> (n.get())) );
-			}
-
-			else if (n->nodeType == "asShape") {
-					value = osgIntrospection::Value( (dynamic_cast<asShape*> (n.get())) );
-			}
-
-			else if (n->nodeType == "asModel") {
-				value = osgIntrospection::Value( (dynamic_cast<asModel*> (n.get())) );
-			}
-
-			const osgIntrospection::Type &type = value.getType().getPointedType();
-			*/
-
 
 #ifdef OSCDEBUG
 			std::cout << "Introspection:" << std::endl;
@@ -1469,7 +1561,7 @@ int oscCallback_node(const char *path, const char *types, lo_arg **argv, int arg
 		}
 
 	}
-
+*/
 
 	//pthread_mutex_unlock(&pthreadLock);
 

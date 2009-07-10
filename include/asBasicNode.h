@@ -153,7 +153,7 @@ public:
 	 * method. Simple C++ inheritance is not enough, because osg::Introspection
 	 * won't see it.
 	 */
-	virtual void stateDump() { asReferenced::stateDump(); dumpGlobals(true); };
+	//virtual void stateDump() { asReferenced::stateDump(); dumpGlobals(true); };
 
 
 

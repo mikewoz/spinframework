@@ -186,24 +186,24 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
         //std::cout << "Populating property editor for: " << newNode->id->s_name << std::endl;
 		//introspect_print_type(classType);
 
-
+        // Parse this class:
+        GenerateProperties(classType, newNode);
 
         // Go through the base classes and add properties for any base class
         // that is castable as asReferened. Start at the the furthest base level
-        std::cout << classType.getQualifiedName() << " has " << classType.getNumBaseTypes() << " base classes:";
+	        
+        // this is now done recursively in GenerateProperties()
+        /*
         for (int i=0; i<classType.getNumBaseTypes(); i++)
         {
             const Type& BaseClassType = classType.getBaseType(i);
-            std::cout<<" "<< BaseClassType.getQualifiedName();
             if ((BaseClassType==asReferencedType) || (BaseClassType.isSubclassOf(asReferencedType)))
             {
                 GenerateProperties(BaseClassType, newNode);
             }
         }
-        std::cout << std::endl;
+        */
 
-        // Parse this class:
-        GenerateProperties(classType, newNode);
 
         // Add a callback method to the listeningServer that will listen for
         // messages related to the new node, and update props:
@@ -289,7 +289,16 @@ void wxVessPropGrid::UpdateFromVess()
 
 void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType, asReferenced* pObject)
 {
+	// TODO: we should try to store this globally somewhere, so that we don't do
+	// a lookup every time there is a message:
+	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
 
+	if (!( classType==asReferencedType || classType.isSubclassOf(asReferencedType) ))
+    {
+		// we've gotten to a non-asReferenced node (recursively), so return
+		return;
+    }
+	
 	//std::cout << "wxVessPropGrid::GenerateProperties for class=" << classType.getQualifiedName() << ", id=" << pObject->id->s_name << std::endl;
 
     wxString className = wxString(classType.getQualifiedName().c_str(), wxConvUTF8);
@@ -481,6 +490,14 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
         } // if desired method
 
     } // method iterator
+    
+    
+    // recursively add properties of all base classes:
+	for (int i=0; i<classType.getNumBaseTypes(); i++)
+	{
+		GenerateProperties(classType.getBaseType(i), pObject);
+	}
+    
 }
 
 
