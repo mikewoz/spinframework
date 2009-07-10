@@ -204,7 +204,7 @@ void asShape::setColor (float r, float g, float b, float a)
 }
 
 // ===================================================================
-void asShape::setTextureFromFile (char* s)
+void asShape::setTextureFromFile (const char* s)
 {
 	// don't do anything if the current texture is already loaded:
 	if (string(s)==textureName) return;
