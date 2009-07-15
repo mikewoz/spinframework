@@ -43,6 +43,8 @@
 #include <ifaddrs.h>
 #include <string>
 #include <stdlib.h>
+#include <sys/utsname.h>
+
 
 #include "asUtil.h"
 
@@ -51,6 +53,16 @@ using namespace std;
 
 // *****************************************************************************
 // networking functions
+
+std::string getHostname()
+{
+	struct utsname ugnm;
+
+	 if (uname(&ugnm) < 0) return "";
+
+	 return string(ugnm.nodename);
+	
+}
 
 std::string getMyIPaddress()
 {
