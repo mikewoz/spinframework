@@ -51,6 +51,7 @@
 // *****************************************************************************
 // networking functions
 
+std::string getHostname();
 std::string getMyIPaddress();
 std::string getMyBroadcastAddress();
 bool isMulticastAddress(std::string s);
