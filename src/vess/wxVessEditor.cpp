@@ -81,7 +81,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	//(*Initialize(wxVessEditor)
 	wxBoxSizer* BoxSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
-
+	
 	Create(parent, wxID_ANY, _("SPIN :: Editor"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(-1,600));
 	vessEditor_splitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
@@ -112,7 +112,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	ToolBarItem5 = wxVessEditor_ToolBar->AddTool(vessEditor_deleteNode, _("Delete Selected Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxITEM_NORMAL, _("Delete the currently selected node"), _("Delete the currently selected node"));
 	wxVessEditor_ToolBar->Realize();
 	SetToolBar(wxVessEditor_ToolBar);
-
+	
 	Connect(vessEditor_clear,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnClear);
 	Connect(vessEditor_refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnRefresh);
 	Connect(vessEditor_debugPrint,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnDebugPrint);

@@ -8,8 +8,8 @@ all: $(OS)
 #	@echo "SPIN_PATH=${SPIN_PATH}";
 
 # choose names of binaries:
-Linux: vess spinViewer spinApp
-Darwin: vess spinViewer spinApp spin.app
+Linux: vess spinViewer spin
+Darwin: vess spinViewer spin spin.app
 
 # if you have a custom verion of wxWidgets:
 #WXCONFIG = $(HOME)/svn/wxMac-2.8.9/wx-config
@@ -71,7 +71,7 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ###################################################################
 # TARGETS:
 
-ALLTARGETS = spinViewer vess spinApp
+ALLTARGETS = spinViewer vess spin
 
 doc: $(OBJS) docGenerator.o
 	@echo "\n------------- Generating OSC Documentation: -------------" 
@@ -87,7 +87,7 @@ vess: $(OBJS) vess.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 
-spinApp: $(OBJS) $(WX_OBJS)
+spin: $(OBJS) $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ -lSPIN $(WX_LIBS) $(OSG_LIBS) $(SPIN_LIBS)
 
@@ -103,7 +103,7 @@ spin.app: spinApp
 	-e "s/VERSION/$(WX_VERSION)/" \
 	Info.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
-	cp spinApp $@/Contents/MacOS
+	cp spin $@/Contents/MacOS
 	#cp ../../lib/Darwin_i386/libSPIN.dylib $@/Contents/Resources
 	cp spin.icns $@/Contents/Resources/spin.icns
 
