@@ -8,8 +8,8 @@ all: $(OS)
 #	@echo "SPIN_PATH=${SPIN_PATH}";
 
 # choose names of binaries:
-Linux: vessServer asViewer vessServerWX
-Darwin: vessServer asViewer vessServerWX vess.app
+Linux: vess spinViewer spinApp
+Darwin: vess spinViewer spinApp spin.app
 
 # if you have a custom verion of wxWidgets:
 #WXCONFIG = $(HOME)/svn/wxMac-2.8.9/wx-config
@@ -71,7 +71,7 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ###################################################################
 # TARGETS:
 
-ALLTARGETS = vess_old asViewer viewer vessServer vessServerWX
+ALLTARGETS = spinViewer vess spinApp
 
 doc: $(OBJS) docGenerator.o
 	@echo "\n------------- Generating OSC Documentation: -------------" 
@@ -79,27 +79,19 @@ doc: $(OBJS) docGenerator.o
 	./docGenerator
 	-cp *.html ../../doxygen/html
 
-vess_old: $(OBJS) vess.o
+spinViewer: $(OBJS) asViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 
-asViewer: $(OBJS) asViewer.o
+vess: $(OBJS) vess.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 
-viewer: $(SIMPLEVIEWER_OBJ)
-	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $(SIMPLEVIEWER_OBJ) $(SPIN_LIBS) $(OSG_LIBS)
-
-vessServer: $(OBJS) vessServer.o
-	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
-
-vessServerWX: $(OBJS) $(WX_OBJS)
+spinApp: $(OBJS) $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ -lSPIN $(WX_LIBS) $(OSG_LIBS) $(SPIN_LIBS)
 
-vess.app: vessServerWX
+spin.app: spinApp
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
 	-mkdir $@/Contents
@@ -111,9 +103,9 @@ vess.app: vessServerWX
 	-e "s/VERSION/$(WX_VERSION)/" \
 	Info.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
-	cp vessServerWX $@/Contents/MacOS
+	cp spinApp $@/Contents/MacOS
 	#cp ../../lib/Darwin_i386/libSPIN.dylib $@/Contents/Resources
-	cp vess.icns $@/Contents/Resources/vessServerWX.icns
+	cp spin.icns $@/Contents/Resources/spin.icns
 
 
 ########################################################

@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -74,9 +74,9 @@ int main(int argc, char **argv)
 {
 	// Now make sure we can load the libAudioscape library:
 	osgDB::Registry *reg = osgDB::Registry::instance();
-	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libAudioscape"));
+	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
 
-	std::cout <<"\nasViewer launching..." << std::endl;
+	std::cout <<"\nspinViewer launching..." << std::endl;
 
 	vessListener *vess = new vessListener();
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 	osg::ArgumentParser arguments(&argc,argv);
 
 	// set up the usage document, which a user can acess with -h or --help
-	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a viewer for VESS.");
+	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a viewer for the SPIN framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options]");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
 	*/
 
 	viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
-	
+
 	// *************************************************************************
 	// any option left unread are converted into errors to write out later.
 	arguments.reportRemainingOptionsAsUnrecognized();
@@ -234,13 +234,13 @@ int main(int argc, char **argv)
 		pthread_mutex_lock(&pthreadLock);
 		vess->sceneManager->updateGraph();
 		pthread_mutex_unlock(&pthreadLock);
-		
-		
+
+
 		// same goes for the cameraManager:
 		pthread_mutex_lock(&pthreadLock);
 		cameraManager->update();
 		pthread_mutex_unlock(&pthreadLock);
-		
+
 		pthread_mutex_lock(&pthreadLock);
 		viewer.frame();
 		pthread_mutex_unlock(&pthreadLock);
