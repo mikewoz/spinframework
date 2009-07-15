@@ -6,8 +6,8 @@
 		<size>500,400</size>
 		<id_arg>0</id_arg>
 		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="mainSplitter" member="yes">
-			<sashpos>30</sashpos>
-			<minsize>30</minsize>
+			<sashpos>40</sashpos>
+			<minsize>40</minsize>
 			<minsize>30,30</minsize>
 			<style>wxSP_NOBORDER|wxNO_BORDER</style>
 			<object class="wxPanel" name="ID_PANEL1" variable="mainPanel" member="yes">
@@ -147,27 +147,28 @@
 			<object class="separator" />
 			<object class="tool" name="wxVess_showConfig" variable="ToolBarItem3" member="yes">
 				<label>Configuration</label>
-				<bitmap stock_id="wxART_REPORT_VIEW" stock_client="wxART_TOOLBAR" />
-				<bitmap2 stock_id="wxART_REPORT_VIEW" stock_client="wxART_TOOLBAR" />
+				<bitmap>../images/icon_network.gif</bitmap>
+				<bitmap2>../images/icon_network.gif</bitmap2>
 				<tooltip>Show configuration panel</tooltip>
 				<longhelp>Show configuration panel</longhelp>
 				<handler function="OnShowConfig" entry="EVT_TOOL" />
 			</object>
-			<object class="tool" name="wxVess_showEditor" variable="ToolBarItem4" member="yes">
-				<label>Editor</label>
-				<bitmap>../images/icon_tree2.gif</bitmap>
-				<bitmap2>../images/icon_tree2.gif</bitmap2>
-				<tooltip>Show the editor</tooltip>
-				<longhelp>Show the editor</longhelp>
-				<handler function="OnShowEditor" entry="EVT_TOOL" />
-			</object>
-			<object class="tool" name="wxVess_showRenderer" variable="ToolBarItem5" member="yes">
+			<object class="separator" />
+			<object class="tool" name="wxVess_showRenderer" variable="ToolBarItem4" member="yes">
 				<label>Renderer</label>
 				<bitmap>../images/icon_3Dview.gif</bitmap>
 				<bitmap2>../images/icon_3Dview.gif</bitmap2>
 				<tooltip>Show the rendered 3D view</tooltip>
 				<longhelp>Show the rendered 3D view</longhelp>
 				<handler function="OnShowRenderer" entry="EVT_TOOL" />
+			</object>
+			<object class="tool" name="wxVess_showEditor" variable="ToolBarItem5" member="yes">
+				<label>Editor</label>
+				<bitmap>../images/icon_tree2.gif</bitmap>
+				<bitmap2>../images/icon_tree2.gif</bitmap2>
+				<tooltip>Show the editor</tooltip>
+				<longhelp>Show the editor</longhelp>
+				<handler function="OnShowEditor" entry="EVT_TOOL" />
 			</object>
 		</object>
 	</object>

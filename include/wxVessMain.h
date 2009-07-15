@@ -105,8 +105,8 @@ class wxVessMain: public wxFrame
         static const long wxVess_load;
         static const long wxVess_Save;
         static const long wxVess_showConfig;
-        static const long wxVess_showEditor;
         static const long wxVess_showRenderer;
+        static const long wxVess_showEditor;
         static const long ID_TOOLBAR1;
         //*)
 

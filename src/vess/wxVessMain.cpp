@@ -113,8 +113,8 @@ const long wxVessMain::ID_STATUSBAR1 = wxNewId();
 const long wxVessMain::wxVess_load = wxNewId();
 const long wxVessMain::wxVess_Save = wxNewId();
 const long wxVessMain::wxVess_showConfig = wxNewId();
-const long wxVessMain::wxVess_showEditor = wxNewId();
 const long wxVessMain::wxVess_showRenderer = wxNewId();
+const long wxVessMain::wxVess_showEditor = wxNewId();
 const long wxVessMain::ID_TOOLBAR1 = wxNewId();
 //*)
 
@@ -133,7 +133,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer1;
     wxMenu* Menu2;
     wxMenuBar* wxVess_MenuBar;
-    
+
     Create(parent, wxID_ANY, _("SPIN Framework"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(500,400));
     {
@@ -143,7 +143,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     }
     mainSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER|wxNO_BORDER, _T("ID_SPLITTERWINDOW1"));
     mainSplitter->SetMinSize(wxSize(30,30));
-    mainSplitter->SetMinimumPaneSize(30);
+    mainSplitter->SetMinimumPaneSize(40);
     mainPanel = new wxPanel(mainSplitter, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     BoxSizer1 = new wxBoxSizer(wxVERTICAL);
     FlexGridSizer1 = new wxFlexGridSizer(0, 4, 0, 0);
@@ -200,12 +200,13 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
     ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
     wxVess_ToolBar->AddSeparator();
-    ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_REPORT_VIEW")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_REPORT_VIEW")),wxART_TOOLBAR), wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
-    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
-    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
+    ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxBitmap(wxImage(_T("../images/icon_network.gif"))), wxBitmap(wxImage(_T("../images/icon_network.gif"))), wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
+    wxVess_ToolBar->AddSeparator();
+    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
+    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
     wxVess_ToolBar->Realize();
     SetToolBar(wxVess_ToolBar);
-    
+
     Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&wxVessMain::OnStartStopToggle);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnLoadScene);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnSaveScene);
@@ -217,8 +218,8 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     Connect(wxVess_load,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnLoadScene);
     Connect(wxVess_Save,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnSaveScene);
     Connect(wxVess_showConfig,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowConfig);
-    Connect(wxVess_showEditor,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowEditor);
     Connect(wxVess_showRenderer,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowRenderer);
+    Connect(wxVess_showEditor,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowEditor);
     //*)
 
     // on the Mac,
@@ -227,7 +228,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     #endif
 
     // sash position doesn't seem to work in wxSmith, so do it manually:
-    mainSplitter->SetSashPosition(30);
+    mainSplitter->SetSashPosition(40);
 
     vessConfigFrame = new wxVessConfig(this);
     vessConfigFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
@@ -326,15 +327,15 @@ void wxVessMain::OnSaveScene(wxCommandEvent& event)
 {
     if (vess->isRunning())
     {
-		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
+		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Save Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
 
 		if ( openFileDialog->ShowModal() == wxID_OK )
 		{
 		   	if (vess->sceneManager->saveXML( openFileDialog->GetPath().mb_str() ))
 		   	{
-		   		std::cout << "Loading scene from file: " << openFileDialog->GetPath().mb_str() << std::endl;
+		   		std::cout << "Saving scene to: " << openFileDialog->GetPath().mb_str() << std::endl;
 		   	} else {
-		   		std::cout << "Error when loading " << openFileDialog->GetPath().mb_str() << std::endl;
+		   		std::cout << "Error when saving " << openFileDialog->GetPath().mb_str() << std::endl;
 		   	}
 		}
     }

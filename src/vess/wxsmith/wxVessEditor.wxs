@@ -61,8 +61,8 @@
 			<object class="separator" />
 			<object class="tool" name="vessEditor_debugPrint" variable="ToolBarItem3" member="yes">
 				<label>DebugPrint</label>
-				<bitmap stock_id="wxART_HELP_PAGE" stock_client="wxART_BUTTON" />
-				<bitmap2 stock_id="wxART_HELP_PAGE" stock_client="wxART_BUTTON" />
+				<bitmap>../images/icon_question_text.gif</bitmap>
+				<bitmap2>../images/icon_question_text.gif</bitmap2>
 				<tooltip>Debug Print to Console</tooltip>
 				<longhelp>Debug Print to Console</longhelp>
 				<handler function="OnDebugPrint" entry="EVT_TOOL" />
