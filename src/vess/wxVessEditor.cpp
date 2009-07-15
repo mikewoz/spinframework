@@ -63,10 +63,11 @@ const long wxVessEditor::ID_treePanel = wxNewId();
 const long wxVessEditor::ID_CUSTOM1 = wxNewId();
 const long wxVessEditor::ID_PANEL2 = wxNewId();
 const long wxVessEditor::ID_SPLITTERWINDOW1 = wxNewId();
-const long wxVessEditor::vessEditor_newNode = wxNewId();
 const long wxVessEditor::vessEditor_clear = wxNewId();
 const long wxVessEditor::vessEditor_refresh = wxNewId();
 const long wxVessEditor::vessEditor_debugPrint = wxNewId();
+const long wxVessEditor::vessEditor_newNode = wxNewId();
+const long wxVessEditor::vessEditor_deleteNode = wxNewId();
 const long wxVessEditor::ID_TOOLBAR1 = wxNewId();
 //*)
 
@@ -102,17 +103,21 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	StaticBoxSizer1->SetSizeHints(editorPanel);
 	vessEditor_splitter->SplitHorizontally(treePanel, editorPanel);
 	wxVessEditor_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-	ToolBarItem1 = wxVessEditor_ToolBar->AddTool(vessEditor_newNode, _("New Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxITEM_NORMAL, _("Create a new node"), _("This will allow you to create a new node (a dialog will let you choose the type)"));
-	ToolBarItem2 = wxVessEditor_ToolBar->AddTool(vessEditor_clear, _("Clear"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Clear the current scene"), _("Clear the current scene"));
-	ToolBarItem3 = wxVessEditor_ToolBar->AddTool(vessEditor_refresh, _("Refresh"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_UNDO")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_UNDO")),wxART_BUTTON), wxITEM_NORMAL, _("Refresh the scene"), _("This will resync with the VESS server, ensuring that the scene is up to date."));
-	ToolBarItem4 = wxVessEditor_ToolBar->AddTool(vessEditor_debugPrint, _("DebugPrint"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
+	ToolBarItem1 = wxVessEditor_ToolBar->AddTool(vessEditor_clear, _("Clear"), wxBitmap(wxImage(_T("../images/icon_eraser.gif"))), wxBitmap(wxImage(_T("../images/icon_eraser.gif"))), wxITEM_NORMAL, _("Clear the current scene"), _("Clear the current scene"));
+	ToolBarItem2 = wxVessEditor_ToolBar->AddTool(vessEditor_refresh, _("Refresh"), wxBitmap(wxImage(_T("../images/icon_refresh.gif"))), wxBitmap(wxImage(_T("../images/icon_refresh.gif"))), wxITEM_NORMAL, _("Refresh the scene"), _("This will resync with the VESS server, ensuring that the scene is up to date."));
+	wxVessEditor_ToolBar->AddSeparator();
+	ToolBarItem3 = wxVessEditor_ToolBar->AddTool(vessEditor_debugPrint, _("DebugPrint"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_HELP_PAGE")),wxART_BUTTON), wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
+	wxVessEditor_ToolBar->AddSeparator();
+	ToolBarItem4 = wxVessEditor_ToolBar->AddTool(vessEditor_newNode, _("New Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxITEM_NORMAL, _("Create a new node"), _("This will allow you to create a new node (a dialog will let you choose the type)"));
+	ToolBarItem5 = wxVessEditor_ToolBar->AddTool(vessEditor_deleteNode, _("Delete Selected Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxITEM_NORMAL, _("Delete the currently selected node"), _("Delete the currently selected node"));
 	wxVessEditor_ToolBar->Realize();
 	SetToolBar(wxVessEditor_ToolBar);
 
-	Connect(vessEditor_newNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnNewNode);
 	Connect(vessEditor_clear,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnClear);
 	Connect(vessEditor_refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnRefresh);
 	Connect(vessEditor_debugPrint,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnDebugPrint);
+	Connect(vessEditor_newNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnNewNode);
+	Connect(vessEditor_deleteNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnDeleteNode);
 	//*)
 
     // sash position doesn't seem to work in wxSmith, so do it manually:
@@ -198,14 +203,9 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
         {
 
             lo_message msg = lo_message_new();
-            lo_message_add_string(msg, "createNode");
-            lo_message_add_string(msg, nodeID.mb_str());
-            lo_message_add_string(msg, nodeType.mb_str());
+            lo_message_add(msg, "sss", "createNode", (const char*)nodeID.mb_str(), (const char*)nodeType.mb_str());
+            vess->sceneMessage(msg);
 
-            std::string OSCpath = "/vess/" + vess->id;
-            vess->sendMessage(OSCpath.c_str(), msg);
-            //lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
-            //lo_message_free(msg);
 
             done = true;
 
@@ -236,9 +236,7 @@ void wxVessEditor::OnRefresh(wxCommandEvent& event)
 
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "refresh");
-
-    std::string OSCpath = "/vess/" + vess->id;
-    vess->sendMessage(OSCpath.c_str(), msg);
+    vess->sceneMessage(msg);
 }
 
 void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
@@ -247,9 +245,7 @@ void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
 
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "debug");
-
-    std::string OSCpath = "/vess/" + vess->id;
-    vess->sendMessage(OSCpath.c_str(), msg);
+    vess->sceneMessage(msg);
 }
 
 void wxVessEditor::OnClear(wxCommandEvent& event)
@@ -258,7 +254,18 @@ void wxVessEditor::OnClear(wxCommandEvent& event)
 
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "clear");
+    vess->sceneMessage(msg);
+}
 
-    std::string OSCpath = "/vess/" + vess->id;
-    vess->sendMessage(OSCpath.c_str(), msg);
+void wxVessEditor::OnDeleteNode(wxCommandEvent& event)
+{
+    //std::cout << " trying to delete node" << std::endl;
+
+    asReferenced *n = vessTree->GetSelectedNode();
+    if (n)
+    {
+        lo_message msg = lo_message_new();
+        lo_message_add(msg, "ss", "deleteNode", (const char*)n->id->s_name);
+        vess->sceneMessage(msg);
+    }
 }

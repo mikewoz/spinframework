@@ -42,7 +42,33 @@
 			</object>
 		</object>
 		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVessEditor_ToolBar" member="yes">
-			<object class="tool" name="vessEditor_newNode" variable="ToolBarItem1" member="yes">
+			<object class="tool" name="vessEditor_clear" variable="ToolBarItem1" member="yes">
+				<label>Clear</label>
+				<bitmap>../images/icon_eraser.gif</bitmap>
+				<bitmap2>../images/icon_eraser.gif</bitmap2>
+				<tooltip>Clear the current scene</tooltip>
+				<longhelp>Clear the current scene</longhelp>
+				<handler function="OnClear" entry="EVT_TOOL" />
+			</object>
+			<object class="tool" name="vessEditor_refresh" variable="ToolBarItem2" member="yes">
+				<label>Refresh</label>
+				<bitmap>../images/icon_refresh.gif</bitmap>
+				<bitmap2>../images/icon_refresh.gif</bitmap2>
+				<tooltip>Refresh the scene</tooltip>
+				<longhelp>This will resync with the VESS server, ensuring that the scene is up to date.</longhelp>
+				<handler function="OnRefresh" entry="EVT_TOOL" />
+			</object>
+			<object class="separator" />
+			<object class="tool" name="vessEditor_debugPrint" variable="ToolBarItem3" member="yes">
+				<label>DebugPrint</label>
+				<bitmap stock_id="wxART_HELP_PAGE" stock_client="wxART_BUTTON" />
+				<bitmap2 stock_id="wxART_HELP_PAGE" stock_client="wxART_BUTTON" />
+				<tooltip>Debug Print to Console</tooltip>
+				<longhelp>Debug Print to Console</longhelp>
+				<handler function="OnDebugPrint" entry="EVT_TOOL" />
+			</object>
+			<object class="separator" />
+			<object class="tool" name="vessEditor_newNode" variable="ToolBarItem4" member="yes">
 				<label>New Node</label>
 				<bitmap stock_id="wxART_NEW" stock_client="wxART_BUTTON" />
 				<bitmap2 stock_id="wxART_NEW" stock_client="wxART_BUTTON" />
@@ -50,29 +76,13 @@
 				<longhelp>This will allow you to create a new node (a dialog will let you choose the type)</longhelp>
 				<handler function="OnNewNode" entry="EVT_TOOL" />
 			</object>
-			<object class="tool" name="vessEditor_clear" variable="ToolBarItem2" member="yes">
-				<label>Clear</label>
-				<bitmap stock_id="wxART_DELETE" stock_client="wxART_TOOLBAR" />
-				<bitmap2 stock_id="wxART_DELETE" stock_client="wxART_TOOLBAR" />
-				<tooltip>Clear the current scene</tooltip>
-				<longhelp>Clear the current scene</longhelp>
-				<handler function="OnClear" entry="EVT_TOOL" />
-			</object>
-			<object class="tool" name="vessEditor_refresh" variable="ToolBarItem3" member="yes">
-				<label>Refresh</label>
-				<bitmap stock_id="wxART_UNDO" stock_client="wxART_BUTTON" />
-				<bitmap2 stock_id="wxART_UNDO" stock_client="wxART_BUTTON" />
-				<tooltip>Refresh the scene</tooltip>
-				<longhelp>This will resync with the VESS server, ensuring that the scene is up to date.</longhelp>
-				<handler function="OnRefresh" entry="EVT_TOOL" />
-			</object>
-			<object class="tool" name="vessEditor_debugPrint" variable="ToolBarItem4" member="yes">
-				<label>DebugPrint</label>
-				<bitmap stock_id="wxART_HELP_PAGE" stock_client="wxART_BUTTON" />
-				<bitmap2 stock_id="wxART_HELP_PAGE" stock_client="wxART_BUTTON" />
-				<tooltip>Debug Print to Console</tooltip>
-				<longhelp>Debug Print to Console</longhelp>
-				<handler function="OnDebugPrint" entry="EVT_TOOL" />
+			<object class="tool" name="vessEditor_deleteNode" variable="ToolBarItem5" member="yes">
+				<label>Delete Selected Node</label>
+				<bitmap stock_id="wxART_DELETE" stock_client="wxART_BUTTON" />
+				<bitmap2 stock_id="wxART_DELETE" stock_client="wxART_BUTTON" />
+				<tooltip>Delete the currently selected node</tooltip>
+				<longhelp>Delete the currently selected node</longhelp>
+				<handler function="OnDeleteNode" entry="EVT_TOOL" />
 			</object>
 		</object>
 	</object>

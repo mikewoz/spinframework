@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -133,7 +133,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxFlexGridSizer* FlexGridSizer1;
     wxMenu* Menu2;
     wxMenuBar* wxVess_MenuBar;
-    
+
     Create(parent, wxID_ANY, _("SPIN Framework"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(500,400));
     {
@@ -199,12 +199,13 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxVess_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
     ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
     ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
+    wxVess_ToolBar->AddSeparator();
     ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_REPORT_VIEW")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_REPORT_VIEW")),wxART_TOOLBAR), wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
-    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxBitmap(wxImage(_T("../images/icon_tree.xpm"))), wxBitmap(wxImage(_T("../images/icon_tree.xpm"))), wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
-    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxBitmap(wxImage(_T("../images/icon_3Dsphere.xpm"))), wxBitmap(wxImage(_T("../images/icon_3Dsphere.xpm"))), wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
+    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
+    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
     wxVess_ToolBar->Realize();
     SetToolBar(wxVess_ToolBar);
-    
+
     Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&wxVessMain::OnStartStopToggle);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnLoadScene);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnSaveScene);
@@ -235,22 +236,22 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     vessConfigFrame->txAddr->SetValue( wxString( vess->txAddr.c_str(), wxConvUTF8 ));
     vessConfigFrame->txPort->SetValue( wxString( vess->txPort.c_str(), wxConvUTF8 ));
 
-    
+
     //wxFFile logFile(wxT("vessWX.log"),wxT("w+"));
     //wxLogTextCtrl w = new wxLogTextCtrl(logTextCtrl);
     //wxLog::SetActiveTarget(w);
     wxLog::SetActiveTarget(new wxLogTextCtrl(logTextCtrl));
     //wxLogChain *LC = new wxLogChain(new wxLogStderr(logFile.fp()));
 
-    
+
     vessLog log("vess.log");
     log.enable_wxlog(true);
     log.enable_cout(false);
 
     log << "Started vessLog" << std::endl;
-    
-    
-    
+
+
+
 #if wxUSE_STD_IOSTREAM
     //redirector = new wxStreamToTextRedirector(logTextCtrl);
     oldstdout = std::cout.rdbuf();
@@ -306,10 +307,10 @@ void wxVessMain::OnLoadScene(wxCommandEvent& event)
     if (vess->isRunning())
     {
 		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
-	 
+
 		if ( openFileDialog->ShowModal() == wxID_OK )
 		{
-	
+
 		    std::cout << "Loading scene from file: " << openFileDialog->GetPath().mb_str() << std::endl;
 		   	vess->sceneManager->loadXML( openFileDialog->GetPath().mb_str() );
 		}
@@ -326,7 +327,7 @@ void wxVessMain::OnSaveScene(wxCommandEvent& event)
     if (vess->isRunning())
     {
 		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
-	 
+
 		if ( openFileDialog->ShowModal() == wxID_OK )
 		{
 		   	if (vess->sceneManager->saveXML( openFileDialog->GetPath().mb_str() ))

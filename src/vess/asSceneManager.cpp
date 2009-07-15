@@ -117,11 +117,11 @@ asSceneManager::asSceneManager (std::string id, std::string addr, std::string po
 
 #ifdef OSCDEBUG
 	// oscCallback_debug() will match any path and args:
-	lo_server_thread_add_method(rxServ, NULL, NULL, oscCallback_debug, NULL);
+	lo_server_thread_add_method(rxServ, NULL, NULL, asSceneManagerCallback_debug, NULL);
 #endif
 
 	// generic admin callback:
-	lo_server_thread_add_method(rxServ, string("/vess/"+sceneID).c_str(), NULL, oscCallback_admin, this);
+	lo_server_thread_add_method(rxServ, string("/vess/"+sceneID).c_str(), NULL, asSceneManagerCallback_admin, this);
 
 	// start the listener:
 	lo_server_thread_start(rxServ);
@@ -1269,66 +1269,7 @@ static bool nodeSortFunction (osg::ref_ptr<asReferenced> n1, osg::ref_ptr<asRefe
 // are declared here as static functions):
 
 
-// these two are the only ones that are not static:
 
-void oscParser_error(int num, const char *msg, const char *path)
-{
-	printf("OSC (liblo) error %d in path %s: %s\n", num, path, msg);
-	fflush(stdout);
-}
-
-int oscCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
-	int i;
-	string    theMethod, idStr;
-
-
-	// make sure there is at least one argument (ie, a method to call):
-	if (!argc) return 0;
-
-	// get the method (argv[0]):
-	if (lo_is_string_type((lo_type)types[0]))
-	{
-		theMethod = string((char *)argv[0]);
-	}
-	else return 0;
-
-	// get the instance of the connection:
-	asSoundConnection *conn = (asSoundConnection*) user_data;
-	if (!conn)
-	{
-		std::cout << "oscParser: Could not find connection: " << idStr << std::endl;
-		return 0;
-	}
-
-	// TODO: replace method call with osg::Introspection
-
-	if (theMethod=="stateDump")
-		conn->stateDump();
-	else if (theMethod=="debug")
-		conn->debug();
-	else if ((argc==2) && (lo_is_numerical_type((lo_type)types[1])))
-	{
-		float value = lo_hires_val((lo_type)types[1], argv[1]);
-
-		if (theMethod=="setThru")
-			conn->setThru((bool) value);
-		else if (theMethod=="setDistanceEffect")
-			conn->setDistanceEffect(value);
-		else if (theMethod=="setRolloffEffect")
-			conn->setRolloffEffect(value);
-		else if (theMethod=="setDopplerEffect")
-			conn->setDopplerEffect(value);
-		else if (theMethod=="setDiffractionEffect")
-			conn->setDiffractionEffect(value);
-		else
-			std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-	}
-
-	else
-		std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-
-}
 
 /**
  * Recursive function to invoke a method for a particular class, that will try
@@ -1366,8 +1307,10 @@ static int invokeMethod(const osgIntrospection::Value classInstance, const osgIn
 	return 0;
 }
 
-int oscCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
+	// NOTE: user_data is a t_symbol pointer
+	
 	int i;
 	string    theMethod, nodeStr;
 	ValueList theArgs;
@@ -1396,9 +1339,6 @@ int oscCallback_node(const char *path, const char *types, lo_arg **argv, int arg
 	}
 
 	//pthread_mutex_lock(&pthreadLock);
-
-	// TODO: split this function into two, to give a generic method calling fn:
-	//this->invokeNodeMethod(n, theMethod, theArgs)
 
 	
 	// get node as an osgInrospection::Value (note that type will be asReferenced pointer):
@@ -1432,136 +1372,6 @@ int oscCallback_node(const char *path, const char *types, lo_arg **argv, int arg
     
 	return invokeMethod(classInstance, classType, theMethod, theArgs);
 	
-	
-	/*
-	// TODO: we should try to store this globally somewhere, so that we don't do
-	// a lookup every time there is a message:
-	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
-	
-    // Try to invoke the method (and arglist) using the current classInstance:
-    try
-    {
-    	classType.invokeMethod(theMethod, classInstance, theArgs, true);
-    	// if we get this far, then the method invocation succeeded and
-    	// we can return:
-    	return 1;
-    	
-    }
-	catch (osgIntrospection::Exception & ex)
-	{
-		std::cerr << "catch exception: " << ex.what() << std::endl;
-	}	
-		
-    // If the method wasn't found in the classInstance, then we need to go
-	// through all base classes to see if method is contained in a parent class:
-	const Type& baseClassType = classType;
-	while ((baseClassType==asReferencedType) || (baseClassType.isSubclassOf(asReferencedType)))
-	{
-    for (int i=0; i<classType.getNumBaseTypes(); i++)
-    {
-        const Type& baseClassType = classType.getBaseType(i);
-        if ((baseClassType==asReferencedType) || (baseClassType.isSubclassOf(asReferencedType)))
-        {
-        	try
-        	{
-        		baseClassType.invokeMethod(theMethod, classInstance, theArgs, true);
-        		// if we get this far, then the method invocation succeeded and
-        		// we can return:
-        		return 1;
-        	}
-        	catch (osgIntrospection::Exception & ex)
-        	{
-       			std::cerr << "catch exception: " << ex.what() << std::endl;
-        		continue;
-      		}
-        }
-    }
-    */
-    
-
-
-
-	/*
-
-	// special case if theMethod is debug():
-	if ((theMethod) == "debug")
-	{
-		n->debug();
-	}
-
-	// special case if theMethod is setParent():
-	else if (theMethod == "setParent")
-	{
-
-#ifdef OSCDEBUG
-		std::cout << "Calling setParent(" << (char *)argv[1] << ")" << std::endl;
-#endif
-		if (argc>1) n->setParent((char *)argv[1]);
-	}
-
-	// another special case if theMethod is setTextFlag():
-	else if (theMethod == "setTextFlag")
-	{
-		if (argc>1)
-			n->setTextFlag((float) lo_hires_val((lo_type)types[1], argv[1]));
-	}
-
-	else {
-
-		// now use osgIntrospection to get the Type of the object, which will allow us to
-		// discover all available methods, and call them using a string argument.
-		try
-		{
-			// get node as an osgInrospection::Value (note that type will be asReferenced pointer):
-			const osgIntrospection::Value value = osgIntrospection::Value(n.get());
-
-
-			// the getInstanceType() method however, gives us the real type being pointed at:
-			const osgIntrospection::Type &type = value.getInstanceType();
-
-			// TODO: cast the value as the actual type (not asReferenced). This will let us
-			// get rid of special case setParent() above
-
-
-
-#ifdef OSCDEBUG
-			std::cout << "Introspection:" << std::endl;
-			introspect_print_type(type);
-#endif
-
-			// If we have found a valid Type, then let's build an argument list and see
-			// if we can find a method that takes this list of argumets:
-			//if (type.isDefined() && type.isNonConstPointer() && type.isSubclassOf(t_referenced) )
-			if (type.isDefined())
-			{
-
-				// parse the rest of the args:
-				for (i=1; i<argc; i++)
-				{
-					if (lo_is_numerical_type((lo_type)types[i]))
-					{
-						theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-					} else {
-						theArgs.push_back( (char*) argv[i] );
-					}
-				}
-
-				// Now try to invoke the method with those args:
-				type.invokeMethod(theMethod, value, theArgs, false);
-
-
-			} else {
-				std::cout << "ERROR: Type is not defined (ie, not reflected)." << std::endl;
-			}
-
-		}
-		catch (osgIntrospection::Exception & ex)
-		{
-			//std::cerr << "catch exception: " << ex.what() << std::endl;
-		}
-
-	}
-*/
 
 	//pthread_mutex_unlock(&pthreadLock);
 
@@ -1569,7 +1379,7 @@ int oscCallback_node(const char *path, const char *types, lo_arg **argv, int arg
 }
 
 
-static int oscCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int asSceneManagerCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
 	printf("************ oscCallback_debug() got message: %s\n", (char*)path);
 	printf("user_data: %s\n", (char*) user_data);
@@ -1584,7 +1394,7 @@ static int oscCallback_debug(const char *path, const char *types, lo_arg **argv,
 	return 1;
 }
 
-static int oscCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
 	asSceneManager *sceneManager = (asSceneManager*) user_data;
 
@@ -1637,4 +1447,62 @@ static int oscCallback_admin(const char *path, const char *types, lo_arg **argv,
 	pthread_mutex_unlock(&pthreadLock);
 
 	return 1;
+}
+
+int asSceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+{
+	int i;
+	string    theMethod, idStr;
+
+
+	// make sure there is at least one argument (ie, a method to call):
+	if (!argc) return 0;
+
+	// get the method (argv[0]):
+	if (lo_is_string_type((lo_type)types[0]))
+	{
+		theMethod = string((char *)argv[0]);
+	}
+	else return 0;
+
+	// get the instance of the connection:
+	asSoundConnection *conn = (asSoundConnection*) user_data;
+	if (!conn)
+	{
+		std::cout << "oscParser: Could not find connection: " << idStr << std::endl;
+		return 0;
+	}
+
+	// TODO: replace method call with osg::Introspection
+
+	if (theMethod=="stateDump")
+		conn->stateDump();
+	else if (theMethod=="debug")
+		conn->debug();
+	else if ((argc==2) && (lo_is_numerical_type((lo_type)types[1])))
+	{
+		float value = lo_hires_val((lo_type)types[1], argv[1]);
+
+		if (theMethod=="setThru")
+			conn->setThru((bool) value);
+		else if (theMethod=="setDistanceEffect")
+			conn->setDistanceEffect(value);
+		else if (theMethod=="setRolloffEffect")
+			conn->setRolloffEffect(value);
+		else if (theMethod=="setDopplerEffect")
+			conn->setDopplerEffect(value);
+		else if (theMethod=="setDiffractionEffect")
+			conn->setDiffractionEffect(value);
+		else
+			std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
+	}
+
+	else
+		std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
+
+}
+void oscParser_error(int num, const char *msg, const char *path)
+{
+	printf("OSC (liblo) error %d in path %s: %s\n", num, path, msg);
+	fflush(stdout);
 }

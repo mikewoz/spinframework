@@ -73,7 +73,7 @@ asSoundConnection::asSoundConnection (asSceneManager *s, osg::ref_ptr<asDSPnode>
 	
 	// register with OSC parser:
 	string oscPattern = "/vess/" + sceneManager->sceneID + "/" + string(id->s_name);
-	lo_server_thread_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, oscCallback_conn, (void*)this);
+	lo_server_thread_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, asSceneManagerCallback_conn, (void*)this);
 
 	// store pointer to sceneManager
 	sceneManager = s;

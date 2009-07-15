@@ -46,6 +46,9 @@
 #include <osgDB/Registry>
 #include <osgIntrospection/Type>
 
+#include <lo/lo.h>
+#include <lo/lo_lowlevel.h>
+
 #include "asUtil.h"
 #include "vessThreads.h"
 #include "vessLog.h"
@@ -58,7 +61,7 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 // *****************************************************************************
 // The vessMaster is a simple extension of vessListener, adding the ability to
-// re-transmit messages that it recieves (done via sceneManager->setTXaddress)
+// re-transmit messages that it recieves
 //
 // Additionally, the vessMaster will periodically broadcast a ping on infoport,
 // and will perform an update traversal on the scene graph for any nodes who
@@ -108,8 +111,11 @@ vessListener::vessListener()
 	id = "default";
 	rxAddr = "224.0.0.1";
 	rxPort = "54323";
+	txAddr = "224.0.0.1";
+	txPort = "54324";
 	infoAddr = "224.0.0.1";
 	infoPort = "54320";
+
 
 	// override txAddr and infoPort based on environment variable:
 	char *infoPortStr = getenv("AS_INFOPORT");
@@ -153,6 +159,11 @@ vessListener::vessListener()
 vessListener::~vessListener()
 {
 	sceneManager->clear();
+	if (lo_txAddr)
+	{
+		lo_address_free(lo_txAddr);
+	}
+
 	if (lo_infoAddr)
 	{
 		lo_address_free(lo_infoAddr);
@@ -168,6 +179,7 @@ vessListener::~vessListener()
 
 void vessListener::start()
 {
+	lo_txAddr = lo_address_new(txAddr.c_str(), txPort.c_str());
 
 	// create thread:
 	if (pthread_attr_init(&pthreadAttr) < 0)
@@ -198,26 +210,51 @@ void vessListener::stop()
 	this->running = false;
 }
 
-void vessListener::sendMessage(const char *OSCpath, lo_message msg)
+void vessListener::nodeMessage(t_symbol *nodeSym, lo_message msg)
 {
-    // If the sceneManager is a listener, then we need to send message from a
-    // multicast-enabled socket. We can hijack the info channel socket, and use
-    // the lo_send_message_from method to send to the rxAddr of the vess server.
+	if (isRunning())
+	{
+		std::string OSCpath = "/vess/" + id + "/" + nodeSym->s_name;
 
-    if (sceneManager->isSlave())
-        lo_send_message_from( lo_infoServ, sceneManager->rxAddr, OSCpath, msg);
+		// If the sceneManager is a listener, then we need to send an OSC message to
+		// the rxAddr of the vess server (can be unicast)
+		if ( sceneManager->isSlave() )
+		{
+			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
+		}
 
-    // Otherwise, we can send directly to the (unicast) rxAddr of this vess
-    // server instance:
+		// if, however, the vess server is in this process, we can optimize and send
+		// directly to the OSC callback function:
+		else asSceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)nodeSym);
 
-    else
-        lo_send_message(sceneManager->rxAddr, OSCpath, msg);
+	} else std::cout << "Error: tried to send message but vess is not running" << std::endl;
 
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);
-
 }
 
+void vessListener::sceneMessage(lo_message msg)
+{
+	if (isRunning())
+	{
+		std::string OSCpath = "/vess/" + id;
+
+		// If the sceneManager is a listener, then we need to send an OSC message to
+		// the rxAddr of the vess server (can be unicast)
+		if ( sceneManager->isSlave() )
+		{
+			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
+		}
+
+		// if, however, the vess server is in this process, we can optimize and send
+		// directly to the OSC callback function:
+		else asSceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
+
+	} else std::cout << "Error: tried to send message but vess is not running" << std::endl;
+
+    // Let's free the message after (not sure if this is necessary):
+    lo_message_free(msg);
+}
 
 // *****************************************************************************
 

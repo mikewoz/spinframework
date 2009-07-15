@@ -67,6 +67,7 @@ class wxVessEditor: public wxFrame
 		wxToolBarToolBase* ToolBarItem1;
 		wxVessTreeCtrl* vessTree;
 		wxPanel* editorPanel;
+		wxToolBarToolBase* ToolBarItem5;
 		wxPanel* treePanel;
 		wxSplitterWindow* vessEditor_splitter;
 		wxToolBarToolBase* ToolBarItem2;
@@ -80,10 +81,11 @@ class wxVessEditor: public wxFrame
 		static const long ID_CUSTOM1;
 		static const long ID_PANEL2;
 		static const long ID_SPLITTERWINDOW1;
-		static const long vessEditor_newNode;
 		static const long vessEditor_clear;
 		static const long vessEditor_refresh;
 		static const long vessEditor_debugPrint;
+		static const long vessEditor_newNode;
+		static const long vessEditor_deleteNode;
 		static const long ID_TOOLBAR1;
 		//*)
 
@@ -101,6 +103,7 @@ class wxVessEditor: public wxFrame
 		void OnvessTreePaint3(wxPaintEvent& event);
 		void OnDebugPrint(wxCommandEvent& event);
 		void OnClear(wxCommandEvent& event);
+		void OnDeleteNode(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

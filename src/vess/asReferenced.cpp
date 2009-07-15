@@ -112,7 +112,7 @@ void asReferenced::registerNode(asSceneManager *s)
 	
 	// register with OSC parser:
 	string oscPattern = "/vess/" + sceneManager->sceneID + "/" + string(id->s_name);
-	lo_server_thread_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, oscCallback_node, (void*)id->s_name);
+	lo_server_thread_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, asSceneManagerCallback_node, (void*)id);
 #ifdef OSCDEBUG
 	std::cout << "oscParser registered: " << oscPattern << std::endl;
 #endif

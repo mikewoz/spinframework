@@ -537,9 +537,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
         lo_message_add_wxProp( msg, id, event.GetValue() );
     }
 
-	std::string OSCpath = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
-
-    vess->sendMessage(OSCpath.c_str(), msg);
+	vess->nodeMessage(currentNode->id, msg);
 
 	// prevent event from propagating:
 	//event.Veto();

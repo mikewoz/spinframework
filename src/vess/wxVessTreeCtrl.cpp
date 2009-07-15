@@ -384,12 +384,8 @@ void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
         {
 
             lo_message msg = lo_message_new();
-            lo_message_add_string(msg, "setParent");
-            lo_message_add_string(msg, parentString.c_str());
-
-            std::string OSCpath = "/vess/" + vess->id + "/" + std::string(child->id->s_name);
-
-            vess->sendMessage(OSCpath.c_str(), msg);
+            lo_message_add(msg, "ss", "setParent", parentString.c_str());
+            vess->nodeMessage(child->id, msg);
 
 
         }

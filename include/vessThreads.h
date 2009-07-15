@@ -75,18 +75,25 @@ class vessListener
 		virtual void start();
 		virtual void stop();
 
-		void sendMessage(const char *OSCpath, lo_message msg);
+		void nodeMessage(t_symbol *nodeSym, lo_message msg);
+		void sceneMessage(lo_message msg);
+
 
 		bool isRunning() { return running; }
 
 		void setID(std::string s) { id = s; }
 		void setRxAddr(std::string s) { rxAddr = s; }
 		void setRxPort(std::string s) { rxPort = s; }
+		void setTxAddr(std::string s) { txAddr = s; }
+		void setTxPort(std::string s) { txPort = s; }
 
 		std::string id;
 		std::string rxAddr, rxPort;
+		std::string txAddr, txPort;
 		std::string infoAddr, infoPort;
 
+		lo_address lo_txAddr;
+		
 		lo_address lo_infoAddr;
 		lo_server  lo_infoServ;
 
@@ -121,12 +128,6 @@ class vessMaster : public vessListener
 
 		vessMaster();
 		~vessMaster();
-
-		void setTxAddr(std::string s) { txAddr = s; }
-		void setTxPort(std::string s) { txPort = s; }
-
-		std::string txAddr, txPort;
-
 };
 
 

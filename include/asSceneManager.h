@@ -46,6 +46,8 @@
 #include <osg/Group>
 #include <osg/Geode>
 
+#include <osgIntrospection/Value>
+
 #include "asGlobals.h"
 #include "asReferenced.h"
 #include "asMediaManager.h"
@@ -171,23 +173,24 @@ class asSceneManager
 
 static bool nodeSortFunction (osg::ref_ptr<asReferenced> n1, osg::ref_ptr<asReferenced> n2);
 
-int oscCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-//static int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, ValueList theArgs);
-int oscCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+static int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
+
+int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+int asSceneManagerCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+/**
+ * The asSoundConnection node is an exception that does not extend asReferenced.
+ * As a result, it cannot use the automated OSC interfacing system, or the WX
+ * property generation stuff. TODO: fix this so that osgIntrospection can be
+ * used (ie, subclass connections from asReferenced or some other an osg class)
+ */
+int asSceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+
 void oscParser_error(int num, const char *msg, const char *path);
 
-static int oscCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int oscCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
-/*
-// replaced by oscCallback_admin:
-static int oscCallback_createNode(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int oscCallback_deleteNode(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int oscCallback_sceneDebug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int oscCallback_sceneClear(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int oscCallback_sceneLoad(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int oscCallback_sceneSave(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-*/
 
 /*
 #define BROADCAST(pNode, types, ...) \
