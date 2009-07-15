@@ -79,7 +79,7 @@ doc: $(OBJS) docGenerator.o
 	./docGenerator
 	-cp *.html ../../doxygen/html
 
-spinViewer: $(OBJS) asViewer.o
+spinViewer: $(OBJS) spinViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 
