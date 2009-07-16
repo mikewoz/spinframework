@@ -91,7 +91,7 @@ spin: $(OBJS) $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ -lSPIN $(WX_LIBS) $(OSG_LIBS) $(SPIN_LIBS)
 
-spin.app: spinApp
+spin.app: spin
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
 	-mkdir $@/Contents

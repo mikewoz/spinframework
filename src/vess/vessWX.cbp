@@ -63,6 +63,8 @@
 		<Unit filename="../../include/oscParser.h" />
 		<Unit filename="../../include/osgUtil.h" />
 		<Unit filename="../../include/pdUtil.h" />
+		<Unit filename="../../include/userNode.h" />
+		<Unit filename="../../include/vessLog.h" />
 		<Unit filename="../../include/vessThreads.h" />
 		<Unit filename="../../include/vessWX.h" />
 		<Unit filename="../../include/wxVessConfig.h" />
@@ -104,6 +106,7 @@
 		<Unit filename="osgUtil.cpp" />
 		<Unit filename="pdUtil.cpp" />
 		<Unit filename="testViewer.cpp" />
+		<Unit filename="userNode.cpp" />
 		<Unit filename="vess.cpp" />
 		<Unit filename="vessServer.cpp" />
 		<Unit filename="vessThreads.cpp" />
