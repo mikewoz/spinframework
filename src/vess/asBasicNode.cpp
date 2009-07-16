@@ -73,6 +73,9 @@ asBasicNode::asBasicNode (asSceneManager *sceneManager, char *initID) : asRefere
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
 	attachmentNode = mainTransform.get();
 
+	// keep a timer for velocity calculation:
+	lastTick = osg::Timer::instance()->tick();
+
 	// We need to set up a callback. This should be on the topmost node, so that during node
 	// traversal, we update our parameters before anything is drawn.
 	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
@@ -92,6 +95,21 @@ void asBasicNode::callbackUpdate()
 {
 
 	dumpGlobals(false); // never force globals here
+
+
+	// Now we need to update translation based on velocity. Since it's in m/s,
+	// we need to find out how many seconds passed since the last time this was
+	// called, and move by _velocity*dt
+    if ( !sceneManager->isSlave() && (_velocity!=osg::Vec3(0,0,0)) )
+	{
+	    osg::Timer_t tick = osg::Timer::instance()->tick();
+		float dt = osg::Timer::instance()->delta_s(lastTick,tick);
+		if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
+		{
+            this->move( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
+            lastTick = tick;
+		}
+	}
 
 }
 
@@ -114,6 +132,8 @@ void asBasicNode::updateNodePath()
 
 	// now update NodePaths for all children:
 	updateChildNodePaths();
+
+
 
 }
 
@@ -153,6 +173,13 @@ void asBasicNode::setOrientation (float p, float r, float y)
 	BROADCAST(this, "sfff", "setOrientation", p, r, y);
 }
 
+void asBasicNode::setVelocity (float dx, float dy, float dz)
+{
+	_velocity = osg::Vec3(dx,dy,dz);
+
+	BROADCAST(this, "sfff", "setVelocity", dx, dy, dz);
+}
+
 void asBasicNode::move (float x, float y, float z)
 {
 	osg::Vec3 newPos = mainTransform->getPosition() + ( mainTransform->getAttitude() * osg::Vec3(x,y,z) );
@@ -190,6 +217,11 @@ std::vector<lo_message> asBasicNode::getState ()
 	msg = lo_message_new();
 	v = this->getOrientation();
 	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	v = this->getVelocity();
+	lo_message_add(msg, "sfff", "setVelocity", v.x(), v.y(), v.z());
 	ret.push_back(msg);
 
 

@@ -49,6 +49,7 @@
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
 #include <osg/NodeVisitor>
+#include <osg/Timer>
 
 #include <string>
 #include <vector>
@@ -108,6 +109,13 @@ public:
 	void setOrientation (float pitch, float roll, float yaw);
 
 	/**
+	 * A translational velocity (m/s). This is computed in the callbackUpdate()
+	 * function.
+	 */
+	void setVelocity (float dx, float dy, float dz);
+	
+	
+	/**
 	 * The move command adds a relative translation with respect to the
 	 * node's current orientation. That is, the node will translate along it's
 	 * direction vector (Y-axis) by the supplied number of units
@@ -125,6 +133,7 @@ public:
 	int getReportGlobals() { return (int)_reportGlobals; };
 	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
+	osg::Vec3 getVelocity() { return _velocity; };
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
 
 
@@ -166,6 +175,8 @@ public:
 private:
 	bool _reportGlobals;
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
+	osg::Vec3 _velocity;
+	osg::Timer_t lastTick;
 	osg::Matrix _globalMatrix;
 	osg::Vec3 _globalScale;
 	float _globalRadius;

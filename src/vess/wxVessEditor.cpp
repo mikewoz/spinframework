@@ -103,7 +103,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	StaticBoxSizer1->SetSizeHints(editorPanel);
 	vessEditor_splitter->SplitHorizontally(treePanel, editorPanel);
 	wxVessEditor_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-	wxVessEditor_ToolBar->SetToolBitmapSize(wxSize(-1,32));
+	wxVessEditor_ToolBar->SetToolBitmapSize(wxSize(24,24));
 	ToolBarItem1 = wxVessEditor_ToolBar->AddTool(vessEditor_clear, _("Clear"), wxBitmap(wxImage(_T("../images/icon_eraser.gif"))), wxBitmap(wxImage(_T("../images/icon_eraser.gif"))), wxITEM_NORMAL, _("Clear the current scene"), _("Clear the current scene"));
 	ToolBarItem2 = wxVessEditor_ToolBar->AddTool(vessEditor_refresh, _("Refresh"), wxBitmap(wxImage(_T("../images/icon_refresh.gif"))), wxBitmap(wxImage(_T("../images/icon_refresh.gif"))), wxITEM_NORMAL, _("Refresh the scene"), _("This will resync with the VESS server, ensuring that the scene is up to date."));
 	wxVessEditor_ToolBar->AddSeparator();
