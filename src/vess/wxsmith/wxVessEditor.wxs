@@ -42,6 +42,7 @@
 			</object>
 		</object>
 		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVessEditor_ToolBar" member="yes">
+			<bitmapsize>-1,32</bitmapsize>
 			<object class="tool" name="vessEditor_clear" variable="ToolBarItem1" member="yes">
 				<label>Clear</label>
 				<bitmap>../images/icon_eraser.gif</bitmap>

@@ -142,7 +142,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     	SetIcon(FrameIcon);
     }
     mainSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER|wxNO_BORDER, _T("ID_SPLITTERWINDOW1"));
-    mainSplitter->SetMinSize(wxSize(30,30));
+    mainSplitter->SetMinSize(wxSize(40,40));
     mainSplitter->SetMinimumPaneSize(40);
     mainPanel = new wxPanel(mainSplitter, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     BoxSizer1 = new wxBoxSizer(wxVERTICAL);
@@ -197,6 +197,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxVess_StatusBar->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(wxVess_StatusBar);
     wxVess_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
+    wxVess_ToolBar->SetToolBitmapSize(wxSize(-1,32));
     ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
     ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
     wxVess_ToolBar->AddSeparator();

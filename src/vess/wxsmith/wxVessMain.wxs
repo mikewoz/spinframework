@@ -8,7 +8,7 @@
 		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="mainSplitter" member="yes">
 			<sashpos>40</sashpos>
 			<minsize>40</minsize>
-			<minsize>30,30</minsize>
+			<minsize>40,40</minsize>
 			<style>wxSP_NOBORDER|wxNO_BORDER</style>
 			<object class="wxPanel" name="ID_PANEL1" variable="mainPanel" member="yes">
 				<object class="wxBoxSizer" variable="BoxSizer1" member="no">
@@ -128,6 +128,7 @@
 			<styles>wxSB_NORMAL</styles>
 		</object>
 		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVess_ToolBar" member="yes">
+			<bitmapsize>-1,32</bitmapsize>
 			<object class="tool" name="wxVess_load" variable="ToolBarItem1" member="yes">
 				<label>Load Scene</label>
 				<bitmap stock_id="wxART_FILE_OPEN" stock_client="wxART_TOOLBAR" />
