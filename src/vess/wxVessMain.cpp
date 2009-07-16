@@ -197,7 +197,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxVess_StatusBar->SetStatusStyles(1,__wxStatusBarStyles_1);
     SetStatusBar(wxVess_StatusBar);
     wxVess_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-    wxVess_ToolBar->SetToolBitmapSize(wxSize(-1,32));
+    wxVess_ToolBar->SetToolBitmapSize(wxSize(-1,24));
     ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
     ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
     wxVess_ToolBar->AddSeparator();
@@ -230,7 +230,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 
     // sash position doesn't seem to work in wxSmith, so do it manually:
     mainSplitter->SetSashPosition(40);
-
+	
     vessConfigFrame = new wxVessConfig(this);
     vessConfigFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
     vessConfigFrame->rxAddr->SetValue( wxString( vess->rxAddr.c_str(), wxConvUTF8 ));
@@ -290,19 +290,19 @@ void wxVessMain::OnAbout(wxCommandEvent& event)
     wxString msg = wxbuildinfo(long_f);
    // wxMessageBox(msg, _("Welcome to..."));
 
-    wxIcon SPINIcon(wxT("images/logo_SPIN.tif"), wxBITMAP_TYPE_TIF);
+    //wxIcon SPINIcon(wxT("images/logo_SPIN.tif"), wxBITMAP_TYPE_TIF);
+    wxIcon SPINIcon(wxT("../images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
 
     wxAboutDialogInfo info;
     info.SetVersion(_("0.9"));
     info.SetName(_("SPIN Framework"));
-    info.SetDescription(_("The Spatial Interaction Framework"));
-    info.SetCopyright(_T("(C) 2009"));
+    info.SetDescription(_("The Spatial Interaction Framework\nhttp://spinframework.sourceforge.net"));
+    info.SetCopyright(_T("Copyright (C) 2009. Mike Wozniewski, Zack Settel"));
     info.SetIcon(SPINIcon);
 
     wxAboutBox(info);
 
 }
-
 
 void wxVessMain::OnLoadScene(wxCommandEvent& event)
 {

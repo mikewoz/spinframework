@@ -62,11 +62,13 @@ vessMaster *vess; // global
 
 bool vessWX::OnInit()
 {
-
+    // call default behaviour (mandatory)
+    if (!wxApp::OnInit())
+        return false;
 
     // Make sure we can load the libAudioscape library:
 	osgDB::Registry *reg = osgDB::Registry::instance();
-	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libAudioscape"));
+	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
 
 
 	vess = new vessMaster();
@@ -81,8 +83,29 @@ bool vessWX::OnInit()
     	SetTopWindow(Frame);
     }
     //*)
-
-
+	
     return wxsOK;
 
+}
+
+void vessWX::OnInitCmdLine(wxCmdLineParser& parser)
+{
+    parser.SetDesc (g_cmdLineDesc);
+    parser.SetSwitchChars (wxT("-"));
+}
+ 
+bool vessWX::OnCmdLineParsed(wxCmdLineParser& parser)
+{
+    if (parser.Found(wxT("s"))) mode = 1;
+    else if (parser.Found(wxT("c"))) mode = 2;
+	else mode = 0;
+
+    // to accept scene files as arguments:
+    wxArrayString files;
+    for (int i = 0; i < parser.GetParamCount(); i++)
+    {
+		files.Add(parser.GetParam(i));
+    }
+ 
+    return true;
 }

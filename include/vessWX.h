@@ -45,6 +45,9 @@
 // For compilers that support precompilation, includes <wx/wx.h>.
 #include <wx/wxprec.h>
 
+#include <wx/cmdline.h>
+
+
 #ifdef __BORLANDC__
     #pragma hdrstop
 #endif
@@ -64,7 +67,22 @@ class vessWX : public wxApp
 {
     public:
         virtual bool OnInit();
+		virtual void OnInitCmdLine(wxCmdLineParser& parser);
+		virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
+	private:
+		int mode;
+		
 };
+
+static const wxCmdLineEntryDesc g_cmdLineDesc [] =
+{
+     { wxCMD_LINE_SWITCH, wxT("h"), wxT("help"),   wxT("displays help on the command line parameters"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+     { wxCMD_LINE_SWITCH, wxT("s"), wxT("server"), wxT("automatically start in server mode") },
+     { wxCMD_LINE_SWITCH, wxT("c"), wxT("client"), wxT("automatically start in client mode") },
+     { wxCMD_LINE_NONE }
+};
+ 
+
 
 #endif

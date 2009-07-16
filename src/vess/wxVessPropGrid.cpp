@@ -127,29 +127,6 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
 
     //pToolBar->Realize();
 
-/*
-    // We'll set up an OSC receiver to listen to messages for the currently
-    // selected node. Note that we MUST listen to the broadcast channel and not
-    // to vessChannel directly. This is because VESS might broadcast different
-    // messages than it receives (eg, it receives a 'move' message, but will
-    // transmit a 'setTranslation' message).
-    if (vess->sceneManager->isSlave())
-    {
-        // if this sceneManager is already a listener, then we can just hijack
-        // the rxServ and add our own method callbacks.
-        listeningServer = vess->sceneManager->rxServ;
-    }
-    else
-    {
-        // if this sceneManager is a server, then we have to create a new server
-        // that listens to the meassages it is broadcasting
-        if (isMulticastAddress(vess->txAddr))
-            listeningServer = lo_server_thread_new_multicast(vess->txAddr.c_str(), vess->txPort.c_str(), oscParser_error);
-        else
-            listeningServer = lo_server_thread_new(vess->txPort.c_str(), oscParser_error);
-        lo_server_thread_start(listeningServer);
-    }
-*/
 }
 
 
@@ -186,23 +163,8 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
         //std::cout << "Populating property editor for: " << newNode->id->s_name << std::endl;
 		//introspect_print_type(classType);
 
-        // Parse this class:
+        // Parse this class (recursively using the GenerateProperties function):
         GenerateProperties(classType, newNode);
-
-        // Go through the base classes and add properties for any base class
-        // that is castable as asReferened. Start at the the furthest base level
-	        
-        // this is now done recursively in GenerateProperties()
-        /*
-        for (int i=0; i<classType.getNumBaseTypes(); i++)
-        {
-            const Type& BaseClassType = classType.getBaseType(i);
-            if ((BaseClassType==asReferencedType) || (BaseClassType.isSubclassOf(asReferencedType)))
-            {
-                GenerateProperties(BaseClassType, newNode);
-            }
-        }
-        */
 
 
         // Add a callback method to the listeningServer that will listen for
@@ -287,6 +249,14 @@ void wxVessPropGrid::UpdateFromVess()
     GetGrid()->Thaw();
 }
 
+/**
+ * This function generates editable propGrid entries from an asReferenced node.
+ * Note that the function is recursive, and calls itself for base classes for
+ * the node type until all vess-related properties are created. Only a specific
+ * set of methods in each class become available as editable properties. These
+ * need to be void functions that take at least one argument, such as something
+ * like: void setTranslation(float x, float y, float z).
+ */
 void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType, asReferenced* pObject)
 {
 	// TODO: we should try to store this globally somewhere, so that we don't do
@@ -298,8 +268,6 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
 		// we've gotten to a non-asReferenced node (recursively), so return
 		return;
     }
-	
-	//std::cout << "wxVessPropGrid::GenerateProperties for class=" << classType.getQualifiedName() << ", id=" << pObject->id->s_name << std::endl;
 
     wxString className = wxString(classType.getQualifiedName().c_str(), wxConvUTF8);
 
@@ -308,6 +276,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
     wxPGId categoryId = Append(new wxPropertyCategory(className));
     wxPGId parentId = categoryId;
 
+	// Create help text for the category:
     wxString helpText;
     if (!classType.getBriefHelp().empty())
     {
@@ -501,10 +470,13 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
 }
 
 
-/*!
-    Property value changed event. Set the change to the osg object.
-    @param[in] event Event data.
-*/
+/**
+ * Called when a property value is about to change (ie, user has modified the
+ * value). When this happens, we create an OSC message that sends the event to
+ * the server. The server will in turn broadcast the event to all clients
+ * (including this one!), hence we need to be careful about how properties are
+ * updated.
+ */
 void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 {
     wxPGId id = event.GetProperty();
@@ -541,7 +513,8 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 
 	// prevent event from propagating:
 	//event.Veto();
-
+	//event.Skip();
+	
     //GetGrid()->Thaw();
 
 }
@@ -685,7 +658,7 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId, wxVariant val )
 
 
 /**
- *
+ * Given an OSC message, we set the value for the specified wxProp id.
  */
 void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_arg **argv)
 {

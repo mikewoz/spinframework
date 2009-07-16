@@ -262,7 +262,7 @@ static void *vessListenerThread(void *arg)
 {
 	vessListener *vess = (vessListener*) arg;
 
-	std::cout << "  VESS listener started." << std::endl;
+	std::cout << "  VESS started in Client mode (listening to messages)" << std::endl;
 
 	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
 
@@ -280,7 +280,7 @@ static void *vessMasterThread(void *arg)
 {
 	vessMaster *vess = (vessMaster*) arg;
 
-	std::cout << "  VESS started in Master mode." << std::endl;
+	std::cout << "  VESS started in Server mode" << std::endl;
 	std::cout << "  broadcasting info messages on " << vess->txAddr << ", port: " << vess->infoPort << std::endl;
 
 	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
