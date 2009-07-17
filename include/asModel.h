@@ -84,11 +84,11 @@ public:
 	 */
 	virtual void updateNodePath();
 
+	void setModelFromFile	(const char *filename);
+
 	void setTranslation		(float x, float y, float z);
 	void setOrientation		(float pitch, float roll, float yaw);
 	void setScale			(float x, float y, float z);
-
-	void setModelFromFile	(const char *filename);
 
 	osg::Vec3 getTranslation() { return modelTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };

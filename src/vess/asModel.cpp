@@ -125,6 +125,20 @@ void asModel::updateNodePath()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
+
+void asModel::setModelFromFile (const char* filename)
+{
+	// don't do anything if the current model is already loaded:
+	if (string(filename)==modelName) return;
+
+	modelName = string(filename);
+	modelPath = mediaManager->getModelPath(filename);
+
+	drawModel();
+
+	BROADCAST(this, "ss", "setModelFromFile", modelName.c_str());
+}
+
 void asModel::setTranslation (float x, float y, float z)
 {
 	modelTransform->setPosition(osg::Vec3(x,y,z));
@@ -147,20 +161,6 @@ void asModel::setScale (float x, float y, float z)
 {
 	modelTransform->setScale(osg::Vec3(x,y,z));
 	BROADCAST(this, "sfff", "setScale", x, y, z);
-}
-
-void asModel::setModelFromFile (const char* filename)
-{
-	// don't do anything if the current model is already loaded:
-	if (string(filename)==modelName) return;
-
-	modelName = string(filename);
-	modelPath = mediaManager->getModelPath(filename);
-
-	drawModel();
-
-	BROADCAST(this, "ss", "setModelFromFile", modelName.c_str());
-
 }
 
 

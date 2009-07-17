@@ -122,36 +122,7 @@ void asShape::updateNodePath()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
-void asShape::setTranslation (float x, float y, float z)
-{
-	shapeTransform->setPosition(osg::Vec3(x,y,z));
 
-	BROADCAST(this, "sfff", "setTranslation", x, y, z);
-}
-
-// ===================================================================
-void asShape::setOrientation (float p, float r, float y)
-{
-	_orientation = osg::Vec3(p, r, y);
-
-	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-
-	shapeTransform->setAttitude(q);
-
-	BROADCAST(this, "sfff", "setOrientation", p, r, y);
-}
-
-// ===================================================================
-void asShape::setScale (float x, float y, float z)
-{
-	shapeTransform->setScale(osg::Vec3(x,y,z));
-
-	BROADCAST(this, "sfff", "setScale", x, y, z);
-}
-
-// ===================================================================
 void asShape::setShape (shapeType s)
 {
 	// don't do anything if the new shape is the same as the current shape:
@@ -165,34 +136,6 @@ void asShape::setShape (shapeType s)
 	BROADCAST(this, "si", "setShape", (int) shape);
 
 }
-
-/*
-// ===================================================================
-void asShape::setShape (char *newShape)
-{
-	shapeType s;
-
-	// don't do anything if the newShape is the same as the current shape:
-	if (string(newShape) == shape) return;
-	else shape = string(newShape);
-
-
-	//if (shapeDescr=="sphere") s = SPHERE;
-	//else if (shapeDescr=="box") s = BOX;
-	//else if (shapeDescr=="cylinder") s = CYLINDER;
-	//else if (shapeDescr=="capsule") s = CAPSULE;
-	//else if (shapeDescr=="cone") s = CONE;
-	//else if (shapeDescr=="plane") s = PLANE;
-	//else s = NONE;
-
-	//shape=s;
-
-
-	drawShape();
-
-	BROADCAST(this, "ss", "setShape", shape.c_str());
-}
-*/
 
 void asShape::setColor (float r, float g, float b, float a)
 {
@@ -235,6 +178,35 @@ void asShape::setRenderBin (int i)
 	BROADCAST(this, "si", "setRenderBin", renderBin);
 }
 
+
+void asShape::setTranslation (float x, float y, float z)
+{
+	shapeTransform->setPosition(osg::Vec3(x,y,z));
+
+	BROADCAST(this, "sfff", "setTranslation", x, y, z);
+}
+
+// ===================================================================
+void asShape::setOrientation (float p, float r, float y)
+{
+	_orientation = osg::Vec3(p, r, y);
+
+	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
+							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
+							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
+
+	shapeTransform->setAttitude(q);
+
+	BROADCAST(this, "sfff", "setOrientation", p, r, y);
+}
+
+// ===================================================================
+void asShape::setScale (float x, float y, float z)
+{
+	shapeTransform->setScale(osg::Vec3(x,y,z));
+
+	BROADCAST(this, "sfff", "setScale", x, y, z);
+}
 
 // ===================================================================
 void asShape::drawShape()

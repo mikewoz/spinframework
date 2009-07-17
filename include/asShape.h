@@ -76,6 +76,18 @@ public:
 	 */
 	virtual void updateNodePath();
 
+
+    /**
+     * We provide several possible shapes
+     */
+    enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
+
+	void setShape			(shapeType s);
+
+	void setColor			(float red, float green, float blue, float alpha);
+	void setTextureFromFile	(const char* filename);
+	void setRenderBin		(int i);
+
     /**
      * This is a local translational offset from the parent
      */
@@ -91,24 +103,14 @@ public:
      */
 	void setScale (float x, float y, float z);
 
-    /**
-     * We provide several possible shapes
-     */
-    enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
 
-	void setShape			(shapeType s);
-
-	void setColor			(float red, float green, float blue, float alpha);
-	void setTextureFromFile	(const char* filename);
-	void setRenderBin		(int i);
-
-
-	osg::Vec3 getTranslation() { return shapeTransform->getPosition(); };
-	osg::Vec3 getOrientation() { return _orientation; };
-	osg::Vec3 getScale() { return shapeTransform->getScale(); };
 	int getShape() { return (int)shape; }
 	osg::Vec4 getColor() { return _color; };
 	int getRenderBin() { return renderBin; }
+    osg::Vec3 getTranslation() { return shapeTransform->getPosition(); };
+	osg::Vec3 getOrientation() { return _orientation; };
+	osg::Vec3 getScale() { return shapeTransform->getScale(); };
+
 
 	/**
 	 * For each subclass of asReferenced, we override the getState() method to

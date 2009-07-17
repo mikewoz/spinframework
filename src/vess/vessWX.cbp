@@ -72,10 +72,10 @@
 		<Unit filename="../../include/wxVessMain.h" />
 		<Unit filename="../../include/wxVessPropGrid.h" />
 		<Unit filename="../../include/wxVessRenderer.h" />
+		<Unit filename="../../include/wxVessSettings.h" />
 		<Unit filename="../../include/wxVessTreeCtrl.h" />
 		<Unit filename="../../include/wxVessTreeVisitor.h" />
 		<Unit filename="DebugVisitor.cpp" />
-		<Unit filename="NewPanel.h" />
 		<Unit filename="asBasicNode.cpp" />
 		<Unit filename="asCameraManager.cpp" />
 		<Unit filename="asCameraView.cpp" />
@@ -99,12 +99,12 @@
 		<Unit filename="asToggle.cpp" />
 		<Unit filename="asUtil.cpp" />
 		<Unit filename="asVideo.cpp" />
-		<Unit filename="asViewer.cpp" />
 		<Unit filename="asWindow.cpp" />
 		<Unit filename="findNodeVisitor.cpp" />
 		<Unit filename="libloUtil.cpp" />
 		<Unit filename="osgUtil.cpp" />
 		<Unit filename="pdUtil.cpp" />
+		<Unit filename="spinViewer.cpp" />
 		<Unit filename="testViewer.cpp" />
 		<Unit filename="userNode.cpp" />
 		<Unit filename="vess.cpp" />
@@ -117,9 +117,9 @@
 		<Unit filename="wxVessMain.cpp" />
 		<Unit filename="wxVessPropGrid.cpp" />
 		<Unit filename="wxVessRenderer.cpp" />
+		<Unit filename="wxVessSettings.cpp" />
 		<Unit filename="wxVessTreeCtrl.cpp" />
 		<Unit filename="wxVessTreeVisitor.cpp" />
-		<Unit filename="wxsmith/NewPanel.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -132,7 +132,7 @@
 					<wxFrame wxs="wxsmith/wxVessEditor.wxs" src="wxVessEditor.cpp" hdr="../../include/wxVessEditor.h" name="wxVessEditor" language="CPP" />
 					<wxFrame wxs="wxsmith/wxVessRenderer.wxs" src="wxVessRenderer.cpp" hdr="../../include/wxVessRenderer.h" name="wxVessRenderer" language="CPP" />
 					<wxPanel wxs="wxsmith/wxVessConfig.wxs" src="wxVessConfig.cpp" hdr="../../include/wxVessConfig.h" name="wxVessConfig" language="CPP" />
-					<wxPanel wxs="wxsmith/NewPanel.wxs" src="NewPanel.cpp" hdr="NewPanel.h" name="NewPanel" language="CPP" />
+					<wxFrame wxs="wxsmith/wxVessSettings.wxs" src="wxVessSettings.cpp" hdr="../../include/wxVessSettings.h" name="wxVessSettings" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

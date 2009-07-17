@@ -33,8 +33,9 @@ OBJS =  vessThreads.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
 	asDSPnode.o asSoundNode.o asSoundSpace.o asSoundConnection.o \
 	asCameraView.o asCameraManager.o asWindow.o
 
-WX_OBJS = vessWX.o wxVessMain.o wxVessEditor.o wxVessRenderer.o wxVessConfig.o \
-	  wxVessPropGrid.o wxVessTreeVisitor.o wxVessTreeCtrl.o
+WX_OBJS = vessWX.o wxVessMain.o wxVessEditor.o wxVessRenderer.o \
+	  wxVessPropGrid.o wxVessSettings.o wxVessTreeVisitor.o \
+	  wxVessTreeCtrl.o
 
 SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o \
 	tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \

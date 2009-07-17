@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -76,8 +76,8 @@ wxVessConfig::wxVessConfig(wxWindow* parent,wxWindowID id,const wxPoint& pos,con
 	wxBoxSizer* BoxSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	
-	Create(parent, id, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("id"));
+
+	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	vessConfigPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	BoxSizer1 = new wxBoxSizer(wxVERTICAL);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);

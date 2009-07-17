@@ -231,12 +231,12 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     // sash position doesn't seem to work in wxSmith, so do it manually:
     mainSplitter->SetSashPosition(40);
 
-    vessConfigFrame = new wxVessConfig(this);
-    vessConfigFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
-    vessConfigFrame->rxAddr->SetValue( wxString( vess->rxAddr.c_str(), wxConvUTF8 ));
-    vessConfigFrame->rxPort->SetValue( wxString( vess->rxPort.c_str(), wxConvUTF8 ));
-    vessConfigFrame->txAddr->SetValue( wxString( vess->txAddr.c_str(), wxConvUTF8 ));
-    vessConfigFrame->txPort->SetValue( wxString( vess->txPort.c_str(), wxConvUTF8 ));
+    vessSettingsFrame = new wxVessSettings(0);
+    vessSettingsFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->rxAddr->SetValue( wxString( vess->rxAddr.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->rxPort->SetValue( wxString( vess->rxPort.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->txAddr->SetValue( wxString( vess->txAddr.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->txPort->SetValue( wxString( vess->txPort.c_str(), wxConvUTF8 ));
 
 
     //wxFFile logFile(wxT("vessWX.log"),wxT("w+"));
@@ -348,8 +348,7 @@ void wxVessMain::OnSaveScene(wxCommandEvent& event)
 
 void wxVessMain::OnShowConfig(wxCommandEvent& event)
 {
-	std::cout << "sgda" << std::endl;
-    vessConfigFrame->Show();
+    vessSettingsFrame->Show();
 }
 
 void wxVessMain::OnShowEditor(wxCommandEvent& event)
@@ -382,11 +381,11 @@ void wxVessMain::OnStartStopToggle(wxCommandEvent& event)
 {
     if (event.IsChecked())
     {
-        vess->id = std::string(vessConfigFrame->vessID->GetValue().mb_str());
-        vess->rxAddr = std::string(vessConfigFrame->rxAddr->GetValue().mb_str());
-        vess->rxPort = std::string(vessConfigFrame->rxPort->GetValue().mb_str());
-        vess->txAddr = std::string(vessConfigFrame->txAddr->GetValue().mb_str());
-        vess->txPort = std::string(vessConfigFrame->txPort->GetValue().mb_str());
+        vess->id = std::string(vessSettingsFrame->vessID->GetValue().mb_str());
+        vess->rxAddr = std::string(vessSettingsFrame->rxAddr->GetValue().mb_str());
+        vess->rxPort = std::string(vessSettingsFrame->rxPort->GetValue().mb_str());
+        vess->txAddr = std::string(vessSettingsFrame->txAddr->GetValue().mb_str());
+        vess->txPort = std::string(vessSettingsFrame->txPort->GetValue().mb_str());
 
         vess->start();
 

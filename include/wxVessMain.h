@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -57,7 +57,7 @@
 #include <wx/statusbr.h>
 //*)
 
-#include "wxVessConfig.h"
+#include "wxVessSettings.h"
 #include "wxVessEditor.h"
 #include "vessLog.h"
 #include <streambuf>
@@ -136,7 +136,7 @@ class wxVessMain: public wxFrame
         wxToggleButton* StartStop;
         //*)
 
-        wxVessConfig *vessConfigFrame;
+        wxVessSettings *vessSettingsFrame;
 
 #if wxUSE_STD_IOSTREAM
         //wxStreamToTextRedirector *redirector;
