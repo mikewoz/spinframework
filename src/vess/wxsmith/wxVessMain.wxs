@@ -5,6 +5,7 @@
 		<icon>../images/logo_SPIN_simple.png</icon>
 		<size>500,400</size>
 		<id_arg>0</id_arg>
+		<handler function="OnClose" entry="EVT_CLOSE" />
 		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="mainSplitter" member="yes">
 			<sashpos>40</sashpos>
 			<minsize>40</minsize>
