@@ -368,7 +368,6 @@ void wxVessMain::OnShowRenderer(wxCommandEvent& event)
 {
     if (vess->isRunning())
     {
-        //wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Sorry. The viewer window is not yet functional. Please use 'asViewer' from the command line."), wxT("NOT YET IMPLEMENTED"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
         wxVessRenderer* vessRenderer = new wxVessRenderer(0);
         vessRenderer->Show();
     } else {

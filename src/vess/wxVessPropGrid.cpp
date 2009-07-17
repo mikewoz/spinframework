@@ -512,7 +512,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 	vess->nodeMessage(currentNode->id, msg);
 
 	// prevent event from propagating:
-	//event.Veto();
+	event.Veto();
 	//event.Skip();
 	
     //GetGrid()->Thaw();
@@ -528,47 +528,6 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
     wxPGId id = event.GetProperty();
     if (!id) return;
 
-    /*
-
-    wxPGId parent = event.GetMainParent();
-
-    std::cout << "OnPropertyChanged: parent=" << parent->GetBaseName().mb_str() << ", numChildren=" << parent->GetChildCount() << ", id=" << id->GetBaseName().mb_str() << ", valueAsString=" << id->GetValueAsString().mb_str() << std::endl;
-
-    lo_message msg = lo_message_new();
-    lo_message_add_string(msg, parent->GetBaseName().mb_str());
-
-    if (parent->GetChildCount())
-    {
-        for (int i=0; i<parent->GetChildCount(); i++)
-        {
-            lo_message_add_wxProp( msg, parent->Item(i) );
-        }
-    }
-
-    else {
-        lo_message_add_wxProp( msg, id );
-    }
-
-	std::string OSCpath = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
-
-	// If this sceneManager is just a listener, then we nees to send to the
-	// broadcastChannel. Otherwise, we send to the (unicast) rxAddr of this
-	// server.
-    if (vess->sceneManager->isSlave())
-    {
-        lo_send_message(vess->lo_infoServ, OSCpath.c_str(), msg);
-    }
-    else
-        lo_send_message(vess->sceneManager->rxAddr, OSCpath.c_str(), msg);
-
-
-	lo_message_free(msg);
-
-	// prevent event from propagating:
-	//event.Veto();
-	//event.Skip();
-
-	*/
 }
 
 
