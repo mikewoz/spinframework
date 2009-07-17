@@ -88,6 +88,8 @@ wxVessSettings::wxVessSettings(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	vessSettings_panel->SetSizer(BoxSizer1);
 	BoxSizer1->Fit(vessSettings_panel);
 	BoxSizer1->SetSizeHints(vessSettings_panel);
+
+	Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&wxVessSettings::OnClose);
 	//*)
 }
 
@@ -100,7 +102,7 @@ wxVessSettings::~wxVessSettings()
 
 void wxVessSettings::OnClose(wxCloseEvent& event)
 {
-    //self.show(false);
+    this->Show(false);
     event.Veto();
 
 }

@@ -84,6 +84,7 @@ class wxVessMain: public wxFrame
         void OnChangeVessType(wxCommandEvent& event);
         void OnVessMaster(wxCommandEvent& event);
         void OnVessSlave(wxCommandEvent& event);
+        void OnClose(wxCloseEvent& event);
         //*)
 
         //(*Identifiers(wxVessMain)

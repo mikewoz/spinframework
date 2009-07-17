@@ -221,6 +221,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     Connect(wxVess_showConfig,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowConfig);
     Connect(wxVess_showRenderer,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowRenderer);
     Connect(wxVess_showEditor,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowEditor);
+    Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&wxVessMain::OnClose);
     //*)
 
     // on the Mac,
@@ -416,4 +417,15 @@ void wxVessMain::OnVessSlave(wxCommandEvent& event)
     wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Slave mode is not working yet."), wxT("TODO"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
     dlg->ShowModal();
     vessRadio_master->SetValue(true);
+}
+
+void wxVessMain::OnClose(wxCloseEvent& event)
+{
+    vess->stop();
+
+    if (vessSettingsFrame) vessSettingsFrame->Destroy();
+    //if (vessRenderer) vessRenderer->Destroy();
+    //if (vessEditor) vessEditor->Destroy();
+
+    this->Destroy();
 }
