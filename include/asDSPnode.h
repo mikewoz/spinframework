@@ -77,10 +77,10 @@ public:
 
 		
 		// define these as virtual so subclasses can redefine them:
-		virtual void connect(char *snk);
-		virtual void disconnect(char *snk);
-		virtual void setActive (int i);
-		virtual void setDSP (char *newDSP);
+		void connect(char *snk);
+		void disconnect(char *snk);
+		void setActive (int i);
+		void setDSP (char *filename);
 		
 		// for sending messages to the connections of this (source) node:
 		//virtual void connectionMsg (char *snkName, char *method, float value);

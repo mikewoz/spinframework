@@ -143,7 +143,6 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
 {
     if (currentNode == newNode && !forceUpdate) return;
 
-    GetGrid()->Freeze();
     GetGrid()->Clear();
 
 
@@ -163,8 +162,12 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
         //std::cout << "Populating property editor for: " << newNode->id->s_name << std::endl;
 		//introspect_print_type(classType);
 
+
+
         // Parse this class (recursively using the GenerateProperties function):
+        GetGrid()->Freeze();
         GenerateProperties(classType, newNode);
+        GetGrid()->Thaw();
 
 
         // Add a callback method to the listeningServer that will listen for
@@ -190,7 +193,7 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
 
     }
 
-    GetGrid()->Thaw();
+
 
     if (newNode) UpdateFromVess();
 
@@ -459,14 +462,14 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
         } // if desired method
 
     } // method iterator
-    
-    
+
+
     // recursively add properties of all base classes:
 	for (int i=0; i<classType.getNumBaseTypes(); i++)
 	{
 		GenerateProperties(classType.getBaseType(i), pObject);
 	}
-    
+
 }
 
 
@@ -514,7 +517,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 	// prevent event from propagating:
 	event.Veto();
 	//event.Skip();
-	
+
     //GetGrid()->Thaw();
 
 }
@@ -678,6 +681,7 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
 
     if (!propGrid) return 0;
 
+    //propGrid->GetGrid()->Freeze();
 
     //std::string parentString = propGrid->GetCurrentNode()->nodeType + "." + std::string((char*)argv[0]);
     //wxPGId parentId = propGrid->GetGrid()->GetRoot()->GetPropertyByName( wxString(parentString.c_str(), wxConvUTF8) );
@@ -713,6 +717,8 @@ int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **
             break;
         }
     }
+
+    //propGrid->GetGrid()->Thaw();
 
 	return 1;
 }

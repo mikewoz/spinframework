@@ -329,7 +329,7 @@ void wxVessMain::OnSaveScene(wxCommandEvent& event)
 {
     if (vess->isRunning())
     {
-		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Save Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
+		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Save Scene"), wxT(""), wxT(""), wxT("*.xml"), wxSAVE, wxDefaultPosition);
 
 		if ( openFileDialog->ShowModal() == wxID_OK )
 		{
@@ -420,11 +420,17 @@ void wxVessMain::OnVessSlave(wxCommandEvent& event)
 
 void wxVessMain::OnClose(wxCloseEvent& event)
 {
-    vess->stop();
+    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to quit?"), wxT("Quit?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);
 
-    if (vessSettingsFrame) vessSettingsFrame->Destroy();
-    //if (vessRenderer) vessRenderer->Destroy();
-    //if (vessEditor) vessEditor->Destroy();
+    if ( dlg->ShowModal() == wxID_OK )
+    {
+        vess->stop();
 
-    this->Destroy();
+        if (vessSettingsFrame) vessSettingsFrame->Destroy();
+        //if (vessRenderer) vessRenderer->Destroy();
+        //if (vessEditor) vessEditor->Destroy();
+
+        this->Destroy();
+
+    } else event.Veto();
 }

@@ -81,7 +81,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	//(*Initialize(wxVessEditor)
 	wxBoxSizer* BoxSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
-	
+
 	Create(parent, wxID_ANY, _("SPIN :: Editor"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(-1,600));
 	vessEditor_splitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
@@ -113,7 +113,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	ToolBarItem5 = wxVessEditor_ToolBar->AddTool(vessEditor_deleteNode, _("Delete Selected Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxITEM_NORMAL, _("Delete the currently selected node"), _("Delete the currently selected node"));
 	wxVessEditor_ToolBar->Realize();
 	SetToolBar(wxVessEditor_ToolBar);
-	
+
 	Connect(vessEditor_clear,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnClear);
 	Connect(vessEditor_refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnRefresh);
 	Connect(vessEditor_debugPrint,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnDebugPrint);
@@ -210,21 +210,6 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
             done = true;
 
-            /*
-            pthread_mutex_lock(&pthreadLock);
-            n = vess->sceneManager->createNode(std::string(nodeID.mb_str()), std::string(nodeType.mb_str()));
-            pthread_mutex_unlock(&pthreadLock);
-
-            if (!n.valid())
-            {
-                wxMessageBox(wxT("Could not create node."), wxT("Oops"), wxOK|wxICON_ERROR);
-            }
-            else {
-                // refresh tree control:
-                vessTree->Refresh();
-            }
-           */
-
         }
 
     }
@@ -233,8 +218,6 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
 void wxVessEditor::OnRefresh(wxCommandEvent& event)
 {
-    //vessTree->BuildTree(vess->sceneManager->worldNode.get());
-
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "refresh");
     vess->sceneMessage(msg);
@@ -242,8 +225,6 @@ void wxVessEditor::OnRefresh(wxCommandEvent& event)
 
 void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
 {
-    //vess->sceneManager->debug();
-
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "debug");
     vess->sceneMessage(msg);
@@ -251,22 +232,30 @@ void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
 
 void wxVessEditor::OnClear(wxCommandEvent& event)
 {
-    //vess->sceneManager->clear();
+    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to clear the scene?"), wxT("Clear?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);
 
-    lo_message msg = lo_message_new();
-    lo_message_add_string(msg, "clear");
-    vess->sceneMessage(msg);
+    if ( dlg->ShowModal() == wxID_OK )
+    {
+        lo_message msg = lo_message_new();
+        lo_message_add_string(msg, "clear");
+        vess->sceneMessage(msg);
+
+    }
 }
 
 void wxVessEditor::OnDeleteNode(wxCommandEvent& event)
 {
-    //std::cout << " trying to delete node" << std::endl;
-
     asReferenced *n = vessTree->GetSelectedNode();
     if (n)
     {
-        lo_message msg = lo_message_new();
-        lo_message_add(msg, "ss", "deleteNode", (const char*)n->id->s_name);
-        vess->sceneMessage(msg);
+        wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to delete node '") + wxString(n->id->s_name, wxConvUTF8) + wxT("'?"), wxT("Delete Node?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);
+        if ( dlg->ShowModal() == wxID_OK )
+        {
+            lo_message msg = lo_message_new();
+            lo_message_add(msg, "ss", "deleteNode", (const char*)n->id->s_name);
+            vess->sceneMessage(msg);
+        }
+    } else {
+        wxMessageDialog *dlg = new wxMessageDialog(this, wxT("You must select a node from the tree first"), wxT("Delete Node?"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
     }
 }
