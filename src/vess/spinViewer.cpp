@@ -315,13 +315,13 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// create a camera manipulator
 
-
+/*
 	osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator();
 	manipulator->setMinimumDistance ( 0.0001 );
 	manipulator->setHomePosition( osg::Vec3(0,-1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+*/
 
 
-/*
 	osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
 	manipulator->setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
@@ -330,7 +330,7 @@ int main(int argc, char **argv)
 	manipulator->setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 //	manipulator->setHomePosition( osg::Vec3(0,1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 	manipulator->setTrackNode(userNode->getAttachmentNode());
-*/
+
 
 	view->setCameraManipulator(manipulator);
 
