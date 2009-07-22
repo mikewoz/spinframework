@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -70,13 +70,13 @@ userNode::~userNode()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
-void userNode::setName (char *newvalue)
+void userNode::setName (const char *newvalue)
 {
 	name = string(newvalue);
 	BROADCAST(this, "ss", "setName", getName());
 }
 
-void userNode::setHost (char *newvalue)
+void userNode::setHost (const char *newvalue)
 {
 	host = string(newvalue);
 	BROADCAST(this, "ss", "setHost", getHost());
@@ -87,9 +87,9 @@ std::vector<lo_message> userNode::getState ()
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = asBasicNode::getState();
-	
+
 	lo_message msg;
-	
+
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setName", getName());
 	ret.push_back(msg);
@@ -97,6 +97,6 @@ std::vector<lo_message> userNode::getState ()
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setHost", getHost());
 	ret.push_back(msg);
-		
+
 	return ret;
 }

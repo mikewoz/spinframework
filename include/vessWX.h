@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -71,8 +71,8 @@ class vessWX : public wxApp
 		virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
 	private:
-		int mode;
-		
+		int startMode;
+
 };
 
 static const wxCmdLineEntryDesc g_cmdLineDesc [] =
@@ -82,7 +82,7 @@ static const wxCmdLineEntryDesc g_cmdLineDesc [] =
      { wxCMD_LINE_SWITCH, wxT("c"), wxT("client"), wxT("automatically start in client mode") },
      { wxCMD_LINE_NONE }
 };
- 
+
 
 
 #endif

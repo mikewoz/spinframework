@@ -120,7 +120,7 @@ void wxVessTreeCtrl::setListeningServer(lo_server_thread t)
 
 void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
 {
-    //Freeze();
+    Freeze();
     DeleteAllItems();
 
     if (pRoot)
@@ -132,7 +132,7 @@ void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
         pRoot->accept(*m_pSceneTreeVisitor.get());
     }
 
-    //Thaw();
+    Thaw();
 
     ExpandAll();
 
@@ -387,7 +387,7 @@ void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
             lo_message_add(msg, "ss", "setParent", parentString.c_str());
             vess->nodeMessage(child->id, msg);
             */
-            vess->sendSceneMessage("ss", "setParent", parentString.c_str(), LO_ARGS_END);
+            vess->sendNodeMessage(child->id, "ss", "setParent", parentString.c_str(), LO_ARGS_END);
 
         }
     }

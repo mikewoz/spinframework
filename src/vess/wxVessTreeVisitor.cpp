@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -72,6 +72,7 @@ void wxVessTreeVisitor::apply(osg::Node& node)
 
 void wxVessTreeVisitor::apply(osg::Group& node)
 {
+    //std::cout << "wxVessTreeVisitor parsing group " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
 
     // for osg::Group, we check if it can be cast as an asReferenced, and add
     // it to the treeCtrl if so:

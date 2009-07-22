@@ -150,9 +150,9 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     StaticText1 = new wxStaticText(mainPanel, ID_STATICTEXT1, _("Run as:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     vessRadio_master = new wxRadioButton(mainPanel, ID_RADIOBUTTON1, _("Server"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
-    vessRadio_master->SetValue(true);
     FlexGridSizer1->Add(vessRadio_master, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     vessRadio_slave = new wxRadioButton(mainPanel, ID_RADIOBUTTON2, _("Client"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+    vessRadio_slave->SetValue(true);
     FlexGridSizer1->Add(vessRadio_slave, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StartStop = new wxToggleButton(mainPanel, ID_TOGGLEBUTTON2, _("Start"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
     FlexGridSizer1->Add(StartStop, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

@@ -188,12 +188,11 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
             lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessPropGrid_liblo_callback, (void*)this);
         }
 
-        // finally, update our internal pointer:
-        currentNode = newNode;
-
     }
 
 
+    // finally, update our internal pointer:
+    currentNode = newNode;
 
     if (newNode) UpdateFromVess();
 

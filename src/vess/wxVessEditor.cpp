@@ -234,6 +234,11 @@ void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
     lo_message_add_string(msg, "debug");
     vess->sceneMessage(msg);
     */
+
+    // local print:
+    vess->sceneManager->debug();
+
+    // remote print:
     vess->sendSceneMessage("s", "debug", LO_ARGS_END);
 }
 

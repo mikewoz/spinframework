@@ -750,16 +750,11 @@ asSoundConnection* asSceneManager::getConnection(char *from, char *to)
 
 void asSceneManager::updateGraph()
 {
-
-	/*
-	vector< osg::ref_ptr<asReferenced> >::iterator iter;
-	for (iter = nodeList.begin(); iter != nodeList.end() ; iter++)
-	{
-		if ((*iter)->newParent != NULL_SYMBOL) (*iter)->attach();
-	}
-	*/
+    // TODO: remove this and just place a thread mutex around the setParent
+    // stuff in asReferenced.
 
 
+/*
 	nodeMapType::iterator it;
 	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
 	{
@@ -769,7 +764,7 @@ void asSceneManager::updateGraph()
 			if ((*iter)->newParent != NULL_SYMBOL) (*iter)->attach();
 		}
 	}
-
+*/
 
 }
 

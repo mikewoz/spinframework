@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -78,7 +78,7 @@ bool vessWX::OnInit()
     	SetTopWindow(Frame);
     }
     //*)
-	
+
     return wxsOK;
 
 }
@@ -88,12 +88,12 @@ void vessWX::OnInitCmdLine(wxCmdLineParser& parser)
     parser.SetDesc (g_cmdLineDesc);
     parser.SetSwitchChars (wxT("-"));
 }
- 
+
 bool vessWX::OnCmdLineParsed(wxCmdLineParser& parser)
 {
-    if (parser.Found(wxT("s"))) mode = 1;
-    else if (parser.Found(wxT("c"))) mode = 2;
-	else mode = 0;
+    if (parser.Found(wxT("c"))) startMode = 1;
+    else if (parser.Found(wxT("s"))) startMode = 2;
+	else startMode = 0;
 
     // to accept scene files as arguments:
     wxArrayString files;
@@ -101,6 +101,6 @@ bool vessWX::OnCmdLineParsed(wxCmdLineParser& parser)
     {
 		files.Add(parser.GetParam(i));
     }
- 
+
     return true;
 }

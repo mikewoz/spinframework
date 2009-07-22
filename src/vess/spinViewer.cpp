@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 
 	vess->sceneManager->isGraphical = true;
 
-/*
+
 	std::cout << "  Registering userNode '" << id << "' with VESS" << std::endl;
 
 	// Add a userNode to the local scene and use it to feed a NodeTracker for
@@ -223,11 +223,7 @@ int main(int argc, char **argv)
     // that the server is running). Eventually, we'll need a better method to
     // synchronize user state with vess server... how? Maybe if VESS receives a
     // ping for a user that doesn't exist, it can request the creation messages?
-
-	lo_message msg = lo_message_new();
-	lo_message_add(msg, "sss", "createNode", (char*) id.c_str(), "userNode");
-	vess->sceneMessage(msg);
-*/
+    vess->sendSceneMessage("sss", "createNode", (char*) id.c_str(), "userNode", LO_ARGS_END);
 
 	// *************************************************************************
 	// any option left unread are converted into errors to write out later.
