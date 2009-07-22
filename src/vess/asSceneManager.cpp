@@ -192,10 +192,11 @@ asSceneManager::asSceneManager (std::string id, std::string addr, std::string po
 // destructor
 asSceneManager::~asSceneManager()
 {
-	if (txAddr) lo_address_free(txAddr);
-	if (rxAddr) lo_address_free(rxAddr);
 	if (txServ) lo_server_free(txServ);
 	if (rxServ) lo_server_thread_free(rxServ);
+    if (txAddr) lo_address_free(txAddr);
+	if (rxAddr) lo_address_free(rxAddr);
+
 }
 
 
@@ -1277,15 +1278,15 @@ static bool nodeSortFunction (osg::ref_ptr<asReferenced> n1, osg::ref_ptr<asRefe
  */
 static int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, ValueList theArgs)
 {
-	
+
 	// TODO: we should try to store this globally somewhere, so that we don't do
 	// a lookup every time there is a message:
 	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
-	
+
 
 	if ((classType==asReferencedType) || (classType.isSubclassOf(asReferencedType)))
     {
-    	try {	
+    	try {
     		classType.invokeMethod(method, classInstance, theArgs, true);
     		// if we get this far, then the method invocation succeeded and
     		// we can return:
@@ -1295,7 +1296,7 @@ static int invokeMethod(const osgIntrospection::Value classInstance, const osgIn
     	{
    			std::cerr << "catch exception: " << ex.what() << std::endl;
   		}
-    	
+
         // If the method wasn't found in the classInstance, then we need to go
     	// through all base classes to see if method is contained in a parent class:
     	for (int i=0; i<classType.getNumBaseTypes(); i++)
@@ -1303,14 +1304,14 @@ static int invokeMethod(const osgIntrospection::Value classInstance, const osgIn
     		if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs)) return 1;
     	}
     }
-	
+
 	return 0;
 }
 
 int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
 	// NOTE: user_data is a t_symbol pointer
-	
+
 	int i;
 	string    theMethod, nodeStr;
 	ValueList theArgs;
@@ -1340,7 +1341,7 @@ int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **ar
 
 	//pthread_mutex_lock(&pthreadLock);
 
-	
+
 	// get node as an osgInrospection::Value (note that type will be asReferenced pointer):
 	const osgIntrospection::Value classInstance = osgIntrospection::Value(n.get());
 
@@ -1348,7 +1349,7 @@ int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **ar
 	// the getInstanceType() method however, gives us the real type being pointed at:
 	const osgIntrospection::Type &classType = classInstance.getInstanceType();
 
-	
+
     if (!classType.isDefined())
     {
         std::cout << "ERROR: oscParser cound not process message '" << path << ". osgIntrospection has no data for that node." << std::endl;
@@ -1357,7 +1358,7 @@ int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **ar
 
 	//introspect_print_type(classType);
 
-    
+
 	// If we have found a valid Type, then let's build an argument list and see
 	// if we can find a method that takes this list of argumets:
 	for (i=1; i<argc; i++)
@@ -1369,9 +1370,9 @@ int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **ar
 			theArgs.push_back( (const char*) argv[i] );
 		}
 	}
-    
+
 	return invokeMethod(classInstance, classType, theMethod, theArgs);
-	
+
 
 	//pthread_mutex_unlock(&pthreadLock);
 

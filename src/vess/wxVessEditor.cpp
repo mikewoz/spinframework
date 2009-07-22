@@ -44,7 +44,7 @@
 #include "vessThreads.h"
 #include <wx/choicdlg.h>
 
-extern vessMaster *vess;
+extern vessThread *vess;
 
 extern pthread_mutex_t pthreadLock;
 
@@ -202,11 +202,12 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
         else
         {
-
+        	/*
             lo_message msg = lo_message_new();
             lo_message_add(msg, "sss", "createNode", (const char*)nodeID.mb_str(), (const char*)nodeType.mb_str());
-            vess->sceneMessage(msg);
-
+            vess->sendSceneMessage(msg);
+            */
+        	vess->sendSceneMessage("sss", "createNode", (const char*)nodeID.mb_str(), (const char*)nodeType.mb_str(), LO_ARGS_END);
 
             done = true;
 
@@ -218,16 +219,22 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
 void wxVessEditor::OnRefresh(wxCommandEvent& event)
 {
+	/*
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "refresh");
     vess->sceneMessage(msg);
+    */
+	vess->sendSceneMessage("s", "refresh", LO_ARGS_END);
 }
 
 void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
 {
+	/*
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "debug");
     vess->sceneMessage(msg);
+    */
+    vess->sendSceneMessage("s", "debug", LO_ARGS_END);
 }
 
 void wxVessEditor::OnClear(wxCommandEvent& event)
@@ -236,9 +243,12 @@ void wxVessEditor::OnClear(wxCommandEvent& event)
 
     if ( dlg->ShowModal() == wxID_OK )
     {
+    	/*
         lo_message msg = lo_message_new();
         lo_message_add_string(msg, "clear");
         vess->sceneMessage(msg);
+        */
+        vess->sendSceneMessage("s", "clear", LO_ARGS_END);
 
     }
 }
@@ -251,9 +261,12 @@ void wxVessEditor::OnDeleteNode(wxCommandEvent& event)
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to delete node '") + wxString(n->id->s_name, wxConvUTF8) + wxT("'?"), wxT("Delete Node?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);
         if ( dlg->ShowModal() == wxID_OK )
         {
+        	/*
             lo_message msg = lo_message_new();
             lo_message_add(msg, "ss", "deleteNode", (const char*)n->id->s_name);
             vess->sceneMessage(msg);
+            */
+            vess->sendSceneMessage("ss", "deleteNode", (const char*)n->id->s_name, LO_ARGS_END);
         }
     } else {
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("You must select a node from the tree first"), wxT("Delete Node?"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);

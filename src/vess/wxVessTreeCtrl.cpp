@@ -51,7 +51,7 @@
 #include "wxVessEditor.h"
 #include "vessThreads.h"
 
-extern vessMaster *vess;
+extern vessThread *vess;
 extern pthread_mutex_t pthreadLock;
 
 
@@ -382,11 +382,12 @@ void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
 
         if (!parentString.empty())
         {
-
+        	/*
             lo_message msg = lo_message_new();
             lo_message_add(msg, "ss", "setParent", parentString.c_str());
             vess->nodeMessage(child->id, msg);
-
+            */
+            vess->sendSceneMessage("ss", "setParent", parentString.c_str(), LO_ARGS_END);
 
         }
     }

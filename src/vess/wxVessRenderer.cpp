@@ -59,7 +59,7 @@
 #include <osgViewer/ViewerEventHandlers>
 
 #include "vessThreads.h"
-extern vessMaster *vess;
+extern vessThread *vess;
 extern pthread_mutex_t pthreadLock;
 
 //(*IdInit(wxVessRenderer)

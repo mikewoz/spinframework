@@ -59,7 +59,7 @@
 #include "../images/icon_tree.xpm"
 #include "../images/icon_3Dsphere.xpm"
 
-extern vessMaster *vess;
+extern vessThread *vess;
 
 
 //(*InternalHeaders(wxVessFrame)
@@ -208,6 +208,8 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxVess_ToolBar->Realize();
     SetToolBar(wxVess_ToolBar);
 
+    Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&wxVessMain::OnVessModeChange);
+    Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&wxVessMain::OnVessModeChange);
     Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&wxVessMain::OnStartStopToggle);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnLoadScene);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnSaveScene);
@@ -387,6 +389,9 @@ void wxVessMain::OnStartStopToggle(wxCommandEvent& event)
         vess->txAddr = std::string(vessSettingsFrame->txAddr->GetValue().mb_str());
         vess->txPort = std::string(vessSettingsFrame->txPort->GetValue().mb_str());
 
+        if (vessRadio_master->GetValue()) vess->setMode(vessThread::SERVER_MODE);
+        else vess->setMode(vessThread::LISTENER_MODE);
+
         vess->start();
 
         // we want the viewer to be able to show all graphical items:
@@ -403,20 +408,7 @@ void wxVessMain::OnStartStopToggle(wxCommandEvent& event)
     }
 }
 
-void wxVessMain::OnChangeVessType(wxCommandEvent& event)
-{
-}
 
-void wxVessMain::OnVessMaster(wxCommandEvent& event)
-{
-}
-
-void wxVessMain::OnVessSlave(wxCommandEvent& event)
-{
-    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Slave mode is not working yet."), wxT("TODO"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
-    dlg->ShowModal();
-    vessRadio_master->SetValue(true);
-}
 
 void wxVessMain::OnClose(wxCloseEvent& event)
 {
@@ -433,4 +425,10 @@ void wxVessMain::OnClose(wxCloseEvent& event)
         this->Destroy();
 
     } else event.Veto();
+}
+
+void wxVessMain::OnVessModeChange(wxCommandEvent& event)
+{
+
+    std::cout << "Changed modes for VESS. You must stop and restart before this takes effect." << std::endl;
 }

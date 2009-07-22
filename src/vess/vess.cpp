@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 {
 
 
-	vessMaster *vess = new vessMaster();
+	vessThread *vess = new vessThread(vessThread::SERVER_MODE);
 
 
 	// *************************************************************************
@@ -130,8 +130,6 @@ int main(int argc, char **argv)
 		// loop until a quit message is received (TODO)
 	}
 
-
-	vess->sceneManager->clear();
 
 	return 0;
 }

@@ -58,7 +58,7 @@
 IMPLEMENT_APP(vessWX);
 
 
-vessMaster *vess; // global
+vessThread *vess; // global
 
 bool vessWX::OnInit()
 {
@@ -66,12 +66,7 @@ bool vessWX::OnInit()
     if (!wxApp::OnInit())
         return false;
 
-    // Make sure we can load the libAudioscape library:
-	osgDB::Registry *reg = osgDB::Registry::instance();
-	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
-
-
-	vess = new vessMaster();
+	vess = new vessThread();
 
     //(*AppInitialize
     bool wxsOK = true;

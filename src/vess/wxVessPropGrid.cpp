@@ -74,7 +74,7 @@
 //#include <osgField/Manager>
 
 #include "vessThreads.h"
-extern vessMaster *vess;
+extern vessThread *vess;
 
 using namespace osgIntrospection;
 
@@ -403,6 +403,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                     // Make a description.
                     if (propId)
                     {
+
                         helpText = wxT("");
                         if (!IsPropertyEnabled(propId))
                         {
@@ -424,6 +425,13 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                             helpText += wxString(method->getDetailedHelp().c_str(), wxConvUTF8) + wxT("\n");
                         }
                         SetPropertyHelpString(propId, helpText);
+
+                        // special case: if property is setParent, then disable
+                        // it:
+                        if (method->getName()=="setParent")
+                        {
+                        	EnableProperty(propId, false);
+                        }
                     }
 
                 } // if param type isDefined
@@ -512,10 +520,10 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
         lo_message_add_wxProp( msg, id, event.GetValue() );
     }
 
-	vess->nodeMessage(currentNode->id, msg);
+	vess->sendNodeMessage(currentNode->id, msg);
 
 	// prevent event from propagating:
-	event.Veto();
+	//event.Veto();
 	//event.Skip();
 
     //GetGrid()->Thaw();

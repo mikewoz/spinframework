@@ -48,6 +48,88 @@
 #include "asMediaManager.h"
 
 
+
+/**
+ * \brief A class to facilitate communication with VESS from any application.
+ *
+ * An instance of this class should be included in any process that needs to
+ * maintain scene state.
+ *
+ * By instantiating this class, we load the OSG nodekit for VESS -- otherwise
+ * known as libSPIN. Furthermore, all of the network handlers are automatically
+ * generated in order to receive OSC messages from VESS and update state.
+ *
+ * Note that this class can be instantiated in different modes, depending on
+ * whether the process is to act as a server or a client.
+ *
+ */
+class vessThread
+{
+
+	public:
+
+		enum vessMode { LISTENER_MODE, SERVER_MODE };
+
+		vessThread(vessMode initMode=LISTENER_MODE);
+		~vessThread();
+
+		bool setMode(vessMode m);
+
+		bool start();
+		void stop();
+
+
+		void sendSceneMessage(lo_message msg);
+		void sendSceneMessage(const char *types, ...);
+
+		void sendNodeMessage(t_symbol *nodeSym, lo_message msg);
+		void sendNodeMessage(t_symbol *nodeSym, const char *types, ...);
+
+
+
+		bool isRunning() { return running; }
+
+		void setID(std::string s) { id = s; }
+		void setRxAddr(std::string s) { rxAddr = s; }
+		void setRxPort(std::string s) { rxPort = s; }
+		void setTxAddr(std::string s) { txAddr = s; }
+		void setTxPort(std::string s) { txPort = s; }
+
+		vessMode mode;
+
+		std::string id;
+		std::string rxAddr, rxPort;
+		std::string txAddr, txPort;
+		std::string infoAddr, infoPort;
+
+		lo_address lo_txAddr;
+
+		lo_address lo_infoAddr;
+		lo_server  lo_infoServ;
+
+		asSceneManager *sceneManager;
+		asMediaManager *mediaManager;
+
+	    bool running;
+
+	    /**
+	     * We store a funciton pointer in the class, which can be dynamically
+	     * swapped depending on vessMode (ie, different thread for server mode
+	     * versus listener mode).
+	     */
+	    void *(*threadFunction) (void*);
+
+	private:
+
+		// pthread stuff
+		pthread_t pthreadID; // id of child thread
+		pthread_attr_t pthreadAttr;
+
+
+};
+
+
+
 /**
  * \brief A class to facilitate communication with VESS from any application.
  *
@@ -64,6 +146,8 @@
  * rather than a client.
  *
 */
+
+/*
 class vessListener
 {
 
@@ -93,7 +177,7 @@ class vessListener
 		std::string infoAddr, infoPort;
 
 		lo_address lo_txAddr;
-		
+
 		lo_address lo_infoAddr;
 		lo_server  lo_infoServ;
 
@@ -112,6 +196,8 @@ class vessListener
 
 
 };
+*/
+
 
 /**
  * \brief The vessMaster class is an extension of vessListener, which broadcasts
@@ -121,6 +207,8 @@ class vessListener
  * can occur. Of course, one can get around this by giving each vessMaster a
  * unique id via the setID() method
  */
+
+/*
 class vessMaster : public vessListener
 {
 
@@ -129,10 +217,29 @@ class vessMaster : public vessListener
 		vessMaster();
 		~vessMaster();
 };
+*/
 
 
-static void *vessMasterThread(void *arg);
+/**
+ * The vessListenerThread is a simple thread that starts a sceneManager and
+ * listens to incoming VESS messages. It does NOT re-transmit those messages,
+ * and it does NOT perform an update traversal.
+ */
 static void *vessListenerThread(void *arg);
+
+/**
+ * The vessServerThread is mainly differentiated from a listener thread by the
+ * fact taht all received messages are re-transmit upon processing. This allows
+ * all clients to keep up-to-date whenever new state information is received by
+ * the server.
+ *
+ * Additionally, the vessServerThread will periodically broadcast a ping on
+ * infoport, and will perform an update traversal on the scene graph for any
+ * nodes who need periodic (scheduled) processing.
+ */
+static void *vessServerThread(void *arg);
+
+
 
 
 #endif

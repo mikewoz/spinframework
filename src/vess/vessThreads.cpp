@@ -59,65 +59,37 @@ using namespace std;
 pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 
-// *****************************************************************************
-// The vessMaster is a simple extension of vessListener, adding the ability to
-// re-transmit messages that it recieves
-//
-// Additionally, the vessMaster will periodically broadcast a ping on infoport,
-// and will perform an update traversal on the scene graph for any nodes who
-// need periodic processing.
-vessMaster::vessMaster() : vessListener()
-{
 
-    // note that master needs to listen to a unicast port:
-    rxAddr = getMyIPaddress();
-	rxPort = "54324";
-
-	txAddr = "224.0.0.1";
-	txPort = "54323";
-
-	threadFunction = &vessMasterThread;
-}
-
-vessMaster::~vessMaster()
-{
-	sceneManager->clear();
-}
-
-// *****************************************************************************
-// The vessListener is a simple class that starts a sceneManager, which listens
-// to incoming vess messages. It does NOT re-transmit those messages, and it
-// does NOT perform an update traversal.
-vessListener::vessListener()
+vessThread::vessThread(vessMode initMode)
 {
 
 	// Load the SPIN library:
 	osgDB::Registry *reg = osgDB::Registry::instance();
 	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
 
-	// Make sure that our OSG wrapper library is loaded
-	// (by checking for existance of asReferenced type):
+	// Make sure that our OSG nodekit is loaded (by checking for existance of
+	// the asReferenced node type):
 	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
 	if (!asReferencedType.isDefined())
 	{
-		std::cout << "ERROR: libSPIN was not found. Please check dynamic libraries. Could not start VESS." << std::endl;
+		std::cout << "ERROR: libSPIN was not found. Please check dynamic libraries. Could not start vessThread." << std::endl;
 		exit(1);
 	}
 
-
-
-	// defaults:
-
+	running = false;
 	id = "default";
-	rxAddr = "224.0.0.1";
-	rxPort = "54323";
-	txAddr = "224.0.0.1";
-	txPort = "54324";
+
+	if (!this->setMode(initMode))
+	{
+		std::cout << "ERROR: Unknown mode for vessThreads" << std::endl;
+		exit(1);
+	}
+
+	// default infoAddr:
 	infoAddr = "224.0.0.1";
 	infoPort = "54320";
 
-
-	// override txAddr and infoPort based on environment variable:
+	// override infoPort based on environment variable:
 	char *infoPortStr = getenv("AS_INFOPORT");
 	if (infoPortStr)
 	{
@@ -145,20 +117,19 @@ vessListener::vessListener()
 
 	std::cout << "  INFO channel: " << lo_address_get_url(lo_infoAddr) << std::endl;
 
-	//lo_server_thread_start(lo_infoServ);
-
-
-
-
-
-
-	running = false;
-	threadFunction = &vessListenerThread;
 }
 
-vessListener::~vessListener()
+vessThread::~vessThread()
 {
-	sceneManager->clear();
+	this->stop();
+	usleep(100);
+
+	if (lo_infoServ)
+	{
+		//lo_server_thread_stop(lo_infoServ);
+		lo_server_free(lo_infoServ);
+	}
+
 	if (lo_txAddr)
 	{
 		lo_address_free(lo_txAddr);
@@ -168,62 +139,90 @@ vessListener::~vessListener()
 	{
 		lo_address_free(lo_infoAddr);
 	}
-
-	if (lo_infoServ)
-	{
-		//lo_server_thread_stop(lo_infoServ);
-		lo_server_free(lo_infoServ);
-	}
-
 }
 
-void vessListener::start()
+
+bool vessThread::setMode(vessMode m)
+{
+	if (running)
+	{
+		stop();
+	}
+
+	switch (m)
+	{
+		case LISTENER_MODE:
+			rxAddr = "224.0.0.1";
+			rxPort = "54323";
+			txAddr = "224.0.0.1";
+			txPort = "54324";
+			threadFunction = &vessListenerThread;
+			break;
+		case SERVER_MODE:
+			rxAddr = getMyIPaddress();
+			rxPort = "54324";
+			txAddr = "224.0.0.1";
+			txPort = "54323";
+			threadFunction = &vessServerThread;
+			break;
+		default:
+			return false;
+	}
+
+	this->mode = m;
+
+	return true;
+}
+
+bool vessThread::start()
 {
 	lo_txAddr = lo_address_new(txAddr.c_str(), txPort.c_str());
 
 	// create thread:
 	if (pthread_attr_init(&pthreadAttr) < 0)
 	{
-		printf("vessServer: warning: could not prepare child thread\n");
-		return;
+		std::cout << "vessThread: could not prepare child thread" << std::endl;
+		return false;
 	}
 	if (pthread_attr_setdetachstate(&pthreadAttr, PTHREAD_CREATE_DETACHED) < 0)
 	{
-		printf("vessServer: warning: could not prepare child thread\n");
-		return;
+		std::cout << "vessThread: could not prepare child thread" << std::endl;
+		return false;
 	}
 	if (pthread_create( &pthreadID, &pthreadAttr, threadFunction, this) < 0)
 	{
-		printf("vessServer: could not create new thread\n");
-		return;
+		std::cout << "vessThread: could not create new thread" << std::endl;
+		return false;
 	}
 
 	//pthread_join(pthreadID, NULL); // if not DETACHED thread
 
 	// wait until the thread gets into it's loop before returning:
 	while (!running) usleep(10);
+
+	return true;
 }
 
-void vessListener::stop()
+void vessThread::stop()
 {
-	std::cout << "Stopping VESS" << std::endl;
+	std::cout << "Stopping vessThread..." << std::endl;
 	this->running = false;
 }
 
-void vessListener::nodeMessage(t_symbol *nodeSym, lo_message msg)
+void vessThread::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
 {
 	if (isRunning())
 	{
 		std::string OSCpath = "/vess/" + id + "/" + nodeSym->s_name;
 
-		// If the sceneManager is a listener, then we need to send an OSC message to
-		// the rxAddr of the vess server (can be unicast)
-		if ( sceneManager->isSlave() )
+		// If this thread is a listener, then we need to send an OSC message to
+		// the rxAddr of the vess server (unicast)
+		if ( this->mode == LISTENER_MODE )
 		{
 			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
 		}
 
-		// if, however, the vess server is in this process, we can optimize and send
+		// if, however, this process acts as a server, we can optimize and send
 		// directly to the OSC callback function:
 		else asSceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)nodeSym);
 
@@ -233,20 +232,39 @@ void vessListener::nodeMessage(t_symbol *nodeSym, lo_message msg)
     lo_message_free(msg);
 }
 
-void vessListener::sceneMessage(lo_message msg)
+void vessThread::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
+{
+	lo_message msg = lo_message_new();
+
+	va_list ap;
+	va_start(ap, types);
+
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		sendNodeMessage(nodeSym, msg);
+	} else {
+		std::cout << "ERROR (vessThread::sendNodeMessage): " << err << std::endl;
+	}
+
+}
+
+
+void vessThread::sendSceneMessage(lo_message msg)
 {
 	if (isRunning())
 	{
 		std::string OSCpath = "/vess/" + id;
 
-		// If the sceneManager is a listener, then we need to send an OSC message to
-		// the rxAddr of the vess server (can be unicast)
-		if ( sceneManager->isSlave() )
+		// If this thread is a listener, then we need to send an OSC message to
+		// the rxAddr of the vess server (unicast)
+		if ( this->mode == LISTENER_MODE )
 		{
 			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
 		}
 
-		// if, however, the vess server is in this process, we can optimize and send
+		// if, however, this process acts as a server, we can optimize and send
 		// directly to the OSC callback function:
 		else asSceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
 
@@ -256,13 +274,30 @@ void vessListener::sceneMessage(lo_message msg)
     lo_message_free(msg);
 }
 
+void vessThread::sendSceneMessage(const char *types, ...)
+{
+	lo_message msg = lo_message_new();
+
+	va_list ap;
+	va_start(ap, types);
+
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		sendSceneMessage(msg);
+	} else {
+		std::cout << "ERROR (vessThread::sendSceneMessage): " << err << std::endl;
+	}
+}
+
 // *****************************************************************************
 
 static void *vessListenerThread(void *arg)
 {
-	vessListener *vess = (vessListener*) arg;
+	vessThread *vess = (vessThread*) arg;
 
-	std::cout << "  VESS started in Client mode (listening to messages)" << std::endl;
+	std::cout << "  vessThread started in Listener mode" << std::endl;
 
 	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
 
@@ -273,14 +308,17 @@ static void *vessListenerThread(void *arg)
 		// do nothing (assume the app is doing updates - eg, in a draw loop)
 	}
 
+	// clean up:
+	delete vess->sceneManager;
+
 	pthread_exit(NULL);
 }
 
-static void *vessMasterThread(void *arg)
+static void *vessServerThread(void *arg)
 {
-	vessMaster *vess = (vessMaster*) arg;
+	vessThread *vess = (vessThread*) arg;
 
-	std::cout << "  VESS started in Server mode" << std::endl;
+	std::cout << "  vessThread started in Server mode" << std::endl;
 	std::cout << "  broadcasting info messages on " << vess->txAddr << ", port: " << vess->infoPort << std::endl;
 
 	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
@@ -308,7 +346,7 @@ static void *vessMasterThread(void *arg)
 		}
 
 		pthread_mutex_lock(&pthreadLock);
-		visitor.apply(*(vess->sceneManager->rootNode.get())); // only vessMaster should do this
+		visitor.apply(*(vess->sceneManager->rootNode.get())); // only server should do this
 		pthread_mutex_unlock(&pthreadLock);
 
 
@@ -319,6 +357,9 @@ static void *vessMasterThread(void *arg)
 
 		usleep(10);
 	}
+
+	// clean up:
+	delete vess->sceneManager;
 
 	pthread_exit(NULL);
 }
