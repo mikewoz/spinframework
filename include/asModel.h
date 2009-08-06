@@ -123,7 +123,7 @@ private:
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 
 	// the model:
-	std::string modelName;
+	//std::string modelName;
 	std::string modelPath;
 
 	osg::ref_ptr<osg::Group> model;

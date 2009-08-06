@@ -143,7 +143,7 @@ public:
 
 
 	// We can have a texture on the shape, loaded from a local file
-	std::string textureName;
+	//std::string textureName;
 	std::string texturePath;
 
 

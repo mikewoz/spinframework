@@ -86,7 +86,7 @@ std::vector<float> floatsFromString (std::string theString);
 // file helpers
 
 bool fileExists(const std::string& fileName);
-
-
+std::string getRelativePath(std::string path);
+std::string getAbsolutePath(std::string path);
 
 #endif

@@ -77,7 +77,7 @@ asShape::asShape (asSceneManager *sceneManager, char *initID) : asReferenced(sce
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);
 
 	shape = NONE; //"NULL";
-	textureName = "NULL";
+	texturePath = "NULL";
 	renderBin = 11;
 
 }
@@ -149,15 +149,15 @@ void asShape::setColor (float r, float g, float b, float a)
 // ===================================================================
 void asShape::setTextureFromFile (const char* s)
 {
+	string path = getRelativePath(string(s));
+	
 	// don't do anything if the current texture is already loaded:
-	if (string(s)==textureName) return;
-	else textureName=string(s);
-
-	texturePath = mediaManager->getImagePath(textureName);
-
+	if (path==texturePath) return;
+	else texturePath=path;
+	
 	drawTexture();
 
-	BROADCAST(this, "ss", "setTextureFromFile", textureName.c_str());
+	BROADCAST(this, "ss", "setTextureFromFile", texturePath.c_str());
 }
 
 // ===================================================================
@@ -326,7 +326,7 @@ void asShape::drawTexture()
 	//std::cout << "debug texturepath: " << texturePath <<  std::endl;
 
 
-	if (texturePath.empty())
+	if (texturePath==string("NULL"))
 	{
 		// remove current texture
 		//shapeStateSet = new osg::StateSet();
@@ -338,7 +338,7 @@ void asShape::drawTexture()
 	{
 
 		//osg::ref_ptr<osg::Image> image;
-		texturePointer = osgDB::readImageFile( texturePath.c_str() );
+		texturePointer = osgDB::readImageFile( getAbsolutePath(texturePath).c_str() );
 		if (texturePointer.valid())
 		{
 
@@ -427,7 +427,7 @@ std::vector<lo_message> asShape::getState ()
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setTextureFromFile", textureName.c_str());
+	lo_message_add(msg,  "ss", "setTextureFromFile", texturePath.c_str());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

@@ -77,7 +77,7 @@ asModel::asModel (asSceneManager *sceneManager, char *initID) : asReferenced(sce
 	modelTransform->setName(string(id->s_name) + ".modelTransform");
 	this->addChild(modelTransform.get());
 
-	modelName = "NULL";
+	modelPath = "NULL";
 
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
@@ -128,15 +128,16 @@ void asModel::updateNodePath()
 
 void asModel::setModelFromFile (const char* filename)
 {
+	string path = getRelativePath(string(filename));
+	
 	// don't do anything if the current model is already loaded:
-	if (string(filename)==modelName) return;
+	if (path==modelPath) return;
 
-	modelName = string(filename);
-	modelPath = mediaManager->getModelPath(filename);
+	modelPath = path;
 
 	drawModel();
 
-	BROADCAST(this, "ss", "setModelFromFile", modelName.c_str());
+	BROADCAST(this, "ss", "setModelFromFile", modelPath.c_str());
 }
 
 void asModel::setTranslation (float x, float y, float z)
@@ -187,11 +188,11 @@ void asModel::drawModel()
 		}
 	}
 
-	if (!modelPath.empty())
+	if (modelPath != string("NULL"))
 	{
 
 		//model = dynamic_cast<osg::Group*>(osgDB::readNodeFile(modelPath));
-		model = (osg::Group*)(osgDB::readNodeFile(modelPath));
+		model = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
 
 		if (model.valid())
 		{
@@ -233,13 +234,13 @@ void asModel::drawModel()
 			}
 			optimizer.optimize(model.get());
 			modelTransform->addChild(model.get());
-			model->setName(string(id->s_name) + ".model['" + modelName + "']");
+			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 			//osg::StateSet *modelStateSet = new osg::StateSet();
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);
 			//model->setStateSet(modelStateSet);
 
-			std::cout << "Created model " << modelName << std::endl;
+			std::cout << "Created model " << modelPath << std::endl;
 			osg::BoundingSphere bound = model->computeBound();
 			osg::Vec3 c = bound.center();
 			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << std::endl;
@@ -276,7 +277,7 @@ std::vector<lo_message> asModel::getState ()
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setModelFromFile", modelName.c_str());
+	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
 	ret.push_back(msg);
 
 	return ret;

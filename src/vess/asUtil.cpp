@@ -221,5 +221,32 @@ bool fileExists(const std::string& fileName)
 	return false;
 }
 
-//string get
+string getRelativePath(string path)
+{
+	string relPath;
+	
+	if (path.substr(0,7) == string("/Users/"))
+	{
+		relPath = path.substr(8);
+	}
+	else if (path.substr(0,6) == string("/home/"))
+	{
+		relPath = path.substr(7);
+	}
+	else {
+		return path;
+	}
+		
+	size_t pos = relPath.find("/");
+	relPath = "~/" + relPath.substr(pos+1);
 
+	return relPath;
+}
+
+string getAbsolutePath(string path)
+{
+	if (path.substr(0,1) == string("~")) // look for "~"
+	{
+		return getenv("HOME") + path.substr(1);
+	} else return path;
+}
