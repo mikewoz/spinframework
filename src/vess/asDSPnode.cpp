@@ -201,7 +201,7 @@ void asDSPnode::setActive (int i)
 	BROADCAST(this, "si", "setActive", (int)active);
 }
 
-void asDSPnode::setDSP (char *newDSP)
+void asDSPnode::setDSP (const char *newDSP)
 {	
 	dsp = std::string(newDSP);
 	BROADCAST(this, "ss", "setDSP", dsp.c_str());

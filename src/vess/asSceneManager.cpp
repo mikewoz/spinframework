@@ -192,6 +192,9 @@ asSceneManager::asSceneManager (std::string id, std::string addr, std::string po
 // destructor
 asSceneManager::~asSceneManager()
 {
+	lo_server_thread_stop(rxServ);
+	usleep(50);
+	
 	if (txServ) lo_server_free(txServ);
 	if (rxServ) lo_server_thread_free(rxServ);
     if (txAddr) lo_address_free(txAddr);

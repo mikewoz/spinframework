@@ -80,7 +80,7 @@ public:
 		void connect(char *snk);
 		void disconnect(char *snk);
 		void setActive (int i);
-		void setDSP (char *filename);
+		void setDSP (const char *filename);
 		
 		// for sending messages to the connections of this (source) node:
 		//virtual void connectionMsg (char *snkName, char *method, float value);
