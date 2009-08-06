@@ -197,8 +197,8 @@ asSceneManager::~asSceneManager()
 	
 	if (txServ) lo_server_free(txServ);
 	if (rxServ) lo_server_thread_free(rxServ);
-    if (txAddr) lo_address_free(txAddr);
-	if (rxAddr) lo_address_free(rxAddr);
+    //if (txAddr) lo_address_free(txAddr);
+	//if (rxAddr) lo_address_free(rxAddr);
 
 }
 
@@ -896,7 +896,7 @@ bool asSceneManager::saveXML(const char *s)
 	// start with XML Header:
 	ostringstream output("");
 	output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
-			<< "<!DOCTYPE soundEngine SYSTEM>\n"
+			<< "<!DOCTYPE SPIN SYSTEM>\n"
 			<< "<asScene>\n";
 
 
@@ -1018,14 +1018,13 @@ bool asSceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parent
 					{
 						if (fromString<float>(f, argVector[i])) args.push_back(f);
 					} else {
-						args.push_back( (char*) argVector[i].c_str() );
+						args.push_back( (const char*) argVector[i].c_str() );
 					}
 				}
 
 				// now we can finally call the method:
 				try {
-					introspectType.invokeMethod(method, introspectValue, args, false);
-
+					introspectType.invokeMethod(method, introspectValue, args, true); // the true means that it will try base classes as well
 				}
 
 				catch (osgIntrospection::Exception & ex)
@@ -1166,6 +1165,7 @@ bool asSceneManager::loadXML(const char *s)
 	if (s[0]=='~') filename = getenv("HOME") + string(s).substr(1);
 	else filename = string(s);
 
+	std::cout << "Loading scene: " << filename << std::endl;
 
 	TiXmlDocument doc( filename.c_str() );
 
@@ -1410,7 +1410,7 @@ int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **a
 
 	//std::cout << "in callback_admin. got method: " << theMethod << std::endl;
 
-	pthread_mutex_lock(&pthreadLock);
+	//pthread_mutex_lock(&pthreadLock);
 
 	// note that args start at argv[1] now:
 	if (theMethod=="debug")
@@ -1443,7 +1443,7 @@ int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **a
 		std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
 	}
 
-	pthread_mutex_unlock(&pthreadLock);
+	//pthread_mutex_unlock(&pthreadLock);
 
 	return 1;
 }

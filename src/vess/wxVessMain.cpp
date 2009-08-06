@@ -311,13 +311,14 @@ void wxVessMain::OnLoadScene(wxCommandEvent& event)
 {
     if (vess->isRunning())
     {
-		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
+		wxFileDialog* d = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
 
-		if ( openFileDialog->ShowModal() == wxID_OK )
+		if ( d->ShowModal() == wxID_OK )
 		{
 
-		    std::cout << "Loading scene from file: " << openFileDialog->GetPath().mb_str() << std::endl;
-		   	vess->sceneManager->loadXML( openFileDialog->GetPath().mb_str() );
+		    std::cout << "Loading scene from file: " << d->GetPath().mb_str() << std::endl;
+		   	//vess->sceneManager->loadXML( d->GetPath().mb_str() );
+		   	vess->sendSceneMessage("ss", "load", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
 		}
     }
     else {
@@ -331,16 +332,19 @@ void wxVessMain::OnSaveScene(wxCommandEvent& event)
 {
     if (vess->isRunning())
     {
-		wxFileDialog* openFileDialog = new wxFileDialog( this, wxT("Save Scene"), wxT(""), wxT(""), wxT("*.xml"), wxSAVE, wxDefaultPosition);
+		wxFileDialog* d = new wxFileDialog( this, wxT("Save Scene"), wxT(""), wxT(""), wxT("*.xml"), wxSAVE, wxDefaultPosition);
 
-		if ( openFileDialog->ShowModal() == wxID_OK )
+		if ( d->ShowModal() == wxID_OK )
 		{
-		   	if (vess->sceneManager->saveXML( openFileDialog->GetPath().mb_str() ))
+			vess->sendSceneMessage("ss", "save", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
+			/*
+		   	if (vess->sceneManager->saveXML( d->GetPath().mb_str() ))
 		   	{
-		   		std::cout << "Saving scene to: " << openFileDialog->GetPath().mb_str() << std::endl;
+		   		std::cout << "Saving scene to: " << d->GetPath().mb_str() << std::endl;
 		   	} else {
-		   		std::cout << "Error when saving " << openFileDialog->GetPath().mb_str() << std::endl;
+		   		std::cout << "Error when saving " << d->GetPath().mb_str() << std::endl;
 		   	}
+		   	*/
 		}
     }
     else {

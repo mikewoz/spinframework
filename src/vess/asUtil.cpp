@@ -221,3 +221,5 @@ bool fileExists(const std::string& fileName)
 	return false;
 }
 
+//string get
+
