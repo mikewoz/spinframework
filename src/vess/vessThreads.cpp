@@ -349,12 +349,6 @@ static void *vessServerThread(void *arg)
 		visitor.apply(*(vess->sceneManager->rootNode.get())); // only server should do this
 		pthread_mutex_unlock(&pthreadLock);
 
-
-		pthread_mutex_lock(&pthreadLock);
-		vess->sceneManager->updateGraph();
-		pthread_mutex_unlock(&pthreadLock);
-
-
 		usleep(10);
 	}
 

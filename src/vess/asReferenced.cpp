@@ -138,6 +138,10 @@ void asReferenced::callbackUpdate()
 void asReferenced::attach()
 {
 	if (this->newParent==NULL_SYMBOL) return;
+	
+	pthread_mutex_lock(&pthreadLock);
+	
+	std::cout << "locked mutex ... attaching " << this->id->s_name << std::endl;
 
 	osg::ref_ptr<asReferenced> newParentNode = newParent->s_thing;
 
@@ -159,25 +163,31 @@ void asReferenced::attach()
 		}
 	}
 
-	// remove node from current parent:
+	pthread_mutex_unlock(&pthreadLock);
+
+	
+	// remove node from current parent (make sure to release the mutex first!)
 	if (this->parent != this->newParent) this->detach();
 
 	// update the new parent symbols:
 	this->parent = this->newParent;
 	this->newParent = NULL_SYMBOL;
 
-	// broadcast this change to any remote clients:
-	BROADCAST(this, "ss", "setParent", this->parent->s_name);
-
-
 	// update currentNodePath:
     this->updateNodePath();
+	
+	
+	// broadcast this change to any remote clients:
+	BROADCAST(this, "ss", "setParent", this->parent->s_name);
 }
 
 // ***********************************************************
 // remove this node from the scenegraph:
 void asReferenced::detach()
 {
+	
+	pthread_mutex_lock(&pthreadLock);
+	
 	if (parent == WORLD_SYMBOL)
 	{
 		if (sceneManager->worldNode->containsNode(this)) sceneManager->worldNode->removeChild(this);
@@ -194,6 +204,8 @@ void asReferenced::detach()
 			}
 		}
 	}
+	
+	pthread_mutex_unlock(&pthreadLock);
 
 }
 
@@ -295,10 +307,8 @@ void asReferenced::setParent (const char *newvalue)
 	t_symbol *s = gensym(newvalue);
 	if (parent != s)
 	{
-	    pthread_mutex_lock(&pthreadLock);
 		newParent = s;
 		attach();
-		pthread_mutex_unlock(&pthreadLock);
 	}
 }
 
