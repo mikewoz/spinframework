@@ -141,8 +141,6 @@ void asReferenced::attach()
 	
 	pthread_mutex_lock(&pthreadLock);
 	
-	std::cout << "locked mutex ... attaching " << this->id->s_name << std::endl;
-
 	osg::ref_ptr<asReferenced> newParentNode = newParent->s_thing;
 
 	// if the parent is invalid (which will be the case, for example, if the user
