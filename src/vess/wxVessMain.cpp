@@ -126,8 +126,8 @@ END_EVENT_TABLE()
 
 wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 {
-	std::cout << "  WX GetResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
 	/*
+	std::cout << "  WX GetResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
 	std::cout << "WX GetConfigDir: " << wxStandardPaths::Get().GetConfigDir().mb_str() << std::endl;
 	std::cout << "WX GetDataDir: " << wxStandardPaths::Get().GetDataDir().mb_str() << std::endl;
 	std::cout << "WX GetDocumentsDir: " << wxStandardPaths::Get().GetDocumentsDir().mb_str() << std::endl;
@@ -266,6 +266,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 
     log << "Started vessLog" << std::endl;
 
+	log << "ResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
 
 
 #if wxUSE_STD_IOSTREAM
