@@ -175,9 +175,13 @@ void asBasicNode::setOrientation (float p, float r, float y)
 
 void asBasicNode::setVelocity (float dx, float dy, float dz)
 {
-	_velocity = osg::Vec3(dx,dy,dz);
-
-	BROADCAST(this, "sfff", "setVelocity", dx, dy, dz);
+	osg::Vec3 newVelocity = osg::Vec3(dx,dy,dz);
+	
+	if (newVelocity != _velocity)
+	{
+		_velocity = newVelocity;
+		BROADCAST(this, "sfff", "setVelocity", dx, dy, dz);
+	}
 }
 
 void asBasicNode::move (float x, float y, float z)
