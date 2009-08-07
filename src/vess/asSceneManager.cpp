@@ -656,8 +656,10 @@ void asSceneManager::doDelete(asReferenced *nodeToDelete)
 
 
 	// have to unregister the callback function to remove the last ref_ptr:
+	pthread_mutex_lock(&pthreadLock);
 	n->setUserData( NULL );
-
+	pthread_mutex_unlock(&pthreadLock);
+	
 	// now force the actual delete by nulling this referenced pointer. At that
 	// time, the destructor for the node should be called
 	char *nodeID = n->id->s_name; // but remember the name for the broadcast

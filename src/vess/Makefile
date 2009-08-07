@@ -105,7 +105,8 @@ spin.app: spin
 	Info.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp spin $@/Contents/MacOS
-	#cp ../../lib/Darwin_i386/libSPIN.dylib $@/Contents/Resources
+	install_name_tool -change libSPIN.dylib @executable_path/../Resources/libSPIN.dylib $@/Contents/MacOS/spin	
+	cp ../osgWrappers/libSPIN.dylib $@/Contents/Resources
 	cp spin.icns $@/Contents/Resources/spin.icns
 
 
@@ -116,4 +117,4 @@ install:
 
 ########################################################
 clean:
-	-rm -f $(ALLTARGETS) *.o 
+	-rm -rf $(ALLTARGETS) *.o	
