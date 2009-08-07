@@ -57,8 +57,8 @@
 #include <wx/artprov.h>
 #include <wx/stdpaths.h>
 
-#include "../images/icon_tree.xpm"
-#include "../images/icon_3Dsphere.xpm"
+//#include "../images/icon_tree.xpm"
+//#include "../images/icon_3Dsphere.xpm"
 
 extern vessThread *vess;
 
@@ -127,7 +127,7 @@ END_EVENT_TABLE()
 wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 {
 	/*
-	std::cout << "  WX GetResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
+	std::cout << "WX GetResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
 	std::cout << "WX GetConfigDir: " << wxStandardPaths::Get().GetConfigDir().mb_str() << std::endl;
 	std::cout << "WX GetDataDir: " << wxStandardPaths::Get().GetDataDir().mb_str() << std::endl;
 	std::cout << "WX GetDocumentsDir: " << wxStandardPaths::Get().GetDocumentsDir().mb_str() << std::endl;
@@ -265,8 +265,6 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     log.enable_cout(false);
 
     log << "Started vessLog" << std::endl;
-
-	log << "ResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
 
 
 #if wxUSE_STD_IOSTREAM

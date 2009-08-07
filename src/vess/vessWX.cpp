@@ -59,6 +59,7 @@ IMPLEMENT_APP(vessWX);
 
 
 vessThread *vess; // global
+wxString resourcesPath; // global
 
 bool vessWX::OnInit()
 {
@@ -68,6 +69,13 @@ bool vessWX::OnInit()
 
 	vess = new vessThread();
 
+#ifdef _DEBUG
+	resourcesPath = wxStandardPaths::Get().GetResourcesDir();
+#else
+	resourcesPath = wxString("../images");
+#endif
+
+	
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();
