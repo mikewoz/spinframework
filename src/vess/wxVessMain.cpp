@@ -55,6 +55,7 @@
 #include <wx/ffile.h>
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
+#include <wx/stdpaths.h>
 
 #include "../images/icon_tree.xpm"
 #include "../images/icon_3Dsphere.xpm"
@@ -295,6 +296,7 @@ void wxVessMain::OnAbout(wxCommandEvent& event)
 
     //wxIcon SPINIcon(wxT("images/logo_SPIN.tif"), wxBITMAP_TYPE_TIF);
     wxIcon SPINIcon(wxT("../images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
+    //wxIcon SPINIcon(wxT("@executable_path/../images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
 
     wxAboutDialogInfo info;
     info.SetVersion(_("0.9"));

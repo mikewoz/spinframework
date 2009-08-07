@@ -62,9 +62,18 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 vessThread::vessThread(vessMode initMode)
 {
-
+	
 	// Load the SPIN library:
 	osgDB::Registry *reg = osgDB::Registry::instance();
+
+	osgDB::FilePathList paths = reg->getLibraryFilePathList();
+	std::cout << "paths:" << std::endl;
+	for (int i=0; i<paths.size(); i++)
+	{
+		std::cout << "  " << paths[i] << std::endl;
+	}
+
+
 	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
 
 	// Make sure that our OSG nodekit is loaded (by checking for existance of
