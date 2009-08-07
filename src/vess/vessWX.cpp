@@ -47,6 +47,7 @@
 #include <wx/log.h>
 #include <wx/ffile.h>
 #include <wx/string.h>
+#include <wx/stdpaths.h>
 
 #include "vessThreads.h"
 
@@ -69,7 +70,7 @@ bool vessWX::OnInit()
 
 	vess = new vessThread();
 
-#ifdef _DEBUG
+#ifdef _SPINDEBUG
 	resourcesPath = wxStandardPaths::Get().GetResourcesDir();
 #else
 	resourcesPath = wxString("../images");

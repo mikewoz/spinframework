@@ -43,7 +43,7 @@ SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o
 
 
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
-SPIN_FLAGS += -D_DEBUG
+SPIN_FLAGS += -D_SPINDEBUG
 #SPIN_FLAGS += -DOSCDEBUG
 
 SPIN_LIBS += -L../osgWrappers
