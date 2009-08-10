@@ -81,12 +81,10 @@ class wxVessRenderer: public wxFrame
 		//(*Declarations(wxVessRenderer)
 		wxToolBarToolBase* ToolBarItem1;
 		wxToolBar* wxVessRenderer_ToolBar;
-		wxToolBarToolBase* ToolBarItem2;
 		//*)
 
 		//(*Identifiers(wxVessRenderer)
 		static const long vessRenderer_grid;
-		static const long vessRenderer_trackNode;
 		static const long ID_TOOLBAR1;
 		//*)
 

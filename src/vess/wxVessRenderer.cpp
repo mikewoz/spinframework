@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -42,7 +42,6 @@
 #include "wxVessRenderer.h"
 
 //(*InternalHeaders(wxVessRenderer)
-#include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/intl.h>
 #include <wx/image.h>
@@ -61,10 +60,10 @@
 #include "vessThreads.h"
 extern vessThread *vess;
 extern pthread_mutex_t pthreadLock;
+extern wxString resourcesPath;
 
 //(*IdInit(wxVessRenderer)
 const long wxVessRenderer::vessRenderer_grid = wxNewId();
-const long wxVessRenderer::vessRenderer_trackNode = wxNewId();
 const long wxVessRenderer::ID_TOOLBAR1 = wxNewId();
 //*)
 
@@ -83,13 +82,14 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	SetClientSize(wxSize(720,480));
 	Move(wxDefaultPosition);
 	wxVessRenderer_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-	ToolBarItem1 = wxVessRenderer_ToolBar->AddTool(vessRenderer_grid, _("Grid"), wxBitmap(wxImage(_T("../images/grid.gif"))), wxBitmap(wxImage(_T("../images/grid.gif"))), wxITEM_CHECK, _("Enable/Disable Grid"), _("Enable/Disable Grid"));
-	ToolBarItem2 = wxVessRenderer_ToolBar->AddTool(vessRenderer_trackNode, _("trackNode"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_GO_TO_PARENT")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_GO_TO_PARENT")),wxART_TOOLBAR), wxITEM_NORMAL, _("Choose a node to track"), _("The camera will attach to this node and show the view from the local perspective. This allows for dynamic camera control via any node in the scene."));
+	ToolBarItem1 = wxVessRenderer_ToolBar->AddTool(vessRenderer_grid, _("Grid"), wxNullBitmap, wxNullBitmap, wxITEM_CHECK, _("Enable/Disable Grid"), _("Enable/Disable Grid"));
 	wxVessRenderer_ToolBar->Realize();
 	SetToolBar(wxVessRenderer_ToolBar);
-	
+
 	Connect(vessRenderer_grid,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessRenderer::OnGridToggle);
 	//*)
+
+    wxVessRenderer_ToolBar->SetToolNormalBitmap( vessRenderer_grid, wxBitmap(wxImage(resourcesPath + _T("/images/grid.gif"))) );
 
 
     int *attributes = new int[7];

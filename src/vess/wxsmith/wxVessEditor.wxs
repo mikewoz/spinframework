@@ -45,16 +45,12 @@
 			<bitmapsize>24,24</bitmapsize>
 			<object class="tool" name="vessEditor_clear" variable="ToolBarItem1" member="yes">
 				<label>Clear</label>
-				<bitmap>../images/icon_eraser.gif</bitmap>
-				<bitmap2>../images/icon_eraser.gif</bitmap2>
 				<tooltip>Clear the current scene</tooltip>
 				<longhelp>Clear the current scene</longhelp>
 				<handler function="OnClear" entry="EVT_TOOL" />
 			</object>
 			<object class="tool" name="vessEditor_refresh" variable="ToolBarItem2" member="yes">
 				<label>Refresh</label>
-				<bitmap>../images/icon_refresh.gif</bitmap>
-				<bitmap2>../images/icon_refresh.gif</bitmap2>
 				<tooltip>Refresh the scene</tooltip>
 				<longhelp>This will resync with the VESS server, ensuring that the scene is up to date.</longhelp>
 				<handler function="OnRefresh" entry="EVT_TOOL" />
@@ -62,8 +58,6 @@
 			<object class="separator" />
 			<object class="tool" name="vessEditor_debugPrint" variable="ToolBarItem3" member="yes">
 				<label>DebugPrint</label>
-				<bitmap>../images/icon_question_text.gif</bitmap>
-				<bitmap2>../images/icon_question_text.gif</bitmap2>
 				<tooltip>Debug Print to Console</tooltip>
 				<longhelp>Debug Print to Console</longhelp>
 				<handler function="OnDebugPrint" entry="EVT_TOOL" />

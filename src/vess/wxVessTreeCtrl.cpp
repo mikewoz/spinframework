@@ -53,6 +53,7 @@
 
 extern vessThread *vess;
 extern pthread_mutex_t pthreadLock;
+extern wxString resourcesPath;
 
 
 BEGIN_EVENT_TABLE(wxVessTreeCtrl, wxTreeCtrl)

@@ -8,19 +8,10 @@
 		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVessRenderer_ToolBar" member="yes">
 			<object class="tool" name="vessRenderer_grid" variable="ToolBarItem1" member="yes">
 				<label>Grid</label>
-				<bitmap>../images/grid.gif</bitmap>
-				<bitmap2>../images/grid.gif</bitmap2>
 				<tooltip>Enable/Disable Grid</tooltip>
 				<longhelp>Enable/Disable Grid</longhelp>
 				<handler function="OnGridToggle" entry="EVT_TOOL" />
 				<check>1</check>
-			</object>
-			<object class="tool" name="vessRenderer_trackNode" variable="ToolBarItem2" member="yes">
-				<label>trackNode</label>
-				<bitmap stock_id="wxART_GO_TO_PARENT" stock_client="wxART_TOOLBAR" />
-				<bitmap2 stock_id="wxART_GO_TO_PARENT" stock_client="wxART_TOOLBAR" />
-				<tooltip>Choose a node to track</tooltip>
-				<longhelp>The camera will attach to this node and show the view from the local perspective. This allows for dynamic camera control via any node in the scene.</longhelp>
 			</object>
 		</object>
 	</object>

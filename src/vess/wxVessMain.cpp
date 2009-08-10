@@ -56,12 +56,8 @@
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 
-
-#include "../images/icon_tree.xpm"
-#include "../images/icon_3Dsphere.xpm"
-
 extern vessThread *vess;
-
+extern wxString resourcesPath;
 
 //(*InternalHeaders(wxVessFrame)
 #include <wx/intl.h>
@@ -135,7 +131,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 	std::cout << "WX GetLocalDataDir: " << wxStandardPaths::Get().GetLocalDataDir().mb_str() << std::endl;
 	std::cout << "WX GetPluginsDir: " << wxStandardPaths::Get().GetPluginsDir().mb_str() << std::endl;
 	*/
-	
+
     //(*Initialize(wxVessMain)
     wxMenuItem* MenuItem1;
     wxBoxSizer* BoxSizer2;
@@ -147,11 +143,6 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 
     Create(parent, wxID_ANY, _("SPIN Framework"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(500,400));
-    {
-    	wxIcon FrameIcon;
-    	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("../images/logo_SPIN_simple.png"))));
-    	SetIcon(FrameIcon);
-    }
     mainSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER|wxNO_BORDER, _T("ID_SPLITTERWINDOW1"));
     mainSplitter->SetMinSize(wxSize(40,40));
     mainSplitter->SetMinimumPaneSize(40);
@@ -212,10 +203,10 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
     ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
     wxVess_ToolBar->AddSeparator();
-    ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxBitmap(wxImage(_T("../images/icon_network.gif"))), wxBitmap(wxImage(_T("../images/icon_network.gif"))), wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
+    ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
     wxVess_ToolBar->AddSeparator();
-    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxBitmap(wxImage(_T("../images/icon_3Dview.gif"))), wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
-    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxBitmap(wxImage(_T("../images/icon_tree2.gif"))), wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
+    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
+    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
     wxVess_ToolBar->Realize();
     SetToolBar(wxVess_ToolBar);
 
@@ -242,6 +233,14 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxApp::s_macAboutMenuItemId = wxVessMenu_About->GetId();
     #endif
 
+    wxIcon SPINIcon(resourcesPath + wxT("/images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
+    SetIcon(SPINIcon);
+
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showConfig, wxBitmap(wxImage(resourcesPath + _T("/images/icon_network.gif"))) );
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showRenderer, wxBitmap(wxImage(resourcesPath + _T("/images/icon_3Dview.gif"))) );
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showEditor, wxBitmap(wxImage(resourcesPath + _T("/images/icon_tree2.gif"))) );
+    //wxVess_ToolBar->Realize();
+
     // sash position doesn't seem to work in wxSmith, so do it manually:
     mainSplitter->SetSashPosition(40);
 
@@ -265,6 +264,8 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     log.enable_cout(false);
 
     log << "Started vessLog" << std::endl;
+
+    log << "Resources path: " << resourcesPath.mb_str() << std::endl;
 
 
 #if wxUSE_STD_IOSTREAM
@@ -303,8 +304,8 @@ void wxVessMain::OnAbout(wxCommandEvent& event)
     wxString msg = wxbuildinfo(long_f);
    // wxMessageBox(msg, _("Welcome to..."));
 
-    //wxIcon SPINIcon(wxT("images/logo_SPIN.tif"), wxBITMAP_TYPE_TIF);
-    wxIcon SPINIcon(wxT("../images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
+    //wxIcon SPINIcon(wxT("s/logo_SPIN.tif"), wxBITMAP_TYPE_TIF);
+    wxIcon SPINIcon(resourcesPath + wxT("/images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
     //wxIcon SPINIcon(wxT("@executable_path/../images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
 
     wxAboutDialogInfo info;

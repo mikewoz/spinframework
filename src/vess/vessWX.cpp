@@ -71,12 +71,12 @@ bool vessWX::OnInit()
 	vess = new vessThread();
 
 #ifdef _SPINDEBUG
-	resourcesPath = wxStandardPaths::Get().GetResourcesDir();
+	resourcesPath = _T("..");
 #else
-	resourcesPath = wxString("../images");
+    resourcesPath = wxStandardPaths::Get().GetResourcesDir();
 #endif
 
-	
+
     //(*AppInitialize
     bool wxsOK = true;
     wxInitAllImageHandlers();

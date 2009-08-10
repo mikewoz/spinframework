@@ -9,7 +9,7 @@ all: $(OS)
 
 # choose names of binaries:
 Linux: vess spinViewer spin
-Darwin: vess spinViewer spin spin.app
+Darwin: vess spinViewer spin spin.app spinViewer.app
 
 # if you have a custom verion of wxWidgets:
 #WXCONFIG = $(HOME)/svn/wxMac-2.8.9/wx-config
@@ -43,7 +43,7 @@ SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o
 
 
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
-SPIN_FLAGS += -D_SPINDEBUG
+#SPIN_FLAGS += -D_SPINDEBUG
 #SPIN_FLAGS += -DOSCDEBUG
 
 SPIN_LIBS += -L../osgWrappers
@@ -97,6 +97,7 @@ spin.app: spin
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
 	-mkdir $@/Contents
+	-mkdir $@/Contents/Frameworks
 	-mkdir $@/Contents/MacOS
 	-mkdir $@/Contents/Resources
 	-mkdir $@/Contents/Resources/English.lproj
@@ -108,8 +109,34 @@ spin.app: spin
 	cp spin $@/Contents/MacOS
 	install_name_tool -change libSPIN.dylib @executable_path/../Resources/libSPIN.dylib $@/Contents/MacOS/spin	
 	cp ../osgWrappers/libSPIN.dylib $@/Contents/Resources
+	cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
+	cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
+	cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
+	cp -R ../images $@/Contents/Resources
 	cp spin.icns $@/Contents/Resources/spin.icns
+	./dylibbundler -od -b -x $@/Contents/MacOS/spin -d $@/Contents/libs
 
+spinViewer.app: spinViewer
+	@echo "\n--------------- Building $@: ---------------" 
+	-mkdir $@    
+	-mkdir $@/Contents
+	-mkdir $@/Contents/Frameworks
+	-mkdir $@/Contents/MacOS
+	-mkdir $@/Contents/Resources
+	-mkdir $@/Contents/Resources/English.lproj
+	sed -e "s/IDENTIFIER/`echo ./ | sed -e 's,\.\./,,g' | sed -e 's,/,.,g'`/" \
+	-e "s/EXECUTABLE/$</" \
+	-e "s/VERSION/$(WX_VERSION)/" \
+	spinViewer.plist.in >$@/Contents/Info.plist
+	echo -n 'APPL????' > $@/Contents/PkgInfo
+	cp spinViewer $@/Contents/MacOS
+	install_name_tool -change libSPIN.dylib @executable_path/../Resources/libSPIN.dylib $@/Contents/MacOS/spinViewer
+	cp ../osgWrappers/libSPIN.dylib $@/Contents/Resources
+	cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
+	cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
+	cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
+	cp logo_spinViewer.icns $@/Contents/Resources
+	./dylibbundler -od -b -x $@/Contents/MacOS/spinViewer -d $@/Contents/libs
 
 ########################################################
 install:
