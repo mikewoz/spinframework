@@ -43,10 +43,14 @@ SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o
 
 
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
-#SPIN_FLAGS += -D_SPINDEBUG
+
+ifeq ($OS,Linux)
+	SPIN_FLAGS += -D_SPINDEBUG
+endif
+
 #SPIN_FLAGS += -DOSCDEBUG
 
-SPIN_LIBS += -L../osgWrappers
+SPIN_LIBS += -llo -L../osgWrappers
 
 
 ###################################################################
@@ -98,29 +102,31 @@ spin.app: spin
 	-mkdir $@    
 	-mkdir $@/Contents
 	-mkdir $@/Contents/Frameworks
+	-mkdir $@/Contents/libs
 	-mkdir $@/Contents/MacOS
 	-mkdir $@/Contents/Resources
 	-mkdir $@/Contents/Resources/English.lproj
 	sed -e "s/IDENTIFIER/`echo ./ | sed -e 's,\.\./,,g' | sed -e 's,/,.,g'`/" \
 	-e "s/EXECUTABLE/$</" \
 	-e "s/VERSION/$(WX_VERSION)/" \
-	Info.plist.in >$@/Contents/Info.plist
+	spin.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp spin $@/Contents/MacOS
-	install_name_tool -change libSPIN.dylib @executable_path/../Resources/libSPIN.dylib $@/Contents/MacOS/spin	
-	cp ../osgWrappers/libSPIN.dylib $@/Contents/Resources
-	cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
-	cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
-	cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
-	cp -R ../images $@/Contents/Resources
+	install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spin	
+	cp ../osgWrappers/libSPIN.dylib $@/Contents/libs
+	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
+	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
+	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
+	cp ../images/* $@/Contents/Resources
 	cp spin.icns $@/Contents/Resources/spin.icns
-	./dylibbundler -od -b -x $@/Contents/MacOS/spin -d $@/Contents/libs
+	./dylibbundler -of -b -x $@/Contents/MacOS/spin -d $@/Contents/libs
 
 spinViewer.app: spinViewer
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
 	-mkdir $@/Contents
 	-mkdir $@/Contents/Frameworks
+	-mkdir $@/Contents/libs
 	-mkdir $@/Contents/MacOS
 	-mkdir $@/Contents/Resources
 	-mkdir $@/Contents/Resources/English.lproj
@@ -130,13 +136,13 @@ spinViewer.app: spinViewer
 	spinViewer.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp spinViewer $@/Contents/MacOS
-	install_name_tool -change libSPIN.dylib @executable_path/../Resources/libSPIN.dylib $@/Contents/MacOS/spinViewer
-	cp ../osgWrappers/libSPIN.dylib $@/Contents/Resources
-	cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
-	cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
-	cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
+	install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinViewer
+	cp ../osgWrappers/libSPIN.dylib $@/Contents/libs
+	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
+	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
+	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
 	cp logo_spinViewer.icns $@/Contents/Resources
-	./dylibbundler -od -b -x $@/Contents/MacOS/spinViewer -d $@/Contents/libs
+	./dylibbundler -of -b -x $@/Contents/MacOS/spinViewer -d $@/Contents/libs
 
 ########################################################
 install:

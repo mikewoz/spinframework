@@ -70,8 +70,9 @@ bool vessWX::OnInit()
 
 	vess = new vessThread();
 
-#ifdef _SPINDEBUG
-	resourcesPath = _T("..");
+	// override infoPort based on environment variable:
+#ifdef SPINDEBUG
+	resourcesPath = _T("../images");
 #else
     resourcesPath = wxStandardPaths::Get().GetResourcesDir();
 #endif

@@ -89,7 +89,7 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	Connect(vessRenderer_grid,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessRenderer::OnGridToggle);
 	//*)
 
-    wxVessRenderer_ToolBar->SetToolNormalBitmap( vessRenderer_grid, wxBitmap(wxImage(resourcesPath + _T("/images/grid.gif"))) );
+    wxVessRenderer_ToolBar->SetToolNormalBitmap( vessRenderer_grid, wxBitmap(wxImage(resourcesPath + _T("/grid.gif"))) );
 
 
     int *attributes = new int[7];

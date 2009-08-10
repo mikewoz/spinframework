@@ -233,12 +233,12 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxApp::s_macAboutMenuItemId = wxVessMenu_About->GetId();
     #endif
 
-    wxIcon SPINIcon(resourcesPath + wxT("/images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
+    wxIcon SPINIcon(resourcesPath + wxT("/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
     SetIcon(SPINIcon);
 
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showConfig, wxBitmap(wxImage(resourcesPath + _T("/images/icon_network.gif"))) );
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showRenderer, wxBitmap(wxImage(resourcesPath + _T("/images/icon_3Dview.gif"))) );
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showEditor, wxBitmap(wxImage(resourcesPath + _T("/images/icon_tree2.gif"))) );
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showConfig, wxBitmap(wxImage(resourcesPath + _T("/icon_network.gif"))) );
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showRenderer, wxBitmap(wxImage(resourcesPath + _T("/icon_3Dview.gif"))) );
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showEditor, wxBitmap(wxImage(resourcesPath + _T("/icon_tree2.gif"))) );
     //wxVess_ToolBar->Realize();
 
     // sash position doesn't seem to work in wxSmith, so do it manually:
@@ -305,7 +305,7 @@ void wxVessMain::OnAbout(wxCommandEvent& event)
    // wxMessageBox(msg, _("Welcome to..."));
 
     //wxIcon SPINIcon(wxT("s/logo_SPIN.tif"), wxBITMAP_TYPE_TIF);
-    wxIcon SPINIcon(resourcesPath + wxT("/images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
+    wxIcon SPINIcon(resourcesPath + wxT("/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
     //wxIcon SPINIcon(wxT("@executable_path/../images/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
 
     wxAboutDialogInfo info;
