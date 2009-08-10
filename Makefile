@@ -31,6 +31,7 @@ vess:
 	$(MAKE) -C src/vess
 
 clean:
+	-rm -rf doxygen/xml
 	-rm src/osgWrappers/*.cpp
 	-rm -rf doxygen/xml
 	$(MAKE) -C src/osgWrappers clean

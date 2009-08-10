@@ -44,7 +44,7 @@ SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o
 
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
 
-ifeq ($OS,Linux)
+ifeq ($(OS),Linux)
 	SPIN_FLAGS += -D_SPINDEBUG
 endif
 
