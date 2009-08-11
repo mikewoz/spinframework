@@ -122,15 +122,6 @@ END_EVENT_TABLE()
 
 wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 {
-	/*
-	std::cout << "WX GetResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
-	std::cout << "WX GetConfigDir: " << wxStandardPaths::Get().GetConfigDir().mb_str() << std::endl;
-	std::cout << "WX GetDataDir: " << wxStandardPaths::Get().GetDataDir().mb_str() << std::endl;
-	std::cout << "WX GetDocumentsDir: " << wxStandardPaths::Get().GetDocumentsDir().mb_str() << std::endl;
-	std::cout << "WX GetExecutablePath: " << wxStandardPaths::Get().GetExecutablePath().mb_str() << std::endl;
-	std::cout << "WX GetLocalDataDir: " << wxStandardPaths::Get().GetLocalDataDir().mb_str() << std::endl;
-	std::cout << "WX GetPluginsDir: " << wxStandardPaths::Get().GetPluginsDir().mb_str() << std::endl;
-	*/
 
     //(*Initialize(wxVessMain)
     wxMenuItem* MenuItem1;
