@@ -48,7 +48,7 @@ ifeq ($(OS),Linux)
 	SPIN_FLAGS += -D_SPINDEBUG
 endif
 
-#SPIN_FLAGS += -D_SPINDEBUG
+SPIN_FLAGS += -D_SPINDEBUG
 
 #SPIN_FLAGS += -DOSCDEBUG
 
@@ -119,7 +119,7 @@ spin.app: spin
 	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
 	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
-	cp ../images/* $@/Contents/Resources
+	-cp -R ../Resources/images $@/Contents/Resources
 	cp spin.icns $@/Contents/Resources/spin.icns
 	./dylibbundler -of -b -x $@/Contents/MacOS/spin -d $@/Contents/libs
 

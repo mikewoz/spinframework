@@ -81,13 +81,13 @@ bool vessWX::OnInit()
 	std::cout << "WX GetPluginsDir: " << wxStandardPaths::Get().GetPluginsDir().mb_str() << std::endl;
 	std::cout << "WX GetResourcesDir: " << wxStandardPaths::Get().GetResourcesDir().mb_str() << std::endl;
 	*/
-#ifdef _SPINDEBUG
+
 	resourcesPath = wxStandardPaths::Get().GetExecutablePath();
 	resourcesPath = resourcesPath.SubString(0,resourcesPath.Find('/',true)); // remove executable name
-	resourcesPath = resourcesPath + _T("../images");
-#else
-    resourcesPath = wxStandardPaths::Get().GetResourcesDir();
-#endif
+	resourcesPath = resourcesPath + _T("../Resources/images");
+
+    //resourcesPath = wxStandardPaths::Get().GetResourcesDir();
+
 
 
     //(*AppInitialize
