@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -65,9 +65,9 @@ asRay::asRay (asSceneManager *sceneManager, char *initID) : asReferenced(sceneMa
 	thickness = 0.25;
 	color = osg::Vec4(1,1,1,1);
 
-	
+
 	this->setNodeMask(DEBUGVIEW_NODE_MASK); // nodemask info in asGlobals.h
-	
+
 	drawRay();
 }
 
@@ -86,7 +86,7 @@ void asRay::setVisible (int b)
 	{
 		this->visible = (bool) b;
 		drawRay();
-		BROADCAST(this, "si", "setVisible", (int) this->visible);	
+		BROADCAST(this, "si", "setVisible", (int) this->visible);
 	}
 }
 
@@ -94,7 +94,7 @@ void asRay::setLength (float len)
 {
 	if (this->length != len)
 	{
-		this->length = len;	
+		this->length = len;
 		drawRay();
 		BROADCAST(this, "sf", "setLength", this->length);
 	}
@@ -105,7 +105,7 @@ void asRay::setThickness (float thk)
 	if (this->thickness != thk)
 	{
 		this->thickness = thk;
-		drawRay();	
+		drawRay();
 		BROADCAST(this, "sf", "setThickness", this->thickness);
 	}
 }
@@ -131,52 +131,52 @@ void asRay::drawRay()
 		this->removeChild(rayGeode.get());
 		rayGeode = NULL;
 	}
-		
+
 	if (this->visible)
 	{
 		rayGeode = new osg::Geode();
-		
-		if (0) 
+
+		if (0)
 		{
 			// the old cylinder method:
-			
+
 			osg::TessellationHints* hints = new osg::TessellationHints;
 			hints->setDetailRatio(GENERIC_SHAPE_RESOLUTION);
-				
+
 			// osg::Cylinder(center, radius, height)
 			osg::Cylinder* cylndr = new osg::Cylinder(osg::Vec3(0.0f,this->length/2,0.0f), this->thickness, this->length);
 			cylndr->setRotation(osg::Quat(osg::PI/2,osg::Vec3(1,0,0)));
-			
+
 			osg::ShapeDrawable* rayDrawable = new osg::ShapeDrawable(cylndr);
 			rayDrawable->setColor(this->color);
-			
+
 			rayGeode->addDrawable(rayDrawable);
-		
+
 		} else {
-			
+
 			// just draw a line
 			osg::Geometry* rayGeom = new osg::Geometry();
-			
+
 			osg::Vec3Array* vertices = new osg::Vec3Array;
 			vertices->push_back(osg::Vec3(0,0,0));
 			vertices->push_back(osg::Vec3(0,this->length,0));
-			
+
 			osg::Vec4Array* vertColors = new osg::Vec4Array;
 			vertColors->push_back(this->color);
 			rayGeom->setColorArray(vertColors);
 			rayGeom->setColorBinding(osg::Geometry::BIND_OVERALL);
-			
+
 			rayGeom->setVertexArray(vertices);
 			rayGeom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, vertices->size()));
 
 			osgUtil::SmoothingVisitor::smooth(*rayGeom);
-				
-			rayGeode->addDrawable(rayGeom);
-		
-		}
-		
 
-		
+			rayGeode->addDrawable(rayGeom);
+
+		}
+
+
+
 
 
 		if (rayGeode.valid())
@@ -186,7 +186,7 @@ void asRay::drawRay()
 			osgUtil::Optimizer optimizer;
 			optimizer.optimize(rayGeode.get());
 		}
-	}	
+	}
 
 }
 
@@ -197,9 +197,9 @@ std::vector<lo_message> asRay::getState ()
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = asReferenced::getState();
-	
+
 	lo_message msg;
-	
+
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setVisible", (int)visible);
 	ret.push_back(msg);
@@ -216,6 +216,6 @@ std::vector<lo_message> asRay::getState ()
 	osg::Vec4 v = this->getColor();
 	lo_message_add(msg, "sffff", "setColor", v.x(), v.y(), v.z(), v.w());
 	ret.push_back(msg);
-	
+
 	return ret;
 }

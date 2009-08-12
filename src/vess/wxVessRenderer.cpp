@@ -42,6 +42,7 @@
 #include "wxVessRenderer.h"
 
 //(*InternalHeaders(wxVessRenderer)
+#include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/intl.h>
 #include <wx/image.h>
@@ -82,14 +83,18 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	SetClientSize(wxSize(720,480));
 	Move(wxDefaultPosition);
 	wxVessRenderer_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-	ToolBarItem1 = wxVessRenderer_ToolBar->AddTool(vessRenderer_grid, _("Grid"), wxNullBitmap, wxNullBitmap, wxITEM_CHECK, _("Enable/Disable Grid"), _("Enable/Disable Grid"));
+	ToolBarItem1 = wxVessRenderer_ToolBar->AddTool(vessRenderer_grid, _("Grid"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_CHECK, _("Enable/Disable Grid"), _("Enable/Disable Grid"));
 	wxVessRenderer_ToolBar->Realize();
 	SetToolBar(wxVessRenderer_ToolBar);
 
 	Connect(vessRenderer_grid,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessRenderer::OnGridToggle);
 	//*)
 
-    wxVessRenderer_ToolBar->SetToolNormalBitmap( vessRenderer_grid, wxBitmap(wxImage(resourcesPath + _T("/grid.gif"))) );
+	wxImage icon_grid(resourcesPath + _T("/icon_grid.gif"));
+	icon_grid.Rescale(24,24);
+    wxVessRenderer_ToolBar->SetToolNormalBitmap( vessRenderer_grid, wxBitmap(icon_grid) );
+
+	wxVessRenderer_ToolBar->Realize();
 
 
     int *attributes = new int[7];

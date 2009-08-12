@@ -63,13 +63,16 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 vessThread::vessThread(vessMode initMode)
 {
 
-	
-	
+#ifdef __Darwin
+    setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
+    //#define OSG_LIBRARY_PATH @executable_path/../PlugIns
+#endif
+
 	// Load the SPIN library:
 	osgDB::Registry *reg = osgDB::Registry::instance();
 	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
 
-	
+
 	// Make sure that our OSG nodekit is loaded (by checking for existance of
 	// the asReferenced node type):
 	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");

@@ -138,6 +138,9 @@ int main(int argc, char **argv)
 
 	vessThread *vess = new vessThread(vessThread::LISTENER_MODE);
 
+
+	std::cout <<"  OSG_LIBRARY_PATH=" << getenv("OSG_LIBRARY_PATH") << std::endl;
+
 	std::string id = getHostname();
 
 

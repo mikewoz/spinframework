@@ -104,13 +104,13 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 	vessEditor_splitter->SplitHorizontally(treePanel, editorPanel);
 	wxVessEditor_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
 	wxVessEditor_ToolBar->SetToolBitmapSize(wxSize(24,24));
-	ToolBarItem1 = wxVessEditor_ToolBar->AddTool(vessEditor_clear, _("Clear"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Clear the current scene"), _("Clear the current scene"));
-	ToolBarItem2 = wxVessEditor_ToolBar->AddTool(vessEditor_refresh, _("Refresh"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Refresh the scene"), _("This will resync with the VESS server, ensuring that the scene is up to date."));
+	ToolBarItem1 = wxVessEditor_ToolBar->AddTool(vessEditor_clear, _("Clear"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Clear the current scene"), _("Clear the current scene"));
+	ToolBarItem2 = wxVessEditor_ToolBar->AddTool(vessEditor_refresh, _("Refresh"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Refresh the scene"), _("This will resync with the VESS server, ensuring that the scene is up to date."));
 	wxVessEditor_ToolBar->AddSeparator();
-	ToolBarItem3 = wxVessEditor_ToolBar->AddTool(vessEditor_debugPrint, _("DebugPrint"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
+	ToolBarItem3 = wxVessEditor_ToolBar->AddTool(vessEditor_debugPrint, _("DebugPrint"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
 	wxVessEditor_ToolBar->AddSeparator();
-	ToolBarItem4 = wxVessEditor_ToolBar->AddTool(vessEditor_newNode, _("New Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxITEM_NORMAL, _("Create a new node"), _("This will allow you to create a new node (a dialog will let you choose the type)"));
-	ToolBarItem5 = wxVessEditor_ToolBar->AddTool(vessEditor_deleteNode, _("Delete Selected Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxITEM_NORMAL, _("Delete the currently selected node"), _("Delete the currently selected node"));
+	ToolBarItem4 = wxVessEditor_ToolBar->AddTool(vessEditor_newNode, _("New Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxNullBitmap, wxITEM_NORMAL, _("Create a new node"), _("This will allow you to create a new node (a dialog will let you choose the type)"));
+	ToolBarItem5 = wxVessEditor_ToolBar->AddTool(vessEditor_deleteNode, _("Delete Selected Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxNullBitmap, wxITEM_NORMAL, _("Delete the currently selected node"), _("Delete the currently selected node"));
 	wxVessEditor_ToolBar->Realize();
 	SetToolBar(wxVessEditor_ToolBar);
 
@@ -124,9 +124,20 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
     // sash position doesn't seem to work in wxSmith, so do it manually:
     vessEditor_splitter->SetSashPosition(150);
 
-    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_clear, wxBitmap(wxImage(resourcesPath + _T("/icon_eraser.gif"))) );
-    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_refresh, wxBitmap(wxImage(resourcesPath + _T("/icon_refresh.gif"))) );
-    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_debugPrint, wxBitmap(wxImage(resourcesPath + _T("/icon_question_text.gif"))) );
+	wxImage icon_eraser(resourcesPath + _T("/icon_eraser.gif"));
+	icon_eraser.Rescale(24,24);
+    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_clear, wxBitmap(icon_eraser) );
+
+	wxImage icon_refresh(resourcesPath + _T("/icon_refresh.gif"));
+	icon_refresh.Rescale(24,24);
+    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_refresh, wxBitmap(icon_refresh) );
+
+	wxImage icon_question_text(resourcesPath + _T("/icon_question_text.gif"));
+	icon_question_text.Rescale(24,24);
+    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_debugPrint, wxBitmap(icon_question_text) );
+
+	wxVessEditor_ToolBar->Realize();
+
 
     // set smaller font
     wxFont pFont = GetFont();

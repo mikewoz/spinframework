@@ -48,6 +48,8 @@ ifeq ($(OS),Linux)
 	SPIN_FLAGS += -D_SPINDEBUG
 endif
 
+#SPIN_FLAGS += -D_SPINDEBUG
+
 #SPIN_FLAGS += -DOSCDEBUG
 
 SPIN_LIBS += -llo -L../osgWrappers
@@ -116,7 +118,7 @@ spin.app: spin
 	cp ../osgWrappers/libSPIN.dylib $@/Contents/libs
 	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
-	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
+	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
 	cp ../images/* $@/Contents/Resources
 	cp spin.icns $@/Contents/Resources/spin.icns
 	./dylibbundler -of -b -x $@/Contents/MacOS/spin -d $@/Contents/libs
@@ -140,7 +142,7 @@ spinViewer.app: spinViewer
 	cp ../osgWrappers/libSPIN.dylib $@/Contents/libs
 	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
-	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns/osgdb*.so $@/Contents/Resources
+	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
 	cp logo_spinViewer.icns $@/Contents/Resources
 	./dylibbundler -of -b -x $@/Contents/MacOS/spinViewer -d $@/Contents/libs
 

@@ -134,7 +134,6 @@
 			<object class="tool" name="wxVess_load" variable="ToolBarItem1" member="yes">
 				<label>Load Scene</label>
 				<bitmap stock_id="wxART_FILE_OPEN" stock_client="wxART_TOOLBAR" />
-				<bitmap2 stock_id="wxART_FILE_OPEN" stock_client="wxART_TOOLBAR" />
 				<tooltip>Load a scene from .xml file</tooltip>
 				<longhelp>Load a scene from .xml file</longhelp>
 				<handler function="OnLoadScene" entry="EVT_TOOL" />
@@ -142,7 +141,6 @@
 			<object class="tool" name="wxVess_Save" variable="ToolBarItem2" member="yes">
 				<label>Save Scene</label>
 				<bitmap stock_id="wxART_FILE_SAVE" stock_client="wxART_TOOLBAR" />
-				<bitmap2 stock_id="wxART_FILE_SAVE" stock_client="wxART_TOOLBAR" />
 				<tooltip>Save current scene</tooltip>
 				<longhelp>Save current scene</longhelp>
 				<handler function="OnSaveScene" entry="EVT_TOOL" />
@@ -150,6 +148,7 @@
 			<object class="separator" />
 			<object class="tool" name="wxVess_showConfig" variable="ToolBarItem3" member="yes">
 				<label>Configuration</label>
+				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Show configuration panel</tooltip>
 				<longhelp>Show configuration panel</longhelp>
 				<handler function="OnShowConfig" entry="EVT_TOOL" />
@@ -157,12 +156,14 @@
 			<object class="separator" />
 			<object class="tool" name="wxVess_showRenderer" variable="ToolBarItem4" member="yes">
 				<label>Renderer</label>
+				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Show the rendered 3D view</tooltip>
 				<longhelp>Show the rendered 3D view</longhelp>
 				<handler function="OnShowRenderer" entry="EVT_TOOL" />
 			</object>
 			<object class="tool" name="wxVess_showEditor" variable="ToolBarItem5" member="yes">
 				<label>Editor</label>
+				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Show the editor</tooltip>
 				<longhelp>Show the editor</longhelp>
 				<handler function="OnShowEditor" entry="EVT_TOOL" />

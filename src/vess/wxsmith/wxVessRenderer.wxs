@@ -8,6 +8,7 @@
 		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVessRenderer_ToolBar" member="yes">
 			<object class="tool" name="vessRenderer_grid" variable="ToolBarItem1" member="yes">
 				<label>Grid</label>
+				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Enable/Disable Grid</tooltip>
 				<longhelp>Enable/Disable Grid</longhelp>
 				<handler function="OnGridToggle" entry="EVT_TOOL" />
