@@ -122,6 +122,8 @@ END_EVENT_TABLE()
 
 wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 {
+	
+	
 
     //(*Initialize(wxVessMain)
     wxMenuItem* MenuItem1;
@@ -194,10 +196,10 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
     ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
     wxVess_ToolBar->AddSeparator();
-    ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
+    ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
     wxVess_ToolBar->AddSeparator();
-    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
-    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxNullBitmap, wxNullBitmap, wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
+    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
+    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
     wxVess_ToolBar->Realize();
     SetToolBar(wxVess_ToolBar);
 
@@ -227,13 +229,24 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxIcon SPINIcon(resourcesPath + wxT("/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
     SetIcon(SPINIcon);
 
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showConfig, wxBitmap(wxImage(resourcesPath + _T("/icon_network.gif"))) );
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showRenderer, wxBitmap(wxImage(resourcesPath + _T("/icon_3Dview.gif"))) );
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showEditor, wxBitmap(wxImage(resourcesPath + _T("/icon_tree2.gif"))) );
-    //wxVess_ToolBar->Realize();
+	// need to redo the icons with resourcePath:
+	wxImage icon_network(resourcesPath + _T("/icon_network.gif"));
+	icon_network.Rescale(32,32);
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showConfig, wxBitmap(icon_network) );
 
+	wxImage icon_3Dview(resourcesPath + _T("/icon_3Dview.gif"));
+	icon_3Dview.Rescale(24,24);
+	wxVess_ToolBar->SetToolNormalBitmap( wxVess_showRenderer, wxBitmap(icon_3Dview) );
+	
+	wxImage icon_tree2(resourcesPath + _T("/icon_tree2.gif"));
+	icon_tree2.Rescale(24,24);	
+    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showEditor, wxBitmap(icon_tree2) );
+		
+	wxVess_ToolBar->Realize();
+
+	
     // sash position doesn't seem to work in wxSmith, so do it manually:
-    mainSplitter->SetSashPosition(40);
+    mainSplitter->SetSashPosition(40);	
 
     vessSettingsFrame = new wxVessSettings(0);
     vessSettingsFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
