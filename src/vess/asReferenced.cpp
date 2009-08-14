@@ -419,6 +419,19 @@ void asReferenced::setTextFlag (int b)
 }
 
 
+
+void asReferenced::setParam (const char *paramName, const char *paramValue)
+{
+	stringParams[string(paramName)] = paramValue;
+	BROADCAST(this, "sss", "setParam", paramName, paramValue);
+}
+
+void asReferenced::setParam (const char *paramName, float paramValue)
+{
+	floatParams[string(paramName)] = paramValue;
+	BROADCAST(this, "ssf", "setParam", paramName, paramValue);
+}
+
 // *****************************************************************************
 
 void asReferenced::debug()
@@ -481,6 +494,23 @@ std::vector<lo_message> asReferenced::getState ()
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setTextFlag", this->getTextFlag());
 	ret.push_back(msg);
+	
+	stringParamType::iterator stringIter;
+	for (stringIter=stringParams.begin(); stringIter!=stringParams.end(); stringIter++ )
+	{
+		msg = lo_message_new();
+		lo_message_add(msg, "sss", "setParam", (*stringIter).first.c_str(), (const char*)(*stringIter).second);
+		ret.push_back(msg);
+	}
+	
+	floatParamType::iterator floatIter;
+	for (floatIter=floatParams.begin(); floatIter!=floatParams.end(); floatIter++ )
+	{
+		msg = lo_message_new();
+		lo_message_add(msg, "ssf", "setParam", (*floatIter).first.c_str(), (*floatIter).second);
+		ret.push_back(msg);
+	}
+
 
 	return ret;
 }

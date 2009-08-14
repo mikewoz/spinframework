@@ -56,6 +56,11 @@
 class asSceneManager;
 class asMediaManager;
 
+
+typedef std::map< std::string, const char* > stringParamType;
+typedef std::map< std::string, float > floatParamType;
+
+
 /**
  * \brief The base class for all VESS scene graph nodes
  *
@@ -151,6 +156,10 @@ public:
 	void setTextFlag (int b);
 	int  getTextFlag () { return (int) this->textFlag; }
 
+	
+	void setParam (const char *paramName, const char *paramValue);
+	void setParam (const char *paramName, float paramValue);
+	
 	/**
 	 * subclasses of asReferenced may contain complicated subgraphs, and any
 	 * children get attached not to the node pointer itself, but to an
@@ -196,6 +205,10 @@ public:
 	// debug
 
 	bool textFlag;
+	
+	stringParamType stringParams;
+	floatParamType floatParams;
+
 
 	// the node that children get attached to:
 	//osg::ref_ptr<osg::Group> attachmentNode;

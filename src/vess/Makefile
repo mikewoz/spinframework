@@ -9,7 +9,9 @@ all: $(OS)
 
 # choose names of binaries:
 Linux: vess spinViewer spin
-Darwin: vess spinViewer spin spin.app spinViewer.app
+Darwin: vess spinViewer spin
+
+apps: spin.app spinViewer.app
 
 # if you have a custom verion of wxWidgets:
 #WXCONFIG = $(HOME)/svn/wxMac-2.8.9/wx-config

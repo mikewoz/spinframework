@@ -266,7 +266,7 @@ void asShape::drawShape()
 				return;
 			}
 			shapeGeode->addDrawable(shapeDrawable);
-			//shapeDrawable->setColor(_color);
+			shapeDrawable->setColor(_color);
 		}
 
 
