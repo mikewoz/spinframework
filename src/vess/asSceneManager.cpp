@@ -123,6 +123,8 @@ asSceneManager::asSceneManager (std::string id, std::string addr, std::string po
 	// generic admin callback:
 	lo_server_thread_add_method(rxServ, string("/vess/"+sceneID).c_str(), NULL, asSceneManagerCallback_admin, this);
 
+
+	
 	// start the listener:
 	lo_server_thread_start(rxServ);
 
@@ -376,7 +378,7 @@ void asSceneManager::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
 
 
 
-// ***********************************************************
+// *****************************************************************************
 void asSceneManager::debug()
 {
 
@@ -413,7 +415,7 @@ void asSceneManager::debug()
 }
 
 
-// ***********************************************************
+// *****************************************************************************
 
 asReferenced* asSceneManager::createNode(string id, string type)
 {
@@ -560,7 +562,7 @@ asReferenced* asSceneManager::createNode(const char *id, const char *type)
 
 }
 
-// ***********************************************************
+// *****************************************************************************
 // returns a pointer to a node given an id:
 asReferenced* asSceneManager::getNode(string id)
 {
@@ -576,7 +578,7 @@ asReferenced* asSceneManager::getNode(const char *id)
 }
 
 
-// ***********************************************************
+// *****************************************************************************
 // returns a pointer to an node given an id and type:
 asReferenced* asSceneManager::getNode(const char *id, const char *type)
 {
@@ -593,7 +595,7 @@ asReferenced* asSceneManager::getNode(const char *id, const char *type)
 	return NULL;
 }
 
-// ***********************************************************
+// *****************************************************************************
 asReferenced* asSceneManager::getOrCreateNode(const char *id, const char *type)
 {
 	osg::ref_ptr<asReferenced> n = getNode(id, type);
@@ -603,14 +605,28 @@ asReferenced* asSceneManager::getOrCreateNode(const char *id, const char *type)
 
 
 
-// ***********************************************************
+// *****************************************************************************
 void asSceneManager::deleteNode(const char *id)
 {
 	// don't use ref_ptr here, otherwise node will stay alive until the end of
 	// the function, and we want to ensure the destructor is called in doDelete
 	asReferenced *n = getNode(id);
 
-	if (n) doDelete(n);
+	if (n)
+	{
+	
+		// for the deleteNode method, all children nodes will remain, so we just
+		// change their parent to the "world":
+		vector<asReferenced*>::iterator childIter;
+		for (childIter = n->children.begin(); childIter!=n->children.end(); childIter++)
+		{
+			(*childIter)->setParent("world");
+		}
+		
+		
+		doDelete(n);
+		
+	}
 	else std::cout << "ERROR: tried to deleteNode " << id << ", but that node does not exist." << std::endl;
 
 	// if delete was successful and removed all other references to the node,
@@ -619,23 +635,40 @@ void asSceneManager::deleteNode(const char *id)
 
 }
 
+
+// *****************************************************************************
+void asSceneManager::deleteGraph(const char *id)
+{
+	// don't use ref_ptr here, otherwise node will stay alive until the end of
+	// the function, and we want to ensure the destructor is called in doDelete
+	asReferenced *n = getNode(id);
+
+	if (n)
+	{
+		// for the deleteGraph method, we also delete all children:
+		while (n->children.size())
+		{
+			doDelete(*(n->children.begin()));
+		}
+	
+		doDelete(n);	
+	}
+	else std::cout << "ERROR: tried to deleteGraph " << id << ", but that node does not exist." << std::endl;
+	
+	// if delete was successful and removed all other references to the node,
+	// then by this point, the node will be deleted, and it's destructor will
+	// have been called.
+}
+
+// *****************************************************************************
 void asSceneManager::doDelete(asReferenced *nodeToDelete)
 {
 
 	// hold on to a referenced pointer, while we remove all others
 	osg::ref_ptr<asReferenced> n = nodeToDelete;
 
-
 	// remove the node from the scenegraph:
 	n->detach();
-
-	// for all children, change their parent to the "world":
-	vector<asReferenced*>::iterator childIter;
-	for (childIter = n->children.begin(); childIter!=n->children.end(); childIter++)
-	{
-		(*childIter)->setParent("world");
-	}
-
 
 	// remove from our storage nodeMap:
 	nodeMapType::iterator it;
@@ -671,9 +704,7 @@ void asSceneManager::doDelete(asReferenced *nodeToDelete)
 }
 
 
-
-
-// ***********************************************************
+// *****************************************************************************
 void asSceneManager::clear()
 {
 	/*
@@ -698,7 +729,7 @@ void asSceneManager::clear()
 
 }
 
-// ***********************************************************
+// *****************************************************************************
 void asSceneManager::refresh()
 {
 	sendNodeList("*");
@@ -717,7 +748,7 @@ void asSceneManager::refresh()
 
 }
 
-// ***********************************************************
+// *****************************************************************************
 // This function returns a pointer to an asSoundConnection object
 /*
 asSoundConnection* asSceneManager::getConnection(char *from, char *to)
@@ -1438,6 +1469,8 @@ int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **a
 		sceneManager->createNode((char*)argv[1], (char*)argv[2]);
 	else if ((theMethod=="deleteNode") && (argc==2))
 		sceneManager->deleteNode((char*)argv[1]);
+	else if ((theMethod=="deleteGraph") && (argc==2))
+		sceneManager->deleteGraph((char*)argv[1]);
 	else if ((theMethod=="setGrid") && (argc==2))
 		if (lo_is_numerical_type((lo_type)types[1])) sceneManager->setGrid((int) lo_hires_val((lo_type)types[1], argv[1]));
 

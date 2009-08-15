@@ -105,7 +105,26 @@ class asSceneManager
 		asReferenced *getNode(const char *id, const char *type);
 		asReferenced *getOrCreateNode(const char *id, const char *type);
 
+		/**
+		 * This method removes a node from the scene, however the actual work is
+		 * done by the doDelete() method.
+		 * NOTE: All children of the node will remain, but will be re-attached
+		 * to the 'world' node instead. If you want to destroy all children as
+		 * well, then use deleteGraph().
+		 */
 		void deleteNode(const char *id);
+		/**
+		 * deleteGraph() operates similarly to deleteNode(), except that all
+		 * children are also deleted.
+		 */
+		void deleteGraph(const char *id);
+		/**
+		 * The doDelete method performs all of the necessary steps to remove a
+		 * node from the scene: The node's detach() method is called, which will
+		 * actually remove it from the scene graph, and eliminate the OSC
+		 * callback. The callbackUpdate() function is unregistered. And finally,
+		 * a message is broadcasted to all clients.
+		 */
 		void doDelete(asReferenced *n);
 		void clear();
 		void refresh();

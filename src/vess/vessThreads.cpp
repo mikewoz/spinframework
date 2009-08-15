@@ -108,21 +108,27 @@ vessThread::vessThread(vessMode initMode)
 
 	if (isMulticastAddress(infoAddr))
 	{
-		lo_infoServ = lo_server_new_multicast(infoAddr.c_str(), NULL, oscParser_error);
+		lo_infoServ = lo_server_thread_new_multicast(infoAddr.c_str(), infoPort.c_str(), oscParser_error);
 
 	} else if (isBroadcastAddress(infoAddr))
 	{
-		lo_infoServ = lo_server_new(NULL, oscParser_error);
-		int sock = lo_server_get_socket_fd(lo_infoServ);
+		lo_infoServ = lo_server_thread_new(infoPort.c_str(), oscParser_error);
+		int sock = lo_server_get_socket_fd(lo_server_thread_get_server(lo_infoServ));
 		int sockopt = 1;
 		setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
 
 	} else {
-		lo_infoServ = lo_server_new(NULL, oscParser_error);
+		lo_infoServ = lo_server_thread_new(infoPort.c_str(), oscParser_error);
 	}
 
-	std::cout << "  INFO channel: " << lo_address_get_url(lo_infoAddr) << std::endl;
+	// info channel callback (receives pings from client apps):
+	lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoChannelCallback, this);
+		
+	lo_server_thread_start(lo_infoServ);
+	
 
+
+	std::cout << "  INFO channel: " << lo_address_get_url(lo_infoAddr) << std::endl;
 }
 
 vessThread::~vessThread()
@@ -132,8 +138,8 @@ vessThread::~vessThread()
 
 	if (lo_infoServ)
 	{
-		//lo_server_thread_stop(lo_infoServ);
-		lo_server_free(lo_infoServ);
+		lo_server_thread_stop(lo_infoServ);
+		lo_server_thread_free(lo_infoServ);
 	}
 
 	if (lo_txAddr)
@@ -213,6 +219,32 @@ void vessThread::stop()
 {
 	std::cout << "Stopping vessThread..." << std::endl;
 	this->running = false;
+}
+
+
+void vessThread::sendInfoMessage(std::string OSCpath, lo_message msg)
+{
+	lo_send_message_from(lo_infoAddr, lo_server_thread_get_server(lo_infoServ), OSCpath.c_str(), msg);
+
+    // Let's free the message after (not sure if this is necessary):
+    lo_message_free(msg);
+}
+
+void vessThread::sendInfoMessage(std::string OSCpath, const char *types, ...)
+{
+	lo_message msg = lo_message_new();
+
+	va_list ap;
+	va_start(ap, types);
+
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		sendInfoMessage(OSCpath, msg);
+	} else {
+		std::cout << "ERROR (vessThread::sendInfoMessage): " << err << std::endl;
+	}
 }
 
 void vessThread::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
@@ -347,7 +379,8 @@ static void *vessServerThread(void *arg)
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			lo_send_from(vess->lo_infoAddr, vess->lo_infoServ, LO_TT_IMMEDIATE, "/ping/vess", "ssisi", vess->id.c_str(), myIP.c_str(), i_rxPort, vess->txAddr.c_str(), i_txPort);
+			vess->sendInfoMessage("/ping/vess", "ssisi", vess->id.c_str(), myIP.c_str(), i_rxPort, vess->txAddr.c_str(), i_txPort, LO_ARGS_END);
+			//lo_send_from(vess->lo_infoAddr, vess->lo_infoServ, LO_TT_IMMEDIATE, "/ping/vess", "ssisi", vess->id.c_str(), myIP.c_str(), i_rxPort, vess->txAddr.c_str(), i_txPort);
 			lastTick = frameTick;
 		}
 
@@ -362,4 +395,35 @@ static void *vessServerThread(void *arg)
 	delete vess->sceneManager;
 
 	pthread_exit(NULL);
+}
+
+
+
+int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+{
+	vessThread *vess = (vessThread*) user_data;
+	
+	if (!vess) return 0;
+	
+	/*
+	std::cout << "************ infoChannelCallback() got message: " << path << std::endl;
+	
+	printf("************ infoChannelCallback() got message: %s\n", (char*)path);
+	printf("user_data: %s\n", (char*) user_data);
+	for (int i=0; i<argc; i++) {
+		printf("arg %d '%c' ", i, types[i]);
+    	lo_arg_pp((lo_type) types[i], argv[i]);
+    	printf("\n");
+	}
+	printf("\n");
+	fflush(stdout);
+	 */
+	
+	if (vess->mode == vessThread::SERVER_MODE)
+	{
+		// TODO: monitor /ping/user messages, keep timeout handlers, 
+		
+	}
+	
+	
 }

@@ -360,7 +360,7 @@ int main(int argc, char **argv)
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			// TODO: send ping message here ...
+			vess->sendInfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
 			lastTick = frameTick;
 		}
 
