@@ -1408,7 +1408,7 @@ int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **ar
 	{
 		if (n->sceneManager->txServ)
 		{
-			std::cout << "Ignoring method '" << theMethod << "' for [" << n->id->s_name << "], but forwarding message anyway..." << std::endl; 
+			//std::cout << "Ignoring method '" << theMethod << "' for [" << n->id->s_name << "], but forwarding message anyway..." << std::endl; 
 			lo_message msg = lo_message_new();
 			for (i=0; i<argc; i++)
 			{
