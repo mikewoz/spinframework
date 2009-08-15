@@ -106,7 +106,7 @@ void asDSPnode::callbackUpdate()
 }
 
 // *****************************************************************************
-asSoundConnection *asDSPnode::getConnection(char *snk)
+asSoundConnection *asDSPnode::getConnection(const char *snk)
 {
 	vector<asSoundConnection*>::iterator iter;
 	for (iter = this->connectTO.begin(); iter != this->connectTO.end(); iter++)
@@ -119,7 +119,7 @@ asSoundConnection *asDSPnode::getConnection(char *snk)
 
 
 // *****************************************************************************
-void asDSPnode::connect(char *snk)
+void asDSPnode::connect(const char *snk)
 {
 	// check if this connection already exists:
 	if (this->getConnection(snk)) return;
@@ -139,7 +139,7 @@ void asDSPnode::connect(char *snk)
 	}
 }
 
-void asDSPnode::disconnect(char *snk)
+void asDSPnode::disconnect(const char *snk)
 {
 	
 	// check if this connection already exists:
