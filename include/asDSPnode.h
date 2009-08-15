@@ -73,12 +73,12 @@ public:
 		virtual void callbackUpdate();
 		
 		
-		asSoundConnection *getConnection(char *snk);
+		asSoundConnection *getConnection(const char *snk);
 
 		
 		// define these as virtual so subclasses can redefine them:
-		void connect(char *snk);
-		void disconnect(char *snk);
+		void connect(const char *snk);
+		void disconnect(const char *snk);
 		void setActive (int i);
 		void setDSP (const char *filename);
 		
