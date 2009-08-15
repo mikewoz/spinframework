@@ -52,7 +52,7 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-asLightSource::asLightSource (asSceneManager *sceneManager, char *initID) : asReferenced(sceneManager, initID)
+asLightSource::asLightSource (asSceneManager *sceneManager, char *initID) : asBasicNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".asLightSource");
 	nodeType = "asLightSource";
@@ -175,7 +175,7 @@ void asLightSource::drawLight()
 	osg::Light *light;
 	osg::StateSet* thisStateSet = sceneManager->rootNode->getOrCreateStateSet();
 	
-	if (!this->_visible && this->containsNode( lightSource.get() ))
+	if (!this->_visible && this->attachmentNode->containsNode( lightSource.get() ))
 	{
 		// kill light:
 		
@@ -190,13 +190,13 @@ void asLightSource::drawLight()
 			lightSource->setStateSetModes(*thisStateSet, osg::StateAttribute::OFF);
 		}
 	
-        this->removeChild( lightSource.get() );
+		this->attachmentNode->removeChild( lightSource.get() );
 		lightSource = NULL;
 		lightNum = -1;
 		
 	}
 	 
-    else if (this->_visible && !this->containsNode(lightSource.get()) )
+    else if (this->_visible && !this->attachmentNode->containsNode(lightSource.get()) )
 	{
     	// instantiate light !!
 
@@ -211,7 +211,7 @@ void asLightSource::drawLight()
 			// create a spot light with standard parameters
 			lightSource = new osg::LightSource();
 
-            this->addChild( lightSource.get() );
+			this->attachmentNode->addChild( lightSource.get() );
 
                 
 			light = lightSource->getLight();
@@ -261,7 +261,7 @@ void asLightSource::drawLight()
 std::vector<lo_message> asLightSource::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = asReferenced::getState();
+	std::vector<lo_message> ret = asBasicNode::getState();
 	
 	lo_message msg;
 	osg::Vec4 v;

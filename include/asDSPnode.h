@@ -47,6 +47,7 @@
 
 #include "asGlobals.h"
 #include "asReferenced.h"
+#include "asBasicNode.h"
 #include "asSoundConnection.h"
 
 class asSoundConnection;
@@ -62,7 +63,7 @@ class asSoundConnection;
  * describes which node sends sound to another. The connect() and disconnect()
  * methods create the interface for managing connections for all derived classes
  */
-class asDSPnode : public asReferenced
+class asDSPnode : public asBasicNode
 {
 
 public:

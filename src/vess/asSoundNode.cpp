@@ -94,7 +94,7 @@ asSoundNode::~asSoundNode()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
-void asSoundNode::setRolloff (char *newvalue)
+void asSoundNode::setRolloff (const char *newvalue)
 {
 	// We store just the id instead of the whole table. If we want, we can always get the table
 	// from the database (eg, for drawing).
@@ -148,8 +148,33 @@ void asSoundNode::setIntensity (float newvalue)
 	if (g > 1.0) g=1.0;
 	currentSoundColor = osg::Vec3(r, g, 0.0);
 	
+	// too heavy!:
+	
 	drawVUmeter();
 	drawLaser();
+	
+	
+	/*
+	if (this->attachmentNode->containsNode(VUmeterTransform.get()) )
+	{
+		
+		for (int i=0; i<VUmeterTransform->getNumChildren(); i++)
+		{
+			// update color of all drawables:
+			osg::ref_ptr<osg::Geode> tmpGeode = dynamic_cast<osg::Geode*>(VUmeterTransform->getChild(i));
+			if (tmpGeode.valid())
+			{
+				for (int j=0; j<tmpGeode->getNumDrawables(); j++)
+				{
+					osg::ref_ptr<osg::ShapeDrawable> tmpDrawable = dynamic_cast<osg::ShapeDrawable*>(tmpGeode->getDrawable(j));
+					if (tmpDrawable.valid())
+						tmpDrawable->setColor( osg::Vec4(currentSoundColor, 1.0) );
+				}
+			}
+		}
+	}
+	*/
+	
 	
 	BROADCAST(this, "sf", "setIntensity", currentSoundIntensity);
 }
@@ -162,9 +187,9 @@ void asSoundNode::setIntensity (float newvalue)
 void asSoundNode::drawVUmeter()
 {
 		
-	if (this->containsNode(VUmeterTransform.get()) )
+	if (this->attachmentNode->containsNode(VUmeterTransform.get()) )
 	{
-		this->removeChild(VUmeterTransform.get());
+		this->attachmentNode->removeChild(VUmeterTransform.get());
 		VUmeterTransform = NULL;
 	}
 		
@@ -199,7 +224,7 @@ void asSoundNode::drawVUmeter()
 		VUmeterTransform->setScale( osg::Vec3(1, 1, 1 + currentSoundIntensity) );
 
 		VUmeterTransform->setName(string(id->s_name) + ".VUmeterTransform");
-		this->addChild(VUmeterTransform.get());
+		this->attachmentNode->addChild(VUmeterTransform.get());
    }
 
 }
@@ -212,9 +237,9 @@ t_float cardioid_to_cone_map[] = {180.0, 155.047, 147.605, 140.163, 116.907, 113
 void asSoundNode::drawDirectivity()
 {
 	
-	if (this->containsNode(directivityGeode.get()))
+	if (this->attachmentNode->containsNode(directivityGeode.get()))
 	{
-        this->removeChild(directivityGeode.get());
+		this->attachmentNode->removeChild(directivityGeode.get());
 		directivityGeode = NULL;
 	}
 
@@ -259,7 +284,7 @@ void asSoundNode::drawDirectivity()
 		directivityGeode->setStateSet(wireframeStateSet);
 		
 		directivityGeode->setName(string(id->s_name) + ".directivityGeode");
-        this->addChild(directivityGeode.get());
+		this->attachmentNode->addChild(directivityGeode.get());
 
 	}
 	
@@ -269,9 +294,9 @@ void asSoundNode::drawDirectivity()
 void asSoundNode::drawLaser()
 {
 	
-	if (this->containsNode(laserGeode.get()))
+	if (this->attachmentNode->containsNode(laserGeode.get()))
 	{
-        this->removeChild(laserGeode.get());
+		this->attachmentNode->removeChild(laserGeode.get());
 		laserGeode = NULL;
 	}
 
@@ -303,7 +328,7 @@ void asSoundNode::drawLaser()
 		laserGeode->setStateSet ( laserStateSet );
 		
 		// add it to the node:
-		this->addChild( laserGeode.get() );
+		this->attachmentNode->addChild( laserGeode.get() );
 	}
 }
 

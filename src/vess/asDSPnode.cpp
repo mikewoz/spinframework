@@ -51,10 +51,13 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-asDSPnode::asDSPnode (asSceneManager *sceneManager, char *initID) : asReferenced(sceneManager, initID)
+asDSPnode::asDSPnode (asSceneManager *sceneManager, char *initID) : asBasicNode(sceneManager, initID)
 {
 
 	nodeType = "asDSPnode";
+	
+	// enable reportGlobals by default:
+	reportGlobals(true);
 	
 	// connection stuff:
 	connectTO.clear();
@@ -91,7 +94,7 @@ asDSPnode::~asDSPnode()
 // *****************************************************************************
 void asDSPnode::callbackUpdate()
 {
-
+	/*
 	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
 	
 	if (this->_globalMatrix != myMatrix)
@@ -102,7 +105,7 @@ void asDSPnode::callbackUpdate()
 		
 		BROADCAST(this, "sffffff", "global6DOF", myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z());
 	}
-	
+	*/
 }
 
 // *****************************************************************************
@@ -248,7 +251,7 @@ void asDSPnode::connectionMsg (char *snkName, char *method, float value)
 std::vector<lo_message> asDSPnode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = asReferenced::getState();
+	std::vector<lo_message> ret = asBasicNode::getState();
 	
 	lo_message msg;
 	

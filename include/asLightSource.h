@@ -46,6 +46,7 @@
 
 #include "asGlobals.h"
 #include "asReferenced.h"
+#include "asBasicNode.h"
 
 #include <osg/Light>
 #include <osg/LightSource>
@@ -55,7 +56,7 @@
  *
  * Note that only 8 light sources are available.
  */
-class asLightSource : public asReferenced
+class asLightSource : public asBasicNode
 {
 
 public:

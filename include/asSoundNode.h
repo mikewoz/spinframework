@@ -68,7 +68,7 @@ class asSoundNode : public asDSPnode
 		virtual ~asSoundNode();
 			
 		// SET methods:
-		void setRolloff (char *newvalue);
+		void setRolloff (const char *newvalue);
 		void setSpread (float newvalue);
 		void setLength (float newvalue);
 		
