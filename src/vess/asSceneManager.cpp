@@ -1062,7 +1062,7 @@ bool asSceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parent
 
 				catch (osgIntrospection::Exception & ex)
 				{
-					std::cerr << "catch exception: " << ex.what() << std::endl;
+					std::cerr << "catch exception in loadXML: " << ex.what() << std::endl;
 				}
 			}
 
@@ -1325,7 +1325,7 @@ static int invokeMethod(const osgIntrospection::Value classInstance, const osgIn
     	}
     	catch (osgIntrospection::Exception & ex)
     	{
-   			std::cerr << "catch exception: " << ex.what() << std::endl;
+   			//std::cerr << "catch exception: " << ex.what() << std::endl;
   		}
 
         // If the method wasn't found in the classInstance, then we need to go
@@ -1402,7 +1402,27 @@ int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **ar
 		}
 	}
 
-	return invokeMethod(classInstance, classType, theMethod, theArgs);
+	// invoke the method on the node, and if it doesn't work, then just forward
+	// the message:
+	if (!invokeMethod(classInstance, classType, theMethod, theArgs))
+	{
+		if (n->sceneManager->txServ)
+		{
+			std::cout << "Ignoring method '" << theMethod << "' for [" << n->id->s_name << "], but forwarding message anyway..." << std::endl; 
+			lo_message msg = lo_message_new();
+			for (i=0; i<argc; i++)
+			{
+				if (lo_is_numerical_type((lo_type)types[i]))
+				{
+					lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+				} else {
+					lo_message_add_string(msg, (const char*) argv[i] );
+				}
+			}
+				
+			n->sceneManager->sendNodeMessage(n->id, msg);
+		}
+	}
 
 
 	//pthread_mutex_unlock(&pthreadLock);
