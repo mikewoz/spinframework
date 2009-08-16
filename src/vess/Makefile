@@ -81,9 +81,10 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ###################################################################
 # TARGETS:
 
-ALLTARGETS = spinViewer vess spin
+ALLTARGETS = docGenerator spinViewer vess spin
 
-doc: $(OBJS) docGenerator.o
+doc: docGenerator
+docGenerator: $(OBJS) docGenerator.o
 	@echo "\n------------- Generating OSC Documentation: -------------" 
 	$(CXX) -o docGenerator $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
 	./docGenerator
