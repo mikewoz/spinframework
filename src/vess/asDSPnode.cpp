@@ -109,44 +109,63 @@ void asDSPnode::callbackUpdate()
 }
 
 // *****************************************************************************
-asSoundConnection *asDSPnode::getConnection(const char *snk)
+
+asSoundConnection *asDSPnode::getConnection(asDSPnode *snk)
 {
-	vector<asSoundConnection*>::iterator iter;
-	for (iter = this->connectTO.begin(); iter != this->connectTO.end(); iter++)
-	{
-		if ((*iter)->sink->id == gensym(snk)) return (*iter);
+	if (snk)
+	{	
+		vector<asSoundConnection*>::iterator iter;
+		for (iter = this->connectTO.begin(); iter != this->connectTO.end(); iter++)
+		{
+			if ((*iter)->sink == snk) return (*iter);
+		}
 	}
 	
 	return NULL;
 }
 
+asSoundConnection *asDSPnode::getConnection(const char *snk)
+{
+	osg::ref_ptr<asDSPnode> sinkNode = dynamic_cast<asDSPnode*>( sceneManager->getNode(snk) );
+	if (sinkNode.valid()) return getConnection(sinkNode.get());
+	else return NULL;
+}
+
 
 // *****************************************************************************
-void asDSPnode::connect(const char *snk)
+void asDSPnode::connect(asDSPnode *snk)
 {
 	// check if this connection already exists:
 	if (this->getConnection(snk)) return;
 	
-	osg::ref_ptr<asDSPnode> sinkNode = dynamic_cast<asDSPnode*>( sceneManager->getNode(snk) );
-	if (sinkNode.valid())
-	{
-
-		asSoundConnection *conn = new asSoundConnection(this->sceneManager, this, sinkNode);
-		
-		// add to the connection lists for each node:
-		this->connectTO.push_back(conn);
-		conn->sink->connectFROM.push_back(conn);
-		
-		BROADCAST(this, "ss", "connect", snk);
-		
-	}
+	asSoundConnection *conn = new asSoundConnection(this->sceneManager, this, snk);
+	
+	// add to the connection lists for each node:
+	this->connectTO.push_back(conn);
+	conn->sink->connectFROM.push_back(conn);
+	
+	BROADCAST(this, "ss", "connect", snk->id->s_name);
 }
+
+// *****************************************************************************
+void asDSPnode::connect(const char *snk)
+{
+	osg::ref_ptr<asDSPnode> sinkNode = dynamic_cast<asDSPnode*>( sceneManager->getNode(snk) );
+	if (sinkNode.valid()) this->connect(sinkNode.get());
+}
+
+void asDSPnode::connectSource(const char *src)
+{
+	osg::ref_ptr<asDSPnode> srcNode = dynamic_cast<asDSPnode*>( sceneManager->getNode(src) );
+	if (srcNode.valid()) srcNode->connect(this);	
+}
+
 
 void asDSPnode::disconnect(const char *snk)
 {
 	
 	// check if this connection already exists:
-	asSoundConnection *conn = this->getConnection(snk);
+	asSoundConnection *conn = this->getConnection(dynamic_cast<asDSPnode*>( sceneManager->getNode(snk) ));
 	
 
 	if (conn)
