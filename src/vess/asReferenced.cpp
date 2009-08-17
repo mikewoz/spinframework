@@ -422,7 +422,7 @@ void asReferenced::setTextFlag (int b)
 
 void asReferenced::setParam (const char *paramName, const char *paramValue)
 {
-	std::cout << id->s_name << " got setParam: " << paramValue << std::endl;
+	//std::cout << id->s_name << " got setParam: " << paramValue << std::endl;
 	stringParams[string(paramName)] = string(paramValue);
 	BROADCAST(this, "sss", "setParam", paramName, paramValue);
 }
