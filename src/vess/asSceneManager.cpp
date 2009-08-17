@@ -60,6 +60,8 @@
 
 #include <sstream>
 
+#include <osgDB/WriteFile>
+
 
 #include <osgIntrospection/Reflection>
 #include <osgIntrospection/Type>
@@ -188,6 +190,7 @@ asSceneManager::asSceneManager (std::string id, std::string addr, std::string po
 	std::string dataPath = "~/Documents/Audioscape-Data"; // this isn't used anymore
 	mediaManager = new asMediaManager(dataPath);
 
+	this->sendSceneMessage("s", "userRefresh");
 }
 
 // *****************************************************************************
@@ -707,25 +710,54 @@ void asSceneManager::doDelete(asReferenced *nodeToDelete)
 // *****************************************************************************
 void asSceneManager::clear()
 {
-	/*
-	while (!nodeList.empty())
-	{
-		doDelete(nodeList[0]);
-	}
-	*/
 
-	nodeMapType::iterator it;
-	for ( it=nodeMap.begin(); it!=nodeMap.end(); it++)
+	
+	// first find all userNodes and check move them to the worldNode:
+	nodeListType::iterator iter;
+	for (iter = nodeMap[string("userNode")].begin(); iter != nodeMap[string("userNode")].end(); iter++)
 	{
-		while ((*it).second.size())
+		(*iter)->setParent("world");
+	}
+	
+	// now go through all children of worldNode and do a deleteGraph on any node
+	// that is not a userNode:
+	
+	for (int i=0; i<worldNode->getNumChildren(); i++)
+	{
+		asReferenced *n = dynamic_cast<asReferenced*>(worldNode->getChild(i));
+		if (n)
 		{
-			doDelete((*it).second[0].get());
+			// as long as this isn't a userNode, delete 
+			if (!dynamic_cast<userNode*>(n))
+			{
+				deleteGraph(n->id->s_name);
+			}
 		}
 	}
-
+	
+	
+	/*
+	asSceneClearVisitor visitor;
+	rootNode->accept(visitor);
+	*/
+	
+	
 	if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneID).c_str(), "s", "clear");
 
 	std::cout << "Cleared scene." << std::endl;
+
+}
+
+void asSceneManager::clearUsers()
+{
+	while (nodeMap[string("userNode")].size())
+	{
+		deleteGraph(nodeMap[string("userNode")][0]->id->s_name);
+	}
+	
+	if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneID).c_str(), "s", "clearUsers");
+
+	std::cout << "Cleared all users." << std::endl;
 
 }
 
@@ -803,6 +835,26 @@ void asSceneManager::updateGraph()
 */
 
 }
+
+// save scene as .osg
+void asSceneManager::exportSubgraph (const char *nodeID, const char *filename)
+{
+	osg::ref_ptr<asReferenced> subgraph = getNode(nodeID);
+	if (subgraph.valid())
+	{
+		std:: string fullPath = string(filename);
+		if (fullPath.substr(fullPath.size()-4) != ".osg") fullPath += ".osg";
+
+		
+		osgDB::writeNodeFile(*subgraph.get(), fullPath);
+		std::cout << "Exported subgraph starting at node '" << subgraph->id->s_name << "' to: " << fullPath << std::endl;
+	}
+	else {
+		std::cout << "Could not find node " << nodeID << ". Export failed." << std::endl;
+	}
+
+}
+
 
 std::string asSceneManager::getStateAsXML(vector<lo_message> nodeState)
 {
@@ -1470,6 +1522,10 @@ int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **a
 		sceneManager->debug();
 	else if (theMethod=="clear")
 		sceneManager->clear();
+	else if (theMethod=="clearUsers")
+		sceneManager->clearUsers();
+	else if (theMethod=="userRefresh")
+		sceneManager->sendSceneMessage("s", "userRefresh", LO_ARGS_END);
 	else if (theMethod=="refresh")
 		sceneManager->refresh();
 	else if (theMethod=="getNodeList")
@@ -1481,6 +1537,9 @@ int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **a
 			if (strcmp((char*)argv[i],"NULL")!=0) sceneManager->createNode((char*)argv[i], (char*)argv[1]);
 		}
 	}
+	
+	else if ((theMethod=="exportSubgraph") && (argc==3))
+		sceneManager->exportSubgraph((char*)argv[1], (char*)argv[2]);
 	else if ((theMethod=="load") && (argc==2))
 		sceneManager->loadXML((char*)argv[1]);
 	else if ((theMethod=="save") && (argc==2))

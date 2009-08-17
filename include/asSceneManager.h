@@ -51,6 +51,8 @@
 #include "asGlobals.h"
 #include "asReferenced.h"
 #include "asMediaManager.h"
+#include "userNode.h"
+
 #include "lo/lo.h"
 #include "tinyxml.h"
 
@@ -127,6 +129,7 @@ class asSceneManager
 		 */
 		void doDelete(asReferenced *n);
 		void clear();
+		void clearUsers();
 		void refresh();
 
 		//asSoundConnection* getConnection(char *from, char *to);
@@ -134,7 +137,7 @@ class asSceneManager
 		void updateGraph();
 		osg::Matrix getWorldCoords(t_symbol *id);
 
-
+		void exportSubgraph (const char *nodeID, const char *filename);
 
 
 		std::string sceneID;
