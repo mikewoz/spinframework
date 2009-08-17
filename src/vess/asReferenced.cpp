@@ -422,7 +422,8 @@ void asReferenced::setTextFlag (int b)
 
 void asReferenced::setParam (const char *paramName, const char *paramValue)
 {
-	stringParams[string(paramName)] = paramValue;
+	std::cout << id->s_name << " got setParam: " << paramValue << std::endl;
+	stringParams[string(paramName)] = string(paramValue);
 	BROADCAST(this, "sss", "setParam", paramName, paramValue);
 }
 
@@ -499,7 +500,7 @@ std::vector<lo_message> asReferenced::getState ()
 	for (stringIter=stringParams.begin(); stringIter!=stringParams.end(); stringIter++ )
 	{
 		msg = lo_message_new();
-		lo_message_add(msg, "sss", "setParam", (*stringIter).first.c_str(), (const char*)(*stringIter).second);
+		lo_message_add(msg, "sss", "setParam", (*stringIter).first.c_str(), (const char*)(*stringIter).second.c_str());
 		ret.push_back(msg);
 	}
 	

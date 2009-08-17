@@ -57,7 +57,7 @@ class asSceneManager;
 class asMediaManager;
 
 
-typedef std::map< std::string, const char* > stringParamType;
+typedef std::map< std::string, std::string > stringParamType;
 typedef std::map< std::string, float > floatParamType;
 
 
