@@ -839,18 +839,22 @@ void asSceneManager::updateGraph()
 // save scene as .osg
 void asSceneManager::exportSubgraph (const char *nodeID, const char *filename)
 {
-	osg::ref_ptr<asReferenced> subgraph = getNode(nodeID);
-	if (subgraph.valid())
-	{
-		std:: string fullPath = string(filename);
-		if (fullPath.substr(fullPath.size()-4) != ".osg") fullPath += ".osg";
+	std:: string fullPath = string(filename);
+	if (fullPath.substr(fullPath.size()-4) != ".osg") fullPath += ".osg";
 
-		
-		osgDB::writeNodeFile(*subgraph.get(), fullPath);
-		std::cout << "Exported subgraph starting at node '" << subgraph->id->s_name << "' to: " << fullPath << std::endl;
+	if (strcmp(nodeID,"world")==0)
+	{
+		osgDB::writeNodeFile(*worldNode.get(), fullPath);
+		std::cout << "Exported entire scene to: " << fullPath << std::endl;
 	}
 	else {
-		std::cout << "Could not find node " << nodeID << ". Export failed." << std::endl;
+		osg::ref_ptr<asReferenced> subgraph = getNode(nodeID);
+		if (subgraph.valid())
+		{
+			osgDB::writeNodeFile(*subgraph.get(), fullPath);
+			std::cout << "Exported subgraph starting at node '" << subgraph->id->s_name << "' to: " << fullPath << std::endl;
+		}
+		else std::cout << "Could not find node " << nodeID << ". Export failed." << std::endl;
 	}
 
 }
