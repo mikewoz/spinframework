@@ -137,7 +137,7 @@ class asSceneManager
 		void updateGraph();
 		osg::Matrix getWorldCoords(t_symbol *id);
 
-		void exportSubgraph (const char *nodeID, const char *filename);
+		void exportScene (const char *nodeID, const char *filename);
 
 
 		std::string sceneID;

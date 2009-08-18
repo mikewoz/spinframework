@@ -744,6 +744,8 @@ void asSceneManager::clear()
 	
 	if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneID).c_str(), "s", "clear");
 
+	sendNodeList("*");
+	
 	std::cout << "Cleared scene." << std::endl;
 
 }
@@ -757,6 +759,8 @@ void asSceneManager::clearUsers()
 	
 	if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneID).c_str(), "s", "clearUsers");
 
+	sendNodeList("*");
+	
 	std::cout << "Cleared all users." << std::endl;
 
 }
@@ -837,7 +841,7 @@ void asSceneManager::updateGraph()
 }
 
 // save scene as .osg
-void asSceneManager::exportSubgraph (const char *nodeID, const char *filename)
+void asSceneManager::exportScene (const char *nodeID, const char *filename)
 {
 	std:: string fullPath = string(filename);
 	if (fullPath.substr(fullPath.size()-4) != ".osg") fullPath += ".osg";
@@ -1542,8 +1546,8 @@ int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **a
 		}
 	}
 	
-	else if ((theMethod=="exportSubgraph") && (argc==3))
-		sceneManager->exportSubgraph((char*)argv[1], (char*)argv[2]);
+	else if ((theMethod=="exportScene") && (argc==3))
+		sceneManager->exportScene((char*)argv[1], (char*)argv[2]);
 	else if ((theMethod=="load") && (argc==2))
 		sceneManager->loadXML((char*)argv[1]);
 	else if ((theMethod=="save") && (argc==2))
