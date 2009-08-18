@@ -719,9 +719,11 @@ void asSceneManager::clear()
 		(*iter)->setParent("world");
 	}
 	
+	
+	/*
 	// now go through all children of worldNode and do a deleteGraph on any node
 	// that is not a userNode:
-	
+	// ERROR: only does odd ones
 	for (int i=0; i<worldNode->getNumChildren(); i++)
 	{
 		asReferenced *n = dynamic_cast<asReferenced*>(worldNode->getChild(i));
@@ -734,11 +736,55 @@ void asSceneManager::clear()
 			}
 		}
 	}
+	*/
 	
+	int i = 0;
+	asReferenced *n;
+	while (i < worldNode->getNumChildren())
+	{
+		if (n=dynamic_cast<userNode*>(worldNode->getChild(i)))
+		{
+			// skip userNodes
+			i++;
+		}
+		else if (n=dynamic_cast<asReferenced*>(worldNode->getChild(i)))
+		{
+			// delete the graph of any asReferenced:
+			deleteGraph(n->id->s_name);
+		}
+		else
+		{
+			// it's possible that there are other nodes attached to worldNode,
+			// so just skip them:
+			i++;
+		}
+	}
+	
+	/*
+	// now remove any remaining nodes attached to world (that are not userNodes)
+	// including their subgraph via deleteGraph()
+	// ERROR: only does odd ones
+	nodeMapType::iterator it;
+	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
+	{
+		if ((*it).first != "userNode")
+		{
+			
+			nodeListType::iterator iter;
+			for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+			{
+				if (strcmp((*iter)->getParent(),"world")==0)
+				{
+					deleteGraph((*iter)->id->s_name);
+				}
+			}
+		}
+	}	
+	*/
 	
 	/*
 	asSceneClearVisitor visitor;
-	rootNode->accept(visitor);
+	worldNode->accept(visitor);
 	*/
 	
 	

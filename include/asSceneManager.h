@@ -230,6 +230,43 @@ void oscParser_error(int num, const char *msg, const char *path);
 	if (sceneManager->txServ) lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneManager->sceneID+"/"+string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
 
 
+class asSceneClearVisitor : public osg::NodeVisitor
+{
+	public:
+
+		//asSceneClearVisitor() : osg::NodeVisitor(TRAVERSE_NONE) {}
+		asSceneClearVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
+		 
+
+		virtual void apply(osg::Node &node)
+		{
+			traverse(node);
+		}
+		virtual void apply(osg::Group &node)
+		{
+			asReferenced *n;
+			
+			if (dynamic_cast<userNode*>(&node))
+			{
+				// if this is a userNode, do nothing
+			}
+			else if (n=dynamic_cast<asReferenced*>(&node))
+			{
+				// If it's any other asReferenced node, delete it, and it's
+				// subgraph. This assumes of course, that there are no userNodes
+				// in the subgraph.
+				n->sceneManager->deleteGraph(n->id->s_name);
+			}
+			else
+			{
+				// if this is some other osg::Group, then traverse it:
+				traverse(node);
+			}
+		}
+};
+
+
+
 class asSceneUpdateVisitor : public osg::NodeVisitor
 {
 	public:
