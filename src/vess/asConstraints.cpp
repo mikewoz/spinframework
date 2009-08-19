@@ -70,12 +70,7 @@ asConstraints::asConstraints (asSceneManager *sceneManager, char *initID) : asRe
 	  
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
-	attachmentNode = mainTransform.get();
-
-	// We need to set up a callback. This should be on the topmost node, so that during node
-	// traversal, we update our parameters before anything is drawn.
-	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
-	this->setUpdateCallback(new asReferenced_callback);
+	setAttachmentNode(mainTransform.get());
 
 }
 

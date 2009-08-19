@@ -89,12 +89,6 @@ asPointer::asPointer (asSceneManager *sceneManager, char *initID) : asReferenced
 	intersectList.clear();
 	
 	
-	// We need to set up a callback, that computes intersections during scene
-	// graph traversal. This should be on the topmost node, so that during node
-	// traversal, we update our parameters before anything is drawn.
-	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
-	this->setUpdateCallback(new asReferenced_callback);
-	
 	this->setNodeMask(STATSDATA_NODE_MASK); // nodemask info in asGlobals.h
 	
 }

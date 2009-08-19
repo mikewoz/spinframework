@@ -245,6 +245,22 @@ void asReferenced::updateChildNodePaths()
 	}
 }
 
+int asReferenced::setAttachmentNode(osg::Group *n)
+{
+	if (n)
+	{
+		attachmentNode = n;
+
+		// update the nodepath now that we've defined a new attachmentNode
+		this->updateNodePath();
+		
+		return 1;
+		
+	}
+	
+	return 0;
+}
+
 
 // *****************************************************************************
 asReferenced *asReferenced::as_getChild(asReferenced *child)

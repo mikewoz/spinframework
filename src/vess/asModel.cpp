@@ -81,7 +81,7 @@ asModel::asModel (asSceneManager *sceneManager, char *initID) : asReferenced(sce
 
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
-	attachmentNode = modelTransform.get();
+	setAttachmentNode(modelTransform.get());
 
 }
 

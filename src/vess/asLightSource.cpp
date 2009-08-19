@@ -175,7 +175,7 @@ void asLightSource::drawLight()
 	osg::Light *light;
 	osg::StateSet* thisStateSet = sceneManager->rootNode->getOrCreateStateSet();
 	
-	if (!this->_visible && this->attachmentNode->containsNode( lightSource.get() ))
+	if (!this->_visible && this->getAttachmentNode()->containsNode( lightSource.get() ))
 	{
 		// kill light:
 		
@@ -190,13 +190,13 @@ void asLightSource::drawLight()
 			lightSource->setStateSetModes(*thisStateSet, osg::StateAttribute::OFF);
 		}
 	
-		this->attachmentNode->removeChild( lightSource.get() );
+		this->getAttachmentNode()->removeChild( lightSource.get() );
 		lightSource = NULL;
 		lightNum = -1;
 		
 	}
 	 
-    else if (this->_visible && !this->attachmentNode->containsNode(lightSource.get()) )
+    else if (this->_visible && !this->getAttachmentNode()->containsNode(lightSource.get()) )
 	{
     	// instantiate light !!
 
@@ -211,7 +211,7 @@ void asLightSource::drawLight()
 			// create a spot light with standard parameters
 			lightSource = new osg::LightSource();
 
-			this->attachmentNode->addChild( lightSource.get() );
+			this->getAttachmentNode()->addChild( lightSource.get() );
 
                 
 			light = lightSource->getLight();

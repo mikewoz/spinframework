@@ -155,7 +155,7 @@ void asSoundNode::setIntensity (float newvalue)
 	
 	
 	/*
-	if (this->attachmentNode->containsNode(VUmeterTransform.get()) )
+	if (this->getAttachmentNode()->containsNode(VUmeterTransform.get()) )
 	{
 		
 		for (int i=0; i<VUmeterTransform->getNumChildren(); i++)
@@ -187,9 +187,9 @@ void asSoundNode::setIntensity (float newvalue)
 void asSoundNode::drawVUmeter()
 {
 		
-	if (this->attachmentNode->containsNode(VUmeterTransform.get()) )
+	if (this->getAttachmentNode()->containsNode(VUmeterTransform.get()) )
 	{
-		this->attachmentNode->removeChild(VUmeterTransform.get());
+		this->getAttachmentNode()->removeChild(VUmeterTransform.get());
 		VUmeterTransform = NULL;
 	}
 		
@@ -224,7 +224,7 @@ void asSoundNode::drawVUmeter()
 		VUmeterTransform->setScale( osg::Vec3(1, 1, 1 + currentSoundIntensity) );
 
 		VUmeterTransform->setName(string(id->s_name) + ".VUmeterTransform");
-		this->attachmentNode->addChild(VUmeterTransform.get());
+		this->getAttachmentNode()->addChild(VUmeterTransform.get());
    }
 
 }
@@ -237,9 +237,9 @@ t_float cardioid_to_cone_map[] = {180.0, 155.047, 147.605, 140.163, 116.907, 113
 void asSoundNode::drawDirectivity()
 {
 	
-	if (this->attachmentNode->containsNode(directivityGeode.get()))
+	if (this->getAttachmentNode()->containsNode(directivityGeode.get()))
 	{
-		this->attachmentNode->removeChild(directivityGeode.get());
+		this->getAttachmentNode()->removeChild(directivityGeode.get());
 		directivityGeode = NULL;
 	}
 
@@ -284,7 +284,7 @@ void asSoundNode::drawDirectivity()
 		directivityGeode->setStateSet(wireframeStateSet);
 		
 		directivityGeode->setName(string(id->s_name) + ".directivityGeode");
-		this->attachmentNode->addChild(directivityGeode.get());
+		this->getAttachmentNode()->addChild(directivityGeode.get());
 
 	}
 	
@@ -294,9 +294,9 @@ void asSoundNode::drawDirectivity()
 void asSoundNode::drawLaser()
 {
 	
-	if (this->attachmentNode->containsNode(laserGeode.get()))
+	if (this->getAttachmentNode()->containsNode(laserGeode.get()))
 	{
-		this->attachmentNode->removeChild(laserGeode.get());
+		this->getAttachmentNode()->removeChild(laserGeode.get());
 		laserGeode = NULL;
 	}
 
@@ -328,7 +328,7 @@ void asSoundNode::drawLaser()
 		laserGeode->setStateSet ( laserStateSet );
 		
 		// add it to the node:
-		this->attachmentNode->addChild( laserGeode.get() );
+		this->getAttachmentNode()->addChild( laserGeode.get() );
 	}
 }
 

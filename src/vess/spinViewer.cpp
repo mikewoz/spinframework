@@ -64,18 +64,41 @@ using namespace std;
 extern pthread_mutex_t pthreadLock;
 
 
+// global:
+// we store userNode in a global ref_ptr so that it can't be deleted
+static osg::ref_ptr<asReferenced> userNode;
+
+
+
+static void registerUser(vessThread *vess)
+{
+	if (!userNode.valid())
+	{
+        std::cout << "ERROR: could not register user" << std::endl;
+        exit(1);
+	}
+	
+	
+	// Send a message to vess that creates this node (assumes that the server
+	// is running). If not, it will send a 'userRefresh' method upon startup
+	// that will request that this function is called again
+	vess->sendSceneMessage("sss", "createNode", userNode->id->s_name, "userNode", LO_ARGS_END);
+
+	std::cout << "  Registered userNode '" << userNode->id->s_name << "' with VESS" << std::endl;
+
+}
 
 // *****************************************************************************
 
 
-int spinViewer_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
 
     // make sure there is at least one argument (ie, a method):
 	if (!argc) return 0;
 
-	osgViewer::CompositeViewer *viewer = (osgViewer::CompositeViewer*)user_data;
-    if (!viewer) return 0;
+	vessThread *vess = (vessThread*)user_data;
+    if (!vess) return 0;
 
 
 	// get the method (argv[0]):
@@ -99,17 +122,13 @@ int spinViewer_liblo_callback(const char *path, const char *types, lo_arg **argv
 		}
 	}
 
-	// try to find the node id:
-	std::string nodeStr = string(path);
-	nodeStr = nodeStr.substr(nodeStr.rfind("/")+1);
-	t_symbol *s = gensym(nodeStr.c_str());
-	osg::ref_ptr<asReferenced> n = s->s_thing;
-	if (!n.valid())
+	if (theMethod=="userRefresh")
 	{
-		std::cout << "spinViewer_liblo_callback: Could not find node: " << nodeStr << std::endl;
-		return 0;
+		registerUser(vess);
 	}
-
+		
+		
+		/*
 	if ( (theMethod=="global6DOF") && (floatArgs.size()==6))
 	{
 //    	viewer->getCamera(0)->setViewMatrixAsLookAt(
@@ -118,15 +137,12 @@ int spinViewer_liblo_callback(const char *path, const char *types, lo_arg **argv
 	//    osg::Vec3 = dirVector
     	//viewer->getCamera(0)->setViewMatrixAsLookAt(osg::Vec3(floatArgs[0],floatArgs[1],floatArgs[2]),
 	}
-
+*/
 
 
 
 	return 1;
 }
-
-
-
 
 
 // *****************************************************************************
@@ -207,26 +223,23 @@ int main(int argc, char **argv)
 
 	vess->sceneManager->isGraphical = true;
 
+	
+	// register an extra OSC callback so that we can spy on OSC messages:
+	std::string OSCpath = "/vess/" + vess->id;
+	lo_server_thread_add_method(vess->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)&vess);
 
-	std::cout << "  Registering userNode '" << id << "' with VESS" << std::endl;
-
+	
+	
+	
 	// Add a userNode to the local scene and use it to feed a NodeTracker for
 	// the viewer's camera. We expect that this node will be created in VESS and
-	// that updates will be generated. Also note that we store it in a ref_ptr
-	// so that it can't be deleted by vess threads.
-	osg::ref_ptr<asReferenced> userNode = vess->sceneManager->createNode(id, "userNode");
-
-    std::string OSCpath;
-
-    OSCpath = "/vess/" + vess->id + "/" + std::string(id);
-    lo_server_thread_add_method(vess->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)&viewer);
-
-
-    // for now, we try to send a message to vess that creates this node (assumes
-    // that the server is running). Eventually, we'll need a better method to
-    // synchronize user state with vess server... how? Maybe if VESS receives a
-    // ping for a user that doesn't exist, it can request the creation messages?
-    vess->sendSceneMessage("sss", "createNode", (char*) id.c_str(), "userNode", LO_ARGS_END);
+	// that updates will be generated. 
+	userNode = vess->sceneManager->getOrCreateNode(id.c_str(), "userNode");
+	
+	// send userNode info to vess
+	registerUser(vess);
+	
+		
 
 	// *************************************************************************
 	// any option left unread are converted into errors to write out later.

@@ -120,6 +120,9 @@ public:
 	 * currentNodePath.
 	 */
 	virtual void updateNodePath();
+	
+	int setAttachmentNode(osg::Group *n);
+	
 
 	/**
 	 * An internal method that keeps track of the nodepath (for efficient
@@ -210,9 +213,7 @@ public:
 	floatParamType floatParams;
 
 
-	// the node that children get attached to:
-	//osg::ref_ptr<osg::Group> attachmentNode;
-	osg::Group *attachmentNode;
+
 
 	osg::NodePath currentNodePath;
 
@@ -254,6 +255,13 @@ private:
 	 */
 	bool legalParent (t_symbol *newParent);
 	
+	
+	/**
+	 * The node that children get attached to:
+	/* We keep it private to force the use of setAttachmentNode(), which results
+	 * in an update of the currentNodePath.
+	 */
+	osg::Group *attachmentNode;
 
 };
 

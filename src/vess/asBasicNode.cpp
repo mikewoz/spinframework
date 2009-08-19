@@ -71,15 +71,10 @@ asBasicNode::asBasicNode (asSceneManager *sceneManager, char *initID) : asRefere
 
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
-	attachmentNode = mainTransform.get();
+	setAttachmentNode(mainTransform.get());
 
 	// keep a timer for velocity calculation:
 	lastTick = osg::Timer::instance()->tick();
-
-	// We need to set up a callback. This should be on the topmost node, so that during node
-	// traversal, we update our parameters before anything is drawn.
-	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
-	this->setUpdateCallback(new asReferenced_callback);
 
 }
 
@@ -133,8 +128,14 @@ void asBasicNode::updateNodePath()
 	// now update NodePaths for all children:
 	updateChildNodePaths();
 
-
-
+	/*
+	osg::NodePath::iterator iter;
+	std::cout << "nodepath for " << id->s_name << ":" << std::endl;
+	for (iter = currentNodePath.begin(); iter!=currentNodePath.end(); iter++)
+	{
+		std::cout << " > " << (*iter)->getName() << std::endl;
+	}
+	*/
 }
 
 
