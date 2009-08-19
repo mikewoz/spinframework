@@ -92,9 +92,10 @@ asDSPnode::~asDSPnode()
 }
 
 // *****************************************************************************
+/*
 void asDSPnode::callbackUpdate()
 {
-	/*
+
 	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
 	
 	if (this->_globalMatrix != myMatrix)
@@ -105,8 +106,9 @@ void asDSPnode::callbackUpdate()
 		
 		BROADCAST(this, "sffffff", "global6DOF", myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z());
 	}
-	*/
 }
+*/
+
 
 // *****************************************************************************
 
