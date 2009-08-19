@@ -47,6 +47,7 @@
 #include <osg/Timer>
 
 #include "vessThreads.h"
+#include "vessLog.h"
 
 
 
@@ -120,10 +121,26 @@ int main(int argc, char **argv)
 		vess->sceneManager->rootNode->addChild(argScene.get());
 	}
 
-
 	vess->start();
 
+	
+	// *************************************************************************
+	// log file:
+	
+	time_t t = time(NULL);
+	tm* tmp = localtime(&t);
+	char logFilename[128];
+	strftime(logFilename, sizeof(logFilename), "vessLog_%Y-%m-%d_%H-%M-%S.txt", tmp);
+	
+	vessLog log(logFilename);
+	log.enable_cout(false);
+	if (vess->isRunning()) vess->sceneManager->setLog(log);
+	
 
+	
+	// *************************************************************************
+	// loop:
+	
 	while (vess->isRunning())
 	{
 		sleep(1);

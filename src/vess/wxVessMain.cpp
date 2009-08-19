@@ -262,7 +262,9 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     wxLog::SetActiveTarget(new wxLogTextCtrl(logTextCtrl));
     //wxLogChain *LC = new wxLogChain(new wxLogStderr(logFile.fp()));
 
+/*
 
+// TODO
     vessLog log("vess.log");
     log.enable_wxlog(true);
     log.enable_cout(false);
@@ -270,7 +272,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     log << "Started vessLog" << std::endl;
 
     log << "Resources path: " << resourcesPath.mb_str() << std::endl;
-
+*/
 
 #if wxUSE_STD_IOSTREAM
     //redirector = new wxStreamToTextRedirector(logTextCtrl);

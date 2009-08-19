@@ -39,44 +39,18 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef VESSLOG_H_
-#define VESSLOG_H_
+#ifndef VESSLOGWX_H_
+#define VESSLOGWX_H_
 
 #include <iostream>
 #include <fstream>
-//#include <time.h>
-#include <sys/time.h>
+#include <time.h>
 #include <stdio.h>
 
+#include <wx/log.h>
+#include <wx/string.h>
+
 using namespace std;
-
-
-
-/* Subtract the `struct timeval' values X and Y, storing the result in RESULT.
- * Return 1 if the difference is negative, otherwise 0.
- */
-static int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
-{
-  // Perform the carry for the later subtraction by updating y:
-  if (x->tv_usec < y->tv_usec) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
-    y->tv_usec -= 1000000 * nsec;
-    y->tv_sec += nsec;
-  }
-  if (x->tv_usec - y->tv_usec > 1000000) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000;
-    y->tv_usec += 1000000 * nsec;
-    y->tv_sec -= nsec;
-  }
-
-  // Compute the time remaining to wait. tv_usec is certainly positive:
-  result->tv_sec = x->tv_sec - y->tv_sec;
-  result->tv_usec = x->tv_usec - y->tv_usec;
-
-  // Return 1 if result is negative:
-  return x->tv_sec < y->tv_sec;
-}
-
 
 // code from http://www.advogato.org/person/elanthis/diary/363.html
 
@@ -109,8 +83,6 @@ public:
 			cout << "Error: Could not open log file: " << logpath << endl;
 			exit(1);
 		}
-		
-		gettimeofday(&startTime, NULL);
 
 	}
 
@@ -130,10 +102,10 @@ public:
 	// logging modes:
 	bool bCOUT;
 	bool bFILE;
+	bool bWXLG;
+
 	
 private:
-	
-	struct timeval startTime;
 	
 	// spit out the time, priority, and the log buffer to cerr and logfile
 	int sync()
@@ -145,21 +117,11 @@ private:
 		char longTime[128];
 		strftime(shortTime, sizeof(shortTime), "%H:%M:%S", tmp);
 		strftime(longTime, sizeof(longTime), "%Y-%m-%d %H:%M:%S", tmp);
-		
-		// for more precise time:
-		struct timeval elapsedTime;
-		gettimeofday(&elapsedTime, NULL);
-		struct timeval dt;
-		timeval_subtract(&dt, &startTime, &elapsedTime);
-		
 
 		// now we stream the time, then the priority, then the message
 		if (bCOUT) cout << shortTime << ' ';
 		if (bFILE) logfile << longTime << ' ';
-		
-		logfile << (int)(-dt.tv_sec) << "." << (int)(dt.tv_usec) << ' ';
 
-		/*
 		switch (priority)
 		{
 		case INFO:
@@ -175,11 +137,18 @@ private:
 			if (bFILE) logfile << "[ERROR] ";
 			break;
 		}
-		*/
 
 
 		if (bCOUT) cout.write(pbase(), pptr() - pbase());
 		if (bFILE) logfile.write(pbase(), pptr() - pbase());
+		
+		if (bWXLG)
+		{
+			char wxBuf[1024];
+			strncpy( wxBuf, pbase(), pptr()-pbase() );
+			wxBuf[pptr()-pbase()-1] = '\0'; // remove the \n that comes from std::endl
+			wxLogMessage(wxString(wxBuf,wxConvUTF8));
+		}
 		
 		// flush output
 		if (bCOUT) cout.flush();
@@ -244,6 +213,11 @@ public:
 	void enable_logfile(bool b)
 	{
 		buf->bFILE = b;
+	}
+	
+	void enable_wxlog(bool b)
+	{
+		buf->bWXLG = b;
 	}
 
 	

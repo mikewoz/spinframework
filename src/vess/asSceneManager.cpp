@@ -53,6 +53,8 @@
 #include "asUtil.h"
 #include "osgUtil.h"
 
+
+
 #include "DebugVisitor.h"
 
 #include <lo/lo.h>
@@ -207,7 +209,15 @@ asSceneManager::~asSceneManager()
 
 }
 
+//void asSceneManager::setLog(const char* filename)
+void asSceneManager::setLog(vessLog &log)
+{
+	// remove existing callback:
+	
 
+			
+	lo_server_thread_add_method(rxServ, NULL, NULL, asSceneManagerCallback_log, &log);
+}
 
 void asSceneManager::setTXaddress (std::string addr, std::string port)
 {
@@ -1536,6 +1546,25 @@ int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **ar
 	return 1;
 }
 
+int asSceneManagerCallback_log(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+{
+	vessLog *log = (vessLog*) user_data;
+	
+	*log << path << ' ' << types << ' ';
+	for (int i=0; i<argc; i++)
+	{
+		if (lo_is_numerical_type((lo_type)types[i]))
+		{
+			*log << (float) lo_hires_val((lo_type)types[i], argv[i]);
+		} else {
+			*log << (const char*) argv[i];
+		}
+		*log << ' ';
+	}
+	*log << std::endl;
+
+	return 1;
+}
 
 int asSceneManagerCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {

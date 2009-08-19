@@ -52,9 +52,12 @@
 #include "asReferenced.h"
 #include "asMediaManager.h"
 #include "userNode.h"
+#include "vessLog.h"
 
 #include "lo/lo.h"
 #include "tinyxml.h"
+
+
 
 
 typedef std::vector< osg::ref_ptr<asReferenced> > nodeListType;
@@ -93,6 +96,9 @@ class asSceneManager
 		//lo_server_thread  txServ;
 
 		bool isSlave() { return (bool) !txServ; }
+		
+		//void setLogFile(const char *logfile);
+		void setLog(vessLog& log);
 
 		void setTXaddress (std::string addr, std::string port);
 		void sendSceneMessage(const char *types, ...);
@@ -186,8 +192,6 @@ class asSceneManager
 	private:
 		std::vector< osg::ref_ptr<asReferenced> > nodeList;
 		nodeMapType nodeMap; // the nodeList arranged by type
-		
-
 
 };
 
@@ -198,8 +202,9 @@ static bool nodeSortFunction (osg::ref_ptr<asReferenced> n1, osg::ref_ptr<asRefe
 
 static int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
 
-int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+int asSceneManagerCallback_log(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 int asSceneManagerCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+int asSceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 /**

@@ -51,7 +51,6 @@
 
 #include "asUtil.h"
 #include "vessThreads.h"
-#include "vessLog.h"
 
 using namespace std;
 

@@ -59,7 +59,6 @@
 
 #include "wxVessSettings.h"
 #include "wxVessEditor.h"
-#include "vessLog.h"
 #include <streambuf>
 
 class wxVessMain: public wxFrame
