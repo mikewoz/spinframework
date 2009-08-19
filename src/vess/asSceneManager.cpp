@@ -1567,7 +1567,7 @@ int asSceneManagerCallback_admin(const char *path, const char *types, lo_arg **a
 	}
 	else return 0;
 
-	std::cout << "in callback_admin. got method: " << theMethod << std::endl;
+	//std::cout << "in callback_admin. got method: " << theMethod << std::endl;
 
 	//pthread_mutex_lock(&pthreadLock);
 

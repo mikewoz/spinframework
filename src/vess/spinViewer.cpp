@@ -70,7 +70,7 @@ static osg::ref_ptr<asReferenced> userNode;
 
 
 
-static void registerUser(vessThread *vess)
+void registerUser(vessThread *vess)
 {
 	if (!userNode.valid())
 	{
@@ -84,7 +84,7 @@ static void registerUser(vessThread *vess)
 	// that will request that this function is called again
 	vess->sendSceneMessage("sss", "createNode", userNode->id->s_name, "userNode", LO_ARGS_END);
 
-	std::cout << "  Registered userNode '" << userNode->id->s_name << "' with VESS" << std::endl;
+	std::cout << "  Registered user '" << userNode->id->s_name << "' with VESS" << std::endl;
 
 }
 
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
 	
 	// register an extra OSC callback so that we can spy on OSC messages:
 	std::string OSCpath = "/vess/" + vess->id;
-	lo_server_thread_add_method(vess->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)&vess);
+	lo_server_thread_add_method(vess->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)vess);
 
 	
 	
