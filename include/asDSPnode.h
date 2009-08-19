@@ -71,7 +71,7 @@ public:
 		asDSPnode (asSceneManager *sceneManager, char *initID);
 		virtual ~asDSPnode();
 		
-		virtual void callbackUpdate();
+		//virtual void callbackUpdate();
 		
 		asSoundConnection *getConnection(asDSPnode *snk);
 		asSoundConnection *getConnection(const char *snk);
