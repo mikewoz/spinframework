@@ -54,6 +54,8 @@ userNode::userNode (asSceneManager *sceneManager, char *initID) : asBasicNode(sc
 
 	name = string(initID);
 	host = "localhost";
+	
+	setReportMode(asBasicNode::GLOBAL_6DOF);
 
 }
 

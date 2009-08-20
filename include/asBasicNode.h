@@ -77,6 +77,9 @@ public:
 	asBasicNode(asSceneManager *sceneManager, char *initID);
 	virtual ~asBasicNode();
 
+	
+	enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
+	
 	virtual void callbackUpdate();
 
 
@@ -98,6 +101,9 @@ public:
 	 */
 	void reportGlobals (int b);
 
+	
+	void setReportMode(globalsReportMode reportMode);
+	
 	/**
 	 * The local translation offset for this node with respect to it's parent
 	 */
@@ -131,6 +137,7 @@ public:
 
 
 	int getReportGlobals() { return (int)_reportGlobals; };
+	int getReportMode() { return (int) _reportMode; };
 	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
 	osg::Vec3 getVelocity() { return _velocity; };
@@ -174,6 +181,7 @@ public:
 
 private:
 	bool _reportGlobals;
+	globalsReportMode _reportMode;
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 	osg::Vec3 _velocity;
 	osg::Timer_t lastTick;

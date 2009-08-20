@@ -63,7 +63,9 @@ asBasicNode::asBasicNode (asSceneManager *sceneManager, char *initID) : asRefere
 	this->setName(string(id->s_name) + ".asBasicNode");
 
 	_reportGlobals = false;
+	_reportMode = asBasicNode::GLOBAL_6DOF;
 
+	
 	mainTransform = new osg::PositionAttitudeTransform();
 	mainTransform->setName(string(id->s_name) + ".mainTransform");
 	this->addChild(mainTransform.get());
@@ -151,6 +153,16 @@ void asBasicNode::reportGlobals (int b)
 	}
 }
 
+void asBasicNode::setReportMode (globalsReportMode mode)
+{
+	if (this->_reportMode != (bool)mode)
+	{
+		this->_reportMode = mode;
+		BROADCAST(this, "si", "setReportMode", (int) this->_reportMode);
+	}
+}
+
+
 
 void asBasicNode::setTranslation (float x, float y, float z)
 {
@@ -215,6 +227,10 @@ std::vector<lo_message> asBasicNode::getState ()
 	ret.push_back(msg);
 
 	msg = lo_message_new();
+	lo_message_add(msg, "si", "reportMode",(int) this->_reportMode);
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
 	v = this->getTranslation();
 	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
 	ret.push_back(msg);
@@ -243,7 +259,8 @@ bool asBasicNode::dumpGlobals(bool forced)
 	// very frequently and should NEVER be forced. The stateDump() method will
 	// however force an update of the current global parameters
 
-	if (this->_reportGlobals)
+	//if (this->_reportGlobals)
+	if (this->_reportMode)
 	{
 
 		// position & rotation: (should we get position from centre of boundingsphere?
@@ -256,25 +273,29 @@ bool asBasicNode::dumpGlobals(bool forced)
 
 			BROADCAST(this, "sffffff", "global6DOF", myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z());
 
-
-			osg::ComputeBoundsVisitor *vst = new osg::ComputeBoundsVisitor;
-			this->accept(*vst);
-			osg::BoundingBox bb = vst->getBoundingBox();
-			osg::Vec3 myScale = osg::Vec3(bb.xMax()-bb.xMin(), bb.yMax()-bb.yMin(), bb.zMax()-bb.zMin());
-			if ((myScale != this->_globalScale) || forced)
+			if (this->_reportMode == GLOBAL_ALL)
 			{
-				this->_globalScale = myScale;
-				BROADCAST(this, "sfff", "globalScale", _globalScale.x(), _globalScale.y(), _globalScale.z());
+				osg::ComputeBoundsVisitor *vst = new osg::ComputeBoundsVisitor;
+				this->accept(*vst);
+				osg::BoundingBox bb = vst->getBoundingBox();
+				osg::Vec3 myScale = osg::Vec3(bb.xMax()-bb.xMin(), bb.yMax()-bb.yMin(), bb.zMax()-bb.zMin());
+				if ((myScale != this->_globalScale) || forced)
+				{
+					this->_globalScale = myScale;
+					BROADCAST(this, "sfff", "globalScale", _globalScale.x(), _globalScale.y(), _globalScale.z());
+				}
 			}
 		}
 
 
-
-		const osg::BoundingSphere& bs = this->getBound();
-		if ((bs.radius() != _globalRadius) || forced)
+		if (this->_reportMode == GLOBAL_ALL)
 		{
-			_globalRadius = bs.radius();
-			BROADCAST(this, "sf", "globalRadius", _globalRadius);
+			const osg::BoundingSphere& bs = this->getBound();
+			if ((bs.radius() != _globalRadius) || forced)
+			{
+				_globalRadius = bs.radius();
+				BROADCAST(this, "sf", "globalRadius", _globalRadius);
+			}
 		}
 
 		return true;

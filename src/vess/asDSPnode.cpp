@@ -57,7 +57,8 @@ asDSPnode::asDSPnode (asSceneManager *sceneManager, char *initID) : asBasicNode(
 	nodeType = "asDSPnode";
 	
 	// enable reportGlobals by default:
-	reportGlobals(true);
+	//reportGlobals(true);
+	setReportMode(asBasicNode::GLOBAL_6DOF);
 	
 	// connection stuff:
 	connectTO.clear();
