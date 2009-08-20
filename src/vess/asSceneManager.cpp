@@ -994,7 +994,8 @@ std::string asSceneManager::getConnectionsAsXML()
 	ostringstream output("");
 	output << "<connections>\n";
 
-	// go through all asDSPnodes and save the connection info at end of file:
+	// go through all asDSPnodes (actually, all nodes that are subclasses of
+	// asDSPnode), and save the connection info at end of file:
 
 	nodeMapType::iterator it;
 	nodeListType::iterator iter;
@@ -1008,21 +1009,25 @@ std::string asSceneManager::getConnectionsAsXML()
 			// check if the nodeType is a subclass of asDSPnode:
 			if (t.getBaseType(0).getName() == "asDSPnode")
 			{
+
 				for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
 				{
 					osg::ref_ptr<asDSPnode> dspNode = dynamic_cast<asDSPnode*>((*iter).get());
-
-					vector<asSoundConnection*>::iterator connIter;
-					for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
+					
+					if ((*iter).valid())
 					{
-						// open tag for this node:
-						output << "<asSoundConnection id=" << (*connIter)->id->s_name << ">\n";
-
-						output << getStateAsXML( (*connIter)->getState() );
-
-						// close tag
-						output << "</asSoundConnection>";
-					}
+						vector<asSoundConnection*>::iterator connIter;
+						for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
+						{
+							// open tag for this node:
+							output << "<asSoundConnection id=" << (*connIter)->id->s_name << ">\n";
+	
+							output << getStateAsXML( (*connIter)->getState() );
+	
+							// close tag
+							output << "</asSoundConnection>";
+						}
+					} //else std::cout << "bad dspnode: " << (*iter)->id->s_name << std::endl;
 				}
 			}
 		}
