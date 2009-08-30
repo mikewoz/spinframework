@@ -46,7 +46,7 @@
 
 #include "vessWX.h"
 #include "wxVessMain.h"
-#include "vessThreads.h"
+#include "spinContext.h"
 #include "wxVessEditor.h"
 #include "wxVessRenderer.h"
 
@@ -56,7 +56,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 
-extern vessThread *vess;
+extern spinContext *spin;
 extern wxString resourcesPath;
 
 //(*InternalHeaders(wxVessFrame)
@@ -249,11 +249,11 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     mainSplitter->SetSashPosition(40);
 
     vessSettingsFrame = new wxVessSettings(0);
-    vessSettingsFrame->vessID->SetValue( wxString( vess->id.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->rxAddr->SetValue( wxString( vess->rxAddr.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->rxPort->SetValue( wxString( vess->rxPort.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->txAddr->SetValue( wxString( vess->txAddr.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->txPort->SetValue( wxString( vess->txPort.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->vessID->SetValue( wxString( spin->id.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->rxAddr->SetValue( wxString( spin->rxAddr.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->rxPort->SetValue( wxString( spin->rxPort.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->txAddr->SetValue( wxString( spin->txAddr.c_str(), wxConvUTF8 ));
+    vessSettingsFrame->txPort->SetValue( wxString( spin->txPort.c_str(), wxConvUTF8 ));
 
 
     //wxFFile logFile(wxT("vessWX.log"),wxT("w+"));
@@ -327,7 +327,7 @@ void wxVessMain::OnAbout(wxCommandEvent& event)
 
 void wxVessMain::OnLoadScene(wxCommandEvent& event)
 {
-    if (vess->isRunning())
+    if (spin->isRunning())
     {
 		wxFileDialog* d = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
 
@@ -335,12 +335,12 @@ void wxVessMain::OnLoadScene(wxCommandEvent& event)
 		{
 
 		    std::cout << "Loading scene from file: " << d->GetPath().mb_str() << std::endl;
-		   	//vess->sceneManager->loadXML( d->GetPath().mb_str() );
-		   	vess->sendSceneMessage("ss", "load", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
+		   	//spin->sceneManager->loadXML( d->GetPath().mb_str() );
+		   	spin->sendSceneMessage("ss", "load", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
 		}
     }
     else {
-	    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The VESS server needs to be started before you can load scenes."), wxT("VESS not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
+	    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The server needs to be started before you can load scenes."), wxT("SPIN not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
 	    dlg->ShowModal();
 	}
 
@@ -348,15 +348,15 @@ void wxVessMain::OnLoadScene(wxCommandEvent& event)
 
 void wxVessMain::OnSaveScene(wxCommandEvent& event)
 {
-    if (vess->isRunning())
+    if (spin->isRunning())
     {
 		wxFileDialog* d = new wxFileDialog( this, wxT("Save Scene"), wxT(""), wxT(""), wxT("*.xml"), wxSAVE, wxDefaultPosition);
 
 		if ( d->ShowModal() == wxID_OK )
 		{
-			vess->sendSceneMessage("ss", "save", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
+			spin->sendSceneMessage("ss", "save", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
 			/*
-		   	if (vess->sceneManager->saveXML( d->GetPath().mb_str() ))
+		   	if (spin->sceneManager->saveXML( d->GetPath().mb_str() ))
 		   	{
 		   		std::cout << "Saving scene to: " << d->GetPath().mb_str() << std::endl;
 		   	} else {
@@ -366,7 +366,7 @@ void wxVessMain::OnSaveScene(wxCommandEvent& event)
 		}
     }
     else {
-	    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("VESS server is not running, so no scene to save."), wxT("VESS not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
+	    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The server is not running, so no scene to save."), wxT("SPIN not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
 	    dlg->ShowModal();
 	}
 }
@@ -378,24 +378,24 @@ void wxVessMain::OnShowConfig(wxCommandEvent& event)
 
 void wxVessMain::OnShowEditor(wxCommandEvent& event)
 {
-    if (vess->isRunning())
+    if (spin->isRunning())
     {
         wxVessEditor* vessEditor = new wxVessEditor(0);
         vessEditor->Show();
     } else {
-        wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The VESS server needs to be started before you can launch the editor."), wxT("VESS not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
+        wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The server needs to be started before you can launch the editor."), wxT("SPIN not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
         dlg->ShowModal();
     }
 }
 
 void wxVessMain::OnShowRenderer(wxCommandEvent& event)
 {
-    if (vess->isRunning())
+    if (spin->isRunning())
     {
         wxVessRenderer* vessRenderer = new wxVessRenderer(0);
         vessRenderer->Show();
     } else {
-        wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The VESS server needs to be started before you can launch the viewer."), wxT("VESS not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
+        wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The server needs to be started before you can launch the viewer."), wxT("SPIN not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
         dlg->ShowModal();
     }
 }
@@ -405,19 +405,19 @@ void wxVessMain::OnStartStopToggle(wxCommandEvent& event)
 {
     if (event.IsChecked())
     {
-        vess->id = std::string(vessSettingsFrame->vessID->GetValue().mb_str());
-        vess->rxAddr = std::string(vessSettingsFrame->rxAddr->GetValue().mb_str());
-        vess->rxPort = std::string(vessSettingsFrame->rxPort->GetValue().mb_str());
-        vess->txAddr = std::string(vessSettingsFrame->txAddr->GetValue().mb_str());
-        vess->txPort = std::string(vessSettingsFrame->txPort->GetValue().mb_str());
+        spin->id = std::string(vessSettingsFrame->vessID->GetValue().mb_str());
+        spin->rxAddr = std::string(vessSettingsFrame->rxAddr->GetValue().mb_str());
+        spin->rxPort = std::string(vessSettingsFrame->rxPort->GetValue().mb_str());
+        spin->txAddr = std::string(vessSettingsFrame->txAddr->GetValue().mb_str());
+        spin->txPort = std::string(vessSettingsFrame->txPort->GetValue().mb_str());
 
-        if (vessRadio_master->GetValue()) vess->setMode(vessThread::SERVER_MODE);
-        else vess->setMode(vessThread::LISTENER_MODE);
+        if (vessRadio_master->GetValue()) spin->setMode(spinContext::SERVER_MODE);
+        else spin->setMode(spinContext::LISTENER_MODE);
 
-        vess->start();
+        spin->start();
 
         // we want the viewer to be able to show all graphical items:
-        vess->sceneManager->isGraphical = true;
+        spin->sceneManager->setGraphical(true);
 
         StartStop->SetLabel(wxT("Stop"));
 
@@ -425,7 +425,7 @@ void wxVessMain::OnStartStopToggle(wxCommandEvent& event)
 
     else {
         // TODO: close all other frames (viewer, editor)
-        vess->stop();
+        spin->stop();
         StartStop->SetLabel(wxT("Start"));
     }
 }
@@ -438,7 +438,7 @@ void wxVessMain::OnClose(wxCloseEvent& event)
 
     if ( dlg->ShowModal() == wxID_OK )
     {
-        vess->stop();
+        spin->stop();
 
         if (vessSettingsFrame) vessSettingsFrame->Destroy();
         //if (vessRenderer) vessRenderer->Destroy();
@@ -452,5 +452,5 @@ void wxVessMain::OnClose(wxCloseEvent& event)
 void wxVessMain::OnVessModeChange(wxCommandEvent& event)
 {
 
-    std::cout << "Changed modes for VESS. You must stop and restart before this takes effect." << std::endl;
+    std::cout << "Changed modes for SPIN. You must stop and restart before this takes effect." << std::endl;
 }

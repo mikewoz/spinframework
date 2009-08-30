@@ -58,8 +58,8 @@
 #include <osgGA/TrackballManipulator>
 #include <osgViewer/ViewerEventHandlers>
 
-#include "vessThreads.h"
-extern vessThread *vess;
+#include "spinContext.h"
+extern spinContext *spin;
 extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
@@ -121,7 +121,7 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
     viewer = new osgViewer::Viewer;
     viewer->getCamera()->setGraphicsContext(gw);
     viewer->getCamera()->setViewport(0,0,size.GetWidth(),size.GetHeight());
-    viewer->setSceneData(vess->sceneManager->rootNode.get());
+    viewer->setSceneData(spin->sceneManager->rootNode.get());
     viewer->addEventHandler(new osgViewer::StatsHandler);
     viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
     viewer->setCameraManipulator(new osgGA::TrackballManipulator);
@@ -138,7 +138,7 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
     view->getCamera()->setGraphicsContext(gw);
     view->getCamera()->setViewport(0,0,200,200);//size.GetWidth(),size.GetHeight());
     view->getCamera()->setClearColor(osg::Vec4(0,0,0,0));
-    view->setSceneData(vess->sceneManager->rootNode.get());
+    view->setSceneData(spin->sceneManager->rootNode.get());
 
 
     // add the view:
@@ -157,7 +157,7 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
 	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::TRACKBALL );
 
-	manipulator->setTrackNode(vess->sceneManager->rootNode.get());
+	manipulator->setTrackNode(spin->sceneManager->rootNode.get());
 
 
 	view->setCameraManipulator(manipulator);
@@ -202,7 +202,7 @@ void wxVessRenderer::OnIdle(wxIdleEvent &event)
 
 /*
     pthread_mutex_lock(&pthreadLock);
-    vess->sceneManager->updateGraph();
+    spin->sceneManager->updateGraph();
     pthread_mutex_unlock(&pthreadLock);
 */
 
@@ -439,9 +439,9 @@ void wxVessRenderer::OnGridToggle(wxCommandEvent& event)
     if (event.IsChecked())
     {
         std::cout << "enabled grid" << std::endl;
-        vess->sceneManager->setGrid(10);
+        spin->sceneManager->setGrid(10);
     } else {
         std::cout << "disabled grid" << std::endl;
-        vess->sceneManager->setGrid(0);
+        spin->sceneManager->setGrid(0);
     }
 }

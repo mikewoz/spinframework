@@ -41,10 +41,10 @@
 
 #include "wxVessEditor.h"
 
-#include "vessThreads.h"
+#include "spinContext.h"
 #include <wx/choicdlg.h>
 
-extern vessThread *vess;
+extern spinContext *spin;
 extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
@@ -144,7 +144,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
     pFont.SetPointSize(9.0f);
     vessTree->SetFont(pFont);
 
-	vessTree->BuildTree(vess->sceneManager->worldNode.get());
+	vessTree->BuildTree(spin->sceneManager->worldNode.get());
 
 	// provide VessTree with a pointer to VessPropGrid so that it can fill it:
 	vessTree->SetPropGrid(VessPropGrid);
@@ -155,20 +155,20 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
     // channel and not to vessChannel directly. This is because VESS might
     // broadcast different messages than it receives (eg, it receives a 'move'
     // message, but will transmit a 'setTranslation' message).
-    if (vess->sceneManager->isSlave())
+    if (spin->sceneManager->isSlave())
     {
         // if this sceneManager is already a listener, then we can just hijack
         // the rxServ and add our own method callbacks.
-        listeningServer = vess->sceneManager->rxServ;
+        listeningServer = spin->sceneManager->rxServ;
     }
     else
     {
         // if this sceneManager is a server, then we have to create a new server
         // that listens to the messages it is broadcasting
-        if (isMulticastAddress(vess->txAddr))
-            listeningServer = lo_server_thread_new_multicast(vess->txAddr.c_str(), vess->txPort.c_str(), oscParser_error);
+        if (isMulticastAddress(spin->txAddr))
+            listeningServer = lo_server_thread_new_multicast(spin->txAddr.c_str(), spin->txPort.c_str(), oscParser_error);
         else
-            listeningServer = lo_server_thread_new(vess->txPort.c_str(), oscParser_error);
+            listeningServer = lo_server_thread_new(spin->txPort.c_str(), oscParser_error);
         lo_server_thread_start(listeningServer);
     }
 
@@ -194,7 +194,7 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
 
     std::vector<std::string>::iterator it;
-    for ( it=vess->sceneManager->nodeTypes.begin(); it!=vess->sceneManager->nodeTypes.end(); it++)
+    for ( it=spin->sceneManager->nodeTypes.begin(); it!=spin->sceneManager->nodeTypes.end(); it++)
 	{
         allTypes.Add(wxString( (*it).c_str(), wxConvUTF8 ));
 	}
@@ -209,7 +209,7 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
         if (nodeID.IsEmpty()) return;
 
-        if ( vess->sceneManager->getNode(std::string(nodeID.mb_str())) )
+        if ( spin->sceneManager->getNode(std::string(nodeID.mb_str())) )
         {
             wxMessageBox(wxT("That node ID already exists. Please try another."), wxT("Oops"), wxOK|wxICON_ERROR);
         }
@@ -219,9 +219,9 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
         	/*
             lo_message msg = lo_message_new();
             lo_message_add(msg, "sss", "createNode", (const char*)nodeID.mb_str(), (const char*)nodeType.mb_str());
-            vess->sendSceneMessage(msg);
+            spin->sendSceneMessage(msg);
             */
-        	vess->sendSceneMessage("sss", "createNode", (const char*)nodeID.mb_str(), (const char*)nodeType.mb_str(), LO_ARGS_END);
+        	spin->sendSceneMessage("sss", "createNode", (const char*)nodeID.mb_str(), (const char*)nodeType.mb_str(), LO_ARGS_END);
 
             done = true;
 
@@ -236,9 +236,9 @@ void wxVessEditor::OnRefresh(wxCommandEvent& event)
 	/*
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "refresh");
-    vess->sceneMessage(msg);
+    spin->sceneMessage(msg);
     */
-	vess->sendSceneMessage("s", "refresh", LO_ARGS_END);
+	spin->sendSceneMessage("s", "refresh", LO_ARGS_END);
 }
 
 void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
@@ -246,14 +246,14 @@ void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
 	/*
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "debug");
-    vess->sceneMessage(msg);
+    spin->sceneMessage(msg);
     */
 
     // local print:
-    vess->sceneManager->debug();
+    spin->sceneManager->debug();
 
     // remote print:
-    vess->sendSceneMessage("s", "debug", LO_ARGS_END);
+    spin->sendSceneMessage("s", "debug", LO_ARGS_END);
 }
 
 void wxVessEditor::OnClear(wxCommandEvent& event)
@@ -265,9 +265,9 @@ void wxVessEditor::OnClear(wxCommandEvent& event)
     	/*
         lo_message msg = lo_message_new();
         lo_message_add_string(msg, "clear");
-        vess->sceneMessage(msg);
+        spin->sceneMessage(msg);
         */
-        vess->sendSceneMessage("s", "clear", LO_ARGS_END);
+        spin->sendSceneMessage("s", "clear", LO_ARGS_END);
 
     }
 }
@@ -283,9 +283,9 @@ void wxVessEditor::OnDeleteNode(wxCommandEvent& event)
         	/*
             lo_message msg = lo_message_new();
             lo_message_add(msg, "ss", "deleteNode", (const char*)n->id->s_name);
-            vess->sceneMessage(msg);
+            spin->sceneMessage(msg);
             */
-            vess->sendSceneMessage("ss", "deleteNode", (const char*)n->id->s_name, LO_ARGS_END);
+            spin->sendSceneMessage("ss", "deleteNode", (const char*)n->id->s_name, LO_ARGS_END);
         }
     } else {
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("You must select a node from the tree first"), wxT("Delete Node?"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);

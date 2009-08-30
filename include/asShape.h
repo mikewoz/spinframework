@@ -151,7 +151,7 @@ public:
 
 	//osg::Vec3 _orientation;
 
-	osg::ref_ptr<osg::Image> texturePointer; // store texturePointer so we don't waste time in the callback
+	osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
 
 
 	osg::ref_ptr<osg::PositionAttitudeTransform> shapeTransform;
@@ -164,7 +164,7 @@ public:
 private:
 
 	void drawShape();
-	void drawTexture();
+	virtual void drawTexture();
 
 };
 

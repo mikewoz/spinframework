@@ -51,9 +51,9 @@ using namespace std;
 userNode::userNode (asSceneManager *sceneManager, char *initID) : asBasicNode(sceneManager, initID)
 {
 	nodeType = "userNode";
+	this->setName(string(id->s_name) + ".userNode");
 
-	name = string(initID);
-	host = "localhost";
+	_description = string(initID);
 	
 	setReportMode(asBasicNode::GLOBAL_6DOF);
 
@@ -72,16 +72,10 @@ userNode::~userNode()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
-void userNode::setName (const char *newvalue)
+void userNode::setDescription (const char *newvalue)
 {
-	name = string(newvalue);
-	BROADCAST(this, "ss", "setName", getName());
-}
-
-void userNode::setHost (const char *newvalue)
-{
-	host = string(newvalue);
-	BROADCAST(this, "ss", "setHost", getHost());
+	_description = string(newvalue);
+	BROADCAST(this, "ss", "setDescription", getDescription());
 }
 
 
@@ -93,12 +87,9 @@ std::vector<lo_message> userNode::getState ()
 	lo_message msg;
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setName", getName());
+	lo_message_add(msg, "ss", "setDescription", getDescription());
 	ret.push_back(msg);
 
-	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setHost", getHost());
-	ret.push_back(msg);
 
 	return ret;
 }

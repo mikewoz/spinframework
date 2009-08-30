@@ -73,8 +73,8 @@
 
 //#include <osgField/Manager>
 
-#include "vessThreads.h"
-extern vessThread *vess;
+#include "spinContext.h"
+extern spinContext *spin;
 extern wxString resourcesPath;
 
 using namespace osgIntrospection;
@@ -180,12 +180,12 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
             // first remove the previously registered method:
             if (currentNode.valid())
             {
-                oscPattern = "/vess/" + vess->id + "/" + std::string(currentNode->id->s_name);
+                oscPattern = "/vess/" + spin->id + "/" + std::string(currentNode->id->s_name);
                 lo_server_del_method_with_userdata(lo_server_thread_get_server(listeningServer), oscPattern.c_str(), NULL, (void*)this);
             }
 
             // add the new method:
-            oscPattern = "/vess/" + vess->id + "/" + std::string(newNode->id->s_name);
+            oscPattern = "/vess/" + spin->id + "/" + std::string(newNode->id->s_name);
             lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessPropGrid_liblo_callback, (void*)this);
         }
 
@@ -411,7 +411,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                         }
                         else
                         {
-                            helpText += wxT("OSC: /vess/") + wxString(vess->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
+                            helpText += wxT("OSC: /vess/") + wxString(spin->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
                             helpText += wxT(" ") + methodName + wxT(" <");
                             for (ParameterInfoList::const_iterator paramIter2=params.begin(); paramIter2!=params.end(); paramIter2++)
                             {
@@ -451,7 +451,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                 //std::cout << "composed value for " << methodName.mb_str() << "= " << composedValue.mb_str() << std::endl;
 
                 helpText = wxT("");
-                helpText += wxT("OSC: /vess/") + wxString(vess->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
+                helpText += wxT("OSC: /vess/") + wxString(spin->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
                 helpText += wxT(" ") + methodName + wxT(" <");
                 for (ParameterInfoList::const_iterator paramIter2=params.begin(); paramIter2!=params.end(); paramIter2++)
                 {
@@ -520,7 +520,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
         lo_message_add_wxProp( msg, id, event.GetValue() );
     }
 
-	vess->sendNodeMessage(currentNode->id, msg);
+	spin->sendNodeMessage(currentNode->id, msg);
 
 	// prevent event from propagating:
 	//event.Veto();

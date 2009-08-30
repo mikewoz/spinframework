@@ -51,7 +51,7 @@
 #include "wxVessEditor.h"
 #include "vessThreads.h"
 
-extern vessThread *vess;
+extern spinContext *spin;
 extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
@@ -112,7 +112,7 @@ void wxVessTreeCtrl::setListeningServer(lo_server_thread t)
     // we can dynamically update the tree based on OSC messages:
     if (listeningServer)
     {
-        std::string oscPattern = "/vess/" + vess->id;
+        std::string oscPattern = "/vess/" + spin->id;
         lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessTreeCtrl_liblo_callback, (void*)this);
     }
 }
@@ -144,7 +144,7 @@ void wxVessTreeCtrl::Refresh()
     // TODO: more efficient method that compares existing tree to VESS, and adds
     // or removes nodes accordingly while keeping the existing ones
 
-    BuildTree(vess->sceneManager->worldNode.get());
+    BuildTree(spin->sceneManager->worldNode.get());
 }
 
 void wxVessTreeCtrl::addToTree(asReferenced *n, wxTreeItemId parentID)
@@ -166,13 +166,13 @@ void wxVessTreeCtrl::addNode(const char *id, const char *type)
     // note that a createNode message was broadcast from vess AFTER the node was
     // instantiated, so we should now be able to find it in the sceneManager,
     // and so we'll create a tree item (if it doesn't already exist).
-    asReferenced *n = vess->sceneManager->getNode(id, type);
+    asReferenced *n = spin->sceneManager->getNode(id, type);
     if (!n) return;
 
     wxTreeItemId nodeInTree = GetTreeItem(n, GetRootItem());
     if (!nodeInTree)
     {
-        asReferenced *parentNode = vess->sceneManager->getNode(n->getParent(), type);
+        asReferenced *parentNode = spin->sceneManager->getNode(n->getParent(), type);
         wxTreeItemId parentInTree = GetTreeItem(n, GetRootItem());
         if (parentInTree) addToTree(n,parentInTree);
         else addToTree(n,GetRootItem());
@@ -386,9 +386,9 @@ void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
         	/*
             lo_message msg = lo_message_new();
             lo_message_add(msg, "ss", "setParent", parentString.c_str());
-            vess->nodeMessage(child->id, msg);
+            spin->nodeMessage(child->id, msg);
             */
-            vess->sendNodeMessage(child->id, "ss", "setParent", parentString.c_str(), LO_ARGS_END);
+            spin->sendNodeMessage(child->id, "ss", "setParent", parentString.c_str(), LO_ARGS_END);
 
         }
     }

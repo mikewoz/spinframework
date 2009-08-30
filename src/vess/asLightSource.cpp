@@ -170,7 +170,7 @@ void asLightSource::setSpecular (float r, float g, float b, float a)
 // *****************************************************************************
 void asLightSource::drawLight()
 {
-	if (!sceneManager->isGraphical) return;
+	if (!sceneManager->isGraphical()) return;
 
 	osg::Light *light;
 	osg::StateSet* thisStateSet = sceneManager->rootNode->getOrCreateStateSet();

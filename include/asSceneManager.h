@@ -97,6 +97,9 @@ class asSceneManager
 
 		bool isSlave() { return (bool) !txServ; }
 		
+		void setGraphical(bool b) { graphicalMode = b; }
+		bool isGraphical() { return (bool) graphicalMode; }
+		
 		//void setLogFile(const char *logfile);
 		void setLog(vessLog& log);
 
@@ -161,7 +164,7 @@ class asSceneManager
 		 *   graph that are needed for GUIs and information servers. Eg, lights
 		 *   are not created.
 		 */
-		bool isGraphical;
+		bool graphicalMode;
 
 		osg::ref_ptr<asBasicNode> globalObserver;
 
@@ -232,7 +235,7 @@ void oscParser_error(int num, const char *msg, const char *path);
 
 
 #define BROADCAST(pNode, types, ...) \
-	if (sceneManager->txServ) lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneManager->sceneID+"/"+string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
+	if (sceneManager->txServ) lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/vess/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
 
 
 class asSceneClearVisitor : public osg::NodeVisitor

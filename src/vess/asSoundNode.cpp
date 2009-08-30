@@ -59,6 +59,7 @@ using namespace std;
 asSoundNode::asSoundNode (asSceneManager *sceneManager, char *initID) : asDSPnode(sceneManager, initID)
 {
 	nodeType = "asSoundNode";
+	this->setName(string(id->s_name) + ".asSoundNode");
 
 	_rolloff = "default";
 	_spread = 1.0f;

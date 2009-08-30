@@ -46,7 +46,7 @@
 #include <osgDB/ReadFile>
 #include <osg/Timer>
 
-#include "vessThreads.h"
+#include "spinContext.h"
 #include "vessLog.h"
 
 
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 {
 
 
-	vessThread *vess = new vessThread(vessThread::SERVER_MODE);
+	spinContext *spin = new spinContext(spinContext::SERVER_MODE);
 
 
 	// *************************************************************************
@@ -70,15 +70,15 @@ int main(int argc, char **argv)
 	osg::ArgumentParser arguments(&argc,argv);
 
 	// set up the usage document, which a user can acess with -h or --help
-	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is the Virtual Environment State Server.");
+	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options]");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify a unique ID for this vess scene.");
-	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <addr>", "Set the transmission address where vess sends update (Default is broadcast: " + vess->txAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-txPort <port>", "Set the transmission port where vess sends updates (Default: " + vess->txPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + vess->rxAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-rxPort <port>", "Set the receiving port for incoming OSC messages (Default: " + vess->rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify a unique ID for this scene.");
+	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <addr>", "Set the transmission address where the server sends update (Default is broadcast: " + spin->txAddr + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-txPort <port>", "Set the transmission port where the server sends updates (Default: " + spin->txPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin->rxAddr + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-rxPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin->rxPort + ")");
 
 	// PARSE ARGS:
 
@@ -88,15 +88,15 @@ int main(int argc, char **argv)
 		arguments.getApplicationUsage()->write(std::cout);
 		return 1;
 	}
-	osg::ArgumentParser::Parameter param_vessID(vess->id);
-	arguments.read("-id", param_vessID);
-	osg::ArgumentParser::Parameter param_txAddr(vess->txAddr);
+	osg::ArgumentParser::Parameter param_spinID(spin->id);
+	arguments.read("-id", param_spinID);
+	osg::ArgumentParser::Parameter param_txAddr(spin->txAddr);
 	arguments.read("-txAddr", param_txAddr);
-	osg::ArgumentParser::Parameter param_txPort(vess->txPort);
+	osg::ArgumentParser::Parameter param_txPort(spin->txPort);
 	arguments.read("-txPort", param_txPort);
-	osg::ArgumentParser::Parameter param_rxAddr(vess->rxAddr);
+	osg::ArgumentParser::Parameter param_rxAddr(spin->rxAddr);
 	arguments.read("-rxAddr", param_rxAddr);
-	osg::ArgumentParser::Parameter param_rxPort(vess->rxPort);
+	osg::ArgumentParser::Parameter param_rxPort(spin->rxPort);
 	arguments.read("-rxPort", param_rxPort);
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
@@ -118,10 +118,10 @@ int main(int argc, char **argv)
 
 	if (argScene.valid()) {
 		std::cout << "Loading sample model" << std::endl;
-		vess->sceneManager->rootNode->addChild(argScene.get());
+		spin->sceneManager->rootNode->addChild(argScene.get());
 	}
 
-	vess->start();
+	spin->start();
 
 	
 	// *************************************************************************
@@ -130,18 +130,18 @@ int main(int argc, char **argv)
 	time_t t = time(NULL);
 	tm* tmp = localtime(&t);
 	char logFilename[128];
-	strftime(logFilename, sizeof(logFilename), "vessLog_%Y-%m-%d_%H-%M-%S.txt", tmp);
+	strftime(logFilename, sizeof(logFilename), "spinLog_%Y-%m-%d_%H-%M-%S.txt", tmp);
 	
 	vessLog log(logFilename);
 	log.enable_cout(false);
-	if (vess->isRunning()) vess->sceneManager->setLog(log);
+	if (spin->isRunning()) spin->sceneManager->setLog(log);
 	
 
 	
 	// *************************************************************************
 	// loop:
 	
-	while (vess->isRunning())
+	while (spin->isRunning())
 	{
 		sleep(1);
 		// loop until a quit message is received (TODO)

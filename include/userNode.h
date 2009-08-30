@@ -69,13 +69,11 @@ class userNode : public asBasicNode
 		virtual ~userNode();
 
 		// SET methods:
-		void setName (const char *name);
-		void setHost (const char *hostname);
+		void setDescription (const char *s);
 
 
 		// GET methods:
-		const char* getName() { return name.c_str(); }
-		const char* getHost() { return host.c_str(); }
+		const char* getDescription() { return _description.c_str(); }
 
 
 		/**
@@ -101,8 +99,7 @@ class userNode : public asBasicNode
 
 	private:
 
-		std::string name;
-		std::string host;
+		std::string _description;
 
 };
 

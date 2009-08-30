@@ -49,7 +49,7 @@
 #include <wx/string.h>
 #include <wx/stdpaths.h>
 
-#include "vessThreads.h"
+#include "spinContext.h"
 
 //(*AppHeaders
 #include "wxVessMain.h"
@@ -59,7 +59,7 @@
 IMPLEMENT_APP(vessWX);
 
 
-vessThread *vess; // global
+spinContext *spin; // global
 wxString resourcesPath; // global
 
 bool vessWX::OnInit()
@@ -68,7 +68,7 @@ bool vessWX::OnInit()
     if (!wxApp::OnInit())
         return false;
 
-	vess = new vessThread();
+	spin = new spinContext();
 
 	// override infoPort based on environment variable:
 	/*

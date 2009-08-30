@@ -96,7 +96,7 @@ asSceneManager::asSceneManager (std::string id, std::string addr, std::string po
 
 	this->sceneID = id;
 
-	isGraphical = false;
+	graphicalMode = false;
 
 
 	rxAddr = lo_address_new(addr.c_str(), port.c_str());

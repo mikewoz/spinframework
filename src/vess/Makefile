@@ -25,13 +25,14 @@ apps: spin.app spinViewer.app
 
 vpath %.cpp .  ../tinyxml
 
-OBJS =  vessThreads.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
+OBJS =  spinContext.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
  	findNodeVisitor.o DebugVisitor.o  \
 	tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \
 	asSceneManager.o asMediaManager.o asReferenced.o \
 	asBasicNode.o asShape.o asModel.o asVideo.o asLightSource.o asRay.o \
 	asContour.o asConstraints.o asRayIntersector.o asPointer.o \
 	asMeasurementNode.o asToggle.o userNode.o \
+	sharedVideoNode.o sharedVideoBuffer.o \
 	asDSPnode.o asSoundNode.o asSoundSpace.o asSoundConnection.o \
 	asCameraView.o asCameraManager.o asWindow.o
 
@@ -76,7 +77,7 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 
 %.o: %.cpp
 	@echo "--------------- compiling $@ ---------------" 
-	$(CXX) $(OSG_INCLUDE) $(WX_CXXFLAGS) $(SPIN_FLAGS) $(SPIN_INCLUDE) -c $< -o $@
+	$(CXX) $(OSG_INCLUDE) $(WX_CXXFLAGS) $(SPIN_FLAGS) $(SPIN_INCLUDE) $(BOOST_INCLUDE) -c $< -o $@
 
 ###################################################################
 # TARGETS:
@@ -86,21 +87,24 @@ ALLTARGETS = docGenerator spinViewer vess spin
 doc: docGenerator
 docGenerator: $(OBJS) docGenerator.o
 	@echo "\n------------- Generating OSC Documentation: -------------" 
-	$(CXX) -o docGenerator $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
+	$(CXX) -o docGenerator $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
 	./docGenerator
 	-cp *.html ../../doxygen/html
 
 spinViewer: $(OBJS) spinViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
 
 vess: $(OBJS) vess.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
 
 spin: $(OBJS) $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ -lSPIN $(WX_LIBS) $(OSG_LIBS) $(SPIN_LIBS)
+	$(CXX) -o $@ $^ -lSPIN $(WX_LIBS) $(OSG_LIBS) $(BOOST_LIBS) $(SPIN_LIBS)
+
+bullet-test: bullet-test.o
+	$(CXX) -o $@ $^ $(OSG_LIBS) -lbulletdynamics -lbulletcollision -lLinearMath -L/usr/local/include/BulletCollision 
 
 spin.app: spin
 	@echo "\n--------------- Building $@: ---------------" 

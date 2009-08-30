@@ -323,6 +323,9 @@ void asShape::drawShape()
 void asShape::drawTexture()
 {
 
+	if (!sceneManager->isGraphical()) return;
+	
+	
 	//std::cout << "debug texturepath: " << texturePath <<  std::endl;
 
 
@@ -338,8 +341,8 @@ void asShape::drawTexture()
 	{
 
 		//osg::ref_ptr<osg::Image> image;
-		texturePointer = osgDB::readImageFile( getAbsolutePath(texturePath).c_str() );
-		if (texturePointer.valid())
+		textureImage = osgDB::readImageFile( getAbsolutePath(texturePath).c_str() );
+		if (textureImage.valid())
 		{
 
 			// old:
@@ -347,7 +350,7 @@ void asShape::drawTexture()
 			shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
 			osg::Texture2D* shapeTexture = new osg::Texture2D();
 			shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-			shapeTexture->setImage(texturePointer.get());
+			shapeTexture->setImage(textureImage.get());
 			shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
 			shapeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 			*/
@@ -355,7 +358,7 @@ void asShape::drawTexture()
 
 			osg::Texture2D* shapeTexture = new osg::Texture2D();
 			shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-			shapeTexture->setImage(texturePointer.get());
+			shapeTexture->setImage(textureImage.get());
 
 			//osg::StateSet *shapeStateSet = new osg::StateSet();
 			osg::StateSet *shapeStateSet = shapeGeode->getOrCreateStateSet();

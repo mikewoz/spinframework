@@ -105,6 +105,11 @@ else
 endif
 
 
+###################################################################
+# For BOOST:
+
+BOOST_INCLUDE = -I/usr/include/boost -I/opt/local/include/boost-1_35
+BOOST_LIBS = -lboost_thread-mt
 
 ###################################################################
 # For WX:

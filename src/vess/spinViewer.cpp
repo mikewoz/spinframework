@@ -56,8 +56,8 @@
 
 
 #include "asUtil.h"
-#include "vessThreads.h"
-#include "asCameraManager.h"
+#include "spinContext.h"
+//#include "asCameraManager.h"
 
 using namespace std;
 
@@ -70,7 +70,7 @@ static osg::ref_ptr<asReferenced> userNode;
 
 
 
-void registerUser(vessThread *vess)
+void registerUser(spinContext *spin)
 {
 	if (!userNode.valid())
 	{
@@ -79,12 +79,12 @@ void registerUser(vessThread *vess)
 	}
 	
 	
-	// Send a message to vess that creates this node (assumes that the server
+	// Send a message to the server to create this node (assumes that the server
 	// is running). If not, it will send a 'userRefresh' method upon startup
 	// that will request that this function is called again
-	vess->sendSceneMessage("sss", "createNode", userNode->id->s_name, "userNode", LO_ARGS_END);
+	spin->sendSceneMessage("sss", "createNode", userNode->id->s_name, "userNode", LO_ARGS_END);
 
-	std::cout << "  Registered user '" << userNode->id->s_name << "' with VESS" << std::endl;
+	std::cout << "  Registered user '" << userNode->id->s_name << "' with SPIN" << std::endl;
 
 }
 
@@ -97,9 +97,8 @@ static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg
     // make sure there is at least one argument (ie, a method):
 	if (!argc) return 0;
 
-	vessThread *vess = (vessThread*)user_data;
-    if (!vess) return 0;
-
+	spinContext *spin = (spinContext*)user_data;
+    if (!spin) return 0;
 
 	// get the method (argv[0]):
     std::string theMethod;
@@ -124,7 +123,7 @@ static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg
 
 	if (theMethod=="userRefresh")
 	{
-		registerUser(vess);
+		registerUser(spin);
 	}
 		
 		
@@ -152,7 +151,7 @@ int main(int argc, char **argv)
 {
 	std::cout <<"\nspinViewer launching..." << std::endl;
 
-	vessThread *vess = new vessThread(vessThread::LISTENER_MODE);
+	spinContext *spin = new spinContext(spinContext::LISTENER_MODE);
 
 
 	std::cout <<"  OSG_LIBRARY_PATH=" << getenv("OSG_LIBRARY_PATH") << std::endl;
@@ -166,15 +165,15 @@ int main(int argc, char **argv)
 	osg::ArgumentParser arguments(&argc,argv);
 
 	// set up the usage document, which a user can acess with -h or --help
-	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a 3D viewer for VESS.");
+	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a 3D viewer for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options]");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify an ID for this viewer (Default is hostname: '" + id + "')");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-vessID <uniqueID>", "Specify the VESS scene ID to listen to (Default: '" + vess->id + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("-vessAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + vess->rxAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-vessPort <port>", "Set the receiving port for incoming OSC messages (Default: " + vess->rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + spin->id + "')");
+	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin->rxAddr + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin->rxPort + ")");
 
 
 	// *************************************************************************
@@ -189,12 +188,12 @@ int main(int argc, char **argv)
 
 	osg::ArgumentParser::Parameter param_id(id);
 	arguments.read("-id", param_id);
-	osg::ArgumentParser::Parameter param_vessID(vess->id);
-	arguments.read("-vessID", param_vessID);
-	osg::ArgumentParser::Parameter param_vessAddr(vess->rxAddr);
-	arguments.read("-vessAddr", param_vessAddr);
-	osg::ArgumentParser::Parameter param_vessPort(vess->rxPort);
-	arguments.read("-vessPort", param_vessPort);
+	osg::ArgumentParser::Parameter param_spinID(spin->id);
+	arguments.read("-sceneID", param_spinID);
+	osg::ArgumentParser::Parameter param_spinAddr(spin->rxAddr);
+	arguments.read("-serverAddr", param_spinAddr);
+	osg::ArgumentParser::Parameter param_spinPort(spin->rxPort);
+	arguments.read("-serverPort", param_spinPort);
 
 
 
@@ -213,31 +212,31 @@ int main(int argc, char **argv)
 
 
 	// *************************************************************************
-	// start the vessListener thread:
+	// start the listener thread:
 
-	if (!vess->start())
+	if (!spin->start())
 	{
-        std::cout << "ERROR: could not start vessThread" << std::endl;
+        std::cout << "ERROR: could not start spin threads" << std::endl;
         exit(1);
 	}
 
-	vess->sceneManager->isGraphical = true;
+	spin->sceneManager->setGraphical(true);
 
 	
 	// register an extra OSC callback so that we can spy on OSC messages:
-	std::string OSCpath = "/vess/" + vess->id;
-	lo_server_thread_add_method(vess->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)vess);
+	std::string OSCpath = "/vess/" + spin->id;
+	lo_server_thread_add_method(spin->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)spin);
 
 	
 	
 	
 	// Add a userNode to the local scene and use it to feed a NodeTracker for
-	// the viewer's camera. We expect that this node will be created in VESS and
-	// that updates will be generated. 
-	userNode = vess->sceneManager->getOrCreateNode(id.c_str(), "userNode");
+	// the viewer's camera. We expect that this node will be created in the
+	// sceneManager and that updates will be generated. 
+	userNode = spin->sceneManager->getOrCreateNode(id.c_str(), "userNode");
 	
-	// send userNode info to vess
-	registerUser(vess);
+	// send userNode info to spin
+	registerUser(spin);
 	
 		
 
@@ -312,7 +311,7 @@ int main(int argc, char **argv)
     view->getCamera()->setGraphicsContext(gfxContext.get());
     view->getCamera()->setViewport(new osg::Viewport(0,0, gfxTraits->width, gfxTraits->height));
 
-    view->setSceneData(vess->sceneManager->rootNode.get());
+    view->setSceneData(spin->sceneManager->rootNode.get());
 
 
 	view->addEventHandler(new osgViewer::StatsHandler);
@@ -356,7 +355,7 @@ int main(int argc, char **argv)
 
 	if (argScene.valid()) {
 		std::cout << "Loading sample model" << std::endl;
-		vess->sceneManager->worldNode->addChild(argScene.get());
+		spin->sceneManager->worldNode->addChild(argScene.get());
 	}
 
 
@@ -368,12 +367,12 @@ int main(int argc, char **argv)
 	osg::Timer_t frameTick = lastTick;
 
 	// program loop:
-	while( !viewer.done() && vess->isRunning() )
+	while( !viewer.done() && spin->isRunning() )
 	{
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			vess->sendInfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
+			spin->sendInfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
 			lastTick = frameTick;
 		}
 
@@ -382,7 +381,7 @@ int main(int argc, char **argv)
 		// In the callback, we have simply flagged what needs to be done (eg, set the
 		// newParent symbol).
 		pthread_mutex_lock(&pthreadLock);
-		vess->sceneManager->updateGraph();
+		spin->sceneManager->updateGraph();
 		pthread_mutex_unlock(&pthreadLock);
 
 		pthread_mutex_lock(&pthreadLock);

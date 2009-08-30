@@ -39,8 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef VESSTHREADS_H_
-#define VESSTHREADS_H_
+#ifndef SPINCONTEXT_H_
+#define SPINCONTEXT_H_
 
 #include "asUtil.h"
 #include "asCameraManager.h"
@@ -63,17 +63,17 @@
  * whether the process is to act as a server or a client.
  *
  */
-class vessThread
+class spinContext
 {
 
 	public:
 
-		enum vessMode { LISTENER_MODE, SERVER_MODE };
+		enum spinContextMode { SERVER_MODE, BASIC_LISTENER, GRAPHICAL_LISTENER };
 
-		vessThread(vessMode initMode=LISTENER_MODE);
-		~vessThread();
+		spinContext(spinContextMode initMode=BASIC_LISTENER);
+		~spinContext();
 
-		bool setMode(vessMode m);
+		bool setMode(spinContextMode m);
 
 		bool start();
 		void stop();
@@ -98,7 +98,7 @@ class vessThread
 		void setTxAddr(std::string s) { txAddr = s; }
 		void setTxPort(std::string s) { txPort = s; }
 
-		vessMode mode;
+		spinContextMode mode;
 
 		std::string id;
 		std::string rxAddr, rxPort;
@@ -118,8 +118,8 @@ class vessThread
 
 	    /**
 	     * We store a funciton pointer in the class, which can be dynamically
-	     * swapped depending on vessMode (ie, different thread for server mode
-	     * versus listener mode).
+	     * swapped depending on spinContextMode (ie, different thread for server
+	     * mode versus listener mode).
 	     */
 	    void *(*threadFunction) (void*);
 
@@ -139,7 +139,7 @@ class vessThread
  * listens to incoming VESS messages. It does NOT re-transmit those messages,
  * and it does NOT perform an update traversal.
  */
-static void *vessListenerThread(void *arg);
+static void *spinListenerThread(void *arg);
 
 /**
  * The vessServerThread is mainly differentiated from a listener thread by the
@@ -151,7 +151,7 @@ static void *vessListenerThread(void *arg);
  * infoport, and will perform an update traversal on the scene graph for any
  * nodes who need periodic (scheduled) processing.
  */
-static void *vessServerThread(void *arg);
+static void *spinServerThread(void *arg);
 
 
 int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);

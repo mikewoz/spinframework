@@ -50,7 +50,7 @@
 #include <lo/lo_lowlevel.h>
 
 #include "asUtil.h"
-#include "vessThreads.h"
+#include "spinContext.h"
 
 using namespace std;
 
@@ -59,7 +59,7 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 
 
-vessThread::vessThread(vessMode initMode)
+spinContext::spinContext(spinContextMode initMode)
 {
 
 #ifdef __Darwin
@@ -77,7 +77,7 @@ vessThread::vessThread(vessMode initMode)
 	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
 	if (!asReferencedType.isDefined())
 	{
-		std::cout << "ERROR: libSPIN was not found. Please check dynamic libraries. Could not start vessThread." << std::endl;
+		std::cout << "ERROR: libSPIN was not found. Please check dynamic libraries. Could not start spinContext." << std::endl;
 		exit(1);
 	}
 
@@ -86,7 +86,7 @@ vessThread::vessThread(vessMode initMode)
 
 	if (!this->setMode(initMode))
 	{
-		std::cout << "ERROR: Unknown mode for vessThreads" << std::endl;
+		std::cout << "ERROR: Unknown mode for spinContext" << std::endl;
 		exit(1);
 	}
 
@@ -130,7 +130,7 @@ vessThread::vessThread(vessMode initMode)
 	std::cout << "  INFO channel: " << lo_address_get_url(lo_infoAddr) << std::endl;
 }
 
-vessThread::~vessThread()
+spinContext::~spinContext()
 {
 	this->stop();
 	usleep(100);
@@ -153,31 +153,29 @@ vessThread::~vessThread()
 }
 
 
-bool vessThread::setMode(vessMode m)
+bool spinContext::setMode(spinContextMode m)
 {
 	if (running)
 	{
 		stop();
 	}
 
-	switch (m)
+	if (m==SERVER_MODE)
 	{
-		case LISTENER_MODE:
-			rxAddr = "224.0.0.1";
-			rxPort = "54323";
-			txAddr = "224.0.0.1";
-			txPort = "54324";
-			threadFunction = &vessListenerThread;
-			break;
-		case SERVER_MODE:
-			rxAddr = getMyIPaddress();
-			rxPort = "54324";
-			txAddr = "224.0.0.1";
-			txPort = "54323";
-			threadFunction = &vessServerThread;
-			break;
-		default:
-			return false;
+		rxAddr = getMyIPaddress();
+		rxPort = "54324";
+		txAddr = "224.0.0.1";
+		txPort = "54323";
+		threadFunction = &spinServerThread;
+	}
+	
+	else
+	{
+		rxAddr = "224.0.0.1";
+		rxPort = "54323";
+		txAddr = "224.0.0.1";
+		txPort = "54324";
+		threadFunction = &spinListenerThread;
 	}
 
 	this->mode = m;
@@ -185,24 +183,24 @@ bool vessThread::setMode(vessMode m)
 	return true;
 }
 
-bool vessThread::start()
+bool spinContext::start()
 {
 	lo_txAddr = lo_address_new(txAddr.c_str(), txPort.c_str());
 
 	// create thread:
 	if (pthread_attr_init(&pthreadAttr) < 0)
 	{
-		std::cout << "vessThread: could not prepare child thread" << std::endl;
+		std::cout << "spinContext: could not prepare child thread" << std::endl;
 		return false;
 	}
 	if (pthread_attr_setdetachstate(&pthreadAttr, PTHREAD_CREATE_DETACHED) < 0)
 	{
-		std::cout << "vessThread: could not prepare child thread" << std::endl;
+		std::cout << "spinContext: could not prepare child thread" << std::endl;
 		return false;
 	}
 	if (pthread_create( &pthreadID, &pthreadAttr, threadFunction, this) < 0)
 	{
-		std::cout << "vessThread: could not create new thread" << std::endl;
+		std::cout << "spinContext: could not create new thread" << std::endl;
 		return false;
 	}
 
@@ -214,14 +212,14 @@ bool vessThread::start()
 	return true;
 }
 
-void vessThread::stop()
+void spinContext::stop()
 {
-	std::cout << "Stopping vessThread..." << std::endl;
+	std::cout << "Stopping spinContext..." << std::endl;
 	this->running = false;
 }
 
 
-void vessThread::sendInfoMessage(std::string OSCpath, lo_message msg)
+void spinContext::sendInfoMessage(std::string OSCpath, lo_message msg)
 {
 	lo_send_message_from(lo_infoAddr, lo_server_thread_get_server(lo_infoServ), OSCpath.c_str(), msg);
 
@@ -229,7 +227,7 @@ void vessThread::sendInfoMessage(std::string OSCpath, lo_message msg)
     lo_message_free(msg);
 }
 
-void vessThread::sendInfoMessage(std::string OSCpath, const char *types, ...)
+void spinContext::sendInfoMessage(std::string OSCpath, const char *types, ...)
 {
 	lo_message msg = lo_message_new();
 
@@ -242,11 +240,11 @@ void vessThread::sendInfoMessage(std::string OSCpath, const char *types, ...)
 	{
 		sendInfoMessage(OSCpath, msg);
 	} else {
-		std::cout << "ERROR (vessThread::sendInfoMessage): " << err << std::endl;
+		std::cout << "ERROR (spinContext::sendInfoMessage): " << err << std::endl;
 	}
 }
 
-void vessThread::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
+void spinContext::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
 {
 	if (isRunning())
 	{
@@ -269,7 +267,7 @@ void vessThread::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
     lo_message_free(msg);
 }
 
-void vessThread::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
+void spinContext::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
 {
 	lo_message msg = lo_message_new();
 
@@ -282,13 +280,13 @@ void vessThread::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
 	{
 		sendNodeMessage(nodeSym, msg);
 	} else {
-		std::cout << "ERROR (vessThread::sendNodeMessage): " << err << std::endl;
+		std::cout << "ERROR (spinContext::sendNodeMessage): " << err << std::endl;
 	}
 
 }
 
 
-void vessThread::sendSceneMessage(lo_message msg)
+void spinContext::sendSceneMessage(lo_message msg)
 {
 	if (isRunning())
 	{
@@ -311,7 +309,7 @@ void vessThread::sendSceneMessage(lo_message msg)
     lo_message_free(msg);
 }
 
-void vessThread::sendSceneMessage(const char *types, ...)
+void spinContext::sendSceneMessage(const char *types, ...)
 {
 	lo_message msg = lo_message_new();
 
@@ -324,17 +322,17 @@ void vessThread::sendSceneMessage(const char *types, ...)
 	{
 		sendSceneMessage(msg);
 	} else {
-		std::cout << "ERROR (vessThread::sendSceneMessage): " << err << std::endl;
+		std::cout << "ERROR (spinContext::sendSceneMessage): " << err << std::endl;
 	}
 }
 
 // *****************************************************************************
 
-static void *vessListenerThread(void *arg)
+static void *spinListenerThread(void *arg)
 {
-	vessThread *vess = (vessThread*) arg;
+	spinContext *vess = (spinContext*) arg;
 
-	std::cout << "  vessThread started in Listener mode" << std::endl;
+	std::cout << "  spinContext started in Listener mode" << std::endl;
 
 	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
 
@@ -351,11 +349,11 @@ static void *vessListenerThread(void *arg)
 	pthread_exit(NULL);
 }
 
-static void *vessServerThread(void *arg)
+static void *spinServerThread(void *arg)
 {
-	vessThread *vess = (vessThread*) arg;
+	spinContext *vess = (spinContext*) arg;
 
-	std::cout << "  vessThread started in Server mode" << std::endl;
+	std::cout << "  spinContext started in Server mode" << std::endl;
 	std::cout << "  broadcasting info messages on " << vess->txAddr << ", port: " << vess->infoPort << std::endl;
 
 	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
@@ -400,7 +398,7 @@ static void *vessServerThread(void *arg)
 
 int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
-	vessThread *vess = (vessThread*) user_data;
+	spinContext *vess = (spinContext*) user_data;
 	
 	if (!vess) return 0;
 	
@@ -418,7 +416,7 @@ int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int 
 	fflush(stdout);
 	 */
 	
-	if (vess->mode == vessThread::SERVER_MODE)
+	if (vess->mode == spinContext::SERVER_MODE)
 	{
 		// TODO: monitor /ping/user messages, keep timeout handlers, 
 		
