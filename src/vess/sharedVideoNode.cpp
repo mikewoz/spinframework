@@ -75,6 +75,10 @@ sharedVideoNode::sharedVideoNode (asSceneManager *sceneManager, char *initID) : 
 	
 
 	this->setShape(asShape::SPHERE);
+	drawTexture();
+	
+	// worker thread is in killed state to start:
+    killed_ = true;
 		
 	textureID = "NULL";
 
@@ -92,14 +96,11 @@ void sharedVideoNode::callbackUpdate()
 {
 
     // do update here
-
+	
+	boost::mutex::scoped_lock displayLock(displayMutex_);
 
     if (sceneManager->isGraphical() && textureImage.valid() && textureRect.valid())
     {
-    	std::cout << "updating texture" << std::endl;
-    	
-        boost::mutex::scoped_lock displayLock(displayMutex_);
-
 	    // update image from shared memory:
 	    textureImage->setImage(SharedVideoBuffer::WIDTH, 
 	    		SharedVideoBuffer::HEIGHT, 
@@ -113,70 +114,76 @@ void sharedVideoNode::callbackUpdate()
 	
 	    // set texture:
 	    textureRect->setImage(textureImage.get());
-	    
-	    textureUploadedCondition_.notify_one();
-	    
     }
+    
+    
+    textureUploadedCondition_.notify_one();
 }
 
 
 /// This function is executed in the worker thread
 void sharedVideoNode::consumeFrame()
 {
-	  using boost::interprocess::scoped_lock;
-	    using boost::interprocess::interprocess_mutex;
-	    using boost::interprocess::shared_memory_object;
+	std::cout << "in consumeFrame. killed=" << killed_ << std::endl;
+	
+	using boost::interprocess::scoped_lock;
+	using boost::interprocess::interprocess_mutex;
+	using boost::interprocess::shared_memory_object;
 
-	    // get frames until the other process marks the end
-	    bool end_loop = false;
-	            
-	    // make sure there's no sentinel
-	    {
-	    // Lock the mutex
-	            scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
-	            sharedBuffer->removeSentinel();   // tell appsink to give us buffers
-	    }
+	// get frames until the other process marks the end
+	bool end_loop = false;
 
+	// make sure there's no sentinel
+	{
+		// Lock the mutex
+		//scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
+		sharedBuffer->removeSentinel(); // tell appsink to give us buffers
+	}
 
-	    do
-	    {
-	        {
-	            // Lock the mutex
-	            scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
+	do
+	{
+		{
+			std::cout << "trying to lock" << std::endl;
+			
+			// Lock the mutex
+			scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
-	            sharedBuffer->removeSentinel();   // tell appsink not to give us any more buffers
+			sharedBuffer->removeSentinel(); // tell appsink not to give us any more buffers
 
-	            // wait for new buffer to be pushed if it's empty
-	            sharedBuffer->waitOnProducer(lock);
+			std::cout << "waiting on producer..." << std::endl;
+			
+			// wait for new buffer to be pushed if it's empty
+			sharedBuffer->waitOnProducer(lock);
 
-	            if (sharedBuffer->hasSentinel())
-	                end_loop = true;
-	            else
-	            {
-	                // got a new buffer, wait until we upload it in gl thread before notifying producer
-	                {
-	                    boost::mutex::scoped_lock displayLock(displayMutex_);
+			std::cout << "got buffer from producer" << std::endl;
+			
+			if (sharedBuffer->hasSentinel())
+				end_loop = true;
+			else
+			{
+				// got a new buffer, wait until we upload it in gl thread before notifying producer
+				{
+					boost::mutex::scoped_lock displayLock(displayMutex_);
 
-	                    if (killed_)
-	                    {
-	                        sharedBuffer->pushSentinel();   // tell appsink not to give us any more buffers
-	                        end_loop = true;
-	                    }
-	                    else
-	                        textureUploadedCondition_.wait(displayLock);
-	                }
+					if (killed_)
+					{
+						sharedBuffer->pushSentinel(); // tell appsink not to give us any more buffers
+						end_loop = true;
+					}
+					else
+						textureUploadedCondition_.wait(displayLock);
+				}
 
-	                // Notify the other process that the buffer status has changed
-	                sharedBuffer->notifyProducer();
-	            }
-	            // mutex is released (goes out of scope) here
-	        }
-	    }
-	    while (!end_loop);
+				// Notify the other process that the buffer status has changed
+				sharedBuffer->notifyProducer();
+			}
+			// mutex is released (goes out of scope) here
+		}
+	} while (!end_loop);
 
-	    std::cout << "\nWorker thread Going out.\n";
-	    // erase shared memory
-	    // shared_memory_object::remove("shared_memory");
+	std::cout << "\nWorker thread Going out.\n";
+	// erase shared memory
+	// shared_memory_object::remove("shared_memory");
 }
 
 // ===================================================================
@@ -198,9 +205,15 @@ void sharedVideoNode::setTextureID (const char* id)
 	if (sceneManager->isGraphical())
 	{
 		
-		// first kill any existing thread:
-	    //this->signalKilled(); // let worker know that the mainloop has exitted
-	    //worker.join(); // wait for worker to end
+
+		
+		if (!killed_)
+		{
+			// first kill any existing thread:
+			std::cout << "worker thread exists. we are killing it. " << std::endl;
+		    this->signalKilled(); // let worker know that the mainloop has exitted
+		    worker.join(); // wait for worker to end
+		}
 	
 	    using namespace boost::interprocess;
 	    try
@@ -215,16 +228,16 @@ void sharedVideoNode::setTextureID (const char* id)
 	        void *addr = region->get_address();
 	
 	        // cast to pointer of type of our shared structure
-	        this->sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
+	        sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
+	
+	        std::cout << "starting worker thread for " << textureID << std::endl;
 	
 	        // reset the killed_ conditional
 	        killed_ = false;
 	        
-	        std::cout << "starting worker thread for " << textureID << std::endl;
-	
 	        // start our consumer thread, which is a member function of this class
 	        // and takes sharedBuffer as an argument
-	        worker = boost::thread(boost::bind<void>(boost::mem_fn(&sharedVideoNode::consumeFrame), boost::ref(this)));
+	        worker = boost::thread(boost::bind<void>(boost::mem_fn(&sharedVideoNode::consumeFrame), boost::ref(*this)));
 	        
 	        
 	    }
@@ -239,11 +252,11 @@ void sharedVideoNode::setTextureID (const char* id)
 	        else
 	        {
 	            std::cerr << "Shared buffer doesn't exist yet\n";
-	            boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
+	            //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
 	        }
 	    }
     
-	    drawTexture();
+	    
 	}
     
     
@@ -315,13 +328,17 @@ void sharedVideoNode::drawTexture()
 	    texenv->setMode(osg::TexEnv::REPLACE);
 
 	    // setup state for geometry
-	    osg::StateSet *shapeStateSet = shapeGeode->getOrCreateStateSet();
+	    //osg::StateSet *shapeStateSet = shapeGeode->getOrCreateStateSet();
+	    osg::StateSet *shapeStateSet = new osg::StateSet();
+	    
 	    shapeStateSet->setTextureAttributeAndModes(0, textureRect.get(), osg::StateAttribute::ON);
 	    shapeStateSet->setTextureAttributeAndModes(0, texmat.get(), osg::StateAttribute::ON);
 	    shapeStateSet->setTextureAttributeAndModes(0, texenv.get(), osg::StateAttribute::ON);
 
 	    // turn off lighting 
 	    shapeStateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	    
+	    shapeGeode->setStateSet( shapeStateSet );
 
 	}
 

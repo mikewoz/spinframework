@@ -1,6 +1,8 @@
 # the following file must be included:
 include ../../Makefile.include
 
+APPSINK_PATH=$(HOME)/svn/miville/inhouse/prototypes/appsink
+
 all: $(OS)
 #	@echo "OS=${OS}";
 #	@echo "curdir=${CURDIR}";
@@ -23,7 +25,10 @@ apps: spin.app spinViewer.app
 ########################################################
 
 
-vpath %.cpp .  ../tinyxml
+vpath %.cpp .  ../tinyxml $(APPSINK_PATH)
+
+
+SPIN_INCLUDE+=-I$(APPSINK_PATH)
 
 OBJS =  spinContext.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
  	findNodeVisitor.o DebugVisitor.o  \
