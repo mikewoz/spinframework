@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -55,7 +55,7 @@
 #include <osg/Timer>
 
 
-#include "asUtil.h"
+#include "spinUtil.h"
 #include "spinContext.h"
 //#include "asCameraManager.h"
 
@@ -65,14 +65,14 @@ extern pthread_mutex_t pthreadLock;
 
 
 // global:
-// we store userNode in a global ref_ptr so that it can't be deleted
-static osg::ref_ptr<asReferenced> userNode;
+// we store UserNode in a global ref_ptr so that it can't be deleted
+static osg::ref_ptr<ReferencedNode> UserNode;
 
 
 
 void registerUser(spinContext *spin)
 {
-	if (!userNode.valid())
+	if (!UserNode.valid())
 	{
         std::cout << "ERROR: could not register user" << std::endl;
         exit(1);
@@ -82,9 +82,9 @@ void registerUser(spinContext *spin)
 	// Send a message to the server to create this node (assumes that the server
 	// is running). If not, it will send a 'userRefresh' method upon startup
 	// that will request that this function is called again
-	spin->sendSceneMessage("sss", "createNode", userNode->id->s_name, "userNode", LO_ARGS_END);
+	spin->sendSceneMessage("sss", "createNode", UserNode->id->s_name, "UserNode", LO_ARGS_END);
 
-	std::cout << "  Registered user '" << userNode->id->s_name << "' with SPIN" << std::endl;
+	std::cout << "  Registered user '" << UserNode->id->s_name << "' with SPIN" << std::endl;
 
 }
 
@@ -224,18 +224,18 @@ int main(int argc, char **argv)
 
 	
 	// register an extra OSC callback so that we can spy on OSC messages:
-	std::string OSCpath = "/vess/" + spin->id;
+	std::string OSCpath = "/SPIN/" + spin->id;
 	lo_server_thread_add_method(spin->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)spin);
 
 	
 	
 	
-	// Add a userNode to the local scene and use it to feed a NodeTracker for
+	// Add a UserNode to the local scene and use it to feed a NodeTracker for
 	// the viewer's camera. We expect that this node will be created in the
 	// sceneManager and that updates will be generated. 
-	userNode = spin->sceneManager->getOrCreateNode(id.c_str(), "userNode");
+	UserNode = spin->sceneManager->getOrCreateNode(id.c_str(), "UserNode");
 	
-	// send userNode info to spin
+	// send UserNode info to spin
 	registerUser(spin);
 	
 		
@@ -344,7 +344,7 @@ int main(int argc, char **argv)
 //	manipulator->setHomePosition( osg::Vec3(0,-1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 	manipulator->setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 //	manipulator->setHomePosition( osg::Vec3(0,1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-	manipulator->setTrackNode(userNode->getAttachmentNode());
+	manipulator->setTrackNode(UserNode->getAttachmentNode());
 
 
 	view->setCameraManipulator(manipulator);

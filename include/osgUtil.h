@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -62,9 +62,15 @@
 #endif
 
 
-#include "asReferenced.h"
+#include "ReferencedNode.h"
 
 #define Vec3inDegrees(v) (osg::Vec3( osg::RadiansToDegrees(v.x()), osg::RadiansToDegrees(v.y()), osg::RadiansToDegrees(v.z()) ))
+
+
+#define GENERIC_SHAPE_RESOLUTION 10.0f
+
+#define AS_UNIT_SCALE  1.0f // 1m
+#define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
 
 #define X_AXIS osg::Vec3(1.0, 0.0, 0.0)
 #define Y_AXIS osg::Vec3(0.0, 1.0, 0.0)

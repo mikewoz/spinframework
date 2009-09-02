@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 //
@@ -48,7 +48,7 @@
 
 #include "wxVessTreeCtrl.h"
 #include "wxVessTreeVisitor.h"
-#include "asReferenced.h"
+#include "ReferencedNode.h"
 
 wxVessTreeVisitor::wxVessTreeVisitor(wxVessTreeCtrl* pTreeCtrl) :
     osg::NodeVisitor(osg::NodeVisitor::NODE_VISITOR, osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
@@ -74,12 +74,12 @@ void wxVessTreeVisitor::apply(osg::Group& node)
 {
     //std::cout << "wxVessTreeVisitor parsing group " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
 
-    // for osg::Group, we check if it can be cast as an asReferenced, and add
+    // for osg::Group, we check if it can be cast as an ReferencedNode, and add
     // it to the treeCtrl if so:
 
-	asReferenced *n;
+	ReferencedNode *n;
 
-	if (n=dynamic_cast<asReferenced*>(&node)) {
+	if (n=dynamic_cast<ReferencedNode*>(&node)) {
 
 	    wxTreeItemId parentId = m_currentParentId;
         //m_currentParentId = AddToTree(&node);
@@ -203,7 +203,7 @@ void wxVessTreeVisitor::apply(osg::StateAttribute& stateAttrib)
 */
 
 
-wxTreeItemId wxVessTreeVisitor::AddToTree(asReferenced* n)
+wxTreeItemId wxVessTreeVisitor::AddToTree(ReferencedNode* n)
 {
 
     wxTreeItemId currentId;
@@ -216,10 +216,10 @@ wxTreeItemId wxVessTreeVisitor::AddToTree(asReferenced* n)
 
 /*
     std::string strLabel = "*";
-    asReferenced *n;
+    ReferencedNode *n;
     osg::Node* pNamedNode;
 
-	if (n=dynamic_cast<asReferenced*>(pObject))
+	if (n=dynamic_cast<ReferencedNode*>(pObject))
 	{
         strLabel = n->nodeType + " : " + n->id->s_name;
     }

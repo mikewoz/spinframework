@@ -6,7 +6,10 @@ LIBNAME = libSPIN
 
 all: $(OS)
 
-WRAPPER_OBJ = asBasicNode.o asReferenced.o asShape.o asModel.o asVideo.o asLightSource.o asRay.o asContour.o asConstraints.o asPointer.o asMeasurementNode.o asSoundNode.o asSoundSpace.o asDSPnode.o asSoundConnection.o userNode.o sharedVideoNode.o
+WRAPPER_OBJ = ReferencedNode.o GroupNode.o ShapeNode.o ModelNode.o \
+	      VideoNode.o LightSource.o RayNode.o Contour.o ConstraintsNode.o \
+	      PointerNode.o MeasurementNode.o SoundNode.o SoundSpace.o \
+	      DSPNode.o SoundConnection.o UserNode.o SharedVideoNode.o
 
 
 #SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus -DASDEBUG -Wall

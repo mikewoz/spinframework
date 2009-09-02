@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 //
@@ -125,7 +125,7 @@ static void GenerateHTML(const osgIntrospection::Type &classType, ofstream& outp
 	
 	/*
 	output << "<code>\n";
-	output << "  /vess/{vessID}/{nodeID} <strong>setParent</strong>  <<font color='gray'>(char *)</font> <strong>newParent</strong>>\n";
+	output << "  /SPIN/{sceneID}/{nodeID} <strong>setParent</strong>  <<font color='gray'>(char *)</font> <strong>newParent</strong>>\n";
 	output << "</code><br>\n";
 	output << "&nbsp;&nbsp;&nbsp;&rarr; <small>This method sets the location of the node in the scene graph, adopting the local coordinate system of the newParent.</small><br><br>\n";
 	*/
@@ -159,7 +159,7 @@ static void GenerateHTML(const osgIntrospection::Type &classType, ofstream& outp
         	//output << "<div class='memproto'>\n";
         	output << "<div>\n";
         	//output << "<code>\n";
-        	output << "  /vess/{vessID}/{nodeID} <strong>" << method->getName() << "</strong>\n";
+        	output << "  /SPIN/{sceneID}/{nodeID} <strong>" << method->getName() << "</strong>\n";
         	
         	
         	if (DEBUG) cout << "  PARAMS: ";
@@ -253,7 +253,7 @@ int main()
 		return 1;
 	}
 	
-	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
+	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
 	
 	output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
 	output << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n";
@@ -284,7 +284,7 @@ int main()
 		   << "listener on the appropriate port to discover messages related to "
 		   << "SPIN.<p>\n";
 		   
-	output << "<p>VESS (the Virtual Environment State Server) multicasts all "
+	output << "<p>The spinServer multicasts all "
 		   << "state information in a specific OSC format. Furthermore, if a "
 		   << "client wishes to update or modify state on the server, it must "
 		   << "send a properly formatted message. In most cases, the message "
@@ -306,7 +306,7 @@ int main()
 		if (classType->isDefined())
 		{
 		
-			if ( classType->isSubclassOf(asReferencedType) )
+			if ( classType->isSubclassOf(ReferencedNodeType) )
 			{
 				output << "  <li><a href='#" << classType->getName() << "'>" << classType->getName() << "</a></li>\n";
 				
@@ -323,7 +323,7 @@ int main()
 		if (classType->isDefined())
 		{
 		
-			if ( classType->isSubclassOf(asReferencedType) )
+			if ( classType->isSubclassOf(ReferencedNodeType) )
 			{
 
 				output << "<hr\n";
@@ -337,7 +337,7 @@ int main()
 		        {
 		            const Type &BaseClassType = classType->getBaseType(i);
 		            
-		            if ((BaseClassType==asReferencedType) || (BaseClassType.isSubclassOf(asReferencedType)))
+		            if ((BaseClassType==ReferencedNodeType) || (BaseClassType.isSubclassOf(ReferencedNodeType)))
 		            {
 		            	GenerateHTML(BaseClassType, output);
 		            }
@@ -349,7 +349,7 @@ int main()
 		    	output << "</blockquote>\n";	
 
 
-			} // if asReferenced
+			} // if ReferencedNode
 		} // if class is defined
 	} // type iter
 	

@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -50,8 +50,7 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 
-#include "asGlobals.h"
-#include "asShape.h"
+#include "ShapeNode.h"
 #include "sharedVideoBuffer.h"
 
 
@@ -61,12 +60,12 @@
  *
  * This is accomplished by the use of boost/interprocess/shared_memory_object
  */
-class sharedVideoNode : public asShape
+class sharedVideoNode : public ShapeNode
 {
 
 public:
 
-	sharedVideoNode(asSceneManager *sceneManager, char *initID);
+	sharedVideoNode(SceneManager *sceneManager, char *initID);
 	virtual ~sharedVideoNode();
 
 	virtual void callbackUpdate();
@@ -80,7 +79,7 @@ public:
 	const char* getTextureID() { return textureID.c_str(); }
 	
 	/**
-	 * For each subclass of asReferenced, we override the getState() method to
+	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();

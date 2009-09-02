@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -265,11 +265,11 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 /*
 
 // TODO
-    vessLog log("vess.log");
+    spinLog log("vess.log");
     log.enable_wxlog(true);
     log.enable_cout(false);
 
-    log << "Started vessLog" << std::endl;
+    log << "Started spinLog" << std::endl;
 
     log << "Resources path: " << resourcesPath.mb_str() << std::endl;
 */

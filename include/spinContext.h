@@ -35,29 +35,28 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
 #ifndef SPINCONTEXT_H_
 #define SPINCONTEXT_H_
 
-#include "asUtil.h"
-#include "asCameraManager.h"
-#include "asSceneManager.h"
-#include "asMediaManager.h"
+#include "spinUtil.h"
+#include "SceneManager.h"
+#include "MediaManager.h"
 
 
 
 /**
- * \brief A class to facilitate communication with VESS from any application.
+ * \brief A class to facilitate communication with SPIN from any application.
  *
  * An instance of this class should be included in any process that needs to
  * maintain scene state.
  *
- * By instantiating this class, we load the OSG nodekit for VESS -- otherwise
+ * By instantiating this class, we load the OSG nodekit for SPIN -- otherwise
  * known as libSPIN. Furthermore, all of the network handlers are automatically
- * generated in order to receive OSC messages from VESS and update state.
+ * generated in order to receive OSC messages from SPIN and update state.
  *
  * Note that this class can be instantiated in different modes, depending on
  * whether the process is to act as a server or a client.
@@ -111,8 +110,8 @@ class spinContext
 		//lo_server  lo_infoServ;
 		lo_server_thread lo_infoServ;
 
-		asSceneManager *sceneManager;
-		asMediaManager *mediaManager;
+		SceneManager *sceneManager;
+		MediaManager *mediaManager;
 
 	    bool running;
 
@@ -135,19 +134,19 @@ class spinContext
 
 
 /**
- * The vessListenerThread is a simple thread that starts a sceneManager and
- * listens to incoming VESS messages. It does NOT re-transmit those messages,
+ * The spinListenerThread is a simple thread that starts a sceneManager and
+ * listens to incoming SPIN messages. It does NOT re-transmit those messages,
  * and it does NOT perform an update traversal.
  */
 static void *spinListenerThread(void *arg);
 
 /**
- * The vessServerThread is mainly differentiated from a listener thread by the
+ * The spinServerThread is mainly differentiated from a listener thread by the
  * fact taht all received messages are re-transmit upon processing. This allows
  * all clients to keep up-to-date whenever new state information is received by
  * the server.
  *
- * Additionally, the vessServerThread will periodically broadcast a ping on
+ * Additionally, the spinServerThread will periodically broadcast a ping on
  * infoport, and will perform an update traversal on the scene graph for any
  * nodes who need periodic (scheduled) processing.
  */

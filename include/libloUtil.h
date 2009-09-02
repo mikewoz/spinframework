@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ typedef struct _lo_server {
  *
  * lo_server_del_method(lo_server s, const char *path, const char *typespec)
  *
- * For VESS, several methods can be registered with the same path (and typespec
+ * For SPIN, several methods can be registered with the same path (and typespec
  * is usually NULL), so ALL methods will be deleted using this function call!
  *
  * Thus, we've copied the lo_server struct (and named it internal_lo_server)

@@ -35,15 +35,15 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __USERNODE_H
-#define __USERNODE_H
+#ifndef __UserNode_H
+#define __UserNode_H
 
-#include "asGlobals.h"
-#include "asBasicNode.h"
+
+#include "GroupNode.h"
 
 
 
@@ -57,16 +57,16 @@
  * - various soundNodes that correspond the ther users loudspeaker setup
  * - etc.
  *
- * It is important to note that anything attached to a userNode's subgraph will
+ * It is important to note that anything attached to a UserNode's subgraph will
  * not be saved with the scene.
  */
-class userNode : public asBasicNode
+class UserNode : public GroupNode
 {
 
 	public:
 
-		userNode(asSceneManager *sceneManager, char *initID);
-		virtual ~userNode();
+		UserNode(SceneManager *sceneManager, char *initID);
+		virtual ~UserNode();
 
 		// SET methods:
 		void setDescription (const char *s);
@@ -77,7 +77,7 @@ class userNode : public asBasicNode
 
 
 		/**
-		 * For each subclass of asReferenced, we override the getState() method to
+		 * For each subclass of ReferencedNode, we override the getState() method to
 		 * fill the vector with the correct set of methods for this particular node
 		 */
 		virtual std::vector<lo_message> getState();
@@ -87,10 +87,10 @@ class userNode : public asBasicNode
 		 * method. Simple C++ inheritance is not enough, because osg::Introspection
 		 * won't see it.
 		 */
-		//virtual void stateDump() { asReferenced::stateDump(); };
+		//virtual void stateDump() { ReferencedNode::stateDump(); };
 
 
-		// We must redefine any methods from out base class (asBasicNode) so
+		// We must redefine any methods from out base class (GroupNode) so
 		// that osg::Introspection will see them. This is really only necessary
 		// for methods for which we want handlers (OSC/WX/etc).
 

@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -49,8 +49,9 @@
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
-#include "asUtil.h"
+#include "spinUtil.h"
 #include "spinContext.h"
+#include "nodeVisitors.h"
 
 using namespace std;
 
@@ -73,9 +74,9 @@ spinContext::spinContext(spinContextMode initMode)
 
 
 	// Make sure that our OSG nodekit is loaded (by checking for existance of
-	// the asReferenced node type):
-	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
-	if (!asReferencedType.isDefined())
+	// the ReferencedNode node type):
+	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+	if (!ReferencedNodeType.isDefined())
 	{
 		std::cout << "ERROR: libSPIN was not found. Please check dynamic libraries. Could not start spinContext." << std::endl;
 		exit(1);
@@ -248,10 +249,10 @@ void spinContext::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
 {
 	if (isRunning())
 	{
-		std::string OSCpath = "/vess/" + id + "/" + nodeSym->s_name;
+		std::string OSCpath = "/SPIN/" + id + "/" + nodeSym->s_name;
 
 		// If this thread is a listener, then we need to send an OSC message to
-		// the rxAddr of the vess server (unicast)
+		// the rxAddr of the spinServer (unicast)
 		if ( this->mode != SERVER_MODE )
 		{
 			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
@@ -259,9 +260,9 @@ void spinContext::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
 
 		// if, however, this process acts as a server, we can optimize and send
 		// directly to the OSC callback function:
-		else asSceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)nodeSym);
+		else SceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)nodeSym);
 
-	} else std::cout << "Error: tried to send message but vess is not running" << std::endl;
+	} else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
 
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);
@@ -290,10 +291,10 @@ void spinContext::sendSceneMessage(lo_message msg)
 {
 	if (isRunning())
 	{
-		std::string OSCpath = "/vess/" + id;
+		std::string OSCpath = "/SPIN/" + id;
 
 		// If this thread is a listener, then we need to send an OSC message to
-		// the rxAddr of the vess server (unicast)
+		// the rxAddr of the spinServer (unicast)
 		if ( this->mode != SERVER_MODE )
 		{
 			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
@@ -301,9 +302,9 @@ void spinContext::sendSceneMessage(lo_message msg)
 
 		// if, however, this process acts as a server, we can optimize and send
 		// directly to the OSC callback function:
-		else asSceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
+		else SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
 
-	} else std::cout << "Error: tried to send message but vess is not running" << std::endl;
+	} else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
 
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);
@@ -330,34 +331,34 @@ void spinContext::sendSceneMessage(const char *types, ...)
 
 static void *spinListenerThread(void *arg)
 {
-	spinContext *vess = (spinContext*) arg;
+	spinContext *spin = (spinContext*) arg;
 
 	std::cout << "  spinContext started in Listener mode" << std::endl;
 
-	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
+	spin->sceneManager = new SceneManager(spin->id, spin->rxAddr, spin->rxPort);
 
-	vess->running = true;
-	while (vess->isRunning())
+	spin->running = true;
+	while (spin->isRunning())
 	{
 		sleep(1);
 		// do nothing (assume the app is doing updates - eg, in a draw loop)
 	}
 
 	// clean up:
-	delete vess->sceneManager;
+	delete spin->sceneManager;
 
 	pthread_exit(NULL);
 }
 
 static void *spinServerThread(void *arg)
 {
-	spinContext *vess = (spinContext*) arg;
+	spinContext *spin = (spinContext*) arg;
 
 	std::cout << "  spinContext started in Server mode" << std::endl;
-	std::cout << "  broadcasting info messages on " << vess->txAddr << ", port: " << vess->infoPort << std::endl;
+	std::cout << "  broadcasting info messages on " << spin->txAddr << ", port: " << spin->infoPort << std::endl;
 
-	vess->sceneManager = new asSceneManager(vess->id, vess->rxAddr, vess->rxPort);
-	vess->sceneManager->setTXaddress(vess->txAddr, vess->txPort);
+	spin->sceneManager = new SceneManager(spin->id, spin->rxAddr, spin->rxPort);
+	spin->sceneManager->setTXaddress(spin->txAddr, spin->txPort);
 
 	string myIP = getMyIPaddress();
 	osg::Timer_t lastTick = osg::Timer::instance()->tick();
@@ -365,31 +366,31 @@ static void *spinServerThread(void *arg)
 
 	// convert ports to integers for sending:
 	int i_rxPort, i_txPort;
-	fromString<int>(i_rxPort, vess->rxPort);
-	fromString<int>(i_txPort, vess->txPort);
+	fromString<int>(i_rxPort, spin->rxPort);
+	fromString<int>(i_txPort, spin->txPort);
 
-	asSceneUpdateVisitor visitor;
+	UpdateSceneVisitor visitor;
 
-	vess->running = true;
-	while (vess->isRunning())
+	spin->running = true;
+	while (spin->isRunning())
 	{
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			vess->sendInfoMessage("/ping/vess", "ssisi", vess->id.c_str(), myIP.c_str(), i_rxPort, vess->txAddr.c_str(), i_txPort, LO_ARGS_END);
-			//lo_send_from(vess->lo_infoAddr, vess->lo_infoServ, LO_TT_IMMEDIATE, "/ping/vess", "ssisi", vess->id.c_str(), myIP.c_str(), i_rxPort, vess->txAddr.c_str(), i_txPort);
+			spin->sendInfoMessage("/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort, LO_ARGS_END);
+			//lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
 			lastTick = frameTick;
 		}
 
 		pthread_mutex_lock(&pthreadLock);
-		visitor.apply(*(vess->sceneManager->rootNode.get())); // only server should do this
+		visitor.apply(*(spin->sceneManager->rootNode.get())); // only server should do this
 		pthread_mutex_unlock(&pthreadLock);
 
 		usleep(10);
 	}
 
 	// clean up:
-	delete vess->sceneManager;
+	delete spin->sceneManager;
 
 	pthread_exit(NULL);
 }
@@ -398,9 +399,9 @@ static void *spinServerThread(void *arg)
 
 int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
-	spinContext *vess = (spinContext*) user_data;
+	spinContext *spin = (spinContext*) user_data;
 	
-	if (!vess) return 0;
+	if (!spin) return 0;
 	
 	/*
 	std::cout << "************ infoChannelCallback() got message: " << path << std::endl;
@@ -416,7 +417,7 @@ int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int 
 	fflush(stdout);
 	 */
 	
-	if (vess->mode == spinContext::SERVER_MODE)
+	if (spin->mode == spinContext::SERVER_MODE)
 	{
 		// TODO: monitor /ping/user messages, keep timeout handlers, 
 		

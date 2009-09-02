@@ -1,7 +1,7 @@
 include ./Makefile.include
 
 # note: order is important:
-all: genwrapper osgWrappers libSPIN vess
+all: genwrapper osgWrappers libSPIN spin
 
 genwrapper:
 	@echo ""; \
@@ -25,9 +25,9 @@ libSPIN:
 	echo ">>>>>>>>>>>>>>>>>>>>> Building libSPIN <<<<<<<<<<<<<<<<<<<<<"; \
 	$(MAKE) -C src/osgWrappers
 
-vess:
+spin:
 	@echo ""; \
-	echo ">>>>>>>>>>>>>>>>>>>>> Building VESS <<<<<<<<<<<<<<<<<<<<<"; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Building SPIN <<<<<<<<<<<<<<<<<<<<<"; \
 	$(MAKE) -C src/vess
 
 clean:

@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -51,11 +51,10 @@
 
 
 
-#include "asGlobals.h"
 #include "osgUtil.h"
 #include "sharedVideoNode.h"
-#include "asSceneManager.h"
-#include "asMediaManager.h"
+#include "SceneManager.h"
+#include "MediaManager.h"
 
 
 static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
@@ -68,13 +67,13 @@ extern pthread_mutex_t pthreadLock;
 
 // ===================================================================
 // constructor:
-sharedVideoNode::sharedVideoNode (asSceneManager *sceneManager, char *initID) : asShape(sceneManager, initID)
+sharedVideoNode::sharedVideoNode (SceneManager *sceneManager, char *initID) : ShapeNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".sharedVideoNode");
 	nodeType = "sharedVideoNode";
 	
 
-	this->setShape(asShape::SPHERE);
+	this->setShape(ShapeNode::SPHERE);
 	drawTexture();
 	
 	// worker thread is in killed state to start:
@@ -282,7 +281,7 @@ void sharedVideoNode::drawTexture()
 	if (shapeGeode.valid())
 	{
 
-		// from asShape:
+		// from ShapeNode:
 		/*
 		osg::Texture2D* shapeTexture = new osg::Texture2D();
 		shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
@@ -347,7 +346,7 @@ void sharedVideoNode::drawTexture()
 std::vector<lo_message> sharedVideoNode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = asShape::getState();
+	std::vector<lo_message> ret = ShapeNode::getState();
 
 	lo_message msg;
 

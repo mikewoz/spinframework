@@ -1,8 +1,6 @@
 # the following file must be included:
 include ../../Makefile.include
 
-APPSINK_PATH=$(HOME)/svn/miville/inhouse/prototypes/appsink
-
 all: $(OS)
 #	@echo "OS=${OS}";
 #	@echo "curdir=${CURDIR}";
@@ -10,8 +8,8 @@ all: $(OS)
 #	@echo "SPIN_PATH=${SPIN_PATH}";
 
 # choose names of binaries:
-Linux: vess spinViewer spin
-Darwin: vess spinViewer spin
+Linux: spinServer spinViewer spin
+Darwin: spinServer spinViewer spin
 
 apps: spin.app spinViewer.app
 
@@ -28,26 +26,18 @@ apps: spin.app spinViewer.app
 vpath %.cpp .  ../tinyxml $(APPSINK_PATH)
 
 
-SPIN_INCLUDE+=-I$(APPSINK_PATH)
-
-OBJS =  spinContext.o pdUtil.o osgUtil.o asUtil.o libloUtil.o \
- 	findNodeVisitor.o DebugVisitor.o  \
-	tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \
-	asSceneManager.o asMediaManager.o asReferenced.o \
-	asBasicNode.o asShape.o asModel.o asVideo.o asLightSource.o asRay.o \
-	asContour.o asConstraints.o asRayIntersector.o asPointer.o \
-	asMeasurementNode.o asToggle.o userNode.o \
-	sharedVideoNode.o sharedVideoBuffer.o \
-	asDSPnode.o asSoundNode.o asSoundSpace.o asSoundConnection.o \
-	asCameraView.o asCameraManager.o asWindow.o
+OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
+       tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \
+       SceneManager.o MediaManager.o ReferencedNode.o \
+       GroupNode.o ShapeNode.o ModelNode.o VideoNode.o LightSource.o \
+       RayNode.o Contour.o ConstraintsNode.o PointerNode.o \
+       MeasurementNode.o UserNode.o \
+       DSPNode.o SoundNode.o SoundSpace.o SoundConnection.o \
+       SharedVideoNode.o sharedVideoBuffer.o 
 
 WX_OBJS = vessWX.o wxVessMain.o wxVessEditor.o wxVessRenderer.o \
 	  wxVessPropGrid.o wxVessSettings.o wxVessTreeVisitor.o \
 	  wxVessTreeCtrl.o
-
-SIMPLEVIEWER_OBJ = viewer.o asCameraManager.o asCameraView.o asWindow.o asUtil.o \
-	tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \
-
 
 
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
@@ -87,7 +77,7 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ###################################################################
 # TARGETS:
 
-ALLTARGETS = docGenerator spinViewer vess spin
+ALLTARGETS = docGenerator spinViewer spinServer spin
 
 doc: docGenerator
 docGenerator: $(OBJS) docGenerator.o
@@ -100,7 +90,7 @@ spinViewer: $(OBJS) spinViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
 
-vess: $(OBJS) vess.o
+spinServer: $(OBJS) spinServer.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
 

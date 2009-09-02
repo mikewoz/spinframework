@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 //
@@ -63,7 +63,7 @@
 
 //#include "wxOsg/wxOsgPGValueType.h"
 #include "wxVessPropGrid.h"
-#include "DebugVisitor.h"
+#include "nodeVisitors.h"
 #include "libloUtil.h"
 
 //#include "../images/icon_D.xpm"
@@ -140,14 +140,14 @@ void wxVessPropGrid::setListeningServer(lo_server_thread t) {
     @param[in] newNode New object to show.
     @param[in] forcaUpdate If 'true', force update when the new object is same as the current displayed object.
 */
-void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
+void wxVessPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
 {
     if (currentNode == newNode && !forceUpdate) return;
 
     GetGrid()->Clear();
 
 
-    const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
+    const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
 
     if (newNode)
     {
@@ -180,12 +180,12 @@ void wxVessPropGrid::SetNode(asReferenced* newNode, bool forceUpdate)
             // first remove the previously registered method:
             if (currentNode.valid())
             {
-                oscPattern = "/vess/" + spin->id + "/" + std::string(currentNode->id->s_name);
+                oscPattern = "/SPIN/" + spin->id + "/" + std::string(currentNode->id->s_name);
                 lo_server_del_method_with_userdata(lo_server_thread_get_server(listeningServer), oscPattern.c_str(), NULL, (void*)this);
             }
 
             // add the new method:
-            oscPattern = "/vess/" + spin->id + "/" + std::string(newNode->id->s_name);
+            oscPattern = "/SPIN/" + spin->id + "/" + std::string(newNode->id->s_name);
             lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessPropGrid_liblo_callback, (void*)this);
         }
 
@@ -253,22 +253,22 @@ void wxVessPropGrid::UpdateFromVess()
 }
 
 /**
- * This function generates editable propGrid entries from an asReferenced node.
+ * This function generates editable propGrid entries from an ReferencedNode node.
  * Note that the function is recursive, and calls itself for base classes for
- * the node type until all vess-related properties are created. Only a specific
+ * the node type until all SPIN-related properties are created. Only a specific
  * set of methods in each class become available as editable properties. These
  * need to be void functions that take at least one argument, such as something
  * like: void setTranslation(float x, float y, float z).
  */
-void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType, asReferenced* pObject)
+void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType, ReferencedNode* pObject)
 {
 	// TODO: we should try to store this globally somewhere, so that we don't do
 	// a lookup every time there is a message:
-	const osgIntrospection::Type &asReferencedType = osgIntrospection::Reflection::getType("asReferenced");
+	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
 
-	if (!( classType==asReferencedType || classType.isSubclassOf(asReferencedType) ))
+	if (!( classType==ReferencedNodeType || classType.isSubclassOf(ReferencedNodeType) ))
     {
-		// we've gotten to a non-asReferenced node (recursively), so return
+		// we've gotten to a non-ReferencedNode node (recursively), so return
 		return;
     }
 
@@ -411,7 +411,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                         }
                         else
                         {
-                            helpText += wxT("OSC: /vess/") + wxString(spin->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
+                            helpText += wxT("OSC: /SPIN/") + wxString(spin->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
                             helpText += wxT(" ") + methodName + wxT(" <");
                             for (ParameterInfoList::const_iterator paramIter2=params.begin(); paramIter2!=params.end(); paramIter2++)
                             {
@@ -451,7 +451,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                 //std::cout << "composed value for " << methodName.mb_str() << "= " << composedValue.mb_str() << std::endl;
 
                 helpText = wxT("");
-                helpText += wxT("OSC: /vess/") + wxString(spin->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
+                helpText += wxT("OSC: /SPIN/") + wxString(spin->id.c_str(), wxConvUTF8) + wxT("/") + wxString(pObject->id->s_name, wxConvUTF8);
                 helpText += wxT(" ") + methodName + wxT(" <");
                 for (ParameterInfoList::const_iterator paramIter2=params.begin(); paramIter2!=params.end(); paramIter2++)
                 {
@@ -678,7 +678,7 @@ void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_
 
 
 /**
- * The propGrid should only be updated by OSC messages - never from VESS directly.
+ * The propGrid should only be updated by OSC messages. never from SPIN directly
  */
 int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {

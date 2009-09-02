@@ -35,33 +35,32 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "userNode.h"
-#include "asSceneManager.h"
-#include "osgUtil.h"
+#include "UserNode.h"
+#include "SceneManager.h"
 
 using namespace std;
 
 
 // ===================================================================
 // constructor:
-userNode::userNode (asSceneManager *sceneManager, char *initID) : asBasicNode(sceneManager, initID)
+UserNode::UserNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
-	nodeType = "userNode";
-	this->setName(string(id->s_name) + ".userNode");
+	nodeType = "UserNode";
+	this->setName(string(id->s_name) + ".UserNode");
 
 	_description = string(initID);
 	
-	setReportMode(asBasicNode::GLOBAL_6DOF);
+	setReportMode(GroupNode::GLOBAL_6DOF);
 
 }
 
 // ===================================================================
 // destructor
-userNode::~userNode()
+UserNode::~UserNode()
 {
 
 }
@@ -72,17 +71,17 @@ userNode::~userNode()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
-void userNode::setDescription (const char *newvalue)
+void UserNode::setDescription (const char *newvalue)
 {
 	_description = string(newvalue);
 	BROADCAST(this, "ss", "setDescription", getDescription());
 }
 
 
-std::vector<lo_message> userNode::getState ()
+std::vector<lo_message> UserNode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = asBasicNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
 

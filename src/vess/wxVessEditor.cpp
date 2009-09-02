@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
@@ -152,7 +152,7 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
 
     // We'll set up an OSC receiver to listen to messages so that we can update
     // vessTree and vessPropGrid. Note that we MUST listen to the broadcast
-    // channel and not to vessChannel directly. This is because VESS might
+    // channel and not to vessChannel directly. This is because SPIN might
     // broadcast different messages than it receives (eg, it receives a 'move'
     // message, but will transmit a 'setTranslation' message).
     if (spin->sceneManager->isSlave())
@@ -189,7 +189,7 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
     wxString nodeID, nodeType;
     wxArrayString allTypes;
 
-    osg::ref_ptr<asReferenced> n;
+    osg::ref_ptr<ReferencedNode> n;
 
 
 
@@ -274,7 +274,7 @@ void wxVessEditor::OnClear(wxCommandEvent& event)
 
 void wxVessEditor::OnDeleteNode(wxCommandEvent& event)
 {
-    asReferenced *n = vessTree->GetSelectedNode();
+    ReferencedNode *n = vessTree->GetSelectedNode();
     if (n)
     {
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to delete node '") + wxString(n->id->s_name, wxConvUTF8) + wxT("'?"), wxT("Delete Node?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);

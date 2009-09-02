@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 //
@@ -85,7 +85,7 @@ public:
 protected:
 
     //wxTreeItemId AddToTree(osg::Referenced* pObject);
-    wxTreeItemId AddToTree(asReferenced* pObject);
+    wxTreeItemId AddToTree(ReferencedNode* pObject);
 
 protected:
     wxTreeItemId m_currentParentId;

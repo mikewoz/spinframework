@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 //
@@ -48,7 +48,7 @@
 #ifndef _wxVessTreeCtrl_H_
 #define _wxVessTreeCtrl_H_
 
-#include "asReferenced.h"
+#include "ReferencedNode.h"
 
 #include "vessWX.h"
 #include "wxVessPropGrid.h"
@@ -75,15 +75,15 @@ class wxVessTreeItemData : public wxTreeItemData
         m_pNode = NULL;
     }
 
-    osg::ref_ptr<asReferenced> m_pNode;
+    osg::ref_ptr<ReferencedNode> m_pNode;
 };
 
 /**
  * \brief A wxWidgets TreeCtrl that provides an overview of the contents of a
- *       VESS scene.
+ *       SPIN scene.
  *
  * This class extends the regular wxTreeCtrl, adding methods for building the
- * tree from queries to the VESS sceneManager.
+ * tree from queries to the SceneManager.
  */
 class wxVessTreeCtrl : public wxTreeCtrl
 {
@@ -109,13 +109,13 @@ public:
     void Refresh();
 
     /**
-     * Adds the asReferenced node to the tree
+     * Adds the ReferencedNode node to the tree
      */
-    void addToTree(asReferenced *n, wxTreeItemId parentID);
+    void addToTree(ReferencedNode *n, wxTreeItemId parentID);
 
     /**
      * This adds a node to the tree. Note that this function will typicall be
-     * called as a result of a createNode message broadcasted from vess AFTER
+     * called as a result of a createNode message broadcasted from SPIN AFTER
      * the node is actually instantiated in memory, so we don't need to actually
      * create it. We should be able to find it in the sceneManager, and just
      * create a tree item (using the addToTree() method).
@@ -123,9 +123,9 @@ public:
     void addNode(const char *id, const char *type);
 
     /**
-     * Remove a node from the tree. Note that the node may not exist in the VESS
-     * scene any more, so we need to perform all searches and comparisons only with
-     * the string id provided.
+     * Remove a node from the tree. Note that the node may not exist in the
+     * scene any more, so we need to perform all searches and comparisons only
+     * with the string id provided.
      */
     void removeNode(const char *id);
 
@@ -133,12 +133,12 @@ public:
      * This method allows us to select a node in the tree programatically. It is
      * useful, for example, when the selected node is deleted.
      */
-    bool SelectNode(asReferenced* pNode);
+    bool SelectNode(ReferencedNode* pNode);
 
     /**
-     * GetTreeItem returns the wxTreeItemId given an asReferenced node pointer
+     * GetTreeItem returns the wxTreeItemId given an ReferencedNode node pointer
      */
-    wxTreeItemId GetTreeItem(asReferenced* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
+    wxTreeItemId GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
 
     /**
      * GetTreeItem returns the wxTreeItemId given an id. This is useful in the case
@@ -149,14 +149,14 @@ public:
     wxTreeItemId GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
 
     /**
-     * Get the current asReferenced node that the user has selected in the tree
+     * Get the current ReferencedNode node that the user has selected in the tree
      */
-    asReferenced* GetSelectedNode() const;
+    ReferencedNode* GetSelectedNode() const;
 
     /**
-     * Get the asReferenced node stored in a TreeCtrl leaf
+     * Get the ReferencedNode node stored in a TreeCtrl leaf
      */
-    asReferenced* GetNode(const wxTreeItemId& item) const;
+    ReferencedNode* GetNode(const wxTreeItemId& item) const;
 
     /**
      * Updates the tree item's icon

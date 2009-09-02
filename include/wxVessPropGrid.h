@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 //
@@ -55,7 +55,7 @@
 #include <osg/Plane>
 #include <osgIntrospection/PropertyInfo>
 
-#include "asReferenced.h"
+#include "ReferencedNode.h"
 #include "lo/lo.h"
 //#include "wxOsg/wxOsg.h"
 
@@ -86,9 +86,9 @@ public:
     void setListeningServer(lo_server_thread t);
 
     //! Set a new node to show.
-    void SetNode(asReferenced* pObject, bool forceUpdate=false);
+    void SetNode(ReferencedNode* pObject, bool forceUpdate=false);
 
-    asReferenced* GetCurrentNode() const {
+    ReferencedNode* GetCurrentNode() const {
         return currentNode.get();
     }
 
@@ -98,7 +98,7 @@ public:
 protected:
 
     //! Create a category and properties of the given object.
-    void GenerateProperties(const osgIntrospection::Type& type, asReferenced* pObject);
+    void GenerateProperties(const osgIntrospection::Type& type, ReferencedNode* pObject);
 
 	void OnPropertyChanging(wxPropertyGridEvent& event);
 
@@ -107,7 +107,7 @@ protected:
 
     void OnToolbarClicked(wxCommandEvent& event);
 
-    osg::ref_ptr<asReferenced> currentNode;    //!< Current osg object
+    osg::ref_ptr<ReferencedNode> currentNode;    //!< Current osg object
 
     lo_server_thread listeningServer;
 

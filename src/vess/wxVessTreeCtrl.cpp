@@ -35,7 +35,7 @@
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU Lesser General Public License for more details.
 //
-//  You should have received a copy of the Lesser GNU General Public License
+//  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 //
@@ -49,7 +49,7 @@
 #include "wxVessTreeCtrl.h"
 #include "wxVessTreeVisitor.h"
 #include "wxVessEditor.h"
-#include "vessThreads.h"
+#include "spinContext.h"
 
 extern spinContext *spin;
 extern pthread_mutex_t pthreadLock;
@@ -112,7 +112,7 @@ void wxVessTreeCtrl::setListeningServer(lo_server_thread t)
     // we can dynamically update the tree based on OSC messages:
     if (listeningServer)
     {
-        std::string oscPattern = "/vess/" + spin->id;
+        std::string oscPattern = "/SPIN/" + spin->id;
         lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessTreeCtrl_liblo_callback, (void*)this);
     }
 }
@@ -141,13 +141,14 @@ void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
 
 void wxVessTreeCtrl::Refresh()
 {
-    // TODO: more efficient method that compares existing tree to VESS, and adds
-    // or removes nodes accordingly while keeping the existing ones
+    // TODO: more efficient method that compares existing tree to SPIN's scene
+	// graph, and adds or removes nodes accordingly while keeping the existing
+	// ones
 
     BuildTree(spin->sceneManager->worldNode.get());
 }
 
-void wxVessTreeCtrl::addToTree(asReferenced *n, wxTreeItemId parentID)
+void wxVessTreeCtrl::addToTree(ReferencedNode *n, wxTreeItemId parentID)
 {
     Freeze();
     std::string strLabel = n->nodeType + " : " + n->id->s_name;
@@ -163,16 +164,16 @@ void wxVessTreeCtrl::addToTree(asReferenced *n, wxTreeItemId parentID)
 
 void wxVessTreeCtrl::addNode(const char *id, const char *type)
 {
-    // note that a createNode message was broadcast from vess AFTER the node was
+    // note that a createNode message was broadcast from SPIN AFTER the node was
     // instantiated, so we should now be able to find it in the sceneManager,
     // and so we'll create a tree item (if it doesn't already exist).
-    asReferenced *n = spin->sceneManager->getNode(id, type);
+    ReferencedNode *n = spin->sceneManager->getNode(id, type);
     if (!n) return;
 
     wxTreeItemId nodeInTree = GetTreeItem(n, GetRootItem());
     if (!nodeInTree)
     {
-        asReferenced *parentNode = spin->sceneManager->getNode(n->getParent(), type);
+        ReferencedNode *parentNode = spin->sceneManager->getNode(n->getParent(), type);
         wxTreeItemId parentInTree = GetTreeItem(n, GetRootItem());
         if (parentInTree) addToTree(n,parentInTree);
         else addToTree(n,GetRootItem());
@@ -199,7 +200,7 @@ void wxVessTreeCtrl::removeNode(const char *id)
 	}
 }
 
-bool wxVessTreeCtrl::SelectNode(asReferenced* pNode)
+bool wxVessTreeCtrl::SelectNode(ReferencedNode* pNode)
 {
     // there should always be at least one node (the scene root). If not, return
     // because this is a problem.
@@ -228,7 +229,7 @@ bool wxVessTreeCtrl::SelectNode(asReferenced* pNode)
 }
 
 
-wxTreeItemId wxVessTreeCtrl::GetTreeItem(asReferenced* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
+wxTreeItemId wxVessTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
     return GetTreeItem(pNode->id->s_name, idParent, cookie);
 
@@ -293,7 +294,7 @@ wxTreeItemId wxVessTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idPare
 }
 
 
-asReferenced* wxVessTreeCtrl::GetSelectedNode() const
+ReferencedNode* wxVessTreeCtrl::GetSelectedNode() const
 {
    if (!GetSelection())
         return NULL;
@@ -306,7 +307,7 @@ asReferenced* wxVessTreeCtrl::GetSelectedNode() const
 }
 
 
-asReferenced* wxVessTreeCtrl::GetNode(const wxTreeItemId& item) const
+ReferencedNode* wxVessTreeCtrl::GetNode(const wxTreeItemId& item) const
 {
     wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(item);
     if (!treeData)
@@ -322,9 +323,9 @@ void wxVessTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
     if (!treeData)
         return;
 
-    if (treeData->m_pNode->nodeType=="asBasicNode")
+    if (treeData->m_pNode->nodeType=="GroupNode")
         SetItemImage(id, 1, wxTreeItemIcon_Normal);
-    else if (treeData->m_pNode->nodeType=="asShape")
+    else if (treeData->m_pNode->nodeType=="ShapeNode")
         SetItemImage(id, wxTreeItemIcon_Normal);
     else
         SetItemImage(id, 0, wxTreeItemIcon_Normal);
@@ -344,7 +345,7 @@ void wxVessTreeCtrl::UpdatePropGrid()
         return;
     }
 
-    asReferenced *n = GetSelectedNode();
+    ReferencedNode *n = GetSelectedNode();
     if (n) VessPropGrid->SetNode(n);
     else VessPropGrid->SetNode(NULL); // This will empty the propgrid editor
 
@@ -364,7 +365,7 @@ void wxVessTreeCtrl::OnVessTreeDragBegin(wxTreeEvent &event)
 void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
 {
 
-    if (asReferenced *child = this->GetNode(draggedItem))
+    if (ReferencedNode *child = this->GetNode(draggedItem))
     {
         std::string parentString;
 
@@ -376,7 +377,7 @@ void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
 
         // otherwise, we get the node that this was dropped on, and set the
         // parent to that symbol:
-        else if (asReferenced *parent = this->GetNode(event.GetItem()))
+        else if (ReferencedNode *parent = this->GetNode(event.GetItem()))
         {
             parentString = parent->id->s_name;
         }
