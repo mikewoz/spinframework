@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="wxVessSettings">
+		<title>SPIN :: Settings</title>
+		<id_arg>0</id_arg>
+		<handler function="OnClose" entry="EVT_CLOSE" />
+		<object class="wxPanel" name="ID_PANEL1" variable="vessSettings_panel" member="yes">
+			<object class="wxBoxSizer" variable="BoxSizer1" member="no">
+				<orient>wxVERTICAL</orient>
+				<object class="sizeritem">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+						<cols>3</cols>
+						<object class="sizeritem">
+							<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+								<label>VESS Session ID:</label>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="vessID" member="yes">
+								<value>Default</value>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+					<border>5</border>
+					<option>1</option>
+				</object>
+				<object class="sizeritem">
+					<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+						<label>VESS Location (unicast):</label>
+						<object class="sizeritem">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+								<cols>4</cols>
+								<rows>1</rows>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+										<label>Addr:</label>
+										<font>
+											<size>9</size>
+											<sysfont>wxSYS_OEM_FIXED_FONT</sysfont>
+										</font>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="rxAddr" member="yes">
+										<value>Text</value>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+										<label>Port:</label>
+										<font>
+											<size>9</size>
+											<sysfont>wxSYS_OEM_FIXED_FONT</sysfont>
+										</font>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="rxPort" member="yes">
+										<value>Text</value>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+					<border>5</border>
+					<option>2</option>
+				</object>
+				<object class="sizeritem">
+					<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
+						<label>Broadcast/Multicast Channel:</label>
+						<object class="sizeritem">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+								<cols>4</cols>
+								<rows>1</rows>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+										<label>Addr:</label>
+										<font>
+											<size>9</size>
+											<sysfont>wxSYS_OEM_FIXED_FONT</sysfont>
+										</font>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="txAddr" member="yes">
+										<value>Text</value>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+										<label>Port:</label>
+										<font>
+											<size>9</size>
+											<sysfont>wxSYS_OEM_FIXED_FONT</sysfont>
+										</font>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="txPort" member="yes">
+										<value>Text</value>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+					<border>5</border>
+					<option>2</option>
+				</object>
+			</object>
+		</object>
+	</object>
+</wxsmith>

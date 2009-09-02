@@ -51,7 +51,7 @@
 
 
 /**
- * \brief Defines a camera perspective located within the scene
+ * \brief Defines a camera perspective located within the scene (NOT YET COMPLETE)
  *
  * This class is used to define camera properties, and is meant to be used with
  * a NodeTrackerManipulator in an osgViewer application
