@@ -122,7 +122,7 @@ spin.app: spin
 	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
 	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
 	-cp -R ../Resources/images $@/Contents/Resources
-	cp spin.icns $@/Contents/Resources/spin.icns
+	#cp spin.icns $@/Contents/Resources/spin.icns
 	./dylibbundler -of -b -x $@/Contents/MacOS/spin -d $@/Contents/libs
 
 spinViewer.app: spinViewer
@@ -145,7 +145,7 @@ spinViewer.app: spinViewer
 	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
 	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
-	cp logo_spinViewer.icns $@/Contents/Resources
+	cp ../Resources/logo_spinViewer.icns $@/Contents/Resources
 	./dylibbundler -of -b -x $@/Contents/MacOS/spinViewer -d $@/Contents/libs
 
 ########################################################
