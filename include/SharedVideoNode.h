@@ -39,8 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __sharedVideoNode_H
-#define __sharedVideoNode_H
+#ifndef __SharedVideoNode_H
+#define __SharedVideoNode_H
 
 #include <osg/TextureRectangle>
 #include <boost/thread/thread.hpp>
@@ -60,13 +60,13 @@
  *
  * This is accomplished by the use of boost/interprocess/shared_memory_object
  */
-class sharedVideoNode : public ShapeNode
+class SharedVideoNode : public ShapeNode
 {
 
 public:
 
-	sharedVideoNode(SceneManager *sceneManager, char *initID);
-	virtual ~sharedVideoNode();
+	SharedVideoNode(SceneManager *sceneManager, char *initID);
+	virtual ~SharedVideoNode();
 
 	virtual void callbackUpdate();
 	
@@ -95,12 +95,12 @@ private:
 
 	// from tristan:
 	boost::thread worker;
-    boost::mutex displayMutex_;
-    boost::condition_variable textureUploadedCondition_;
-    SharedVideoBuffer *sharedBuffer;
+	boost::mutex displayMutex_;
+	boost::condition_variable textureUploadedCondition_;
+	SharedVideoBuffer *sharedBuffer;
 	
-    boost::interprocess::shared_memory_object *shm;
-    boost::interprocess::mapped_region *region;    
+	boost::interprocess::shared_memory_object *shm;
+	boost::interprocess::mapped_region *region;    
     
 	bool killed_;
 

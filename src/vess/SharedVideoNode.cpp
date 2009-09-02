@@ -52,7 +52,7 @@
 
 
 #include "osgUtil.h"
-#include "sharedVideoNode.h"
+#include "SharedVideoNode.h"
 #include "SceneManager.h"
 #include "MediaManager.h"
 
@@ -67,10 +67,10 @@ extern pthread_mutex_t pthreadLock;
 
 // ===================================================================
 // constructor:
-sharedVideoNode::sharedVideoNode (SceneManager *sceneManager, char *initID) : ShapeNode(sceneManager, initID)
+SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : ShapeNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".sharedVideoNode");
-	nodeType = "sharedVideoNode";
+	this->setName(string(id->s_name) + ".SharedVideoNode");
+	nodeType = "SharedVideoNode";
 	
 
 	this->setShape(ShapeNode::SPHERE);
@@ -85,13 +85,13 @@ sharedVideoNode::sharedVideoNode (SceneManager *sceneManager, char *initID) : Sh
 
 // ===================================================================
 // destructor
-sharedVideoNode::~sharedVideoNode()
+SharedVideoNode::~SharedVideoNode()
 {
 
 }
 
 
-void sharedVideoNode::callbackUpdate()
+void SharedVideoNode::callbackUpdate()
 {
 
     // do update here
@@ -121,7 +121,7 @@ void sharedVideoNode::callbackUpdate()
 
 
 /// This function is executed in the worker thread
-void sharedVideoNode::consumeFrame()
+void SharedVideoNode::consumeFrame()
 {
 	std::cout << "in consumeFrame. killed=" << killed_ << std::endl;
 	
@@ -186,7 +186,7 @@ void sharedVideoNode::consumeFrame()
 }
 
 // ===================================================================
-void sharedVideoNode::signalKilled ()
+void SharedVideoNode::signalKilled ()
 {
     boost::mutex::scoped_lock displayLock(displayMutex_);
     killed_ = true;
@@ -194,7 +194,7 @@ void sharedVideoNode::signalKilled ()
 }
 
 // ===================================================================
-void sharedVideoNode::setTextureID (const char* id)
+void SharedVideoNode::setTextureID (const char* id)
 {
 
 	// only do this if the id has changed:
@@ -236,7 +236,7 @@ void sharedVideoNode::setTextureID (const char* id)
 	        
 	        // start our consumer thread, which is a member function of this class
 	        // and takes sharedBuffer as an argument
-	        worker = boost::thread(boost::bind<void>(boost::mem_fn(&sharedVideoNode::consumeFrame), boost::ref(*this)));
+	        worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoNode::consumeFrame), boost::ref(*this)));
 	        
 	        
 	    }
@@ -267,7 +267,7 @@ void sharedVideoNode::setTextureID (const char* id)
 
 
 // ===================================================================
-void sharedVideoNode::drawTexture()
+void SharedVideoNode::drawTexture()
 {
 	/*
 	if (textureID==0)
@@ -343,7 +343,7 @@ void sharedVideoNode::drawTexture()
 
 }
 
-std::vector<lo_message> sharedVideoNode::getState ()
+std::vector<lo_message> SharedVideoNode::getState ()
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ShapeNode::getState();

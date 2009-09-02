@@ -39,12 +39,13 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include <arpa/inet.h>
-#include <ifaddrs.h>
-#include <string>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <string>
 #include <sys/utsname.h>
-
+#include <ifaddrs.h>
+#include <arpa/inet.h>
 
 #include <osgIntrospection/Reflection>
 #include <osgIntrospection/Value>
