@@ -12,7 +12,7 @@ doc:
 	@echo ""; \
 	echo ">>>>>>>>>>>>>>>>>>>>> Generating Documentation <<<<<<<<<<<<<<<<<<<<<"; \
 	doxygen ./doxygen_config	
-	$(MAKE) -C src/vess doc
+	$(MAKE) -C src/spin doc
 
 osgWrappers:
 	@echo ""; \
@@ -28,16 +28,16 @@ libSPIN:
 spin:
 	@echo ""; \
 	echo ">>>>>>>>>>>>>>>>>>>>> Building SPIN <<<<<<<<<<<<<<<<<<<<<"; \
-	$(MAKE) -C src/vess
+	$(MAKE) -C src/spin
 
 clean:
 	-rm -rf doxygen/xml
 	-rm src/osgWrappers/*.cpp
 	-rm -rf doxygen/xml
 	$(MAKE) -C src/osgWrappers clean
-	$(MAKE) -C src/vess clean
+	$(MAKE) -C src/spin clean
 
 install:
 	$(MAKE) -C src/osgWrappers install
-	$(MAKE) -C src/vess install
+	$(MAKE) -C src/spin install
 
