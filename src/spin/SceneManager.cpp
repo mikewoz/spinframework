@@ -481,11 +481,11 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 	std::cout << "is type defined? " << tt.isDefined() << std::endl;
 	*/
 
+	try {	
 
-	// Let's use osgIntrospection to create a node of the proper type:
-	const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(type);
-	if (t.isDefined())
-	{
+		// Let's use osgIntrospection to create a node of the proper type:
+		const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(type);
+
 		//std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
 		//introspect_print_type(t);
 
@@ -537,8 +537,11 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 		*/
 		n = osgIntrospection::variant_cast<ReferencedNode*>(v);
 
-
-	} else {
+	}
+	
+	catch (osgIntrospection::Exception & ex)
+	{
+			
 		std::cout << "ERROR: Type " << type << " is not defined." << std::endl;
 		return NULL;
 	}
@@ -625,16 +628,13 @@ void SceneManager::deleteNode(const char *id)
 
 	if (n)
 	{
-	
 		// for the deleteNode method, all children nodes will remain, so we just
 		// change their parent to the "world":
-		vector<ReferencedNode*>::iterator childIter;
-		for (childIter = n->children.begin(); childIter!=n->children.end(); childIter++)
+		vector<ReferencedNode*>::iterator childIter = n->children.begin();
+		while (childIter!=n->children.end()) // iterator should automatically advance once child has changed parent
 		{
-			std::cout << "sstting parent for " << (*childIter)->id->s_name << " (who's current parent is " << (*childIter)->parent->s_name << ") to world" << std::endl;
 			(*childIter)->setParent("world");
 		}
-		
 		
 		doDelete(n);
 		

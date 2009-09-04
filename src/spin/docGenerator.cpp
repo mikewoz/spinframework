@@ -257,7 +257,7 @@ int main()
 	
 	output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
 	output << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n";
-	output << "<title>SpIF: SPIN (Spatial Interaction) Framework</title>\n";
+	output << "<title>SPIN (Spatial Interaction) Framework</title>\n";
 	output << "<link href=\"doxygen.css\" rel=\"stylesheet\" type=\"text/css\">\n";
 	output << "<link href=\"tabs.css\" rel=\"stylesheet\" type=\"text/css\">\n";
 	output << "</head><body>\n";

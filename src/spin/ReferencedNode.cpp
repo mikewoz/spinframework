@@ -161,10 +161,13 @@ void ReferencedNode::attach()
 	}
 
 	pthread_mutex_unlock(&pthreadLock);
-
+	
 	
 	// remove node from current parent (make sure to release the mutex first!)
-	if (this->parent != this->newParent) this->detach();
+	if (this->parent != this->newParent)
+	{
+		this->detach();
+	}
 
 	// update the new parent symbols:
 	this->parent = this->newParent;
@@ -173,9 +176,9 @@ void ReferencedNode::attach()
 	// update currentNodePath:
     this->updateNodePath();
 	
-	
 	// broadcast this change to any remote clients:
 	BROADCAST(this, "ss", "setParent", this->parent->s_name);
+	
 }
 
 // ***********************************************************
@@ -203,7 +206,6 @@ void ReferencedNode::detach()
 	}
 	
 	pthread_mutex_unlock(&pthreadLock);
-
 }
 
 
