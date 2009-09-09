@@ -307,11 +307,13 @@ void ShapeNode::drawShape()
 		shapeTransform->addChild(shapeGeode.get());
 		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
 		optimizer.optimize(shapeGeode.get()); // ?
-		drawTexture();
 	}
 
 	pthread_mutex_unlock(&pthreadLock);
 
+	
+	drawTexture();
+	
 }
 
 
@@ -328,12 +330,10 @@ void ShapeNode::drawTexture()
 	if (texturePath==string("NULL"))
 	{
 		// remove current texture
-		//shapeStateSet = new osg::StateSet();
-		shapeGeode->setStateSet( new osg::StateSet() );
-		return;
+		//shapeGeode->setStateSet( new osg::StateSet() );
 	}
 
-	if (shapeGeode.valid())
+	else if (shapeGeode.valid())
 	{
 
 		//osg::ref_ptr<osg::Image> image;
@@ -356,8 +356,8 @@ void ShapeNode::drawTexture()
 			shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
 			shapeTexture->setImage(textureImage.get());
 
-			//osg::StateSet *shapeStateSet = new osg::StateSet();
-			osg::StateSet *shapeStateSet = shapeGeode->getOrCreateStateSet();
+			osg::StateSet *shapeStateSet = new osg::StateSet();
+			//osg::StateSet *shapeStateSet = shapeGeode->getOrCreateStateSet();
 
 			// Turn blending on:
 			shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
@@ -377,7 +377,7 @@ void ShapeNode::drawTexture()
 			// Set Texture:
 			shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
 
-			//shapeGeode->setStateSet( shapeStateSet.get() );
+			shapeGeode->setStateSet( shapeStateSet );
 
 
 		} else {

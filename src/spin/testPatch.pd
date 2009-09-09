@@ -1,6 +1,6 @@
-#N canvas 76 368 630 581 10;
+#N canvas 105 184 865 635 10;
 #X obj 13 119 spigot;
-#X obj 13 83 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
+#X obj 13 83 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
 ;
 #X obj 124 101 AS_infoport;
 #X obj 124 138 print infoport;
@@ -32,6 +32,26 @@
 #X msg 84 279 createNode child1 ShapeNode;
 #X msg 136 322 createNode child2 ShapeNode;
 #X msg 171 362 createNode child3 ShapeNode;
+#X text 19 233 Creating parent/child relationships & deleting:;
+#X msg 425 229 createNode shvid SharedVideoNode;
+#X obj 454 446 s \$0-to-SPIN;
+#X msg 472 329 /shvid setShape \$1;
+#X obj 471 256 vradio 10 1 0 7 empty empty empty 0 -8 0 10 -262144
+-1 -1 6;
+#X text 482 253 NULL;
+#X text 482 263 Sphere;
+#X text 482 273 Box;
+#X text 482 283 Cylinder;
+#X text 482 293 Capsule;
+#X text 482 303 Cone;
+#X text 482 313 Plane;
+#X msg 498 353 /shvid setTranslation 0 5 0;
+#X msg 500 385 /shvid setTextureID shm1;
+#X msg 513 410 /shvid setTextureID shm2;
+#X text 454 208 SharedVideoNode:;
+#X msg 565 259 createNode shvid2 SharedVideoNode;
+#X msg 607 286 /shvid2 setTranslation 1 5 0;
+#X msg 627 306 /shvid2 setTextureID shm2;
 #X connect 0 0 23 0;
 #X connect 1 0 0 1;
 #X connect 2 0 5 0;
@@ -56,3 +76,12 @@
 #X connect 27 0 25 0;
 #X connect 28 0 25 0;
 #X connect 29 0 25 0;
+#X connect 31 0 32 0;
+#X connect 33 0 32 0;
+#X connect 34 0 33 0;
+#X connect 42 0 32 0;
+#X connect 43 0 32 0;
+#X connect 44 0 32 0;
+#X connect 46 0 32 0;
+#X connect 47 0 32 0;
+#X connect 48 0 32 0;

@@ -11,7 +11,7 @@
 	<key>CFBundleExecutable</key>
 	<string>EXECUTABLE</string>
 	<key>CFBundleIconFile</key>
-	<string>spin.icns</string>
+	<string>logo_spin.icns</string>
 	<key>CFBundleName</key>
 	<string>EXECUTABLE</string>
 	<key>CFBundlePackageType</key>
