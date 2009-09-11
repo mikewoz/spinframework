@@ -128,16 +128,16 @@
 		<Cursor position="5213" topLine="92" />
 	</File>
 	<File name="wxVessEditor.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="7762" topLine="95" />
+		<Cursor position="7766" topLine="54" />
 	</File>
 	<File name="wxVessMain.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="12888" topLine="121" />
+		<Cursor position="12904" topLine="121" />
 	</File>
 	<File name="wxVessPropGrid.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="3245" topLine="51" />
 	</File>
 	<File name="wxVessRenderer.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="3915" topLine="65" />
+		<Cursor position="3917" topLine="65" />
 	</File>
 	<File name="wxVessSettings.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="6154" topLine="68" />

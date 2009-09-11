@@ -1,6 +1,6 @@
-#N canvas 105 184 865 635 10;
+#N canvas 140 470 865 635 10;
 #X obj 13 119 spigot;
-#X obj 13 83 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1 1
+#X obj 13 83 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0 1
 ;
 #X obj 124 101 AS_infoport;
 #X obj 124 138 print infoport;
@@ -37,7 +37,7 @@
 #X obj 454 446 s \$0-to-SPIN;
 #X msg 472 329 /shvid setShape \$1;
 #X obj 471 256 vradio 10 1 0 7 empty empty empty 0 -8 0 10 -262144
--1 -1 6;
+-1 -1 2;
 #X text 482 253 NULL;
 #X text 482 263 Sphere;
 #X text 482 273 Box;
@@ -52,6 +52,8 @@
 #X msg 565 259 createNode shvid2 SharedVideoNode;
 #X msg 607 286 /shvid2 setTranslation 1 5 0;
 #X msg 627 306 /shvid2 setTextureID shm2;
+#X msg 587 439 /shvid setTextureID shared_memory;
+#X msg 540 487 /shvid setOrientation 30 0 20;
 #X connect 0 0 23 0;
 #X connect 1 0 0 1;
 #X connect 2 0 5 0;
@@ -85,3 +87,5 @@
 #X connect 46 0 32 0;
 #X connect 47 0 32 0;
 #X connect 48 0 32 0;
+#X connect 49 0 32 0;
+#X connect 50 0 32 0;
