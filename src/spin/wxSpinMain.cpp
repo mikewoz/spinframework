@@ -44,11 +44,11 @@
 #include <sstream>
 #include <ostream>
 
-#include "vessWX.h"
-#include "wxVessMain.h"
+#include "spinWX.h"
+#include "wxSpinMain.h"
 #include "spinContext.h"
-#include "wxVessEditor.h"
-#include "wxVessRenderer.h"
+#include "wxSpinEditor.h"
+#include "wxSpinRenderer.h"
 
 #include <wx/msgdlg.h>
 #include <wx/log.h>
@@ -59,7 +59,7 @@
 extern spinContext *spin;
 extern wxString resourcesPath;
 
-//(*InternalHeaders(wxVessFrame)
+//(*InternalHeaders(wxSpinFrame)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
@@ -90,50 +90,50 @@ wxString wxbuildinfo(wxbuildinfoformat format)
     return wxbuild;
 }
 
-//(*IdInit(wxVessMain)
-const long wxVessMain::ID_STATICTEXT1 = wxNewId();
-const long wxVessMain::ID_RADIOBUTTON1 = wxNewId();
-const long wxVessMain::ID_RADIOBUTTON2 = wxNewId();
-const long wxVessMain::ID_TOGGLEBUTTON2 = wxNewId();
-const long wxVessMain::ID_PANEL1 = wxNewId();
-const long wxVessMain::ID_TEXTCTRL6 = wxNewId();
-const long wxVessMain::ID_SCROLLEDWINDOW1 = wxNewId();
-const long wxVessMain::ID_SPLITTERWINDOW1 = wxNewId();
-const long wxVessMain::idMenuOpen = wxNewId();
-const long wxVessMain::idMenuSave = wxNewId();
-const long wxVessMain::idMenuQuit = wxNewId();
-const long wxVessMain::idMenuShowConfig = wxNewId();
-const long wxVessMain::idMenuShowEditor = wxNewId();
-const long wxVessMain::idMenuShowRenderer = wxNewId();
-const long wxVessMain::idMenuAbout = wxNewId();
-const long wxVessMain::ID_STATUSBAR1 = wxNewId();
-const long wxVessMain::wxVess_load = wxNewId();
-const long wxVessMain::wxVess_Save = wxNewId();
-const long wxVessMain::wxVess_showConfig = wxNewId();
-const long wxVessMain::wxVess_showRenderer = wxNewId();
-const long wxVessMain::wxVess_showEditor = wxNewId();
-const long wxVessMain::ID_TOOLBAR1 = wxNewId();
+//(*IdInit(wxSpinMain)
+const long wxSpinMain::ID_STATICTEXT1 = wxNewId();
+const long wxSpinMain::ID_RADIOBUTTON1 = wxNewId();
+const long wxSpinMain::ID_RADIOBUTTON2 = wxNewId();
+const long wxSpinMain::ID_TOGGLEBUTTON2 = wxNewId();
+const long wxSpinMain::ID_PANEL1 = wxNewId();
+const long wxSpinMain::ID_TEXTCTRL6 = wxNewId();
+const long wxSpinMain::ID_SCROLLEDWINDOW1 = wxNewId();
+const long wxSpinMain::ID_SPLITTERWINDOW1 = wxNewId();
+const long wxSpinMain::idMenuOpen = wxNewId();
+const long wxSpinMain::idMenuSave = wxNewId();
+const long wxSpinMain::idMenuQuit = wxNewId();
+const long wxSpinMain::idMenuShowConfig = wxNewId();
+const long wxSpinMain::idMenuShowEditor = wxNewId();
+const long wxSpinMain::idMenuShowRenderer = wxNewId();
+const long wxSpinMain::idMenuAbout = wxNewId();
+const long wxSpinMain::ID_STATUSBAR1 = wxNewId();
+const long wxSpinMain::wxSpin_load = wxNewId();
+const long wxSpinMain::wxSpin_Save = wxNewId();
+const long wxSpinMain::wxSpin_showConfig = wxNewId();
+const long wxSpinMain::wxSpin_showRenderer = wxNewId();
+const long wxSpinMain::wxSpin_showEditor = wxNewId();
+const long wxSpinMain::ID_TOOLBAR1 = wxNewId();
 //*)
 
-BEGIN_EVENT_TABLE(wxVessMain,wxFrame)
-    //(*EventTable(wxVessMain)
+BEGIN_EVENT_TABLE(wxSpinMain,wxFrame)
+    //(*EventTable(wxSpinMain)
     //*)
 END_EVENT_TABLE()
 
-wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
+wxSpinMain::wxSpinMain(wxWindow* parent,wxWindowID id)
 {
 
 
 
-    //(*Initialize(wxVessMain)
+    //(*Initialize(wxSpinMain)
+    wxMenuBar* wxSpin_MenuBar;
     wxMenuItem* MenuItem1;
     wxBoxSizer* BoxSizer2;
     wxMenu* Menu1;
     wxBoxSizer* BoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
     wxMenu* Menu2;
-    wxMenuBar* wxVess_MenuBar;
-
+    
     Create(parent, wxID_ANY, _("SPIN Framework"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(500,400));
     mainSplitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_NOBORDER|wxNO_BORDER, _T("ID_SPLITTERWINDOW1"));
@@ -144,11 +144,11 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     FlexGridSizer1 = new wxFlexGridSizer(0, 4, 0, 0);
     StaticText1 = new wxStaticText(mainPanel, ID_STATICTEXT1, _("Run as:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    vessRadio_master = new wxRadioButton(mainPanel, ID_RADIOBUTTON1, _("Server"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
-    FlexGridSizer1->Add(vessRadio_master, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    vessRadio_slave = new wxRadioButton(mainPanel, ID_RADIOBUTTON2, _("Client"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
-    vessRadio_slave->SetValue(true);
-    FlexGridSizer1->Add(vessRadio_slave, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    spinRadio_master = new wxRadioButton(mainPanel, ID_RADIOBUTTON1, _("Server"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+    FlexGridSizer1->Add(spinRadio_master, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    spinRadio_slave = new wxRadioButton(mainPanel, ID_RADIOBUTTON2, _("Client"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+    spinRadio_slave->SetValue(true);
+    FlexGridSizer1->Add(spinRadio_slave, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StartStop = new wxToggleButton(mainPanel, ID_TOGGLEBUTTON2, _("Start"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
     FlexGridSizer1->Add(StartStop, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer1->Add(FlexGridSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -163,7 +163,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     BoxSizer2->Fit(logPanel);
     BoxSizer2->SetSizeHints(logPanel);
     mainSplitter->SplitHorizontally(mainPanel, logPanel);
-    wxVess_MenuBar = new wxMenuBar();
+    wxSpin_MenuBar = new wxMenuBar();
     Menu1 = new wxMenu();
     MenuItem3 = new wxMenuItem(Menu1, idMenuOpen, _("&Load Scene\tCtrl-O"), _("Load a  scene from .xml"), wxITEM_NORMAL);
     Menu1->Append(MenuItem3);
@@ -171,7 +171,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     Menu1->Append(MenuItem4);
     MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
     Menu1->Append(MenuItem1);
-    wxVess_MenuBar->Append(Menu1, _("&File"));
+    wxSpin_MenuBar->Append(Menu1, _("&File"));
     Menu3 = new wxMenu();
     MenuItem5 = new wxMenuItem(Menu3, idMenuShowConfig, _("Show &Config\tF2"), _("Show the configuration panel"), wxITEM_NORMAL);
     Menu3->Append(MenuItem5);
@@ -179,51 +179,51 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     Menu3->Append(MenuItem6);
     MenuItem7 = new wxMenuItem(Menu3, idMenuShowRenderer, _("Show &Renderer\tCtrl-R"), _("Show the 3D renderer window"), wxITEM_NORMAL);
     Menu3->Append(MenuItem7);
-    wxVess_MenuBar->Append(Menu3, _("&View"));
+    wxSpin_MenuBar->Append(Menu3, _("&View"));
     Menu2 = new wxMenu();
-    wxVessMenu_About = new wxMenuItem(Menu2, idMenuAbout, _("&About"), wxEmptyString, wxITEM_NORMAL);
-    Menu2->Append(wxVessMenu_About);
-    wxVess_MenuBar->Append(Menu2, _("Help"));
-    SetMenuBar(wxVess_MenuBar);
-    wxVess_StatusBar = new wxStatusBar(this, ID_STATUSBAR1, 0, _T("ID_STATUSBAR1"));
+    wxSpinMenu_About = new wxMenuItem(Menu2, idMenuAbout, _("&About"), wxEmptyString, wxITEM_NORMAL);
+    Menu2->Append(wxSpinMenu_About);
+    wxSpin_MenuBar->Append(Menu2, _("Help"));
+    SetMenuBar(wxSpin_MenuBar);
+    wxSpin_StatusBar = new wxStatusBar(this, ID_STATUSBAR1, 0, _T("ID_STATUSBAR1"));
     int __wxStatusBarWidths_1[1] = { -1 };
     int __wxStatusBarStyles_1[1] = { wxSB_NORMAL };
-    wxVess_StatusBar->SetFieldsCount(1,__wxStatusBarWidths_1);
-    wxVess_StatusBar->SetStatusStyles(1,__wxStatusBarStyles_1);
-    SetStatusBar(wxVess_StatusBar);
-    wxVess_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-    wxVess_ToolBar->SetToolBitmapSize(wxSize(24,24));
-    ToolBarItem1 = wxVess_ToolBar->AddTool(wxVess_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
-    ToolBarItem2 = wxVess_ToolBar->AddTool(wxVess_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
-    wxVess_ToolBar->AddSeparator();
-    ToolBarItem3 = wxVess_ToolBar->AddTool(wxVess_showConfig, _("Configuration"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
-    wxVess_ToolBar->AddSeparator();
-    ToolBarItem4 = wxVess_ToolBar->AddTool(wxVess_showRenderer, _("Renderer"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
-    ToolBarItem5 = wxVess_ToolBar->AddTool(wxVess_showEditor, _("Editor"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
-    wxVess_ToolBar->Realize();
-    SetToolBar(wxVess_ToolBar);
-
-    Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&wxVessMain::OnVessModeChange);
-    Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&wxVessMain::OnVessModeChange);
-    Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&wxVessMain::OnStartStopToggle);
-    Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnLoadScene);
-    Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnSaveScene);
-    Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnQuit);
-    Connect(idMenuShowConfig,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnShowConfig);
-    Connect(idMenuShowEditor,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnShowEditor);
-    Connect(idMenuShowRenderer,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnShowRenderer);
-    Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxVessMain::OnAbout);
-    Connect(wxVess_load,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnLoadScene);
-    Connect(wxVess_Save,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnSaveScene);
-    Connect(wxVess_showConfig,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowConfig);
-    Connect(wxVess_showRenderer,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowRenderer);
-    Connect(wxVess_showEditor,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessMain::OnShowEditor);
-    Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&wxVessMain::OnClose);
+    wxSpin_StatusBar->SetFieldsCount(1,__wxStatusBarWidths_1);
+    wxSpin_StatusBar->SetStatusStyles(1,__wxStatusBarStyles_1);
+    SetStatusBar(wxSpin_StatusBar);
+    wxSpin_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
+    wxSpin_ToolBar->SetToolBitmapSize(wxSize(24,24));
+    ToolBarItem1 = wxSpin_ToolBar->AddTool(wxSpin_load, _("Load Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_OPEN")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Load a scene from .xml file"), _("Load a scene from .xml file"));
+    ToolBarItem2 = wxSpin_ToolBar->AddTool(wxSpin_Save, _("Save Scene"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_FILE_SAVE")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Save current scene"), _("Save current scene"));
+    wxSpin_ToolBar->AddSeparator();
+    ToolBarItem3 = wxSpin_ToolBar->AddTool(wxSpin_showConfig, _("Configuration"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show configuration panel"), _("Show configuration panel"));
+    wxSpin_ToolBar->AddSeparator();
+    ToolBarItem4 = wxSpin_ToolBar->AddTool(wxSpin_showRenderer, _("Renderer"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show the rendered 3D view"), _("Show the rendered 3D view"));
+    ToolBarItem5 = wxSpin_ToolBar->AddTool(wxSpin_showEditor, _("Editor"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Show the editor"), _("Show the editor"));
+    wxSpin_ToolBar->Realize();
+    SetToolBar(wxSpin_ToolBar);
+    
+    Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnSpinModeChange);
+    Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnSpinModeChange);
+    Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&wxSpinMain::OnStartStopToggle);
+    Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnLoadScene);
+    Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnSaveScene);
+    Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnQuit);
+    Connect(idMenuShowConfig,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnShowConfig);
+    Connect(idMenuShowEditor,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnShowEditor);
+    Connect(idMenuShowRenderer,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnShowRenderer);
+    Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&wxSpinMain::OnAbout);
+    Connect(wxSpin_load,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinMain::OnLoadScene);
+    Connect(wxSpin_Save,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinMain::OnSaveScene);
+    Connect(wxSpin_showConfig,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinMain::OnShowConfig);
+    Connect(wxSpin_showRenderer,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinMain::OnShowRenderer);
+    Connect(wxSpin_showEditor,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinMain::OnShowEditor);
+    Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&wxSpinMain::OnClose);
     //*)
 
     // on the Mac,
     #ifdef __WXMAC__
-    wxApp::s_macAboutMenuItemId = wxVessMenu_About->GetId();
+    wxApp::s_macAboutMenuItemId = wxSpinMenu_About->GetId();
     #endif
 
     wxIcon SPINIcon(resourcesPath + wxT("/logo_SPIN_simple.png"), wxBITMAP_TYPE_PNG);
@@ -232,31 +232,31 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 	// need to redo the icons with resourcePath:
 	wxImage icon_network(resourcesPath + _T("/icon_network.gif"));
 	icon_network.Rescale(32,32);
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showConfig, wxBitmap(icon_network) );
+    wxSpin_ToolBar->SetToolNormalBitmap( wxSpin_showConfig, wxBitmap(icon_network) );
 
 	wxImage icon_3Dview(resourcesPath + _T("/icon_3Dview.gif"));
 	icon_3Dview.Rescale(24,24);
-	wxVess_ToolBar->SetToolNormalBitmap( wxVess_showRenderer, wxBitmap(icon_3Dview) );
+	wxSpin_ToolBar->SetToolNormalBitmap( wxSpin_showRenderer, wxBitmap(icon_3Dview) );
 
 	wxImage icon_tree2(resourcesPath + _T("/icon_tree2.gif"));
 	icon_tree2.Rescale(24,24);
-    wxVess_ToolBar->SetToolNormalBitmap( wxVess_showEditor, wxBitmap(icon_tree2) );
+    wxSpin_ToolBar->SetToolNormalBitmap( wxSpin_showEditor, wxBitmap(icon_tree2) );
 
-	wxVess_ToolBar->Realize();
+	wxSpin_ToolBar->Realize();
 
 
     // sash position doesn't seem to work in wxSmith, so do it manually:
     mainSplitter->SetSashPosition(40);
 
-    vessSettingsFrame = new wxVessSettings(0);
-    vessSettingsFrame->vessID->SetValue( wxString( spin->id.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->rxAddr->SetValue( wxString( spin->rxAddr.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->rxPort->SetValue( wxString( spin->rxPort.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->txAddr->SetValue( wxString( spin->txAddr.c_str(), wxConvUTF8 ));
-    vessSettingsFrame->txPort->SetValue( wxString( spin->txPort.c_str(), wxConvUTF8 ));
+    spinSettingsFrame = new wxSpinSettings(0);
+    spinSettingsFrame->spinID->SetValue( wxString( spin->id.c_str(), wxConvUTF8 ));
+    spinSettingsFrame->rxAddr->SetValue( wxString( spin->rxAddr.c_str(), wxConvUTF8 ));
+    spinSettingsFrame->rxPort->SetValue( wxString( spin->rxPort.c_str(), wxConvUTF8 ));
+    spinSettingsFrame->txAddr->SetValue( wxString( spin->txAddr.c_str(), wxConvUTF8 ));
+    spinSettingsFrame->txPort->SetValue( wxString( spin->txPort.c_str(), wxConvUTF8 ));
 
 
-    //wxFFile logFile(wxT("vessWX.log"),wxT("w+"));
+    //wxFFile logFile(wxT("spinWX.log"),wxT("w+"));
     //wxLogTextCtrl w = new wxLogTextCtrl(logTextCtrl);
     //wxLog::SetActiveTarget(w);
     wxLog::SetActiveTarget(new wxLogTextCtrl(logTextCtrl));
@@ -265,7 +265,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 /*
 
 // TODO
-    spinLog log("vess.log");
+    spinLog log("spin.log");
     log.enable_wxlog(true);
     log.enable_cout(false);
 
@@ -280,7 +280,7 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
     std::cout.rdbuf(logTextCtrl);
 #endif
 
-    wxLogMessage(wxT("vessWX started"));
+    wxLogMessage(wxT("spinWX started"));
 
 
 #if wxUSE_STD_IOSTREAM
@@ -290,9 +290,9 @@ wxVessMain::wxVessMain(wxWindow* parent,wxWindowID id)
 
 }
 
-wxVessMain::~wxVessMain()
+wxSpinMain::~wxSpinMain()
 {
-    //(*Destroy(wxVessMain)
+    //(*Destroy(wxSpinMain)
     //*)
 
 #if wxUSE_STD_IOSTREAM
@@ -300,12 +300,12 @@ wxVessMain::~wxVessMain()
 #endif
 }
 
-void wxVessMain::OnQuit(wxCommandEvent& event)
+void wxSpinMain::OnQuit(wxCommandEvent& event)
 {
     Close();
 }
 
-void wxVessMain::OnAbout(wxCommandEvent& event)
+void wxSpinMain::OnAbout(wxCommandEvent& event)
 {
     wxString msg = wxbuildinfo(long_f);
    // wxMessageBox(msg, _("Welcome to..."));
@@ -325,7 +325,7 @@ void wxVessMain::OnAbout(wxCommandEvent& event)
 
 }
 
-void wxVessMain::OnLoadScene(wxCommandEvent& event)
+void wxSpinMain::OnLoadScene(wxCommandEvent& event)
 {
     if (spin->isRunning())
     {
@@ -346,7 +346,7 @@ void wxVessMain::OnLoadScene(wxCommandEvent& event)
 
 }
 
-void wxVessMain::OnSaveScene(wxCommandEvent& event)
+void wxSpinMain::OnSaveScene(wxCommandEvent& event)
 {
     if (spin->isRunning())
     {
@@ -371,29 +371,29 @@ void wxVessMain::OnSaveScene(wxCommandEvent& event)
 	}
 }
 
-void wxVessMain::OnShowConfig(wxCommandEvent& event)
+void wxSpinMain::OnShowConfig(wxCommandEvent& event)
 {
-    vessSettingsFrame->Show();
+    spinSettingsFrame->Show();
 }
 
-void wxVessMain::OnShowEditor(wxCommandEvent& event)
+void wxSpinMain::OnShowEditor(wxCommandEvent& event)
 {
     if (spin->isRunning())
     {
-        wxVessEditor* vessEditor = new wxVessEditor(0);
-        vessEditor->Show();
+        wxSpinEditor* spinEditor = new wxSpinEditor(0);
+        spinEditor->Show();
     } else {
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The server needs to be started before you can launch the editor."), wxT("SPIN not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
         dlg->ShowModal();
     }
 }
 
-void wxVessMain::OnShowRenderer(wxCommandEvent& event)
+void wxSpinMain::OnShowRenderer(wxCommandEvent& event)
 {
     if (spin->isRunning())
     {
-        wxVessRenderer* vessRenderer = new wxVessRenderer(0);
-        vessRenderer->Show();
+        wxSpinRenderer* spinRenderer = new wxSpinRenderer(0);
+        spinRenderer->Show();
     } else {
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The server needs to be started before you can launch the viewer."), wxT("SPIN not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
         dlg->ShowModal();
@@ -401,17 +401,17 @@ void wxVessMain::OnShowRenderer(wxCommandEvent& event)
 }
 
 
-void wxVessMain::OnStartStopToggle(wxCommandEvent& event)
+void wxSpinMain::OnStartStopToggle(wxCommandEvent& event)
 {
     if (event.IsChecked())
     {
-        spin->id = std::string(vessSettingsFrame->vessID->GetValue().mb_str());
-        spin->rxAddr = std::string(vessSettingsFrame->rxAddr->GetValue().mb_str());
-        spin->rxPort = std::string(vessSettingsFrame->rxPort->GetValue().mb_str());
-        spin->txAddr = std::string(vessSettingsFrame->txAddr->GetValue().mb_str());
-        spin->txPort = std::string(vessSettingsFrame->txPort->GetValue().mb_str());
+        spin->id = std::string(spinSettingsFrame->spinID->GetValue().mb_str());
+        spin->rxAddr = std::string(spinSettingsFrame->rxAddr->GetValue().mb_str());
+        spin->rxPort = std::string(spinSettingsFrame->rxPort->GetValue().mb_str());
+        spin->txAddr = std::string(spinSettingsFrame->txAddr->GetValue().mb_str());
+        spin->txPort = std::string(spinSettingsFrame->txPort->GetValue().mb_str());
 
-        if (vessRadio_master->GetValue()) spin->setMode(spinContext::SERVER_MODE);
+        if (spinRadio_master->GetValue()) spin->setMode(spinContext::SERVER_MODE);
         else spin->setMode(spinContext::LISTENER_MODE);
 
         spin->start();
@@ -432,7 +432,7 @@ void wxVessMain::OnStartStopToggle(wxCommandEvent& event)
 
 
 
-void wxVessMain::OnClose(wxCloseEvent& event)
+void wxSpinMain::OnClose(wxCloseEvent& event)
 {
     wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to quit?"), wxT("Quit?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);
 
@@ -440,16 +440,16 @@ void wxVessMain::OnClose(wxCloseEvent& event)
     {
         spin->stop();
 
-        if (vessSettingsFrame) vessSettingsFrame->Destroy();
-        //if (vessRenderer) vessRenderer->Destroy();
-        //if (vessEditor) vessEditor->Destroy();
+        if (spinSettingsFrame) spinSettingsFrame->Destroy();
+        //if (spinRenderer) spinRenderer->Destroy();
+        //if (spinEditor) spinEditor->Destroy();
 
         this->Destroy();
 
     } else event.Veto();
 }
 
-void wxVessMain::OnVessModeChange(wxCommandEvent& event)
+void wxSpinMain::OnSpinModeChange(wxCommandEvent& event)
 {
 
     std::cout << "Changed modes for SPIN. You must stop and restart before this takes effect." << std::endl;

@@ -39,10 +39,10 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef WXVESSMAIN_H
-#define WXVESSMAIN_H
+#ifndef WXSPINMAIN_H
+#define WXSPINMAIN_H
 
-//(*Headers(wxVessMain)
+//(*Headers(wxSpinMain)
 #include <wx/scrolwin.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -57,20 +57,20 @@
 #include <wx/statusbr.h>
 //*)
 
-#include "wxVessSettings.h"
-#include "wxVessEditor.h"
+#include "wxSpinSettings.h"
+#include "wxSpinEditor.h"
 #include <streambuf>
 
-class wxVessMain: public wxFrame
+class wxSpinMain: public wxFrame
 {
     public:
 
-        wxVessMain(wxWindow* parent,wxWindowID id = -1);
-        virtual ~wxVessMain();
+        wxSpinMain(wxWindow* parent,wxWindowID id = -1);
+        virtual ~wxSpinMain();
 
     private:
 
-        //(*Handlers(wxVessMain)
+        //(*Handlers(wxSpinMain)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
         void OnStartButtonClick(wxCommandEvent& event);
@@ -80,14 +80,14 @@ class wxVessMain: public wxFrame
         void OnShowConfig(wxCommandEvent& event);
         void OnShowEditor(wxCommandEvent& event);
         void OnShowRenderer(wxCommandEvent& event);
-        void OnChangeVessType(wxCommandEvent& event);
-        void OnVessMaster(wxCommandEvent& event);
-        void OnVessSlave(wxCommandEvent& event);
+        void OnChangeSpinType(wxCommandEvent& event);
+        void OnSpinMaster(wxCommandEvent& event);
+        void OnSpinSlave(wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
-        void OnVessModeChange(wxCommandEvent& event);
+        void OnSpinModeChange(wxCommandEvent& event);
         //*)
 
-        //(*Identifiers(wxVessMain)
+        //(*Identifiers(wxSpinMain)
         static const long ID_STATICTEXT1;
         static const long ID_RADIOBUTTON1;
         static const long ID_RADIOBUTTON2;
@@ -104,16 +104,15 @@ class wxVessMain: public wxFrame
         static const long idMenuShowRenderer;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
-        static const long wxVess_load;
-        static const long wxVess_Save;
-        static const long wxVess_showConfig;
-        static const long wxVess_showRenderer;
-        static const long wxVess_showEditor;
+        static const long wxSpin_load;
+        static const long wxSpin_Save;
+        static const long wxSpin_showConfig;
+        static const long wxSpin_showRenderer;
+        static const long wxSpin_showEditor;
         static const long ID_TOOLBAR1;
         //*)
 
-        //(*Declarations(wxVessMain)
-        wxToolBar* wxVess_ToolBar;
+        //(*Declarations(wxSpinMain)
         wxSplitterWindow* mainSplitter;
         wxToolBarToolBase* ToolBarItem4;
         wxPanel* mainPanel;
@@ -123,21 +122,22 @@ class wxVessMain: public wxFrame
         wxMenuItem* MenuItem5;
         wxMenu* Menu3;
         wxMenuItem* MenuItem4;
-        wxRadioButton* vessRadio_slave;
-        wxStatusBar* wxVess_StatusBar;
+        wxRadioButton* spinRadio_slave;
         wxStaticText* StaticText1;
-        wxRadioButton* vessRadio_master;
         wxToolBarToolBase* ToolBarItem1;
         wxMenuItem* MenuItem3;
         wxTextCtrl* logTextCtrl;
         wxMenuItem* MenuItem6;
         wxToolBarToolBase* ToolBarItem5;
-        wxMenuItem* wxVessMenu_About;
+        wxMenuItem* wxSpinMenu_About;
+        wxRadioButton* spinRadio_master;
+        wxToolBar* wxSpin_ToolBar;
         wxToolBarToolBase* ToolBarItem2;
+        wxStatusBar* wxSpin_StatusBar;
         wxToggleButton* StartStop;
         //*)
 
-        wxVessSettings *vessSettingsFrame;
+        wxSpinSettings *spinSettingsFrame;
 
 #if wxUSE_STD_IOSTREAM
         //wxStreamToTextRedirector *redirector;

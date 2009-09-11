@@ -45,8 +45,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef _WXVESSPROPGRID_H_
-#define _WXVESSPROPGRID_H_
+#ifndef _WXSPINPROPGRID_H_
+#define _WXSPINPROPGRID_H_
 
 #include <osg/Node>
 #include <osg/Texture>
@@ -70,14 +70,14 @@ DECLARE_EVENT_TYPE(EVT_WXPG_OBJECT_SELECTED, -1);
 DECLARE_EVENT_TYPE(EVT_WXPG_TOOLBAR_CLICKED, -1);
 
 /*!
-    @brief Property grid for VESS scene
+    @brief Property grid for SPIN scene
 */
-class wxVessPropGrid : public wxPropertyGridManager
+class wxSpinPropGrid : public wxPropertyGridManager
 {
 public:
 
     //! Constructor
-    wxVessPropGrid(wxWindow *parent, wxWindowID id = -1,
+    wxSpinPropGrid(wxWindow *parent, wxWindowID id = -1,
                   const wxPoint& pos = wxDefaultPosition,
                   const wxSize& size = wxDefaultSize,
                   long style = wxPG_SPLITTER_AUTO_CENTER | wxTAB_TRAVERSAL | wxPG_TOOLBAR | wxPG_DESCRIPTION,
@@ -93,7 +93,7 @@ public:
     }
 
     //! Updates all the properties based on getState() of currentNode
-    void UpdateFromVess();
+    void UpdateFromSpin();
 
 protected:
 
@@ -119,6 +119,6 @@ void lo_message_add_wxProp( lo_message msg, wxPGId propId, wxVariant val );
 
 void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_arg **args);
 
-int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+int wxSpinPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-#endif // _wxVessPropGrid_H_
+#endif // _wxSpinPropGrid_H_

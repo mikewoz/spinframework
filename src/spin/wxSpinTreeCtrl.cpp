@@ -46,9 +46,9 @@
 // -----------------------------------------------------------------------------
 
 
-#include "wxVessTreeCtrl.h"
-#include "wxVessTreeVisitor.h"
-#include "wxVessEditor.h"
+#include "wxSpinTreeCtrl.h"
+#include "wxSpinTreeVisitor.h"
+#include "wxSpinEditor.h"
 #include "spinContext.h"
 
 extern spinContext *spin;
@@ -56,18 +56,18 @@ extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
 
-BEGIN_EVENT_TABLE(wxVessTreeCtrl, wxTreeCtrl)
-    //EVT_TREE_SEL_CHANGED(wxVessEditor::publicVessTree, wxVessEditor::OnVessSelectionChange)
-	//EVT_TREE_BEGIN_DRAG(wxVessEditor::publicVessTree, wxVessEditor::OnDragBegin)
-	//EVT_TREE_END_DRAG(wxVessEditor::publicVessTree, wxVessEditor::OnDragEnd)
-	//EVT_TREE_ITEM_EXPANDING(O_TREE, wxVessTreeCtrl::OnItemExpanding)
-	//EVT_TREE_ITEM_COLLAPSED(O_TREE, wxVessTreeCtrl::OnItemCollapsed)
-	//EVT_TREE_ITEM_ACTIVATED(O_TREE, wxVessTreeCtrl::OnItemActivated)
+BEGIN_EVENT_TABLE(wxSpinTreeCtrl, wxTreeCtrl)
+    //EVT_TREE_SEL_CHANGED(wxSpinEditor::publicSpinTree, wxSpinEditor::OnSpinSelectionChange)
+	//EVT_TREE_BEGIN_DRAG(wxSpinEditor::publicSpinTree, wxSpinEditor::OnDragBegin)
+	//EVT_TREE_END_DRAG(wxSpinEditor::publicSpinTree, wxSpinEditor::OnDragEnd)
+	//EVT_TREE_ITEM_EXPANDING(O_TREE, wxSpinTreeCtrl::OnItemExpanding)
+	//EVT_TREE_ITEM_COLLAPSED(O_TREE, wxSpinTreeCtrl::OnItemCollapsed)
+	//EVT_TREE_ITEM_ACTIVATED(O_TREE, wxSpinTreeCtrl::OnItemActivated)
 END_EVENT_TABLE()
 
 
 
-wxVessTreeCtrl::wxVessTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
+wxSpinTreeCtrl::wxSpinTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
     long style, const wxValidator& validator, const wxString& name) : wxTreeCtrl(parent, id, pos, size, style, validator, name)
 {
 	/*
@@ -86,25 +86,25 @@ wxVessTreeCtrl::wxVessTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& p
     */
 
 
-    Connect(id,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&wxVessTreeCtrl::OnVessSelectionChange);
-    Connect(id,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&wxVessTreeCtrl::OnVessTreeDragBegin);
-    Connect(id,wxEVT_COMMAND_TREE_END_DRAG,  (wxObjectEventFunction)&wxVessTreeCtrl::OnVessTreeDragEnd);
+    Connect(id,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&wxSpinTreeCtrl::OnSpinSelectionChange);
+    Connect(id,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&wxSpinTreeCtrl::OnSpinTreeDragBegin);
+    Connect(id,wxEVT_COMMAND_TREE_END_DRAG,  (wxObjectEventFunction)&wxSpinTreeCtrl::OnSpinTreeDragEnd);
 
 /*
-    Connect(id, wxEVT_COMMAND_TREE_SEL_CHANGED, (wxObjectEventFunction)&wxVessTreeCtrl::OnVessSelectionChange);
-    Connect(id, wxEVT_COMMAND_TREE_BEGIN_DRAG,  (wxObjectEventFunction)&wxVessEditor::OnVessTreeDragBegin);
-    Connect(id, wxEVT_COMMAND_TREE_END_DRAG,    (wxObjectEventFunction)&wxVessEditor::OnVessTreeDragEnd);
+    Connect(id, wxEVT_COMMAND_TREE_SEL_CHANGED, (wxObjectEventFunction)&wxSpinTreeCtrl::OnSpinSelectionChange);
+    Connect(id, wxEVT_COMMAND_TREE_BEGIN_DRAG,  (wxObjectEventFunction)&wxSpinEditor::OnSpinTreeDragBegin);
+    Connect(id, wxEVT_COMMAND_TREE_END_DRAG,    (wxObjectEventFunction)&wxSpinEditor::OnSpinTreeDragEnd);
 */
 
-    // create and store and instance of wxVessTreeVisitor:
-    m_pSceneTreeVisitor = new wxVessTreeVisitor(this);
+    // create and store and instance of wxSpinTreeVisitor:
+    m_pSceneTreeVisitor = new wxSpinTreeVisitor(this);
 }
 
-wxVessTreeCtrl::~wxVessTreeCtrl()
+wxSpinTreeCtrl::~wxSpinTreeCtrl()
 {
 }
 
-void wxVessTreeCtrl::setListeningServer(lo_server_thread t)
+void wxSpinTreeCtrl::setListeningServer(lo_server_thread t)
 {
     this->listeningServer = t;
 
@@ -113,13 +113,13 @@ void wxVessTreeCtrl::setListeningServer(lo_server_thread t)
     if (listeningServer)
     {
         std::string oscPattern = "/SPIN/" + spin->id;
-        lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessTreeCtrl_liblo_callback, (void*)this);
+        lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxSpinTreeCtrl_liblo_callback, (void*)this);
     }
 }
 
 
 
-void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
+void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)
 {
     Freeze();
     DeleteAllItems();
@@ -139,7 +139,7 @@ void wxVessTreeCtrl::BuildTree(osg::Node* pRoot)
 
 }
 
-void wxVessTreeCtrl::Refresh()
+void wxSpinTreeCtrl::Refresh()
 {
     // TODO: more efficient method that compares existing tree to SPIN's scene
 	// graph, and adds or removes nodes accordingly while keeping the existing
@@ -148,12 +148,12 @@ void wxVessTreeCtrl::Refresh()
     BuildTree(spin->sceneManager->worldNode.get());
 }
 
-void wxVessTreeCtrl::addToTree(ReferencedNode *n, wxTreeItemId parentID)
+void wxSpinTreeCtrl::addToTree(ReferencedNode *n, wxTreeItemId parentID)
 {
     Freeze();
     std::string strLabel = n->nodeType + " : " + n->id->s_name;
 
-    wxVessTreeItemData *treeData = new wxVessTreeItemData;
+    wxSpinTreeItemData *treeData = new wxSpinTreeItemData;
     treeData->m_pNode = n;
 
     wxTreeItemId id = AppendItem(parentID, wxString(strLabel.c_str(),wxConvUTF8), -1, -1, treeData);
@@ -162,7 +162,7 @@ void wxVessTreeCtrl::addToTree(ReferencedNode *n, wxTreeItemId parentID)
     ExpandAll();
 }
 
-void wxVessTreeCtrl::addNode(const char *id, const char *type)
+void wxSpinTreeCtrl::addNode(const char *id, const char *type)
 {
     // note that a createNode message was broadcast from SPIN AFTER the node was
     // instantiated, so we should now be able to find it in the sceneManager,
@@ -182,7 +182,7 @@ void wxVessTreeCtrl::addNode(const char *id, const char *type)
 }
 
 
-void wxVessTreeCtrl::removeNode(const char *id)
+void wxSpinTreeCtrl::removeNode(const char *id)
 {
 	// if the node to be removed is currently selected, then select NULL (root)
 	if (strcmp(GetSelectedNode()->id->s_name,id)==0)
@@ -200,7 +200,7 @@ void wxVessTreeCtrl::removeNode(const char *id)
 	}
 }
 
-bool wxVessTreeCtrl::SelectNode(ReferencedNode* pNode)
+bool wxSpinTreeCtrl::SelectNode(ReferencedNode* pNode)
 {
     // there should always be at least one node (the scene root). If not, return
     // because this is a problem.
@@ -229,7 +229,7 @@ bool wxVessTreeCtrl::SelectNode(ReferencedNode* pNode)
 }
 
 
-wxTreeItemId wxVessTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
+wxTreeItemId wxSpinTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
     return GetTreeItem(pNode->id->s_name, idParent, cookie);
 
@@ -239,7 +239,7 @@ wxTreeItemId wxVessTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idP
 
     std::cout << "lookging for node '" << pNode->id->s_name "' in tree ... " << std::endl;
 
-    wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(idParent);
+    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(idParent);
     if (treeData)
     {
         if (treeData->m_pNode.get() == pNode)
@@ -266,11 +266,11 @@ wxTreeItemId wxVessTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idP
 }
 
 
-wxTreeItemId wxVessTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie)
+wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
     if (!idParent.IsOk()) return NULL;
 
-    wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(idParent);
+    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(idParent);
     if (treeData)
     {
         if (strcmp(treeData->m_pNode->id->s_name,nodeId) == 0)
@@ -294,12 +294,12 @@ wxTreeItemId wxVessTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idPare
 }
 
 
-ReferencedNode* wxVessTreeCtrl::GetSelectedNode() const
+ReferencedNode* wxSpinTreeCtrl::GetSelectedNode() const
 {
    if (!GetSelection())
         return NULL;
 
-    wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(GetSelection());
+    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(GetSelection());
     if (!treeData)
         return NULL;
 
@@ -307,9 +307,9 @@ ReferencedNode* wxVessTreeCtrl::GetSelectedNode() const
 }
 
 
-ReferencedNode* wxVessTreeCtrl::GetNode(const wxTreeItemId& item) const
+ReferencedNode* wxSpinTreeCtrl::GetNode(const wxTreeItemId& item) const
 {
-    wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(item);
+    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(item);
     if (!treeData)
         return NULL;
 
@@ -317,9 +317,9 @@ ReferencedNode* wxVessTreeCtrl::GetNode(const wxTreeItemId& item) const
 }
 
 
-void wxVessTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
+void wxSpinTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
 {
-    wxVessTreeItemData *treeData = (wxVessTreeItemData*)GetItemData(id);
+    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(id);
     if (!treeData)
         return;
 
@@ -331,38 +331,38 @@ void wxVessTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
         SetItemImage(id, 0, wxTreeItemIcon_Normal);
 }
 
-void wxVessTreeCtrl::SetPropGrid(wxVessPropGrid *PG)
+void wxSpinTreeCtrl::SetPropGrid(wxSpinPropGrid *PG)
 {
     if (!PG) return;
-    VessPropGrid = PG;
+    SpinPropGrid = PG;
 }
 
-void wxVessTreeCtrl::UpdatePropGrid()
+void wxSpinTreeCtrl::UpdatePropGrid()
 {
-    if (!VessPropGrid)
+    if (!SpinPropGrid)
     {
-        std::cout << "wxVessTreeCtrl: Oops. VessPropGrid does not exist. Cannot populate the property editor." << std::endl;
+        std::cout << "wxSpinTreeCtrl: Oops. SpinPropGrid does not exist. Cannot populate the property editor." << std::endl;
         return;
     }
 
     ReferencedNode *n = GetSelectedNode();
-    if (n) VessPropGrid->SetNode(n);
-    else VessPropGrid->SetNode(NULL); // This will empty the propgrid editor
+    if (n) SpinPropGrid->SetNode(n);
+    else SpinPropGrid->SetNode(NULL); // This will empty the propgrid editor
 
 }
 
-void wxVessTreeCtrl::OnVessSelectionChange(wxTreeEvent &event)
+void wxSpinTreeCtrl::OnSpinSelectionChange(wxTreeEvent &event)
 {
     UpdatePropGrid();
 }
 
-void wxVessTreeCtrl::OnVessTreeDragBegin(wxTreeEvent &event)
+void wxSpinTreeCtrl::OnSpinTreeDragBegin(wxTreeEvent &event)
 {
     draggedItem = event.GetItem();
 	event.Allow();
 }
 
-void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
+void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
 {
 
     if (ReferencedNode *child = this->GetNode(draggedItem))
@@ -396,12 +396,12 @@ void wxVessTreeCtrl::OnVessTreeDragEnd(wxTreeEvent &event)
 }
 
 
-int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int wxSpinTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     // make sure there is at least one argument (ie, a method to call):
 	if (!argc) return 0;
 
-    wxVessTreeCtrl *treeCtrl = (wxVessTreeCtrl*) user_data;
+    wxSpinTreeCtrl *treeCtrl = (wxSpinTreeCtrl*) user_data;
 
     if (!treeCtrl) return 0;
 

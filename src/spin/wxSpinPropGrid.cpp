@@ -62,7 +62,7 @@
 
 
 //#include "wxOsg/wxOsgPGValueType.h"
-#include "wxVessPropGrid.h"
+#include "wxSpinPropGrid.h"
 #include "nodeVisitors.h"
 #include "libloUtil.h"
 
@@ -90,10 +90,10 @@ enum
 DEFINE_EVENT_TYPE(EVT_WXPG_OBJECT_SELECTED);
 DEFINE_EVENT_TYPE(EVT_WXPG_TOOLBAR_CLICKED);
 
-BEGIN_EVENT_TABLE(wxVessPropGrid, wxPropertyGridManager)
-	EVT_PG_CHANGING(wxID_ANY, wxVessPropGrid::OnPropertyChanging)
-    EVT_PG_CHANGED(wxID_ANY, wxVessPropGrid::OnPropertyChanged)
-    EVT_MENU(wxID_ANY, wxVessPropGrid::OnToolbarClicked)
+BEGIN_EVENT_TABLE(wxSpinPropGrid, wxPropertyGridManager)
+	EVT_PG_CHANGING(wxID_ANY, wxSpinPropGrid::OnPropertyChanging)
+    EVT_PG_CHANGED(wxID_ANY, wxSpinPropGrid::OnPropertyChanged)
+    EVT_MENU(wxID_ANY, wxSpinPropGrid::OnToolbarClicked)
 END_EVENT_TABLE()
 
 /*!
@@ -105,7 +105,7 @@ END_EVENT_TABLE()
     @param[in] style
     @param[in] name
 */
-wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxChar* name) : wxPropertyGridManager(parent, id, pos, size, style, name)
+wxSpinPropGrid::wxSpinPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxChar* name) : wxPropertyGridManager(parent, id, pos, size, style, name)
 {
     SetExtraStyle(wxPG_EX_MODE_BUTTONS | wxPG_EX_HIDE_PAGE_BUTTONS);
 
@@ -131,7 +131,7 @@ wxVessPropGrid::wxVessPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
 }
 
 
-void wxVessPropGrid::setListeningServer(lo_server_thread t) {
+void wxSpinPropGrid::setListeningServer(lo_server_thread t) {
     this->listeningServer = t;
 }
 
@@ -140,7 +140,7 @@ void wxVessPropGrid::setListeningServer(lo_server_thread t) {
     @param[in] newNode New object to show.
     @param[in] forcaUpdate If 'true', force update when the new object is same as the current displayed object.
 */
-void wxVessPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
+void wxSpinPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
 {
     if (currentNode == newNode && !forceUpdate) return;
 
@@ -186,7 +186,7 @@ void wxVessPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
 
             // add the new method:
             oscPattern = "/SPIN/" + spin->id + "/" + std::string(newNode->id->s_name);
-            lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxVessPropGrid_liblo_callback, (void*)this);
+            lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxSpinPropGrid_liblo_callback, (void*)this);
         }
 
     }
@@ -195,7 +195,7 @@ void wxVessPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
     // finally, update our internal pointer:
     currentNode = newNode;
 
-    if (newNode) UpdateFromVess();
+    if (newNode) UpdateFromSpin();
 
     GetGrid()->RefreshEditor();
 
@@ -214,7 +214,7 @@ void wxVessPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
     */
 }
 
-void wxVessPropGrid::UpdateFromVess()
+void wxSpinPropGrid::UpdateFromSpin()
 {
 
     GetGrid()->Freeze();
@@ -260,7 +260,7 @@ void wxVessPropGrid::UpdateFromVess()
  * need to be void functions that take at least one argument, such as something
  * like: void setTranslation(float x, float y, float z).
  */
-void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType, ReferencedNode* pObject)
+void wxSpinPropGrid::GenerateProperties(const osgIntrospection::Type& classType, ReferencedNode* pObject)
 {
 	// TODO: we should try to store this globally somewhere, so that we don't do
 	// a lookup every time there is a message:
@@ -488,7 +488,7 @@ void wxVessPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
  * (including this one!), hence we need to be careful about how properties are
  * updated.
  */
-void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
+void wxSpinPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
 {
     wxPGId id = event.GetProperty();
     if (!id) return;
@@ -534,7 +534,7 @@ void wxVessPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
     Property value is about to change.
     @param[in] event Event data.
 */
-void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
+void wxSpinPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 {
     wxPGId id = event.GetProperty();
     if (!id) return;
@@ -542,7 +542,7 @@ void wxVessPropGrid::OnPropertyChanged(wxPropertyGridEvent& event)
 }
 
 
-void wxVessPropGrid::OnToolbarClicked(wxCommandEvent& event)
+void wxSpinPropGrid::OnToolbarClicked(wxCommandEvent& event)
 {
     switch (event.GetId())
     {
@@ -680,12 +680,12 @@ void wxProp_from_lo_message(wxPGId parentId, const char *argTypes, int argc, lo_
 /**
  * The propGrid should only be updated by OSC messages. never from SPIN directly
  */
-int wxVessPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int wxSpinPropGrid_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     // make sure there is at least one argument (ie, a method to call):
 	if (!argc) return 0;
 
-    wxVessPropGrid *propGrid = (wxVessPropGrid*) user_data;
+    wxSpinPropGrid *propGrid = (wxSpinPropGrid*) user_data;
 
     if (!propGrid) return 0;
 

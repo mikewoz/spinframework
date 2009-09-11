@@ -45,14 +45,14 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef _wxVessTreeCtrl_H_
-#define _wxVessTreeCtrl_H_
+#ifndef _wxSpinTreeCtrl_H_
+#define _wxSpinTreeCtrl_H_
 
 #include "ReferencedNode.h"
 
-#include "vessWX.h"
-#include "wxVessPropGrid.h"
-//#include "wxVessEditor.h"
+#include "spinWX.h"
+#include "wxSpinPropGrid.h"
+//#include "wxSpinEditor.h"
 
 #include <osg/Node>
 #include <osg/Group>
@@ -65,13 +65,13 @@
 #include <wx/imaglist.h>
 #include <wx/treectrl.h>
 
-class wxVessTreeVisitor;
+class wxSpinTreeVisitor;
 
 
-class wxVessTreeItemData : public wxTreeItemData
+class wxSpinTreeItemData : public wxTreeItemData
 {
   public:
-    wxVessTreeItemData() {
+    wxSpinTreeItemData() {
         m_pNode = NULL;
     }
 
@@ -85,15 +85,15 @@ class wxVessTreeItemData : public wxTreeItemData
  * This class extends the regular wxTreeCtrl, adding methods for building the
  * tree from queries to the SceneManager.
  */
-class wxVessTreeCtrl : public wxTreeCtrl
+class wxSpinTreeCtrl : public wxTreeCtrl
 {
 public:
 
-    wxVessTreeCtrl(wxWindow* parent, wxWindowID id,
+    wxSpinTreeCtrl(wxWindow* parent, wxWindowID id,
                   const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
                   long style = wxTR_HAS_BUTTONS, const wxValidator& validator = wxDefaultValidator,
                   const wxString& name = wxT("treeCtrl"));
-    virtual ~wxVessTreeCtrl();
+    virtual ~wxSpinTreeCtrl();
 
 
     void setListeningServer(lo_server_thread t);
@@ -169,19 +169,19 @@ public:
     void UpdatePropGrid();
 
     /**
-     * Sets the internal VessPropGrid pointer. This is needed because when a
+     * Sets the internal SpinPropGrid pointer. This is needed because when a
      * node is selected in the tree, it will populate the prop grid below.
      */
-    void SetPropGrid(wxVessPropGrid *PG);
+    void SetPropGrid(wxSpinPropGrid *PG);
 
 
      /**
      * When a user selects a node in the TreeCtrl, this event is produced.
      */
-    void OnVessSelectionChange(wxTreeEvent &event);
+    void OnSpinSelectionChange(wxTreeEvent &event);
 
-    void OnVessTreeDragBegin(wxTreeEvent &event);
-    void OnVessTreeDragEnd(wxTreeEvent &event);
+    void OnSpinTreeDragBegin(wxTreeEvent &event);
+    void OnSpinTreeDragEnd(wxTreeEvent &event);
 
 
 
@@ -190,9 +190,9 @@ public:
 protected:
 
     wxImageList* m_pImages;
-    osg::ref_ptr<wxVessTreeVisitor> m_pSceneTreeVisitor;
+    osg::ref_ptr<wxSpinTreeVisitor> m_pSceneTreeVisitor;
 
-    wxVessPropGrid* VessPropGrid;
+    wxSpinPropGrid* SpinPropGrid;
 
     lo_server_thread listeningServer;
 
@@ -202,11 +202,11 @@ protected:
 };
 
 /**
- * For VessTreeCtrl, we need to listen to OSC messages for high level events
+ * For SpinTreeCtrl, we need to listen to OSC messages for high level events
  * such as the creation/deletion of nodes so that we may update the tree
  * accordingly.
  */
-int wxVessTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+int wxSpinTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 
-#endif // _wxVessTreeCtrl_H_
+#endif // _wxSpinTreeCtrl_H_

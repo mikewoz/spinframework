@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxFrame" name="wxVessEditor">
+	<object class="wxFrame" name="wxSpinEditor">
 		<title>SPIN :: Editor</title>
 		<size>-1,600</size>
 		<id_arg>0</id_arg>
-		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="vessEditor_splitter" member="yes">
+		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="spinEditor_splitter" member="yes">
 			<sashpos>150</sashpos>
 			<minsize>50</minsize>
 			<minsize>50,50</minsize>
@@ -12,9 +12,9 @@
 				<object class="wxBoxSizer" variable="BoxSizer1" member="no">
 					<orient>wxVERTICAL</orient>
 					<object class="sizeritem">
-						<object class="Custom" name="ID_VESS_TREE" subclass="wxVessTreeCtrl" variable="vessTree" member="yes">
+						<object class="Custom" name="ID_SPIN_TREE" subclass="wxSpinTreeCtrl" variable="spinTree" member="yes">
 							<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE),wxDefaultValidator,$(NAME));</creating_code>
-							<include_file>wxVessTreeCtrl.h</include_file>
+							<include_file>wxSpinTreeCtrl.h</include_file>
 							<local_include>1</local_include>
 							<style>wxTR__DEFAULT__STYLE</style>
 						</object>
@@ -28,9 +28,9 @@
 				<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
 					<label>Editor:</label>
 					<object class="sizeritem">
-						<object class="Custom" name="ID_CUSTOM1" subclass="wxVessPropGrid" variable="VessPropGrid" member="yes">
+						<object class="Custom" name="ID_CUSTOM1" subclass="wxSpinPropGrid" variable="SpinPropGrid" member="yes">
 							<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE));</creating_code>
-							<include_file>wxVessPropGrid.h</include_file>
+							<include_file>wxSpinPropGrid.h</include_file>
 							<local_include>1</local_include>
 							<style></style>
 						</object>
@@ -41,24 +41,24 @@
 				</object>
 			</object>
 		</object>
-		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVessEditor_ToolBar" member="yes">
+		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxSpinEditor_ToolBar" member="yes">
 			<bitmapsize>24,24</bitmapsize>
-			<object class="tool" name="vessEditor_clear" variable="ToolBarItem1" member="yes">
+			<object class="tool" name="spinEditor_clear" variable="ToolBarItem1" member="yes">
 				<label>Clear</label>
 				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Clear the current scene</tooltip>
 				<longhelp>Clear the current scene</longhelp>
 				<handler function="OnClear" entry="EVT_TOOL" />
 			</object>
-			<object class="tool" name="vessEditor_refresh" variable="ToolBarItem2" member="yes">
+			<object class="tool" name="spinEditor_refresh" variable="ToolBarItem2" member="yes">
 				<label>Refresh</label>
 				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Refresh the scene</tooltip>
-				<longhelp>This will resync with the VESS server, ensuring that the scene is up to date.</longhelp>
+				<longhelp>This will resync with the SPIN server, ensuring that the scene is up to date.</longhelp>
 				<handler function="OnRefresh" entry="EVT_TOOL" />
 			</object>
 			<object class="separator" />
-			<object class="tool" name="vessEditor_debugPrint" variable="ToolBarItem3" member="yes">
+			<object class="tool" name="spinEditor_debugPrint" variable="ToolBarItem3" member="yes">
 				<label>DebugPrint</label>
 				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Debug Print to Console</tooltip>
@@ -66,14 +66,14 @@
 				<handler function="OnDebugPrint" entry="EVT_TOOL" />
 			</object>
 			<object class="separator" />
-			<object class="tool" name="vessEditor_newNode" variable="ToolBarItem4" member="yes">
+			<object class="tool" name="spinEditor_newNode" variable="ToolBarItem4" member="yes">
 				<label>New Node</label>
 				<bitmap stock_id="wxART_NEW" stock_client="wxART_BUTTON" />
 				<tooltip>Create a new node</tooltip>
 				<longhelp>This will allow you to create a new node (a dialog will let you choose the type)</longhelp>
 				<handler function="OnNewNode" entry="EVT_TOOL" />
 			</object>
-			<object class="tool" name="vessEditor_deleteNode" variable="ToolBarItem5" member="yes">
+			<object class="tool" name="spinEditor_deleteNode" variable="ToolBarItem5" member="yes">
 				<label>Delete Selected Node</label>
 				<bitmap stock_id="wxART_DELETE" stock_client="wxART_BUTTON" />
 				<tooltip>Delete the currently selected node</tooltip>

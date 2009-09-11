@@ -136,6 +136,8 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ###################################################################
 # For appsink:
 
-APPSINK_PATH=$(HOME)/src/miville/inhouse/prototypes/appsink
+ifndef APPSINK_PATH
+  APPSINK_PATH=$(HOME)/src/miville/inhouse/prototypes/appsink
+endif
 SPIN_INCLUDE+=-I$(APPSINK_PATH)
 

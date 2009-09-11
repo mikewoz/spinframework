@@ -46,17 +46,17 @@
 // -----------------------------------------------------------------------------
 
 
-#include "wxVessTreeCtrl.h"
-#include "wxVessTreeVisitor.h"
+#include "wxSpinTreeCtrl.h"
+#include "wxSpinTreeVisitor.h"
 #include "ReferencedNode.h"
 
-wxVessTreeVisitor::wxVessTreeVisitor(wxVessTreeCtrl* pTreeCtrl) :
+wxSpinTreeVisitor::wxSpinTreeVisitor(wxSpinTreeCtrl* pTreeCtrl) :
     osg::NodeVisitor(osg::NodeVisitor::NODE_VISITOR, osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
 {
     m_pTreeCtrl = pTreeCtrl;
 }
 
-void wxVessTreeVisitor::SetParentTreeItem(wxTreeItemId* pParentId)
+void wxSpinTreeVisitor::SetParentTreeItem(wxTreeItemId* pParentId)
 {
     if (pParentId)
         m_currentParentId = *pParentId;
@@ -64,15 +64,15 @@ void wxVessTreeVisitor::SetParentTreeItem(wxTreeItemId* pParentId)
         m_currentParentId = wxTreeItemId();
 }
 
-void wxVessTreeVisitor::apply(osg::Node& node)
+void wxSpinTreeVisitor::apply(osg::Node& node)
 {
     // for any node other than an osg::Group, just keep going:
     traverse(node);
 }
 
-void wxVessTreeVisitor::apply(osg::Group& node)
+void wxSpinTreeVisitor::apply(osg::Group& node)
 {
-    //std::cout << "wxVessTreeVisitor parsing group " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
+    //std::cout << "wxSpinTreeVisitor parsing group " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
 
     // for osg::Group, we check if it can be cast as an ReferencedNode, and add
     // it to the treeCtrl if so:
@@ -96,7 +96,7 @@ void wxVessTreeVisitor::apply(osg::Group& node)
 
 /*
 
-void wxVessTreeVisitor::apply(osg::Node& node)
+void wxSpinTreeVisitor::apply(osg::Node& node)
 {
     AddToTree(&node);
 
@@ -108,7 +108,7 @@ void wxVessTreeVisitor::apply(osg::Node& node)
     traverse(node);
 }
 
-void wxVessTreeVisitor::apply(osg::Group& node)
+void wxSpinTreeVisitor::apply(osg::Group& node)
 {
     //Commented out by mikewoz
     //if (dynamic_cast<orh::SelectionDecorator*>(&node))
@@ -128,7 +128,7 @@ void wxVessTreeVisitor::apply(osg::Group& node)
     m_currentParentId = parentId;
 }
 
-void wxVessTreeVisitor::apply(osg::Geode& node)
+void wxSpinTreeVisitor::apply(osg::Geode& node)
 {
     wxTreeItemId parentId = m_currentParentId;
     m_currentParentId = AddToTree(&node);
@@ -146,7 +146,7 @@ void wxVessTreeVisitor::apply(osg::Geode& node)
     m_currentParentId = parentId;
 }
 
-void wxVessTreeVisitor::apply(osg::Drawable& drawable)
+void wxSpinTreeVisitor::apply(osg::Drawable& drawable)
 {
     wxTreeItemId parentId = m_currentParentId;
     m_currentParentId = AddToTree(&drawable);
@@ -160,7 +160,7 @@ void wxVessTreeVisitor::apply(osg::Drawable& drawable)
     m_currentParentId = parentId;
 }
 
-void wxVessTreeVisitor::apply(osg::StateSet& stateSet)
+void wxSpinTreeVisitor::apply(osg::StateSet& stateSet)
 {
     wxTreeItemId parentId = m_currentParentId;
     m_currentParentId = AddToTree(&stateSet);
@@ -183,7 +183,7 @@ void wxVessTreeVisitor::apply(osg::StateSet& stateSet)
     m_currentParentId = parentId;
 }
 
-void wxVessTreeVisitor::apply(osg::StateAttribute& stateAttrib)
+void wxSpinTreeVisitor::apply(osg::StateAttribute& stateAttrib)
 {
     wxTreeItemId parentId = m_currentParentId;
     m_currentParentId = AddToTree(&stateAttrib);
@@ -203,14 +203,14 @@ void wxVessTreeVisitor::apply(osg::StateAttribute& stateAttrib)
 */
 
 
-wxTreeItemId wxVessTreeVisitor::AddToTree(ReferencedNode* n)
+wxTreeItemId wxSpinTreeVisitor::AddToTree(ReferencedNode* n)
 {
 
     wxTreeItemId currentId;
     if (!n) return currentId;
 
     std::string strLabel = n->nodeType + " : " + n->id->s_name;
-    wxVessTreeItemData *treeData = new wxVessTreeItemData;
+    wxSpinTreeItemData *treeData = new wxSpinTreeItemData;
     treeData->m_pNode = n;
 
 

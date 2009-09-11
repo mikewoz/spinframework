@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -38,58 +38,78 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
-//
-//  NOTE: This file is based on source code from the Orihalcon Framework Library
-//  Copyright (C) 2005 by Toshiyuki Takahei <takahei@orihalcon.jp>
-//  (Released under the GNU Lesser General Public License)
-//
-// -----------------------------------------------------------------------------
 
+#ifndef WXSPINEDITOR_H
+#define WXSPINEDITOR_H
 
-#ifndef _WXVESSTREEVISITOR_H_
-#define _WXVESSTREEVISITOR_H_
+//(*Headers(wxSpinEditor)
+#include "wxSpinPropGrid.h"
+#include <wx/sizer.h>
+#include <wx/splitter.h>
+#include <wx/toolbar.h>
+#include <wx/panel.h>
+#include "wxSpinTreeCtrl.h"
+#include <wx/frame.h>
+//*)
 
-#include <osg/NodeVisitor>
-#include <osg/Node>
-#include <osg/Group>
-#include <osg/Geode>
-#include <osg/Drawable>
-#include <osg/StateSet>
-#include <osg/StateAttribute>
-#include <osg/Texture>
-#include <osg/Image>
-
-//#include "wxOsg/wxOsg.h"
-#include <wx/treectrl.h>
-#include <wx/string.h>
-
-class wxVessTreeCtrl;
-
-class wxVessTreeVisitor : public osg::NodeVisitor
+class wxSpinEditor: public wxFrame
 {
-public:
+	public:
 
-    wxVessTreeVisitor(wxVessTreeCtrl* pTreeCtrl);
+		wxSpinEditor(wxWindow* parent,wxWindowID id=wxID_ANY);
+		virtual ~wxSpinEditor();
 
-    void SetParentTreeItem(wxTreeItemId* pParentId);
+		//(*Declarations(wxSpinEditor)
+		wxToolBarToolBase* ToolBarItem4;
+		wxToolBarToolBase* ToolBarItem3;
+		wxSplitterWindow* spinEditor_splitter;
+		wxSpinTreeCtrl* spinTree;
+		wxToolBarToolBase* ToolBarItem1;
+		wxToolBar* wxSpinEditor_ToolBar;
+		wxPanel* editorPanel;
+		wxToolBarToolBase* ToolBarItem5;
+		wxPanel* treePanel;
+		wxSpinPropGrid* SpinPropGrid;
+		wxToolBarToolBase* ToolBarItem2;
+		//*)
 
-    virtual void apply(osg::Node& node);
-    virtual void apply(osg::Group& node);
-    /*
-    virtual void apply(osg::Geode& node);
-    virtual void apply(osg::Drawable& drawable);
-    virtual void apply(osg::StateSet& stateSet);
-    virtual void apply(osg::StateAttribute& stateAttrib);
-    */
+	protected:
 
-protected:
+		//(*Identifiers(wxSpinEditor)
+		static const long ID_SPIN_TREE;
+		static const long ID_treePanel;
+		static const long ID_CUSTOM1;
+		static const long ID_PANEL2;
+		static const long ID_SPLITTERWINDOW1;
+		static const long spinEditor_clear;
+		static const long spinEditor_refresh;
+		static const long spinEditor_debugPrint;
+		static const long spinEditor_newNode;
+		static const long spinEditor_deleteNode;
+		static const long ID_TOOLBAR1;
+		//*)
 
-    //wxTreeItemId AddToTree(osg::Referenced* pObject);
-    wxTreeItemId AddToTree(ReferencedNode* pObject);
+	private:
 
-protected:
-    wxTreeItemId m_currentParentId;
-    wxVessTreeCtrl* m_pTreeCtrl;
+		//(*Handlers(wxSpinEditor)
+		void OnNewNode(wxCommandEvent& event);
+		void OnRefresh(wxCommandEvent& event);
+		void OnspinTreePaint(wxPaintEvent& event);
+		void OnSpinTreeLeftDown(wxMouseEvent& event);
+		void OnspinTreePaint1(wxPaintEvent& event);
+		void OnspinTreePaint2(wxPaintEvent& event);
+		void OnSpinTreeLeftDClick(wxMouseEvent& event);
+		void OnCustom1Paint(wxPaintEvent& event);
+		void OnspinTreePaint3(wxPaintEvent& event);
+		void OnDebugPrint(wxCommandEvent& event);
+		void OnClear(wxCommandEvent& event);
+		void OnDeleteNode(wxCommandEvent& event);
+		//*)
+
+		DECLARE_EVENT_TABLE()
+
+		lo_server_thread listeningServer;
 };
+
 
 #endif

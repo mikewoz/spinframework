@@ -39,7 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "wxVessEditor.h"
+#include "wxSpinEditor.h"
 
 #include "spinContext.h"
 #include <wx/choicdlg.h>
@@ -49,7 +49,7 @@ extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
 
-//(*InternalHeaders(wxVessEditor)
+//(*InternalHeaders(wxSpinEditor)
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/intl.h>
@@ -57,102 +57,102 @@ extern wxString resourcesPath;
 #include <wx/string.h>
 //*)
 
-//(*IdInit(wxVessEditor)
-const long wxVessEditor::ID_VESS_TREE = wxNewId();
-const long wxVessEditor::ID_treePanel = wxNewId();
-const long wxVessEditor::ID_CUSTOM1 = wxNewId();
-const long wxVessEditor::ID_PANEL2 = wxNewId();
-const long wxVessEditor::ID_SPLITTERWINDOW1 = wxNewId();
-const long wxVessEditor::vessEditor_clear = wxNewId();
-const long wxVessEditor::vessEditor_refresh = wxNewId();
-const long wxVessEditor::vessEditor_debugPrint = wxNewId();
-const long wxVessEditor::vessEditor_newNode = wxNewId();
-const long wxVessEditor::vessEditor_deleteNode = wxNewId();
-const long wxVessEditor::ID_TOOLBAR1 = wxNewId();
+//(*IdInit(wxSpinEditor)
+const long wxSpinEditor::ID_SPIN_TREE = wxNewId();
+const long wxSpinEditor::ID_treePanel = wxNewId();
+const long wxSpinEditor::ID_CUSTOM1 = wxNewId();
+const long wxSpinEditor::ID_PANEL2 = wxNewId();
+const long wxSpinEditor::ID_SPLITTERWINDOW1 = wxNewId();
+const long wxSpinEditor::spinEditor_clear = wxNewId();
+const long wxSpinEditor::spinEditor_refresh = wxNewId();
+const long wxSpinEditor::spinEditor_debugPrint = wxNewId();
+const long wxSpinEditor::spinEditor_newNode = wxNewId();
+const long wxSpinEditor::spinEditor_deleteNode = wxNewId();
+const long wxSpinEditor::ID_TOOLBAR1 = wxNewId();
 //*)
 
-BEGIN_EVENT_TABLE(wxVessEditor,wxFrame)
-	//(*EventTable(wxVessEditor)
+BEGIN_EVENT_TABLE(wxSpinEditor,wxFrame)
+	//(*EventTable(wxSpinEditor)
 	//*)
 END_EVENT_TABLE()
 
-wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
+wxSpinEditor::wxSpinEditor(wxWindow* parent,wxWindowID id)
 {
-	//(*Initialize(wxVessEditor)
+	//(*Initialize(wxSpinEditor)
 	wxBoxSizer* BoxSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
-
+	
 	Create(parent, wxID_ANY, _("SPIN :: Editor"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(-1,600));
-	vessEditor_splitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
-	vessEditor_splitter->SetMinSize(wxSize(50,50));
-	vessEditor_splitter->SetMinimumPaneSize(50);
-	treePanel = new wxPanel(vessEditor_splitter, ID_treePanel, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_treePanel"));
+	spinEditor_splitter = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxDefaultPosition, wxDefaultSize, wxSP_3D, _T("ID_SPLITTERWINDOW1"));
+	spinEditor_splitter->SetMinSize(wxSize(50,50));
+	spinEditor_splitter->SetMinimumPaneSize(50);
+	treePanel = new wxPanel(spinEditor_splitter, ID_treePanel, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_treePanel"));
 	BoxSizer1 = new wxBoxSizer(wxVERTICAL);
-	vessTree = new wxVessTreeCtrl(treePanel,ID_VESS_TREE,wxDefaultPosition,wxDefaultSize,wxTR_DEFAULT_STYLE,wxDefaultValidator,_T("ID_VESS_TREE"));
-	BoxSizer1->Add(vessTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	spinTree = new wxSpinTreeCtrl(treePanel,ID_SPIN_TREE,wxDefaultPosition,wxDefaultSize,wxTR_DEFAULT_STYLE,wxDefaultValidator,_T("ID_SPIN_TREE"));
+	BoxSizer1->Add(spinTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	treePanel->SetSizer(BoxSizer1);
 	BoxSizer1->Fit(treePanel);
 	BoxSizer1->SetSizeHints(treePanel);
-	editorPanel = new wxPanel(vessEditor_splitter, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+	editorPanel = new wxPanel(spinEditor_splitter, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, editorPanel, _("Editor:"));
-	VessPropGrid = new wxVessPropGrid(editorPanel,ID_CUSTOM1,wxDefaultPosition,wxDefaultSize);
-	StaticBoxSizer1->Add(VessPropGrid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	SpinPropGrid = new wxSpinPropGrid(editorPanel,ID_CUSTOM1,wxDefaultPosition,wxDefaultSize);
+	StaticBoxSizer1->Add(SpinPropGrid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	editorPanel->SetSizer(StaticBoxSizer1);
 	StaticBoxSizer1->Fit(editorPanel);
 	StaticBoxSizer1->SetSizeHints(editorPanel);
-	vessEditor_splitter->SplitHorizontally(treePanel, editorPanel);
-	wxVessEditor_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-	wxVessEditor_ToolBar->SetToolBitmapSize(wxSize(24,24));
-	ToolBarItem1 = wxVessEditor_ToolBar->AddTool(vessEditor_clear, _("Clear"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Clear the current scene"), _("Clear the current scene"));
-	ToolBarItem2 = wxVessEditor_ToolBar->AddTool(vessEditor_refresh, _("Refresh"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Refresh the scene"), _("This will resync with the VESS server, ensuring that the scene is up to date."));
-	wxVessEditor_ToolBar->AddSeparator();
-	ToolBarItem3 = wxVessEditor_ToolBar->AddTool(vessEditor_debugPrint, _("DebugPrint"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
-	wxVessEditor_ToolBar->AddSeparator();
-	ToolBarItem4 = wxVessEditor_ToolBar->AddTool(vessEditor_newNode, _("New Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxNullBitmap, wxITEM_NORMAL, _("Create a new node"), _("This will allow you to create a new node (a dialog will let you choose the type)"));
-	ToolBarItem5 = wxVessEditor_ToolBar->AddTool(vessEditor_deleteNode, _("Delete Selected Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxNullBitmap, wxITEM_NORMAL, _("Delete the currently selected node"), _("Delete the currently selected node"));
-	wxVessEditor_ToolBar->Realize();
-	SetToolBar(wxVessEditor_ToolBar);
-
-	Connect(vessEditor_clear,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnClear);
-	Connect(vessEditor_refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnRefresh);
-	Connect(vessEditor_debugPrint,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnDebugPrint);
-	Connect(vessEditor_newNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnNewNode);
-	Connect(vessEditor_deleteNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessEditor::OnDeleteNode);
+	spinEditor_splitter->SplitHorizontally(treePanel, editorPanel);
+	wxSpinEditor_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
+	wxSpinEditor_ToolBar->SetToolBitmapSize(wxSize(24,24));
+	ToolBarItem1 = wxSpinEditor_ToolBar->AddTool(spinEditor_clear, _("Clear"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Clear the current scene"), _("Clear the current scene"));
+	ToolBarItem2 = wxSpinEditor_ToolBar->AddTool(spinEditor_refresh, _("Refresh"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Refresh the scene"), _("This will resync with the SPIN server, ensuring that the scene is up to date."));
+	wxSpinEditor_ToolBar->AddSeparator();
+	ToolBarItem3 = wxSpinEditor_ToolBar->AddTool(spinEditor_debugPrint, _("DebugPrint"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_NORMAL, _("Debug Print to Console"), _("Debug Print to Console"));
+	wxSpinEditor_ToolBar->AddSeparator();
+	ToolBarItem4 = wxSpinEditor_ToolBar->AddTool(spinEditor_newNode, _("New Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_NEW")),wxART_BUTTON), wxNullBitmap, wxITEM_NORMAL, _("Create a new node"), _("This will allow you to create a new node (a dialog will let you choose the type)"));
+	ToolBarItem5 = wxSpinEditor_ToolBar->AddTool(spinEditor_deleteNode, _("Delete Selected Node"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_DELETE")),wxART_BUTTON), wxNullBitmap, wxITEM_NORMAL, _("Delete the currently selected node"), _("Delete the currently selected node"));
+	wxSpinEditor_ToolBar->Realize();
+	SetToolBar(wxSpinEditor_ToolBar);
+	
+	Connect(spinEditor_clear,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinEditor::OnClear);
+	Connect(spinEditor_refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinEditor::OnRefresh);
+	Connect(spinEditor_debugPrint,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinEditor::OnDebugPrint);
+	Connect(spinEditor_newNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinEditor::OnNewNode);
+	Connect(spinEditor_deleteNode,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinEditor::OnDeleteNode);
 	//*)
 
     // sash position doesn't seem to work in wxSmith, so do it manually:
-    vessEditor_splitter->SetSashPosition(150);
+    spinEditor_splitter->SetSashPosition(150);
 
 	wxImage icon_eraser(resourcesPath + _T("/icon_eraser.gif"));
 	icon_eraser.Rescale(24,24);
-    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_clear, wxBitmap(icon_eraser) );
+    wxSpinEditor_ToolBar->SetToolNormalBitmap( spinEditor_clear, wxBitmap(icon_eraser) );
 
 	wxImage icon_refresh(resourcesPath + _T("/icon_refresh.gif"));
 	icon_refresh.Rescale(24,24);
-    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_refresh, wxBitmap(icon_refresh) );
+    wxSpinEditor_ToolBar->SetToolNormalBitmap( spinEditor_refresh, wxBitmap(icon_refresh) );
 
 	wxImage icon_question_text(resourcesPath + _T("/icon_question_text.gif"));
 	icon_question_text.Rescale(24,24);
-    wxVessEditor_ToolBar->SetToolNormalBitmap( vessEditor_debugPrint, wxBitmap(icon_question_text) );
+    wxSpinEditor_ToolBar->SetToolNormalBitmap( spinEditor_debugPrint, wxBitmap(icon_question_text) );
 
-	wxVessEditor_ToolBar->Realize();
+	wxSpinEditor_ToolBar->Realize();
 
 
     // set smaller font
     wxFont pFont = GetFont();
     pFont.SetPointSize(9.0f);
-    vessTree->SetFont(pFont);
+    spinTree->SetFont(pFont);
 
-	vessTree->BuildTree(spin->sceneManager->worldNode.get());
+	spinTree->BuildTree(spin->sceneManager->worldNode.get());
 
-	// provide VessTree with a pointer to VessPropGrid so that it can fill it:
-	vessTree->SetPropGrid(VessPropGrid);
+	// provide SpinTree with a pointer to SpinPropGrid so that it can fill it:
+	spinTree->SetPropGrid(SpinPropGrid);
 
 
     // We'll set up an OSC receiver to listen to messages so that we can update
-    // vessTree and vessPropGrid. Note that we MUST listen to the broadcast
-    // channel and not to vessChannel directly. This is because SPIN might
+    // spinTree and spinPropGrid. Note that we MUST listen to the broadcast
+    // channel and not to spinChannel directly. This is because SPIN might
     // broadcast different messages than it receives (eg, it receives a 'move'
     // message, but will transmit a 'setTranslation' message).
     if (spin->sceneManager->isSlave())
@@ -172,18 +172,18 @@ wxVessEditor::wxVessEditor(wxWindow* parent,wxWindowID id)
         lo_server_thread_start(listeningServer);
     }
 
-    vessTree->setListeningServer(this->listeningServer);
-    VessPropGrid->setListeningServer(this->listeningServer);
+    spinTree->setListeningServer(this->listeningServer);
+    SpinPropGrid->setListeningServer(this->listeningServer);
 
 }
 
-wxVessEditor::~wxVessEditor()
+wxSpinEditor::~wxSpinEditor()
 {
-	//(*Destroy(wxVessEditor)
+	//(*Destroy(wxSpinEditor)
 	//*)
 }
 
-void wxVessEditor::OnNewNode(wxCommandEvent& event)
+void wxSpinEditor::OnNewNode(wxCommandEvent& event)
 {
     bool done = false;
     wxString nodeID, nodeType;
@@ -231,7 +231,7 @@ void wxVessEditor::OnNewNode(wxCommandEvent& event)
 
 }
 
-void wxVessEditor::OnRefresh(wxCommandEvent& event)
+void wxSpinEditor::OnRefresh(wxCommandEvent& event)
 {
 	/*
     lo_message msg = lo_message_new();
@@ -241,7 +241,7 @@ void wxVessEditor::OnRefresh(wxCommandEvent& event)
 	spin->sendSceneMessage("s", "refresh", LO_ARGS_END);
 }
 
-void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
+void wxSpinEditor::OnDebugPrint(wxCommandEvent& event)
 {
 	/*
     lo_message msg = lo_message_new();
@@ -256,7 +256,7 @@ void wxVessEditor::OnDebugPrint(wxCommandEvent& event)
     spin->sendSceneMessage("s", "debug", LO_ARGS_END);
 }
 
-void wxVessEditor::OnClear(wxCommandEvent& event)
+void wxSpinEditor::OnClear(wxCommandEvent& event)
 {
     wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to clear the scene?"), wxT("Clear?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);
 
@@ -272,9 +272,9 @@ void wxVessEditor::OnClear(wxCommandEvent& event)
     }
 }
 
-void wxVessEditor::OnDeleteNode(wxCommandEvent& event)
+void wxSpinEditor::OnDeleteNode(wxCommandEvent& event)
 {
-    ReferencedNode *n = vessTree->GetSelectedNode();
+    ReferencedNode *n = spinTree->GetSelectedNode();
     if (n)
     {
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("Are you sure that you want to delete node '") + wxString(n->id->s_name, wxConvUTF8) + wxT("'?"), wxT("Delete Node?"), wxOK|wxCANCEL|wxICON_ERROR|wxSTAY_ON_TOP);

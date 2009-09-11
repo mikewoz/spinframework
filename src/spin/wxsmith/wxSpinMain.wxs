@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxFrame" name="wxVessMain">
+	<object class="wxFrame" name="wxSpinMain">
 		<title>SPIN Framework</title>
 		<size>500,400</size>
 		<id_arg>0</id_arg>
@@ -25,20 +25,20 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="vessRadio_master" member="yes">
+								<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="spinRadio_master" member="yes">
 									<label>Server</label>
 									<style>wxRB_GROUP</style>
-									<handler function="OnVessModeChange" entry="EVT_RADIOBUTTON" />
+									<handler function="OnSpinModeChange" entry="EVT_RADIOBUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxRadioButton" name="ID_RADIOBUTTON2" variable="vessRadio_slave" member="yes">
+								<object class="wxRadioButton" name="ID_RADIOBUTTON2" variable="spinRadio_slave" member="yes">
 									<label>Client</label>
 									<selected>1</selected>
-									<handler function="OnVessModeChange" entry="EVT_RADIOBUTTON" />
+									<handler function="OnSpinModeChange" entry="EVT_RADIOBUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
@@ -73,7 +73,7 @@
 				</object>
 			</object>
 		</object>
-		<object class="wxMenuBar" variable="wxVess_MenuBar" member="no">
+		<object class="wxMenuBar" variable="wxSpin_MenuBar" member="no">
 			<object class="wxMenu" variable="Menu1" member="no">
 				<label>&amp;File</label>
 				<object class="wxMenuItem" name="idMenuOpen" variable="MenuItem3" member="yes">
@@ -118,27 +118,27 @@
 			</object>
 			<object class="wxMenu" variable="Menu2" member="no">
 				<label>Help</label>
-				<object class="wxMenuItem" name="idMenuAbout" variable="wxVessMenu_About" member="yes">
+				<object class="wxMenuItem" name="idMenuAbout" variable="wxSpinMenu_About" member="yes">
 					<label>&amp;About</label>
 					<handler function="OnAbout" entry="EVT_MENU" />
 				</object>
 			</object>
 		</object>
-		<object class="wxStatusBar" name="ID_STATUSBAR1" variable="wxVess_StatusBar" member="yes">
+		<object class="wxStatusBar" name="ID_STATUSBAR1" variable="wxSpin_StatusBar" member="yes">
 			<fields>1</fields>
 			<widths>-1</widths>
 			<styles>wxSB_NORMAL</styles>
 		</object>
-		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxVess_ToolBar" member="yes">
+		<object class="wxToolBar" name="ID_TOOLBAR1" variable="wxSpin_ToolBar" member="yes">
 			<bitmapsize>24,24</bitmapsize>
-			<object class="tool" name="wxVess_load" variable="ToolBarItem1" member="yes">
+			<object class="tool" name="wxSpin_load" variable="ToolBarItem1" member="yes">
 				<label>Load Scene</label>
 				<bitmap stock_id="wxART_FILE_OPEN" stock_client="wxART_TOOLBAR" />
 				<tooltip>Load a scene from .xml file</tooltip>
 				<longhelp>Load a scene from .xml file</longhelp>
 				<handler function="OnLoadScene" entry="EVT_TOOL" />
 			</object>
-			<object class="tool" name="wxVess_Save" variable="ToolBarItem2" member="yes">
+			<object class="tool" name="wxSpin_Save" variable="ToolBarItem2" member="yes">
 				<label>Save Scene</label>
 				<bitmap stock_id="wxART_FILE_SAVE" stock_client="wxART_TOOLBAR" />
 				<tooltip>Save current scene</tooltip>
@@ -146,7 +146,7 @@
 				<handler function="OnSaveScene" entry="EVT_TOOL" />
 			</object>
 			<object class="separator" />
-			<object class="tool" name="wxVess_showConfig" variable="ToolBarItem3" member="yes">
+			<object class="tool" name="wxSpin_showConfig" variable="ToolBarItem3" member="yes">
 				<label>Configuration</label>
 				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Show configuration panel</tooltip>
@@ -154,14 +154,14 @@
 				<handler function="OnShowConfig" entry="EVT_TOOL" />
 			</object>
 			<object class="separator" />
-			<object class="tool" name="wxVess_showRenderer" variable="ToolBarItem4" member="yes">
+			<object class="tool" name="wxSpin_showRenderer" variable="ToolBarItem4" member="yes">
 				<label>Renderer</label>
 				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Show the rendered 3D view</tooltip>
 				<longhelp>Show the rendered 3D view</longhelp>
 				<handler function="OnShowRenderer" entry="EVT_TOOL" />
 			</object>
-			<object class="tool" name="wxVess_showEditor" variable="ToolBarItem5" member="yes">
+			<object class="tool" name="wxSpin_showEditor" variable="ToolBarItem5" member="yes">
 				<label>Editor</label>
 				<bitmap stock_id="wxART_ERROR" stock_client="wxART_TOOLBAR" />
 				<tooltip>Show the editor</tooltip>

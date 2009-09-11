@@ -39,7 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "vessWX.h"
+#include "spinWX.h"
 
 #include <iostream>
 
@@ -52,17 +52,17 @@
 #include "spinContext.h"
 
 //(*AppHeaders
-#include "wxVessMain.h"
+#include "wxSpinMain.h"
 #include <wx/image.h>
 //*)
 
-IMPLEMENT_APP(vessWX);
+IMPLEMENT_APP(spinWX);
 
 
 spinContext *spin; // global
 wxString resourcesPath; // global
 
-bool vessWX::OnInit()
+bool spinWX::OnInit()
 {
     // call default behaviour (mandatory)
     if (!wxApp::OnInit())
@@ -95,7 +95,7 @@ bool vessWX::OnInit()
     wxInitAllImageHandlers();
     if ( wxsOK )
     {
-    	wxVessMain* Frame = new wxVessMain(0);
+    	wxSpinMain* Frame = new wxSpinMain(0);
     	Frame->Show();
     	SetTopWindow(Frame);
     }
@@ -105,13 +105,13 @@ bool vessWX::OnInit()
 
 }
 
-void vessWX::OnInitCmdLine(wxCmdLineParser& parser)
+void spinWX::OnInitCmdLine(wxCmdLineParser& parser)
 {
     parser.SetDesc (g_cmdLineDesc);
     parser.SetSwitchChars (wxT("-"));
 }
 
-bool vessWX::OnCmdLineParsed(wxCmdLineParser& parser)
+bool spinWX::OnCmdLineParsed(wxCmdLineParser& parser)
 {
     if (parser.Found(wxT("c"))) startMode = 1;
     else if (parser.Found(wxT("s"))) startMode = 2;

@@ -39,8 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef VESSWX_H
-#define VESSWX_H
+#ifndef SPINWX_H
+#define SPINWX_H
 
 // For compilers that support precompilation, includes <wx/wx.h>.
 #include <wx/wxprec.h>
@@ -63,7 +63,7 @@
 #include <wx/app.h>
 
 
-class vessWX : public wxApp
+class spinWX : public wxApp
 {
     public:
         virtual bool OnInit();

@@ -1,7 +1,7 @@
-#ifndef WXVESSSETTINGS_H
-#define WXVESSSETTINGS_H
+#ifndef WXSPINSETTINGS_H
+#define WXSPINSETTINGS_H
 
-//(*Headers(wxVessSettings)
+//(*Headers(wxSpinSettings)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -9,15 +9,15 @@
 #include <wx/frame.h>
 //*)
 
-class wxVessSettings: public wxFrame
+class wxSpinSettings: public wxFrame
 {
 	public:
 
-		wxVessSettings(wxWindow* parent=0,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
-		virtual ~wxVessSettings();
+		wxSpinSettings(wxWindow* parent=0,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+		virtual ~wxSpinSettings();
 
 
-		//(*Declarations(wxVessSettings)
+		//(*Declarations(wxSpinSettings)
 		wxTextCtrl* rxPort;
 		wxTextCtrl* rxAddr;
 		wxStaticText* StaticText2;
@@ -25,16 +25,16 @@ class wxVessSettings: public wxFrame
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxStaticText* StaticText5;
-		wxTextCtrl* vessID;
+		wxTextCtrl* spinID;
 		wxTextCtrl* txPort;
-		wxPanel* vessSettings_panel;
+		wxPanel* spinSettings_panel;
 		wxStaticText* StaticText4;
 		//*)
 
 	private:
 
 
-		//(*Identifiers(wxVessSettings)
+		//(*Identifiers(wxSpinSettings)
 		static const long ID_STATICTEXT5;
 		static const long ID_TEXTCTRL5;
 		static const long ID_STATICTEXT3;
@@ -48,7 +48,7 @@ class wxVessSettings: public wxFrame
 		static const long ID_PANEL1;
 		//*)
 
-		//(*Handlers(wxVessSettings)
+		//(*Handlers(wxSpinSettings)
 		void OnClose(wxCloseEvent& event);
 		//*)
 

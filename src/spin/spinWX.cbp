@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="spinWX" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="spinWX">
+				<Option output="spinWX" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+				<ExtraCommands>
+					<Add after="/Developer/Tools/Rez -d __DARWIN__ -t APPL Carbon.r -o $(TARGET_OUTPUT_FILE)" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-g" />
+			<Add option="`wx-config --cflags`" />
+		</Compiler>
+		<Linker>
+			<Add option="`wx-config --libs`" />
+		</Linker>
+		<Unit filename="../../include/GroupNode.h" />
+		<Unit filename="../../include/ConstraintsNode.h" />
+		<Unit filename="../../include/Contour.h" />
+		<Unit filename="../../include/DSPNode.h" />
+		<Unit filename="../../include/LightSource.h" />
+		<Unit filename="../../include/MeasurementNode.h" />
+		<Unit filename="../../include/MediaManager.h" />
+		<Unit filename="../../include/ModelNode.h" />
+		<Unit filename="../../include/PointerNode.h" />
+		<Unit filename="../../include/RayNode.h" />
+		<Unit filename="../../include/ReferencedNode.h" />
+		<Unit filename="../../include/SceneManager.h" />
+		<Unit filename="../../include/ShapeNode.h" />
+		<Unit filename="../../include/SoundConnection.h" />
+		<Unit filename="../../include/SoundNode.h" />
+		<Unit filename="../../include/SoundSpace.h" />
+		<Unit filename="../../include/spinUtil.h" />
+		<Unit filename="../../include/VideoNode.h" />
+		<Unit filename="../../include/libloUtil.h" />
+		<Unit filename="../../include/mainpage.h" />
+		<Unit filename="../../include/UserNode.h" />
+		<Unit filename="../../include/spinLog.h" />
+		<Unit filename="../../include/spinContext.h" />
+		<Unit filename="../../include/spinWX.h" />
+		<Unit filename="../../include/wxSpinConfig.h" />
+		<Unit filename="../../include/wxSpinEditor.h" />
+		<Unit filename="../../include/wxSpinMain.h" />
+		<Unit filename="../../include/wxSpinPropGrid.h" />
+		<Unit filename="../../include/wxSpinRenderer.h" />
+		<Unit filename="../../include/wxSpinSettings.h" />
+		<Unit filename="../../include/wxSpinTreeCtrl.h" />
+		<Unit filename="../../include/wxSpinTreeVisitor.h" />
+		<Unit filename="GroupNode.cpp" />
+		<Unit filename="ConstraintsNode.cpp" />
+		<Unit filename="Contour.cpp" />
+		<Unit filename="DSPNode.cpp" />
+		<Unit filename="LightSource.cpp" />
+		<Unit filename="MeasurementNode.cpp" />
+		<Unit filename="MediaManager.cpp" />
+		<Unit filename="ModelNode.cpp" />
+		<Unit filename="PointerNode.cpp" />
+		<Unit filename="RayNode.cpp" />
+		<Unit filename="ReferencedNode.cpp" />
+		<Unit filename="SceneManager.cpp" />
+		<Unit filename="ShapeNode.cpp" />
+		<Unit filename="SoundConnection.cpp" />
+		<Unit filename="SoundNode.cpp" />
+		<Unit filename="SoundSpace.cpp" />
+		<Unit filename="spinUtil.cpp" />
+		<Unit filename="VideoNode.cpp" />
+		<Unit filename="libloUtil.cpp" />
+		<Unit filename="spinViewer.cpp" />
+		<Unit filename="UserNode.cpp" />
+		<Unit filename="spinServer.cpp" />
+		<Unit filename="spinContext.cpp" />
+		<Unit filename="spinWX.cpp" />
+		<Unit filename="wxSpinConfig.cpp" />
+		<Unit filename="wxSpinEditor.cpp" />
+		<Unit filename="wxSpinMain.cpp" />
+		<Unit filename="wxSpinPropGrid.cpp" />
+		<Unit filename="wxSpinRenderer.cpp" />
+		<Unit filename="wxSpinSettings.cpp" />
+		<Unit filename="wxSpinTreeCtrl.cpp" />
+		<Unit filename="wxSpinTreeVisitor.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="spinWX.cpp" main="wxSpinMain" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxFrame wxs="wxsmith/wxSpinMain.wxs" src="wxSpinMain.cpp" hdr="../../include/wxSpinMain.h" name="wxSpinMain" language="CPP" />
+					<wxFrame wxs="wxsmith/wxSpinEditor.wxs" src="wxSpinEditor.cpp" hdr="../../include/wxSpinEditor.h" name="wxSpinEditor" language="CPP" />
+					<wxFrame wxs="wxsmith/wxSpinRenderer.wxs" src="wxSpinRenderer.cpp" hdr="../../include/wxSpinRenderer.h" name="wxSpinRenderer" language="CPP" />
+					<wxPanel wxs="wxsmith/wxSpinConfig.wxs" src="wxSpinConfig.cpp" hdr="../../include/wxSpinConfig.h" name="wxSpinConfig" language="CPP" />
+					<wxFrame wxs="wxsmith/wxSpinSettings.wxs" src="wxSpinSettings.cpp" hdr="../../include/wxSpinSettings.h" name="wxSpinSettings" language="CPP" />
+				</resources>
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

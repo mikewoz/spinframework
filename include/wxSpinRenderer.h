@@ -39,10 +39,10 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef WXVESSRENDERER_H
-#define WXVESSRENDERER_H
+#ifndef WXSPINRENDERER_H
+#define WXSPINRENDERER_H
 
-//(*Headers(wxVessRenderer)
+//(*Headers(wxSpinRenderer)
 #include <wx/toolbar.h>
 #include <wx/frame.h>
 //*)
@@ -67,28 +67,28 @@ class GraphicsWindowWX;
 class OSGCanvas;
 
 
-class wxVessRenderer: public wxFrame
+class wxSpinRenderer: public wxFrame
 {
 	public:
 
-		wxVessRenderer(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
-		virtual ~wxVessRenderer();
+		wxSpinRenderer(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+		virtual ~wxSpinRenderer();
 
         void OnIdle(wxIdleEvent& event);
 
 	private:
 
-		//(*Declarations(wxVessRenderer)
+		//(*Declarations(wxSpinRenderer)
 		wxToolBarToolBase* ToolBarItem1;
-		wxToolBar* wxVessRenderer_ToolBar;
+		wxToolBar* wxSpinRenderer_ToolBar;
 		//*)
 
-		//(*Identifiers(wxVessRenderer)
-		static const long vessRenderer_grid;
+		//(*Identifiers(wxSpinRenderer)
+		static const long spinRenderer_grid;
 		static const long ID_TOOLBAR1;
 		//*)
 
-		//(*Handlers(wxVessRenderer)
+		//(*Handlers(wxSpinRenderer)
 		void OnGridToggle(wxCommandEvent& event);
 		//*)
 

@@ -38,59 +38,58 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
+//
+//  NOTE: This file is based on source code from the Orihalcon Framework Library
+//  Copyright (C) 2005 by Toshiyuki Takahei <takahei@orihalcon.jp>
+//  (Released under the GNU Lesser General Public License)
+//
+// -----------------------------------------------------------------------------
 
-#ifndef WXVESSCONFIG_H
-#define WXVESSCONFIG_H
 
-//(*Headers(wxVessConfig)
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/textctrl.h>
-#include <wx/panel.h>
-//*)
+#ifndef _WXSPINTREEVISITOR_H_
+#define _WXSPINTREEVISITOR_H_
 
-class wxVessConfig: public wxPanel
+#include <osg/NodeVisitor>
+#include <osg/Node>
+#include <osg/Group>
+#include <osg/Geode>
+#include <osg/Drawable>
+#include <osg/StateSet>
+#include <osg/StateAttribute>
+#include <osg/Texture>
+#include <osg/Image>
+
+//#include "wxOsg/wxOsg.h"
+#include <wx/treectrl.h>
+#include <wx/string.h>
+
+class wxSpinTreeCtrl;
+
+class wxSpinTreeVisitor : public osg::NodeVisitor
 {
-	public:
+public:
 
-		wxVessConfig(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
-		virtual ~wxVessConfig();
+    wxSpinTreeVisitor(wxSpinTreeCtrl* pTreeCtrl);
 
-		//(*Declarations(wxVessConfig)
-		wxTextCtrl* rxPort;
-		wxTextCtrl* rxAddr;
-		wxTextCtrl* txAddr;
-		wxStaticText* StaticText2;
-		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
-		wxStaticText* StaticText5;
-		wxTextCtrl* vessID;
-		wxTextCtrl* txPort;
-		wxStaticText* StaticText4;
-		wxPanel* vessConfigPanel;
-		//*)
+    void SetParentTreeItem(wxTreeItemId* pParentId);
 
-	private:
+    virtual void apply(osg::Node& node);
+    virtual void apply(osg::Group& node);
+    /*
+    virtual void apply(osg::Geode& node);
+    virtual void apply(osg::Drawable& drawable);
+    virtual void apply(osg::StateSet& stateSet);
+    virtual void apply(osg::StateAttribute& stateAttrib);
+    */
 
-		//(*Identifiers(wxVessConfig)
-		static const long ID_STATICTEXT1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_STATICTEXT2;
-		static const long ID_TEXTCTRL2;
-		static const long ID_STATICTEXT3;
-		static const long ID_TEXTCTRL3;
-		static const long ID_STATICTEXT4;
-		static const long ID_TEXTCTRL4;
-		static const long ID_STATICTEXT5;
-		static const long ID_TEXTCTRL5;
-		static const long ID_PANEL1;
-		//*)
+protected:
 
-		//(*Handlers(wxVessConfig)
-		void OnClose(wxCloseEvent& event);
-		//*)
+    //wxTreeItemId AddToTree(osg::Referenced* pObject);
+    wxTreeItemId AddToTree(ReferencedNode* pObject);
 
-		DECLARE_EVENT_TABLE()
+protected:
+    wxTreeItemId m_currentParentId;
+    wxSpinTreeCtrl* m_pTreeCtrl;
 };
 
 #endif

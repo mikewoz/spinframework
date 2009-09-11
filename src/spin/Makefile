@@ -35,9 +35,9 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        DSPNode.o SoundNode.o SoundSpace.o SoundConnection.o \
        SharedVideoNode.o sharedVideoBuffer.o 
 
-WX_OBJS = vessWX.o wxVessMain.o wxVessEditor.o wxVessRenderer.o \
-	  wxVessPropGrid.o wxVessSettings.o wxVessTreeVisitor.o \
-	  wxVessTreeCtrl.o
+WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
+	  wxSpinPropGrid.o wxSpinSettings.o wxSpinTreeVisitor.o \
+	  wxSpinTreeCtrl.o
 
 
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus

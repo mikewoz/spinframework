@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-//
+// 
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -39,77 +39,58 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef WXVESSEDITOR_H
-#define WXVESSEDITOR_H
+#ifndef WXSPINCONFIG_H
+#define WXSPINCONFIG_H
 
-//(*Headers(wxVessEditor)
+//(*Headers(wxSpinConfig)
 #include <wx/sizer.h>
-#include <wx/splitter.h>
-#include <wx/toolbar.h>
+#include <wx/stattext.h>
+#include <wx/textctrl.h>
 #include <wx/panel.h>
-#include "wxVessPropGrid.h"
-#include "wxVessTreeCtrl.h"
-#include <wx/frame.h>
 //*)
 
-class wxVessEditor: public wxFrame
+class wxSpinConfig: public wxPanel
 {
 	public:
 
-		wxVessEditor(wxWindow* parent,wxWindowID id=wxID_ANY);
-		virtual ~wxVessEditor();
+		wxSpinConfig(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+		virtual ~wxSpinConfig();
 
-		//(*Declarations(wxVessEditor)
-		wxToolBarToolBase* ToolBarItem4;
-		wxToolBarToolBase* ToolBarItem3;
-		wxVessPropGrid* VessPropGrid;
-		wxToolBar* wxVessEditor_ToolBar;
-		wxToolBarToolBase* ToolBarItem1;
-		wxVessTreeCtrl* vessTree;
-		wxPanel* editorPanel;
-		wxToolBarToolBase* ToolBarItem5;
-		wxPanel* treePanel;
-		wxSplitterWindow* vessEditor_splitter;
-		wxToolBarToolBase* ToolBarItem2;
-		//*)
-
-	protected:
-
-		//(*Identifiers(wxVessEditor)
-		static const long ID_VESS_TREE;
-		static const long ID_treePanel;
-		static const long ID_CUSTOM1;
-		static const long ID_PANEL2;
-		static const long ID_SPLITTERWINDOW1;
-		static const long vessEditor_clear;
-		static const long vessEditor_refresh;
-		static const long vessEditor_debugPrint;
-		static const long vessEditor_newNode;
-		static const long vessEditor_deleteNode;
-		static const long ID_TOOLBAR1;
+		//(*Declarations(wxSpinConfig)
+		wxTextCtrl* rxPort;
+		wxTextCtrl* rxAddr;
+		wxTextCtrl* txAddr;
+		wxStaticText* StaticText2;
+		wxStaticText* StaticText1;
+		wxStaticText* StaticText3;
+		wxStaticText* StaticText5;
+		wxTextCtrl* spinID;
+		wxTextCtrl* txPort;
+		wxStaticText* StaticText4;
+		wxPanel* spinConfigPanel;
 		//*)
 
 	private:
 
-		//(*Handlers(wxVessEditor)
-		void OnNewNode(wxCommandEvent& event);
-		void OnRefresh(wxCommandEvent& event);
-		void OnvessTreePaint(wxPaintEvent& event);
-		void OnVessTreeLeftDown(wxMouseEvent& event);
-		void OnvessTreePaint1(wxPaintEvent& event);
-		void OnvessTreePaint2(wxPaintEvent& event);
-		void OnVessTreeLeftDClick(wxMouseEvent& event);
-		void OnCustom1Paint(wxPaintEvent& event);
-		void OnvessTreePaint3(wxPaintEvent& event);
-		void OnDebugPrint(wxCommandEvent& event);
-		void OnClear(wxCommandEvent& event);
-		void OnDeleteNode(wxCommandEvent& event);
+		//(*Identifiers(wxSpinConfig)
+		static const long ID_STATICTEXT1;
+		static const long ID_TEXTCTRL1;
+		static const long ID_STATICTEXT2;
+		static const long ID_TEXTCTRL2;
+		static const long ID_STATICTEXT3;
+		static const long ID_TEXTCTRL3;
+		static const long ID_STATICTEXT4;
+		static const long ID_TEXTCTRL4;
+		static const long ID_STATICTEXT5;
+		static const long ID_TEXTCTRL5;
+		static const long ID_PANEL1;
+		//*)
+
+		//(*Handlers(wxSpinConfig)
+		void OnClose(wxCloseEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()
-
-		lo_server_thread listeningServer;
 };
-
 
 #endif

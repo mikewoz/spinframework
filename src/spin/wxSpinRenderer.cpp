@@ -39,9 +39,9 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "wxVessRenderer.h"
+#include "wxSpinRenderer.h"
 
-//(*InternalHeaders(wxVessRenderer)
+//(*InternalHeaders(wxSpinRenderer)
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/intl.h>
@@ -63,38 +63,38 @@ extern spinContext *spin;
 extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
-//(*IdInit(wxVessRenderer)
-const long wxVessRenderer::vessRenderer_grid = wxNewId();
-const long wxVessRenderer::ID_TOOLBAR1 = wxNewId();
+//(*IdInit(wxSpinRenderer)
+const long wxSpinRenderer::spinRenderer_grid = wxNewId();
+const long wxSpinRenderer::ID_TOOLBAR1 = wxNewId();
 //*)
 
-BEGIN_EVENT_TABLE(wxVessRenderer,wxFrame)
-	//(*EventTable(wxVessRenderer)
+BEGIN_EVENT_TABLE(wxSpinRenderer,wxFrame)
+	//(*EventTable(wxSpinRenderer)
 	//*)
 
-    EVT_IDLE(wxVessRenderer::OnIdle)
+    EVT_IDLE(wxSpinRenderer::OnIdle)
 
 END_EVENT_TABLE()
 
-wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
+wxSpinRenderer::wxSpinRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
 {
-	//(*Initialize(wxVessRenderer)
+	//(*Initialize(wxSpinRenderer)
 	Create(parent, id, _("SPIN :: Renderer"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
 	SetClientSize(wxSize(720,480));
 	Move(wxDefaultPosition);
-	wxVessRenderer_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
-	ToolBarItem1 = wxVessRenderer_ToolBar->AddTool(vessRenderer_grid, _("Grid"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_CHECK, _("Enable/Disable Grid"), _("Enable/Disable Grid"));
-	wxVessRenderer_ToolBar->Realize();
-	SetToolBar(wxVessRenderer_ToolBar);
+	wxSpinRenderer_ToolBar = new wxToolBar(this, ID_TOOLBAR1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER, _T("ID_TOOLBAR1"));
+	ToolBarItem1 = wxSpinRenderer_ToolBar->AddTool(spinRenderer_grid, _("Grid"), wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_ERROR")),wxART_TOOLBAR), wxNullBitmap, wxITEM_CHECK, _("Enable/Disable Grid"), _("Enable/Disable Grid"));
+	wxSpinRenderer_ToolBar->Realize();
+	SetToolBar(wxSpinRenderer_ToolBar);
 
-	Connect(vessRenderer_grid,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxVessRenderer::OnGridToggle);
+	Connect(spinRenderer_grid,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&wxSpinRenderer::OnGridToggle);
 	//*)
 
 	wxImage icon_grid(resourcesPath + _T("/icon_grid.gif"));
 	icon_grid.Rescale(24,24);
-    wxVessRenderer_ToolBar->SetToolNormalBitmap( vessRenderer_grid, wxBitmap(icon_grid) );
+    wxSpinRenderer_ToolBar->SetToolNormalBitmap( spinRenderer_grid, wxBitmap(icon_grid) );
 
-	wxVessRenderer_ToolBar->Realize();
+	wxSpinRenderer_ToolBar->Realize();
 
 
     int *attributes = new int[7];
@@ -187,13 +187,13 @@ wxVessRenderer::wxVessRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
 
 }
 
-wxVessRenderer::~wxVessRenderer()
+wxSpinRenderer::~wxSpinRenderer()
 {
-	//(*Destroy(wxVessRenderer)
+	//(*Destroy(wxSpinRenderer)
 	//*)
 }
 
-void wxVessRenderer::OnIdle(wxIdleEvent &event)
+void wxSpinRenderer::OnIdle(wxIdleEvent &event)
 {
     // We now have to go through all the nodes, and check if we need to update the
     // graph. Note: this cannot be done as a callback in a traversal - dangerous.
@@ -434,7 +434,7 @@ void GraphicsWindowWX::swapBuffersImplementation()
     _canvas->SwapBuffers();
 }
 
-void wxVessRenderer::OnGridToggle(wxCommandEvent& event)
+void wxSpinRenderer::OnGridToggle(wxCommandEvent& event)
 {
     if (event.IsChecked())
     {
