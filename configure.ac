@@ -5,8 +5,8 @@ AC_PREREQ([2.63])
 AC_INIT([SPINFramework], [0.2], [mike@mikewoz.com])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE
-AC_CONFIG_SRCDIR([include/ModelNode.h])
-AC_CONFIG_HEADERS([config.h])
+#AC_CONFIG_SRCDIR([include/ModelNode.h])
+AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_CONFIG_FILES([Makefile src/genwrapper/Makefile src/osgWrappers/Makefile src/spin/Makefile])
@@ -24,15 +24,24 @@ AC_PROG_LIBTOOL
 #AM_PATH_XML2(2.4.0)
 PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.4)
 
+
+dnl Check for boost
 AX_BOOST_BASE([1.35])
+if test "$succeeded" != "yes" ; then
+  echo "Error: You need to install the boost library!"
+  exit
+fi
+
 AX_BOOST_REGEX
-#  if test "x$ax_cv_boost_regex" = "xno"; then
-#    echo
-#    echo "Error: You need to install the boost regex library!"
-#    echo
-#    exit
-#fi
+if test "x$ax_cv_boost_regex" = "xno"; then
+  echo
+  echo "Error: You need to install the boost regex library!"
+  echo
+  exit
+fi
  
+
+
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
