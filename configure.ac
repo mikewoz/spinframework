@@ -28,7 +28,9 @@ PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.4)
 dnl Check for boost
 AX_BOOST_BASE([1.35])
 if test "$succeeded" != "yes" ; then
+  echo
   echo "Error: You need to install the boost library!"
+  echo
   exit
 fi
 
