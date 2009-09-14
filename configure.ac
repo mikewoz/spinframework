@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.63])
+AC_PREREQ([2.61])
 AC_INIT([SPINFramework], [0.2], [mike@mikewoz.com])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE
