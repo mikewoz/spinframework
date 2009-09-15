@@ -241,12 +241,20 @@ void ShapeNode::drawShape()
 		osg::TessellationHints* hints = new osg::TessellationHints;
 		hints->setDetailRatio(GENERIC_SHAPE_RESOLUTION);
 
-		
-		
 		if (billboard)
 		{
 			osg::Billboard *b = new osg::Billboard();
-			b->setMode(osg::Billboard::POINT_ROT_EYE);
+			switch (billboard)
+			{
+				case POINT_EYE:
+					b->setMode(osg::Billboard::POINT_ROT_EYE);
+					break;
+				case STAY_UP:
+					b->setMode(osg::Billboard::AXIAL_ROT);
+					b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
+					b->setNormal(osg::Vec3(0.0f,-1.0f,0.0f));
+					break;
+			}
 			shapeGeode = b;
 			
 		} else {

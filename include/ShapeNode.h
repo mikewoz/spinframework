@@ -80,7 +80,7 @@ public:
      * We provide several possible shapes
      */
     enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
-    enum billboardType { RELATIVE, POINT_EYE };
+    enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
     
 	void setShape			(shapeType t);
 	void setBillboard		(billboardType t);
