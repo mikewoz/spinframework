@@ -89,7 +89,7 @@ std::string getMyIPaddress()
 	{    
 		for (tempIfAddr = interfaceArray; tempIfAddr != NULL; tempIfAddr = tempIfAddr->ifa_next)
 		{
-			if (tempIfAddr->ifa_addr->sa_family == AF_INET) // check if it is IP4
+			if (tempIfAddr->ifa_addr && (tempIfAddr->ifa_addr->sa_family == AF_INET)) // check if it is IP4
 			{
 				tempAddrPtr = &((struct sockaddr_in *)tempIfAddr->ifa_addr)->sin_addr;
 				
