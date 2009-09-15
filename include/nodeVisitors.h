@@ -192,7 +192,7 @@ class DebugVisitor : public osg::NodeVisitor
 			ReferencedNode *n;
 						
 			if (n=dynamic_cast<ReferencedNode*>(&node)) {
-				osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->nodeType << ", id=" << n->id << "  (" << node.getNumChildren () << " children)" << std::endl;
+				osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->nodeType << ", id=" << n->id->s_name << "  (" << node.getNumChildren () << " children)" << std::endl;
 			} else {
 				osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "GROUP: " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
 			}
