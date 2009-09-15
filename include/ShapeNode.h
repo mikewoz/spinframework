@@ -80,8 +80,10 @@ public:
      * We provide several possible shapes
      */
     enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
-
-	void setShape			(shapeType s);
+    enum billboardType { RELATIVE, POINT_EYE };
+    
+	void setShape			(shapeType t);
+	void setBillboard		(billboardType t);
 
 	void setColor			(float red, float green, float blue, float alpha);
 	void setTextureFromFile	(const char* filename);
@@ -104,6 +106,7 @@ public:
 
 
 	int getShape() { return (int)shape; }
+	int getBillboard() { return (int)billboard; }
 	osg::Vec4 getColor() { return _color; };
 	int getRenderBin() { return renderBin; }
     osg::Vec3 getTranslation() { return shapeTransform->getPosition(); };
@@ -135,6 +138,8 @@ public:
 	shapeType shape;
 	//std::string shape;
 	//std::string shapeDescr;
+	
+	billboardType billboard;
 
 	osg::Vec4 _color;
 

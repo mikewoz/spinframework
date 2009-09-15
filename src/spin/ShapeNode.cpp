@@ -41,6 +41,7 @@
 
 #include <osgDB/ReadFile>
 #include <osg/Geometry>
+#include <osg/Billboard>
 
 #include "osgUtil.h"
 #include "ShapeNode.h"
@@ -71,8 +72,10 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 	setAttachmentNode(shapeTransform.get());
 
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);
+	
 
 	shape = NONE; //"NULL";
+	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
 	renderBin = 11;
 
@@ -119,17 +122,28 @@ void ShapeNode::updateNodePath()
 // ===================================================================
 
 
-void ShapeNode::setShape (shapeType s)
+void ShapeNode::setShape (shapeType t)
 {
 	// don't do anything if the new shape is the same as the current shape:
-	if (s == shape) return;
-	else shape = s;
+	if (t == shape) return;
+	else shape = t;
 
 	//std::cout << "GOT NEW SHAPE MESSAGE: " << s << std::endl;
 
 	drawShape();
 
 	BROADCAST(this, "si", "setShape", (int) shape);
+
+}
+
+void ShapeNode::setBillboard (billboardType t)
+{
+	if (t == billboard) return;
+	else billboard = t;
+
+	drawShape();
+
+	BROADCAST(this, "si", "setBillboard", (int) billboard);
 
 }
 
@@ -227,7 +241,17 @@ void ShapeNode::drawShape()
 		osg::TessellationHints* hints = new osg::TessellationHints;
 		hints->setDetailRatio(GENERIC_SHAPE_RESOLUTION);
 
-		shapeGeode = new osg::Geode();
+		
+		
+		if (billboard)
+		{
+			osg::Billboard *b = new osg::Billboard();
+			b->setMode(osg::Billboard::POINT_ROT_EYE);
+			shapeGeode = b;
+			
+		} else {
+			shapeGeode = new osg::Geode();
+		}
 
 
 
@@ -420,6 +444,10 @@ std::vector<lo_message> ShapeNode::getState ()
 	lo_message_add(msg, "si", "setShape", getShape());
 	ret.push_back(msg);
 
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setBillboard", getBillboard());
+	ret.push_back(msg);
+	
 	msg = lo_message_new();
 	v4 = this->getColor();
 	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());

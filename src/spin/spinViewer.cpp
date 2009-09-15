@@ -153,9 +153,6 @@ int main(int argc, char **argv)
 
 	spinContext *spin = new spinContext(spinContext::LISTENER_MODE);
 
-
-	std::cout <<"  OSG_LIBRARY_PATH=" << getenv("OSG_LIBRARY_PATH") << std::endl;
-
 	std::string id = getHostname();
 
 
@@ -216,7 +213,7 @@ int main(int argc, char **argv)
 
 	if (!spin->start())
 	{
-        std::cout << "ERROR: could not start spin threads" << std::endl;
+        std::cout << "ERROR: could not start SPIN listener thread" << std::endl;
         exit(1);
 	}
 

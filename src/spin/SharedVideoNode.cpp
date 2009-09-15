@@ -73,7 +73,9 @@ SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : Sh
 	nodeType = "SharedVideoNode";
 	
 
+
 	this->setShape(ShapeNode::PLANE);
+	this->setBillboard(ShapeNode::POINT_EYE);
 	//drawTexture(); //setShape will automatically call drawTexture()
 	
 	// worker thread is in killed state to start:

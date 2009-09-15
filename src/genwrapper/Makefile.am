@@ -7,6 +7,6 @@ genwrapper_SOURCES = main.cpp Configuration.cpp FileSystemUtils.cpp NodeMap.cpp 
 
 genwrapper_CPPFLAGS = $(XML_CFLAGS) $(BOOST_CPPFLAGS)
 genwrapper_LDFLAGS = $(XML_LIBS) $(BOOST_LDFLAGS)
-#genwrapper_LDFLAGS = $(XML_LIBS) $(BOOST_LDFLAGS) -l$(BOOST_REGEX_LIB)
+#genwrapper_LDFLAGS = $(XML_LIBS) $(BOOST_LDFLAGS) $(BOOST_REGEX_LIB)
 genwrapper_LDADD = $(BOOST_REGEX_LIB)
 
