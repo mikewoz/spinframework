@@ -72,10 +72,11 @@
 #define AS_UNIT_SCALE  1.0f // 1m
 #define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
 
+/*
 #define X_AXIS osg::Vec3(1.0, 0.0, 0.0)
 #define Y_AXIS osg::Vec3(0.0, 1.0, 0.0)
 #define Z_AXIS osg::Vec3(0.0, 0.0, 1.0)
-
+*/
 
 double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2);
 osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle);

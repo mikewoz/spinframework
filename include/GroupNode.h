@@ -147,6 +147,7 @@ public:
 	osg::Vec3 getVelocity() { return _velocity; };
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
 
+	osg::Matrix getGlobalMatrix() { return _globalMatrix; };
 
 	/**
 	* The dumpGlobals method results in a broadcast of this node's translation

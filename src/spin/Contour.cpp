@@ -173,12 +173,12 @@ osg::Quat Contour::getOrientation(int index)
 		
 		osg::Quat rot;
 		osg::Vec3 v = osg::Vec3(_vArray->at((int)index+1)-_vArray->at((int)index));
-		//rot.makeRotate( X_AXIS, v )
+		//rot.makeRotate( osg::X_AXIS, v )
 		
 		v.normalize();
 		//rot.makeRotate(0.0, v);
-		//rot.makeRotate( (float)v.y(), X_AXIS, (float)0.0, Y_AXIS, (float)v.x(), Z_AXIS );
-		rot.makeRotate( Z_AXIS, v);
+		//rot.makeRotate( (float)v.y(), osg::X_AXIS, (float)0.0,osg:: Y_AXIS, (float)v.x(), osg::Z_AXIS );
+		rot.makeRotate( osg::Z_AXIS, v);
 		
 		return rot;
 	}
@@ -448,7 +448,7 @@ void Contour::draw()
 			{
 				//osg::Cylinder(center, radius, height)
 				cyl = new osg::Cylinder(getTranslation(i+0.5), _thickness, (getTranslation(i+1)-getTranslation(i)).length());
-				cyl->setRotation(getOrientation(i));// * osg::Quat(osg::PI/2, Y_AXIS)); // * osg::Matrix::rotate(osg::PI/2,0,1,0);
+				cyl->setRotation(getOrientation(i));// * osg::Quat(osg::PI/2, osg::Y_AXIS)); // * osg::Matrix::rotate(osg::PI/2,0,1,0);
 				
 				cylDrawable = new osg::ShapeDrawable(cyl,hints);
 				cylDrawable->setColor(_color);
