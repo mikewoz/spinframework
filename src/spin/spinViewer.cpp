@@ -331,8 +331,9 @@ int main(int argc, char **argv)
 
 
 	osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator();
-	//manipulator->setMinimumDistance ( 0.0001 );
-	manipulator->setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,1,0), osg::Vec3(0,0,1), false );
+	manipulator->setMinimumDistance ( 0.0001 );
+	//manipulator->setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,1,0), osg::Vec3(0,0,1), false );
+	manipulator->setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 
 
 	
