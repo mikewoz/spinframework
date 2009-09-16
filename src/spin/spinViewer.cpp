@@ -65,14 +65,14 @@ extern pthread_mutex_t pthreadLock;
 
 
 // global:
-// we store UserNode in a global ref_ptr so that it can't be deleted
-static osg::ref_ptr<ReferencedNode> UserNode;
+// we store userNode in a global ref_ptr so that it can't be deleted
+static osg::ref_ptr<ReferencedNode> userNode;
 
 
 
 void registerUser(spinContext *spin)
 {
-	if (!UserNode.valid())
+	if (!userNode.valid())
 	{
         std::cout << "ERROR: could not register user" << std::endl;
         exit(1);
@@ -82,9 +82,9 @@ void registerUser(spinContext *spin)
 	// Send a message to the server to create this node (assumes that the server
 	// is running). If not, it will send a 'userRefresh' method upon startup
 	// that will request that this function is called again
-	spin->sendSceneMessage("sss", "createNode", UserNode->id->s_name, "UserNode", LO_ARGS_END);
+	spin->sendSceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
 
-	std::cout << "  Registered user '" << UserNode->id->s_name << "' with SPIN" << std::endl;
+	std::cout << "  Registered user '" << userNode->id->s_name << "' with SPIN" << std::endl;
 
 }
 
@@ -230,9 +230,9 @@ int main(int argc, char **argv)
 	// Add a UserNode to the local scene and use it to feed a NodeTracker for
 	// the viewer's camera. We expect that this node will be created in the
 	// sceneManager and that updates will be generated. 
-	UserNode = spin->sceneManager->getOrCreateNode(id.c_str(), "UserNode");
+	userNode = spin->sceneManager->getOrCreateNode(id.c_str(), "UserNode");
 	
-	// send UserNode info to spin
+	// send userNode info to spin
 	registerUser(spin);
 	
 		
@@ -341,7 +341,7 @@ int main(int argc, char **argv)
 //	manipulator->setHomePosition( osg::Vec3(0,-1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 	manipulator->setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 //	manipulator->setHomePosition( osg::Vec3(0,1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-	manipulator->setTrackNode(UserNode->getAttachmentNode());
+	manipulator->setTrackNode(userNode->getAttachmentNode());
 
 
 	view->setCameraManipulator(manipulator);
