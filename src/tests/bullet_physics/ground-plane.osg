@@ -1,0 +1,75 @@
+Group {
+  UniqueID "Ground"
+  DataVariance DYNAMIC
+  name "Ground"
+  cullingActive TRUE
+  num_children 1
+MatrixTransform {
+  StateSet { 0xba1 ON }
+  Matrix {
+    DataVariance DYNAMIC
+    0.5 0.0 0.0 0.0
+    0.0 0.499999910593 0.0 0.0
+    0.0 0.0 0.10000000149 0.0
+    0.0 0.0 0.0 1.0
+  }
+  UniqueID "Plane"
+  DataVariance DYNAMIC
+  name "Plane"
+  cullingActive TRUE
+  num_children 1
+Geode {
+  UniqueID "Plane_geode"
+  DataVariance DYNAMIC
+  name "Plane_geode"
+  cullingActive TRUE
+  num_drawables 1
+  Geometry {
+    StateSet {
+      UniqueID Plane_stateset
+      DataVariance STATIC
+      rendering_hint OPAQUE_BIN
+      GL_BLEND OFF
+      textureUnit 0 {
+        GL_TEXTURE_2D ON
+        Texture2D {
+          DataVariance STATIC
+          file "/home/janoc/src/sensorama/accel-osg/data/grass.png"
+          wrap_s REPEAT
+          wrap_t REPEAT
+          wrap_r CLAMP
+          min_filter LINEAR_MIPMAP_LINEAR
+          mag_filter LINEAR
+          maxAnisotropy 1
+          internalFormatMode USE_IMAGE_DATA_FORMAT
+        }
+      }
+    }
+    VertexArray 4 {
+      1.0 0.999999940395 4.12693523799e-08
+      -0.999999642372 1.00000035763 4.12693701435e-08
+      -1.00000011921 -0.999999821186 -4.12693488272e-08
+      1.0 -1.0 -4.12693559326e-08
+    }
+    NormalBinding PER_VERTEX
+    NormalArray 4 {
+      -1.7763568394e-15 -4.12693523799e-08 1.0
+      -1.7763568394e-15 -4.12693523799e-08 1.0
+      -1.7763568394e-15 -4.12693523799e-08 1.0
+      -1.7763568394e-15 -4.12693523799e-08 1.0
+    }
+    PrimitiveSets 1 {
+      DrawElementsUInt QUADS 1 {
+        0 1 2 3
+      }
+    }
+    TexCoordArray 0 Vec2Array 4 {
+      1.03362417221 1.0341758728
+      -0.0343115329742 1.0341758728
+      -0.0343117713928 -0.0337595939636
+      1.03362417221 -0.0337597131729
+    }
+  }
+}
+}
+}
