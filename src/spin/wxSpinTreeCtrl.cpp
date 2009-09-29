@@ -389,7 +389,7 @@ void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
             lo_message_add(msg, "ss", "setParent", parentString.c_str());
             spin->nodeMessage(child->id, msg);
             */
-            spin->sendNodeMessage(child->id, "ss", "setParent", parentString.c_str(), LO_ARGS_END);
+            spin->sendNodeMessage(child->id->s_name, "ss", "setParent", parentString.c_str(), LO_ARGS_END);
 
         }
     }

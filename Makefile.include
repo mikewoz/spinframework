@@ -54,7 +54,11 @@ SPIN_LIBS += -L/usr/local/lib -L/usr/lib
 SPIN_INCLUDE += -I${SPIN_PATH}/include -I${SPIN_PATH}/src/tinyxml -I/usr/local/include -I/usr/include
 
 
-
+ifeq ($(OS),Darwin)
+	LIB_EXT=dylib
+else
+	LIB_EXT=so
+endif
 
 ###################################################################
 # Some customizations needed for Darwin:
@@ -132,6 +136,12 @@ WX_VERSION = $(shell $(WXCONFIG) --version)
 # wxPropGrid library:
 WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 
+###################################################################
+# For Python / Boost.Python:
+
+#PYTHON_FLAGS = $(shell python-config --cflags)
+PYTHON_INCLUDE = $(shell python-config --includes)
+PYTHON_LIBS = $(shell python-config --ldflags)
 
 ###################################################################
 # For appsink:

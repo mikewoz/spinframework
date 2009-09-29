@@ -520,7 +520,7 @@ void wxSpinPropGrid::OnPropertyChanging(wxPropertyGridEvent& event)
         lo_message_add_wxProp( msg, id, event.GetValue() );
     }
 
-	spin->sendNodeMessage(currentNode->id, msg);
+	spin->sendNodeMessage(currentNode->id->s_name, msg);
 
 	// prevent event from propagating:
 	//event.Veto();

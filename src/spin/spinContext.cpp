@@ -68,19 +68,43 @@ spinContext::spinContext(spinContextMode initMode)
     //#define OSG_LIBRARY_PATH @executable_path/../PlugIns
 #endif
 
+    
 	// Load the SPIN library:
-	osgDB::Registry *reg = osgDB::Registry::instance();
-	osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN"));
-
-
+    osgDB::Registry *reg = osgDB::Registry::instance();
+    /*
+	if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN")))
+	{
+		std::cout << "Error: Could not load libSPIN" << std::endl;
+	}
+	*/
+	if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPINwrappers")))
+	{
+		std::cout << "Error: Could not load libSPINwrappers" << std::endl;
+	}
+	
+	
+	
 	// Make sure that our OSG nodekit is loaded (by checking for existance of
 	// the ReferencedNode node type):
-	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-	if (!ReferencedNodeType.isDefined())
-	{
-		std::cout << "ERROR: libSPIN was not found. Please check dynamic libraries. Could not start spinContext." << std::endl;
+    try
+    {
+    	/*
+    	std::cout << "[DEBUG] These are all possible types:" << std::endl;
+    	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
+    	for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
+    	{
+    		if ( ((*it).second)->isDefined() )
+    		std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
+    	}
+    	*/
+    	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+    }
+    catch (osgIntrospection::Exception & ex)
+	{    	
+		std::cout << "ERROR: " << ex.what() << ". This is likely a dynamic library problem. Make sure that libSPINwrappers exists and can be found." << std::endl;
 		exit(1);
 	}
+	
 
 	running = false;
 	id = "default";
@@ -220,21 +244,31 @@ void spinContext::stop()
 }
 
 
-void spinContext::sendInfoMessage(std::string OSCpath, lo_message msg)
-{
-	lo_send_message_from(lo_infoAddr, lo_server_thread_get_server(lo_infoServ), OSCpath.c_str(), msg);
-
-    // Let's free the message after (not sure if this is necessary):
-    lo_message_free(msg);
-}
-
 void spinContext::sendInfoMessage(std::string OSCpath, const char *types, ...)
 {
-	lo_message msg = lo_message_new();
-
 	va_list ap;
 	va_start(ap, types);
+	sendInfoMessage(OSCpath, types, ap);
 
+	/*
+	va_start(ap, types);
+
+	lo_message msg = lo_message_new();
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		sendInfoMessage(OSCpath, msg);
+	} else {
+		std::cout << "ERROR (spinContext::sendInfoMessage): " << err << std::endl;
+	}
+	*/
+}
+
+
+void spinContext::sendInfoMessage(std::string OSCpath, const char *types, va_list ap)
+{
+	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 
 	if (!err)
@@ -245,29 +279,17 @@ void spinContext::sendInfoMessage(std::string OSCpath, const char *types, ...)
 	}
 }
 
-void spinContext::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
+void spinContext::sendInfoMessage(std::string OSCpath, lo_message msg)
 {
-	if (isRunning())
-	{
-		std::string OSCpath = "/SPIN/" + id + "/" + nodeSym->s_name;
-
-		// If this thread is a listener, then we need to send an OSC message to
-		// the rxAddr of the spinServer (unicast)
-		if ( this->mode != SERVER_MODE )
-		{
-			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
-		}
-
-		// if, however, this process acts as a server, we can optimize and send
-		// directly to the OSC callback function:
-		else SceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)nodeSym);
-
-	} else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
+	lo_send_message_from(lo_infoAddr, lo_server_thread_get_server(lo_infoServ), OSCpath.c_str(), msg);
 
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);
 }
 
+
+
+/*
 void spinContext::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
 {
 	lo_message msg = lo_message_new();
@@ -285,7 +307,105 @@ void spinContext::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
 	}
 
 }
+*/
 
+void spinContext::sendNodeMessage(const char *nodeId, const char *types, ...)
+{
+	va_list ap;
+	va_start(ap, types);
+	sendNodeMessage(nodeId, types, ap);
+}
+
+void spinContext::sendNodeMessage(const char *nodeId, const char *types, va_list ap)
+{
+	lo_message msg = lo_message_new();
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		sendNodeMessage(nodeId, msg);
+	} else {
+		std::cout << "ERROR (spinContext::sendNodeMessage): " << err << std::endl;
+	}
+}
+
+
+void spinContext::sendNodeMessage(const char *nodeId, lo_message msg)
+{
+	if (isRunning())
+	{
+		std::string OSCpath = "/SPIN/" + id + "/" + nodeId;
+
+		// If this thread is a listener, then we need to send an OSC message to
+		// the rxAddr of the spinServer (unicast)
+		if ( this->mode != SERVER_MODE )
+		{
+			lo_send_message(lo_txAddr, OSCpath.c_str(), msg);
+		}
+
+		// if, however, this process acts as a server, we can optimize and send
+		// directly to the OSC callback function:
+		else SceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)gensym(nodeId));
+
+	} else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
+
+    // Let's free the message after (not sure if this is necessary):
+    lo_message_free(msg);
+}
+
+
+
+/*
+void sendNodeMessage(const char *nodeName, const char *types, ...)
+{
+	lo_message msg = lo_message_new();
+
+	va_list ap;
+	va_start(ap, types);
+
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		sendNodeMessage(gensym(nodeName), msg);
+	} else {
+		std::cout << "ERROR (spinContext::sendNodeMessage): " << err << std::endl;
+	}	
+}
+*/
+
+void spinContext::sendSceneMessage(const char *types, ...)
+{
+	va_list ap;
+	va_start(ap, types);
+	sendSceneMessage(types, ap);
+	
+	/*
+	va_start(ap, types);
+
+	lo_message msg = lo_message_new();
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		sendSceneMessage(msg);
+	} else {
+		std::cout << "ERROR (spinContext::sendSceneMessage): " << err << std::endl;
+	}
+	*/
+}
+
+void spinContext::sendSceneMessage(const char *types, va_list ap)
+{
+	lo_message msg = lo_message_new();
+	int err = lo_message_add_varargs(msg, types, ap);
+	if (!err)
+	{
+		sendSceneMessage(msg);
+	} else {
+		std::cout << "ERROR (spinContext::sendSceneMessage): " << err << std::endl;
+	}
+}
 
 void spinContext::sendSceneMessage(lo_message msg)
 {
@@ -310,22 +430,8 @@ void spinContext::sendSceneMessage(lo_message msg)
     lo_message_free(msg);
 }
 
-void spinContext::sendSceneMessage(const char *types, ...)
-{
-	lo_message msg = lo_message_new();
 
-	va_list ap;
-	va_start(ap, types);
 
-	int err = lo_message_add_varargs(msg, types, ap);
-
-	if (!err)
-	{
-		sendSceneMessage(msg);
-	} else {
-		std::cout << "ERROR (spinContext::sendSceneMessage): " << err << std::endl;
-	}
-}
 
 // *****************************************************************************
 

@@ -2,14 +2,18 @@
 include ../../Makefile.include
 
 # choose names of library:
-LIBNAME = libSPIN
+LIBNAME = libSPINwrappers
 
+#all: staticlib
 all: $(OS)
 
-WRAPPER_OBJ = ReferencedNode.o GroupNode.o ShapeNode.o ModelNode.o \
-	      VideoNode.o LightSource.o RayNode.o Contour.o ConstraintsNode.o \
-	      PointerNode.o MeasurementNode.o SoundNode.o SoundSpace.o \
-	      DSPNode.o SoundConnection.o UserNode.o SharedVideoNode.o
+NODELIST = ReferencedNode GroupNode ShapeNode ModelNode \
+	   VideoNode LightSource RayNode Contour ConstraintsNode \
+	   PointerNode MeasurementNode SoundNode SoundSpace \
+	   DSPNode SoundConnection UserNode SharedVideoNode
+
+# turn nodelist into an object list of form: wrapper_<name>.o
+WRAPPER_OBJ = $(patsubst %,wrapper_%.o,$(NODELIST))
 
 
 #SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus -DASDEBUG -Wall
@@ -19,18 +23,23 @@ SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus -DASDEBUG
 ###################################################################
 # GENERIC COMPILATION RULE:
 
-%.o: %.cpp
+wrapper_%.o: %.cpp
 	$(CXX) $(SPIN_FLAGS) $(SPIN_INCLUDE) $(OSG_INCLUDE) $(BOOST_INCLUDE) -c $< -o $@
 
 ###################################################################
 # TARGETS:
 
+staticlib: $(WRAPPER_OBJ)
+	$(AR) -rs $(LIBNAME).a $(WRAPPER_OBJ)
+	#cp $(LIBNAME).a ../spin
 
-Linux: $(WRAPPER_OBJ)
+Linux: $(WRAPPER_OBJ) staticlib
 	$(CXX) --export-dynamic -shared -Wl,-soname,$(LIBNAME).so -o $(LIBNAME).so $(WRAPPER_OBJ) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	#cp $(LIBNAME).so ../spin
 
-Darwin: $(WRAPPER_OBJ)
+Darwin: $(WRAPPER_OBJ) staticlib
 	$(CXX) -dynamiclib -undefined suppress -flat_namespace -o $(LIBNAME).dylib $(WRAPPER_OBJ) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	#cp $(LIBNAME).dylib ../spin
 
 
 ########################################################
@@ -40,4 +49,4 @@ install:
 
 ########################################################
 clean:
-	-rm -f $(LIBNAME).* *.o 
+	-rm -f $(LIBNAME)* *.o 

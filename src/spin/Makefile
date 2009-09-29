@@ -23,7 +23,7 @@ apps: spin.app spinViewer.app
 ########################################################
 
 
-vpath %.cpp .  ../tinyxml $(APPSINK_PATH)
+vpath %.cpp .  ../tinyxml $(APPSINK_PATH) ../tests/bullet_physics
 
 
 OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
@@ -35,9 +35,28 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        DSPNode.o SoundNode.o SoundSpace.o SoundConnection.o \
        SharedVideoNode.o sharedVideoBuffer.o 
 
+WRAPPER_NODELIST = ReferencedNode GroupNode ShapeNode ModelNode \
+	   VideoNode LightSource RayNode Contour ConstraintsNode \
+	   PointerNode MeasurementNode SoundNode SoundSpace \
+	   DSPNode SoundConnection UserNode SharedVideoNode
+
+# turn nodelist into an object list of form: wrapper_<name>.o
+WRAPPER_OBJ = $(patsubst %,../osgWrappers/wrapper_%.o,$(WRAPPER_NODELIST))
+
+
+
 WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
 	  wxSpinPropGrid.o wxSpinSettings.o wxSpinTreeVisitor.o \
 	  wxSpinTreeCtrl.o
+
+
+ifeq ($(OS),Darwin)
+  SPINLIBNAME = libSPIN.dylib
+  PYTHON_TARGET = pythonModule_Darwin
+else
+  SPINLIBNAME = libSPIN.so
+
+endif
 
 
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
@@ -50,7 +69,9 @@ SPIN_FLAGS += -D_SPINDEBUG
 
 #SPIN_FLAGS += -DOSCDEBUG
 
-SPIN_LIBS += -llo -L../osgWrappers
+#SPIN_LIBS += -llo -L../osgWrappers
+#SPIN_LIBS += -llo -lSPIN -lSPINwrappers -L. -L../osgWrappers
+SPIN_LIBS += -llo -lSPIN -L. -L../osgWrappers
 
 
 ###################################################################
@@ -77,30 +98,60 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ###################################################################
 # TARGETS:
 
-ALLTARGETS = docGenerator spinViewer spinServer spin
+# libSPIN is the core dynamic library that enables SPIN to be included
+# in other apps:
 
+libSPIN.dylib: $(OBJS)
+	@echo "\n------------- creating $@: -------------"
+	$(CXX) -dynamiclib -undefined suppress -flat_namespace -o $@ $(OBJS) -lSPINwrappers -L../osgWrappers $(OSG_LIBS) $(BOOST_LIBS)
+
+libSPIN.so: $(OBJS)
+	@echo "\n------------- creating $@: -------------" 
+	$(CXX) --export-dynamic -shared -Wl,-soname,$@ -o $@ $(OBJS) -lSPINwrappers -L../osgWrappers $(OSG_LIBS) $(BOOST_LIBS)
+
+# spinPython is a library created in Boost.Python that exposes core
+# elements for use in Python scripts:
+
+python: python_$(OS)
+
+python_wrappers.o: python_wrappers.cpp
+	@echo "--------------- compiling $@  ---------------" 
+	$(CXX) $(SPIN_INCLUDE) $(PYTHON_INCLUDE) $(BOOST_INCLUDE) -c $< -o $@
+
+python_Darwin: python_wrappers.o $(SPINLIBNAME)
+	@echo "\n------------- Creating spinFramework Python module: -------------"
+	$(CXX) -shared -module -undefined suppress -flat_namespace -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+
+
+
+# docGenerator is an app that uses osgIntrospection and doxygen to
+# create customized docs for SPIN:
 doc: docGenerator
-docGenerator: $(OBJS) docGenerator.o
+docGenerator: $(SPINLIBNAME) docGenerator.o
 	@echo "\n------------- Generating OSC Documentation: -------------" 
-	$(CXX) -o docGenerator $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -o docGenerator $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 	./docGenerator
 	-cp *.html ../../doxygen/html
 
-spinViewer: $(OBJS) spinViewer.o
+# spinViewer is a simple OSG viewer client:
+spinViewer: $(SPINLIBNAME) spinViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
-spinServer: $(OBJS) spinServer.o
+# spinServer is a commandline SPIN server instance:
+spinServer: $(SPINLIBNAME) spinServer.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) -lSPIN $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
-spin: $(OBJS) $(WX_OBJS)
+# spin is a GUI (using WX Widgets) encompassing most features of SPIN:
+spin: $(SPINLIBNAME) $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ -lSPIN $(WX_LIBS) $(OSG_LIBS) $(BOOST_LIBS) $(SPIN_LIBS)
+	$(CXX) -o $@ $^ $(SPIN_LIBS) $(WX_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
 bullet-test: bullet-test.o
 	$(CXX) -o $@ $^ $(OSG_LIBS) -lbulletdynamics -lbulletcollision -lLinearMath -L/usr/local/include/BulletCollision 
 
+# spin.app creates an OSX application bundle for spin:
 spin.app: spin
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
@@ -116,8 +167,8 @@ spin.app: spin
 	spin.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp spin $@/Contents/MacOS
-	install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spin	
-	cp ../osgWrappers/libSPIN.dylib $@/Contents/libs
+	install_name_tool -change libSPIN.dylib @executable_pathlibSPIN.dylib $@/Contents/MacOS/spin	
+	cp libSPIN.dylib $@/Contents/libs
 	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
 	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
@@ -125,6 +176,7 @@ spin.app: spin
 	cp ../Resources/images/logo_spin.icns $@/Contents/Resources
 	./dylibbundler -of -b -x $@/Contents/MacOS/spin -d $@/Contents/libs
 
+# spinViewer.app creates an OSX application bundle for spin:
 spinViewer.app: spinViewer
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
@@ -140,8 +192,8 @@ spinViewer.app: spinViewer
 	spinViewer.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp spinViewer $@/Contents/MacOS
-	install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinViewer
-	cp ../osgWrappers/libSPIN.dylib $@/Contents/libs
+	install_name_tool -change libSPIN.dylib @executable_path/libSPIN.dylib $@/Contents/MacOS/spinViewer
+	cp libSPIN.dylib $@/Contents/libs
 	-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 	-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
 	-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
@@ -155,4 +207,4 @@ install:
 
 ########################################################
 clean:
-	-rm -rf $(ALLTARGETS) *.o	
+	-rm -rf spin spinViewer spinServer libSPIN.* *.o	

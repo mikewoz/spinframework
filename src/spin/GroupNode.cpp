@@ -183,6 +183,21 @@ void GroupNode::setOrientation (float p, float r, float y)
 
 	BROADCAST(this, "sfff", "setOrientation", p, r, y);
 }
+/*
+void GroupNode::setOrientationQuat (float x, float y, float z, float w)
+{
+
+	_orientation = osg::Vec3(p, r, y);
+
+	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
+							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
+							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
+
+	mainTransform->setAttitude(osg::Quat(x,y,z,w));
+
+	BROADCAST(this, "sfff", "setOrientation", p, r, y);
+}
+*/
 
 void GroupNode::setVelocity (float dx, float dy, float dz)
 {

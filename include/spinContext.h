@@ -78,14 +78,17 @@ class spinContext
 		void stop();
 
 
-		void sendInfoMessage(std::string OSCpath, lo_message msg);
 		void sendInfoMessage(std::string OSCpath, const char *types, ...);
+		void sendInfoMessage(std::string OSCpath, const char *types, va_list ap);
+		void sendInfoMessage(std::string OSCpath, lo_message msg);
 		
-		void sendSceneMessage(lo_message msg);
 		void sendSceneMessage(const char *types, ...);
+		void sendSceneMessage(const char *types, va_list ap);
+		void sendSceneMessage(lo_message msg);
 
-		void sendNodeMessage(t_symbol *nodeSym, lo_message msg);
-		void sendNodeMessage(t_symbol *nodeSym, const char *types, ...);
+		void sendNodeMessage(const char *nodeId, const char *types, ...);
+		void sendNodeMessage(const char *nodeId, const char *types, va_list ap);
+		void sendNodeMessage(const char *nodeId, lo_message msg);
 
 
 
