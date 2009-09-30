@@ -46,7 +46,8 @@
 #include <boost/python/call_method.hpp>
 #include <boost/python/class.hpp>
 #include <boost/python/module.hpp>
-
+#include <boost/python/object/function_object.hpp>
+#include <boost/python/enum.hpp>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -58,65 +59,120 @@
 using namespace boost::python;
 
 /*
-class spinContext_wrapped : spinContext
+NOTES:
+
+C declaration of a liblo callback:
+int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+registering the callback:
+lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoChannelCallback, this);
+
+*/
+
+/*
+// In python, we'll need to create an instance of the spinCallback class,
+// and override the virtual functions defined here:
+struct spinCallbacks
 {
+	virtual int sceneCallback(args) = 0;
+	virtual int nodeCallback() = 0;
+	virtual int infoCallback() = 0;
+};
 
-public:
-	spinContext_wrapped(PyObject* self) : m_self(self) {}
-
-	virtual void sendSceneMessage(const char* types, ... )
+class spinCallbacksWrapper : spinCallbacks
+{
+	spinCallbacksWrapper(PyObject* self_) : self(self_) {}
+	int sceneCallback()
 	{
-		va_list args;
-		va_start(args, types);
-		call_method< void >(m_self, "sendSceneMessage", types, args);
+		return call_method<int>(self, "sceneCallback", args);
 	}
-	
-private:
-  PyObject* const m_self;
-
+	PyObject* self;
 };
 */
 
 
+class spinContext_wrapped : spinContext
+{
+
+public:
+	spinContext_wrapped(PyObject* self_) : self(self_) {}
+
+	virtual int sceneCallback(const char *types, lo_arg **argv, int argc)
+	{
+		// need to convert liblo args into something python will understand:
+		
+		// ???
+		boost::python::tuple args = boost::python::make_tuple();
+		
+		for (int i=0; i<argc; i++)
+		{
+			if (lo_is_numerical_type((lo_type)types[i]))
+			{
+				args + boost::python::make_tuple( lo_hires_val((lo_type)types[i], argv[i]) );
+			}
+			else {
+				args + boost::python::make_tuple( (const char*)argv[i] );
+			}
+		}
+		
+		
+		call_method< void >(self, "sceneCallback", args);
+	}
+	
+private:
+	PyObject* const self;
+
+};
+
+
+//void (spinContext_wrapped::*sendSceneMessage_var)(const char*, ...) = &spinContext_wrapped::sendSceneMessage;
+//typedef void (spinContext::*sendSceneMessage_fnType)(const char*, va_list);
+
+
+
 // define member function pointer variables for overloaded functions:
-//void (spinContext::*sendInfoMessage_var)(std::string, const char*, ...) = &spinContext::sendInfoMessage;
+void (spinContext::*sendInfoMessage_var)(std::string, const char*, va_list) = &spinContext::sendInfoMessage;
 void (spinContext::*sendNodeMessage_var)(const char*, const char*, va_list) = &spinContext::sendNodeMessage;
 void (spinContext::*sendSceneMessage_var)(const char*, va_list) = &spinContext::sendSceneMessage;
 
-//void (spinContext_wrapped::*sendSceneMessage_var)(const char*, ...) = &spinContext_wrapped::sendSceneMessage;
-
-//typedef void (spinContext::*sendSceneMessage_fnType)(const char*, va_list);
-
-//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(spinContext_overloads, sendSceneMessage, 2, 12)
 
 
 
 BOOST_PYTHON_MODULE(spinFramework)
 {
-	//class_<spinContext, spinContext_wrapped>("spinContext", init<int>())
+	
 	class_<spinContext>("spinContext", init<spinContext::spinContextMode>())
 
 	.def("start", &spinContext::start)
 	.def("stop", &spinContext::stop)
 	
-	//.def("sendInfoMessage", sendInfoMessage_var)
+	.def("sendInfoMessage", sendInfoMessage_var)
 	.def("sendNodeMessage", sendNodeMessage_var)
 	.def("sendSceneMessage", sendSceneMessage_var)
-	
-	
-	//.def("sendSceneMessage", &spinContext::sendSceneMessage, spinContext_overloads())
 
-	
-	//.def("sendSceneMessage", &spinContext_wrapped::sendSceneMessage)
-	
-	//.def("sendSceneMessage", sendSceneMessage_fnType(&spinContext::sendSceneMessage))
-	//.def("sendSceneMessage", raw_function(sendSceneMessage_var)
-	
 	.def("isRunning", &spinContext::isRunning)
 	.def("setID", &spinContext::setID)
 	.def("setRxAddr", &spinContext::setRxAddr)
 	.def("setRxPort", &spinContext::setRxPort)
 	.def("setTxAddr", &spinContext::setTxAddr)
 	.def("setTxPort", &spinContext::setTxPort)
+	
+	//implicitly_convertible<spinContext::spinContextMode,int>();
+    //implicitly_convertible<int,spinContext::spinContextMode>();
+	
 	;
+	
+	/*
+	enum_<spinContext_wrapped::spinContextMode>("spinContextMode")
+	    .value("SERVER_MODE", spinContext_wrapped::SERVER_MODE)
+	    .value("LISTENER_MODE", spinContext_wrapped::LISTENER_MODE)
+	    ;
+	 */
+
+	/*
+	class_<spinContext_wrapped bases<spinContext> >("spinContext", init<spinContext::spinContextMode>())
+	.def("sceneCallback", &spinContext_wrapped::sceneCallback)
+	;
+	*/
+	
 }
