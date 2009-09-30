@@ -67,7 +67,7 @@ spinContext::spinContext(spinContextMode initMode)
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
     //#define OSG_LIBRARY_PATH @executable_path/../PlugIns
 #endif
-
+std::cout << "LO_ARGS_END = " << LO_ARGS_END << std::endl;
     
 	// Load the SPIN library:
     osgDB::Registry *reg = osgDB::Registry::instance();

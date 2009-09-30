@@ -141,7 +141,8 @@ void (spinContext::*sendSceneMessage_var)(const char*, va_list) = &spinContext::
 BOOST_PYTHON_MODULE(spinFramework)
 {
 	
-	class_<spinContext>("spinContext", init<spinContext::spinContextMode>())
+	scope in_spinContext = class_<spinContext>("spinContext", init<spinContext::spinContextMode>())
+	//class_<spinContext>("spinContext", init<int>())
 
 	.def("start", &spinContext::start)
 	.def("stop", &spinContext::stop)
@@ -156,18 +157,24 @@ BOOST_PYTHON_MODULE(spinFramework)
 	.def("setRxPort", &spinContext::setRxPort)
 	.def("setTxAddr", &spinContext::setTxAddr)
 	.def("setTxPort", &spinContext::setTxPort)
+
+/*
+	.value("SERVER_MODE", spinContext::SERVER_MODE)
+	.value("LISTENER_MODE", spinContext::LISTENER_MODE)
+	.export_values()
+*/
 	
 	//implicitly_convertible<spinContext::spinContextMode,int>();
-    //implicitly_convertible<int,spinContext::spinContextMode>();
+	//implicitly_convertible<int,spinContext::spinContextMode>();
 	
 	;
 	
-	/*
-	enum_<spinContext_wrapped::spinContextMode>("spinContextMode")
-	    .value("SERVER_MODE", spinContext_wrapped::SERVER_MODE)
-	    .value("LISTENER_MODE", spinContext_wrapped::LISTENER_MODE)
+	
+	enum_<spinContext::spinContextMode>("mode")
+	    .value("SERVER_MODE", spinContext::SERVER_MODE)
+	    .value("LISTENER_MODE", spinContext::LISTENER_MODE)
 	    ;
-	 */
+	
 
 	/*
 	class_<spinContext_wrapped bases<spinContext> >("spinContext", init<spinContext::spinContextMode>())
