@@ -91,6 +91,7 @@ class spinContext
 		void sendNodeMessage(const char *nodeId, lo_message msg);
 
 
+		virtual int sceneCallback(const char *types, lo_arg **argv, int argc);
 
 		bool isRunning() { return running; }
 
@@ -156,6 +157,7 @@ static void *spinListenerThread(void *arg);
 static void *spinServerThread(void *arg);
 
 
+int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 #endif

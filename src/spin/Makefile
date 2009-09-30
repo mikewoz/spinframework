@@ -120,7 +120,7 @@ python_wrappers.o: python_wrappers.cpp
 
 python_Darwin: python_wrappers.o $(SPINLIBNAME)
 	@echo "\n------------- Creating spinFramework Python module: -------------"
-	$(CXX) -shared -module -undefined suppress -flat_namespace -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -shared -module -undefined suppress -flat_namespace -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -llo -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
 python_Linux: python_wrappers.o $(SPINLIBNAME)
 	@echo "\n------------- Creating spinFramework Python module: -------------"

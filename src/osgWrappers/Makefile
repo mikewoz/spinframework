@@ -4,7 +4,7 @@ include ../../Makefile.include
 # choose names of library:
 LIBNAME = libSPINwrappers
 
-#all: staticlib
+#all: $(OS) staticlib
 all: $(OS)
 
 NODELIST = ReferencedNode GroupNode ShapeNode ModelNode \
@@ -31,15 +31,12 @@ wrapper_%.o: %.cpp
 
 staticlib: $(WRAPPER_OBJ)
 	$(AR) -rs $(LIBNAME).a $(WRAPPER_OBJ)
-	#cp $(LIBNAME).a ../spin
 
-Linux: $(WRAPPER_OBJ) staticlib
+Linux: $(WRAPPER_OBJ)
 	$(CXX) --export-dynamic -shared -Wl,-soname,$(LIBNAME).so -o $(LIBNAME).so $(WRAPPER_OBJ) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
-	#cp $(LIBNAME).so ../spin
 
-Darwin: $(WRAPPER_OBJ) staticlib
+Darwin: $(WRAPPER_OBJ)
 	$(CXX) -dynamiclib -undefined suppress -flat_namespace -o $(LIBNAME).dylib $(WRAPPER_OBJ) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
-	#cp $(LIBNAME).dylib ../spin
 
 
 ########################################################

@@ -146,10 +146,9 @@ spinContext::spinContext(spinContextMode initMode)
 
 	// info channel callback (receives pings from client apps):
 	lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoChannelCallback, this);
-		
+	
 	lo_server_thread_start(lo_infoServ);
 	
-
 
 	std::cout << "  INFO channel: " << lo_address_get_url(lo_infoAddr) << std::endl;
 }
@@ -175,6 +174,7 @@ spinContext::~spinContext()
 		lo_address_free(lo_infoAddr);
 	}
 }
+
 
 
 bool spinContext::setMode(spinContextMode m)
@@ -429,7 +429,42 @@ void spinContext::sendSceneMessage(lo_message msg)
     lo_message_free(msg);
 }
 
+int spinContext::sceneCallback(const char *types, lo_arg **argv, int argc)
+{
 
+	std::cout << "Got sceneCallback method call, with types=" << types << std::endl;
+
+	for (int i=0; i<argc; i++)
+	{
+		if (lo_is_numerical_type((lo_type)types[i]))
+		{
+			std::cout << i << ": " << lo_hires_val((lo_type)types[i], argv[i]) << std::endl;
+		}
+		else {
+			std::cout << i << ": " << (const char*) argv[i] << std::endl;
+		}
+	}
+	
+	/*
+    for (int i=0; i<argc; i++)
+    {
+        if (types[i]=='s')
+        {
+            std::cout << i << ": " << va_arg(ap, const char*) <<  std::endl;
+        }
+        else if (types[i]=='i')
+        {
+        	std::cout << i << ": " << va_arg(ap, int) <<  std::endl;
+        }
+        else if (types[i]=='f' || types[i]=='d')
+        {
+        	std::cout << i << ": " << va_arg(ap, double) <<  std::endl;
+        }
+    }
+    */
+	
+    return 1;
+}
 
 
 // *****************************************************************************
@@ -476,6 +511,12 @@ static void *spinServerThread(void *arg)
 
 	UpdateSceneVisitor visitor;
 
+	
+	//lo_server_thread_add_method(spin->sceneManager->rxServ, NULL, NULL, sceneCallback, spin);
+	
+
+	
+	
 	spin->running = true;
 	while (spin->isRunning())
 	{
@@ -501,6 +542,29 @@ static void *spinServerThread(void *arg)
 }
 
 
+int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+{
+	//std::cout << "got to sceneCallback function" << std::endl;
+	
+	spinContext *spin = (spinContext*) user_data;
+	
+	// make sure there is at least one argument (ie, a method to call):
+	if (!argc) return 0;
+
+	// get the method (argv[0]):
+	string theMethod;
+	if (lo_is_string_type((lo_type)types[0]))
+	{
+		theMethod = string((char *)argv[0]);
+	}
+	else return 0;
+	
+	// bundle all other arguments
+
+	
+	//return spin->sceneCallback(types, argv, argc);
+	
+}
 
 int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
@@ -527,6 +591,5 @@ int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int 
 		// TODO: monitor /ping/user messages, keep timeout handlers, 
 		
 	}
-	
 	
 }
