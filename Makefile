@@ -37,6 +37,10 @@ clean:
 	$(MAKE) -C src/osgWrappers clean
 	$(MAKE) -C src/spin clean
 
+cleanb:
+	$(MAKE) -C src/osgWrappers cleanb
+	$(MAKE) -C src/spin cleanb
+
 install:
 	$(MAKE) -C src/osgWrappers install
 	$(MAKE) -C src/spin install
