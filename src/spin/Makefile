@@ -8,8 +8,8 @@ all: $(OS)
 #	@echo "SPIN_PATH=${SPIN_PATH}";
 
 # choose names of binaries:
-Linux: spinServer spinViewer spin
-Darwin: spinServer spinViewer spin
+Linux: libSPIN spinServer spinViewer spin
+Darwin: libSPIN spinServer spinViewer spin
 
 apps: spin.app spinViewer.app
 
@@ -50,15 +50,6 @@ WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
 	  wxSpinTreeCtrl.o
 
 
-ifeq ($(OS),Darwin)
-  SPINLIBNAME = libSPIN.dylib
-  PYTHON_TARGET = pythonModule_Darwin
-else
-  SPINLIBNAME = libSPIN.so
-
-endif
-
-
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
 
 ifeq ($(OS),Linux)
@@ -71,7 +62,7 @@ SPIN_FLAGS += -D_SPINDEBUG
 
 #SPIN_LIBS += -llo -L../osgWrappers
 #SPIN_LIBS += -llo -lSPIN -lSPINwrappers -L. -L../osgWrappers
-SPIN_LIBS += -llo -lSPIN -L. -L../osgWrappers
+SPIN_LIBS += -llo -lSPIN -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers
 
 
 ###################################################################
@@ -101,6 +92,12 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 # libSPIN is the core dynamic library that enables SPIN to be included
 # in other apps:
 
+ifeq ($(OS),Darwin)
+libSPIN: libSPIN.dylib
+else
+libSPIN: libSPIN.so
+endif
+
 libSPIN.dylib: $(OBJS)
 	@echo "\n------------- creating $@: -------------"
 	$(CXX) -dynamiclib -undefined suppress -flat_namespace -o $@ $(OBJS) -lSPINwrappers -L../osgWrappers $(OSG_LIBS) $(BOOST_LIBS)
@@ -118,36 +115,36 @@ python_wrappers.o: python_wrappers.cpp
 	@echo "--------------- compiling $@  ---------------" 
 	$(CXX) $(SPIN_INCLUDE) $(PYTHON_INCLUDE) $(BOOST_INCLUDE) -c $< -o $@
 
-python_Darwin: python_wrappers.o $(SPINLIBNAME)
+python_Darwin: python_wrappers.o 
 	@echo "\n------------- Creating spinFramework Python module: -------------"
-	$(CXX) -shared -module -undefined suppress -flat_namespace -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -llo -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -shared -module -undefined suppress -flat_namespace -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -llo -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS) $(SPIN_LIBS)
 
-python_Linux: python_wrappers.o $(SPINLIBNAME)
+python_Linux: python_wrappers.o 
 	@echo "\n------------- Creating spinFramework Python module: -------------"
-	$(CXX) -shared -module -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -llo -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -shared -module -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -llo -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS) $(SPIN_LIBS)
 
 
 # docGenerator is an app that uses osgIntrospection and doxygen to
 # create customized docs for SPIN:
 doc: docGenerator
-docGenerator: $(SPINLIBNAME) docGenerator.o
+docGenerator: docGenerator.o
 	@echo "\n------------- Generating OSC Documentation: -------------" 
 	$(CXX) -o docGenerator $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 	./docGenerator
 	-cp *.html ../../doxygen/html
 
 # spinViewer is a simple OSG viewer client:
-spinViewer: $(SPINLIBNAME) spinViewer.o
+spinViewer: spinViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
 # spinServer is a commandline SPIN server instance:
-spinServer: $(SPINLIBNAME) spinServer.o
+spinServer: spinServer.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
 # spin is a GUI (using WX Widgets) encompassing most features of SPIN:
-spin: $(SPINLIBNAME) $(WX_OBJS)
+spin: $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(SPIN_LIBS) $(WX_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
