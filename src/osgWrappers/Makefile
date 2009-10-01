@@ -41,7 +41,7 @@ Darwin: $(WRAPPER_OBJ)
 
 ########################################################
 install:
-	@echo "INSTALLING ${LIBNAME} to ${SPIN_INSTALL_PREFIX}";
+	@echo "\nINSTALLING to ${SPIN_INSTALL_PREFIX}";
 	-cp $(LIBNAME).* ${SPIN_INSTALL_PREFIX}/lib
 
 ########################################################

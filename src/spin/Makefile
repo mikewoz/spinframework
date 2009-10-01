@@ -7,9 +7,11 @@ all: $(OS)
 #	@echo "pwd="${PWD};
 #	@echo "SPIN_PATH=${SPIN_PATH}";
 
-# choose names of binaries:
-Linux: libSPIN spinServer spinViewer spin
-Darwin: libSPIN spinServer spinViewer spin
+PROGRAMS = spinServer spinViewer spin
+
+# choose targets:
+Linux: libSPIN $(PROGRAMS)
+Darwin: libSPIN $(PROGRAMS)
 
 apps: spin.app spinViewer.app
 
@@ -88,6 +90,8 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 
 ###################################################################
 # TARGETS:
+
+
 
 # libSPIN is the core dynamic library that enables SPIN to be included
 # in other apps:
@@ -200,11 +204,18 @@ spinViewer.app: spinViewer
 	cp ../Resources/images/logo_spinViewer.icns $@/Contents/Resources
 	./dylibbundler -of -b -x $@/Contents/MacOS/spinViewer -d $@/Contents/libs
 
+
+
 ########################################################
 install:
-	@echo "make install NOT YET DONE. Where do we install to??"
+	@echo "\nINSTALLING to ${SPIN_INSTALL_PREFIX}";
+	-cp libSPIN.* ${SPIN_INSTALL_PREFIX}/lib
+	-cp ${PROGRAMS} ${SPIN_INSTALL_PREFIX}/bin
 
 
 ########################################################
+cleanb:
+	-rm -rf $(PROGRAMS) libSPIN.*	
+
 clean:
-	-rm -rf spin spinViewer spinServer libSPIN.* *.o	
+	-rm -rf $(PROGRAMS) libSPIN.* *.o	
