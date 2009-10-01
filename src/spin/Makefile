@@ -64,7 +64,7 @@ SPIN_FLAGS += -D_SPINDEBUG
 
 #SPIN_LIBS += -llo -L../osgWrappers
 #SPIN_LIBS += -llo -lSPIN -lSPINwrappers -L. -L../osgWrappers
-SPIN_LIBS += -llo -lSPIN -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers
+SPIN_LIBS += -llo -lSPIN -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
 
 
 ###################################################################
