@@ -128,6 +128,8 @@ class spinContext
 
 	private:
 
+		std::string spinFolder;
+
 		// pthread stuff
 		pthread_t pthreadID; // id of child thread
 		pthread_attr_t pthreadAttr;

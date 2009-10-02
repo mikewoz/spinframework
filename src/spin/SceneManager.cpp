@@ -440,6 +440,13 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 	t_symbol *nodeID = gensym(id);
 	string nodeType = string(type);
 
+	// disallow node with the name "NULL" or bad things might happen
+	if (nodeID == gensym("NULL"))
+	{
+		std::cout << "Oops. Cannot create a node with the reserved name: 'NULL'" << std::endl;
+		return NULL;
+	}
+		
 	// ignore SoundConnection messages (these should be created by
 	// the DSPNode::connect() method
 	if (nodeType == "SoundConnection") return NULL;
@@ -1039,11 +1046,12 @@ std::string SceneManager::getConnectionsAsXML()
 // *****************************************************************************
 bool SceneManager::saveXML(const char *s)
 {
-	string filename;
-
-	// replace tilde with $HOME variable
-	if (s[0]=='~') filename = getenv("HOME") + string(s).substr(1);
-	else filename = string(s);
+	// convert filename into valid path:
+	string filename = getSpinPath(s);
+	// and make sure that there is an .xml extension:
+	if (filename.substr(filename.length()-4)!=string(".xml")) filename+=".xml";
+	
+		  
 
 
 	// start with XML Header:
@@ -1312,12 +1320,12 @@ bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
 // *****************************************************************************
 bool SceneManager::loadXML(const char *s)
 {
-	string filename;
+	// convert filename into valid path:
+	string filename = getSpinPath(s);
+	// and make sure that there is an .xml extension:
+	if (filename.substr(filename.length()-4)!=string(".xml")) filename+=".xml";
 
-	// replace tilde with $HOME variable
-	if (s[0]=='~') filename = getenv("HOME") + string(s).substr(1);
-	else filename = string(s);
-
+	
 	std::cout << "Loading scene: " << filename << std::endl;
 
 	TiXmlDocument doc( filename.c_str() );

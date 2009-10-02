@@ -266,6 +266,8 @@ std::string getRelativePath(std::string path)
 std::string getAbsolutePath(std::string path)
 {
 	using namespace std;
+
+	// TODO: also deal with: ./ ../
 	
 	if (path.substr(0,1) == string("~")) // look for "~"
 	{
@@ -273,6 +275,34 @@ std::string getAbsolutePath(std::string path)
 	} else return path;
 }
 
+/**
+ * This checks the file/path name to see there is encoded path information, and
+ * if it doesn't we assume the user wants to put it in the SPIN_DIRECTORY
+ */
+std::string getSpinPath(std::string path)
+{
+	using namespace std;
+
+	string filename = string(path);
+
+	// check if the filename has specific path information:
+	if ( (filename.substr(0,1)==string("~")) || 
+		 (filename.substr(0,1)==string("/")) || 
+		 (filename.substr(0,2)==string("./")) || 
+		 (filename.substr(0,3)==string("../")) )
+	{
+		filename = getAbsolutePath(path);
+	}
+	
+	// if not, then put it in the local SPIN_DIRECTORY:
+	else
+	{
+		filename = SPIN_DIRECTORY + "/" + string(path);
+	}
+
+	return filename;
+}
+	
 
 // *****************************************************************************
 // gensym stuff

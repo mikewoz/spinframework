@@ -56,7 +56,7 @@ MeasurementNode::MeasurementNode (SceneManager *sceneManager, char *initID) : Re
 	this->setName(string(id->s_name) + ".MeasurementNode");
 	nodeType = "MeasurementNode";
 
-	targetNode = NULL;
+	targetName = gensym("NULL");
 	reportingLevel = 2;
 	
 	thisMatrix.makeIdentity();
@@ -78,10 +78,11 @@ MeasurementNode::~MeasurementNode()
 
 void MeasurementNode::callbackUpdate()
 {
+	osg::ref_ptr<ReferencedNode> targetNode = targetName->s_thing;
 	if (!targetNode.valid()) return;
 	
 	osg::Matrix mthis = osg::computeLocalToWorld(this->currentNodePath);
-	osg::Matrix mtarget = osg::computeLocalToWorld(this->targetNode->currentNodePath);
+	osg::Matrix mtarget = osg::computeLocalToWorld(targetNode->currentNodePath);
 	
 	// check if there is a change in the matrices:
 	if ((thisMatrix==mthis) && (targetMatrix==mtarget))
@@ -135,36 +136,20 @@ void MeasurementNode::callbackUpdate()
 	
 }
 
-
 // *****************************************************************************
-const char* MeasurementNode::getTarget()
+void MeasurementNode::setTarget (const char *targetID)
 {
-	if (targetNode.valid())
+	if (targetName != gensym(targetID))
 	{
-		std::cout << "targetNode is valid. name is "<< targetNode->id->s_name << std::endl;
-		return targetNode->id->s_name;
-	} else
-	{
-		return "NULL";
+		targetName = gensym(targetID);
+		BROADCAST(this, "ss", "setTarget", getTarget());	
 	}
 }
 
-// *****************************************************************************
-void MeasurementNode::setTarget (char *id)
-{
-	this->targetNode = sceneManager->getNode(id);
-	if (targetNode.valid())
-	{
-		BROADCAST(this, "ss", "setTarget", this->targetNode->id->s_name);	
-	} else
-	{
-		BROADCAST(this, "ss", "setTarget", "NULL");			
-	}
-}
 void MeasurementNode::setReportingLevel (int level)
 {
 	this->reportingLevel = level;
-	BROADCAST(this, "si", "setReportingLevel", this->reportingLevel);	
+	BROADCAST(this, "si", "setReportingLevel", getReportingLevel());	
 }
 
 

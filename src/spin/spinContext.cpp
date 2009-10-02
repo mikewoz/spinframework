@@ -46,6 +46,9 @@
 #include <osgDB/Registry>
 #include <osgIntrospection/Type>
 
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/exception.hpp>
+
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
@@ -83,7 +86,7 @@ spinContext::spinContext(spinContextMode initMode)
 	
 	
 	
-	// Make sure that our OSG nodekit is loaded (by checking for existance of
+	// Make sure that our OSG nodekit	 is loaded (by checking for existance of
 	// the ReferencedNode node type):
     try
     {
@@ -114,6 +117,23 @@ spinContext::spinContext(spinContextMode initMode)
 		exit(1);
 	}
 
+	// check if local user directory exists, otherwise make it:
+	try
+	{
+		using namespace boost::filesystem;
+		
+ 		if (!exists(SPIN_DIRECTORY))
+		{
+			create_directory(path(SPIN_DIRECTORY));
+			create_directory(path(SPIN_DIRECTORY+"/log"));
+		}
+	}
+	catch ( const boost::filesystem::filesystem_error& e )
+	{
+		std::cout << "ERROR: " << e.what() << std::endl;
+		exit(1);
+	}
+	
 	// default infoAddr:
 	infoAddr = "224.0.0.1";
 	infoPort = "54320";
@@ -499,6 +519,20 @@ static void *spinServerThread(void *arg)
 
 	spin->sceneManager = new SceneManager(spin->id, spin->rxAddr, spin->rxPort);
 	spin->sceneManager->setTXaddress(spin->txAddr, spin->txPort);
+
+	
+	// create log filename based on datetime:
+	time_t t = time(NULL);
+	tm* tmp = localtime(&t);
+	char dateString[128];
+	strftime(dateString, sizeof(dateString), "%Y-%m-%d_%H-%M-%S", tmp);
+
+	// start spinLog, and disable console printing:
+	string logFilename = SPIN_DIRECTORY + "/log/spinLog_" + string(dateString) + ".txt";
+	spinLog log(logFilename.c_str());
+	log.enable_cout(false);
+	spin->sceneManager->setLog(log);
+	
 
 	string myIP = getMyIPaddress();
 	osg::Timer_t lastTick = osg::Timer::instance()->tick();

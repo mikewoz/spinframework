@@ -265,7 +265,7 @@ wxSpinMain::wxSpinMain(wxWindow* parent,wxWindowID id)
 /*
 
 // TODO
-    spinLog log("spin.log");
+    spinLogWX log(SPIN_DIRECTORY + "/log/spin.log");
     log.enable_wxlog(true);
     log.enable_cout(false);
 

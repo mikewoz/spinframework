@@ -122,19 +122,6 @@ int main(int argc, char **argv)
 	}
 
 	spin->start();
-
-	
-	// *************************************************************************
-	// log file:
-	
-	time_t t = time(NULL);
-	tm* tmp = localtime(&t);
-	char logFilename[128];
-	strftime(logFilename, sizeof(logFilename), "spinLog_%Y-%m-%d_%H-%M-%S.txt", tmp);
-	
-	spinLog log(logFilename);
-	log.enable_cout(false);
-	if (spin->isRunning()) spin->sceneManager->setLog(log);
 	
 
 	

@@ -116,9 +116,7 @@ BOOST_INCLUDE = -I/usr/include/boost
 
 ifeq ($(OS),Darwin)
   BOOST_INCLUDE += -I/opt/local/include/boost-1_35
-  BOOST_LIBS = -lboost_thread-mt
 else
-  BOOST_LIBS = -lboost_thread
 endif
 
 ###################################################################

@@ -33,19 +33,9 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        SceneManager.o MediaManager.o ReferencedNode.o \
        GroupNode.o ShapeNode.o ModelNode.o VideoNode.o LightSource.o \
        RayNode.o Contour.o ConstraintsNode.o PointerNode.o \
-       MeasurementNode.o UserNode.o \
+       TextNode.o MeasurementNode.o UserNode.o \
        DSPNode.o SoundNode.o SoundSpace.o SoundConnection.o \
        SharedVideoNode.o sharedVideoBuffer.o 
-
-WRAPPER_NODELIST = ReferencedNode GroupNode ShapeNode ModelNode \
-	   VideoNode LightSource RayNode Contour ConstraintsNode \
-	   PointerNode MeasurementNode SoundNode SoundSpace \
-	   DSPNode SoundConnection UserNode SharedVideoNode
-
-# turn nodelist into an object list of form: wrapper_<name>.o
-WRAPPER_OBJ = $(patsubst %,../osgWrappers/wrapper_%.o,$(WRAPPER_NODELIST))
-
-
 
 WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
 	  wxSpinPropGrid.o wxSpinSettings.o wxSpinTreeVisitor.o \
@@ -62,10 +52,15 @@ SPIN_FLAGS += -D_SPINDEBUG
 
 #SPIN_FLAGS += -DOSCDEBUG
 
-#SPIN_LIBS += -llo -L../osgWrappers
-#SPIN_LIBS += -llo -lSPIN -lSPINwrappers -L. -L../osgWrappers
-SPIN_LIBS += -llo -lSPIN -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
+DEV_LDFLAGS = -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
 
+SPIN_LIBS += -llo -lSPIN
+
+ifeq ($(OS),Darwin)
+  BOOST_LIBS += -lboost_thread-mt -lboost_filesystem-mt
+else
+  BOOST_LIBS += -lboost_thread -lboost_filesystem
+endif
 
 ###################################################################
 # WX VARS:
@@ -133,24 +128,24 @@ python_Linux: python_wrappers.o
 doc: docGenerator
 docGenerator: docGenerator.o
 	@echo "\n------------- Generating OSC Documentation: -------------" 
-	$(CXX) -o docGenerator $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -o docGenerator $^ $(DEV_LD_FLAGS) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 	./docGenerator
 	-cp *.html ../../doxygen/html
 
 # spinViewer is a simple OSG viewer client:
 spinViewer: spinViewer.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -o $@ $^ $(DEV_LDFLAGS) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
 # spinServer is a commandline SPIN server instance:
 spinServer: spinServer.o
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -o $@ $^ $(DEV_LDFLAGS) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
 # spin is a GUI (using WX Widgets) encompassing most features of SPIN:
 spin: $(WX_OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
-	$(CXX) -o $@ $^ $(SPIN_LIBS) $(WX_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -o $@ $^ $(DEV_LDFLAGS) $(SPIN_LIBS) $(WX_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 
 bullet-test: bullet-test.o
 	$(CXX) -o $@ $^ $(OSG_LIBS) -lbulletdynamics -lbulletcollision -lLinearMath -L/usr/local/include/BulletCollision 

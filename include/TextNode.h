@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -39,61 +39,102 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef MeasurementNode_H_
-#define MeasurementNode_H_
+#ifndef __TextNode_H
+#define __TextNode_H
 
 #include "ReferencedNode.h"
 
+
+#include <osgText/Text>
+#include <osg/PositionAttitudeTransform>
+
+
+
 /**
- * \brief A node that can be used to measure relations to another node.
- * 
- * 
- * A targetNode must be specified, and then measurements (such as distance,
- * incidence of orientation, etc.) are computed in the callback and can be
- * reported with different levels of detail.
+ * \brief Provides 3D text rendered in the scene
+ *
  */
-class MeasurementNode : public ReferencedNode
+class TextNode : public ReferencedNode
 {
 
 public:
 
-	MeasurementNode(SceneManager *sceneManager, char *initID);
-	virtual ~MeasurementNode();
-	
-	virtual void callbackUpdate();
+	TextNode(SceneManager *sceneManager, char *initID);
+	virtual ~TextNode();
 
-	void setTarget (const char *targetID);
-	void setReportingLevel (int level);
-	
-	const char* getTarget() { return this->targetName->s_name; }
-	int getReportingLevel() { return this->reportingLevel; }
-	
-	
+	/**
+	 * IMPORTANT:
+	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
+	 * and can also change their attachmentNode so that children are attached
+	 * anywhere in that subgraph. If that is the case, the updateNodePath()
+	 * function MUST be overridden, and extra nodes must be manually pushed onto
+	 * currentNodePath.
+	 */
+	virtual void updateNodePath();
+
+
+    /**
+     * We provide several possible shapes
+     */
+    enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
+    
+	void setText			(const char* s);
+	void setFont			(const char* s);
+	void setBillboard		(billboardType t);
+	void setColor			(float red, float green, float blue, float alpha);
+
+    /**
+     * This is a local translational offset from the parent
+     */
+	void setTranslation (float x, float y, float z);
+
+    /**
+     * This is a local orientation offset from the parent
+     */
+	void setOrientation (float pitch, float roll, float yaw);
+
+	 /**
+     * Allows for scaling in each axis
+     */
+	void setScale (float x, float y, float z);
+
+
+	const char *getText() { return _text.c_str(); }
+	const char *getFont() { return _font.c_str(); }
+	int getBillboard() { return (int)_billboard; }
+	osg::Vec4 getColor() { return _color; };
+    osg::Vec3 getTranslation() { return textTransform->getPosition(); };
+	osg::Vec3 getOrientation() { return _orientation; };
+	osg::Vec3 getScale() { return textTransform->getScale(); };
+
+
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();
+
+
+
+	std::string _text, _font;
 	
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
-	
-	
+	billboardType _billboard;
+
+	osg::Vec4 _color;
+
+	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
+
+
+	osg::ref_ptr<osg::PositionAttitudeTransform> textTransform;
+
+
 private:
 	
-	//osg::ref_ptr<ReferencedNode> targetNode;
-	t_symbol *targetName;
-	int reportingLevel;
+	osg::ref_ptr<osg::Geode> textGeode;
 	
-	
-	osg::Matrix thisMatrix, targetMatrix;
-	
-};
+	void drawText();
 
+};
 
 
 #endif

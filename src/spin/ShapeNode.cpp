@@ -225,9 +225,9 @@ void ShapeNode::drawShape()
     pthread_mutex_lock(&pthreadLock);
 
 	// remove the old shape:
-	if (shapeTransform->containsNode(shapeGeode.get()))
+	if (this->getAttachmentNode()->containsNode(shapeGeode.get()))
 	{
-		shapeTransform->removeChild(shapeGeode.get());
+		this->getAttachmentNode()->removeChild(shapeGeode.get());
 		shapeGeode = NULL;
 	}
 
@@ -336,7 +336,7 @@ void ShapeNode::drawShape()
 		//modelGroup->addChild(scribe);
 		//scribe->addChild(shapeGeode.get());
 		// end wireframe test
-		shapeTransform->addChild(shapeGeode.get());
+		this->getAttachmentNode()->addChild(shapeGeode.get());
 		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
 		optimizer.optimize(shapeGeode.get()); // ?
 	}

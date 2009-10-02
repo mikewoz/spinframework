@@ -63,6 +63,7 @@
 #define NULL_SYMBOL gensym("NULL")
 #define WORLD_SYMBOL gensym("world")
 
+#define SPIN_DIRECTORY getAbsolutePath("~/.spinFramework")
 
 // *****************************************************************************
 // NODE MASKS:
@@ -128,7 +129,7 @@ bool fileExists(const std::string& fileName);
 std::string getRelativePath(std::string path);
 std::string getAbsolutePath(std::string path);
 
-
+std::string getSpinPath(std::string path);
 
 // *****************************************************************************
 // gensym stuff (from m_pd.h)

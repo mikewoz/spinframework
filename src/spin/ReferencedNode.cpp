@@ -43,7 +43,7 @@
 #include <vector>
 #include <iostream>
 
-#include <osgText/Text>
+
 
 #include "ReferencedNode.h"
 #include "SceneManager.h"
