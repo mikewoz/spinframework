@@ -72,18 +72,17 @@ spinContext::spinContext(spinContextMode initMode)
 #endif
     
 	// Load the SPIN library:
-    osgDB::Registry *reg = osgDB::Registry::instance();
     /*
+	osgDB::Registry *reg = osgDB::Registry::instance();
 	if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN")))
 	{
 		std::cout << "Error: Could not load libSPIN" << std::endl;
 	}
-	*/
 	if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPINwrappers")))
 	{
 		std::cout << "Error: Could not load libSPINwrappers" << std::endl;
 	}
-	
+	*/	
 	
 	
 	// Make sure that our OSG nodekit	 is loaded (by checking for existance of

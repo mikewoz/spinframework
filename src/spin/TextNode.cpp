@@ -65,7 +65,7 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : ReferencedNode(s
 	textTransform = new osg::PositionAttitudeTransform();
 	textTransform->setName(string(id->s_name) + ".textTransform");
 	this->addChild(textTransform.get());
-
+	
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
 	setAttachmentNode(textTransform.get());
@@ -74,7 +74,10 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : ReferencedNode(s
 	_font = "arial.ttf";
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);
 	_billboard = RELATIVE; // ie, no billboard
-	
+
+	// By default osgText is not properly rotated for our use. We want the text
+	// to "face" in the direction of the parent's orientation.
+	setOrientation(0,0,180);
 }
 
 // ===================================================================
@@ -258,7 +261,8 @@ void TextNode::drawText()
 		// LEFT_BOTTOM_BASE_LINE, CENTER_BOTTOM_BASE_LINE, RIGHT_BOTTOM_BASE_LINE
 		textLabel->setAlignment(osgText::Text::CENTER_CENTER);
 
-		textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS) * osg::Quat(osg::PI, osg::Z_AXIS));
+		//textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS) * osg::Quat(osg::PI, osg::Z_AXIS));
+		textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS));
 
 		
 		// disable lighting effects on the text, and allow transparency:
