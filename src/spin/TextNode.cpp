@@ -258,7 +258,7 @@ void TextNode::drawText()
 		// LEFT_BOTTOM_BASE_LINE, CENTER_BOTTOM_BASE_LINE, RIGHT_BOTTOM_BASE_LINE
 		textLabel->setAlignment(osgText::Text::CENTER_CENTER);
 
-		textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS));
+		textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS) * osg::Quat(osg::PI, osg::Z_AXIS));
 
 		
 		// disable lighting effects on the text, and allow transparency:
