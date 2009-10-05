@@ -241,18 +241,26 @@ void TextNode::drawText()
 		textLabel->setText(this->_text);
 
 		// set some parameters for the text:
-		textLabel->setCharacterSize(0.01f);
+		textLabel->setCharacterSize(0.1f);
 		//textLabel->setFont(0); // inbuilt font (small)
-		textLabel->setFont( sceneManager->resourcesPath + _font );
+		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
 		textLabel->setFontResolution(40,40);
 		textLabel->setColor( _color );
 
-		textLabel->setDrawMode(osgText::Text::TEXT);
-		//textLabel->setDrawMode(osgText::Text::ALIGNMENT);
-		//textLabel->setDrawMode(osgText::Text::BOUNDINGBOX);
-		
-		//textLabel->setAlignment(osgText::Text::CENTER_BOTTOM); // means text bottom
+		// setDrawMode
+		// TEXT = 1, BOUNDINGBOX = 2, ALIGNMENT = 4
+		//textLabel->setDrawMode(osgText::Text::TEXT); 
 
+		// setAlignment
+		// LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM, CENTER_TOP,
+		// CENTER_CENTER, CENTER_BOTTOM, RIGHT_TOP, RIGHT_CENTER,
+		// RIGHT_BOTTOM, LEFT_BASE_LINE, CENTER_BASE_LINE, RIGHT_BASE_LINE,
+		// LEFT_BOTTOM_BASE_LINE, CENTER_BOTTOM_BASE_LINE, RIGHT_BOTTOM_BASE_LINE
+		textLabel->setAlignment(osgText::Text::CENTER_CENTER);
+
+		textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS));
+
+		
 		// disable lighting effects on the text, and allow transparency:
 		osg::StateSet *labelStateSet = new osg::StateSet;
 		labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
