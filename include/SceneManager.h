@@ -190,6 +190,8 @@ class SceneManager
 
 		void setGrid(int gridSize);
 
+		std::string resourcesPath;
+		
 		MediaManager *mediaManager;
 
 		//pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;

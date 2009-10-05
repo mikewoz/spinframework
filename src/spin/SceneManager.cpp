@@ -187,9 +187,21 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	}
 	rootNode->setStateSet(rootStateSet);
 
-	std::string dataPath = "~/Documents/Audioscape-Data"; // this isn't used anymore
-	mediaManager = new MediaManager(dataPath);
 
+	// Set resourcesPath:
+	std::string currentDir = getenv("PWD");
+	if ((currentDir.length()>8) && (currentDir.substr(currentDir.length()-9))==string("/src/spin"))
+	{
+		resourcesPath = "../Resources";
+	} else {
+		resourcesPath = "/usr/local/share/spinFramework";
+	}
+	std::cout << "  Resources path: " << resourcesPath << std::endl;
+	
+	mediaManager = new MediaManager(resourcesPath);
+
+
+	
 	this->sendSceneMessage("s", "userRefresh");
 }
 

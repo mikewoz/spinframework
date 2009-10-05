@@ -206,6 +206,8 @@ install:
 	@echo "\nINSTALLING to ${SPIN_INSTALL_PREFIX}";
 	-cp libSPIN.* ${SPIN_INSTALL_PREFIX}/lib
 	-cp ${PROGRAMS} ${SPIN_INSTALL_PREFIX}/bin
+	#mkdir -p ${SPIN_INSTALL_PREFIX}/share/spinFramework
+	-cp -R ../Resources ${SPIN_INSTALL_PREFIX}/share/spinFramework
 
 
 ########################################################

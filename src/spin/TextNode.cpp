@@ -243,7 +243,7 @@ void TextNode::drawText()
 		// set some parameters for the text:
 		textLabel->setCharacterSize(0.01f);
 		//textLabel->setFont(0); // inbuilt font (small)
-		textLabel->setFont( _font );
+		textLabel->setFont( sceneManager->resourcesPath + _font );
 		textLabel->setFontResolution(40,40);
 		textLabel->setColor( _color );
 
