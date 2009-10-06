@@ -75,7 +75,7 @@ SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : Sh
 
 
 	this->setShape(ShapeNode::PLANE);
-	this->setBillboard(ShapeNode::POINT_EYE);
+	this->setBillboard(ShapeNode::STAY_UP);
 	//drawTexture(); //setShape will automatically call drawTexture()
 	
 	// worker thread is in killed state to start:
@@ -184,7 +184,8 @@ void SharedVideoNode::consumeFrame()
     }
     while (!end_loop);
 
-    std::cout << "\nWorker thread Going out.\n";
+    //std::cout << "\nWorker thread Going out.\n";
+	
     // erase shared memory
     //shared_memory_object::remove(textureID.c_str());
     // TODO: shouldn't we also destroy our shm and region objects?
@@ -250,7 +251,7 @@ void SharedVideoNode::setTextureID (const char* id)
 	        }
 	        else
 	        {
-	            std::cerr << "Shared buffer doesn't exist yet\n";
+	            std::cerr << "Shared buffer " << textureID << " doesn't exist yet\n";
 	            //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
 	        }
 	    }

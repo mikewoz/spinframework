@@ -72,13 +72,25 @@
 #define AS_UNIT_SCALE  1.0f // 1m
 #define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
 
-/*
-#define X_AXIS osg::Vec3(1.0, 0.0, 0.0)
-#define Y_AXIS osg::Vec3(0.0, 1.0, 0.0)
-#define Z_AXIS osg::Vec3(0.0, 0.0, 1.0)
-*/
 
+/**
+ * Returns an absolute angle difference between v1 and v2 (with no notion of
+ * which is ahead or behind the other). Returned angle is from 0 to PI
+ */
 double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2);
+
+/**
+ * Returns a signed angle of rotation that describes the rotation from v1 to v2,
+ * assuming that one axis is null. 1=X_AXIS, 2=Y_AXIS, 3=Z_AXIS
+ */
+double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2, int nullAxis);
+
+/**
+ * Returns a quaternion that represents the rotation from v1 to v2
+ */
+osg::Quat RotationBetweenVectors(osg::Vec3 v1, osg::Vec3 v2);
+
+
 osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle);
 osg::Quat EulerToQuat(float roll, float pitch, float yaw);
 osg::Vec3 QuatToEuler(osg::Quat q);

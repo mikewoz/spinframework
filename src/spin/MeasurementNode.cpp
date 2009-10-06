@@ -96,42 +96,65 @@ void MeasurementNode::callbackUpdate()
 	
 	osg::Vec3 connection_vector = targetMatrix.getTrans() - thisMatrix.getTrans();
 	
-	
 	osg::Quat srcQuat, snkQuat;
 	thisMatrix.get(srcQuat);
 	targetMatrix.get(snkQuat);
 	
-	// let's also compute the orientations projected on the (local) horizontal and vertical plane:
-	// (ie, azimuth and elevation respectively)
-	osg::Vec3 src_dir   = srcQuat * osg::Vec3(0,1,0);
-	osg::Vec3 src_right = srcQuat * osg::Vec3(1,0,0);
-	osg::Vec3 src_up    = srcQuat * osg::Vec3(0,0,1);
-	osg::Vec3 snk_dir   = snkQuat * osg::Vec3(0,1,0);
-	osg::Vec3 snk_right = snkQuat * osg::Vec3(1,0,0);
-	osg::Vec3 snk_up    = snkQuat * osg::Vec3(0,0,1);
-		
-
-	// incidence (radians) between source and the connection_vector:
-	float srcIncidence = AngleBetweenVectors(src_dir, connection_vector);
-	float srcIncidenceAzim = (osg::PI/2) - AngleBetweenVectors(src_right, connection_vector);
-	float srcIncidenceElev = (osg::PI/2) - AngleBetweenVectors(src_up, connection_vector);
-
-	// incidence (radians) between sink and the connection_vector:
-	float snkIncidence = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector);		
-	float snkIncidenceAzim = (osg::PI/2) - AngleBetweenVectors(snk_right, -connection_vector);
-	float snkIncidenceElev = (osg::PI/2) - AngleBetweenVectors(snk_up, -connection_vector);
-
+	// let's also compute the orientations projected on the (local) horizontal
+	// and vertical planes (ie, azimuth and elevation respectively)
+	
+	osg::Vec3 src_dir   = srcQuat * osg::Y_AXIS;
+	osg::Vec3 src_right = srcQuat * osg::X_AXIS;
+	osg::Vec3 src_up    = srcQuat * osg::Z_AXIS;
+	
+	osg::Vec3 snk_dir   = snkQuat * osg::Y_AXIS;
+	osg::Vec3 snk_right = snkQuat * osg::X_AXIS;
+	osg::Vec3 snk_up    = snkQuat * osg::Z_AXIS;
+	
+	// NOTE: all output angles are in RADIANS::
+	
 	if (reportingLevel>0)
 	{
+		// direction: angle of connection_vector (projected on XY plane):
+		float direction = AngleBetweenVectors(connection_vector, osg::Y_AXIS, 3);
+		
+		// relative incidence between source and t	he connection_vector:
+		float srcIncidence = AngleBetweenVectors(src_dir, connection_vector);
+
+		// relative incidence between sink and the connection_vector:
+		float snkIncidence = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector);		
+			
 		BROADCAST(this, "sf", "distance", connection_vector.length());
+		BROADCAST(this, "sf", "direction", direction);
 		BROADCAST(this, "sf", "angle", srcIncidence);
+		//BROADCAST(this, "sf", "incidence", (srcIncidence / osg::PI) * (snkIncidence / osg::PI) );
+		BROADCAST(this, "sf", "incidence", srcIncidence * (180-snkIncidence) );
 	}
 	
 	if (reportingLevel>1)
 	{
+		
+		// Azimuth: incidence projected on XY plane (Z is ignored)
+		float srcIncidenceAzim = AngleBetweenVectors(connection_vector, src_dir, 3);
+
+		// Elevation: incidence projected on XZ plane (Y is ignored)
+		float srcIncidenceElev = AngleBetweenVectors(connection_vector, src_up, 2);
+
+		// Roll: incidence projected on YZ plane (X is ignored)
+		float srcIncidenceRoll = AngleBetweenVectors(connection_vector, src_right, 1);
+		
 		BROADCAST(this, "sf", "azimuth", srcIncidenceAzim);
 		BROADCAST(this, "sf", "elevation", srcIncidenceElev);
-		BROADCAST(this, "sf", "incidence", (srcIncidence / osg::PI) * (snkIncidence / osg::PI) );
+		BROADCAST(this, "sf", "roll", srcIncidenceRoll);
+		
+
+		/*
+		osg::Quat rot = RotationBetweenVectors(src_dir, connection_vector);
+		osg::Vec3 eulers = QuatToEuler(rot);
+		BROADCAST(this, "sf", "azimuth", eulers.z());
+		BROADCAST(this, "sf", "elevation", eulers.x());
+		BROADCAST(this, "sf", "roll", eulers.y());
+		*/
 	}
 	
 }

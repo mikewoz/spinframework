@@ -48,6 +48,10 @@
 
 #include "osgUtil.h"
 
+/**
+ * Returns an absolute angle difference between v1 and v2 (with no notion of
+ * which is ahead or behind the other). Returned angle is from 0 to PI
+ */
 double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
 {
 	// normalize vectors (note: this must be done alone, not within any vector arithmetic. why?!)
@@ -71,6 +75,57 @@ double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
 	// Return the angle in radians
 	return( angle );
 }
+
+/**
+ * Returns a signed angle of rotation that describes the rotation from v1 to v2,
+ * assuming that one axis is null. 1=X_AXIS, 2=Y_AXIS, 3=Z_AXIS
+ */
+double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2, int nullAxis)
+{
+	// normalize vectors (note: this must be done alone, not within any vector arithmetic. why?!)
+	v1.normalize();
+	v2.normalize();
+
+	double angle = 0;
+	switch (nullAxis)
+	{
+		case 1: // X_AXIS is ignored
+			angle = atan2(v2.z(),v2.y()) - atan2(v1.z(),v1.y());
+			break;
+		case 2: // Y_AXIS is ignored
+			angle = atan2(v2.z(),v2.x()) - atan2(v1.z(),v1.x());
+			break;
+		case 3: // Z_AXIS is ignored
+			angle = atan2(v2.y(),v2.x()) - atan2(v1.y(),v1.x());
+			break;
+	}
+
+	// angle will be from -90 to 270 for some reason, so convert to -PI,PI
+	if (angle>osg::PI) angle -= 2 * osg::PI;
+	
+	return(angle);
+}
+		
+/**
+ * Returns a quaternion that represents the rotation from v1 to v2
+ */
+osg::Quat RotationBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
+{
+	v1.normalize();
+	v2.normalize();
+	
+	// Get the dot product of the vectors
+	double dotProduct = v1 * v2;
+	osg::Vec3 crossProduct = v1 ^ v2;
+	
+    double qw = (double) sqrt(v1.length2()*v2.length2()) + dotProduct;
+	
+	if (qw < 0.0001) { // vectors are 180 degrees apart
+		return osg::Quat(0,-v1.z(),v1.y(),v1.x());
+	}
+	
+    return osg::Quat(qw, crossProduct);
+} 
 
 
 osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle)
