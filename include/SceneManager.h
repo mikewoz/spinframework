@@ -180,10 +180,12 @@ class SceneManager
 		std::vector<std::string> nodeTypes;
 
 		std::string getStateAsXML(std::vector<lo_message> nodeState);
-		std::string getNodeAsXML(ReferencedNode *n);
+		std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
+		
 		std::string getConnectionsAsXML();
-		bool saveXML(const char *filename);
-
+		bool saveXML(const char *filename, bool withUsers);
+		bool saveUsers(const char *s);
+			
 		bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
 		bool createConnectionsFromXML(TiXmlElement *XMLnode);
 		bool loadXML(const char *filename);

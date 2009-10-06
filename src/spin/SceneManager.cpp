@@ -980,8 +980,14 @@ std::string SceneManager::getStateAsXML(vector<lo_message> nodeState)
 	return output.str();
 }
 
-std::string SceneManager::getNodeAsXML(ReferencedNode *n)
+std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
 {
+	// we can ignore UserNodes, and their entire subgraphs:
+	if (!withUsers && (n->nodeType=="UserNode"))
+	{
+		return "";
+	}
+	
 	ostringstream output("");
 
 	// open tag for this node:
@@ -996,7 +1002,7 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n)
 		vector<ReferencedNode*>::iterator childIter;
 		for (childIter = n->children.begin(); childIter != n->children.end(); childIter++)
 		{
-			output << getNodeAsXML(*childIter);
+			output << getNodeAsXML(*childIter, withUsers);
 		}
 		output << "</subgraph>\n";
 	}
@@ -1004,6 +1010,7 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n)
 	// remember to close tag:
 	output << "</" << n->nodeType << ">\n";
 
+	
 	return output.str();
 }
 
@@ -1055,8 +1062,24 @@ std::string SceneManager::getConnectionsAsXML()
 	return output.str();
 }
 
+/*
+std::string SceneManager::getConnectionsAsXML(ReferencedNode *n)
+{
+	// just give connections for the node in question (and all children
+
+	ostringstream output("");
+	output << "<connection>\n";
+
+
+	
+	output << "</connection>\n";
+	return output.str();
+}
+*/
+
+
 // *****************************************************************************
-bool SceneManager::saveXML(const char *s)
+bool SceneManager::saveXML(const char *s, bool withUsers = false)
 {
 	// convert filename into valid path:
 	string filename = getSpinPath(s);
@@ -1093,7 +1116,7 @@ bool SceneManager::saveXML(const char *s)
 		{
 			if ((*iter)->parent == WORLD_SYMBOL)
 			{
-				output << getNodeAsXML((*iter).get());
+				output << getNodeAsXML((*iter).get(), withUsers);
 			}
 		}
 	}
@@ -1122,6 +1145,42 @@ bool SceneManager::saveXML(const char *s)
 
 }
 
+bool SceneManager::saveUsers(const char *s)
+{
+	// convert filename into valid path:
+	string filename = getSpinPath(s);
+	// and make sure that there is an .xml extension:
+	if (filename.substr(filename.length()-4)!=string(".xml")) filename+=".xml";
+	
+	// start with XML Header:
+	ostringstream output("");
+	output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
+			<< "<!DOCTYPE SPIN SYSTEM>\n"
+			<< "<spinScene>\n";
+
+	for (nodeListType::iterator iter = nodeMap["UserNode"].begin(); iter != nodeMap["UserNode"].end(); iter++)
+	{
+		output << getNodeAsXML((*iter).get(), true);
+	}
+
+	output << "</spinScene>\n";
+
+	// now write to file:
+	TiXmlDocument outfile( filename.c_str() );
+	outfile.Parse( output.str().c_str() );
+	if ( outfile.Error() )
+	{
+		// error!
+		std::cout << "ERROR: failed to save " << filename << std::endl;
+		return false;
+	} else {
+		// success!
+		outfile.SaveFile();
+		std::cout << "Saved users to: " << filename << std::endl;
+		return true;
+	}
+
+}
 
 bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode= "")
 {
@@ -1651,6 +1710,10 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 		sceneManager->loadXML((char*)argv[1]);
 	else if ((theMethod=="save") && (argc==2))
 		sceneManager->saveXML((char*)argv[1]);
+	else if ((theMethod=="saveAll") && (argc==2))
+		sceneManager->saveXML((char*)argv[1], true);
+	else if ((theMethod=="saveUsers") && (argc==2))
+		sceneManager->saveUsers((char*)argv[1]);
 	else if ((theMethod=="createNode") && (argc==3))
 		sceneManager->createNode((char*)argv[1], (char*)argv[2]);
 	else if ((theMethod=="deleteNode") && (argc==2))
