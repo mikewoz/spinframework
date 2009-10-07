@@ -581,9 +581,10 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 		nodeMap[n->nodeType].push_back(n);
 
 		// broadcast:
-		//std::cout << "sending createNode message: " << ("/SPIN/"+sceneID).c_str() << " createNode " << id << " " << type << std::endl;
-		if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
-		//sendNodeList(n->nodeType);
+		if (txServ)
+		{
+			lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
+		}
 
 		return n.get();
 	}

@@ -73,7 +73,8 @@ public:
 	// from tristan:
 	void consumeFrame();
 	void signalKilled();
-	
+
+	virtual void setHost(const char *newvalue);
 	
 	void setTextureID(const char *id);
 	const char* getTextureID() { return textureID.c_str(); }
@@ -83,8 +84,6 @@ public:
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();
-
-	virtual void drawTexture();
 
 
 	
@@ -104,8 +103,10 @@ private:
     
 	bool killed_;
 
-	
 
+	// must override draw methods:
+	virtual void drawShape();
+	virtual void drawTexture();
 
 };
 

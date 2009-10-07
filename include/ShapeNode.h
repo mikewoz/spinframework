@@ -165,9 +165,9 @@ public:
 	osgUtil::Optimizer optimizer;
 
 
-private:
+protected:
 
-	void drawShape();
+	virtual void drawShape();
 	virtual void drawTexture();
 
 };

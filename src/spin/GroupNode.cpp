@@ -268,9 +268,9 @@ std::vector<lo_message> GroupNode::getState ()
 bool GroupNode::dumpGlobals(bool forced)
 {
 	// The "forced" parameter means that we do the dump even if there has been
-	// no change. This method is called in the updateCallback, which occurs
-	// very frequently and should NEVER be forced. The stateDump() method will
-	// however force an update of the current global parameters
+	// no change. The "forced" flag should NEVER be used in the updateCallback,
+	// which occurs very frequently. The stateDump() method will however force
+	// an update of the current global parameters
 
 	//if (this->_reportGlobals)
 	if (this->_reportMode)

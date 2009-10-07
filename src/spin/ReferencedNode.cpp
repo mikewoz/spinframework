@@ -62,6 +62,8 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
 
 	nodeType = "ReferencedNode";
 
+	host = "NULL";
+
 	this->setName(string(id->s_name) + ".ReferencedNode");
 
 	// set some initial symbols:
@@ -327,63 +329,14 @@ void ReferencedNode::setParent (const char *newvalue)
 	}
 }
 
-/*
-void ReferencedNode::setTextFlag (int b)
+void ReferencedNode::setHost (const char *newvalue)
 {
-	this->textFlag = (bool) b;
-
-	// first remove existing label:
-	if (this->attachmentNode->containsNode(textGeode.get()))
+	if (host != string(newvalue))
 	{
-		this->attachmentNode->removeChild(textGeode.get());
-		textGeode = NULL;
+		host = string(newvalue);
+		BROADCAST(this, "ss", "setHost", getHost());
 	}
-
-	// create a new text label if the labelFlag is set:
-	if (this->textFlag)
-	{
-
-		textGeode = new osg::Geode;
-		this->attachmentNode->addChild(textGeode.get());
-
-		osgText::Text *textLabel = new osgText::Text();
-		textGeode->addDrawable(textLabel);
-
-		// set text:
-		textLabel->setText(this->nodeType + "('" + string(this->id->s_name) + "')");
-
-		// set some parameters for the text:
-		textLabel->setCharacterSize(0.1f);
-		textLabel->setFont(0); // inbuilt font (small)
-		//textLabel->setFont(projectPath + "/fonts/arial.ttf");
-		textLabel->setFontResolution(40,40);
-		textLabel->setAxisAlignment(osgText::Text::SCREEN); // keep facing us
-		textLabel->setColor( osg::Vec4(1.0f,1.0f,1.0f,1.0f) );
-
-		//textLabel->setDrawMode(osgText::Text::TEXT);
-		//textLabel->setDrawMode(osgText::Text::ALIGNMENT);
-		//textLabel->setDrawMode(osgText::Text::BOUNDINGBOX);
-		textLabel->setAlignment(osgText::Text::CENTER_BOTTOM); // means text bottom
-
-
-		// position the text above the bound of the subgraph:
-		//const osg::BoundingSphere& bs = this->getBound();
-		//float z = bs.center().z()+bs.radius();
-		textLabel->setPosition( osg::Vec3(0,0,this->getBound().radius()) );
-
-
-		// disable lighting effects on the text
-		//osg::StateSet *labelStateSet = new osg::StateSet;
-		//labelStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
-		//labelStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-		//textLabel->setStateSet( labelStateSet );
-
-	}
-
-	BROADCAST(this, "si", "setTextFlag", getTextFlag());
 }
-*/
-
 
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)
 {
@@ -457,11 +410,9 @@ std::vector<lo_message> ReferencedNode::getState ()
 	lo_message_add(msg, "ss", "setParent", this->getParent());
 	ret.push_back(msg);
 
-	/*
 	msg = lo_message_new();
-	lo_message_add(msg, "si", "setTextFlag", this->getTextFlag());
+	lo_message_add(msg, "ss", "setHost", this->getHost());
 	ret.push_back(msg);
-	*/
 	
 	stringParamType::iterator stringIter;
 	for (stringIter=stringParams.begin(); stringIter!=stringParams.end(); stringIter++ )

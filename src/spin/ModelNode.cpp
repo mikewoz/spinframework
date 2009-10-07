@@ -124,6 +124,15 @@ void ModelNode::updateNodePath()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
+void ModelNode::setHost (const char *newvalue)
+{
+	// need to redraw after setHost() is called:
+	if (host != string(newvalue))
+	{
+		ReferencedNode::setHost(newvalue);
+		drawModel();
+	}
+}
 
 void ModelNode::setModelFromFile (const char* filename)
 {
@@ -187,7 +196,9 @@ void ModelNode::drawModel()
 		}
 	}
 
-	if (modelPath != string("NULL"))
+	bool ignoreOnThisHost = (sceneManager->isSlave() && (host==getHostname()));
+	
+	if ((modelPath != string("NULL")) && !ignoreOnThisHost)
 	{
 
 		//model = dynamic_cast<osg::Group*>(osgDB::readNodeFile(modelPath));

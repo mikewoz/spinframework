@@ -83,6 +83,8 @@ public:
 	 */
 	virtual void updateNodePath();
 
+	virtual void setHost (const char *newvalue);
+	
 	void setModelFromFile	(const char *filename);
 
 	void setTranslation		(float x, float y, float z);

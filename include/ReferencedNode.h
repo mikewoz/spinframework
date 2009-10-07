@@ -144,23 +144,32 @@ public:
 	 * Internally, this method just sets the newParent property.
 	 */
 	void setParent (const char *newvalue);
-
+	
 	/**
 	 * Returns the current parent name (string)
 	 */
 	char *getParent() { return parent->s_name; }
-
+	
 	/**
 	 * Returns the current parent as an osg::Group
 	 */
 	osg::Group *getParent(unsigned int i) { return osg::Group::getParent(i); }
 
 	/**
-	 * Enables a simple text label. For more control, use the asText node.
+	 * A node can 'belong' to a certain host machine, allowing it to be rendered
+	 * or behave differently than on other machines.
+	 *
+	 * NOTE: the "NULL" string means that it belongs to no host.
+	 *
+	 * NOTE: a scene operating in SERVER_MODE will always create the node, so
+	 * this feature is only really relevant for clients applications.
 	 */
-	//void setTextFlag (int b);
-	//int  getTextFlag () { return (int) this->textFlag; }
-
+	virtual void setHost (const char *newvalue);
+	
+	/**
+	 * Returns the current host
+	 */
+	const char *getHost() { return host.c_str(); }
 	
 	void setParam (const char *paramName, const char *paramValue);
 	void setParam (const char *paramName, float paramValue);
@@ -201,6 +210,8 @@ public:
 
 	t_symbol *id;
 	std::string nodeType;
+
+	std::string host;
 
 	int pd_mail_id;
 	lo_method oscHandler;

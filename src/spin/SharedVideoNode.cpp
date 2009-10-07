@@ -72,17 +72,14 @@ SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : Sh
 	this->setName(string(id->s_name) + ".SharedVideoNode");
 	nodeType = "SharedVideoNode";
 	
-
-
-	this->setShape(ShapeNode::PLANE);
 	this->setBillboard(ShapeNode::STAY_UP);
-	//drawTexture(); //setShape will automatically call drawTexture()
 	
 	// worker thread is in killed state to start:
     killed_ = true;
 		
 	textureID = "NULL";
-
+	
+	drawShape(); // will automatically call drawTexture()
 }
 
 // ===================================================================
@@ -200,6 +197,17 @@ void SharedVideoNode::signalKilled ()
 }
 
 // ===================================================================
+void SharedVideoNode::setHost (const char *newvalue)
+{
+	// need to redraw after setHost() is called:
+	if (host != string(newvalue))
+	{
+		ReferencedNode::setHost(newvalue);
+		drawShape();
+	}
+}
+
+// ===================================================================
 void SharedVideoNode::setTextureID (const char* id)
 {
 
@@ -266,6 +274,22 @@ void SharedVideoNode::setTextureID (const char* id)
     
 }
 
+// ===================================================================
+void SharedVideoNode::drawShape()
+{
+	// Then check if the new value is equivalent to this machine's hostname.
+	// If so, prevent it from drawing anything (but only for client threads)
+	if (sceneManager->isSlave() && (host==getHostname()))
+	{
+		this->setShape(ShapeNode::NONE);
+	} else {
+		this->setShape(ShapeNode::PLANE);
+	}
+
+	// must explicitly call drawShape() in base class 
+	ShapeNode::drawShape();
+
+}
 
 // ===================================================================
 void SharedVideoNode::drawTexture()
