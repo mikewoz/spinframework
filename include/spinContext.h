@@ -70,7 +70,7 @@ class spinContext
 		enum spinContextMode { SERVER_MODE, LISTENER_MODE };
 
 		spinContext(spinContextMode initMode=LISTENER_MODE);
-		~spinContext();
+		virtual ~spinContext();
 
 		bool setMode(spinContextMode m);
 
@@ -126,9 +126,11 @@ class spinContext
 	     */
 	    void *(*threadFunction) (void*);
 
-	private:
+	protected:
 
 		std::string spinFolder;
+
+	private:
 
 		// pthread stuff
 		pthread_t pthreadID; // id of child thread

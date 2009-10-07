@@ -48,11 +48,17 @@
 #include <boost/python/module.hpp>
 #include <boost/python/object/function_object.hpp>
 #include <boost/python/enum.hpp>
+#include <boost/python/extract.hpp>
+
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
 #include <string.h>
+
+#include <lo/lo.h>
+#include <lo/lo_lowlevel.h>
+
 #include "spinContext.h"
 
 
@@ -68,6 +74,82 @@ registering the callback:
 lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoChannelCallback, this);
 
 */
+
+class pySpinContext : public spinContext
+{
+	
+	public:
+		pySpinContext(spinContextMode initMode);
+		virtual ~pySpinContext();
+		void sendSceneMessage(PyObject* list);
+	
+};
+
+pySpinContext::pySpinContext(spinContextMode initMode) : spinContext(initMode)
+{}
+
+pySpinContext::~pySpinContext()
+{}
+
+void pySpinContext::sendSceneMessage(PyObject* list)
+{
+	
+	lo_message msg = lo_message_new();
+	
+	// ensure 1st argument is a string (ie, the method name):
+	if (!PyString_Check(PyList_GetItem(list, 0)))
+	{
+		std::cout << "ERROR: sendSceneMessage() must have a method as the first item" << std::endl;
+		return;
+	}
+	
+	// add args to lo_message:
+	PyObject *item;
+	char types[PyList_Size(list)];
+	for (int i=0; i<PyList_Size(list); i++)
+	{
+		/*
+		item = PyList_GetItem(list, i);
+		if (PyInt_Check(item))
+		{
+			types[i] = 'i';
+			lo_message_add_int32(msg,(int)PyInt_AsLong(item));
+		}
+		else if (PyFloat_Check(item))
+		{
+			types[i] = 'f';
+			lo_message_add_float(msg,(float)PyFloat_asDouble(item));	
+		}	
+		else if (PyString_Check(item))
+		{
+			types[i] = 's';
+			lo_message_add_string(msg,PyString_AsString(item));	
+		}
+		 */
+		
+		item = PyList_GetItem(list, i);
+		if (PyInt_Check(item))
+		{
+			types[i] = 'i';
+			lo_message_add_int32(msg,extract<int>(item));
+		}
+		else if (PyFloat_Check(item))
+		{
+			types[i] = 'f';
+			lo_message_add_float(msg,extract<float>(item));	
+		}	
+		else if (PyString_Check(item))
+		{
+			types[i] = 's';
+			lo_message_add_string(msg,extract<char*>(item));	
+		}
+	}	
+	
+	std::cout << "got message from python:" << std::endl;
+	lo_message_pp(msg);
+	//sendSceneMessage(msg);
+}
+
 
 /*
 // In python, we'll need to create an instance of the spinCallback class,
@@ -90,7 +172,7 @@ class spinCallbacksWrapper : spinCallbacks
 };
 */
 
-
+/*
 class spinContext_wrapped : spinContext
 {
 
@@ -123,6 +205,7 @@ private:
 	PyObject* const self;
 
 };
+*/
 
 
 //void (spinContext_wrapped::*sendSceneMessage_var)(const char*, ...) = &spinContext_wrapped::sendSceneMessage;
@@ -131,55 +214,50 @@ private:
 
 
 // define member function pointer variables for overloaded functions:
+/*
 void (spinContext::*sendInfoMessage_var)(std::string, const char*, va_list) = &spinContext::sendInfoMessage;
 void (spinContext::*sendNodeMessage_var)(const char*, const char*, va_list) = &spinContext::sendNodeMessage;
 void (spinContext::*sendSceneMessage_var)(const char*, va_list) = &spinContext::sendSceneMessage;
+*/
+
+void (pySpinContext::*sendSceneMessage_fromPython)(PyObject* list) = &pySpinContext::sendSceneMessage;
 
 
 
 
 BOOST_PYTHON_MODULE(spinFramework)
 {
-	
-	scope in_spinContext = class_<spinContext>("spinContext", init<spinContext::spinContextMode>())
-	//class_<spinContext>("spinContext", init<int>())
 
-	.def("start", &spinContext::start)
-	.def("stop", &spinContext::stop)
-	
-	.def("sendInfoMessage", sendInfoMessage_var)
-	.def("sendNodeMessage", sendNodeMessage_var)
-	.def("sendSceneMessage", sendSceneMessage_var)
-
-	.def("isRunning", &spinContext::isRunning)
-	.def("setID", &spinContext::setID)
-	.def("setRxAddr", &spinContext::setRxAddr)
-	.def("setRxPort", &spinContext::setRxPort)
-	.def("setTxAddr", &spinContext::setTxAddr)
-	.def("setTxPort", &spinContext::setTxPort)
-
-/*
-	.value("SERVER_MODE", spinContext::SERVER_MODE)
-	.value("LISTENER_MODE", spinContext::LISTENER_MODE)
-	.export_values()
-*/
-	
-	//implicitly_convertible<spinContext::spinContextMode,int>();
-	//implicitly_convertible<int,spinContext::spinContextMode>();
-	
-	;
-	
-	
+	scope in_spinContext = class_<spinContext>("spinContext",  init<spinContext::spinContextMode>())
+		.def("start", &spinContext::start)
+		.def("stop", &spinContext::stop)
+		/*
+		.def("sendInfoMessage", sendInfoMessage_var)
+		.def("sendNodeMessage", sendNodeMessage_var)
+		.def("sendSceneMessage", sendSceneMessage_var)
+		 */
+		
+		/*
+		.def("isRunning", &spinContext::isRunning)
+		.def("setID", &spinContext::setID)
+		.def("setRxAddr", &spinContext::setRxAddr)
+		.def("setRxPort", &spinContext::setRxPort)
+		.def("setTxAddr", &spinContext::setTxAddr)
+		.def("setTxPort", &spinContext::setTxPort)
+		*/
+		;
+		
 	enum_<spinContext::spinContextMode>("mode")
 	    .value("SERVER_MODE", spinContext::SERVER_MODE)
 	    .value("LISTENER_MODE", spinContext::LISTENER_MODE)
 	    ;
 	
-
-	/*
-	class_<spinContext_wrapped bases<spinContext> >("spinContext", init<spinContext::spinContextMode>())
-	.def("sceneCallback", &spinContext_wrapped::sceneCallback)
-	;
-	*/
 	
+	class_< pySpinContext, bases<spinContext> >("pySpinContext", init<spinContext::spinContextMode>())
+
+		.def("sendSceneMessage", sendSceneMessage_fromPython)
+
+		;
+	
+		
 }

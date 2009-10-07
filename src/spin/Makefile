@@ -81,7 +81,8 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 
 %.o: %.cpp
 	@echo "--------------- compiling $@ ---------------" 
-	$(CXX) $(OSG_INCLUDE) $(WX_CXXFLAGS) $(SPIN_FLAGS) $(SPIN_INCLUDE) $(BOOST_INCLUDE) -c $< -o $@
+	$(CXX) $(OSG_INCLUDE) $(PYTHON_INCLUDE) $(WX_CXXFLAGS) $(SPIN_FLAGS) $(SPIN_INCLUDE) $(BOOST_INCLUDE) -c $< -o $@
+
 
 ###################################################################
 # TARGETS:
@@ -99,11 +100,11 @@ endif
 
 libSPIN.dylib: $(OBJS)
 	@echo "\n------------- creating $@: -------------"
-	$(CXX) -dynamiclib -undefined suppress -flat_namespace -o $@ $(OBJS) -lSPINwrappers -L../osgWrappers $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) -dynamiclib -undefined suppress -flat_namespace -o $@ $(OBJS) -lSPINwrappers -L../osgWrappers $(OSG_LIBS) $(BOOST_LIBS) $(PYTHON_LIBS)
 
 libSPIN.so: $(OBJS)
 	@echo "\n------------- creating $@: -------------" 
-	$(CXX) --export-dynamic -shared -Wl,-soname,$@ -o $@ $(OBJS) -lSPINwrappers -L../osgWrappers $(OSG_LIBS) $(BOOST_LIBS)
+	$(CXX) --export-dynamic -shared -Wl,-soname,$@ -o $@ $(OBJS) -lSPINwrappers -L../osgWrappers $(OSG_LIBS) $(BOOST_LIBS) $(PYTHONS_LIBS)
 
 # spinPython is a library created in Boost.Python that exposes core
 # elements for use in Python scripts:
