@@ -121,7 +121,7 @@ python_Darwin: python_wrappers.o
 
 python_Linux: python_wrappers.o 
 	@echo "\n------------- Creating spinFramework Python module: -------------"
-	$(CXX) -shared -module -o spinFramework.so $(OBJS) python_wrappers.o -lSPINwrappers -L../osgWrappers -llo -lboost_python-mt $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS) $(SPIN_LIBS)
+	$(CXX) -shared -module -o spinFramework.so python_wrappers.o -lboost_python-mt $(DEV_LDFLAGS) $(PYTHON_LIBS) $(OSG_LIBS) $(BOOST_LIBS) $(SPIN_LIBS)
 
 
 # docGenerator is an app that uses osgIntrospection and doxygen to

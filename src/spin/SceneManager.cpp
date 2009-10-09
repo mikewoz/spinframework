@@ -210,7 +210,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 SceneManager::~SceneManager()
 {
 	lo_server_thread_stop(rxServ);
-	usleep(50);
+	usleep(100);
 	
 	if (txServ) lo_server_free(txServ);
 	if (rxServ) lo_server_thread_free(rxServ);

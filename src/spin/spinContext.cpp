@@ -176,7 +176,7 @@ spinContext::spinContext(spinContextMode initMode)
 spinContext::~spinContext()
 {
 	this->stop();
-	usleep(100);
+	usleep(100); // ouch. this is bad programming
 
 	if (lo_infoServ)
 	{

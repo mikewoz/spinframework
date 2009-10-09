@@ -2,23 +2,30 @@ import time
 import sys
 import os
 
-import spinFramework
-
-spinServer = spinFramework.spinContext(spinFramework.spinContext.mode.SERVER_MODE)
-
-#spinServer.sendSceneMessage("s", "clear", 0xdeadbeef, 0xf00baa)
+from spinFramework import *
+#import spinFramework.*
 
 
-spinServer.sendSceneMessage(["createNode", "foo", "GroupNode"]
-spinServer.sendSceneMessage(["debug"])
+
+class spinClient(pySpinContext):
+	def sceneCallback(self, d):
+		print "in python sceneCallback"
+		print d
+
+spin = spinClient(pySpinContext.mode.LISTENER_MODE)
+
+spin.start()
+
+spin.sendSceneMessage(["createNode", "foo", "GroupNode"])
+spin.sendSceneMessage(["debug"])
+
+spin.sendNodeMessage(["foo", "debug"])
+
+time.sleep(2)
+
+spin.sendSceneMessage(["clear"])
+spin.sendSceneMessage(["debug"])
 
 time.sleep(5)
-
-spinServer.sendSceneMessage(["clear"])
-spinServer.sendSceneMessage(["debug"])
-
-
-
-
 
 

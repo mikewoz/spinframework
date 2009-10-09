@@ -74,8 +74,8 @@ class spinContext
 
 		bool setMode(spinContextMode m);
 
-		bool start();
-		void stop();
+		virtual bool start();
+		virtual void stop();
 
 
 		void sendInfoMessage(std::string OSCpath, const char *types, ...);
