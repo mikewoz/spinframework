@@ -109,6 +109,7 @@ class SceneManager
 		void setTXaddress (std::string addr, std::string port);
 		void sendSceneMessage(const char *types, ...);
 		void sendNodeList(std::string type);
+		void sendConnectionList();
 		void sendNodeMessage(t_symbol *nodeSym, lo_message msg);
 		void sendNodeMessage(t_symbol *nodeSym, const char *types, ...);
 
@@ -118,6 +119,8 @@ class SceneManager
 		ReferencedNode *getNode(const char *id);
 		ReferencedNode *getNode(const char *id, const char *type);
 		ReferencedNode *getOrCreateNode(const char *id, const char *type);
+		
+		std::vector<SoundConnection*> getConnections();
 
 		/**
 		 * This method removes a node from the scene, however the actual work is

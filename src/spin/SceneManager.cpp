@@ -43,12 +43,7 @@
 #include "SceneManager.h"
 #include "MediaManager.h"
 #include "ReferencedNode.h"
-//#include "GroupNode.h"
-//#include "DSPNode.h"
-//#include "SoundNode.h"
-//#include "SoundSpace.h"
 #include "SoundConnection.h"
-//#include "ModelNode.h"
 #include "spinUtil.h"
 #include "osgUtil.h"
 
@@ -293,7 +288,7 @@ void SceneManager::sendNodeList(std::string typeFilter)
 	if (!txServ) return;
 
 	int i;
-	string OSCpath;
+	string OSCpath = "/SPIN/" + sceneID;
 	lo_message msg;
 
 	nodeMapType::iterator it;
@@ -309,8 +304,7 @@ void SceneManager::sendNodeList(std::string typeFilter)
 			//std::cout << std::endl;
 
 			msg = lo_message_new();
-			OSCpath = "/SPIN/" + sceneID; // + "/nodeList/" + (*it).first;
-
+			
 			lo_message_add_string(msg, "nodeList" );
 			lo_message_add_string(msg, (*it).first.c_str() );
 
@@ -326,32 +320,66 @@ void SceneManager::sendNodeList(std::string typeFilter)
 
 			lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 		}
+		// remember to send connections as well
+		sendConnectionList();
 	}
 
 	// just send a list for the desired type:
 	else {
 
-		it = nodeMap.find(typeFilter);
-		if ( it != nodeMap.end() )
+		if (typeFilter=="SoundConnection")
 		{
-			msg = lo_message_new();
-			OSCpath = "/SPIN/" + sceneID; // + "/nodeList/" + (*it).first;
-
-			lo_message_add_string(msg, "nodeList" );
-			lo_message_add_string(msg, (*it).first.c_str() );
-			if ( (*it).second.size() )
+			sendConnectionList();
+		}
+		else
+		{
+			it = nodeMap.find(typeFilter);
+			if ( it != nodeMap.end() )
 			{
-				for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+				msg = lo_message_new();
+	
+				lo_message_add_string(msg, "nodeList" );
+				lo_message_add_string(msg, (*it).first.c_str() );
+				if ( (*it).second.size() )
 				{
-					lo_message_add_string(msg, (char*) (*iter)->id->s_name );
+					for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+					{
+						lo_message_add_string(msg, (char*) (*iter)->id->s_name );
+					}
+				} else {
+					lo_message_add_string(msg, "NULL");
 				}
-			} else {
-				lo_message_add_string(msg, "NULL");
+	
+				lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 			}
-
-			lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 		}
 	}
+}
+
+void SceneManager::sendConnectionList()
+{
+	// need to manually send soundConnections, since they are not in the nodeMap
+
+	lo_message msg = lo_message_new();
+	lo_message_add_string(msg, "nodeList" );
+	lo_message_add_string(msg, "SoundConnection" );
+	
+	vector<SoundConnection*> connections = getConnections();
+	
+	if (connections.size())
+	{
+		for (vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
+		{
+			lo_message_add_string(msg, (*iter)->id->s_name );
+		}
+		
+	} else {
+		lo_message_add_string(msg, "NULL" );
+	}
+	
+	std::string OSCpath = "/SPIN/" + sceneID;
+	
+	lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 }
 
 void SceneManager::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
@@ -638,6 +666,44 @@ ReferencedNode* SceneManager::getOrCreateNode(const char *id, const char *type)
 }
 
 
+// *****************************************************************************
+std::vector<SoundConnection*> SceneManager::getConnections()
+{
+	vector<SoundConnection*> allConnections;
+	
+	nodeMapType::iterator it;
+	nodeListType::iterator iter;
+	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
+	{
+		string nodeType = (*it).first;
+
+		const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(nodeType);
+		if (t.isDefined())
+		{
+			// check if the nodeType is a subclass of DSPNode:
+			if (t.getBaseType(0).getName() == "DSPNode")
+			{
+				for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+				{
+					osg::ref_ptr<DSPNode> dspNode = dynamic_cast<DSPNode*>((*iter).get());
+					
+					if ((*iter).valid())
+					{
+						vector<SoundConnection*>::iterator connIter;
+						for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
+						{
+							allConnections.push_back((*connIter));
+						}
+					} // bad dsp node
+				}
+			}
+		}
+	}
+	return allConnections;
+}
+
+
+
 
 // *****************************************************************************
 void SceneManager::deleteNode(const char *id)
@@ -854,8 +920,15 @@ void SceneManager::refresh()
 			(*iter)->stateDump();
 		}
 	}
+	
+	// must do connections manually:
+	vector<SoundConnection*> connections = getConnections();
+	for (vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
+	{
+		(*iter)->stateDump();
+	}
 
-    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "refresh");
+	if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "refresh");
 
 }
 

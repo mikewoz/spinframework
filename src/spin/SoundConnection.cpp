@@ -94,6 +94,7 @@ SoundConnection::~SoundConnection()
 {	
 	//std::cout << "In SoundConnection destructor... id: " << this->id->s_name << std::endl;
 	
+	
 	// broadcast the delete message of this connection (for editors)
 	sceneManager->sendSceneMessage("ss", "deleteNode", id->s_name, LO_ARGS_END);	
 	
