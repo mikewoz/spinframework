@@ -146,7 +146,7 @@ PYTHON_LIBS = $(shell python-config --ldflags)
 # For appsink:
 
 ifndef APPSINK_PATH
-  APPSINK_PATH=$(HOME)/src/miville/inhouse/prototypes/appsink
+  APPSINK_PATH=$(SPIN_PATH)/src/appsink
 endif
 SPIN_INCLUDE+=-I$(APPSINK_PATH)
 
