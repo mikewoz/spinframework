@@ -500,7 +500,10 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 		{
 			std::cout << "ERROR: Tried to create " << type << " with id '" << id << "', but that id already exists as an " << n->nodeType << "." << std::endl;
 			return NULL;
-		} else return n.get();
+		} else {
+			if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
+			return n.get();
+		}
 	}
 
 
