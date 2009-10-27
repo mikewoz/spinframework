@@ -63,12 +63,19 @@
 
 std::string getHostname()
 {
-	struct utsname ugnm;
-
-	 if (uname(&ugnm) < 0) return "";
-
-	 return std::string(ugnm.nodename);
+	using namespace std;
 	
+	struct utsname ugnm;
+	string hostname;
+
+	if (uname(&ugnm) < 0) return "";
+	hostname = std::string(ugnm.nodename);
+	
+	// for OSX, remove .local
+	size_t pos = hostname.rfind(".local");
+	if (pos!=string::npos) hostname = hostname.substr(0,pos);
+	
+	return hostname;
 }
 
 std::string getMyIPaddress()
