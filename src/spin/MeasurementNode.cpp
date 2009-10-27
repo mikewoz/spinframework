@@ -118,17 +118,19 @@ void MeasurementNode::callbackUpdate()
 		// direction: angle of connection_vector (projected on XY plane):
 		float direction = AngleBetweenVectors(connection_vector, osg::Y_AXIS, 3);
 		
-		// relative incidence between source and t	he connection_vector:
-		float srcIncidence = AngleBetweenVectors(src_dir, connection_vector);
+		// relative incidence between source and the connection_vector:
+		float srcIncidence = AngleBetweenVectors(src_dir, connection_vector, 3);
 
 		// relative incidence between sink and the connection_vector:
-		float snkIncidence = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector);		
+		float snkIncidence = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 3);		
 			
 		BROADCAST(this, "sf", "distance", connection_vector.length());
 		BROADCAST(this, "sf", "direction", direction);
 		BROADCAST(this, "sf", "angle", srcIncidence);
 		//BROADCAST(this, "sf", "incidence", (srcIncidence / osg::PI) * (snkIncidence / osg::PI) );
-		BROADCAST(this, "sf", "incidence", srcIncidence * (180-snkIncidence) );
+		//BROADCAST(this, "sf", "incidence", srcIncidence * (osg::PI-snkIncidence) );
+		BROADCAST(this, "sf", "incidence", srcIncidence );
+		BROADCAST(this, "sf", "targetIncidence", snkIncidence );
 	}
 	
 	if (reportingLevel>1)

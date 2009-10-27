@@ -252,7 +252,7 @@ void ShapeNode::drawShape()
 				case STAY_UP:
 					b->setMode(osg::Billboard::AXIAL_ROT);
 					b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
-					b->setNormal(osg::Vec3(0.0f,-1.0f,0.0f));
+					b->setNormal(osg::Vec3(0.0f,1.0f,0.0f));
 					break;
 			}
 			shapeGeode = b;
