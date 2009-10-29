@@ -66,7 +66,7 @@ DSPNode::DSPNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneMan
 	
 	active = 1;
 	
-	dsp = "empty~";	
+	plugin = "empty~";	
 	
 }
 
@@ -226,10 +226,10 @@ void DSPNode::setActive (int i)
 	BROADCAST(this, "si", "setActive", (int)active);
 }
 
-void DSPNode::setDSP (const char *newDSP)
+void DSPNode::setPlugin (const char *newPlugin)
 {	
-	dsp = std::string(newDSP);
-	BROADCAST(this, "ss", "setDSP", dsp.c_str());
+	plugin = std::string(newPlugin);
+	BROADCAST(this, "ss", "setPlugin", plugin.c_str());
 }
 
 /*
@@ -282,7 +282,7 @@ std::vector<lo_message> DSPNode::getState ()
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setDSP", dsp.c_str());
+	lo_message_add(msg, "ss", "setPlugin", plugin.c_str());
 	ret.push_back(msg);
 	
 	/*

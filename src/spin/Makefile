@@ -34,7 +34,7 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        GroupNode.o ShapeNode.o ModelNode.o VideoNode.o LightSource.o \
        RayNode.o Contour.o ConstraintsNode.o PointerNode.o \
        TextNode.o MeasurementNode.o UserNode.o \
-       DSPNode.o SoundNode.o SoundSpace.o SoundConnection.o \
+       DSPNode.o Listener.o SoundNode.o SoundSpace.o SoundConnection.o \
        SharedVideoNode.o sharedVideoBuffer.o 
 
 WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
