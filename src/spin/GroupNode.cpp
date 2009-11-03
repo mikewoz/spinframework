@@ -60,7 +60,7 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 	nodeType = "GroupNode";
 	this->setName(string(id->s_name) + ".GroupNode");
 
-	_reportGlobals = false;
+	//_reportGlobals = false;
 	_reportMode = GroupNode::GLOBAL_6DOF;
 
 	
@@ -142,6 +142,7 @@ void GroupNode::updateNodePath()
 // ***********************************************************
 // ***********************************************************
 
+/*
 void GroupNode::reportGlobals (int b)
 {
 	if (this->_reportGlobals != (bool)b)
@@ -150,6 +151,7 @@ void GroupNode::reportGlobals (int b)
 		BROADCAST(this, "si", "reportGlobals", (int) this->_reportGlobals);
 	}
 }
+*/
 
 void GroupNode::setReportMode (globalsReportMode mode)
 {
@@ -234,11 +236,12 @@ std::vector<lo_message> GroupNode::getState ()
 	lo_message msg;
 	osg::Vec3 v;
 
-
+/*
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "reportGlobals",(int) this->_reportGlobals);
 	ret.push_back(msg);
-
+*/
+	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "reportMode",(int) this->_reportMode);
 	ret.push_back(msg);

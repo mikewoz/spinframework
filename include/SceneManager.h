@@ -110,6 +110,7 @@ class SceneManager
 		void sendSceneMessage(const char *types, ...);
 		void sendNodeList(std::string type);
 		void sendConnectionList();
+		void sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
 		void sendNodeMessage(t_symbol *nodeSym, lo_message msg);
 		void sendNodeMessage(t_symbol *nodeSym, const char *types, ...);
 

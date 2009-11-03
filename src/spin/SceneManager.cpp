@@ -382,6 +382,26 @@ void SceneManager::sendConnectionList()
 	lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 }
 
+void SceneManager::sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
+{
+	if (!txServ) return;
+
+	lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+	
+	string OSCpath = "/SPIN/" + sceneID + "/" + string(nodeSym->s_name);
+
+	vector<lo_message>::iterator iter = msgs.begin();
+	while (iter != msgs.end())
+	{
+		lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+		msgs.erase(iter); // iterator automatically advances after erase()
+	}
+
+	lo_send_bundle_from(txAddr, txServ, b);
+
+	lo_bundle_free_messages(b);
+}
+	
 void SceneManager::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
 {
 	if (!txServ) return;

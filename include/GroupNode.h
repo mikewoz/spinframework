@@ -103,7 +103,7 @@ public:
 	 * orientation in the global coordinate system will be reported.
 	 * OSC message format: /spin/spinID/nodeID global6DOF x y z p r y
 	 */
-	void reportGlobals (int b);
+	//void reportGlobals (int b);
 
 	
 	void setReportMode(globalsReportMode reportMode);
@@ -140,7 +140,7 @@ public:
 	void rotate (float pitch, float roll, float yaw);
 
 
-	int getReportGlobals() { return (int)_reportGlobals; };
+	//int getReportGlobals() { return (int)_reportGlobals; };
 	int getReportMode() { return (int) _reportMode; };
 	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
@@ -185,7 +185,7 @@ public:
 
 
 private:
-	bool _reportGlobals;
+	//bool _reportGlobals;
 	globalsReportMode _reportMode;
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 	osg::Vec3 _velocity;

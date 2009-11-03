@@ -15,6 +15,8 @@ Darwin: libSPIN $(PROGRAMS)
 
 apps: spin.app spinViewer.app
 
+#SPIN_FLAGS += -DOSCDEBUG
+
 # if you have a custom verion of wxWidgets:
 #WXCONFIG = $(HOME)/svn/wxMac-2.8.9/wx-config
 #WXCONFIG = /usr/local/bin/wx-config
@@ -50,7 +52,6 @@ endif
 
 SPIN_FLAGS += -D_SPINDEBUG
 
-#SPIN_FLAGS += -DOSCDEBUG
 
 DEV_LDFLAGS = -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
 

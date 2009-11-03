@@ -112,7 +112,8 @@ void MeasurementNode::callbackUpdate()
 	osg::Vec3 snk_up    = snkQuat * osg::Z_AXIS;
 	
 	// NOTE: all output angles are in RADIANS::
-	
+
+	lo_message msg;
 	if (reportingLevel>0)
 	{
 		// direction: angle of connection_vector (projected on XY plane):
@@ -123,14 +124,37 @@ void MeasurementNode::callbackUpdate()
 
 		// relative incidence between sink and the connection_vector:
 		float snkIncidence = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 3);		
-			
+
+		/*
 		BROADCAST(this, "sf", "distance", connection_vector.length());
 		BROADCAST(this, "sf", "direction", direction);
-		BROADCAST(this, "sf", "angle", srcIncidence);
 		//BROADCAST(this, "sf", "incidence", (srcIncidence / osg::PI) * (snkIncidence / osg::PI) );
 		//BROADCAST(this, "sf", "incidence", srcIncidence * (osg::PI-snkIncidence) );
 		BROADCAST(this, "sf", "incidence", srcIncidence );
 		BROADCAST(this, "sf", "targetIncidence", snkIncidence );
+		*/
+
+		std::vector<lo_message> msgs;
+		lo_message msg;
+
+		msg = lo_message_new();
+		lo_message_add( msg, "sf", "distance", connection_vector.length() );
+		msgs.push_back(msg);
+
+		msg = lo_message_new();
+		lo_message_add( msg, "sf", "direction", direction );
+		msgs.push_back(msg);
+
+		msg = lo_message_new();
+		lo_message_add( msg, "sf", "incidence", srcIncidence );
+		msgs.push_back(msg);
+
+		msg = lo_message_new();
+		lo_message_add( msg, "sf", "targetIncidence", snkIncidence );
+		msgs.push_back(msg);
+		
+		sceneManager->sendNodeBundle(this->id, msgs);
+		
 	}
 	
 	if (reportingLevel>1)

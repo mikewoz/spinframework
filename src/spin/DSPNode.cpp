@@ -56,8 +56,7 @@ DSPNode::DSPNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneMan
 
 	nodeType = "DSPNode";
 	
-	// enable reportGlobals by default:
-	//reportGlobals(true);
+	// enable report of globals by default:
 	setReportMode(GroupNode::GLOBAL_6DOF);
 	
 	// connection stuff:
