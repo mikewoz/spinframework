@@ -110,7 +110,7 @@ libSPIN.so: $(OBJS)
 # spinPython is a library created in Boost.Python that exposes core
 # elements for use in Python scripts:
 
-python: python_$(OS)
+python: libSPIN python_$(OS)
 
 python_wrappers.o: python_wrappers.cpp
 	@echo "--------------- compiling $@  ---------------" 

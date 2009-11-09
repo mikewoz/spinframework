@@ -44,10 +44,6 @@
 
 #include "DSPNode.h"
 
-
-#define AS_LASER_RADIUS 0.0025
-#define DEFAULT_DIRECTIVITY_COLOR osg::Vec3(0.0,0.0,1.0) //blue
-
 class DSPNode;
 
 /**
@@ -70,6 +66,12 @@ class Listener : public DSPNode
 		 * fill the vector with the correct set of methods for this particular node
 		 */
 		virtual std::vector<lo_message> getState();
+		
+		
+		void setType	(const char* t);
+		const char* getType() { return type.c_str(); }
+		
+		std::string type;
 		
 		
 	private:
