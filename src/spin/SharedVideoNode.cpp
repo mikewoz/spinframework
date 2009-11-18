@@ -75,7 +75,7 @@ SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : Sh
 	this->setBillboard(ShapeNode::STAY_UP);
 	
 	// worker thread is in killed state to start:
-    killed_ = true;
+        killed_ = true;
 		
 	textureID = "NULL";
 	
@@ -94,13 +94,12 @@ void SharedVideoNode::callbackUpdate()
 {
 
     // do update here
-	
+    
 
     if (!killed_ && sceneManager->isGraphical() && textureImage.valid() && textureRect.valid())
     {
     	boost::mutex::scoped_lock displayLock(displayMutex_);
 
-    	
     	// update image from shared memory:
 	    textureImage->setImage(SharedVideoBuffer::WIDTH, 
 	    		SharedVideoBuffer::HEIGHT, 
@@ -150,16 +149,23 @@ void SharedVideoNode::consumeFrame()
     do
     {
         {
+			
             // Lock the mutex
             scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
+			std::cout << "lock ipc mutex" << std::endl;
+			
             // wait for new buffer to be pushed if it's empty
             sharedBuffer->waitOnProducer(lock);
+			
+			
 
             if (!sharedBuffer->isPushing())
                 end_loop = true;
             else
             {
+				std::cout << "got new buffer" << std::endl;
+				
                 // got a new buffer, wait until we upload it in gl thread before notifying producer
                 {
                     boost::mutex::scoped_lock displayLock(displayMutex_);
@@ -181,7 +187,7 @@ void SharedVideoNode::consumeFrame()
     }
     while (!end_loop);
 
-    //std::cout << "\nWorker thread Going out.\n";
+    std::cout << "... worker thread Going out" << std::endl;
 	
     // erase shared memory
     //shared_memory_object::remove(textureID.c_str());
@@ -208,74 +214,80 @@ void SharedVideoNode::setHost (const char *newvalue)
 }
 
 // ===================================================================
-void SharedVideoNode::setTextureID (const char* id)
+void SharedVideoNode::setTextureID (const char* newID)
 {
-
-	// only do this if the id has changed:
-	if (textureID == std::string(id)) return;
-	textureID = std::string(id);
-
+	
 	bool ignoreOnThisHost = ( !sceneManager->isGraphical() || (host==getHostname()) );
-
 	
 	if (!ignoreOnThisHost)
 	{
 		
+		std::cout << "setTextureID for node " << this->id->s_name << " ... from " << textureID << " to " << newID << std::endl;
+		
+		// only do this if the id has changed:
+		if (textureID == std::string(newID)) return;
+		textureID = std::string(newID);
+		
 		if (!killed_)
 		{
+			std::cout << "... asking to kill worker" << std::endl;
 			// first kill any existing thread:
-		    this->signalKilled(); // let worker know that the mainloop has exitted
-		    worker.join(); // wait for worker to end
+			this->signalKilled(); // let worker know that the mainloop has exitted
+			std::cout << "... signaled kill" << std::endl;
+			worker.join(); // wait for worker to end
 		}
-	
-	    using namespace boost::interprocess;
-	    try
-	    {	
-	        // open the already created shared memory object
-	        shm = new shared_memory_object(open_only, textureID.c_str(), read_write);
-	        
-	        // map the whole shared memory in this process
-	        region = new mapped_region(*shm, read_write);
-	
-	        // get the address of the region
-	        void *addr = region->get_address();
-	
-	        // cast to pointer of type of our shared structure
-	        sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
 		
-	        // reset the killed_ conditional
-	        killed_ = false;
-	        
-	        // start our consumer thread, which is a member function of this class
-	        // and takes sharedBuffer as an argument
-	        worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoNode::consumeFrame), boost::ref(*this)));
-	        
-	        
-	    }
-	    catch(interprocess_exception &ex)
-	    {
-	        static const char *MISSING_ERROR = "No such file or directory";
-	        if (strncmp(ex.what(), MISSING_ERROR, strlen(MISSING_ERROR)) != 0)
-	        {
-	            shared_memory_object::remove(textureID.c_str());
-	            std::cout << "Unexpected exception: " << ex.what() << std::endl;
-	        }
-	        else
-	        {
-	            std::cerr << "Tried to setTextureID for " << this->id->s_name << ", but shared buffer " << textureID << " doesn't exist yet\n";
-	            //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
-	        }
+		using namespace boost::interprocess;
+		try
+		{	
+			// open the already created shared memory object
+			shm = new shared_memory_object(open_only, textureID.c_str(), read_write);
+			
+			std::cout << "... got shm" << std::endl;
+			
+			// map the whole shared memory in this process
+			region = new mapped_region(*shm, read_write);
+			
+			// get the address of the region
+			void *addr = region->get_address();
+			
+			// cast to pointer of type of our shared structure
+			sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
+			
+			// reset the killed_ conditional
+			killed_ = false;
+			
+			// start our consumer thread, which is a member function of this class
+			// and takes sharedBuffer as an argument
+			worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoNode::consumeFrame), boost::ref(*this)));
+			
+			std::cout << "... success" << std::endl;
+			
+		}
+		catch(interprocess_exception &ex)
+		{
+			static const char *MISSING_ERROR = "No such file or directory";
+			if (strncmp(ex.what(), MISSING_ERROR, strlen(MISSING_ERROR)) != 0)
+			{
+				shared_memory_object::remove(textureID.c_str());
+				std::cout << "Unexpected exception: " << ex.what() << std::endl;
+			}
+			else
+			{
+				std::cerr << "Tried to setTextureID for " << this->id->s_name << ", but shared buffer " << textureID << " doesn't exist yet\n";
+				//boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
+			}
 			killed_ = true;
-	    }
-    
-	    
+		}
+		
+		
 	}
-    
-    
-    BROADCAST(this, "ss", "setTextureID", getTextureID());
-    
-
-    
+	
+	
+	BROADCAST(this, "ss", "setTextureID", getTextureID());
+	
+	
+	
 }
 
 // ===================================================================
