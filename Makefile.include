@@ -145,8 +145,8 @@ PYTHON_LIBS = $(shell python-config --ldflags)
 ###################################################################
 # For appsink:
 
-ifndef APPSINK_PATH
-  APPSINK_PATH=$(SPIN_PATH)/src/appsink
+ifndef SHAREDVIDEO_PATH
+  SHAREDVIDEO_PATH=$(SPIN_PATH)/src/mivilleEngine
 endif
-SPIN_INCLUDE+=-I$(APPSINK_PATH)
+SPIN_INCLUDE+=-I$(SHAREDVIDEO_PATH)
 
