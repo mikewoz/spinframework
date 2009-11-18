@@ -262,6 +262,7 @@ void SharedVideoNode::setTextureID (const char* id)
 	            std::cerr << "Shared buffer " << textureID << " doesn't exist yet\n";
 	            //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
 	        }
+			killed_ = true;
 	    }
     
 	    
