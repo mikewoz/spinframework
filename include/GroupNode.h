@@ -123,7 +123,11 @@ public:
 	 * function.
 	 */
 	void setVelocity (float dx, float dy, float dz);
-	
+
+	/**
+	 * A rotational velocity (deg/sec), computed in callbackUpdate().
+	 */
+	void setSpin (float dp, float dr, float dy);
 	
 	/**
 	 * The move command adds a relative translation with respect to the
@@ -189,6 +193,7 @@ private:
 	globalsReportMode _reportMode;
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 	osg::Vec3 _velocity;
+	osg::Vec3 _spin;
 	osg::Timer_t lastTick;
 	osg::Matrix _globalMatrix;
 	osg::Vec3 _globalScale;
