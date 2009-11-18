@@ -53,7 +53,8 @@ endif
 SPIN_FLAGS += -D_SPINDEBUG
 
 
-DEV_LDFLAGS = -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
+#DEV_LDFLAGS = -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
+DEV_LDFLAGS = -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers
 
 SPIN_LIBS += -llo -lSPIN
 
