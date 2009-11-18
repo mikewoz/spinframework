@@ -50,7 +50,7 @@
 
 
 
-
+#include "videoSize.h"
 #include "osgUtil.h"
 #include "SharedVideoNode.h"
 #include "SceneManager.h"
@@ -101,8 +101,8 @@ void SharedVideoNode::callbackUpdate()
     	boost::mutex::scoped_lock displayLock(displayMutex_);
 
     	// update image from shared memory:
-	    textureImage->setImage(SharedVideoBuffer::WIDTH, 
-	    		SharedVideoBuffer::HEIGHT, 
+	    textureImage->setImage(videosize::WIDTH, 
+	    		videosize::HEIGHT, 
 	            0, 
 	            GL_RGB, 
 	            GL_RGB, 
@@ -153,19 +153,14 @@ void SharedVideoNode::consumeFrame()
             // Lock the mutex
             scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
-			std::cout << "lock ipc mutex" << std::endl;
-			
             // wait for new buffer to be pushed if it's empty
             sharedBuffer->waitOnProducer(lock);
-			
 			
 
             if (!sharedBuffer->isPushing())
                 end_loop = true;
             else
             {
-				std::cout << "got new buffer" << std::endl;
-				
                 // got a new buffer, wait until we upload it in gl thread before notifying producer
                 {
                     boost::mutex::scoped_lock displayLock(displayMutex_);
@@ -187,7 +182,6 @@ void SharedVideoNode::consumeFrame()
     }
     while (!end_loop);
 
-    std::cout << "... worker thread Going out" << std::endl;
 	
     // erase shared memory
     //shared_memory_object::remove(textureID.c_str());
@@ -222,7 +216,7 @@ void SharedVideoNode::setTextureID (const char* newID)
 	if (!ignoreOnThisHost)
 	{
 		
-		std::cout << "setTextureID for node " << this->id->s_name << " ... from " << textureID << " to " << newID << std::endl;
+		//std::cout << "setTextureID for node " << this->id->s_name << " ... from " << textureID << " to " << newID << std::endl;
 		
 		// only do this if the id has changed:
 		if (textureID == std::string(newID)) return;
@@ -230,10 +224,8 @@ void SharedVideoNode::setTextureID (const char* newID)
 		
 		if (!killed_)
 		{
-			std::cout << "... asking to kill worker" << std::endl;
 			// first kill any existing thread:
 			this->signalKilled(); // let worker know that the mainloop has exitted
-			std::cout << "... signaled kill" << std::endl;
 			worker.join(); // wait for worker to end
 		}
 		
@@ -242,9 +234,7 @@ void SharedVideoNode::setTextureID (const char* newID)
 		{	
 			// open the already created shared memory object
 			shm = new shared_memory_object(open_only, textureID.c_str(), read_write);
-			
-			std::cout << "... got shm" << std::endl;
-			
+
 			// map the whole shared memory in this process
 			region = new mapped_region(*shm, read_write);
 			
@@ -260,9 +250,6 @@ void SharedVideoNode::setTextureID (const char* newID)
 			// start our consumer thread, which is a member function of this class
 			// and takes sharedBuffer as an argument
 			worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoNode::consumeFrame), boost::ref(*this)));
-			
-			std::cout << "... success" << std::endl;
-			
 		}
 		catch(interprocess_exception &ex)
 		{
