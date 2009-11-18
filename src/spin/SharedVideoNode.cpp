@@ -211,17 +211,16 @@ void SharedVideoNode::setHost (const char *newvalue)
 void SharedVideoNode::setTextureID (const char* newID)
 {
 	
-	bool ignoreOnThisHost = ( !sceneManager->isGraphical() || (host==getHostname()) );
+	std::cout << "switching videoTexture for node " << this->id->s_name << " ... from " << textureID << " to " << newID << std::endl;
+		
+	// only do this if the id has changed:
+	if (textureID == std::string(newID)) return;
+	textureID = std::string(newID);
 	
+	
+	bool ignoreOnThisHost = ( !sceneManager->isGraphical() || (host==getHostname()) );
 	if (!ignoreOnThisHost)
-	{
-		
-		//std::cout << "setTextureID for node " << this->id->s_name << " ... from " << textureID << " to " << newID << std::endl;
-		
-		// only do this if the id has changed:
-		if (textureID == std::string(newID)) return;
-		textureID = std::string(newID);
-		
+	{	
 		if (!killed_)
 		{
 			// first kill any existing thread:
