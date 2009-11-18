@@ -92,16 +92,20 @@ void GroupNode::callbackUpdate()
 	dumpGlobals(false); // never force globals here
 
 
-	// Now we need to update translation based on velocity. Since it's in m/s,
-	// we need to find out how many seconds passed since the last time this was
-	// called, and move by _velocity*dt
-    if ( !sceneManager->isSlave() && (_velocity!=osg::Vec3(0,0,0)) )
+	// Now we need to update translation/orientation based on our velocity/spin.
+	// We find out how many seconds passed since the last time this was called,
+	// and move by _velocity*dt (ie, m/s) and rotate by _spin*dt (ie, deg/sec)
+    if ( !sceneManager->isSlave() )
 	{
 	    osg::Timer_t tick = osg::Timer::instance()->tick();
 		float dt = osg::Timer::instance()->delta_s(lastTick,tick);
 		if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
+		//if (dt > 0.1) // only update when dt is at least 0.1s (ie 10hz):
 		{
-            this->move( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
+			if (_velocity != osg::Vec3(0,0,0))
+            	this->move( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
+			if (_spin != osg::Vec3(0,0,0))
+				this->rotate( _spin.x()*dt, _spin.y()*dt, _spin.z()*dt );
             lastTick = tick;
 		}
 	}
@@ -210,6 +214,18 @@ void GroupNode::setVelocity (float dx, float dy, float dz)
 		_velocity = newVelocity;
 		BROADCAST(this, "sfff", "setVelocity", dx, dy, dz);
 	}
+}
+
+void GroupNode::setSpin (float dp, float dr, float dy)
+{
+	osg::Vec3 newSpin = osg::Vec3(dp,dr,dy);
+	
+	if (newSpin != _spin)
+	{
+		_spin = newSpin;
+		BROADCAST(this, "sfff", "setSpin", dp, dr, dy);
+	}
+
 }
 
 void GroupNode::move (float x, float y, float z)

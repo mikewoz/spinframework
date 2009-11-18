@@ -214,8 +214,11 @@ void SharedVideoNode::setTextureID (const char* id)
 	// only do this if the id has changed:
 	if (textureID == std::string(id)) return;
 	textureID = std::string(id);
+
+	bool ignoreOnThisHost = ( !sceneManager->isGraphical() || (host==getHostname()) );
+
 	
-	if (sceneManager->isGraphical())
+	if (!ignoreOnThisHost)
 	{
 		
 		if (!killed_)
@@ -259,7 +262,7 @@ void SharedVideoNode::setTextureID (const char* id)
 	        }
 	        else
 	        {
-	            std::cerr << "Shared buffer " << textureID << " doesn't exist yet\n";
+	            std::cerr << "Tried to setTextureID for " << this->id->s_name << ", but shared buffer " << textureID << " doesn't exist yet\n";
 	            //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
 	        }
 			killed_ = true;
