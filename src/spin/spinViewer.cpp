@@ -145,6 +145,7 @@ static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg
 }
 
 
+
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -155,6 +156,8 @@ int main(int argc, char **argv)
 	spinContext *spin = new spinContext(spinContext::LISTENER_MODE);
 
 	std::string id = getHostname();
+	
+	bool picker = false;
 
 
 	// *************************************************************************
@@ -172,6 +175,8 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + spin->id + "')");
 	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin->rxAddr + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin->rxPort + ")");
+
+	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server.");
 
 
 	// *************************************************************************
@@ -193,7 +198,7 @@ int main(int argc, char **argv)
 	osg::ArgumentParser::Parameter param_spinPort(spin->rxPort);
 	arguments.read("-serverPort", param_spinPort);
 
-
+	if (arguments.read("--picker")) picker=true;
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
 	osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
@@ -351,6 +356,18 @@ int main(int argc, char **argv)
 
 	view->setCameraManipulator(manipulator);
 
+	
+	
+	// *************************************************************************
+	// set up picker:
+	if (picker)
+	{
+		//view->addEventHandler(new PickHandler(updateText.get()));
+		
+	}
+	
+	
+	
 
 	// *************************************************************************
 	// set up any initial scene elements:
