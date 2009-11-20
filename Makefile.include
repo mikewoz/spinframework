@@ -137,10 +137,15 @@ WX_LIBS += -lwxcode_$(WX_LIBTYPE)_propgrid-2.8
 ###################################################################
 # For Python / Boost.Python:
 
-#PYTHON_FLAGS = $(shell python-config --cflags)
-PYTHON_FLAGS = -fno-strict-aliasing -Wno-long-double -no-cpp-precomp -mno-fused-madd -fno-common -dynamic -DNDEBUG -g -fwrapv -O3
+PYTHON_FLAGS = $(shell python-config --cflags)
+#PYTHON_FLAGS = -fno-strict-aliasing -Wno-long-double -no-cpp-precomp -mno-fused-madd -fno-common -dynamic -DNDEBUG -g -fwrapv -O3
 PYTHON_INCLUDE = $(shell python-config --includes)
 PYTHON_LIBS = $(shell python-config --ldflags)
+#ifeq ($(OS),Darwin)
+#	PYTHON_LIBS = -F$(shell python-config --prefix) -framework Python
+#else
+#	PYTHON_LIBS = $(shell python-config --ldflags)
+#endif
 
 ###################################################################
 # For appsink:
