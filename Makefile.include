@@ -94,9 +94,12 @@ ifeq ($(OS),Darwin)
   OSG_FLAGS += -D__USE_OSX_AGL_IMPLEMENTATION__
   FRAMEWORKS = OpenThreads osg osgGA osgSim osgDB \
 	       osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
-  OSG_LIBS += -lpthread $(patsubst %,-framework %,$(FRAMEWORKS)) 
+  #OSG_LIBS += -lpthread $(patsubst %,-framework %,$(FRAMEWORKS)) 
+  OSG_LIBS += -lpthread \
+	      -lOpenThreads -losg -losgGA -losgSim -losgDB -losgIntrospection \
+	      -losgManipulator -losgText -losgUtil -losgFX -losgParticle -losgViewer
   OSG_LIBS += -isysroot $(SDKROOT)
-  OSG_LIBS += -F/Library/Frameworks -L/opt/local/lib -L$(SDKROOT)/usr/X11R6/lib
+  OSG_LIBS += -L/usr/local/lib -F/Library/Frameworks -L/opt/local/lib -L$(SDKROOT)/usr/X11R6/lib
 
 else
   OSG_LIBS += -lc -lm -ldl -lGL -lX11 -lpthread \
@@ -107,7 +110,6 @@ else
 	      -L/usr/local/lib64/osgPlugins \
 	      -L/usr/X11R6/lib 
 endif
-
 
 ###################################################################
 # For BOOST:
