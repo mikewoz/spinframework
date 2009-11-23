@@ -158,14 +158,21 @@ int main(int argc, char **argv)
 	std::string id = getHostname();
 	
 	bool picker = false;
+	
+	bool fullscreen = false;
+	
+	int width=640;
+	int height=480;
+	int screen=-1;
 
 
 	// *************************************************************************
 
 	// get arguments:
 	osg::ArgumentParser arguments(&argc,argv);
-
+	
 	// set up the usage document, which a user can acess with -h or --help
+    arguments.getApplicationUsage()->setApplicationName(arguments.getApplicationName());
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a 3D viewer for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options]");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
@@ -176,6 +183,12 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin->rxAddr + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin->rxPort + ")");
 
+	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
+	arguments.getApplicationUsage()->addCommandLineOption("-screen", "Screen number to display on (Default: ALLSCREENS)");
+	arguments.getApplicationUsage()->addCommandLineOption("-width", "Width of the viewer window, when not in fullscreen mode (Default: 640)");
+	arguments.getApplicationUsage()->addCommandLineOption("-height", "Height of the viewer window, when not in fullscreen mode (Default: 480)");
+
+	
 	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server.");
 
 
@@ -198,6 +211,15 @@ int main(int argc, char **argv)
 	osg::ArgumentParser::Parameter param_spinPort(spin->rxPort);
 	arguments.read("-serverPort", param_spinPort);
 
+	if (arguments.read("--fullscreen")) fullscreen=true;
+	osg::ArgumentParser::Parameter param_screen(screen);
+	arguments.read("-screen", param_screen);
+	osg::ArgumentParser::Parameter param_width(width);
+	arguments.read("-width", param_width);
+	osg::ArgumentParser::Parameter param_height(height);
+	arguments.read("-height", param_height);
+	
+	
 	if (arguments.read("--picker")) picker=true;
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
@@ -260,6 +282,8 @@ int main(int argc, char **argv)
 	viewer.getUsage(*arguments.getApplicationUsage());
 
 
+	
+/*
 	// *************************************************************************
     // window and graphicsContext stuff:
     osg::GraphicsContext::WindowingSystemInterface* wsi = osg::GraphicsContext::getWindowingSystemInterface();
@@ -301,20 +325,29 @@ int main(int argc, char **argv)
 	} else {
 		std::cout << "ERROR: Could not create GraphicsContext." << std::endl;
 	}
-
+*/
 
     // *************************************************************************
     // set up initial view:
     osg::ref_ptr<osgViewer::View> view = new osgViewer::View;
     viewer.addView(view.get());
 
+    if (fullscreen)
+    {
+    	if (screen<0) view->setUpViewAcrossAllScreens();
+    	else view->setUpViewOnSingleScreen(screen);
+    } else {
+    	if (screen<0) view->setUpViewInWindow(50,50,width,height);
+    	else view->setUpViewInWindow(50,50,width,height,screen);
+    }
 
-    //
+    //view->setUpViewInWindow(50,50,320,240);
     //view->setUpViewOnSingleScreen(0);
 
+    /*
     view->getCamera()->setGraphicsContext(gfxContext.get());
     view->getCamera()->setViewport(new osg::Viewport(0,0, gfxTraits->width, gfxTraits->height));
-
+*/
     view->setSceneData(spin->sceneManager->rootNode.get());
 
 
