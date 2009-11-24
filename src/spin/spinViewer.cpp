@@ -161,6 +161,8 @@ int main(int argc, char **argv)
 	
 	bool fullscreen = false;
 	
+	int x=50;
+	int y=50;
 	int width=640;
 	int height=480;
 	int screen=-1;
@@ -184,9 +186,8 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin->rxPort + ")");
 
 	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
-	arguments.getApplicationUsage()->addCommandLineOption("-screen", "Screen number to display on (Default: ALLSCREENS)");
-	arguments.getApplicationUsage()->addCommandLineOption("-width", "Width of the viewer window, when not in fullscreen mode (Default: 640)");
-	arguments.getApplicationUsage()->addCommandLineOption("-height", "Height of the viewer window, when not in fullscreen mode (Default: 480)");
+	arguments.getApplicationUsage()->addCommandLineOption("--window <x y w h>", "Set the position (x,y) and size (w,h) of the viewer window (Default: 50 50 640 480)");
+	arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 
 	
 	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server.");
@@ -212,12 +213,8 @@ int main(int argc, char **argv)
 	arguments.read("-serverPort", param_spinPort);
 
 	if (arguments.read("--fullscreen")) fullscreen=true;
-	osg::ArgumentParser::Parameter param_screen(screen);
-	arguments.read("-screen", param_screen);
-	osg::ArgumentParser::Parameter param_width(width);
-	arguments.read("-width", param_width);
-	osg::ArgumentParser::Parameter param_height(height);
-	arguments.read("-height", param_height);
+	while (arguments.read("--window",x,y,width,height)) {}
+	while (arguments.read("--screen",screen)) {}
 	
 	
 	if (arguments.read("--picker")) picker=true;
