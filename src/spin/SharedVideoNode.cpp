@@ -78,6 +78,9 @@ SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : Sh
         killed_ = true;
 		
 	textureID = "NULL";
+
+	width=640;
+	height=480;
 	
 	drawShape(); // will automatically call drawTexture()
 }
@@ -101,8 +104,8 @@ void SharedVideoNode::callbackUpdate()
     	boost::mutex::scoped_lock displayLock(displayMutex_);
 
     	// update image from shared memory:
-	    textureImage->setImage(videosize::WIDTH, 
-	    		videosize::HEIGHT, 
+	    textureImage->setImage(width, 
+	    		height, 
 	            0, 
 	            GL_RGB, 
 	            GL_RGB, 
@@ -242,7 +245,10 @@ void SharedVideoNode::setTextureID (const char* newID)
 			
 			// cast to pointer of type of our shared structure
 			sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
-			
+
+			width = sharedBuffer->getWidth();
+            height = sharedBuffer->getHeight();
+
 			// reset the killed_ conditional
 			killed_ = false;
 			

@@ -92,6 +92,8 @@ private:
 	std::string textureID;
 	osg::ref_ptr<osg::TextureRectangle> textureRect;
 
+	int width, height;
+	
 	// from tristan:
 	boost::thread worker;
 	boost::mutex displayMutex_;
