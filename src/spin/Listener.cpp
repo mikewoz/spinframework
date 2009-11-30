@@ -50,8 +50,8 @@ using namespace std;
 Listener::Listener (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
 {
 	nodeType = "Listener";
-	this->setPlugin("listener~");
-	type = "listener-stereo~";
+	this->setPlugin("listener-stereo~");
+	type = "listener-stereo.connn~";
 	this->setName(string(id->s_name) + ".Listener");
 }
 
