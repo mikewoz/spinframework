@@ -75,7 +75,7 @@ void Listener::setType (const char* t)
 std::vector<lo_message> Listener::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = DSPNode::getState();
+	std::vector<lo_message> ret = SoundNode::getState();
 	
 	lo_message msg = lo_message_new();
 	lo_message_add(msg,  "ss", "setType", getType());
