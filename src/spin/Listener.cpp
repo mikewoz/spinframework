@@ -47,7 +47,7 @@ using namespace std;
 
 // ===================================================================
 // constructor:
-Listener::Listener (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
+Listener::Listener (SceneManager *sceneManager, char *initID) : SoundNode(sceneManager, initID)
 {
 	nodeType = "Listener";
 	this->setPlugin("listener-stereo~");
