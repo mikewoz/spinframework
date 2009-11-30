@@ -42,18 +42,16 @@
 #ifndef __Listener_H
 #define __Listener_H
 
-#include "DSPNode.h"
+#include "SoundNode.h"
 
-class DSPNode;
 
 /**
- * \brief Represents a point sound source (or sink).
+ * \brief Represents an audio listener in 3D.
  * 
- * The Listener class allows for the positioning of a sound node in 3D space,
- * and controlling various aspects such as directivity and visual rendering for
- * debugging purposes.
+ * The Listener class is a special type of SoundNode, that allows for different
+ * types of connections. 
  */
-class Listener : public DSPNode
+class Listener : public SoundNode
 {
 	
 	public:
