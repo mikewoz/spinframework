@@ -42,7 +42,7 @@
 #ifndef __ShapeNode_H
 #define __ShapeNode_H
 
-#include "ReferencedNode.h"
+#include "GroupNode.h"
 
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
@@ -54,27 +54,22 @@
 /**
  * \brief Node that represents a simple 3D geometry (spheres, boxes, etc).
  *
- * This allows for the creation of simple shapes (osg::Geodes) and provides a
- * mechanism for applying textures on the shape.
+ * This allows for the creation of simple graphical primitives (osg::Geodes such
+ * as spheres, boxes, cylinders, cones, etc.) and provides some higher level
+ * functionality, such as applying color and/or textures on the shape, setting
+ * billboards, and organizing rendering order.
+ * 
+ * The shape is attached to "shapeGeode", which in turn, is attached to the
+ * "mainTransform" inherited from GroupNode, allowing the shape to be offset
+ * from it's parent.
  */
-class ShapeNode : public ReferencedNode
+class ShapeNode : public GroupNode
 {
 
 public:
 
 	ShapeNode(SceneManager *sceneManager, char *initID);
 	virtual ~ShapeNode();
-
-	/**
-	 * IMPORTANT:
-	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
-	 * and can also change their attachmentNode so that children are attached
-	 * anywhere in that subgraph. If that is the case, the updateNodePath()
-	 * function MUST be overridden, and extra nodes must be manually pushed onto
-	 * currentNodePath.
-	 */
-	virtual void updateNodePath();
-
 
     /**
      * We provide several possible shapes
@@ -89,30 +84,11 @@ public:
 	void setTextureFromFile	(const char* filename);
 	void setRenderBin		(int i);
 
-    /**
-     * This is a local translational offset from the parent
-     */
-	void setTranslation (float x, float y, float z);
-
-    /**
-     * This is a local orientation offset from the parent
-     */
-	void setOrientation (float pitch, float roll, float yaw);
-
-	 /**
-     * Allows for scaling in each axis
-     */
-	void setScale (float x, float y, float z);
-
 
 	int getShape() { return (int)shape; }
 	int getBillboard() { return (int)billboard; }
 	osg::Vec4 getColor() { return _color; };
 	int getRenderBin() { return renderBin; }
-    osg::Vec3 getTranslation() { return shapeTransform->getPosition(); };
-	osg::Vec3 getOrientation() { return _orientation; };
-	osg::Vec3 getScale() { return shapeTransform->getScale(); };
-
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
@@ -120,47 +96,22 @@ public:
 	 */
 	virtual std::vector<lo_message> getState();
 
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
 
-
-
-
-	// ShapeNode supports simple graphical primitives (ie, spheres, boxes,
-	// cylinders, cones, etc). The shape is attached to a shapeGeode, which
-	// itself gets attached to the shapeTransform, allowing the shape to be offset
-	// from it's parent.
 
 	shapeType shape;
-	//std::string shape;
-	//std::string shapeDescr;
 	
 	billboardType billboard;
 
 	osg::Vec4 _color;
 
-	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
-
-
 	// We can have a texture on the shape, loaded from a local file
-	//std::string textureName;
 	std::string texturePath;
-
 
 	int renderBin;
 
-	//osg::Vec3 _orientation;
-
 	osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
 
-
-	osg::ref_ptr<osg::PositionAttitudeTransform> shapeTransform;
 	osg::ref_ptr<osg::Geode> shapeGeode;
-	//osg::ref_ptr<osg::StateSet> shapeStateSet;
 
 	osgUtil::Optimizer optimizer;
 

@@ -41,10 +41,12 @@
 
 
 #include <osg/ComputeBoundsVisitor>
+#include <osgGA/GUIEventAdapter>
 
 #include "GroupNode.h"
 #include "SceneManager.h"
 #include "osgUtil.h"
+#include "UserNode.h"
 
 
 
@@ -61,7 +63,8 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 	this->setName(string(id->s_name) + ".GroupNode");
 
 	//_reportGlobals = false;
-	_reportMode = GroupNode::GLOBAL_6DOF;
+	_reportMode = GroupNode::NONE;
+	_interactionMode = GroupNode::STATIC;
 
 	
 	mainTransform = new osg::PositionAttitudeTransform();
@@ -143,6 +146,79 @@ void GroupNode::updateNodePath()
 }
 
 
+// *****************************************************************************
+//void GroupNode::pickEvent (int event, float localX, float localY, float localZ, float worldX, float worldY, float worldZ)
+void GroupNode::pickEvent (int event, const char* userString, float eData1, float eData2)
+{
+	if (_interactionMode == GroupNode::DRAGGABLE)
+	{
+		osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+		if (!user.valid()) return;
+		
+		if (1)
+		{
+			std::cout << this->id->s_name << ".pickEvent from '" << userString << "': ";
+			switch(event)
+			{
+				case(osgGA::GUIEventAdapter::PUSH):
+					std::cout << "PUSH ("<<event<<")"; break;
+				case(osgGA::GUIEventAdapter::RELEASE):
+					std::cout << "RELEASE ("<<event<<")"; break;
+				case(osgGA::GUIEventAdapter::DOUBLECLICK):
+					std::cout << "DOUBLECLICK ("<<event<<")"; break;
+				case(osgGA::GUIEventAdapter::DRAG):
+					std::cout << "DRAG ("<<event<<")"; break;
+				case(osgGA::GUIEventAdapter::MOVE):
+					std::cout << "MOVE ("<<event<<")"; break;
+				case(osgGA::GUIEventAdapter::SCROLL):
+					std::cout << "SCROLL ("<<event<<")"; break;
+			}
+			std::cout << " with data=" << eData1 << "," << eData2 << std::endl;
+			//std::cout << " @ local (" << x<<","<<y<<","<<z << ")" << std::endl;
+		}
+		
+		switch(event)
+		{
+		
+			case(osgGA::GUIEventAdapter::PUSH):
+				
+				// on push, we check if the current node is owned by anyone,
+				// and if not, we give ownnerhip to the event's user:
+				if (!this->owner.valid())
+				{
+					this->owner = user.get();
+				}
+				break;
+				
+			case(osgGA::GUIEventAdapter::RELEASE):
+				
+				// on release, the user gives up ownership of the node (assuming
+				// that he had ownership in the first place):
+				if (this->owner == user) this->owner = NULL;
+				break;
+			
+			case(osgGA::GUIEventAdapter::DRAG):
+				
+				// if this node is owned by the event's user, then we apply the
+				// motion relative to the user's current position/orientation:
+				
+				osg::Matrix targMatrix = this->getGlobalMatrix();
+				osg::Matrix userMatrix = user->getGlobalMatrix();
+			
+				
+				float distance = (targMatrix.getTrans() - userMatrix.getTrans()).length();
+				osg::Quat rot = userMatrix.getRotate();
+				//osg::Vec3 rot = Vec3inDegrees(QuatToEuler(userMatrix.getRotate()));
+				osg::Vec3 newPos = mainTransform->getPosition() + ( userMatrix.getRotate() * osg::Vec3(eData1,eData2,0) );
+				this->setTranslation(newPos.x(), newPos.y(), newPos.z());
+
+				break;
+
+				
+		}
+	}
+}
+
 // ***********************************************************
 // ***********************************************************
 
@@ -159,12 +235,22 @@ void GroupNode::reportGlobals (int b)
 
 void GroupNode::setReportMode (globalsReportMode mode)
 {
-	if (this->_reportMode != (bool)mode)
+	if (this->_reportMode != (int)mode)
 	{
 		this->_reportMode = mode;
 		BROADCAST(this, "si", "setReportMode", (int) this->_reportMode);
 	}
 }
+
+void GroupNode::setInteractionMode (interactionMode mode)
+{
+	if (this->_interactionMode != (int)mode)
+	{
+		this->_interactionMode = mode;
+		BROADCAST(this, "si", "setInteractionMode", (int) this->_interactionMode);
+	}
+}
+
 
 
 
@@ -189,6 +275,8 @@ void GroupNode::setOrientation (float p, float r, float y)
 
 	BROADCAST(this, "sfff", "setOrientation", p, r, y);
 }
+
+
 /*
 void GroupNode::setOrientationQuat (float x, float y, float z, float w)
 {
@@ -204,6 +292,12 @@ void GroupNode::setOrientationQuat (float x, float y, float z, float w)
 	BROADCAST(this, "sfff", "setOrientation", p, r, y);
 }
 */
+
+void GroupNode::setScale (float x, float y, float z)
+{
+	mainTransform->setScale(osg::Vec3(x,y,z));
+	BROADCAST(this, "sfff", "setScale", x, y, z);
+}
 
 void GroupNode::setVelocity (float dx, float dy, float dz)
 {
@@ -241,49 +335,18 @@ void GroupNode::rotate (float p, float r, float y)
 
 // *****************************************************************************
 
-
-
-
-std::vector<lo_message> GroupNode::getState ()
+osg::Matrix GroupNode::getGlobalMatrix()
 {
-	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedNode::getState();
-
-	lo_message msg;
-	osg::Vec3 v;
-
-/*
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "reportGlobals",(int) this->_reportGlobals);
-	ret.push_back(msg);
-*/
+	if (!this->_reportMode)
+	{
+		// might not be up-to-date, so force an update:
+		_globalMatrix = osg::computeLocalToWorld(this->currentNodePath);
+	}
 	
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "reportMode",(int) this->_reportMode);
-	ret.push_back(msg);
-	
-	msg = lo_message_new();
-	v = this->getTranslation();
-	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	v = this->getOrientation();
-	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	v = this->getVelocity();
-	lo_message_add(msg, "sfff", "setVelocity", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-
-
-	//lo_message_free(msg);
-
-	return ret;
+	return _globalMatrix;
 }
 
-// *****************************************************************************
+
 bool GroupNode::dumpGlobals(bool forced)
 {
 	// The "forced" parameter means that we do the dump even if there has been
@@ -335,3 +398,56 @@ bool GroupNode::dumpGlobals(bool forced)
 	}
 	return false;
 }
+
+
+// *****************************************************************************
+
+
+std::vector<lo_message> GroupNode::getState ()
+{
+	// inherit state from base class
+	std::vector<lo_message> ret = ReferencedNode::getState();
+
+	lo_message msg;
+	osg::Vec3 v;
+
+/*
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "reportGlobals",(int) this->_reportGlobals);
+	ret.push_back(msg);
+*/
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setReportMode",(int) this->_reportMode);
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setInteractionMode",(int) this->_interactionMode);
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	v = this->getTranslation();
+	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	v = this->getOrientation();
+	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	v = this->getScale();
+	lo_message_add(msg, "sfff", "setScale", v.x(), v.y(), v.z());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	v = this->getVelocity();
+	lo_message_add(msg, "sfff", "setVelocity", v.x(), v.y(), v.z());
+	ret.push_back(msg);
+
+
+	//lo_message_free(msg);
+
+	return ret;
+}
+

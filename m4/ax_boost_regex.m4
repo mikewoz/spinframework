@@ -1,23 +1,33 @@
-dnl @synopsis AX_BOOST_REGEX
-dnl
-dnl Test for Regex library from the Boost C++ libraries. The macro
-dnl requires a preceding call to AX_BOOST_BASE. Further documentation
-dnl is available at <http://randspringer.de/boost/index.html>.
-dnl
-dnl This macro calls:
-dnl
-dnl   AC_SUBST(BOOST_REGEX_LIB)
-dnl
-dnl And sets:
-dnl
-dnl   HAVE_BOOST_REGEX
-dnl
-dnl @category InstalledPackages
-dnl @category Cxx
-dnl @author Thomas Porschberg <thomas@randspringer.de>
-dnl @author Michael Tindal <mtindal@paradoxpoint.com>
-dnl @version 2006-06-15
-dnl @license AllPermissive
+# ===========================================================================
+#         http://www.nongnu.org/autoconf-archive/ax_boost_regex.html
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_BOOST_REGEX
+#
+# DESCRIPTION
+#
+#   Test for Regex library from the Boost C++ libraries. The macro requires
+#   a preceding call to AX_BOOST_BASE. Further documentation is available at
+#   <http://randspringer.de/boost/index.html>.
+#
+#   This macro calls:
+#
+#     AC_SUBST(BOOST_REGEX_LIB)
+#
+#   And sets:
+#
+#     HAVE_BOOST_REGEX
+#
+# LICENSE
+#
+#   Copyright (c) 2008 Thomas Porschberg <thomas@randspringer.de>
+#   Copyright (c) 2008 Michael Tindal
+#
+#   Copying and distribution of this file, with or without modification, are
+#   permitted in any medium without royalty provided the copyright notice
+#   and this notice are preserved.
 
 AC_DEFUN([AX_BOOST_REGEX],
 [
@@ -36,7 +46,7 @@ AC_DEFUN([AX_BOOST_REGEX],
         	ax_boost_user_regex_lib="$withval"
 		fi
         ],
-        [want_boost="no"]
+        [want_boost="yes"]
 	)
 
 	if test "x$want_boost" = "xyes"; then
@@ -60,22 +70,31 @@ AC_DEFUN([AX_BOOST_REGEX],
 		])
 		if test "x$ax_cv_boost_regex" = "xyes"; then
 			AC_DEFINE(HAVE_BOOST_REGEX,,[define if the Boost::Regex library is available])
-			BN=boost_regex
+            BOOSTLIBDIR=`echo $BOOST_LDFLAGS | sed -e 's/@<:@^\/@:>@*//'`
             if test "x$ax_boost_user_regex_lib" = "x"; then
-				for ax_lib in $BN $BN-$CC $BN-$CC-mt $BN-$CC-mt-s $BN-$CC-s \
-                              lib$BN lib$BN-$CC lib$BN-$CC-mt lib$BN-$CC-mt-s lib$BN-$CC-s \
-                              $BN-mgw $BN-mgw $BN-mgw-mt $BN-mgw-mt-s $BN-mgw-s ; do
-				    AC_CHECK_LIB($ax_lib, main, [BOOST_REGEX_LIB="-l$ax_lib" AC_SUBST(BOOST_REGEX_LIB) link_regex="yes" break],
+                for libextension in `ls $BOOSTLIBDIR/libboost_regex*.{so,a}* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^lib\(boost_regex.*\)\.so.*$;\1;' -e 's;^lib\(boost_regex.*\)\.a*$;\1;'` ; do
+                     ax_lib=${libextension}
+				    AC_CHECK_LIB($ax_lib, exit,
+                                 [BOOST_REGEX_LIB="-l$ax_lib"; AC_SUBST(BOOST_REGEX_LIB) link_regex="yes"; break],
                                  [link_regex="no"])
   				done
+                if test "x$link_regex" != "xyes"; then
+                for libextension in `ls $BOOSTLIBDIR/boost_regex*.{dll,a}* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^\(boost_regex.*\)\.dll.*$;\1;' -e 's;^\(boost_regex.*\)\.a*$;\1;'` ; do
+                     ax_lib=${libextension}
+				    AC_CHECK_LIB($ax_lib, exit,
+                                 [BOOST_REGEX_LIB="-l$ax_lib"; AC_SUBST(BOOST_REGEX_LIB) link_regex="yes"; break],
+                                 [link_regex="no"])
+  				done
+                fi
+
             else
-               for ax_lib in $ax_boost_user_regex_lib $BN-$ax_boost_user_regex_lib; do
+               for ax_lib in $ax_boost_user_regex_lib boost_regex-$ax_boost_user_regex_lib; do
 				      AC_CHECK_LIB($ax_lib, main,
-                                   [BOOST_REGEX_LIB="-l$ax_lib" AC_SUBST(BOOST_REGEX_LIB) link_regex="yes" break],
+                                   [BOOST_REGEX_LIB="-l$ax_lib"; AC_SUBST(BOOST_REGEX_LIB) link_regex="yes"; break],
                                    [link_regex="no"])
                done
             fi
-			if test "x$link_regex" = "xno"; then
+			if test "x$link_regex" != "xyes"; then
 				AC_MSG_ERROR(Could not link against $ax_lib !)
 			fi
 		fi

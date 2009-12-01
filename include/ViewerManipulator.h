@@ -39,76 +39,50 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __ModelNode_H
-#define __ModelNode_H
+#ifndef __ViewerManipulator_H
+#define __ViewerManipulator_H
 
-#include <string>
-//#include <osg/Vec3>
-//#include <osg/PositionAttitudeTransform>
+#include <osg/ref_ptr>
+#include <osgViewer/View>
+#include <osgGA/NodeTrackerManipulator>
 
-#include <osgUtil/Optimizer>
-
-//#include "ReferencedNode.h"
-#include "GroupNode.h"
-
-
-#define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
-
-enum animationModeType { OFF, SWITCH, SEQUENCE };
+#include "spinContext.h"
 
 
 /**
- * \brief Node for including 3D models of popular formats in the scene.
+ * \brief This class provides camera control and picking for viewers that render
+ *        a SPIN scene.
  *
- * This class allows us to attach an external 3D model from a file. Popular
- * formats (.3ds, .obj, .osg, etc) are supported as long as an OSG plugin exists
- * to read it. The model can be offset and scaled. Animations are also supported
- * as long as the model has an osg::Switch or osg::Sequence node inside.
+ * We override the osgGA::NodeTrackerManipulator class so that our camera can
+ * follow any node (ie, the UserNode for the viewer). However, mouse events are
+ * handled differently. Instead of directly affecting the state of the viewer's
+ * graph, we send the events to the server, which will update the UserNode and
+ * the changes will be updated on ALL machines.
+ * 
+ * Additionally, picking of interactive nodes is supported, allowing the viewer
+ * to manipulate content of a SPIN scene using the mouse.
  */
 
-class ModelNode : public GroupNode
+class ViewerManipulator : public osgGA::NodeTrackerManipulator
 {
+	public:
+		ViewerManipulator(spinContext* s, UserNode* u);
+		
+		void enablePicking(bool b);
+		
+	    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
+	    void processKeypress(const osgGA::GUIEventAdapter& ea);
+	    void processEvent(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
 
-public:
-
-	ModelNode (SceneManager *sceneManager, char *initID);
-	virtual ~ModelNode();
-
-
-	virtual void setHost (const char *newvalue);
-	
-	void setModelFromFile	(const char *filename);
-
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState();
-
-private:
-
-	void drawModel();
-
-	// ModelNode supports simple loading of 3D models (eg, those that
-	// have been designed in 3DSMax, Maya, Blender, etc.)
-
-	// the model:
-	//std::string modelName;
-	std::string modelPath;
-
-	osg::ref_ptr<osg::Group> model;
-
-	// animation stuff for gfx:
-	t_float state[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
-	int animationNumFrames[MODELNODE_NUM_ANIM_CONTROLS]; // number of keyframes
-	animationModeType animationMode[MODELNODE_NUM_ANIM_CONTROLS]; // type of animation (switch vs. sequence vs. ??)
-	osg::ref_ptr<osg::Switch> switcher[MODELNODE_NUM_ANIM_CONTROLS];
-	osg::ref_ptr<osg::Sequence> sequencer[MODELNODE_NUM_ANIM_CONTROLS];
-
-	osgUtil::Optimizer optimizer;
-
-
-
+	protected:
+		virtual ~ViewerManipulator();
+		
+		spinContext *spin;
+		osg::ref_ptr<UserNode> user;
+		
+		bool picker;
+		float lastX, lastY;
+		float clickX, clickY;
 };
 
 

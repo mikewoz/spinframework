@@ -56,6 +56,9 @@
 #include <map>
 
 
+class UserNode;
+
+
 class SceneManager;
 
 
@@ -81,7 +84,7 @@ public:
 	GroupNode(SceneManager *sceneManager, char *initID);
 	virtual ~GroupNode();
 
-	
+	enum interactionMode { STATIC, DRAGGABLE };
 	enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
 	
 	virtual void callbackUpdate();
@@ -106,7 +109,13 @@ public:
 	//void reportGlobals (int b);
 
 	
-	void setReportMode(globalsReportMode reportMode);
+	//void pickEvent (int event, float dx, float dy, float localX, float localY, float localZ, float worldX, float worldY, float worldZ);
+	void pickEvent (int event, const char* userString, float eData1, float eData2);
+	
+	void setReportMode(globalsReportMode mode);
+	
+	void setInteractionMode(interactionMode mode);
+
 	
 	/**
 	 * The local translation offset for this node with respect to it's parent
@@ -118,6 +127,12 @@ public:
 	 */
 	void setOrientation (float pitch, float roll, float yaw);
 
+	/**
+	 * A grouped scale operation
+	 */
+	void setScale (float z, float y, float z);
+
+	
 	/**
 	 * A translational velocity (m/s). This is computed in the callbackUpdate()
 	 * function.
@@ -146,13 +161,17 @@ public:
 
 	//int getReportGlobals() { return (int)_reportGlobals; };
 	int getReportMode() { return (int) _reportMode; };
+	int getInteractionMode() { return (int) _interactionMode; };
 	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
+	osg::Vec3 getScale() { return mainTransform->getScale(); };
 	osg::Vec3 getVelocity() { return _velocity; };
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
 
-	osg::Matrix getGlobalMatrix() { return _globalMatrix; };
 
+	osg::Matrix getGlobalMatrix();
+
+	
 	/**
 	* The dumpGlobals method results in a broadcast of this node's translation
 	* and orientation. It is called by callbackUpdate() every frame, however the
@@ -166,19 +185,12 @@ public:
     */
 	bool dumpGlobals(bool forced);
 
-
+	
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();
-
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); dumpGlobals(true); };
 
 
 
@@ -189,7 +201,10 @@ public:
 
 
 private:
-	//bool _reportGlobals;
+	interactionMode _interactionMode;
+	osg::Vec3 lastPos;
+	osg::ref_ptr<UserNode> owner;
+	
 	globalsReportMode _reportMode;
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 	osg::Vec3 _velocity;
@@ -198,6 +213,7 @@ private:
 	osg::Matrix _globalMatrix;
 	osg::Vec3 _globalScale;
 	float _globalRadius;
+	
 
 };
 

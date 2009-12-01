@@ -136,7 +136,7 @@ docGenerator: docGenerator.o
 	-cp *.html ../../doxygen/html
 
 # spinViewer is a simple OSG viewer client:
-spinViewer: spinViewer.o
+spinViewer: spinViewer.o ViewerManipulator.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(DEV_LDFLAGS) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 

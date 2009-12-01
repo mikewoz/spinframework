@@ -58,21 +58,12 @@ extern pthread_mutex_t pthreadLock;
 
 // ===================================================================
 // constructor:
-ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".ShapeNode");
 	nodeType = "ShapeNode";
 
-	shapeTransform = new osg::PositionAttitudeTransform();
-	shapeTransform->setName(string(id->s_name) + ".shapeTransform");
-	this->addChild(shapeTransform.get());
-
-	// When children are attached to this, they get added to the attachNode:
-	// NOTE: by changing this, we MUST override the updateNodePath() method!
-	setAttachmentNode(shapeTransform.get());
-
-	_color = osg::Vec4(1.0,1.0,1.0,1.0);
-	
+	_color = osg::Vec4(1.0,1.0,1.0,1.0);	
 
 	shape = NONE; //"NULL";
 	billboard = RELATIVE; // ie, no billboard
@@ -85,35 +76,6 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 // destructor
 ShapeNode::~ShapeNode()
 {
-
-}
-
-// ===================================================================
-
-// IMPORTANT:
-// subclasses of ReferencedNode are allowed to contain complicated subgraphs, and
-// can also change their attachmentNode so that children are attached anywhere
-// in this subgraph. If that is the case, the updateNodePath() function MUST be
-// overridden, and extra nodes must be manually pushed onto the currentNodePath.
-
-void ShapeNode::updateNodePath()
-{
-	currentNodePath.clear();
-	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
-	{
-		osg::ref_ptr<ReferencedNode> parentNode = parent->s_thing;
-		if (parentNode.valid())
-		{
-			currentNodePath = parentNode->currentNodePath;
-		}
-	}
-
-	// here, the nodePath includes the base osg::group, PLUS the shapeTransform
-	currentNodePath.push_back(this);
-	currentNodePath.push_back(shapeTransform.get());
-
-	// now update NodePaths for all children:
-	updateChildNodePaths();
 
 }
 
@@ -188,35 +150,6 @@ void ShapeNode::setRenderBin (int i)
 	BROADCAST(this, "si", "setRenderBin", renderBin);
 }
 
-
-void ShapeNode::setTranslation (float x, float y, float z)
-{
-	shapeTransform->setPosition(osg::Vec3(x,y,z));
-
-	BROADCAST(this, "sfff", "setTranslation", x, y, z);
-}
-
-// ===================================================================
-void ShapeNode::setOrientation (float p, float r, float y)
-{
-	_orientation = osg::Vec3(p, r, y);
-
-	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-
-	shapeTransform->setAttitude(q);
-
-	BROADCAST(this, "sfff", "setOrientation", p, r, y);
-}
-
-// ===================================================================
-void ShapeNode::setScale (float x, float y, float z)
-{
-	shapeTransform->setScale(osg::Vec3(x,y,z));
-
-	BROADCAST(this, "sfff", "setScale", x, y, z);
-}
 
 // ===================================================================
 void ShapeNode::drawShape()
@@ -424,29 +357,13 @@ void ShapeNode::drawTexture()
 std::vector<lo_message> ShapeNode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
 	osg::Vec3 v;
 	osg::Vec4 v4;
 
 	//std::cout << "in getState. shape=" << shape << ", textureName=" << textureName << std::endl;
-
-
-	msg = lo_message_new();
-	v = this->getTranslation();
-	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	v = this->getOrientation();
-	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	v = this->getScale();
-	lo_message_add(msg, "sfff", "setScale", v.x(), v.y(), v.z());
-	ret.push_back(msg);
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setShape", getShape());

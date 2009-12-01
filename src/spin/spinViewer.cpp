@@ -54,11 +54,12 @@
 #include <osgDB/ReadFile>
 #include <osg/Timer>
 
-
+#include "ViewerManipulator.h"
 #include "spinUtil.h"
 #include "spinContext.h"
 #include "osgUtil.h"
-//#include "asCameraManager.h"
+#include "GroupNode.h"
+#include "ShapeNode.h"
 
 using namespace std;
 
@@ -68,7 +69,6 @@ extern pthread_mutex_t pthreadLock;
 // global:
 // we store userNode in a global ref_ptr so that it can't be deleted
 static osg::ref_ptr<UserNode> userNode;
-
 
 
 void registerUser(spinContext *spin)
@@ -143,6 +143,7 @@ static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg
 
 	return 1;
 }
+
 
 
 
@@ -364,16 +365,18 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// create a camera manipulator
 
-
+/*
 	osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator();
 	manipulator->setMinimumDistance ( 0.0001 );
 	//manipulator->setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,1,0), osg::Vec3(0,0,1), false );
 	manipulator->setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-
+*/
 
 	
-/*
-	osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
+
+	//osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
+	//custom_NodeTrackerManipulator *manipulator = new custom_NodeTrackerManipulator();
+	ViewerManipulator *manipulator = new ViewerManipulator(spin, userNode.get());
 	manipulator->setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
 	manipulator->setMinimumDistance( 0.0001 );
@@ -382,7 +385,6 @@ int main(int argc, char **argv)
 //	manipulator->setHomePosition( osg::Vec3(0,1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 	manipulator->setTrackNode(userNode->getAttachmentNode());
 
-*/
 
 	view->setCameraManipulator(manipulator);
 
@@ -390,10 +392,12 @@ int main(int argc, char **argv)
 	
 	// *************************************************************************
 	// set up picker:
+	
 	if (picker)
 	{
-		//view->addEventHandler(new PickHandler(updateText.get()));
-		
+		//view->addEventHandler(new PickHandler(spin));
+		manipulator->enablePicking(true);
+		std::cout << "Enabled mouse picking" << std::endl;
 	}
 	
 	
@@ -407,11 +411,21 @@ int main(int argc, char **argv)
 		spin->sceneManager->worldNode->addChild(argScene.get());
 	}
 
+	if (0)
+	{
+		osg::ref_ptr<ShapeNode> shp = dynamic_cast<ShapeNode*>(spin->sceneManager->createNode("shp", "ShapeNode"));
+		shp->setShape(ShapeNode::SPHERE);
+		shp->setTranslation(0,5,0);
+		shp->setInteractionMode(GroupNode::DRAGGABLE);
+	}
 
 	// *************************************************************************
 	// start threads:
 	viewer.realize();
 
+	// ask for refresh:
+	spin->sendSceneMessage("s", "refresh", LO_ARGS_END);
+	
 	osg::Timer_t lastTick = osg::Timer::instance()->tick();
 	osg::Timer_t frameTick = lastTick;
 
@@ -427,11 +441,12 @@ int main(int argc, char **argv)
 
 		// TODO: move this into the callback, and do it only when userNode sends
 		// a global6DOF message:
+		/*
 		osg::Matrix m = osg::computeLocalToWorld(userNode->currentNodePath);
 		osg::Vec3 rot = QuatToEuler(m.getRotate());
 		manipulator->setCenter(m.getTrans());
 		manipulator->setRotation(osg::Quat( rot.x()+osg::PI_2,osg::X_AXIS, rot.y(),osg::Y_AXIS, rot.z(),osg::Z_AXIS) );
-		
+		*/
 
 
 		// We now have to go through all the nodes, and check if we need to update the

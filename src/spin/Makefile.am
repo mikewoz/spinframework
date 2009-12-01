@@ -1,10 +1,10 @@
 
+INCLUDES = -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/mivilleEngine
 
 # use lib_LTLIBRARIES to build a shared lib:
 lib_LTLIBRARIES = libSPIN.la
-libSPIN_la_LIBADD = ../osgWrappers/libSPINwrapper.a
+libSPIN_la_LIBADD = ../osgWrappers/libSPINwrapper.a ../tinyxml/libtinyxml.a
 libSPIN_la_SOURCES = spinContext.cpp osgUtil.cpp spinUtil.cpp libloUtil.cpp \
-       tinystr.cpp tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp \
        SceneManager.cpp MediaManager.cpp ReferencedNode.cpp \
        GroupNode.cpp ShapeNode.cpp ModelNode.cpp VideoNode.cpp LightSource.cpp \
        RayNode.cpp Contour.cpp ConstraintsNode.cpp PointerNode.cpp \
@@ -13,6 +13,7 @@ libSPIN_la_SOURCES = spinContext.cpp osgUtil.cpp spinUtil.cpp libloUtil.cpp \
        SharedVideoNode.cpp sharedVideoBuffer.cpp
 
 bin_PROGRAMS = spinServer spinViewer spin
+
 
 spinServer_SOURCES = spinServer.cpp
 spinServer_LDADD = libSPIN

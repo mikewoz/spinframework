@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
 	// set up the usage document, which a user can acess with -h or --help
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
-	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options]");
+	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] <scene-to-load.xml>");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify a unique ID for this scene.");
@@ -98,31 +98,37 @@ int main(int argc, char **argv)
 	arguments.read("-rxAddr", param_rxAddr);
 	osg::ArgumentParser::Parameter param_rxPort(spin->rxPort);
 	arguments.read("-rxPort", param_rxPort);
-
-	// For testing purposes, we allow loading a scene with a commandline arg:
-	osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
-
-	// any option left unread are converted into errors to write out later.
+	
+	// any option left unread are converted into errors to write out later
 	arguments.reportRemainingOptionsAsUnrecognized();
 
-	// report any errors if they have occured when parsing the program aguments.
+	
+	// *************************************************************************
+	// start spin:
+
+	spin->start();
+	
+	// *************************************************************************
+	// remaining arguments are assumed to be scene elements to be loaded (.xml)
+	
+	std::vector<std::string>::iterator arg;
+	for (int i=1; i<argc; i++) //arg=arguments.begin(); arg!=arguments.end(); ++arg)
+	{
+		if (arguments[i][0]!='-')
+		{
+			// not an option so assume string is a filename
+			spin->sceneManager->loadXML(arguments[i]);
+		} else i++;
+	}
+	 	
+	// any option left unread are converted into errors
+	//arguments.reportRemainingOptionsAsUnrecognized();
+	
 	if (arguments.errors())
 	{
 		arguments.writeErrorMessages(std::cout);
 		return 1;
 	}
-
-
-	// *************************************************************************
-	// set up any initial scene elements:
-
-	if (argScene.valid()) {
-		std::cout << "Loading sample model" << std::endl;
-		spin->sceneManager->rootNode->addChild(argScene.get());
-	}
-
-	spin->start();
-	
 
 	
 	// *************************************************************************
