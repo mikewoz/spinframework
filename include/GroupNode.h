@@ -130,7 +130,7 @@ public:
 	/**
 	 * A grouped scale operation
 	 */
-	void setScale (float z, float y, float z);
+	void setScale (float x, float y, float z);
 
 	
 	/**
