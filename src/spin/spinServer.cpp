@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] <scene-to-load.xml>");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify a unique ID for this scene.");
+	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify a unique ID for this scene.");
 	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <addr>", "Set the transmission address where the server sends update (Default is broadcast: " + spin->txAddr + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("-txPort <port>", "Set the transmission port where the server sends updates (Default: " + spin->txPort + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin->rxAddr + ")");
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	osg::ArgumentParser::Parameter param_spinID(spin->id);
-	arguments.read("-id", param_spinID);
+	arguments.read("-sceneID", param_spinID);
 	osg::ArgumentParser::Parameter param_txAddr(spin->txAddr);
 	arguments.read("-txAddr", param_txAddr);
 	osg::ArgumentParser::Parameter param_txPort(spin->txPort);
