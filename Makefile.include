@@ -94,8 +94,8 @@ ifeq ($(OS),Darwin)
   OSG_FLAGS += -D__USE_OSX_AGL_IMPLEMENTATION__
   FRAMEWORKS = OpenThreads osg osgGA osgSim osgDB \
 	       osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
-  #OSG_LIBS += -lpthread $(patsubst %,-framework %,$(FRAMEWORKS)) 
-  OSG_LIBS += -lpthread \
+  OSG_LIBS += -lpthread $(patsubst %,-framework %,$(FRAMEWORKS)) 
+  #OSG_LIBS += -lpthread \
 	      -lOpenThreads -losg -losgGA -losgSim -losgDB -losgIntrospection \
 	      -losgManipulator -losgText -losgUtil -losgFX -losgParticle -losgViewer
   OSG_LIBS += -isysroot $(SDKROOT)
