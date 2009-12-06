@@ -46,6 +46,7 @@
 #include <osg/Group>
 #include <osg/Geode>
 
+#include <osgDB/SharedStateManager>
 #include <osgIntrospection/Value>
 
 #include "ReferencedNode.h"
@@ -199,6 +200,8 @@ class SceneManager
 		std::string resourcesPath;
 		
 		MediaManager *mediaManager;
+		
+		osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
 		//pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;
 

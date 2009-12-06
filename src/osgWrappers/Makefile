@@ -10,7 +10,8 @@ all: $(OS)
 NODELIST = ReferencedNode GroupNode ShapeNode ModelNode TextNode \
 	   VideoNode LightSource RayNode Contour ConstraintsNode \
 	   PointerNode MeasurementNode SoundNode SoundSpace \
-	   DSPNode Listener SoundConnection UserNode SharedVideoNode
+	   DSPNode Listener SoundConnection UserNode \
+	   SharedVideoNode 
 
 # turn nodelist into an object list of form: wrapper_<name>.o
 WRAPPER_OBJ = $(patsubst %,wrapper_%.o,$(NODELIST))

@@ -69,8 +69,13 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 	
 	mainTransform = new osg::PositionAttitudeTransform();
 	mainTransform->setName(string(id->s_name) + ".mainTransform");
+	//mainTransform->setAttitude(osg::Quat(0.0,0.0,0.0,0.0));
+	//mainTransform->setPosition(osg::Vec3(0.0,0.0,0.0));
 	this->addChild(mainTransform.get());
 
+	_velocity = osg::Vec3(0.0,0.0,0.0);
+	_spin = osg::Vec3(0.0,0.0,0.0);
+	_damping = 0.0;
 
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
@@ -88,6 +93,7 @@ GroupNode::~GroupNode()
 
 }
 
+#define EPSILON 0.00001
 
 void GroupNode::callbackUpdate()
 {
@@ -105,11 +111,38 @@ void GroupNode::callbackUpdate()
 		if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
 		//if (dt > 0.1) // only update when dt is at least 0.1s (ie 10hz):
 		{
-			if (_velocity != osg::Vec3(0,0,0))
-            	this->move( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
-			if (_spin != osg::Vec3(0,0,0))
+
+			
+			if (_velocity.length() > EPSILON) // != osg::Vec3(0,0,0))
+			{
+            	this->translate( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
+            	if (_damping > EPSILON) _velocity -= osg::Vec3(_damping*dt,_damping*dt,_damping*dt);
+			}
+			if (_spin.length() > EPSILON) // != osg::Vec3(0,0,0))
+			{
 				this->rotate( _spin.x()*dt, _spin.y()*dt, _spin.z()*dt );
-            lastTick = tick;
+            	if (_damping > EPSILON) _spin -= osg::Vec3(_damping*dt,_damping*dt,_damping*dt);
+			}
+ 
+            
+            // apply damping to _velocity and _spin (units are -m/sec^2)
+			/*
+            if (_damping > EPSILON)
+            {
+	            osg::Vec3 dampingVec = osg::Vec3(_damping*dt,_damping*dt,_damping*dt);
+	            _velocity = _velocity - dampingVec;
+	            _spin = _spin - dampingVec;
+            }
+            */
+			
+			/*
+            std::cout << "update(" << id->s_name << "): damping=" << _damping << ", ";
+			std::cout << "_velocity="<<_velocity.x()<<","<<_velocity.y()<<","<<_velocity.z();
+			std::cout << "_spin="<<_spin.x()<<","<<_spin.y()<<","<<_spin.z();
+			std::cout << std::endl;
+			*/
+			
+			lastTick = tick;
 		}
 	}
 
@@ -147,38 +180,54 @@ void GroupNode::updateNodePath()
 
 
 // *****************************************************************************
-//void GroupNode::pickEvent (int event, float localX, float localY, float localZ, float worldX, float worldY, float worldZ)
-void GroupNode::pickEvent (int event, const char* userString, float eData1, float eData2)
+//void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
+void GroupNode::event (int event, const char* userString, float eData1, float eData2)
 {
-	if (_interactionMode == GroupNode::DRAGGABLE)
+	if (_interactionMode)
 	{
 		osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
 		if (!user.valid()) return;
 		
-		if (1)
+		if (0)
 		{
-			std::cout << this->id->s_name << ".pickEvent from '" << userString << "': ";
+			std::cout << this->id->s_name << ".event from '" << userString << "': ";
 			switch(event)
 			{
 				case(osgGA::GUIEventAdapter::PUSH):
-					std::cout << "PUSH ("<<event<<")"; break;
+					std::cout << "PUSH ("<<event<<")";
+					break;
 				case(osgGA::GUIEventAdapter::RELEASE):
-					std::cout << "RELEASE ("<<event<<")"; break;
+					std::cout << "RELEASE ("<<event<<")";
+					break;
 				case(osgGA::GUIEventAdapter::DOUBLECLICK):
-					std::cout << "DOUBLECLICK ("<<event<<")"; break;
+					std::cout << "DOUBLECLICK ("<<event<<")";
+					break;
 				case(osgGA::GUIEventAdapter::DRAG):
-					std::cout << "DRAG ("<<event<<")"; break;
+					std::cout << "DRAG ("<<event<<")";
+					break;
 				case(osgGA::GUIEventAdapter::MOVE):
-					std::cout << "MOVE ("<<event<<")"; break;
+					std::cout << "MOVE ("<<event<<")";
+					break;
 				case(osgGA::GUIEventAdapter::SCROLL):
-					std::cout << "SCROLL ("<<event<<")"; break;
+					std::cout << "SCROLL ("<<event<<")";
+					break;
 			}
-			std::cout << " with data=" << eData1 << "," << eData2 << std::endl;
-			//std::cout << " @ local (" << x<<","<<y<<","<<z << ")" << std::endl;
+			std::cout << " with data=" << eData1 << "," << eData2;
+			//std::cout << " @ local (" << x<<","<<y<<","<<z << ")";
+
+			if (this->owner.valid())
+				std::cout << ", Current owner: " << this->owner->id->s_name;
+			else
+				std::cout << ", Current owner: NULL";
+			
+			std::cout << std::endl;
 		}
 		
+
+
 		switch(event)
 		{
+		
 		
 			case(osgGA::GUIEventAdapter::PUSH):
 				
@@ -195,6 +244,16 @@ void GroupNode::pickEvent (int event, const char* userString, float eData1, floa
 				// on release, the user gives up ownership of the node (assuming
 				// that he had ownership in the first place):
 				if (this->owner == user) this->owner = NULL;
+			
+				// Take average of stored motion vectors, and set velocity in
+				// that direction. Note: _damping should be set so that node 
+				// gradually stops:
+			
+			
+				// TODO
+				// osg::Vec3 vel = ??
+				//this->setVelocity(vel.x(), vel.y(), vel.z());
+				
 				break;
 			
 			case(osgGA::GUIEventAdapter::DRAG):
@@ -204,18 +263,30 @@ void GroupNode::pickEvent (int event, const char* userString, float eData1, floa
 				
 				osg::Matrix targMatrix = this->getGlobalMatrix();
 				osg::Matrix userMatrix = user->getGlobalMatrix();
-			
 				
 				float distance = (targMatrix.getTrans() - userMatrix.getTrans()).length();
-				osg::Quat rot = userMatrix.getRotate();
-				//osg::Vec3 rot = Vec3inDegrees(QuatToEuler(userMatrix.getRotate()));
-				osg::Vec3 newPos = mainTransform->getPosition() + ( userMatrix.getRotate() * osg::Vec3(eData1,eData2,0) );
+				
+				// perspective projection:
+				//float f = 29.1489;
+				float f = 3.9;  // why this number?
+				float dx = distance * -eData1 / f;
+				float dy = distance * -eData2 / f;
+
+				osg::Vec3 motionVec = userMatrix.getRotate() * osg::Vec3(dx,0,dy);
+				osg::Vec3 newPos = mainTransform->getPosition() + motionVec;
 				this->setTranslation(newPos.x(), newPos.y(), newPos.z());
+				
+				// save last N motion vectors, so we can setVelocity on RELEASE:
+				// TODO
 
 				break;
 
 				
 		}
+		
+		// broadcast event
+		// NO! can't do this, because we will duplicate move/rotate/etc actions
+		//BROADCAST(this, "si", "setReportMode", (int) this->_reportMode);
 	}
 }
 
@@ -322,8 +393,25 @@ void GroupNode::setSpin (float dp, float dr, float dy)
 
 }
 
+void GroupNode::setDamping (float d)
+{
+	if (d != _damping)
+	{
+		_damping = d;
+		BROADCAST(this, "sf", "setDamping", _damping);
+	}
+}
+
+void GroupNode::translate (float x, float y, float z)
+{
+	// simple move relative to the parent
+	osg::Vec3 newPos = mainTransform->getPosition() + osg::Vec3(x,y,z);
+	setTranslation(newPos.x(), newPos.y(), newPos.z());
+}
+
 void GroupNode::move (float x, float y, float z)
 {
+	// take the orientation into account, and move along that vector:
 	osg::Vec3 newPos = mainTransform->getPosition() + ( mainTransform->getAttitude() * osg::Vec3(x,y,z) );
 	setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
@@ -411,38 +499,37 @@ std::vector<lo_message> GroupNode::getState ()
 	lo_message msg;
 	osg::Vec3 v;
 
-/*
+
 	msg = lo_message_new();
-	lo_message_add(msg, "si", "reportGlobals",(int) this->_reportGlobals);
-	ret.push_back(msg);
-*/
-	
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setReportMode",(int) this->_reportMode);
+	lo_message_add(msg, "si", "setReportMode", getReportMode());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg, "si", "setInteractionMode",(int) this->_interactionMode);
+	lo_message_add(msg, "si", "setInteractionMode", getInteractionMode());
 	ret.push_back(msg);
 	
 	msg = lo_message_new();
-	v = this->getTranslation();
+	v = getTranslation();
 	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	v = this->getOrientation();
+	v = getOrientation();
 	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
 	ret.push_back(msg);
 	
 	msg = lo_message_new();
-	v = this->getScale();
+	v = getScale();
 	lo_message_add(msg, "sfff", "setScale", v.x(), v.y(), v.z());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	v = this->getVelocity();
+	v = getVelocity();
 	lo_message_add(msg, "sfff", "setVelocity", v.x(), v.y(), v.z());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setDamping", getDamping());
 	ret.push_back(msg);
 
 

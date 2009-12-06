@@ -232,6 +232,7 @@ public:
 
 	std::vector<ReferencedNode*> children;
 
+	
 
 	//osg::ref_ptr<osg::Geode> textGeode;
 

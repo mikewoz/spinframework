@@ -159,6 +159,7 @@ int main(int argc, char **argv)
 	std::string id = getHostname();
 	
 	bool picker = false;
+	bool mover = true;
 	
 	bool fullscreen = false;
 	
@@ -167,6 +168,8 @@ int main(int argc, char **argv)
 	int width=640;
 	int height=480;
 	int screen=-1;
+	
+	std::string redirectAddr, redirectPort;
 
 
 	// *************************************************************************
@@ -191,7 +194,9 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 
 	
-	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server.");
+	arguments.getApplicationUsage()->addCommandLineOption("--disabled", "Disable camera controls for this user");
+	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server");
+	arguments.getApplicationUsage()->addCommandLineOption("--redirection <addr port>", "Redirect events to the specified address/port instead of the SPIN server");
 
 
 	// *************************************************************************
@@ -218,7 +223,9 @@ int main(int argc, char **argv)
 	while (arguments.read("--screen",screen)) {}
 	
 	
+	if (arguments.read("--disabled")) mover=false;
 	if (arguments.read("--picker")) picker=true;
+	while (arguments.read("--redirection",redirectAddr,redirectPort)) {}
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
 	osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
@@ -279,52 +286,6 @@ int main(int argc, char **argv)
 	// get details on keyboard and mouse bindings used by the viewer.
 	viewer.getUsage(*arguments.getApplicationUsage());
 
-
-	
-/*
-	// *************************************************************************
-    // window and graphicsContext stuff:
-    osg::GraphicsContext::WindowingSystemInterface* wsi = osg::GraphicsContext::getWindowingSystemInterface();
-    if (!wsi)
-    {
-        osg::notify(osg::NOTICE)<<"Error, no WindowSystemInterface available, cannot create windows."<<std::endl;
-        exit(0);
-    }
-
-
-    unsigned int width, height;
-    wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(0), width, height);
-
-
-    // create a GraphicsContext::Traits for this window and initialize with some defaults:
-	osg::ref_ptr<osg::GraphicsContext::Traits> gfxTraits = new osg::GraphicsContext::Traits;
-
-    gfxTraits->windowName = "spinViewer";
-	gfxTraits->x = 50;
-	gfxTraits->y = 50;
-	gfxTraits->width = 320;
-	gfxTraits->height = 240;
-	gfxTraits->windowDecoration = true;
-	gfxTraits->doubleBuffer = true;
-	gfxTraits->useCursor = true;
-	gfxTraits->supportsResize = true;
-	gfxTraits->sharedContext = 0;
-
-	gfxTraits->displayNum = 0;
-	gfxTraits->screenNum = 0;
-
-
-
-	osg::ref_ptr<osg::GraphicsContext> gfxContext = osg::GraphicsContext::createGraphicsContext(gfxTraits.get());
-	if (gfxContext.valid())
-	{
-		gfxContext->setClearColor(osg::Vec4f(0.0f,0.0f,0.0f,1.0f));
-		gfxContext->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	} else {
-		std::cout << "ERROR: Could not create GraphicsContext." << std::endl;
-	}
-*/
-
     // *************************************************************************
     // set up initial view:
     osg::ref_ptr<osgViewer::View> view = new osgViewer::View;
@@ -335,19 +296,12 @@ int main(int argc, char **argv)
     	if (screen<0) view->setUpViewAcrossAllScreens();
     	else view->setUpViewOnSingleScreen(screen);
     } else {
-    	if (screen<0) view->setUpViewInWindow(50,50,width,height);
-    	else view->setUpViewInWindow(50,50,width,height,screen);
+    	if (screen<0) view->setUpViewInWindow(x,y,width,height);
+    	else view->setUpViewInWindow(x,y,width,height,screen);
     }
 
-    //view->setUpViewInWindow(50,50,320,240);
-    //view->setUpViewOnSingleScreen(0);
 
-    /*
-    view->getCamera()->setGraphicsContext(gfxContext.get());
-    view->getCamera()->setViewport(new osg::Viewport(0,0, gfxTraits->width, gfxTraits->height));
-*/
     view->setSceneData(spin->sceneManager->rootNode.get());
-
 
 	view->addEventHandler(new osgViewer::StatsHandler);
 	view->addEventHandler(new osgViewer::ThreadingHandler);
@@ -377,6 +331,12 @@ int main(int argc, char **argv)
 	//osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
 	//custom_NodeTrackerManipulator *manipulator = new custom_NodeTrackerManipulator();
 	ViewerManipulator *manipulator = new ViewerManipulator(spin, userNode.get());
+	
+	manipulator->setPicker(picker);
+	manipulator->setMover(mover);
+	if (!redirectAddr.empty() && !redirectPort.empty())
+		manipulator->setRedirection(redirectAddr, redirectPort);
+	
 	manipulator->setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
 	manipulator->setMinimumDistance( 0.0001 );
@@ -390,17 +350,7 @@ int main(int argc, char **argv)
 
 	
 	
-	// *************************************************************************
-	// set up picker:
-	
-	if (picker)
-	{
-		//view->addEventHandler(new PickHandler(spin));
-		manipulator->enablePicking(true);
-		std::cout << "Enabled mouse picking" << std::endl;
-	}
-	
-	
+
 	
 
 	// *************************************************************************
@@ -416,7 +366,7 @@ int main(int argc, char **argv)
 		osg::ref_ptr<ShapeNode> shp = dynamic_cast<ShapeNode*>(spin->sceneManager->createNode("shp", "ShapeNode"));
 		shp->setShape(ShapeNode::SPHERE);
 		shp->setTranslation(0,5,0);
-		shp->setInteractionMode(GroupNode::DRAGGABLE);
+		shp->setInteractionMode(GroupNode::PUSH);
 	}
 
 	// *************************************************************************

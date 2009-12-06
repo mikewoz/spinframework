@@ -49,6 +49,9 @@
 #include <osg/MatrixTransform>
 #include <osg/Switch>
 #include <osg/Sequence>
+#include <osg/Texture2D>
+#include <osg/TextureRectangle>
+
 
 #include <iostream>
 
@@ -223,7 +226,81 @@ class UpdateSceneVisitor : public osg::NodeVisitor
 		}
 };
 
+/**
+ * \brief A NodeVisitor class that finds all textured statesets in a node:
+ */
+typedef std::vector< osg::observer_ptr<osg::StateSet> > StateSetList;
+class TextureStateSetFinder : public osg::NodeVisitor
+    {
+    public:
+    	TextureStateSetFinder(StateSetList& list):_statesetList(list)
+    	{
+    		setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN );
+    	}
+        
+        virtual void apply(osg::Node& node)
+        {
+            apply(node.getStateSet());
+            traverse(node);
+        }
+    	
+        virtual void apply(osg::Geode& geode)
+        {
+            apply(geode.getStateSet());
+            for(unsigned int i=0;i<geode.getNumDrawables();++i)
+            {
+                apply(geode.getDrawable(i)->getStateSet());
+            }
+        
+            traverse(geode);
+        }
+        
+        inline void apply(osg::StateSet* stateset)
+        {
+            if (!stateset) return;
+            
 
+            osg::StateAttribute* attr = stateset->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
+            if (attr)
+            {
+            	
+                // from doxygen:
+            	// attr->asTexture() is fast alternative to dynamic_cast<>
+            	// for determining if state attribute is a Texture. 
+
+            	osg::Texture2D* texture2D = dynamic_cast<osg::Texture2D*>(attr);
+                if (texture2D)
+                {
+                	_statesetList.push_back(stateset);
+                	//apply(dynamic_cast<osg::Image*>(texture2D->getImage()));
+                }
+
+                osg::TextureRectangle* textureRec = dynamic_cast<osg::TextureRectangle*>(attr);
+                if (textureRec) 
+                {
+                	_statesetList.push_back(stateset);
+                	//apply(dynamic_cast<osg::Image*>(textureRec->getImage()));
+                }
+            }
+        }
+        
+        /*
+        inline void apply(osg::Image* img)
+        {
+            if (img)
+            {
+                std::cout << "      adding image: " << img->getFileName() << std::endl;
+                _imageList.push_back(img);
+            }
+        }
+        */
+        
+        StateSetList& _statesetList;
+        
+    protected:
+    
+    	TextureStateSetFinder& operator = (const TextureStateSetFinder&) { return *this; }
+    };
 
 
 

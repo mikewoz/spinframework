@@ -84,7 +84,7 @@ public:
 	GroupNode(SceneManager *sceneManager, char *initID);
 	virtual ~GroupNode();
 
-	enum interactionMode { STATIC, DRAGGABLE };
+	enum interactionMode { STATIC, DRAG, PUSH };
 	enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
 	
 	virtual void callbackUpdate();
@@ -100,17 +100,8 @@ public:
 	 */
 	virtual void updateNodePath();
 
-	/**
-	 * The reportGlobals flag means that every time this node's matrix changes
-	 * (either directly, or because a parent changed), the translation and
-	 * orientation in the global coordinate system will be reported.
-	 * OSC message format: /spin/spinID/nodeID global6DOF x y z p r y
-	 */
-	//void reportGlobals (int b);
-
 	
-	//void pickEvent (int event, float dx, float dy, float localX, float localY, float localZ, float worldX, float worldY, float worldZ);
-	void pickEvent (int event, const char* userString, float eData1, float eData2);
+	void event (int event, const char* userString, float eData1, float eData2);
 	
 	void setReportMode(globalsReportMode mode);
 	
@@ -143,14 +134,27 @@ public:
 	 * A rotational velocity (deg/sec), computed in callbackUpdate().
 	 */
 	void setSpin (float dp, float dr, float dy);
+
+	/**
+	 * A Damping value (negative acceleration) that gets applied to velocity
+	 * and spin over time. Units are in -m/sec2 or -deg/sec2, meaning that:
+	 * - zero damping will not change velocity/spin values
+	 * - any positive value will decrease the speeds
+	 */
+	void setDamping (float d);
 	
+	/**
+	 * The translate command increments the node's current translation values
+	 * (ie, it's position in the scene with respect to it's parent)
+	 */
+    void translate (float x, float y, float z);
+    
 	/**
 	 * The move command adds a relative translation with respect to the
 	 * node's current orientation. That is, the node will translate along it's
 	 * direction vector (Y-axis) by the supplied number of units
 	 */
     void move (float x, float y, float z);
-
 
 	/**
 	 * The rotate command adds a relative rotation to the node's current
@@ -166,6 +170,7 @@ public:
 	osg::Vec3 getOrientation() { return _orientation; };
 	osg::Vec3 getScale() { return mainTransform->getScale(); };
 	osg::Vec3 getVelocity() { return _velocity; };
+	float getDamping() { return _damping; };
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
 
 
@@ -202,18 +207,20 @@ public:
 
 private:
 	interactionMode _interactionMode;
-	osg::Vec3 lastPos;
 	osg::ref_ptr<UserNode> owner;
 	
 	globalsReportMode _reportMode;
-	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
-	osg::Vec3 _velocity;
-	osg::Vec3 _spin;
-	osg::Timer_t lastTick;
 	osg::Matrix _globalMatrix;
 	osg::Vec3 _globalScale;
 	float _globalRadius;
+
+	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
+
+	osg::Vec3 _velocity;
+	osg::Vec3 _spin;
+	float _damping;
 	
+	osg::Timer_t lastTick;
 
 };
 

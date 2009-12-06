@@ -43,6 +43,7 @@
 
 #include "ViewerManipulator.h"
 #include "osgUtil.h"
+#include "spinUtil.h"
 
 using namespace osgGA;
 
@@ -51,13 +52,83 @@ ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
 	this->spin = s;
 	this->user = u;
 	this->picker = false;
+	this->mover = true;
+	selectedNode=gensym("NULL");	
 }
 
 ViewerManipulator::~ViewerManipulator() {}
 
-void ViewerManipulator::enablePicking(bool b)
+void ViewerManipulator::setRedirection(std::string addr, std::string port)
 {
-	this->picker = b;
+	//if (redirectServ) lo_server_free(redirectServ);
+	
+	redirectAddr = lo_address_new(addr.c_str(), port.c_str());
+	
+	if (isMulticastAddress(addr))
+	{
+		redirectServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
+	}
+
+	else if (isBroadcastAddress(addr))
+	{
+		redirectServ = lo_server_new(NULL, oscParser_error);
+		int sock = lo_server_get_socket_fd(redirectServ);
+		int sockopt = 1;
+		setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
+	}
+
+	else {
+		redirectServ = lo_server_new(NULL, oscParser_error);
+	}
+
+	if (!redirectServ) std::cout << "ERROR (ViewerManipulator) - Could not set redirection. Bad address?: " << addr << ":" << port << std::endl;
+	else
+	{
+		std::cout << "  ViewerManipulator is redirecting picking events to: " << lo_address_get_url(redirectAddr) << std::endl;
+	}
+}
+
+void ViewerManipulator::send(const char *nodeId, const char *types, ...)
+{
+	va_list ap;
+	va_start(ap, types);
+	send(nodeId, types, ap);
+}
+
+void ViewerManipulator::send(const char *nodeId, const char *types, va_list ap)
+{
+	lo_message msg = lo_message_new();
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
+		else spin->sendNodeMessage(nodeId, msg);
+		
+	} else {
+		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
+	}
+}
+
+
+void ViewerManipulator::setPicker(bool b)
+{
+	if (picker!=b)
+	{
+		this->picker = b;
+		if (picker) std::cout << "Enabled mouse picking" << std::endl;
+		else std::cout << "Disabled mouse picking" << std::endl;
+	}
+}
+
+void ViewerManipulator::setMover(bool b)
+{
+	if (mover!=b)
+	{
+		this->mover = b;
+		if (mover) std::cout << "Enabled camera motion controls" << std::endl;
+		else std::cout << "Disabled camera motion controls" << std::endl;	
+	}
 }
 
 bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
@@ -93,32 +164,59 @@ void ViewerManipulator::processKeypress(const GUIEventAdapter& ea)
 {
 	if (ea.getKey()=='r')
 	{
-		spin->sendNodeMessage(user->id->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
+		send(user->id->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
 	}
 }
 
 void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapter& ea)
 {
-
-	/*
-	float dX = (lastX - ea.getX()) / ea.getWindowWidth();
-	float dY = (lastY - ea.getY()) / ea.getWindowHeight();
-	*/
-	
+	osgUtil::LineSegmentIntersector::Intersections intersections;
+	osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+		    
 	float dX = lastX - ea.getXnormalized();
 	float dY = lastY - ea.getYnormalized();
-	
+
 	float dXclick = clickX - ea.getXnormalized();
 	float dYclick = clickY - ea.getYnormalized();
 
-	
 	unsigned int buttonMask = ea.getButtonMask();
 	unsigned int modkeyMask = ea.getModKeyMask();
+
 	
-	// a boolean that tells us if we should move the camera as well (will become
-	// false if there is an pick event)
-	bool processSceneEvent = true;
-	
+	// correct dX for aspect ratio:		
+	//std::cout << "aspect= " << (float)ea.getWindowWidth()/ea.getWindowHeight() << std::endl;
+	dX *= (float)ea.getWindowWidth()/ea.getWindowHeight();
+	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
+
+
+	float scrollX, scrollY;
+	if (ea.getEventType()==osgGA::GUIEventAdapter::SCROLL)
+	{
+		scrollX = ea.getScrollingDeltaX();
+		scrollY = ea.getScrollingDeltaY();
+
+		// some devices can't report the delta, so we check if both deltas are
+		// zero and in that case, we set the delta to a unit value (1.0) in the 
+		// appropriate direction
+		if (scrollX==0 && scrollY==0)
+		{
+			switch (ea.getScrollingMotion())
+			{
+				case osgGA::GUIEventAdapter::SCROLL_LEFT:
+					scrollX = 1.0;
+					break;
+				case osgGA::GUIEventAdapter::SCROLL_RIGHT:
+					scrollX = -1.0;
+					break;
+				case osgGA::GUIEventAdapter::SCROLL_UP:
+					scrollY = -1.0;
+					break;
+				case osgGA::GUIEventAdapter::SCROLL_DOWN:
+					scrollY = 1.0;
+					break;
+			}
+		}
+	}
 	
 	
 	/*
@@ -138,73 +236,149 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 			std::cout << "SCROLL ("<<ea.getEventType()<<")"; break;
 	}
 	std::cout << " buttonMask=" << buttonMask << ", modkeyMask=" << modkeyMask << std::endl;
+	std::cout << " selectedNode="<<selectedNode->s_name << ", dXYclick: " << dXclick<<","<<dYclick << std::endl;
 	*/
 	
 	
 	if (this->picker)
 	{
+
+
 		
-	
-	    osgUtil::LineSegmentIntersector::Intersections intersections;
-	    osgUtil::LineSegmentIntersector::Intersections::iterator itr;
-	    if (view->computeIntersections(ea.getX(),ea.getY(),intersections))
+		// if a node is currently selected, then we look for a MOVE, RELEASE or
+		// DRAG event
+		if (selectedNode!=gensym("NULL"))
+		{
+			switch(ea.getEventType())
+			{
+				case(GUIEventAdapter::MOVE):
+	    			send(selectedNode->s_name,
+	    					"sisff",
+	    					"event",
+	    					(int)ea.getEventType(),
+	    					user->id->s_name,
+	    					dX,
+	    					dY,
+	    					LO_ARGS_END);
+	    			break;	
+	    			
+	    		case(GUIEventAdapter::DRAG):
+	    			send(selectedNode->s_name,
+	    					"sisff",
+	    					"event",
+	    					(int)ea.getEventType(),
+	    					user->id->s_name,
+	    					dX,
+	    					dY,
+	    					LO_ARGS_END);
+	    			break;	
+	    		case(GUIEventAdapter::RELEASE):
+	    			send(selectedNode->s_name,
+			    			"sisff",
+			    			"event",
+			    			(int)ea.getEventType(),
+			    			user->id->s_name,
+			    			(float) ea.getModKeyMask(),
+			    			(float) ea.getButtonMask(),
+			    			LO_ARGS_END);
+	    			selectedNode = gensym("NULL");
+	    			break;
+			}
+		}
+		
+		// otherwise, we check to see if the mouse is intersecting with anything
+		// and set the selectedNode in the case of a PUSH, or just send other
+		// events as necessary
+		
+		else if (view->computeIntersections(ea.getX(),ea.getY(),intersections))
 	    {  
 			osg::ref_ptr<GroupNode> testNode;
-			lo_message msg;
 			osg::Vec3 v;
+
 			
 			
 			for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 			{
+				// intersections are ordered from nearest to furthest, so we
+				// iterate through and act upon the first intersection that can
+				// be cast as an interactive SPIN node
 				for (int i=(*itr).nodePath.size()-1; i>=0; i--)
 				{
 					testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
-					if (testNode.valid() && (testNode->getInteractionMode()==GroupNode::DRAGGABLE)) // this is a Draggable!
+					if (testNode.valid() && (testNode->getInteractionMode())) // this is a interactive!
 					{
-						// only add the hit if not already in the list (note that
-						// one node might have several intersections, for each face
-						// that instersects with the line segment)
-						//vector<t_symbol*>::iterator found = std::find( (*itr).begin(), (*itr).end(), testNode->id );
-						//if ( found == (*itr).end() )
-						{
-							//std::cout << ea.getEventType() << " on SPIN node: " << testNode->id->s_name << std::endl;
-							processSceneEvent = false;
-							
-				    		msg = lo_message_new();
+						//std::cout << ea.getEventType() << " on SPIN node: " << testNode->id->s_name << std::endl;
+						
+
+				    	switch(ea.getEventType())
+				    	{
+				    		// send MOVE events (eg, for drawing on nodes)
+				    		case(GUIEventAdapter::MOVE):
+				    			send(testNode->id->s_name,
+				    					"sisff",
+				    					"event",
+				    					(int)ea.getEventType(),
+				    					user->id->s_name,
+				    					dX,
+				    					dY,
+				    					LO_ARGS_END);
+				    			break;
 				    		
-				    		// first add the event type, and user name:
-				    		lo_message_add( msg, "sis", "pickEvent", (int)ea.getEventType(), user->id->s_name);
-							
-				    		// add the 2 data floats for the event:
-					    	switch(ea.getEventType())
-					    	{
-					    		case(GUIEventAdapter::MOVE):
-					    			lo_message_add( msg, "ff", dX, dY );
-					    			break;
-					    		case(GUIEventAdapter::DRAG):
-					    			lo_message_add( msg, "ff", dX, dY );
-					    			break;
-					    		case(GUIEventAdapter::SCROLL):
-					    			lo_message_add( msg, "ff", ea.getScrollingDeltaX(), ea.getScrollingDeltaY() );
-					    			break;
-					    		default:
-					    			lo_message_add( msg, "ff", (float) ea.getModKeyMask(), (float) ea.getButtonMask() );
-					    			break;
-					    	}
-							
-					    	// finally, add the intersection point:
-					    	//v = (*itr).getLocalIntersectPoint();
-					    	//lo_message_add( msg, "fff", v.x(), v.y(), v.z() );
+				    		// DRAG will only occur if someone clicks elsewhere
+				    		// and rolls onto this node, so we shouldn't send
+				    		// anything, should we?
+				    		case(GUIEventAdapter::DRAG):
+				    			break;
+
+				    		// Same goes for the case where someone rolls onto a
+				    		// node with the mouse button down, and releases.
+				    		// However, just to be safe, we'll also ensure that
+				    		// there is no selected node anymore:
+				    		case(GUIEventAdapter::RELEASE):
+				    			
+				    			selectedNode = gensym("NULL");
+				    			break;
 				    		
-				    		//v = (*itr).getWorldIntersectPoint();
-				    		//lo_message_add(msg, "fff", v.x(), v.y(), v.z());
-			
-					    	spin->sendNodeMessage(testNode->id->s_name, msg);
-							
-						}
+				    		// SCROLLING (with the mouse wheel) is important. It
+				    		// could be used to scale for example.
+				    		case(GUIEventAdapter::SCROLL):
+				    			send(testNode->id->s_name,
+				    					"sisff",
+				    					"event",
+				    					(int)ea.getEventType(),
+				    					user->id->s_name,
+				    					scrollX,
+				    					scrollY,
+				    					LO_ARGS_END);
+				    			break;
+				    		
+				    		// Finally, in the case of a PUSH, we both send the
+				    		// event, and set the selectedNode
+				    		case(GUIEventAdapter::PUSH):
+				    			send(testNode->id->s_name,
+				    					"sisff",
+				    					"event",
+				    					(int)ea.getEventType(),
+				    					user->id->s_name,
+				    					(float) ea.getModKeyMask(),
+				    					(float) ea.getButtonMask(),
+				    					LO_ARGS_END);
+				    			selectedNode = testNode->id;
+				    			break;
+				    	}
+						
+				    	//v = (*itr).getLocalIntersectPoint();
+				    	//lo_message_add( msg, "fff", v.x(), v.y(), v.z() );
+			    		//v = (*itr).getWorldIntersectPoint();
+			    		//lo_message_add(msg, "fff", v.x(), v.y(), v.z());
+    
+				    	// stop searching up the nodePath
 						break;
-					}
+
+					} // end if interactive
 				}
+
+				// stop searching through the intersections
 				if (testNode.valid()) break;
 				
 				/*
@@ -220,16 +394,18 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				dbgVect = (*itr).getWorldIntersectNormal();
 				std::cout<<"  worldNormal ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
 				*/
-			}
-		}
-	}
+				
+				
+			} // end intersection iterator
+		} // end intersections test
+	} // end picker
 	
     
     // scene event processing (eg, camera motion):
-	if (processSceneEvent)
+	if (this->mover && (selectedNode==gensym("NULL")))
 	{
 		float movScalar = 10.0;
-		float rotScalar = 20.0;
+		float rotScalar = 30.0;
 		
 		switch(ea.getEventType())
 		{
@@ -237,6 +413,13 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				// in the case of a mouse click, we store the current coords
 				clickX = ea.getXnormalized();
 				clickY = ea.getYnormalized();
+				
+				
+				send(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
+					send(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+
+				
 				break;
 				
 			case(GUIEventAdapter::DRAG):
@@ -262,50 +445,50 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// pan forward/back & left/right:
-				    	spin->sendNodeMessage(user->id->s_name, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
+				    	send(user->id->s_name, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// pan up/down & left/right:
-				    	spin->sendNodeMessage(user->id->s_name, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
+				    	send(user->id->s_name, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
 				    }
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-				    	spin->sendNodeMessage(user->id->s_name, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
+				    	send(user->id->s_name, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
 				    }
 				}
 			
 			    else if (modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL)
 			    {
+			    	int dXsign, dYsign;
+			    	(dXclick<0) ? dXsign=-1 : dXsign=1;
+			    	(dYclick<0) ? dYsign=-1 : dYsign=1;
+			    	
 			    	// drive mode:
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// drive forward/back & left/right:
-				    	
-				    	std::cout << "dClick: " << dXclick<<","<<dYclick << std::endl;
-				    	//spin->sendNodeMessage(user->id->s_name, "sfff", "setVelocity", pow(2,dXclick*movScalar)-1, pow(2,dYclick*movScalar)-1, 0.0f, LO_ARGS_END);
-				    	
-			    		spin->sendNodeMessage(user->id->s_name, "sfff", "setVelocity", dXclick*movScalar*2, dYclick*movScalar*2, 0.0f, LO_ARGS_END);
+			    		send(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
 			    		
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// drive up/down & left/right:
-			    		spin->sendNodeMessage(user->id->s_name, "sfff", "setVelocity", dXclick*movScalar*2, 0.0f, dYclick*movScalar*2, LO_ARGS_END);
+			    		send(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
 			    	}
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-			    		spin->sendNodeMessage(user->id->s_name, "sfff", "setSpin", dYclick*rotScalar, 0.0, dXclick*rotScalar, LO_ARGS_END);
+			    		send(user->id->s_name, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
 				    }
 			    }
 
 				break;
 				
 			case(GUIEventAdapter::RELEASE):
-				spin->sendNodeMessage(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
-				spin->sendNodeMessage(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+				//send(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				//send(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 				break;
 				
 			case(GUIEventAdapter::SCROLL):

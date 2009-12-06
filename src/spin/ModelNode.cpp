@@ -56,6 +56,7 @@
 #include "SceneManager.h"
 #include "MediaManager.h"
 #include "nodeVisitors.h"
+#include "SharedVideoTexture.h"
 
 
 
@@ -125,6 +126,9 @@ void ModelNode::drawModel()
 
 		this->getAttachmentNode()->removeChild(model.get());
 		model = NULL;
+		
+		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+		
 		for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
 		{
 			// re-initialize:
@@ -144,6 +148,11 @@ void ModelNode::drawModel()
 		//model = dynamic_cast<osg::Group*>(osgDB::readNodeFile(modelPath));
 		model = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
 
+		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->share(model);
+
+		
+
+		
 		if (model.valid())
 		{
 			SearchVisitor getAnimInterface;
@@ -182,6 +191,8 @@ void ModelNode::drawModel()
 				}
 
 			}
+
+			
 			optimizer.optimize(model.get());
 			this->getAttachmentNode()->addChild(model.get());
 			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
@@ -189,12 +200,103 @@ void ModelNode::drawModel()
 			//osg::StateSet *modelStateSet = new osg::StateSet();
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);
 			//model->setStateSet(modelStateSet);
+			
+			// search for all statesets with textures:
+			StateSetList statesets;
+			statesets.clear();
+			TextureStateSetFinder f(statesets);
+		    model->accept(f);
+			
 
 			std::cout << "Created model " << modelPath << std::endl;
 			osg::BoundingSphere bound = model->computeBound();
 			osg::Vec3 c = bound.center();
-			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << std::endl;
+			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << "  numTextures=" << statesets.size() << std::endl;
 
+		    // Here, we replace some custom placeholder textures with custom
+		    // classes. However, we ONLY do this for GRAPHICAL clients (viewers)
+		    if (sceneManager->isGraphical())
+		    {
+			    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); itr++)
+			    {
+			    	// check if this stateset has a special texture
+			    	osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
+			    	if (attr)
+			    	{
+			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
+			    		size_t pos;
+			    		
+			    		// if filename contains "shared_video_texture", then replace
+			    		// current TextureAttribute with a SharedVideoTexture
+			    		if ((pos=imageFile.find("shared_video_texture")) != string::npos)
+			    		{
+				    		
+			    			
+			    			
+				    		osg::Image *img = osgDB::readImageFile( "/Users/mikewoz/src/breakingtheice/Models/images/shared_video_texture_fake.tga" );
+		
+				    		
+				    		// as a TextureRectangle;
+				    		/*
+				    		osg::TextureRectangle *textureRect = new osg::TextureRectangle(img);
+				    		*itr)->setTextureAttributeAndModes(0, textureRect, osg::StateAttribute::ON);
+				    		*/
+				    		
+				    		// as a Texture2D:
+				    		/*
+				    		osg::Texture2D *texture2D = new osg::Texture2D();
+				    		texture2D->setImage(img);
+				    		(*itr)->setTextureAttributeAndModes(0, texture2D, osg::StateAttribute::ON);
+				    		*/
+				    		
+				    		// as a SharedVideoTexture
+				    		std::string shID = imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
+				    		SharedVideoTexture *shTex = new SharedVideoTexture(shID.c_str());
+				    		(*itr)->setTextureAttributeAndModes(0, shTex, osg::StateAttribute::ON);
+				    		
+				    		
+				    		
+				    		
+				    		// turn off lighting 
+				    		(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+				    		
+				    		
+				    		
+			    			
+				    		/*
+						    osg::ref_ptr<osg::TexMat> texmat(new osg::TexMat);
+						    texmat->setScaleByTextureRectangleSize(true);
+				
+						    osg::ref_ptr<osg::TexEnv> texenv(new osg::TexEnv);
+						    texenv->setMode(osg::TexEnv::REPLACE);
+				
+						    (*itr)->setTextureAttributeAndModes(0, textureRect.get(), osg::StateAttribute::ON);
+						    (*itr)->setTextureAttributeAndModes(0, texmat.get(), osg::StateAttribute::ON);
+						    (*itr)->setTextureAttributeAndModes(0, texenv.get(), osg::StateAttribute::ON);
+				
+						    // turn off lighting 
+						    (*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+						    */
+				    			
+				    		std::cout << "  replaced '" << imageFile.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
+			    		}
+			    		
+			    		// TODO:
+			    		// if filename is a movie format, create an ImageStream from
+			    		// it and replace the current TextureAttribute:
+			    		if (pos=imageFile.find(".avi") != string::npos)
+			    		{
+			    			
+			    		}
+			    		
+			    		
+			    	} // if texture attribute
+			    } // stateset iterator
+		    } // if (sceneManager->isGraphical())
+		    
+		    
+			
+			
 		} else {
 			std::cout << "ERROR [ModelNode::drawModel]: Could not find \"" << modelPath << "\". Make sure file exists, and that it is a valid 3D model." << std::endl;
 		}

@@ -196,6 +196,34 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	mediaManager = new MediaManager(resourcesPath);
 
 
+	// To prevent same external texture from being loaded multiple times,
+	// we use the osgDB::SharedStateManager:
+	
+	//sharedStateManager = new osgDB::SharedStateManager;
+	sharedStateManager = osgDB::Registry::instance()->getOrCreateSharedStateManager();
+	if (sharedStateManager.valid())
+	{
+		//sharedStateManager->setShareMode(osgDB::SharedStateManager::SHARE_ALL);
+		sharedStateManager->setShareMode(osgDB::SharedStateManager::SHARE_TEXTURES);
+	} else {
+		std::cout << "ERROR: Could not create sharedStateManager" << std::endl;
+	}
+				
+	// then, when a node is created:
+	//		osgDB::Registry::instance()->getSharedStateManager()->share(node);
+	// and when a node is deleted:
+	// 		osgDB::Registry::instance()->getSharedStateManager()->prune();
+
+	/*
+	Another way?:
+		osgDB::Options* opt = osgDB::Registry::instance()->getOptions();
+		if (opt == NULL) {
+			opt = new osgDB::Options();
+		}
+		opt->setObjectCacheHint(osgDB::Options::CACHE_ALL);
+		osgDB::Registry::instance()->setOptions(opt);
+	*/
+	
 	
 	this->sendSceneMessage("s", "userRefresh");
 }

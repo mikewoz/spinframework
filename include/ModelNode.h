@@ -43,12 +43,8 @@
 #define __ModelNode_H
 
 #include <string>
-//#include <osg/Vec3>
-//#include <osg/PositionAttitudeTransform>
-
 #include <osgUtil/Optimizer>
 
-//#include "ReferencedNode.h"
 #include "GroupNode.h"
 
 

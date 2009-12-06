@@ -39,64 +39,79 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __ViewerManipulator_H
-#define __ViewerManipulator_H
+#ifndef __SharedVideoTexture_H
+#define __SharedVideoTexture_H
 
-#include <osg/ref_ptr>
-#include <osgViewer/View>
-#include <osgGA/NodeTrackerManipulator>
+#include <osg/TextureRectangle>
+#include <osg/Texture2D>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/bind.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
-#include "spinContext.h"
-#include <lo/lo.h>
-#include <lo/lo_lowlevel.h>
+#include "sharedVideoBuffer.h"
 
 
 /**
- * \brief This class provides camera control and picking for viewers that render
- *        a SPIN scene.
+ * \brief This shares a GL texture from memory with another process
  *
- * We override the osgGA::NodeTrackerManipulator class so that our camera can
- * follow any node (ie, the UserNode for the viewer). However, mouse events are
- * handled differently. Instead of directly affecting the state of the viewer's
- * graph, we send the events to the server, which will update the UserNode and
- * the changes will be updated on ALL machines.
- * 
- * Additionally, picking of interactive nodes is supported, allowing the viewer
- * to manipulate content of a SPIN scene using the mouse.
+ * This is accomplished by the use of boost/interprocess/shared_memory_object
  */
-
-class ViewerManipulator : public osgGA::NodeTrackerManipulator
+class SharedVideoTexture : virtual public osg::Texture2D
 {
-	public:
-		ViewerManipulator(spinContext* s, UserNode* u);
-		
-		void setRedirection(std::string addr, std::string port);
-		void send(const char *nodeId, const char *types, ...);
-		void send(const char *nodeId, const char *types, va_list ap);
-		
-		void setPicker(bool b);
-		void setMover(bool b);
-		
-	    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
-	    void processKeypress(const osgGA::GUIEventAdapter& ea);
-	    void processEvent(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
 
-	protected:
-		virtual ~ViewerManipulator();
-		
-		spinContext *spin;
-		osg::ref_ptr<UserNode> user;
-		
-		t_symbol *selectedNode;
-		
-		lo_address redirectAddr;
-		lo_server  redirectServ;
-		
-		bool picker, mover;
-		float lastX, lastY;
-		float clickX, clickY;
+public:
+
+	SharedVideoTexture(const char *initID);
+	~SharedVideoTexture();
+
+	void updateCallback();
+	
+	// from tristan:
+	void consumeFrame();
+	void signalKilled();
+
+	void setTextureID(const char *id);
+	const char* getTextureID() { return textureID.c_str(); }
+	
+
+private:
+	
+	std::string textureID;
+	
+	osg::ref_ptr<osg::Image> img;
+	
+	int width, height;
+	
+	// from tristan:
+	boost::thread worker;
+	boost::mutex displayMutex_;
+	boost::condition_variable textureUploadedCondition_;
+	SharedVideoBuffer *sharedBuffer;
+	
+	boost::interprocess::shared_memory_object *shm;
+	boost::interprocess::mapped_region *region;    
+    
+	bool killed_;
+
 };
 
+class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::Callback
+{
+
+	public:
+		virtual void operator()(osg::StateAttribute* attr, osg::NodeVisitor* nv)
+		{
+			osg::ref_ptr<SharedVideoTexture> thisAttr = dynamic_cast<SharedVideoTexture*> (attr->getUserData());
+
+			if (thisAttr != NULL)
+			{
+				thisAttr->updateCallback();
+			}
+		}
+};
 
 
 #endif
