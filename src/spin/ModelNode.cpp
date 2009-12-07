@@ -227,7 +227,7 @@ void ModelNode::drawModel()
 			    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
-			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
+			    		if ((pos=imageFile.find("shared_video_texture")) != string::npos)
 			    		{
 				    		
 			    			
