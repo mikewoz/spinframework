@@ -150,10 +150,10 @@ PYTHON_LIBS = $(shell python-config --ldflags)
 #endif
 
 ###################################################################
-# For appsink:
+# For miville (sharedvideo stuff):
 
-ifndef SHAREDVIDEO_PATH
-  SHAREDVIDEO_PATH=$(SPIN_PATH)/src/mivilleEngine
+ifndef MIVILLE_SRC
+  MIVILLE_SRC=$(SPIN_PATH)/src/mivilleSrc
 endif
-SPIN_INCLUDE+=-I$(SHAREDVIDEO_PATH)
+SPIN_INCLUDE+=-I$(MIVILLE_SRC) -I$(MIVILLE_SRC)/include -I$(MIVILLE_SRC)/gst/engine
 
