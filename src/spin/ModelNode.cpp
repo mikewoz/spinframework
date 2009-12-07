@@ -249,7 +249,7 @@ void ModelNode::drawModel()
 				    		*/
 				    		
 				    		// as a SharedVideoTexture
-				    		std::string shID = imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
+				    		std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
 				    		SharedVideoTexture *shTex = new SharedVideoTexture(shID.c_str());
 				    		(*itr)->setTextureAttributeAndModes(0, shTex, osg::StateAttribute::ON);
 				    		

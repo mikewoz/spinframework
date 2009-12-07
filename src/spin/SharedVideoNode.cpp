@@ -142,6 +142,8 @@ void SharedVideoNode::consumeFrame()
 	// get frames until the other process marks the end
 	bool end_loop = false;
 
+	std::cout << "starting worker thread" << std::endl;
+
     // make sure there's no sentinel
     {
         // Lock the mutex
@@ -149,16 +151,24 @@ void SharedVideoNode::consumeFrame()
         sharedBuffer->startPushing();   // tell appsink to give us buffers
     }
 
+	
+	std::cout << "asked for sharedBuffer to startPushing()" << std::endl;
+
     do
     {
         {
+	
+		std::cout << "interprocess lock" << std::endl;
 			
             // Lock the mutex
             scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
+		std::cout << "wait on producer" << std::endl;
+
             // wait for new buffer to be pushed if it's empty
             sharedBuffer->waitOnProducer(lock);
 			
+		std::cout << "after wait producer" << std::endl;
 
             if (!sharedBuffer->isPushing())
                 end_loop = true;
@@ -166,6 +176,8 @@ void SharedVideoNode::consumeFrame()
             {
                 // got a new buffer, wait until we upload it in gl thread before notifying producer
                 {
+			std::cout << "frame" << std::endl;
+
                     boost::mutex::scoped_lock displayLock(displayMutex_);
 
                     if (killed_)
@@ -234,6 +246,8 @@ void SharedVideoNode::setTextureID (const char* newID)
 		using namespace boost::interprocess;
 		try
 		{	
+			std::cout << "setting up shared memory: " << textureID << std::endl;
+
 			// open the already created shared memory object
 			shm = new shared_memory_object(open_only, textureID.c_str(), read_write);
 
@@ -247,7 +261,7 @@ void SharedVideoNode::setTextureID (const char* newID)
 			sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
 
 			width = sharedBuffer->getWidth();
-            height = sharedBuffer->getHeight();
+			height = sharedBuffer->getHeight();
 
 			// reset the killed_ conditional
 			killed_ = false;

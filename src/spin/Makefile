@@ -27,7 +27,7 @@ apps: spin.app spinViewer.app
 ########################################################
 
 
-vpath %.cpp .  ../tinyxml $(SHAREDVIDEO_PATH) ../tests/bullet_physics
+vpath %.cpp .  ../tinyxml $(MIVILLE_SRC)/gst/engine ../tests/bullet_physics
 
 
 OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
