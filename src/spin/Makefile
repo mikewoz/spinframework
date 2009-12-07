@@ -27,7 +27,8 @@ apps: spin.app spinViewer.app
 ########################################################
 
 
-vpath %.cpp .  ../tinyxml $(MIVILLE_SRC)/gst/engine ../tests/bullet_physics
+#vpath %.cpp .  ../tinyxml $(MIVILLE_SRC)/gst/engine ../tests/bullet_physics
+vpath %.cpp .  ../tinyxml
 
 
 OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
@@ -37,7 +38,7 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        RayNode.o Contour.o ConstraintsNode.o PointerNode.o \
        TextNode.o MeasurementNode.o UserNode.o \
        DSPNode.o Listener.o SoundNode.o SoundSpace.o SoundConnection.o \
-       SharedVideoNode.o SharedVideoTexture.o sharedVideoBuffer.o 
+       SharedVideoNode.o SharedVideoTexture.o  
 
 WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
 	  wxSpinPropGrid.o wxSpinSettings.o wxSpinTreeVisitor.o \
@@ -56,7 +57,7 @@ SPIN_FLAGS += -D_SPINDEBUG
 DEV_LDFLAGS = -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
 #DEV_LDFLAGS = -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers
 
-SPIN_LIBS += -llo -lSPIN
+SPIN_LIBS += -llo -lSPIN -lshared_video
 
 ifeq ($(OS),Darwin)
   BOOST_LIBS += -lboost_thread-mt -lboost_filesystem-mt

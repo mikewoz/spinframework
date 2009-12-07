@@ -60,8 +60,6 @@ static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
 using namespace std;
 
 
-extern pthread_mutex_t pthreadLock;
-
 
 // ===================================================================
 // constructor:
@@ -115,6 +113,7 @@ SharedVideoTexture::~SharedVideoTexture()
 		// first kill any existing thread:
 		this->signalKilled(); // let worker know that the mainloop has exitted
 		worker.join(); // wait for worker to end
+		std::cout << "killed SharedVideoTexture thread" << std::endl;
 	}
 }
 
