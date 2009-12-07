@@ -148,13 +148,12 @@ void ModelNode::drawModel()
 		//model = dynamic_cast<osg::Group*>(osgDB::readNodeFile(modelPath));
 		model = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
 
-		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->share(model);
-
-		
-
-		
 		if (model.valid())
 		{
+			if (sceneManager->sharedStateManager.valid())
+				sceneManager->sharedStateManager->share(model);
+
+			
 			SearchVisitor getAnimInterface;
 			char buf[16];
 
@@ -228,7 +227,7 @@ void ModelNode::drawModel()
 			    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
-			    		if ((pos=imageFile.find("shared_video_texture")) != string::npos)
+			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
 			    		{
 				    		
 			    			

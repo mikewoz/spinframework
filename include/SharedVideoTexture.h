@@ -44,6 +44,8 @@
 
 #include <osg/TextureRectangle>
 #include <osg/Texture2D>
+#include <osg/Timer>
+
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
@@ -59,6 +61,7 @@
  *
  * This is accomplished by the use of boost/interprocess/shared_memory_object
  */
+//class SharedVideoTexture : virtual public osg::TextureRectangle
 class SharedVideoTexture : virtual public osg::Texture2D
 {
 
@@ -76,6 +79,7 @@ public:
 	void setTextureID(const char *id);
 	const char* getTextureID() { return textureID.c_str(); }
 	
+	void loadSharedMemory();
 
 private:
 	
@@ -94,6 +98,8 @@ private:
 	boost::interprocess::shared_memory_object *shm;
 	boost::interprocess::mapped_region *region;    
     
+	osg::Timer_t lastTick;
+		
 	bool killed_;
 
 };

@@ -65,7 +65,7 @@ extern pthread_mutex_t pthreadLock;
 
 // ===================================================================
 // constructor:
-//SharedVideoTexture::SharedVideoTexture (char *initID) : osg::TextureRectangle()
+//SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
 SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
 {
 
@@ -75,23 +75,31 @@ SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
 	width=640;
 	height=480;
 
+	// placeholder image:
 	img = new osg::Image;
-	img->setOrigin(osg::Image::TOP_LEFT); 
+	//img->setOrigin(osg::Image::TOP_LEFT); 
+	img->setOrigin(osg::Image::BOTTOM_LEFT); 
 
 
-    // setup TextureRectangle:
-	
+    // setup texture:
 	setImage(img.get());
 	setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
     setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
     setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
     setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+	
+	// It is important to disable resizing of this texture if
+	// resolution is not a power of two. Othwerwise, there will
+	// be a very slow resize every update. NOTE: this might cause
+	// problems on harware that doesn't support NPOT textures.
+	setResizeNonPowerOfTwoHint(false);
     
     // register callback:
 	this->setUserData( dynamic_cast<osg::StateAttribute*>(this) );
 	this->setUpdateCallback(new SharedVideoTexture_callback);
 	
-	
+	// keep a timer for reload attempts:
+	lastTick = osg::Timer::instance()->tick();
 	
 	// set initial textureID:
 	setTextureID(initID);
@@ -102,7 +110,12 @@ SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
 // destructor
 SharedVideoTexture::~SharedVideoTexture()
 {
-
+	if (!killed_)
+	{
+		// first kill any existing thread:
+		this->signalKilled(); // let worker know that the mainloop has exitted
+		worker.join(); // wait for worker to end
+	}
 }
 
 
@@ -139,7 +152,21 @@ void SharedVideoTexture::updateCallback()
 	    
 	    textureUploadedCondition_.notify_one();
 
-    }
+    } else {
+		
+		// if the shared memory has not been set, we will recheck
+		// every 5 seconds or so
+		
+		osg::Timer_t tick = osg::Timer::instance()->tick();
+		float dt = osg::Timer::instance()->delta_s(lastTick,tick);
+		if (dt > 5)
+		{
+			loadSharedMemory();
+		
+			// this is the last time we checked
+			lastTick = osg::Timer::instance()->tick();
+		}
+	}
     
     
 }
@@ -165,7 +192,6 @@ void SharedVideoTexture::consumeFrame()
     do
     {
         {
-			
             // Lock the mutex
             scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
@@ -200,8 +226,10 @@ void SharedVideoTexture::consumeFrame()
 
 	
     // erase shared memory
+	// No! we never do this... only the other process is allowed to
+	// destroy the memory
     //shared_memory_object::remove(textureID.c_str());
-    // TODO: shouldn't we also destroy our shm and region objects?
+    // shouldn't we also destroy our shm and region objects?
 }
 
 // ===================================================================
@@ -223,56 +251,66 @@ void SharedVideoTexture::setTextureID (const char* newID)
 	textureID = std::string(newID);
 	this->setName("SharedVideoTexture("+textureID+")");
 	
+	loadSharedMemory();
 	
-	if (true)
-	{	
-		if (!killed_)
-		{
-			// first kill any existing thread:
-			this->signalKilled(); // let worker know that the mainloop has exitted
-			worker.join(); // wait for worker to end
-		}
+}
+
+// ===================================================================
+void SharedVideoTexture::loadSharedMemory()
+{
 		
-		using namespace boost::interprocess;
-		try
-		{	
-			// open the already created shared memory object
-			shm = new shared_memory_object(open_only, textureID.c_str(), read_write);
-
-			// map the whole shared memory in this process
-			region = new mapped_region(*shm, read_write);
-			
-			// get the address of the region
-			void *addr = region->get_address();
-			
-			// cast to pointer of type of our shared structure
-			sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
-
-			width = sharedBuffer->getWidth();
-            height = sharedBuffer->getHeight();
-
-			// reset the killed_ conditional
-			killed_ = false;
-			
-			// start our consumer thread, which is a member function of this class
-			// and takes sharedBuffer as an argument
-			worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoTexture::consumeFrame), boost::ref(*this)));
-		}
-		catch(interprocess_exception &ex)
-		{
-			static const char *MISSING_ERROR = "No such file or directory";
-			if (strncmp(ex.what(), MISSING_ERROR, strlen(MISSING_ERROR)) != 0)
-			{
-				shared_memory_object::remove(textureID.c_str());
-				std::cout << "Unexpected exception: " << ex.what() << std::endl;
-			}
-			else
-			{
-				std::cerr << "Tried to setTextureID, but shared buffer " << textureID << " doesn't exist yet\n";
-				//boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
-			}
-			killed_ = true;
-		}
+	if (!killed_)
+	{
+		// first kill any existing thread:
+		this->signalKilled(); // let worker know that the mainloop has exitted
+		worker.join(); // wait for worker to end
 	}
+	
+	using namespace boost::interprocess;
+	try
+	{
+		// open the already created shared memory object
+		shm = new shared_memory_object(open_only, textureID.c_str(), read_write);
+
+		// map the whole shared memory in this process
+		region = new mapped_region(*shm, read_write);
+		
+		// get the address of the region
+		void *addr = region->get_address();
+		
+		
+		// cast to pointer of type of our shared structure
+		sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
+		
+		std::cout << "SharedVideoTexture getting width/height" << std::endl;
+		
+		width = sharedBuffer->getWidth();
+		height = sharedBuffer->getHeight();
+		
+		// reset the killed_ conditional
+		killed_ = false;
+		
+		std::cout << "SharedVideoTexture starting thread" << std::endl;
+		
+		// start our consumer thread, which is a member function of this class
+		// and takes sharedBuffer as an argument
+		worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoTexture::consumeFrame), boost::ref(*this)));
+	}
+	catch(interprocess_exception &ex)
+	{
+		static const char *MISSING_ERROR = "No such file or directory";
+		if (strncmp(ex.what(), MISSING_ERROR, strlen(MISSING_ERROR)) != 0)
+		{
+			shared_memory_object::remove(textureID.c_str());
+			std::cout << "Unexpected exception: " << ex.what() << std::endl;
+		}
+		else
+		{
+			std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet\n";
+			//boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
+		}
+		killed_ = true;
+	}
+
 }
 
