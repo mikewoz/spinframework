@@ -47,13 +47,21 @@
 
 using namespace osgGA;
 
-ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
+//ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
+ViewerManipulator::ViewerManipulator(UserNode *u)
 {
-	this->spin = s;
+	//this->spin = s;
 	this->user = u;
 	this->picker = false;
 	this->mover = true;
 	selectedNode=gensym("NULL");	
+	
+	// defaults:
+	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
+	setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
+	setMinimumDistance( 0.0001 );
+	setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+	
 }
 
 ViewerManipulator::~ViewerManipulator() {}
@@ -97,13 +105,15 @@ void ViewerManipulator::send(const char *nodeId, const char *types, ...)
 
 void ViewerManipulator::send(const char *nodeId, const char *types, va_list ap)
 {
+	spinContext &spin = spinContext::Instance();
+	
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 
 	if (!err)
 	{
 		if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
-		else spin->sendNodeMessage(nodeId, msg);
+		else spin.sendNodeMessage(nodeId, msg);
 		
 	} else {
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;

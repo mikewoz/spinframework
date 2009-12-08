@@ -207,7 +207,7 @@ class SceneManager
 
 
 	private:
-		std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
+		//std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
 		nodeMapType nodeMap; // the nodeList arranged by type
 
 };

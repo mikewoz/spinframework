@@ -39,7 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-//#include <osg/Texture>
+
 #include <osg/TexMat>
 #include <osg/TexEnv>
 #include <osg/StateSet>
@@ -49,8 +49,6 @@
 #include <iostream>
 
 
-#include "videoSize.h"
-//#include "osgUtil.h"
 #include "SharedVideoTexture.h"
 
 

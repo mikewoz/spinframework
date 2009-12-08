@@ -62,7 +62,7 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 // destructor
 UserNode::~UserNode()
 {
-
+	std::cout << "Destroying UserNode: " << id->s_name << std::endl;
 }
 
 

@@ -68,7 +68,8 @@
 class ViewerManipulator : public osgGA::NodeTrackerManipulator
 {
 	public:
-		ViewerManipulator(spinContext* s, UserNode* u);
+		//ViewerManipulator(spinContext* s, UserNode* u);
+		ViewerManipulator(UserNode* u);
 		
 		void setRedirection(std::string addr, std::string port);
 		void send(const char *nodeId, const char *types, ...);
@@ -84,7 +85,7 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 	protected:
 		virtual ~ViewerManipulator();
 		
-		spinContext *spin;
+		//spinContext *spin;
 		osg::ref_ptr<UserNode> user;
 		
 		t_symbol *selectedNode;

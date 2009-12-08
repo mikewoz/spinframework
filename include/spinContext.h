@@ -67,11 +67,19 @@ class spinContext
 
 	public:
 
+
+		//spinContext(spinContextMode initMode=LISTENER_MODE);
+		//virtual ~spinContext();
+
+		// Meyers Singleton design pattern:
+		static spinContext& Instance() {
+			static spinContext spinInstance;
+			return spinInstance;
+		}
+		
 		enum spinContextMode { SERVER_MODE, LISTENER_MODE };
 
-		spinContext(spinContextMode initMode=LISTENER_MODE);
-		virtual ~spinContext();
-
+		
 		bool setMode(spinContextMode m);
 
 		virtual bool start();
@@ -117,6 +125,7 @@ class spinContext
 		SceneManager *sceneManager;
 		MediaManager *mediaManager;
 
+		bool signalStop;
 	    bool running;
 
 	    /**
@@ -131,6 +140,16 @@ class spinContext
 		std::string spinFolder;
 
 	private:
+		
+		// singleton constructors & desctructor (hidden):
+		spinContext();
+		spinContext(spinContext const&); // copy constructor
+		// hide the assignment operator, otherwise it would be possible to
+		// assign the singleton spinContext to itself:
+		spinContext& operator=(spinContext const&);
+		~spinContext();
+		
+		
 
 		// pthread stuff
 		pthread_t pthreadID; // id of child thread

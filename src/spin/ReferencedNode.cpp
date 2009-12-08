@@ -98,7 +98,7 @@ ReferencedNode::~ReferencedNode()
 
 	// register with OSC parser:
 	string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-	lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
+	if (sceneManager) lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
 
 #ifdef OSCDEBUG
 	std::cout << "oscParser unregistered: " << oscPattern << std::endl;

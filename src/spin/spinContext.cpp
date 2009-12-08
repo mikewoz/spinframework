@@ -42,6 +42,8 @@
 #include <string>
 #include <iostream>
 #include <pthread.h>
+#include <signal.h>
+
 
 #include <osgDB/Registry>
 #include <osgIntrospection/Type>
@@ -64,9 +66,27 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 
 
-spinContext::spinContext(spinContextMode initMode)
+
+
+static void sigHandler(int signum)
+{
+	std::cout << " Caught signal: " << signum << std::endl;
+	
+	spinContext &spin = spinContext::Instance();
+	
+	spin.stop();
+
+	//exit(0);
+}
+
+
+
+//spinContext::spinContext(spinContextMode initMode)
+spinContext::spinContext()
 {
 
+	spinContextMode  initMode = spinContext::LISTENER_MODE;
+	
 #ifdef __Darwin
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
     //#define OSG_LIBRARY_PATH @executable_path/../PlugIns
@@ -85,6 +105,13 @@ spinContext::spinContext(spinContextMode initMode)
 	}
 	*/	
 	
+    
+    signal(SIGINT, sigHandler);
+
+
+    
+    
+    
 	
 	// Make sure that our OSG nodekit	 is loaded (by checking for existance of
 	// the ReferencedNode node type):
@@ -176,7 +203,6 @@ spinContext::spinContext(spinContextMode initMode)
 spinContext::~spinContext()
 {
 	this->stop();
-	usleep(100); // ouch. this is bad programming
 
 	if (lo_infoServ)
 	{
@@ -231,6 +257,8 @@ bool spinContext::start()
 {
 	lo_txAddr = lo_address_new(txAddr.c_str(), txPort.c_str());
 
+	signalStop = false;
+	
 	// create thread:
 	if (pthread_attr_init(&pthreadAttr) < 0)
 	{
@@ -258,8 +286,12 @@ bool spinContext::start()
 
 void spinContext::stop()
 {
-	std::cout << "Stopping spinContext..." << std::endl;
-	this->running = false;
+	if (isRunning())
+	{
+		std::cout << "Stopping spinContext..." << std::endl;
+		signalStop = true;
+		while (running) usleep(10);
+	}
 }
 
 
@@ -498,15 +530,16 @@ static void *spinListenerThread(void *arg)
 	spin->sceneManager = new SceneManager(spin->id, spin->rxAddr, spin->rxPort);
 
 	spin->running = true;
-	while (spin->isRunning())
+	while (!spin->signalStop)
 	{
 		sleep(1);
 		// do nothing (assume the app is doing updates - eg, in a draw loop)
 	}
-
+	spin->running = false;
+	
 	// clean up:
 	delete spin->sceneManager;
-
+	
 	pthread_exit(NULL);
 }
 
@@ -549,10 +582,8 @@ static void *spinServerThread(void *arg)
 	//lo_server_thread_add_method(spin->sceneManager->rxServ, NULL, NULL, sceneCallback, spin);
 	
 
-	
-	
 	spin->running = true;
-	while (spin->isRunning())
+	while (!(spin->signalStop))
 	{
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
@@ -568,6 +599,8 @@ static void *spinServerThread(void *arg)
 
 		usleep(10);
 	}
+	spin->running = false;
+
 
 	// clean up:
 	delete spin->sceneManager;

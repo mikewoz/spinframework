@@ -68,12 +68,17 @@ extern pthread_mutex_t pthreadLock;
 
 // global:
 // we store userNode in a global ref_ptr so that it can't be deleted
-static osg::ref_ptr<UserNode> userNode;
+//static osg::ref_ptr<UserNode> userNode;
+static UserNode *userNode;
 
 
-void registerUser(spinContext *spin)
+//void registerUser(spinContext *spin)
+void registerUser()
 {
-	if (!userNode.valid())
+	spinContext &spin = spinContext::Instance();
+	
+	//if (!userNode.valid())
+	if (!userNode)
 	{
         std::cout << "ERROR: could not register user" << std::endl;
         exit(1);
@@ -83,7 +88,7 @@ void registerUser(spinContext *spin)
 	// Send a message to the server to create this node (assumes that the server
 	// is running). If not, it will send a 'userRefresh' method upon startup
 	// that will request that this function is called again
-	spin->sendSceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
+	spin.sendSceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
 
 	std::cout << "  Registered user '" << userNode->id->s_name << "' with SPIN" << std::endl;
 
@@ -95,12 +100,16 @@ void registerUser(spinContext *spin)
 static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
 
+	
+	
     // make sure there is at least one argument (ie, a method):
 	if (!argc) return 0;
 
-	spinContext *spin = (spinContext*)user_data;
-    if (!spin) return 0;
-
+	//spinContext *spin = (spinContext*)user_data;
+    //if (!spin) return 0;
+    spinContext &spin = spinContext::Instance();
+    
+    
 	// get the method (argv[0]):
     std::string theMethod;
 	if (lo_is_string_type((lo_type)types[0]))
@@ -124,7 +133,8 @@ static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg
 
 	if (theMethod=="userRefresh")
 	{
-		registerUser(spin);
+		//registerUser(spin);
+		registerUser();
 	}
 		
 		
@@ -154,7 +164,10 @@ int main(int argc, char **argv)
 {
 	std::cout <<"\nspinViewer launching..." << std::endl;
 
-	spinContext *spin = new spinContext(spinContext::LISTENER_MODE);
+	//spinContext spin = new spinContext(spinContext::LISTENER_MODE);
+	// Singleton instance:
+	spinContext &spin = spinContext::Instance();
+	spin.setMode(spinContext::LISTENER_MODE);
 
 	std::string id = getHostname();
 	
@@ -185,9 +198,9 @@ int main(int argc, char **argv)
 
 	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify an ID for this viewer (Default is hostname: '" + id + "')");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + spin->id + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin->rxAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin->rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + spin.id + "')");
+	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin.rxAddr + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin.rxPort + ")");
 
 	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
 	arguments.getApplicationUsage()->addCommandLineOption("--window <x y w h>", "Set the position (x,y) and size (w,h) of the viewer window (Default: 50 50 640 480)");
@@ -211,11 +224,11 @@ int main(int argc, char **argv)
 
 	osg::ArgumentParser::Parameter param_id(id);
 	arguments.read("-id", param_id);
-	osg::ArgumentParser::Parameter param_spinID(spin->id);
+	osg::ArgumentParser::Parameter param_spinID(spin.id);
 	arguments.read("-sceneID", param_spinID);
-	osg::ArgumentParser::Parameter param_spinAddr(spin->rxAddr);
+	osg::ArgumentParser::Parameter param_spinAddr(spin.rxAddr);
 	arguments.read("-serverAddr", param_spinAddr);
-	osg::ArgumentParser::Parameter param_spinPort(spin->rxPort);
+	osg::ArgumentParser::Parameter param_spinPort(spin.rxPort);
 	arguments.read("-serverPort", param_spinPort);
 
 	if (arguments.read("--fullscreen")) fullscreen=true;
@@ -244,30 +257,31 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// start the listener thread:
 
-	if (!spin->start())
+	if (!spin.start())
 	{
         std::cout << "ERROR: could not start SPIN listener thread" << std::endl;
         exit(1);
 	}
 
-	spin->sceneManager->setGraphical(true);
+	spin.sceneManager->setGraphical(true);
 
 	
 	// register an extra OSC callback so that we can spy on OSC messages:
-	std::string OSCpath = "/SPIN/" + spin->id;
-	lo_server_thread_add_method(spin->sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)spin);
+	std::string OSCpath = "/SPIN/" + spin.id;
+	//lo_server_thread_add_method(spin.sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)spin);
+	lo_server_thread_add_method(spin.sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, NULL);
 
-	
 	
 	
 	// Add a UserNode to the local scene and use it to feed a NodeTracker for
 	// the viewer's camera. We expect that this node will be created in the
 	// sceneManager and that updates will be generated. 
-	userNode = dynamic_cast<UserNode*>(spin->sceneManager->getOrCreateNode(id.c_str(), "UserNode"));
+	userNode = dynamic_cast<UserNode*>(spin.sceneManager->getOrCreateNode(id.c_str(), "UserNode"));
 	
 	
 	// send userNode info to spin
-	registerUser(spin);
+	registerUser();
+	//registerUser(spin);
 	
 		
 
@@ -301,7 +315,7 @@ int main(int argc, char **argv)
     }
 
 
-    view->setSceneData(spin->sceneManager->rootNode.get());
+    view->setSceneData(spin.sceneManager->rootNode.get());
 
 	view->addEventHandler(new osgViewer::StatsHandler);
 	view->addEventHandler(new osgViewer::ThreadingHandler);
@@ -330,7 +344,9 @@ int main(int argc, char **argv)
 
 	//osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
 	//custom_NodeTrackerManipulator *manipulator = new custom_NodeTrackerManipulator();
-	ViewerManipulator *manipulator = new ViewerManipulator(spin, userNode.get());
+	//ViewerManipulator *manipulator = new ViewerManipulator(spin, userNode.get());
+	//ViewerManipulator *manipulator = new ViewerManipulator(userNode.get());
+	ViewerManipulator *manipulator = new ViewerManipulator(userNode);
 	
 	manipulator->setPicker(picker);
 	manipulator->setMover(mover);
@@ -358,12 +374,12 @@ int main(int argc, char **argv)
 
 	if (argScene.valid()) {
 		std::cout << "Loading sample model" << std::endl;
-		spin->sceneManager->worldNode->addChild(argScene.get());
+		spin.sceneManager->worldNode->addChild(argScene.get());
 	}
 
 	if (0)
 	{
-		osg::ref_ptr<ShapeNode> shp = dynamic_cast<ShapeNode*>(spin->sceneManager->createNode("shp", "ShapeNode"));
+		osg::ref_ptr<ShapeNode> shp = dynamic_cast<ShapeNode*>(spin.sceneManager->createNode("shp", "ShapeNode"));
 		shp->setShape(ShapeNode::SPHERE);
 		shp->setTranslation(0,5,0);
 		shp->setInteractionMode(GroupNode::PUSH);
@@ -374,43 +390,53 @@ int main(int argc, char **argv)
 	viewer.realize();
 
 	// ask for refresh:
-	spin->sendSceneMessage("s", "refresh", LO_ARGS_END);
+	spin.sendSceneMessage("s", "refresh", LO_ARGS_END);
 	
 	osg::Timer_t lastTick = osg::Timer::instance()->tick();
 	osg::Timer_t frameTick = lastTick;
 
 	// program loop:
-	while( !viewer.done() && spin->isRunning() )
+	//while( !viewer.done() && spin.isRunning() )
+	while( !viewer.done() )
 	{
-		frameTick = osg::Timer::instance()->tick();
-		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
+		
+		if (spin.isRunning())
 		{
-			spin->sendInfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
-			lastTick = frameTick;
+			frameTick = osg::Timer::instance()->tick();
+			if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
+			{
+				spin.sendInfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
+				lastTick = frameTick;
+			}
+	
+			// TODO: move this into the callback, and do it only when userNode sends
+			// a global6DOF message:
+			/*
+			osg::Matrix m = osg::computeLocalToWorld(userNode->currentNodePath);
+			osg::Vec3 rot = QuatToEuler(m.getRotate());
+			manipulator->setCenter(m.getTrans());
+			manipulator->setRotation(osg::Quat( rot.x()+osg::PI_2,osg::X_AXIS, rot.y(),osg::Y_AXIS, rot.z(),osg::Z_AXIS) );
+			*/
+	
+			// We now have to go through all the nodes, and check if we need to update the
+			// graph. Note: this cannot be done as a callback in a traversal - dangerous.
+			// In the callback, we have simply flagged what needs to be done (eg, set the
+			// newParent symbol).
+			pthread_mutex_lock(&pthreadLock);
+			spin.sceneManager->updateGraph();
+			pthread_mutex_unlock(&pthreadLock);
+	
+			pthread_mutex_lock(&pthreadLock);
+			viewer.frame();
+			pthread_mutex_unlock(&pthreadLock);
+		
+		} else {
+			viewer.setDone(true);
 		}
-
-		// TODO: move this into the callback, and do it only when userNode sends
-		// a global6DOF message:
-		/*
-		osg::Matrix m = osg::computeLocalToWorld(userNode->currentNodePath);
-		osg::Vec3 rot = QuatToEuler(m.getRotate());
-		manipulator->setCenter(m.getTrans());
-		manipulator->setRotation(osg::Quat( rot.x()+osg::PI_2,osg::X_AXIS, rot.y(),osg::Y_AXIS, rot.z(),osg::Z_AXIS) );
-		*/
-
-
-		// We now have to go through all the nodes, and check if we need to update the
-		// graph. Note: this cannot be done as a callback in a traversal - dangerous.
-		// In the callback, we have simply flagged what needs to be done (eg, set the
-		// newParent symbol).
-		pthread_mutex_lock(&pthreadLock);
-		spin->sceneManager->updateGraph();
-		pthread_mutex_unlock(&pthreadLock);
-
-		pthread_mutex_lock(&pthreadLock);
-		viewer.frame();
-		pthread_mutex_unlock(&pthreadLock);
+		
 	}
+	
+	std::cout << "spinViewer done." << std::endl;
 
 	return 0;
 }

@@ -56,8 +56,10 @@
 #include "SceneManager.h"
 #include "MediaManager.h"
 #include "nodeVisitors.h"
-#include "SharedVideoTexture.h"
 
+#ifdef WITH_SHARED_VIDEO
+#include "SharedVideoTexture.h"
+#endif
 
 
 using namespace std;
@@ -82,7 +84,8 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 // destructor
 ModelNode::~ModelNode()
 {
-
+	std::cout << "Destroying ModelNode: " << this->id->s_name << std::endl;
+	
 }
 
 
@@ -225,6 +228,8 @@ void ModelNode::drawModel()
 			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 			    		size_t pos;
 			    		
+			    		
+#ifdef WITH_SHARED_VIDEO			    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
 			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
@@ -279,6 +284,7 @@ void ModelNode::drawModel()
 				    			
 				    		std::cout << "  replaced '" << imageFile.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
 			    		}
+#endif
 			    		
 			    		// TODO:
 			    		// if filename is a movie format, create an ImageStream from

@@ -97,7 +97,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	// initialize storage vectors:
 	nodeTypes.clear();
 	nodeMap.clear();
-	nodeList.clear();
+	//nodeList.clear();
 
 	// set up OSC event listener:
 
@@ -232,6 +232,27 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 // destructor
 SceneManager::~SceneManager()
 {
+	std::cout << "Cleaning up SceneManager..." << std::endl;
+	
+	// Force a delete (and destructor call) for all nodes still in the scene:
+	int i = 0;
+	ReferencedNode *n;
+	while (i < worldNode->getNumChildren())
+	{
+		if (n=dynamic_cast<ReferencedNode*>(worldNode->getChild(i)))
+		{
+			// delete the graph of any ReferencedNode:
+			deleteGraph(n->id->s_name);
+		}
+		else
+		{
+			// it's possible that there are other nodes attached to worldNode,
+			// so just skip them:
+			i++;
+		}
+	}
+	
+	// stop sceneManager OSC threads:
 	lo_server_thread_stop(rxServ);
 	usleep(100);
 	
@@ -774,6 +795,7 @@ void SceneManager::deleteNode(const char *id)
 		}
 		
 		doDelete(n);
+		if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
 		
 	}
 	else std::cout << "ERROR: tried to deleteNode " << id << ", but that node does not exist." << std::endl;
@@ -797,16 +819,20 @@ void SceneManager::deleteGraph(const char *id)
 		// for the deleteGraph method, we also delete all children:
 		while (n->children.size())
 		{
+			char* childID = (*(n->children.begin()))->id->s_name;
 			doDelete(*(n->children.begin()));
+			if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", childID);
 		}
 	
-		doDelete(n);	
+		doDelete(n);
+		if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
 	}
 	else std::cout << "ERROR: tried to deleteGraph " << id << ", but that node does not exist." << std::endl;
 	
 	// if delete was successful and removed all other references to the node,
 	// then by this point, the node will be deleted, and it's destructor will
 	// have been called.
+	
 }
 
 // *****************************************************************************
@@ -848,7 +874,7 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 	n = NULL;
 
 	// finally, broadcast:
-	if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", nodeID);
+	//if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", nodeID);
 
 }
 

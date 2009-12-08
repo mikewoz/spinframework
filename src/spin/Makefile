@@ -7,7 +7,8 @@ all: $(OS)
 #	@echo "pwd="${PWD};
 #	@echo "SPIN_PATH=${SPIN_PATH}";
 
-PROGRAMS = spinServer spinViewer spin
+#PROGRAMS = spinServer spinViewer spin
+PROGRAMS = spinServer spinViewer
 
 # choose targets:
 Linux: libSPIN $(PROGRAMS)
@@ -38,7 +39,11 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        RayNode.o Contour.o ConstraintsNode.o PointerNode.o \
        TextNode.o MeasurementNode.o UserNode.o \
        DSPNode.o Listener.o SoundNode.o SoundSpace.o SoundConnection.o \
-       SharedVideoNode.o SharedVideoTexture.o  
+
+ifdef SHARED_VIDEO_LIB
+  OBJS += SharedVideoNode.o SharedVideoTexture.o  
+endif
+
 
 WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
 	  wxSpinPropGrid.o wxSpinSettings.o wxSpinTreeVisitor.o \
@@ -48,7 +53,7 @@ WX_OBJS = spinWX.o wxSpinMain.o wxSpinEditor.o wxSpinRenderer.o \
 SPIN_FLAGS += -g -O2 -DC_PLUSPLUS -D__cplusplus
 
 ifeq ($(OS),Linux)
-	SPIN_FLAGS += -D_SPINDEBUG
+  SPIN_FLAGS += -D_SPINDEBUG
 endif
 
 SPIN_FLAGS += -D_SPINDEBUG
@@ -57,7 +62,11 @@ SPIN_FLAGS += -D_SPINDEBUG
 DEV_LDFLAGS = -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib
 #DEV_LDFLAGS = -Wl,-rpath,$(SPIN_INSTALL_PREFIX)/lib -L. -L../osgWrappers -Wl,-rpath,. -Wl,-rpath,../osgWrappers
 
-SPIN_LIBS += -llo -lSPIN -lshared_video
+SPIN_LIBS += -llo -lSPIN
+
+ifdef SHARED_VIDEO_LIB
+  SPIN_LIBS += -lshared_video
+endif
 
 ifeq ($(OS),Darwin)
   BOOST_LIBS += -lboost_thread-mt -lboost_filesystem-mt

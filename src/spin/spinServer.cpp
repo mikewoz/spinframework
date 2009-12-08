@@ -61,8 +61,9 @@ int main(int argc, char **argv)
 {
 
 
-	spinContext *spin = new spinContext(spinContext::SERVER_MODE);
-
+	//spinContext *spin = new spinContext(spinContext::SERVER_MODE);
+	spinContext &spin = spinContext::Instance();
+	spin.setMode(spinContext::SERVER_MODE);
 
 	// *************************************************************************
 	// ARGUMENTS::
@@ -75,10 +76,10 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify a unique ID for this scene.");
-	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <addr>", "Set the transmission address where the server sends update (Default is broadcast: " + spin->txAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-txPort <port>", "Set the transmission port where the server sends updates (Default: " + spin->txPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin->rxAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-rxPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin->rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <addr>", "Set the transmission address where the server sends update (Default is broadcast: " + spin.txAddr + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-txPort <port>", "Set the transmission port where the server sends updates (Default: " + spin.txPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin.rxAddr + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-rxPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin.rxPort + ")");
 
 	// PARSE ARGS:
 
@@ -88,15 +89,15 @@ int main(int argc, char **argv)
 		arguments.getApplicationUsage()->write(std::cout);
 		return 1;
 	}
-	osg::ArgumentParser::Parameter param_spinID(spin->id);
+	osg::ArgumentParser::Parameter param_spinID(spin.id);
 	arguments.read("-sceneID", param_spinID);
-	osg::ArgumentParser::Parameter param_txAddr(spin->txAddr);
+	osg::ArgumentParser::Parameter param_txAddr(spin.txAddr);
 	arguments.read("-txAddr", param_txAddr);
-	osg::ArgumentParser::Parameter param_txPort(spin->txPort);
+	osg::ArgumentParser::Parameter param_txPort(spin.txPort);
 	arguments.read("-txPort", param_txPort);
-	osg::ArgumentParser::Parameter param_rxAddr(spin->rxAddr);
+	osg::ArgumentParser::Parameter param_rxAddr(spin.rxAddr);
 	arguments.read("-rxAddr", param_rxAddr);
-	osg::ArgumentParser::Parameter param_rxPort(spin->rxPort);
+	osg::ArgumentParser::Parameter param_rxPort(spin.rxPort);
 	arguments.read("-rxPort", param_rxPort);
 	
 	// any option left unread are converted into errors to write out later
@@ -106,7 +107,7 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// start spin:
 
-	spin->start();
+	spin.start();
 	
 	// *************************************************************************
 	// remaining arguments are assumed to be scene elements to be loaded (.xml)
@@ -117,7 +118,7 @@ int main(int argc, char **argv)
 		if (arguments[i][0]!='-')
 		{
 			// not an option so assume string is a filename
-			spin->sceneManager->loadXML(arguments[i]);
+			spin.sceneManager->loadXML(arguments[i]);
 		} else i++;
 	}
 	 	
@@ -134,11 +135,13 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// loop:
 	
-	while (spin->isRunning())
+	while (spin.isRunning())
 	{
 		sleep(1);
 		// loop until a quit message is received (TODO)
 	}
+	
+	std::cout << "spinServer done." << std::endl;
 
 
 	return 0;

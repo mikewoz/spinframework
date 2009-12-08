@@ -152,8 +152,12 @@ PYTHON_LIBS = $(shell python-config --ldflags)
 ###################################################################
 # For miville (sharedvideo stuff):
 
-ifndef MIVILLE_SRC
-  MIVILLE_SRC=$(SPIN_PATH)/src/mivilleSrc
-endif
+#ifndef MIVILLE_SRC
+#  MIVILLE_SRC=$(SPIN_PATH)/src/mivilleSrc
+#endif
 #SPIN_INCLUDE+=-I$(MIVILLE_SRC)/gst/engine
 
+ifneq ($(OS),Darwin)
+  SHARED_VIDEO_LIB=shared_video
+  SPIN_FLAGS += -DWITH_SHARED_VIDEO
+endif
