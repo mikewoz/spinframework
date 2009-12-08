@@ -64,7 +64,10 @@ ViewerManipulator::ViewerManipulator(UserNode *u)
 	
 }
 
-ViewerManipulator::~ViewerManipulator() {}
+ViewerManipulator::~ViewerManipulator()
+{
+	if (redirectServ) lo_server_free(redirectServ);
+}
 
 void ViewerManipulator::setRedirection(std::string addr, std::string port)
 {
