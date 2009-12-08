@@ -66,20 +66,27 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 	_reportMode = GroupNode::NONE;
 	_interactionMode = GroupNode::STATIC;
 
-	
+
 	mainTransform = new osg::PositionAttitudeTransform();
 	mainTransform->setName(string(id->s_name) + ".mainTransform");
 	//mainTransform->setAttitude(osg::Quat(0.0,0.0,0.0,0.0));
 	//mainTransform->setPosition(osg::Vec3(0.0,0.0,0.0));
 	this->addChild(mainTransform.get());
 
+	
+	clipNode = new osg::ClipNode();
+	clipNode->setCullingActive(false);
+	mainTransform->addChild(clipNode.get());
+	
+	
+	
 	_velocity = osg::Vec3(0.0,0.0,0.0);
 	_spin = osg::Vec3(0.0,0.0,0.0);
 	_damping = 0.0;
 
 	// When children are attached to this, they get added to the attachNode:
 	// NOTE: by changing this, we MUST override the updateNodePath() method!
-	setAttachmentNode(mainTransform.get());
+	setAttachmentNode(clipNode.get());
 
 	// keep a timer for velocity calculation:
 	lastTick = osg::Timer::instance()->tick();
@@ -162,8 +169,10 @@ void GroupNode::updateNodePath()
 	}
 
 	// here, the nodePath includes the base osg::group, PLUS the mainTransform
+	// and clipNode
 	currentNodePath.push_back(this);
 	currentNodePath.push_back(mainTransform.get());
+	currentNodePath.push_back(clipNode.get());
 
 	// now update NodePaths for all children:
 	updateChildNodePaths();
@@ -322,7 +331,22 @@ void GroupNode::setInteractionMode (interactionMode mode)
 	}
 }
 
+void GroupNode::setClipping(float x, float y, float z)
+{
+	_clipping = osg::Vec3d(x,y,z);
+	
+	// remove existing clipping planes:
+	while (clipNode->getNumClipPlanes()) clipNode->removeClipPlane((unsigned int)0);
 
+	// add this one:
+	if ( (_clipping.x()>0) && (_clipping.y()>0) && (_clipping.z()>0) )
+	{
+		osg::BoundingBox bb(-_clipping.x(),-_clipping.y(),-_clipping.z(),_clipping.x(),_clipping.y(),_clipping.z());
+		clipNode->createClipBox(bb);
+	}
+	
+	BROADCAST(this, "sfff", "setClipping", _clipping.x(), _clipping.y(), _clipping.z());
+}
 
 
 void GroupNode::setTranslation (float x, float y, float z)
@@ -351,16 +375,11 @@ void GroupNode::setOrientation (float p, float r, float y)
 /*
 void GroupNode::setOrientationQuat (float x, float y, float z, float w)
 {
+	osg::Quat = osg::Quat(x,y,z,w);
+	_orientation = QuatToEuler(q);
+	mainTransform->setAttitude(q);
 
-	_orientation = osg::Vec3(p, r, y);
-
-	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-
-	mainTransform->setAttitude(osg::Quat(x,y,z,w));
-
-	BROADCAST(this, "sfff", "setOrientation", p, r, y);
+	BROADCAST(this, "sfff", "setOrientation", _orientatoin.x(), _orientation.y(), _orientation.z());
 }
 */
 
@@ -506,6 +525,10 @@ std::vector<lo_message> GroupNode::getState ()
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setInteractionMode", getInteractionMode());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "sfff", "setClipping", _clipping.x(), _clipping.y(), _clipping.z());
 	ret.push_back(msg);
 	
 	msg = lo_message_new();

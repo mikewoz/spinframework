@@ -50,6 +50,7 @@
 #include <osg/PositionAttitudeTransform>
 #include <osg/NodeVisitor>
 #include <osg/Timer>
+#include <osg/ClipNode>
 
 #include <string>
 #include <vector>
@@ -107,6 +108,12 @@ public:
 	
 	void setInteractionMode(interactionMode mode);
 
+	/**
+	 * Set a clipping rectangle for the model so that geometry outside of the
+	 * region (+-x, +-y, +-z) will not be shown (or used in interactive events)
+	 */
+	void setClipping(float x, float y, float z);
+	
 	
 	/**
 	 * The local translation offset for this node with respect to it's parent
@@ -166,6 +173,7 @@ public:
 	//int getReportGlobals() { return (int)_reportGlobals; };
 	int getReportMode() { return (int) _reportMode; };
 	int getInteractionMode() { return (int) _interactionMode; };
+	osg::Vec3 getClipping() { return _clipping; };
 	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
 	osg::Vec3 getOrientation() { return _orientation; };
 	osg::Vec3 getScale() { return mainTransform->getScale(); };
@@ -205,9 +213,14 @@ public:
 	osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
 
 
-private:
+protected:
+	
+	
 	interactionMode _interactionMode;
 	osg::ref_ptr<UserNode> owner;
+	
+	osg::ref_ptr<osg::ClipNode> clipNode;
+	osg::Vec3 _clipping;
 	
 	globalsReportMode _reportMode;
 	osg::Matrix _globalMatrix;

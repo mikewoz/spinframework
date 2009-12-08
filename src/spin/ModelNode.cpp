@@ -74,14 +74,6 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 {
 	this->setName(string(id->s_name) + ".ModelNode");
 	nodeType = "ModelNode";
-	
-	
-	clipNode = new osg::ClipNode();
-	clipNode->setCullingActive(false);
-	
-	mainTransform->addChild(clipNode.get());
-	
-	setAttachmentNode(clipNode.get());
 
 	modelPath = "NULL";
 
@@ -94,18 +86,6 @@ ModelNode::~ModelNode()
 {
 	std::cout << "Destroying ModelNode: " << this->id->s_name << std::endl;
 	
-}
-
-
-void ModelNode::updateNodePath()
-{
-	GroupNode::updateNodePath();
-	
-	// add the additional clipNode to the nodepath
-	currentNodePath.push_back(clipNode.get());
-	
-	// now update NodePaths for all children:
-	updateChildNodePaths(); // TODO: this should be called elsewhere, otherwise we end up doing it twice (once for the parent, and once for the derived node)
 }
 
 
@@ -135,23 +115,6 @@ void ModelNode::setModelFromFile (const char* filename)
 	drawModel();
 
 	BROADCAST(this, "ss", "setModelFromFile", modelPath.c_str());
-}
-
-void ModelNode::setClipping(float x, float y, float z)
-{
-	_clipping = osg::Vec3d(x,y,z);
-	
-	// remove existing clipping planes:
-	while (clipNode->getNumClipPlanes()) clipNode->removeClipPlane((unsigned int)0);
-
-	// add this one:
-	if ( (_clipping.x()>0) && (_clipping.y()>0) && (_clipping.z()>0) )
-	{
-		osg::BoundingBox bb(-_clipping.x(),-_clipping.y(),-_clipping.z(),_clipping.x(),_clipping.y(),_clipping.z());
-		clipNode->createClipBox(bb);
-	}
-	
-	BROADCAST(this, "sfff", "setClipping", _clipping.x(), _clipping.y(), _clipping.z());
 }
 
 // ===================================================================
@@ -356,11 +319,6 @@ std::vector<lo_message> ModelNode::getState ()
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
 	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "sfff", "setClipping", _clipping.x(), _clipping.y(), _clipping.z());
-	ret.push_back(msg);
-	
 	
 	return ret;
 }
