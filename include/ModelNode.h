@@ -44,6 +44,7 @@
 
 #include <string>
 #include <osgUtil/Optimizer>
+#include <osg/ClipNode>
 
 #include "GroupNode.h"
 
@@ -70,10 +71,22 @@ public:
 	ModelNode (SceneManager *sceneManager, char *initID);
 	virtual ~ModelNode();
 
-
+	virtual void updateNodePath();
+	
+	
 	virtual void setHost (const char *newvalue);
 	
+	
 	void setModelFromFile	(const char *filename);
+	const char* getModelFromFile() { return modelPath.c_str(); }
+	
+
+	/**
+	 * Set a clipping rectangle for the model so that geometry outside of the
+	 * region (+-x, +-y, +-z) will not be shown (or used in interactive events)
+	 */
+	void setClipping(float x, float y, float z);
+	osg::Vec3 getClipping() { return _clipping; };
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
@@ -93,6 +106,9 @@ private:
 	std::string modelPath;
 
 	osg::ref_ptr<osg::Group> model;
+	
+	osg::ref_ptr<osg::ClipNode> clipNode;
+	osg::Vec3 _clipping;
 
 	// animation stuff for gfx:
 	t_float state[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
