@@ -66,7 +66,7 @@ using namespace std;
 extern pthread_mutex_t pthreadLock;
 
 
-
+/*
 // global:
 // we store userNode in a global ref_ptr so that it can't be deleted
 //static osg::ref_ptr<UserNode> userNode;
@@ -138,24 +138,11 @@ static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg
 		registerUser();
 	}
 		
-		
-		/*
-	if ( (theMethod=="global6DOF") && (floatArgs.size()==6))
-	{
-//    	viewer->getCamera(0)->setViewMatrixAsLookAt(
-		//std::cout << "got camera update:" << floatArgs[0] << "," << floatArgs[1] << "," << floatArgs[2] << "  " << floatArgs[3] << "," << floatArgs[4] << "," << floatArgs[5] << std::endl;
-
-	//    osg::Vec3 = dirVector
-    	//viewer->getCamera(0)->setViewMatrixAsLookAt(osg::Vec3(floatArgs[0],floatArgs[1],floatArgs[2]),
-	}
-*/
-
-
 
 	return 1;
 }
 
-
+*/
 
 
 // *****************************************************************************
@@ -266,7 +253,9 @@ int main(int argc, char **argv)
 
 	spin.sceneManager->setGraphical(true);
 
-	
+
+
+	/*
 	// register an extra OSC callback so that we can spy on OSC messages:
 	std::string OSCpath = "/SPIN/" + spin.id;
 	//lo_server_thread_add_method(spin.sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)spin);
@@ -283,7 +272,9 @@ int main(int argc, char **argv)
 	// send userNode info to spin
 	registerUser();
 	//registerUser(spin);
-	
+	*/
+
+	spin.registerUser(id.c_str());
 		
 
 
@@ -337,24 +328,19 @@ int main(int argc, char **argv)
 	//custom_NodeTrackerManipulator *manipulator = new custom_NodeTrackerManipulator();
 	//ViewerManipulator *manipulator = new ViewerManipulator(spin, userNode.get());
 	//ViewerManipulator *manipulator = new ViewerManipulator(userNode.get());
-	osg::ref_ptr<ViewerManipulator> manipulator = new ViewerManipulator(userNode);
-	
-	manipulator->setPicker(picker);
-	manipulator->setMover(mover);
-	if (!redirectAddr.empty() && !redirectPort.empty())
-		manipulator->setRedirection(redirectAddr, redirectPort);
-	
-	manipulator->setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
-	manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
-	manipulator->setMinimumDistance( 0.0001 );
-//	manipulator->setHomePosition( osg::Vec3(0,-1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-	manipulator->setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-//	manipulator->setHomePosition( osg::Vec3(0,1,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-	manipulator->setTrackNode(userNode->getAttachmentNode());
 
+	osg::ref_ptr<ViewerManipulator> manipulator;
+	if (spin.user.valid())
+	{
+		manipulator = new ViewerManipulator(spin.user.get());
+		
+		manipulator->setPicker(picker);
+		manipulator->setMover(mover);
+		if (!redirectAddr.empty() && !redirectPort.empty())
+			manipulator->setRedirection(redirectAddr, redirectPort);
 
-	view->setCameraManipulator(manipulator.get());
-
+		view->setCameraManipulator(manipulator.get());
+	}
 	
 	
 
@@ -432,9 +418,11 @@ int main(int argc, char **argv)
 			pthread_mutex_unlock(&pthreadLock);
 		
 		} else {
-			
-			view->setCameraManipulator(NULL);
-			manipulator.release();
+			if (manipulator.valid())
+			{
+				view->setCameraManipulator(NULL);
+				manipulator.release();
+			}
 			viewer.setDone(true);
 		}
 		

@@ -108,6 +108,7 @@ int main(int argc, char **argv)
 	// start spin:
 
 	spin.start();
+
 	
 	// *************************************************************************
 	// remaining arguments are assumed to be scene elements to be loaded (.xml)

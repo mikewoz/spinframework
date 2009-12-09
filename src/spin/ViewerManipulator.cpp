@@ -50,20 +50,25 @@ using namespace osgGA;
 //ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
 ViewerManipulator::ViewerManipulator(UserNode *u)
 {
-	//this->spin = s;
-	this->user = u;
+	if (!u) {
+		std::cout << "ERROR: Could not create ViewerManipulator because no user is registered with SPIN" << std::endl;
+	} else {
+		this->user = u;
+		setTrackNode(user->getAttachmentNode());
+	}
+	
 	this->picker = false;
 	this->mover = true;
 	selectedNode=gensym("NULL");
 	
 	redirectServ = NULL;
-	
-	// defaults:
+
+	// set up user node tracker:
 	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
 	setMinimumDistance( 0.0001 );
 	setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-	
+
 }
 
 ViewerManipulator::~ViewerManipulator()
@@ -74,7 +79,6 @@ ViewerManipulator::~ViewerManipulator()
 		usleep(100);
 	
 		lo_server_thread_free(redirectServ);
-
 	}
 }
 
@@ -130,8 +134,6 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 		if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
 		else spin.sendNodeMessage(nodeId, msg);
 		
-		//spin.sendNodeMessage(nodeId, msg);
-		
 	} else {
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
 	}
@@ -140,21 +142,21 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 
 void ViewerManipulator::setPicker(bool b)
 {
-	if (picker!=b)
+	if (1)//(picker!=b)
 	{
 		this->picker = b;
-		if (picker) std::cout << "Enabled mouse picking" << std::endl;
-		else std::cout << "Disabled mouse picking" << std::endl;
+		if (picker) std::cout << "Mouse picking:\tEnabled" << std::endl;
+		else std::cout << "Mouse picking:\tDisabled" << std::endl;
 	}
 }
 
 void ViewerManipulator::setMover(bool b)
 {
-	if (mover!=b)
+	if (1)//(mover!=b)
 	{
 		this->mover = b;
-		if (mover) std::cout << "Enabled camera motion controls" << std::endl;
-		else std::cout << "Disabled camera motion controls" << std::endl;	
+		if (mover) std::cout << "Camera motion controls:\tDisabled" << std::endl;
+		else std::cout << "Camera motion controls:\tDisabled" << std::endl;	
 	}
 }
 
@@ -209,6 +211,10 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 	unsigned int buttonMask = ea.getButtonMask();
 	unsigned int modkeyMask = ea.getModKeyMask();
 
+	// adjust modkeyMask to ignore numlock and capslock:
+	if (modkeyMask>=GUIEventAdapter::MODKEY_CAPS_LOCK) modkeyMask -= GUIEventAdapter::MODKEY_CAPS_LOCK;
+	if (modkeyMask>=GUIEventAdapter::MODKEY_NUM_LOCK) modkeyMask -= GUIEventAdapter::MODKEY_NUM_LOCK;
+	
 	
 	// correct dX for aspect ratio:		
 	//std::cout << "aspect= " << (float)ea.getWindowWidth()/ea.getWindowHeight() << std::endl;
@@ -486,7 +492,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    }
 				}
 			
-			    else if (modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL)
+			    else if ( modkeyMask==GUIEventAdapter::MODKEY_CTRL )
 			    {
 			    	int dXsign, dYsign;
 			    	(dXclick<0) ? dXsign=-1 : dXsign=1;

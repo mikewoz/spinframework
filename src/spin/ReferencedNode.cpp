@@ -96,14 +96,17 @@ ReferencedNode::~ReferencedNode()
 {
 	//std::cout << "In ReferencedNode destructor... node: " << this->id->s_name << std::endl;
 
-	// register with OSC parser:
-	string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-	if (sceneManager) lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
-
-#ifdef OSCDEBUG
-	std::cout << "oscParser unregistered: " << oscPattern << std::endl;
-#endif
-
+	if (sceneManager)
+	{
+		// unregister with OSC parser:
+		string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
+		lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
+			
+		#ifdef OSCDEBUG
+		std::cout << "oscParser unregistered: " << oscPattern << std::endl;
+		#endif
+	}
+	
 	id->s_thing = 0;
 }
 

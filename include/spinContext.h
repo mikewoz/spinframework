@@ -85,6 +85,12 @@ class spinContext
 		virtual bool start();
 		virtual void stop();
 
+		/**
+		 * This method should be used to register a user for a listener-style
+		 * SPIN client. The user is definitively created and stored in the
+		 * current application context, even if a server is not running.
+		 */
+		void registerUser(const char *id);
 
 		void sendInfoMessage(std::string OSCpath, const char *types, ...);
 		void sendInfoMessage(std::string OSCpath, const char *types, va_list ap);
@@ -111,6 +117,8 @@ class spinContext
 
 		spinContextMode mode;
 
+		osg::ref_ptr<UserNode> user;
+		
 		std::string id;
 		std::string rxAddr, rxPort;
 		std::string txAddr, txPort;
@@ -135,6 +143,8 @@ class spinContext
 	     */
 	    void *(*threadFunction) (void*);
 
+
+		
 	protected:
 
 		std::string spinFolder;
@@ -180,7 +190,7 @@ static void *spinListenerThread(void *arg);
 static void *spinServerThread(void *arg);
 
 
-int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 #endif

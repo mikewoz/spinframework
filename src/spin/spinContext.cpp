@@ -76,6 +76,10 @@ static void sigHandler(int signum)
 	
 	spin.stop();
 
+	// TODO: this doesn't work; something else must be holding onto a reference
+	// for the user (viewer?). We should figure out how to proper destroy him.
+	if (spin.user.valid()) spin.user.release();
+
 	//exit(0);
 }
 
@@ -192,7 +196,7 @@ spinContext::spinContext()
 	}
 
 	// info channel callback (receives pings from client apps):
-	lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoChannelCallback, this);
+	lo_server_thread_add_method(lo_infoServ, NULL, NULL, spinContext_infoCallback, this);
 	
 	lo_server_thread_start(lo_infoServ);
 	
@@ -291,6 +295,31 @@ void spinContext::stop()
 		std::cout << "Stopping spinContext..." << std::endl;
 		signalStop = true;
 		while (running) usleep(10);
+	}
+}
+
+
+void spinContext::registerUser (const char *id)
+{
+	if (isRunning())
+	{
+		// Here, we (definitively) create a UserNode and store it in this
+		// client's sceneManager.
+		user = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(id, "UserNode"));
+
+		// We then send a message to the server to create the node. If the
+		// server doesn't exist yet, it doesn't really matter, since we are
+		// guaranteed to have a local instance. Then, once the server starts,
+		// it will send a 'userRefresh' method that will inform it of this node
+		// (see the spinContext_sceneCallback method)
+		
+		sendSceneMessage("sss", "createNode", user->id->s_name, "UserNode", LO_ARGS_END);
+
+		std::cout << "  Registered user '" << user->id->s_name << "'" << std::endl;
+	}
+
+	else {
+		std::cout << "ERROR: Could not registerUser '" << id <<	"' because SPIN is not running." << std::endl;
 	}
 }
 
@@ -529,6 +558,9 @@ static void *spinListenerThread(void *arg)
 
 	spin->sceneManager = new SceneManager(spin->id, spin->rxAddr, spin->rxPort);
 
+	// register our special scene callback:
+	lo_server_thread_add_method(spin->sceneManager->rxServ, ("/SPIN/" + spin->id).c_str(), NULL, spinContext_sceneCallback, NULL);
+
 	spin->running = true;
 	while (!spin->signalStop)
 	{
@@ -545,13 +577,14 @@ static void *spinListenerThread(void *arg)
 
 static void *spinServerThread(void *arg)
 {
-	spinContext *spin = (spinContext*) arg;
+	//spinContext *spin = (spinContext*) arg;
+	spinContext &spin = spinContext::Instance();
 
 	std::cout << "  spinContext started in Server mode" << std::endl;
-	std::cout << "  broadcasting info messages on " << spin->txAddr << ", port: " << spin->infoPort << std::endl;
+	std::cout << "  broadcasting info messages on " << spin.txAddr << ", port: " << spin.infoPort << std::endl;
 
-	spin->sceneManager = new SceneManager(spin->id, spin->rxAddr, spin->rxPort);
-	spin->sceneManager->setTXaddress(spin->txAddr, spin->txPort);
+	spin.sceneManager = new SceneManager(spin.id, spin.rxAddr, spin.rxPort);
+	spin.sceneManager->setTXaddress(spin.txAddr, spin.txPort);
 
 	
 	// create log filename based on datetime:
@@ -564,7 +597,7 @@ static void *spinServerThread(void *arg)
 	string logFilename = SPIN_DIRECTORY + "/log/spinLog_" + string(dateString) + ".txt";
 	spinLog log(logFilename.c_str());
 	log.enable_cout(false);
-	spin->sceneManager->setLog(log);
+	spin.sceneManager->setLog(log);
 	
 
 	string myIP = getMyIPaddress();
@@ -573,8 +606,8 @@ static void *spinServerThread(void *arg)
 
 	// convert ports to integers for sending:
 	int i_rxPort, i_txPort;
-	fromString<int>(i_rxPort, spin->rxPort);
-	fromString<int>(i_txPort, spin->txPort);
+	fromString<int>(i_rxPort, spin.rxPort);
+	fromString<int>(i_txPort, spin.txPort);
 
 	UpdateSceneVisitor visitor;
 
@@ -582,38 +615,38 @@ static void *spinServerThread(void *arg)
 	//lo_server_thread_add_method(spin->sceneManager->rxServ, NULL, NULL, sceneCallback, spin);
 	
 
-	spin->running = true;
-	while (!(spin->signalStop))
+	spin.running = true;
+	while (!(spin.signalStop))
 	{
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			spin->sendInfoMessage("/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort, LO_ARGS_END);
+			spin.sendInfoMessage("/ping/SPIN", "ssisi", spin.id.c_str(), myIP.c_str(), i_rxPort, spin.txAddr.c_str(), i_txPort, LO_ARGS_END);
 			//lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
 			lastTick = frameTick;
 		}
 
 		pthread_mutex_lock(&pthreadLock);
-		visitor.apply(*(spin->sceneManager->rootNode.get())); // only server should do this
+		visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
 		pthread_mutex_unlock(&pthreadLock);
 
 		usleep(10);
 	}
-	spin->running = false;
+	spin.running = false;
 
 
 	// clean up:
-	delete spin->sceneManager;
+	delete spin.sceneManager;
 
 	pthread_exit(NULL);
 }
 
 
-int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
 {
-	//std::cout << "got to sceneCallback function" << std::endl;
+	//std::cout << "got to spinContext_sceneCallback function" << std::endl;
 	
-	spinContext *spin = (spinContext*) user_data;
+	spinContext &spin = spinContext::Instance();
 	
 	// make sure there is at least one argument (ie, a method to call):
 	if (!argc) return 0;
@@ -627,13 +660,33 @@ int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, 
 	else return 0;
 	
 	// bundle all other arguments
+	vector<float> floatArgs;
+	vector<const char*> stringArgs;
+	for (int i=1; i<argc; i++)
+	{
+		if (lo_is_numerical_type((lo_type)types[i]))
+		{
+			floatArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
+		} else {
+			stringArgs.push_back( (const char*) argv[i] );
+		}
+	}
 
+	// now, here are some special messages that we need to look for:
 	
-	//return spin->sceneCallback(types, argv, argc);
+	if (theMethod=="userRefresh")
+	{
+		if (spin.user.valid())
+		{
+			spin.sendSceneMessage("sss", "createNode", spin.user->id->s_name, "UserNode", LO_ARGS_END);
+		}
+	}
+	
+	//return spin.sceneCallback(types, argv, argc);
 	
 }
 
-int infoChannelCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
 	spinContext *spin = (spinContext*) user_data;
 	
