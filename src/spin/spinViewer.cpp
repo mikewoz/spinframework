@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 	osgViewer::CompositeViewer viewer = osgViewer::CompositeViewer(arguments);
 	viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
 
-
+	viewer.getUsage(*arguments.getApplicationUsage());
 
 	// *************************************************************************
 	// start the listener thread:
@@ -285,16 +285,6 @@ int main(int argc, char **argv)
 	
 		
 
-	// *************************************************************************
-	// any option left unread are converted into errors to write out later.
-	arguments.reportRemainingOptionsAsUnrecognized();
-
-	// report any errors if they have occured when parsing the program aguments.
-	if (arguments.errors())
-	{
-		arguments.writeErrorMessages(std::cout);
-		return 1;
-	}
 
 	// *************************************************************************
 	// get details on keyboard and mouse bindings used by the viewer.
@@ -367,6 +357,16 @@ int main(int argc, char **argv)
 	
 	
 
+	// *************************************************************************
+	// any option left unread are converted into errors to write out later.
+	arguments.reportRemainingOptionsAsUnrecognized();
+
+	// report any errors if they have occured when parsing the program aguments.
+	if (arguments.errors())
+	{
+		arguments.writeErrorMessages(std::cout);
+		return 1;
+	}
 	
 
 	// *************************************************************************
