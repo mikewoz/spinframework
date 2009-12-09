@@ -66,6 +66,7 @@ using namespace std;
 extern pthread_mutex_t pthreadLock;
 
 
+
 // global:
 // we store userNode in a global ref_ptr so that it can't be deleted
 //static osg::ref_ptr<UserNode> userNode;
@@ -336,7 +337,7 @@ int main(int argc, char **argv)
 	//custom_NodeTrackerManipulator *manipulator = new custom_NodeTrackerManipulator();
 	//ViewerManipulator *manipulator = new ViewerManipulator(spin, userNode.get());
 	//ViewerManipulator *manipulator = new ViewerManipulator(userNode.get());
-	ViewerManipulator *manipulator = new ViewerManipulator(userNode);
+	osg::ref_ptr<ViewerManipulator> manipulator = new ViewerManipulator(userNode);
 	
 	manipulator->setPicker(picker);
 	manipulator->setMover(mover);
@@ -352,7 +353,7 @@ int main(int argc, char **argv)
 	manipulator->setTrackNode(userNode->getAttachmentNode());
 
 
-	view->setCameraManipulator(manipulator);
+	view->setCameraManipulator(manipulator.get());
 
 	
 	
@@ -431,6 +432,9 @@ int main(int argc, char **argv)
 			pthread_mutex_unlock(&pthreadLock);
 		
 		} else {
+			
+			view->setCameraManipulator(NULL);
+			manipulator.release();
 			viewer.setDone(true);
 		}
 		

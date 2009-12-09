@@ -37,8 +37,10 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        SceneManager.o MediaManager.o ReferencedNode.o \
        GroupNode.o ShapeNode.o ModelNode.o VideoNode.o LightSource.o \
        RayNode.o Contour.o ConstraintsNode.o PointerNode.o \
-       TextNode.o MeasurementNode.o UserNode.o ViewerManipulator.o \
+       TextNode.o MeasurementNode.o UserNode.o \
        DSPNode.o Listener.o SoundNode.o SoundSpace.o SoundConnection.o \
+
+       #TextNode.o MeasurementNode.o UserNode.o ViewerManipulator.o \
 
 ifdef SHARED_VIDEO_LIB
   OBJS += SharedVideoNode.o SharedVideoTexture.o  
@@ -146,7 +148,7 @@ docGenerator: docGenerator.o
 	-cp *.html ../../doxygen/html
 
 # spinViewer is a simple OSG viewer client:
-spinViewer: spinViewer.o
+spinViewer: spinViewer.o ViewerManipulator.o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(DEV_LDFLAGS) $(SPIN_LIBS) $(OSG_LIBS) $(BOOST_LIBS)
 

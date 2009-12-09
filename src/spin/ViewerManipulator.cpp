@@ -54,7 +54,9 @@ ViewerManipulator::ViewerManipulator(UserNode *u)
 	this->user = u;
 	this->picker = false;
 	this->mover = true;
-	selectedNode=gensym("NULL");	
+	selectedNode=gensym("NULL");
+	
+	redirectServ = NULL;
 	
 	// defaults:
 	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
@@ -66,8 +68,16 @@ ViewerManipulator::ViewerManipulator(UserNode *u)
 
 ViewerManipulator::~ViewerManipulator()
 {
-	if (redirectServ) lo_server_free(redirectServ);
+	if (redirectServ)
+	{
+		lo_server_thread_stop(redirectServ);
+		usleep(100);
+	
+		lo_server_thread_free(redirectServ);
+
+	}
 }
+
 
 void ViewerManipulator::setRedirection(std::string addr, std::string port)
 {
@@ -77,19 +87,19 @@ void ViewerManipulator::setRedirection(std::string addr, std::string port)
 	
 	if (isMulticastAddress(addr))
 	{
-		redirectServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
+		redirectServ = lo_server_thread_new_multicast(addr.c_str(), NULL, oscParser_error);
 	}
 
 	else if (isBroadcastAddress(addr))
 	{
-		redirectServ = lo_server_new(NULL, oscParser_error);
+		redirectServ = lo_server_thread_new(NULL, oscParser_error);
 		int sock = lo_server_get_socket_fd(redirectServ);
 		int sockopt = 1;
 		setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
 	}
 
 	else {
-		redirectServ = lo_server_new(NULL, oscParser_error);
+		redirectServ = lo_server_thread_new(NULL, oscParser_error);
 	}
 
 	if (!redirectServ) std::cout << "ERROR (ViewerManipulator) - Could not set redirection. Bad address?: " << addr << ":" << port << std::endl;
@@ -97,16 +107,18 @@ void ViewerManipulator::setRedirection(std::string addr, std::string port)
 	{
 		std::cout << "  ViewerManipulator is redirecting picking events to: " << lo_address_get_url(redirectAddr) << std::endl;
 	}
+	
+	lo_server_thread_start(redirectServ);
 }
 
-void ViewerManipulator::send(const char *nodeId, const char *types, ...)
+void ViewerManipulator::sendEvent(const char *nodeId, const char *types, ...)
 {
 	va_list ap;
 	va_start(ap, types);
-	send(nodeId, types, ap);
+	sendEvent(nodeId, types, ap);
 }
 
-void ViewerManipulator::send(const char *nodeId, const char *types, va_list ap)
+void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list ap)
 {
 	spinContext &spin = spinContext::Instance();
 	
@@ -117,6 +129,8 @@ void ViewerManipulator::send(const char *nodeId, const char *types, va_list ap)
 	{
 		if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
 		else spin.sendNodeMessage(nodeId, msg);
+		
+		//spin.sendNodeMessage(nodeId, msg);
 		
 	} else {
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
@@ -177,7 +191,7 @@ void ViewerManipulator::processKeypress(const GUIEventAdapter& ea)
 {
 	if (ea.getKey()=='r')
 	{
-		send(user->id->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
+		sendEvent(user->id->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
 	}
 }
 
@@ -265,7 +279,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 			switch(ea.getEventType())
 			{
 				case(GUIEventAdapter::MOVE):
-	    			send(selectedNode->s_name,
+	    			sendEvent(selectedNode->s_name,
 	    					"sisff",
 	    					"event",
 	    					(int)ea.getEventType(),
@@ -276,7 +290,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 	    			break;	
 	    			
 	    		case(GUIEventAdapter::DRAG):
-	    			send(selectedNode->s_name,
+	    			sendEvent(selectedNode->s_name,
 	    					"sisff",
 	    					"event",
 	    					(int)ea.getEventType(),
@@ -286,7 +300,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 	    					LO_ARGS_END);
 	    			break;	
 	    		case(GUIEventAdapter::RELEASE):
-	    			send(selectedNode->s_name,
+	    			sendEvent(selectedNode->s_name,
 			    			"sisff",
 			    			"event",
 			    			(int)ea.getEventType(),
@@ -327,7 +341,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    	{
 				    		// send MOVE events (eg, for drawing on nodes)
 				    		case(GUIEventAdapter::MOVE):
-				    			send(testNode->id->s_name,
+				    			sendEvent(testNode->id->s_name,
 				    					"sisff",
 				    					"event",
 				    					(int)ea.getEventType(),
@@ -355,7 +369,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    		// SCROLLING (with the mouse wheel) is important. It
 				    		// could be used to scale for example.
 				    		case(GUIEventAdapter::SCROLL):
-				    			send(testNode->id->s_name,
+				    			sendEvent(testNode->id->s_name,
 				    					"sisff",
 				    					"event",
 				    					(int)ea.getEventType(),
@@ -368,7 +382,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    		// Finally, in the case of a PUSH, we both send the
 				    		// event, and set the selectedNode
 				    		case(GUIEventAdapter::PUSH):
-				    			send(testNode->id->s_name,
+				    			sendEvent(testNode->id->s_name,
 				    					"sisff",
 				    					"event",
 				    					(int)ea.getEventType(),
@@ -428,9 +442,9 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				clickY = ea.getYnormalized();
 				
 				
-				send(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
 				if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
-					send(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+					sendEvent(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 
 				
 				break;
@@ -458,17 +472,17 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// pan forward/back & left/right:
-				    	send(user->id->s_name, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
+				    	sendEvent(user->id->s_name, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// pan up/down & left/right:
-				    	send(user->id->s_name, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
+				    	sendEvent(user->id->s_name, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
 				    }
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-				    	send(user->id->s_name, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
+				    	sendEvent(user->id->s_name, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
 				    }
 				}
 			
@@ -482,26 +496,26 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// drive forward/back & left/right:
-			    		send(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
+			    		sendEvent(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
 			    		
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// drive up/down & left/right:
-			    		send(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
+			    		sendEvent(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
 			    	}
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-			    		send(user->id->s_name, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
+			    		sendEvent(user->id->s_name, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
 				    }
 			    }
 
 				break;
 				
 			case(GUIEventAdapter::RELEASE):
-				//send(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
-				//send(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+				//sendEvent(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				//sendEvent(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 				break;
 				
 			case(GUIEventAdapter::SCROLL):
