@@ -65,8 +65,7 @@
 
 using namespace std;
 
-//extern SceneManager *sceneManager;
-//extern MediaManager *mediaManager;
+extern pthread_mutex_t pthreadLock;
 
 
 // ===================================================================
@@ -118,12 +117,27 @@ void ModelNode::setModelFromFile (const char* filename)
 	BROADCAST(this, "ss", "setModelFromFile", modelPath.c_str());
 }
 
+void ModelNode::setPlay (int i)
+{
+	_play = (bool)i;
+
+	if (imagestream.valid())
+	{
+		if (_play) imagestream->play();
+		else imagestream->pause();
+	}
+	
+	BROADCAST(this, "si", "setPlay", getPlay());
+}
+
 // ===================================================================
 // ===================================================================
 // ===================================================================
 void ModelNode::drawModel()
 {
 	int i,j;
+
+	pthread_mutex_lock(&pthreadLock);
 
 	if (model.valid())
 	{
@@ -229,7 +243,6 @@ void ModelNode::drawModel()
 			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 			    		size_t pos;
 			    		
-			    		
 #ifdef WITH_SHARED_VIDEO			    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
@@ -287,28 +300,47 @@ void ModelNode::drawModel()
 			    		}
 #endif
 			    		
-			    		// TODO:
-			    		// if filename is a movie format, create an ImageStream from
-			    		// it and replace the current TextureAttribute:
-			    		if (pos=imageFile.find(".mov") != string::npos)
+			    		// if filename is a movie format, create an ImageStream
+			    		// and replace the current TextureAttribute:
+			    		if ((pos=imageFile.find(".mp4") != string::npos) ||
+					        (pos=imageFile.find(".avi") != string::npos) ||
+					        (pos=imageFile.find(".mov") != string::npos) )
 			    		{
-			    			osg::Image* image = osgDB::readImageFile(imageFile);
-			    			osg::ImageStream* imagestream = dynamic_cast<osg::ImageStream*>(image);
-			    			if (imagestream) imagestream->play();
+							
+			    			image = osgDB::readImageFile(imageFile.substr(0,imageFile.length()-4));
+			    			//osg::ImageStream* imagestream = dynamic_cast<osg::ImageStream*>(image);
+			    			imagestream = dynamic_cast<osg::ImageStream*>(image.get());
 			    			
-			    			if (image)
+			    			
+			    			if (image.valid())
 			    			{
 			    				std::cout<<"image->s()="<<image->s()<<" image-t()="<<image->t()<<std::endl;
 
-			    				osg::Texture2D* vidTexture = new osg::Texture2D(image);
-			    				vidTexture->setResizeNonPowerOfTwoHint(false);
-			    				vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+								osg::Texture *vidTexture;
+								if (0) //(useTextureRectangle)
+								{
+									vidTexture = new osg::TextureRectangle(image.get());
+								} else {
+									vidTexture = new osg::Texture2D(image.get());
+									vidTexture->setResizeNonPowerOfTwoHint(false);
+									vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+								}
+			    				
 			    				vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 			    				vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-			    				
+
+								(*itr) = new osg::StateSet();
+								
 					    		(*itr)->setTextureAttributeAndModes(0, vidTexture, osg::StateAttribute::ON);
 
-					    		std::cout << "  found video and replaced texture: " << imageFile << std::endl;
+					    		std::cout << "  found video and replaced texture: " << imageFile.substr(0,imageFile.length()-4) << std::endl;
+
+								// turn off lighting 
+				    			(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+								
+								//if (imagestream.valid()) imagestream->play();
+								//_play = true;
 
 			    			}
 			    			
@@ -330,6 +362,9 @@ void ModelNode::drawModel()
 			std::cout << "ERROR [ModelNode::drawModel]: Could not find \"" << modelPath << "\". Make sure file exists, and that it is a valid 3D model." << std::endl;
 		}
 	}
+	
+	pthread_mutex_unlock(&pthreadLock);
+
 }
 
 std::vector<lo_message> ModelNode::getState ()
@@ -343,6 +378,11 @@ std::vector<lo_message> ModelNode::getState ()
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
 	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setPlay", getPlay());
+	ret.push_back(msg);
+	
 	
 	return ret;
 }

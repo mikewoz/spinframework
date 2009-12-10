@@ -44,6 +44,8 @@
 
 #include <string>
 #include <osgUtil/Optimizer>
+#include <osg/ImageStream>
+#include <osg/Image>
 
 
 #include "GroupNode.h"
@@ -75,7 +77,9 @@ public:
 	
 	void setModelFromFile	(const char *filename);
 	const char* getModelFromFile() { return modelPath.c_str(); }
-	
+
+	void setPlay(int i);
+	int getPlay() { return (int) _play; }
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
@@ -94,8 +98,12 @@ private:
 	//std::string modelName;
 	std::string modelPath;
 
+
 	osg::ref_ptr<osg::Group> model;
 
+	osg::ref_ptr<osg::Image> image;
+	osg::ref_ptr<osg::ImageStream> imagestream;
+	bool _play;
 
 	// animation stuff for gfx:
 	t_float state[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
