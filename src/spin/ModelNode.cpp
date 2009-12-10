@@ -50,6 +50,7 @@
 
 #include <osgUtil/SmoothingVisitor>
 #include <osg/BoundingBox>
+#include <osg/ImageStream>
 
 #include "ModelNode.h"
 #include "osgUtil.h"
@@ -289,9 +290,32 @@ void ModelNode::drawModel()
 			    		// TODO:
 			    		// if filename is a movie format, create an ImageStream from
 			    		// it and replace the current TextureAttribute:
-			    		if (pos=imageFile.find(".avi") != string::npos)
+			    		if (pos=imageFile.find(".mov") != string::npos)
 			    		{
+			    			osg::Image* image = osgDB::readImageFile(imageFile);
+			    			osg::ImageStream* imagestream = dynamic_cast<osg::ImageStream*>(image);
+			    			if (imagestream) imagestream->play();
 			    			
+			    			if (image)
+			    			{
+			    				std::cout<<"image->s()="<<image->s()<<" image-t()="<<image->t()<<std::endl;
+
+			    				osg::Texture2D* vidTexture = new osg::Texture2D(image);
+			    				vidTexture->setResizeNonPowerOfTwoHint(false);
+			    				vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+			    				vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+			    				vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+			    				
+					    		(*itr)->setTextureAttributeAndModes(0, vidTexture, osg::StateAttribute::ON);
+
+					    		std::cout << "  found video and replaced texture: " << imageFile << std::endl;
+
+			    			}
+			    			
+			    			else
+			    			{
+			    				std::cout << "Found video (" << imageFile << "), but could not read it" << std::endl;
+			    			}
 			    		}
 			    		
 			    		
