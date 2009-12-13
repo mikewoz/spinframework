@@ -75,7 +75,7 @@ SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : Sh
 	this->setBillboard(ShapeNode::STAY_UP);
 	
 	// worker thread is in killed state to start:
-        killed_ = true;
+	killed_ = true;
 		
 	textureID = "NULL";
 

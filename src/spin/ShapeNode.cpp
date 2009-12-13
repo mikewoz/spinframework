@@ -300,56 +300,130 @@ void ShapeNode::drawTexture()
 
 	else if (shapeGeode.valid())
 	{
-
-		//osg::ref_ptr<osg::Image> image;
-		textureImage = osgDB::readImageFile( getAbsolutePath(texturePath).c_str() );
-		if (textureImage.valid())
+			
+		
+#ifdef WITH_SHARED_VIDEO		
+		
+		// if filename contains "shared_video_texture", then replace
+		// current TextureAttribute with a SharedVideoTexture
+		size_t pos;
+		if ((pos=texturePath.find("shared_video_texture")) != string::npos)
 		{
+			
+			// find the shared memory id from the filename:
+			std::string shID = "shvid_"+texturePath.substr(pos+20, texturePath.rfind(".")-(pos+20));
+			
 
-			// old:
+			// see if an instance already exists:
 			/*
-			shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
-			osg::Texture2D* shapeTexture = new osg::Texture2D();
-			shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-			shapeTexture->setImage(textureImage.get());
-			shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
-			shapeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+			 SharedVideoTexture *shTex=0;
+			 std::cout << "num existing sharedtextures: " << sharedVideoTextures.size() << std::endl;
+			 
+			 //std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr;
+			 std::vector<SharedVideoTexture*>::iterator shvItr;
+			 
+			 for (shvItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
+			 {
+				 std::cout << "comparing id with " << (*shvItr)->getTextureID() << std::endl;
+				 if (string((*shvItr)->getTextureID())==shID)
+				 {
+					 std::cout << "... already exists" << std::endl;
+					 //shTex = (*shvItr).get();
+					 shTex = (*shvItr);
+			}
+			}
+			
+			// if it doesn't exist, create a new one:
+			if (!shTex)
+			{
+				std::cout << "... doesn't exist. creating." << std::endl;
+				shTex = new SharedVideoTexture(shID.c_str());
+				
+				// add it to the list:
+				sharedVideoTextures.push_back(shTex);
+				
+			}
 			*/
+			
+			if (!sceneManager->shTex.valid())
+			{
+				std::cout << "making new SharedVideoTexture with id: " << shID << std::endl;
+				sceneManager->shTex = new SharedVideoTexture(shID.c_str());
+			}
+			//sharedVideoTextures.push_back(shTex);
+			
+			osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+			
+			// Finally, replace the texture attribute:
+			ss->setTextureAttributeAndModes(0, sceneManager->shTex, osg::StateAttribute::ON);
+			
+			// turn off lighting 
+			ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-
-			osg::Texture2D* shapeTexture = new osg::Texture2D();
-			shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-			shapeTexture->setImage(textureImage.get());
-
-			osg::StateSet *shapeStateSet = new osg::StateSet();
-			//osg::StateSet *shapeStateSet = shapeGeode->getOrCreateStateSet();
-
-			// Turn blending on:
-			shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
-			shapeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-
-			// Disable depth testing so geometry is drawn regardless of depth values
-			// of geometry already draw.
-			//shapeStateSet->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-
-			// Disable lighting:
-			//shapeStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-
-			// Need to make sure this geometry is draw last. RenderBins are handled
-			// in numerical order.
-			shapeStateSet->setRenderBinDetails( renderBin, "RenderBin");
-
-			// Set Texture:
-			shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
-
-			shapeGeode->setStateSet( shapeStateSet );
-
-
-		} else {
-			std::cout << "ERROR (setTexture): The file " << texturePath << " is not a valid texture." << std::endl;
+			
+			std::cout << "  replaced '" << texturePath.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
 		}
+#endif
+		
+		
+		
+		
+		
+		
+		
+		else {
+		
+		
+		
+			//osg::ref_ptr<osg::Image> image;
+			textureImage = osgDB::readImageFile( getAbsolutePath(texturePath).c_str() );
+			if (textureImage.valid())
+			{
+
+				// old:
+				/*
+				shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
+				osg::Texture2D* shapeTexture = new osg::Texture2D();
+				shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
+				shapeTexture->setImage(textureImage.get());
+				shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
+				shapeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+				*/
 
 
+				osg::Texture2D* shapeTexture = new osg::Texture2D();
+				shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
+				shapeTexture->setImage(textureImage.get());
+
+				osg::StateSet *shapeStateSet = new osg::StateSet();
+				//osg::StateSet *shapeStateSet = shapeGeode->getOrCreateStateSet();
+
+				// Turn blending on:
+				shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
+				shapeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+				// Disable depth testing so geometry is drawn regardless of depth values
+				// of geometry already draw.
+				//shapeStateSet->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
+
+				// Disable lighting:
+				//shapeStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+				// Need to make sure this geometry is draw last. RenderBins are handled
+				// in numerical order.
+				shapeStateSet->setRenderBinDetails( renderBin, "RenderBin");
+
+				// Set Texture:
+				shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
+
+				shapeGeode->setStateSet( shapeStateSet );
+
+
+			} else {
+				std::cout << "ERROR (setTexture): The file " << texturePath << " is not a valid texture." << std::endl;
+			}
+
+		}
 	}
 
 }

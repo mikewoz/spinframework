@@ -189,50 +189,53 @@ void GroupNode::updateNodePath()
 
 
 // *****************************************************************************
-//void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
-void GroupNode::event (int event, const char* userString, float eData1, float eData2)
+void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
+//void GroupNode::event (int event, const char* userString, float eData1, float eData2)
 {
-	if (_interactionMode)
+	
+	if (0)
+	{
+		std::cout << this->id->s_name << ".event (interactionMode="<<_interactionMode<<") from '" << userString << "': ";
+		switch(event)
+		{
+			case(osgGA::GUIEventAdapter::PUSH):
+				std::cout << "PUSH ("<<event<<")";
+				break;
+			case(osgGA::GUIEventAdapter::RELEASE):
+				std::cout << "RELEASE ("<<event<<")";
+				break;
+			case(osgGA::GUIEventAdapter::DOUBLECLICK):
+				std::cout << "DOUBLECLICK ("<<event<<")";
+				break;
+			case(osgGA::GUIEventAdapter::DRAG):
+				std::cout << "DRAG ("<<event<<")";
+				break;
+			case(osgGA::GUIEventAdapter::MOVE):
+				std::cout << "MOVE ("<<event<<")";
+				break;
+			case(osgGA::GUIEventAdapter::SCROLL):
+				std::cout << "SCROLL ("<<event<<")";
+				break;
+		}
+		std::cout << " with data=" << eData1 << "," << eData2;
+		std::cout << " @ local (" << x<<","<<y<<","<<z << ")";
+		
+		if (this->owner.valid())
+			std::cout << ", Current owner: " << this->owner->id->s_name;
+		else
+			std::cout << ", Current owner: NULL";
+		
+		std::cout << std::endl;
+	}
+		
+
+	
+	if (_interactionMode==DRAG || _interactionMode==PUSH)
 	{
 		osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
 		if (!user.valid()) return;
 		
-		if (0)
-		{
-			std::cout << this->id->s_name << ".event from '" << userString << "': ";
-			switch(event)
-			{
-				case(osgGA::GUIEventAdapter::PUSH):
-					std::cout << "PUSH ("<<event<<")";
-					break;
-				case(osgGA::GUIEventAdapter::RELEASE):
-					std::cout << "RELEASE ("<<event<<")";
-					break;
-				case(osgGA::GUIEventAdapter::DOUBLECLICK):
-					std::cout << "DOUBLECLICK ("<<event<<")";
-					break;
-				case(osgGA::GUIEventAdapter::DRAG):
-					std::cout << "DRAG ("<<event<<")";
-					break;
-				case(osgGA::GUIEventAdapter::MOVE):
-					std::cout << "MOVE ("<<event<<")";
-					break;
-				case(osgGA::GUIEventAdapter::SCROLL):
-					std::cout << "SCROLL ("<<event<<")";
-					break;
-			}
-			std::cout << " with data=" << eData1 << "," << eData2;
-			//std::cout << " @ local (" << x<<","<<y<<","<<z << ")";
-
-			if (this->owner.valid())
-				std::cout << ", Current owner: " << this->owner->id->s_name;
-			else
-				std::cout << ", Current owner: NULL";
-			
-			std::cout << std::endl;
-		}
 		
-
 
 		switch(event)
 		{
@@ -295,7 +298,23 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 		
 		// broadcast event
 		// NO! can't do this, because we will duplicate move/rotate/etc actions
-		//BROADCAST(this, "si", "setReportMode", (int) this->_reportMode);
+		
+	}
+	
+	else if (_interactionMode==DRAW)
+	{
+		switch(event)
+		{
+			case(osgGA::GUIEventAdapter::PUSH):
+			case(osgGA::GUIEventAdapter::DRAG):
+		
+				BROADCAST(this, "ssfff", "draw", userString, x, y, z);
+			
+			default:
+				// nothing else
+				break;
+		
+		}
 	}
 }
 

@@ -58,9 +58,7 @@
 #include "MediaManager.h"
 #include "nodeVisitors.h"
 
-#ifdef WITH_SHARED_VIDEO
-#include "SharedVideoTexture.h"
-#endif
+
 
 
 using namespace std;
@@ -85,7 +83,28 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 ModelNode::~ModelNode()
 {
 	std::cout << "Destroying ModelNode: " << this->id->s_name << std::endl;
-	
+
+#ifdef WITH_SHARED_VIDEO
+	// unload any registered shared memory textures:
+	/*
+	std::vector<SharedVideoTexture*>::iterator shvItr = sharedVideoTextures.begin();
+	while (shvItr!=sharedVideoTextures.end())
+	{
+		std::cout << "cleaning SharedVideoTexture " << (*shvItr)->getTextureID() << std::endl;
+		(*shvItr)->unload(); 
+		sharedVideoTextures.erase(shvItr);
+	}
+
+	std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr = sharedVideoTextures.begin();
+	while (shvItr!=sharedVideoTextures.end())
+	{
+		std::cout << "cleaning SharedVideoTexture " << (*shvItr)->getTextureID() << std::endl;
+		(*shvItr)->unload(); 
+		sharedVideoTextures.erase(shvItr);
+	}
+*/
+
+#endif
 }
 
 
@@ -249,37 +268,55 @@ void ModelNode::drawModel()
 			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
 			    		{
 				    		
-			    			
-			    			
-				    		osg::Image *img = osgDB::readImageFile( "/Users/mikewoz/src/breakingtheice/Models/images/shared_video_texture_fake.tga" );
-		
-				    		
-				    		// as a TextureRectangle;
-				    		/*
-				    		osg::TextureRectangle *textureRect = new osg::TextureRectangle(img);
-				    		*itr)->setTextureAttributeAndModes(0, textureRect, osg::StateAttribute::ON);
-				    		*/
-				    		
-				    		// as a Texture2D:
-				    		/*
-				    		osg::Texture2D *texture2D = new osg::Texture2D();
-				    		texture2D->setImage(img);
-				    		(*itr)->setTextureAttributeAndModes(0, texture2D, osg::StateAttribute::ON);
-				    		*/
-				    		
-				    		// as a SharedVideoTexture
+							// find the shared memory id from the filename:
 				    		std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
-				    		SharedVideoTexture *shTex = new SharedVideoTexture(shID.c_str());
-				    		(*itr)->setTextureAttributeAndModes(0, shTex, osg::StateAttribute::ON);
+				    					
+							// see if an instance already exists:
+							/*
+							SharedVideoTexture *shTex=0;
+							std::cout << "num existing sharedtextures: " << sharedVideoTextures.size() << std::endl;
+							
+							//std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr;
+							std::vector<SharedVideoTexture*>::iterator shvItr;
+							
+							for (shvItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
+							{
+								std::cout << "comparing id with " << (*shvItr)->getTextureID() << std::endl;
+								if (string((*shvItr)->getTextureID())==shID)
+								{
+									std::cout << "... already exists" << std::endl;
+									//shTex = (*shvItr).get();
+									shTex = (*shvItr);
+								}
+							}
+							
+							// if it doesn't exist, create a new one:
+							if (!shTex)
+							{
+								std::cout << "... doesn't exist. creating." << std::endl;
+								shTex = new SharedVideoTexture(shID.c_str());
 				    		
-				    		
-				    		
-				    		
+								// add it to the list:
+								sharedVideoTextures.push_back(shTex);
+								
+							}
+							*/
+							
+							if (!sceneManager->shTex.valid())
+							{
+								std::cout << "making new SharedVideoTexture" << std::endl;
+								sceneManager->shTex = new SharedVideoTexture(shID.c_str());
+							}
+								//sharedVideoTextures.push_back(shTex);
+							
+							
+							
+							// Finally, replace the texture attribute:
+							(*itr)->setTextureAttributeAndModes(0, sceneManager->shTex, osg::StateAttribute::ON);
+							
 				    		// turn off lighting 
 				    		(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-				    		
-				    		
-				    		
+
 			    			
 				    		/*
 						    osg::ref_ptr<osg::TexMat> texmat(new osg::TexMat);

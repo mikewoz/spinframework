@@ -66,85 +66,6 @@ using namespace std;
 extern pthread_mutex_t pthreadLock;
 
 
-/*
-// global:
-// we store userNode in a global ref_ptr so that it can't be deleted
-//static osg::ref_ptr<UserNode> userNode;
-static UserNode *userNode;
-
-
-//void registerUser(spinContext *spin)
-void registerUser()
-{
-	spinContext &spin = spinContext::Instance();
-	
-	//if (!userNode.valid())
-	if (!userNode)
-	{
-        std::cout << "ERROR: could not register user" << std::endl;
-        exit(1);
-	}
-	
-	
-	// Send a message to the server to create this node (assumes that the server
-	// is running). If not, it will send a 'userRefresh' method upon startup
-	// that will request that this function is called again
-	spin.sendSceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
-
-	std::cout << "  Registered user '" << userNode->id->s_name << "' with SPIN" << std::endl;
-
-}
-
-// *****************************************************************************
-
-
-static int spinViewer_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
-
-	
-	
-    // make sure there is at least one argument (ie, a method):
-	if (!argc) return 0;
-
-	//spinContext *spin = (spinContext*)user_data;
-    //if (!spin) return 0;
-    spinContext &spin = spinContext::Instance();
-    
-    
-	// get the method (argv[0]):
-    std::string theMethod;
-	if (lo_is_string_type((lo_type)types[0]))
-	{
-		theMethod = string((char *)argv[0]);
-	}
-	else return 0;
-
-	// parse the rest of the args:
-	vector<float> floatArgs;
-	vector<const char*> stringArgs;
-	for (int i=1; i<argc; i++)
-	{
-		if (lo_is_numerical_type((lo_type)types[i]))
-		{
-			floatArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-		} else {
-			stringArgs.push_back( (const char*) argv[i] );
-		}
-	}
-
-	if (theMethod=="userRefresh")
-	{
-		//registerUser(spin);
-		registerUser();
-	}
-		
-
-	return 1;
-}
-
-*/
-
-
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -253,27 +174,6 @@ int main(int argc, char **argv)
 
 	spin.sceneManager->setGraphical(true);
 
-
-
-	/*
-	// register an extra OSC callback so that we can spy on OSC messages:
-	std::string OSCpath = "/SPIN/" + spin.id;
-	//lo_server_thread_add_method(spin.sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, (void*)spin);
-	lo_server_thread_add_method(spin.sceneManager->rxServ, OSCpath.c_str(), NULL, spinViewer_liblo_callback, NULL);
-
-	
-	
-	// Add a UserNode to the local scene and use it to feed a NodeTracker for
-	// the viewer's camera. We expect that this node will be created in the
-	// sceneManager and that updates will be generated. 
-	userNode = dynamic_cast<UserNode*>(spin.sceneManager->getOrCreateNode(id.c_str(), "UserNode"));
-	
-	
-	// send userNode info to spin
-	registerUser();
-	//registerUser(spin);
-	*/
-
 	spin.registerUser(id.c_str());
 		
 
@@ -314,20 +214,6 @@ int main(int argc, char **argv)
 
 	// *************************************************************************
 	// create a camera manipulator
-
-/*
-	osgGA::TrackballManipulator *manipulator = new osgGA::TrackballManipulator();
-	manipulator->setMinimumDistance ( 0.0001 );
-	//manipulator->setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,1,0), osg::Vec3(0,0,1), false );
-	manipulator->setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
-*/
-
-	
-
-	//osgGA::NodeTrackerManipulator *manipulator = new osgGA::NodeTrackerManipulator();
-	//custom_NodeTrackerManipulator *manipulator = new custom_NodeTrackerManipulator();
-	//ViewerManipulator *manipulator = new ViewerManipulator(spin, userNode.get());
-	//ViewerManipulator *manipulator = new ViewerManipulator(userNode.get());
 
 	osg::ref_ptr<ViewerManipulator> manipulator;
 	if (spin.user.valid())
@@ -395,20 +281,10 @@ int main(int argc, char **argv)
 				spin.sendInfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
 				lastTick = frameTick;
 			}
-	
-			// TODO: move this into the callback, and do it only when userNode sends
-			// a global6DOF message:
-			/*
-			osg::Matrix m = osg::computeLocalToWorld(userNode->currentNodePath);
-			osg::Vec3 rot = QuatToEuler(m.getRotate());
-			manipulator->setCenter(m.getTrans());
-			manipulator->setRotation(osg::Quat( rot.x()+osg::PI_2,osg::X_AXIS, rot.y(),osg::Y_AXIS, rot.z(),osg::Z_AXIS) );
-			*/
-	
+
 			// We now have to go through all the nodes, and check if we need to update the
 			// graph. Note: this cannot be done as a callback in a traversal - dangerous.
-			// In the callback, we have simply flagged what needs to be done (eg, set the
-			// newParent symbol).
+			// In the callback, we have simply flagged what needs to be done.
 			pthread_mutex_lock(&pthreadLock);
 			spin.sceneManager->updateGraph();
 			pthread_mutex_unlock(&pthreadLock);

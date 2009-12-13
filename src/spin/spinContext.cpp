@@ -318,7 +318,8 @@ void spinContext::registerUser (const char *id)
 		std::cout << "  Registered user '" << user->id->s_name << "'" << std::endl;
 	}
 
-	else {
+	if (!user.valid())
+	{
 		std::cout << "ERROR: Could not registerUser '" << id <<	"' because SPIN is not running." << std::endl;
 	}
 }

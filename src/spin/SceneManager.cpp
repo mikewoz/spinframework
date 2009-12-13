@@ -234,6 +234,10 @@ SceneManager::~SceneManager()
 {
 	std::cout << "Cleaning up SceneManager..." << std::endl;
 	
+	// 
+	shTex->stop();
+	
+	
 	// Force a delete (and destructor call) for all nodes still in the scene:
 	int i = 0;
 	ReferencedNode *n;
@@ -1037,31 +1041,13 @@ SoundConnection* SceneManager::getConnection(char *from, char *to)
 // detach them, move them to different parts of the scene graph, etc).
 //
 // IMPORTANT: We do not want to change the graph during a traversal because this
-// will invalidate iterators that are on the stack (NodeVisitor uses nested calls
-// to do traversal).
-//
-// So, take care to only call this function outside of a traversal. For example,
-// during the GroupNode callback, we set the newParent symbol, and only after the
-// traversal do we call this function which then re-arranges the graph to reflect
-// the new parent relationships.
+// will invalidate iterators that are on the stack (NodeVisitor uses nested 
+// calls to do traversal).
 
 void SceneManager::updateGraph()
 {
-    // TODO: remove this and just place a thread mutex around the setParent
-    // stuff in ReferencedNode.
-
-
-/*
-	nodeMapType::iterator it;
-	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
-	{
-		nodeListType::iterator iter;
-		for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-		{
-			if ((*iter)->newParent != NULL_SYMBOL) (*iter)->attach();
-		}
-	}
-*/
+	
+	if (shTex.valid()) shTex->updateCallback();
 
 }
 

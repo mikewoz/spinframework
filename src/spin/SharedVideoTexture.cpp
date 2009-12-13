@@ -91,8 +91,8 @@ SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
 	setResizeNonPowerOfTwoHint(false);
     
     // register callback:
-	this->setUserData( dynamic_cast<osg::StateAttribute*>(this) );
-	this->setUpdateCallback(new SharedVideoTexture_callback);
+	//this->setUserData( dynamic_cast<osg::StateAttribute*>(this) );
+	//this->setUpdateCallback(new SharedVideoTexture_callback);
 	
 	// keep a timer for reload attempts:
 	lastTick = osg::Timer::instance()->tick();
@@ -106,13 +106,7 @@ SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
 // destructor
 SharedVideoTexture::~SharedVideoTexture()
 {
-	if (!killed_)
-	{
-		// first kill any existing thread:
-		this->signalKilled(); // let worker know that the mainloop has exitted
-		worker.join(); // wait for worker to end
-		std::cout << "killed SharedVideoTexture thread" << std::endl;
-	}
+	stop();
 }
 
 
@@ -158,7 +152,7 @@ void SharedVideoTexture::updateCallback()
 		float dt = osg::Timer::instance()->delta_s(lastTick,tick);
 		if (dt > 5)
 		{
-			loadSharedMemory();
+			start();
 		
 			// this is the last time we checked
 			lastTick = osg::Timer::instance()->tick();
@@ -248,20 +242,20 @@ void SharedVideoTexture::setTextureID (const char* newID)
 	textureID = std::string(newID);
 	this->setName("SharedVideoTexture("+textureID+")");
 	
-	loadSharedMemory();
+	start();
 	
 }
 
+
+
 // ===================================================================
-void SharedVideoTexture::loadSharedMemory()
+
+
+
+void SharedVideoTexture::start()
 {
-		
-	if (!killed_)
-	{
-		// first kill any existing thread:
-		this->signalKilled(); // let worker know that the mainloop has exitted
-		worker.join(); // wait for worker to end
-	}
+	// first kill any existing thread:
+	stop();
 	
 	using namespace boost::interprocess;
 	try
@@ -278,16 +272,14 @@ void SharedVideoTexture::loadSharedMemory()
 		
 		// cast to pointer of type of our shared structure
 		sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
-		
-		std::cout << "SharedVideoTexture getting width/height" << std::endl;
-		
+			
 		width = sharedBuffer->getWidth();
 		height = sharedBuffer->getHeight();
 		
 		// reset the killed_ conditional
 		killed_ = false;
 		
-		std::cout << "SharedVideoTexture starting thread" << std::endl;
+		std::cout << "SharedVideoTexture '" << textureID << "' starting thread" << std::endl;
 		
 		// start our consumer thread, which is a member function of this class
 		// and takes sharedBuffer as an argument
@@ -311,3 +303,12 @@ void SharedVideoTexture::loadSharedMemory()
 
 }
 
+void SharedVideoTexture::stop()
+{
+	if (!killed_)
+	{
+		this->signalKilled();
+		worker.join(); // wait here until thread exits
+		std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
+	}
+}

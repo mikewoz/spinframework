@@ -50,7 +50,6 @@
 #include "spinLog.h"
 
 
-
 using namespace std;
 
 
