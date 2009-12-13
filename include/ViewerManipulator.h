@@ -80,6 +80,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		
 	    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
 	    void processKeypress(const osgGA::GUIEventAdapter& ea);
+		
+		GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
 	    void processEvent(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
 
 	protected:
@@ -96,6 +98,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		bool picker, mover;
 		float lastX, lastY;
 		float clickX, clickY;
+		
+		osg::Vec3 lastHitPoint;
 };
 
 

@@ -79,7 +79,8 @@ public:
 	void setTextureID(const char *id);
 	const char* getTextureID() { return textureID.c_str(); }
 	
-	void loadSharedMemory();
+	void start();
+	void stop();
 
 private:
 	

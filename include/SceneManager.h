@@ -53,6 +53,7 @@
 //#include "MediaManager.h"
 #include "UserNode.h"
 #include "spinLog.h"
+#include "SharedVideoTexture.h"
 
 #include "lo/lo.h"
 #include "tinyxml.h"
@@ -206,6 +207,13 @@ class SceneManager
 		//pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;
 
 
+		#ifdef WITH_SHARED_VIDEO
+	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;
+	//std::vector<SharedVideoTexture*> sharedVideoTextures;
+	osg::ref_ptr<SharedVideoTexture> shTex;
+#endif
+
+		
 	private:
 		//std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
 		nodeMapType nodeMap; // the nodeList arranged by type

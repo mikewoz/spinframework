@@ -85,7 +85,7 @@ public:
 	GroupNode(SceneManager *sceneManager, char *initID);
 	virtual ~GroupNode();
 
-	enum interactionMode { STATIC, DRAG, PUSH };
+	enum interactionMode { STATIC, DRAG, PUSH, DRAW };
 	enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
 	
 	virtual void callbackUpdate();
@@ -102,7 +102,7 @@ public:
 	virtual void updateNodePath();
 
 	
-	void event (int event, const char* userString, float eData1, float eData2);
+	void event (int event, const char* userString, float eData1, float eData2, float x, float y, float z);
 	
 	void setReportMode(globalsReportMode mode);
 	

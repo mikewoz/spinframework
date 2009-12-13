@@ -50,6 +50,9 @@
 
 #include "GroupNode.h"
 
+#ifdef WITH_SHARED_VIDEO
+#include "SharedVideoTexture.h"
+#endif
 
 #define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
 
@@ -97,7 +100,12 @@ private:
 	// the model:
 	//std::string modelName;
 	std::string modelPath;
-
+	
+#ifdef WITH_SHARED_VIDEO
+	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;
+	//std::vector<SharedVideoTexture*> sharedVideoTextures;
+	//osg::ref_ptr<SharedVideoTexture> shTex;
+#endif
 
 	osg::ref_ptr<osg::Group> model;
 
