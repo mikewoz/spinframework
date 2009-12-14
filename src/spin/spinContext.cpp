@@ -76,11 +76,6 @@ static void sigHandler(int signum)
 	
 	spin.stop();
 
-	// TODO: this doesn't work; something else must be holding onto a reference
-	// for the user (viewer?). We should figure out how to proper destroy him.
-	if (spin.user.valid()) spin.user.release();
-
-	//exit(0);
 }
 
 
@@ -90,6 +85,10 @@ spinContext::spinContext()
 {
 
 	spinContextMode  initMode = spinContext::LISTENER_MODE;
+	
+	// default is hostname:
+	user = gensym(getHostname().c_str());
+	
 	
 #ifdef __Darwin
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
@@ -301,11 +300,18 @@ void spinContext::stop()
 
 void spinContext::registerUser (const char *id)
 {
+	UserNode *n = 0;
+	
+	user = gensym(id);
+	
 	if (isRunning())
 	{
-		// Here, we (definitively) create a UserNode and store it in this
-		// client's sceneManager.
-		user = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(id, "UserNode"));
+		// Here we force the creation of a (local) UserNode, so that we are sure
+		// to have one, even if a server is not running. This way, we can create
+		// our ViewerManipulator, and tracker node before receiver the official
+		// createNode message from the server.
+		
+		n = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(id, "UserNode"));
 
 		// We then send a message to the server to create the node. If the
 		// server doesn't exist yet, it doesn't really matter, since we are
@@ -313,54 +319,39 @@ void spinContext::registerUser (const char *id)
 		// it will send a 'userRefresh' method that will inform it of this node
 		// (see the spinContext_sceneCallback method)
 		
-		sendSceneMessage("sss", "createNode", user->id->s_name, "UserNode", LO_ARGS_END);
+		SceneMessage("sss", "createNode", user->s_name, "UserNode", LO_ARGS_END);
 
-		std::cout << "  Registered user '" << user->id->s_name << "'" << std::endl;
+		std::cout << "  Registered user '" << user->s_name << "'" << std::endl;
 	}
 
-	if (!user.valid())
+	if (!n)
 	{
-		std::cout << "ERROR: Could not registerUser '" << id <<	"' because SPIN is not running." << std::endl;
+		std::cout << "ERROR: Could not registerUser '" << id <<	"'. Perhaps SPIN is not running?" << std::endl;
 	}
 }
 
 
-void spinContext::sendInfoMessage(std::string OSCpath, const char *types, ...)
+void spinContext::InfoMessage(std::string OSCpath, const char *types, ...)
 {
 	va_list ap;
 	va_start(ap, types);
-	sendInfoMessage(OSCpath, types, ap);
-
-	/*
-	va_start(ap, types);
-
-	lo_message msg = lo_message_new();
-	int err = lo_message_add_varargs(msg, types, ap);
-
-	if (!err)
-	{
-		sendInfoMessage(OSCpath, msg);
-	} else {
-		std::cout << "ERROR (spinContext::sendInfoMessage): " << err << std::endl;
-	}
-	*/
+	InfoMessage(OSCpath, types, ap);
 }
 
-
-void spinContext::sendInfoMessage(std::string OSCpath, const char *types, va_list ap)
+void spinContext::InfoMessage(std::string OSCpath, const char *types, va_list ap)
 {
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 
 	if (!err)
 	{
-		sendInfoMessage(OSCpath, msg);
+		InfoMessage(OSCpath, msg);
 	} else {
-		std::cout << "ERROR (spinContext::sendInfoMessage): " << err << std::endl;
+		std::cout << "ERROR (spinContext::InfoMessage): " << err << std::endl;
 	}
 }
 
-void spinContext::sendInfoMessage(std::string OSCpath, lo_message msg)
+void spinContext::InfoMessage(std::string OSCpath, lo_message msg)
 {
 	lo_send_message_from(lo_infoAddr, lo_server_thread_get_server(lo_infoServ), OSCpath.c_str(), msg);
 
@@ -369,49 +360,30 @@ void spinContext::sendInfoMessage(std::string OSCpath, lo_message msg)
 }
 
 
-
-/*
-void spinContext::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
-{
-	lo_message msg = lo_message_new();
-
-	va_list ap;
-	va_start(ap, types);
-
-	int err = lo_message_add_varargs(msg, types, ap);
-
-	if (!err)
-	{
-		sendNodeMessage(nodeSym, msg);
-	} else {
-		std::cout << "ERROR (spinContext::sendNodeMessage): " << err << std::endl;
-	}
-
-}
-*/
-
-void spinContext::sendNodeMessage(const char *nodeId, const char *types, ...)
+void spinContext::NodeMessage(const char *nodeId, const char *types, ...)
 {
 	va_list ap;
 	va_start(ap, types);
-	sendNodeMessage(nodeId, types, ap);
+	NodeMessage(nodeId, types, ap);
 }
 
-void spinContext::sendNodeMessage(const char *nodeId, const char *types, va_list ap)
+void spinContext::NodeMessage(const char *nodeId, const char *types, va_list ap)
 {
+	std::cout << "msg " << nodeId << " " << types << std::endl;
+	
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 
 	if (!err)
 	{
-		sendNodeMessage(nodeId, msg);
+		NodeMessage(nodeId, msg);
 	} else {
-		std::cout << "ERROR (spinContext::sendNodeMessage): " << err << std::endl;
+		std::cout << "ERROR (spinContext::NodeMessage): " << err << std::endl;
 	}
 }
 
 
-void spinContext::sendNodeMessage(const char *nodeId, lo_message msg)
+void spinContext::NodeMessage(const char *nodeId, lo_message msg)
 {
 	if (isRunning())
 	{
@@ -435,60 +407,26 @@ void spinContext::sendNodeMessage(const char *nodeId, lo_message msg)
 }
 
 
-
-/*
-void sendNodeMessage(const char *nodeName, const char *types, ...)
-{
-	lo_message msg = lo_message_new();
-
-	va_list ap;
-	va_start(ap, types);
-
-	int err = lo_message_add_varargs(msg, types, ap);
-
-	if (!err)
-	{
-		sendNodeMessage(gensym(nodeName), msg);
-	} else {
-		std::cout << "ERROR (spinContext::sendNodeMessage): " << err << std::endl;
-	}	
-}
-*/
-
-void spinContext::sendSceneMessage(const char *types, ...)
+void spinContext::SceneMessage(const char *types, ...)
 {
 	va_list ap;
 	va_start(ap, types);
-	sendSceneMessage(types, ap);
-	
-	/*
-	va_start(ap, types);
-
-	lo_message msg = lo_message_new();
-	int err = lo_message_add_varargs(msg, types, ap);
-
-	if (!err)
-	{
-		sendSceneMessage(msg);
-	} else {
-		std::cout << "ERROR (spinContext::sendSceneMessage): " << err << std::endl;
-	}
-	*/
+	SceneMessage(types, ap);
 }
 
-void spinContext::sendSceneMessage(const char *types, va_list ap)
+void spinContext::SceneMessage(const char *types, va_list ap)
 {
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 	if (!err)
 	{
-		sendSceneMessage(msg);
+		SceneMessage(msg);
 	} else {
-		std::cout << "ERROR (spinContext::sendSceneMessage): " << err << std::endl;
+		std::cout << "ERROR (spinContext::SceneMessage): " << err << std::endl;
 	}
 }
 
-void spinContext::sendSceneMessage(lo_message msg)
+void spinContext::SceneMessage(lo_message msg)
 {
 	if (isRunning())
 	{
@@ -553,25 +491,38 @@ int spinContext::sceneCallback(const char *types, lo_arg **argv, int argc)
 
 static void *spinListenerThread(void *arg)
 {
-	spinContext *spin = (spinContext*) arg;
+	//spinContext *spin = (spinContext*) arg;
+	spinContext &spin = spinContext::Instance();
 
 	std::cout << "  spinContext started in Listener mode" << std::endl;
 
-	spin->sceneManager = new SceneManager(spin->id, spin->rxAddr, spin->rxPort);
+	spin.sceneManager = new SceneManager(spin.id, spin.rxAddr, spin.rxPort);
 
 	// register our special scene callback:
-	lo_server_thread_add_method(spin->sceneManager->rxServ, ("/SPIN/" + spin->id).c_str(), NULL, spinContext_sceneCallback, NULL);
+	lo_server_thread_add_method(spin.sceneManager->rxServ, ("/SPIN/" + spin.id).c_str(), NULL, spinContext_sceneCallback, NULL);
 
-	spin->running = true;
-	while (!spin->signalStop)
+	osg::Timer_t lastTick = osg::Timer::instance()->tick();
+	osg::Timer_t frameTick = lastTick;
+	
+	spin.running = true;
+	while (!spin.signalStop)
 	{
-		sleep(1);
+		usleep(200);
 		// do nothing (assume the app is doing updates - eg, in a draw loop)
+		
+		// just send a ping so the server knows we are still here
+		frameTick = osg::Timer::instance()->tick();
+		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
+		{
+			spin.InfoMessage("/ping/user", "s", (char*) spin.user->s_name, LO_ARGS_END);
+			lastTick = frameTick;
+		}
+		
 	}
-	spin->running = false;
+	spin.running = false;
 	
 	// clean up:
-	delete spin->sceneManager;
+	delete spin.sceneManager;
 	
 	pthread_exit(NULL);
 }
@@ -617,12 +568,12 @@ static void *spinServerThread(void *arg)
 	
 
 	spin.running = true;
-	while (!(spin.signalStop))
+	while (!spin.signalStop)
 	{
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			spin.sendInfoMessage("/ping/SPIN", "ssisi", spin.id.c_str(), myIP.c_str(), i_rxPort, spin.txAddr.c_str(), i_txPort, LO_ARGS_END);
+			spin.InfoMessage("/ping/SPIN", "ssisi", spin.id.c_str(), myIP.c_str(), i_rxPort, spin.txAddr.c_str(), i_txPort, LO_ARGS_END);
 			//lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
 			lastTick = frameTick;
 		}
@@ -677,10 +628,7 @@ static int spinContext_sceneCallback(const char *path, const char *types, lo_arg
 	
 	if (theMethod=="userRefresh")
 	{
-		if (spin.user.valid())
-		{
-			spin.sendSceneMessage("sss", "createNode", spin.user->id->s_name, "UserNode", LO_ARGS_END);
-		}
+		spin.SceneMessage("sss", "createNode", spin.user->s_name, "UserNode", LO_ARGS_END);
 	}
 	
 	//return spin.sceneCallback(types, argv, argc);
@@ -689,25 +637,24 @@ static int spinContext_sceneCallback(const char *path, const char *types, lo_arg
 
 static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
-	spinContext *spin = (spinContext*) user_data;
-	
-	if (!spin) return 0;
-	
-	/*
-	std::cout << "************ infoChannelCallback() got message: " << path << std::endl;
-	
-	printf("************ infoChannelCallback() got message: %s\n", (char*)path);
-	printf("user_data: %s\n", (char*) user_data);
-	for (int i=0; i<argc; i++) {
-		printf("arg %d '%c' ", i, types[i]);
-    	lo_arg_pp((lo_type) types[i], argv[i]);
-    	printf("\n");
+	//spinContext *spin = (spinContext*) user_data;
+	spinContext &spin = spinContext::Instance();
+
+	if (0)
+	{
+		printf("************ infoChannelCallback() got message: %s\n", (char*)path);
+		printf("user_data: %s\n", (char*) user_data);
+		for (int i=0; i<argc; i++) {
+			printf("arg %d '%c' ", i, types[i]);
+	    	lo_arg_pp((lo_type) types[i], argv[i]);
+	    	printf("\n");
+		}
+		printf("\n");
+		fflush(stdout);
 	}
-	printf("\n");
-	fflush(stdout);
-	 */
 	
-	if (spin->mode == spinContext::SERVER_MODE)
+	
+	if (spin.isServer())
 	{
 		// TODO: monitor /ping/user messages, keep timeout handlers, 
 		

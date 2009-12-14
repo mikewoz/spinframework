@@ -53,7 +53,11 @@
 //#include "MediaManager.h"
 #include "UserNode.h"
 #include "spinLog.h"
+#include "spinContext.h"
+
+#ifdef WITH_SHARED_VIDEO
 #include "SharedVideoTexture.h"
+#endif
 
 #include "lo/lo.h"
 #include "tinyxml.h"
@@ -100,6 +104,7 @@ class SceneManager
 		lo_server  txServ;
 		//lo_server_thread  txServ;
 
+		bool isServer() { return (bool) txServ; }
 		bool isSlave() { return (bool) !txServ; }
 		
 		void setGraphical(bool b) { graphicalMode = b; }
@@ -109,12 +114,11 @@ class SceneManager
 		void setLog(spinLog& log);
 
 		void setTXaddress (std::string addr, std::string port);
-		void sendSceneMessage(const char *types, ...);
+		
 		void sendNodeList(std::string type);
 		void sendConnectionList();
 		void sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
-		void sendNodeMessage(t_symbol *nodeSym, lo_message msg);
-		void sendNodeMessage(t_symbol *nodeSym, const char *types, ...);
+
 
         ReferencedNode *createNode(std::string id, std::string type);
 		ReferencedNode *createNode(const char *id, const char *type);
@@ -128,16 +132,19 @@ class SceneManager
 		/**
 		 * This method removes a node from the scene, however the actual work is
 		 * done by the doDelete() method.
+		 * 
 		 * NOTE: All children of the node will remain, but will be re-attached
 		 * to the 'world' node instead. If you want to destroy all children as
 		 * well, then use deleteGraph().
 		 */
 		void deleteNode(const char *id);
+		
 		/**
 		 * deleteGraph() operates similarly to deleteNode(), except that all
 		 * children are also deleted.
 		 */
 		void deleteGraph(const char *id);
+		
 		/**
 		 * The doDelete method performs all of the necessary steps to remove a
 		 * node from the scene: The node's detach() method is called, which will
@@ -146,13 +153,36 @@ class SceneManager
 		 * a message is broadcasted to all clients.
 		 */
 		void doDelete(ReferencedNode *n);
+		
+		/**
+		 * Clears scene elements that are not part of any user's subgraphs
+		 */
 		void clear();
+		
+		/**
+		 * Clears only the users from the scene (and any attached nodes in their
+		 * subgraphs
+		 */
 		void clearUsers();
+		
+		/**
+		 * The refresh method results in a broadcast of all nodelists so that
+		 * clients can create any missing nodes. Then, the full node state is
+		 * broadcasted, for ALL nodes.
+		 */
 		void refresh();
 
-		//SoundConnection* getConnection(char *from, char *to);
 
-		void updateGraph();
+		/**
+		 * The update method is where any thread-safe changes to the scene graph
+		 * should go. The method is guaranteed to be called only when there are
+		 * no traversals being performed.
+		 */
+		void update();
+		
+		
+		
+		
 		osg::Matrix getWorldCoords(t_symbol *id);
 
 		void exportScene (const char *nodeID, const char *filename);
@@ -196,7 +226,7 @@ class SceneManager
 		bool createConnectionsFromXML(TiXmlElement *XMLnode);
 		bool loadXML(const char *filename);
 
-		void setGrid(int gridSize);
+		//void setGrid(int gridSize);
 
 		std::string resourcesPath;
 		
@@ -207,7 +237,7 @@ class SceneManager
 		//pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;
 
 
-		#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHARED_VIDEO
 	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;
 	//std::vector<SharedVideoTexture*> sharedVideoTextures;
 	osg::ref_ptr<SharedVideoTexture> shTex;
@@ -243,23 +273,40 @@ int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv
 
 void oscParser_error(int num, const char *msg, const char *path);
 
-
 /*
 #define BROADCAST(pNode, types, ...) \
-		fprintf (stderr, "broadcasting message: %s %s %.2f %.2f %.2f\n", ("/node/"+string(pNode->id->s_name)).c_str(), ##__VA_ARGS__); \
-       	lo_send(sceneManager->txAddr, ("/node/"+string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
+	if (sceneManager->isServer()) \
+	lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
+
+#define BROADCAST_MSG(pNode, msg) \
+	if (sceneManager->isServer()) \
+	lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
 */
 
-/*
-#define BROADCAST(pNode, types, ...) \
-        lo_send(sceneManager->txAddr, ("/node/"+string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
-*/
+
+// Internal server-side MACROS for sending messages. Clients should NEVER use
+// these macros, and should rather use spinContext::send* methods. But just in
+// case, the macros always check that the passed SceneManager (s) is a server.
+
+#define SCENE_MSG(s, types, ...) \
+	if (s->isServer()) \
+	lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
+
+#define SCENE_LO_MSG(s, msg) \
+	if (s->isServer()) \
+	lo_send_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID).c_str(), msg)
+
+#define NODE_MSG(s, pNode, types, ...) \
+	if (s->isServer()) \
+	lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
+
+#define NODE_LO_MSG(s, pNode, msg) \
+	if (s->isServer()) \
+	lo_send_message_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
 
 
-#define BROADCAST(pNode, types, ...) \
-	if (sceneManager->txServ) lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
-
-
+// backwards compatibility (TODO: replace all BROADCAST messages with NODE_MSG)
+#define BROADCAST(pNode, types, ...) NODE_MSG(pNode->sceneManager, pNode, types, ##__VA_ARGS__)
 
 
 

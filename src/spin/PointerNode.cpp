@@ -280,8 +280,8 @@ void PointerNode::callbackUpdate()
 			for (i=0; i<intersectList.size(); i++) lo_message_add_string(msg, (char*)intersectList[i]->s_name);
 		} else lo_message_add_string(msg, "NULL");
 		
-		sceneManager->sendNodeMessage(this->id, msg);
-		
+		//sceneManager->sendNodeMessage(this->id, msg);
+		NODE_LO_MSG(sceneManager, this, msg);
 	}
 	
 }

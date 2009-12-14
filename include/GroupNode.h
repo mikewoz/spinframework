@@ -118,17 +118,17 @@ public:
 	/**
 	 * The local translation offset for this node with respect to it's parent
 	 */
-	void setTranslation (float x, float y, float z);
+	virtual void setTranslation (float x, float y, float z);
 
 	/**
 	 * The local orientation offset for this node with respect to it's parent
 	 */
-	void setOrientation (float pitch, float roll, float yaw);
+	virtual void setOrientation (float pitch, float roll, float yaw);
 
 	/**
 	 * A grouped scale operation
 	 */
-	void setScale (float x, float y, float z);
+	virtual void setScale (float x, float y, float z);
 
 	
 	/**

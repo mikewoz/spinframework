@@ -79,6 +79,9 @@ class spinContext
 		
 		enum spinContextMode { SERVER_MODE, LISTENER_MODE };
 
+		bool isServer() { return (mode==SERVER_MODE); }
+		bool isSlave() { return (mode!=SERVER_MODE); }
+		
 		
 		bool setMode(spinContextMode m);
 
@@ -92,17 +95,24 @@ class spinContext
 		 */
 		void registerUser(const char *id);
 
-		void sendInfoMessage(std::string OSCpath, const char *types, ...);
-		void sendInfoMessage(std::string OSCpath, const char *types, va_list ap);
-		void sendInfoMessage(std::string OSCpath, lo_message msg);
+		/**
+		 * This sends a variable length message. 
+		 * 
+		 * IMPORTANT: the list must be terminated with LO_ARGS_END, or this call
+		 * will fail.  This is used to do simple error checking on the sizes of
+		 * parameters passed.
+		 */
+		void InfoMessage(std::string OSCpath, const char *types, ...);
+		void InfoMessage(std::string OSCpath, const char *types, va_list ap);
+		void InfoMessage(std::string OSCpath, lo_message msg);
 		
-		void sendSceneMessage(const char *types, ...);
-		void sendSceneMessage(const char *types, va_list ap);
-		void sendSceneMessage(lo_message msg);
+		void SceneMessage(const char *types, ...);
+		void SceneMessage(const char *types, va_list ap);
+		void SceneMessage(lo_message msg);
 
-		void sendNodeMessage(const char *nodeId, const char *types, ...);
-		void sendNodeMessage(const char *nodeId, const char *types, va_list ap);
-		void sendNodeMessage(const char *nodeId, lo_message msg);
+		void NodeMessage(const char *nodeId, const char *types, ...);
+		void NodeMessage(const char *nodeId, const char *types, va_list ap);
+		void NodeMessage(const char *nodeId, lo_message msg);
 
 
 		virtual int sceneCallback(const char *types, lo_arg **argv, int argc);
@@ -117,7 +127,8 @@ class spinContext
 
 		spinContextMode mode;
 
-		osg::ref_ptr<UserNode> user;
+		//osg::ref_ptr<UserNode> user;
+		t_symbol *user;
 		
 		std::string id;
 		std::string rxAddr, rxPort;
@@ -192,5 +203,6 @@ static void *spinServerThread(void *arg);
 
 static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
 
 #endif

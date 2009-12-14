@@ -39,69 +39,57 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __ViewerManipulator_H
-#define __ViewerManipulator_H
+#ifndef GridNode_H_
+#define GridNode_H_
 
-#include <osg/ref_ptr>
-#include <osgViewer/View>
-#include <osgGA/NodeTrackerManipulator>
+#include <osg/Geode>
 
-#include "spinContext.h"
-#include <lo/lo.h>
-#include <lo/lo_lowlevel.h>
 
+#include "ReferencedNode.h"
 
 /**
- * \brief This class provides camera control and picking for viewers that render
- *        a SPIN scene.
- *
- * We override the osgGA::NodeTrackerManipulator class so that our camera can
- * follow any node (ie, the UserNode for the viewer). However, mouse events are
- * handled differently. Instead of directly affecting the state of the viewer's
- * graph, we send the events to the server, which will update the UserNode and
- * the changes will be updated on ALL machines.
- * 
- * Additionally, picking of interactive nodes is supported, allowing the viewer
- * to manipulate content of a SPIN scene using the mouse.
+ * \brief Draws a tiled grid, which is useful for debugging and measurements
  */
-
-class ViewerManipulator : public osgGA::NodeTrackerManipulator
+class GridNode : public ReferencedNode
 {
-	public:
-		//ViewerManipulator(spinContext *s, UserNode *u);
-		//ViewerManipulator(UserNode *u);
-		ViewerManipulator(t_symbol *u);
-		
-		void setRedirection(std::string addr, std::string port);
-		void sendEvent(const char *nodeId, const char *types, ...);
-		void sendEvent(const char *nodeId, const char *types, va_list ap);
-		
-		void setPicker(bool b);
-		void setMover(bool b);
-		
-	    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
-	    void processKeypress(const osgGA::GUIEventAdapter& ea);
-		
-		GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
-	    void processEvent(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
 
-	protected:
-		virtual ~ViewerManipulator();
-		
-		//spinContext *spin;
-		//osg::ref_ptr<UserNode> user;
-		t_symbol *user;
-		
-		t_symbol *selectedNode;
-		
-		lo_address redirectAddr;
-		lo_server_thread  redirectServ;
-		
-		bool picker, mover;
-		float lastX, lastY;
-		float clickX, clickY;
-		
-		osg::Vec3 lastHitPoint;
+public:
+
+	GridNode(SceneManager *sceneManager, char *initID);
+	virtual ~GridNode();
+
+	/**
+	 * The grid size is measured in meters, and defines how far out from the
+	 * center the grid is drawn (ie, half width).
+	 */
+	void setSize		(int _size);
+
+	/**
+	 * Grid line color
+	 */
+	void setColor		(float red, float green, float blue, float alpha);
+
+	int getSize() { return (int) this->_size; }
+	osg::Vec4 getColor() { return this->_color;  };
+
+
+	/**
+	 * For each subclass of ReferencedNode, we override the getState() method to
+	 * fill the vector with the correct set of methods for this particular node
+	 */
+	virtual std::vector<lo_message> getState();
+
+
+private:
+
+	void drawGrid();
+
+	osg::ref_ptr<osg::Geode> gridGeode;
+
+	int _size;
+	float _thickness;
+	osg::Vec4 _color;
+
 };
 
 

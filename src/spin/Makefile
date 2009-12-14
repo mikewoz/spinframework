@@ -36,9 +36,10 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        tinystr.o tinyxml.o tinyxmlerror.o tinyxmlparser.o \
        SceneManager.o MediaManager.o ReferencedNode.o \
        GroupNode.o ShapeNode.o ModelNode.o VideoNode.o LightSource.o \
-       RayNode.o Contour.o ConstraintsNode.o PointerNode.o \
+       RayNode.o GridNode.o Contour.o ConstraintsNode.o PointerNode.o \
        TextNode.o MeasurementNode.o UserNode.o ViewerManipulator.o \
        DSPNode.o Listener.o SoundNode.o SoundSpace.o SoundConnection.o \
+       AnimationNode.o
 
 ifdef SHARED_VIDEO_LIB
   OBJS += SharedVideoNode.o SharedVideoTexture.o  

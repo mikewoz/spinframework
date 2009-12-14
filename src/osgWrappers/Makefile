@@ -9,8 +9,9 @@ all: $(OS)
 
 NODELIST = ReferencedNode GroupNode ShapeNode ModelNode TextNode \
 	   VideoNode LightSource RayNode Contour ConstraintsNode \
-	   PointerNode MeasurementNode SoundNode SoundSpace \
-	   DSPNode Listener SoundConnection UserNode
+	   GridNode PointerNode MeasurementNode SoundNode SoundSpace \
+	   DSPNode Listener SoundConnection UserNode \
+	   AnimationNode
 
 ifdef SHARED_VIDEO_LIB
   NODELIST += SharedVideoNode

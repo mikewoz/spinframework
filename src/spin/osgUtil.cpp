@@ -224,6 +224,7 @@ osg::Vec3 QuatToEuler_old(osg::Quat q)
 	return osg::Vec3(yaw,pitch,roll); // note order is messed up on purpose
 }
 
+/*
 osg::Geode* createGrid(int radius, osg::Vec4 color)
 {
 	int i,j;
@@ -293,6 +294,7 @@ osg::Geode* createGrid(int radius, osg::Vec4 color)
 	
 	return gridGeode;
 }
+*/
 
 osg::Geometry* createPlane(float halfLength, osg::Vec4 color)
 {

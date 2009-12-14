@@ -48,13 +48,17 @@
 using namespace osgGA;
 
 //ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
-ViewerManipulator::ViewerManipulator(UserNode *u)
+//ViewerManipulator::ViewerManipulator(UserNode *u)
+ViewerManipulator::ViewerManipulator(t_symbol *u)
 {
-	if (!u) {
-		std::cout << "ERROR: Could not create ViewerManipulator because no user is registered with SPIN" << std::endl;
+	this->user = u;
+	
+	UserNode *n = dynamic_cast<UserNode*>(user->s_thing);
+	if (!n)
+	{
+		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
 	} else {
-		this->user = u;
-		setTrackNode(user->getAttachmentNode());
+		setTrackNode(n->getAttachmentNode());
 	}
 	
 	this->picker = false;
@@ -132,7 +136,7 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 	if (!err)
 	{
 		if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
-		else spin.sendNodeMessage(nodeId, msg);
+		else spin.NodeMessage(nodeId, msg);
 		
 	} else {
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
@@ -193,7 +197,7 @@ void ViewerManipulator::processKeypress(const GUIEventAdapter& ea)
 {
 	if (ea.getKey()=='r')
 	{
-		sendEvent(user->id->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
+		sendEvent(user->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
 	}
 }
 
@@ -305,7 +309,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 	    					"sisfffff",
 	    					"event",
 	    					(int)ea.getEventType(),
-	    					user->id->s_name,
+	    					user->s_name,
 	    					dX,
 	    					dY,
 	    					LO_ARGS_END);
@@ -316,7 +320,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 	    					"sisfffff",
 	    					"event",
 	    					(int)ea.getEventType(),
-	    					user->id->s_name,
+	    					user->s_name,
 	    					dX,
 	    					dY,
 	    					LO_ARGS_END);
@@ -326,7 +330,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 			    			"sisfffff",
 			    			"event",
 			    			(int)ea.getEventType(),
-			    			user->id->s_name,
+			    			user->s_name,
 			    			(float) ea.getModKeyMask(),
 			    			(float) ea.getButtonMask(),
 							0, 0, 0,
@@ -409,7 +413,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 							  "sisfffff",
 							  "picevent",
 							  (int)ea.getEventType(),
-							  user->id->s_name,
+							  user->s_name,
 							  dX,
 							  dY,
 							  lastHitPoint.x(),
@@ -426,7 +430,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 							  "sisfffff",
 							  "event",
 							  (int)ea.getEventType(),
-							  user->id->s_name,
+							  user->s_name,
 							  dX,
 							  dY,
 							  lastHitPoint.x(),
@@ -444,7 +448,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 			    			"sisfffff",
 			    			"event",
 			    			(int)ea.getEventType(),
-			    			user->id->s_name,
+			    			user->s_name,
 			    			(float) ea.getModKeyMask(),
 			    			(float) ea.getButtonMask(),
 							lastHitPoint.x(),
@@ -461,7 +465,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 							  "sisfffff",
 							  "event",
 							  (int)ea.getEventType(),
-							  user->id->s_name,
+							  user->s_name,
 							  scrollX,
 							  scrollY,
 							  lastHitPoint.x(),
@@ -477,7 +481,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 							  "sisfffff",
 							  "event",
 							  (int)ea.getEventType(),
-							  user->id->s_name,
+							  user->s_name,
 							  (float) ea.getModKeyMask(),
 							  (float) ea.getButtonMask(),
 							  lastHitPoint.x(),
@@ -506,9 +510,9 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				clickY = ea.getYnormalized();
 				
 				
-				sendEvent(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(user->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
 				if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
-					sendEvent(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+					sendEvent(user->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 
 				
 				break;
@@ -536,17 +540,17 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// pan forward/back & left/right:
-				    	sendEvent(user->id->s_name, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
+				    	sendEvent(user->s_name, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// pan up/down & left/right:
-				    	sendEvent(user->id->s_name, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
+				    	sendEvent(user->s_name, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
 				    }
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-				    	sendEvent(user->id->s_name, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
+				    	sendEvent(user->s_name, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
 				    }
 				}
 			
@@ -560,26 +564,26 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// drive forward/back & left/right:
-			    		sendEvent(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
+			    		sendEvent(user->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
 			    		
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// drive up/down & left/right:
-			    		sendEvent(user->id->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
+			    		sendEvent(user->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
 			    	}
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-			    		sendEvent(user->id->s_name, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
+			    		sendEvent(user->s_name, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
 				    }
 			    }
 
 				break;
 				
 			case(GUIEventAdapter::RELEASE):
-				//sendEvent(user->id->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
-				//sendEvent(user->id->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+				//sendEvent(user->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				//sendEvent(user->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 				break;
 				
 			case(GUIEventAdapter::SCROLL):

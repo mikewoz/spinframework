@@ -441,8 +441,11 @@ std::vector<lo_message> ReferencedNode::getState ()
 void ReferencedNode::stateDump ()
 {
 
+	sceneManager->sendNodeBundle(this->id, this->getState());
+	
+	/*
 	vector<lo_message> nodeState = this->getState();
-
+	
 	vector<lo_message>::iterator iter = nodeState.begin();
 	while (iter != nodeState.end())
 	{
@@ -451,5 +454,5 @@ void ReferencedNode::stateDump ()
 		//lo_message_free(*iter);
 		nodeState.erase(iter); //note: iterator automatically advances after erase()
 	}
-
+	*/
 }

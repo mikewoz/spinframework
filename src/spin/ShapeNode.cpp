@@ -302,13 +302,15 @@ void ShapeNode::drawTexture()
 	{
 			
 		
-#ifdef WITH_SHARED_VIDEO		
 		
 		// if filename contains "shared_video_texture", then replace
 		// current TextureAttribute with a SharedVideoTexture
 		size_t pos;
 		if ((pos=texturePath.find("shared_video_texture")) != string::npos)
 		{
+
+#ifdef WITH_SHARED_VIDEO		
+
 			
 			// find the shared memory id from the filename:
 			std::string shID = "shvid_"+texturePath.substr(pos+20, texturePath.rfind(".")-(pos+20));
@@ -362,14 +364,11 @@ void ShapeNode::drawTexture()
 
 			
 			std::cout << "  replaced '" << texturePath.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
-		}
+
 #endif
-		
-		
-		
-		
-		
-		
+
+		}
+
 		
 		else {
 		

@@ -375,6 +375,14 @@ void ModelNode::drawModel()
 								// turn off lighting 
 				    			(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
+				    			
+				    			if (image->isImageTranslucent())
+				    			{
+				    				std::cout << "  Transparent movie, enabling blending." << std::endl;
+				    				(*itr)->setMode(GL_BLEND, osg::StateAttribute::ON);
+				    				(*itr)->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+				    			}
+				    			
 								
 								//if (imagestream.valid()) imagestream->play();
 								//_play = true;

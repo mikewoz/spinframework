@@ -224,8 +224,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 		osgDB::Registry::instance()->setOptions(opt);
 	*/
 	
-	
-	this->sendSceneMessage("s", "userRefresh");
 }
 
 // *****************************************************************************
@@ -234,8 +232,9 @@ SceneManager::~SceneManager()
 {
 	std::cout << "Cleaning up SceneManager..." << std::endl;
 	
-	// 
+#ifdef WITH_SHARED_VIDEO
 	shTex->stop();
+#endif
 	
 	
 	// Force a delete (and destructor call) for all nodes still in the scene:
@@ -309,29 +308,6 @@ void SceneManager::setTXaddress (std::string addr, std::string port)
 		std::cout << "  SceneManager is sending scene updates to: " << lo_address_get_url(txAddr) << std::endl;
 		//std::cout << "  ... via liblo server: " << lo_server_get_url(txServ) << std::endl;
 	}
-}
-
-void SceneManager::sendSceneMessage(const char *types, ...)
-{
-	if (!txServ) return;
-
-
-	lo_message msg = lo_message_new();
-
-	va_list ap;
-	va_start(ap, types);
-
-	int err = lo_message_add_varargs(msg, types, ap);
-
-	if (!err)
-	{
-		string OSCpath = "/SPIN/" + sceneID;
-		lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
-	} else {
-		std::cout << "ERROR (lo_message_add_varargs): " << err << std::endl;
-	}
-
-	//lo_message_free(msg);
 }
 
 void SceneManager::sendNodeList(std::string typeFilter)
@@ -454,7 +430,34 @@ void SceneManager::sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msg
 
 	lo_bundle_free_messages(b);
 }
-	
+
+/*
+
+
+void SceneManager::sendSceneMessage(const char *types, ...)
+{
+	if (!txServ) return;
+
+
+	lo_message msg = lo_message_new();
+
+	va_list ap;
+	va_start(ap, types);
+
+	int err = lo_message_add_varargs(msg, types, ap);
+
+	if (!err)
+	{
+		string OSCpath = "/SPIN/" + sceneID;
+		lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
+	} else {
+		std::cout << "ERROR (lo_message_add_varargs): " << err << std::endl;
+	}
+
+	//lo_message_free(msg);
+}
+
+
 void SceneManager::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
 {
 	if (!txServ) return;
@@ -477,18 +480,6 @@ void SceneManager::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
 	va_list ap;
 	va_start(ap, types);
 
-	/*
-    while (types && *types) {
-        count++;
-        switch (*types++) {
-        */
-
-	/* The data will be added in OSC byteorder (bigendian).
-	 * IMPORTANT: args list must be terminated with LO_ARGS_END, or this call will
-	 * fail.  This is used to do simple error checking on the sizes of parameters
-	 * passed.
-	*/
-
 	err = lo_message_add_varargs(msg, types, ap);
 
 	if (!err)
@@ -499,7 +490,7 @@ void SceneManager::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
 	}
 
 }
-
+*/
 
 
 // *****************************************************************************
@@ -574,7 +565,8 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 			std::cout << "ERROR: Tried to create " << type << " with id '" << id << "', but that id already exists as an " << n->nodeType << "." << std::endl;
 			return NULL;
 		} else {
-			if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
+			SCENE_MSG(this, "sss", "createNode", id, type);
+			//if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
 			return n.get();
 		}
 	}
@@ -684,11 +676,14 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 		//nodeList.push_back(n);
 		nodeMap[n->nodeType].push_back(n);
 
-		// broadcast:
-		if (txServ)
+		// broadcast (only if this is the server):
+		SCENE_MSG(this, "sss", "createNode", id, type);
+		/*
+		if (this->isServer())
 		{
 			lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
 		}
+		*/
 
 		return n.get();
 	}
@@ -1044,10 +1039,12 @@ SoundConnection* SceneManager::getConnection(char *from, char *to)
 // will invalidate iterators that are on the stack (NodeVisitor uses nested 
 // calls to do traversal).
 
-void SceneManager::updateGraph()
+void SceneManager::update()
 {
 	
+#ifdef WITH_SHARED_VIDEO
 	if (shTex.valid()) shTex->updateCallback();
+#endif
 
 }
 
@@ -1571,48 +1568,13 @@ bool SceneManager::loadXML(const char *s)
 		}
 	}
 
-
-	// note: the setParent() just set the intended parent. We still have to call
-	// sceneManager::updateGraph() to force the changes to the scene graph:
-
-	this->updateGraph();
-
-
+	
+	this->update();
 
 	std::cout << "Successfully loaded scene from " << filename << std::endl;
 	return true;
 
 }
-
-
-
-// *****************************************************************************
-void SceneManager::setGrid(int gridSize)
-{
-	std::cout << "called setGrid() with : " << gridSize << std::endl;
-
-	// first remove existing grid (if any):
-	if (gridGeode.valid())
-	{
-		if (worldNode->containsNode(gridGeode.get()))
-		{
-			worldNode->removeChild(gridGeode.get());
-			gridGeode = NULL;
-		}
-	}
-
-	// now create a new grid and add it to the worldNode:
-	if (gridSize > 0)
-	{
-		gridGeode = createGrid(gridSize, osg::Vec4(0.3,0.3,0.3,0.0));
-		worldNode->addChild(gridGeode.get());
-	}
-
-	sendSceneMessage("si", "setGrid", gridSize, LO_ARGS_END);
-}
-
-
-
 
 
 
@@ -1742,8 +1704,9 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	// the message:
 	if (!invokeMethod(classInstance, classType, theMethod, theArgs))
 	{
-		if (n->sceneManager->txServ)
+		if (n->sceneManager->isServer())
 		{
+
 			//std::cout << "Ignoring method '" << theMethod << "' for [" << n->id->s_name << "], but forwarding message anyway..." << std::endl; 
 			lo_message msg = lo_message_new();
 			for (i=0; i<argc; i++)
@@ -1755,8 +1718,9 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 					lo_message_add_string(msg, (const char*) argv[i] );
 				}
 			}
-				
-			n->sceneManager->sendNodeMessage(n->id, msg);
+			
+			lo_send_message_from(n->sceneManager->txAddr, n->sceneManager->txServ, ("/SPIN/"+n->sceneManager->sceneID+"/"+std::string(n->id->s_name)).c_str(), msg);
+			//n->sceneManager->sendNodeMessage(n->id, msg);
 		}
 	}
 
@@ -1805,6 +1769,19 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 {
 	SceneManager *sceneManager = (SceneManager*) user_data;
 
+	if (0)
+	{
+		printf("************ oscCallback_debug() got message: %s\n", (char*)path);
+		printf("sceneManager passed as user_data: sceneID=%s\n", (sceneManager->sceneID).c_str());
+		for (int i=0; i<argc; i++) {
+			printf("arg %d '%c' ", i, types[i]);
+	    	lo_arg_pp((lo_type) types[i], argv[i]);
+	    	printf("\n");
+		}
+		printf("\n");
+		fflush(stdout);
+	}
+	
 	// make sure there is at least one argument (ie, a method to call):
 	if (!argc) return 0;
 
@@ -1815,9 +1792,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 		theMethod = string((char *)argv[0]);
 	}
 	else return 0;
-
-	//std::cout << "in callback_admin. got method: " << theMethod << std::endl;
-
+	
 	//pthread_mutex_lock(&pthreadLock);
 
 	// note that args start at argv[1] now:
@@ -1828,7 +1803,11 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 	else if (theMethod=="clearUsers")
 		sceneManager->clearUsers();
 	else if (theMethod=="userRefresh")
-		sceneManager->sendSceneMessage("s", "userRefresh", LO_ARGS_END);
+	{
+		SCENE_MSG(sceneManager, "s", "userRefresh");
+		//lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID).c_str(), "s", "uesrRefresh");
+		//sceneManager->sendSceneMessage("s", "userRefresh", LO_ARGS_END);
+	}
 	else if (theMethod=="refresh")
 		sceneManager->refresh();
 	else if (theMethod=="getNodeList")
@@ -1857,8 +1836,8 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 		sceneManager->deleteNode((char*)argv[1]);
 	else if ((theMethod=="deleteGraph") && (argc==2))
 		sceneManager->deleteGraph((char*)argv[1]);
-	else if ((theMethod=="setGrid") && (argc==2))
-		if (lo_is_numerical_type((lo_type)types[1])) sceneManager->setGrid((int) lo_hires_val((lo_type)types[1], argv[1]));
+//	else if ((theMethod=="setGrid") && (argc==2))
+//		if (lo_is_numerical_type((lo_type)types[1])) sceneManager->setGrid((int) lo_hires_val((lo_type)types[1], argv[1]));
 
 	else {
 		std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;

@@ -78,9 +78,15 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	// store pointer to sceneManager
 	sceneManager = s;
 	
-	// broadcast the creation of this connection (for editors)
-	sceneManager->sendSceneMessage("sss", "createNode", id->s_name, "SoundConnection", LO_ARGS_END);	
-	
+	// broadcast the creation of this connection
+	SCENE_MSG(sceneManager, "sss", "createNode", id->s_name, "SoundConnection");
+	/*;
+	if (spinContext::Instance().isServer())
+	{
+		//sceneManager->sendSceneMessage("sss", "createNode", id->s_name, "SoundConnection", LO_ARGS_END);	
+		spinContext::Instance().SceneMessage("sss", "createNode", id->s_name, "SoundConnection", LO_ARGS_END);	
+	}
+	*/
 }
 
 
@@ -95,9 +101,15 @@ SoundConnection::~SoundConnection()
 	//std::cout << "In SoundConnection destructor... id: " << this->id->s_name << std::endl;
 	
 	
-	// broadcast the delete message of this connection (for editors)
-	sceneManager->sendSceneMessage("ss", "deleteNode", id->s_name, LO_ARGS_END);	
-	
+	// broadcast the delete message of this connection
+	SCENE_MSG(sceneManager, "ss", "deleteNode", id->s_name);
+	/*
+	if (spinContext::Instance().isServer())
+	{
+		//sceneManager->sendSceneMessage("ss", "deleteNode", id->s_name, LO_ARGS_END);	
+		spinContext::Instance().SceneMessage("ss", "deleteNode", id->s_name, LO_ARGS_END);	
+	}	
+	*/
 
 	string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
 	lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
@@ -489,9 +501,10 @@ std::vector<lo_message> SoundConnection::getState ()
 // *****************************************************************************
 void SoundConnection::stateDump ()
 {
-	// NOTE: this operates differently than other nodes. We dump the state
-	// with respect to the source node.
+
+	sceneManager->sendNodeBundle(this->id, this->getState());
 	
+	/*
 	vector<lo_message> nodeState = this->getState();
 
 	vector<lo_message>::iterator iter = nodeState.begin();
@@ -501,5 +514,5 @@ void SoundConnection::stateDump ()
 		sceneManager->sendNodeMessage(this->id, (*iter));
 		nodeState.erase(iter); //note: iterator automatically advances after erase()
 	}
-	
+	*/
 }

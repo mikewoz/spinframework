@@ -197,6 +197,14 @@ int main(int argc, char **argv)
     }
 
 
+    osgViewer::ViewerBase::Windows windows;
+    osgViewer::ViewerBase::Windows::iterator wIter;
+    viewer.getWindows(windows);
+    for (wIter=windows.begin(); wIter!=windows.end(); wIter++)
+    {
+    	(*wIter)->setWindowName("spinViewer");
+    }
+    
     view->setSceneData(spin.sceneManager->rootNode.get());
 
 	view->addEventHandler(new osgViewer::StatsHandler);
@@ -216,9 +224,10 @@ int main(int argc, char **argv)
 	// create a camera manipulator
 
 	osg::ref_ptr<ViewerManipulator> manipulator;
-	if (spin.user.valid())
+	if (1) // if (spin.user.valid())
 	{
-		manipulator = new ViewerManipulator(spin.user.get());
+		//manipulator = new ViewerManipulator(spin.user.get());
+		manipulator = new ViewerManipulator(spin.user);
 		
 		manipulator->setPicker(picker);
 		manipulator->setMover(mover);
@@ -263,7 +272,7 @@ int main(int argc, char **argv)
 	viewer.realize();
 
 	// ask for refresh:
-	spin.sendSceneMessage("s", "refresh", LO_ARGS_END);
+	spin.SceneMessage("s", "refresh", LO_ARGS_END);
 	
 	osg::Timer_t lastTick = osg::Timer::instance()->tick();
 	osg::Timer_t frameTick = lastTick;
@@ -275,18 +284,17 @@ int main(int argc, char **argv)
 		
 		if (spin.isRunning())
 		{
+			/*
 			frameTick = osg::Timer::instance()->tick();
 			if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 			{
-				spin.sendInfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
+				spin.InfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
 				lastTick = frameTick;
 			}
+			*/
 
-			// We now have to go through all the nodes, and check if we need to update the
-			// graph. Note: this cannot be done as a callback in a traversal - dangerous.
-			// In the callback, we have simply flagged what needs to be done.
 			pthread_mutex_lock(&pthreadLock);
-			spin.sceneManager->updateGraph();
+			spin.sceneManager->update();
 			pthread_mutex_unlock(&pthreadLock);
 	
 			pthread_mutex_lock(&pthreadLock);

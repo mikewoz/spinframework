@@ -95,7 +95,7 @@ osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle);
 osg::Quat EulerToQuat(float roll, float pitch, float yaw);
 osg::Vec3 QuatToEuler(osg::Quat q);
 
-osg::Geode* 	createGrid(int radius, osg::Vec4 color);
+//osg::Geode* 	createGrid(int radius, osg::Vec4 color);
 osg::Geometry*	createPlane(float halfLength, osg::Vec4 color);
 osg::Geode*		createHollowSphere(float radius, osg::Vec4 color);
 osg::Geode*		createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color);
