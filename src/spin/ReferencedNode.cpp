@@ -369,7 +369,7 @@ void ReferencedNode::debug()
 
 	vector<lo_message> nodeState = this->getState();
 	vector<lo_message>::iterator nodeStateIterator;
-	for (nodeStateIterator = nodeState.begin(); nodeStateIterator != nodeState.end() ; nodeStateIterator++)
+	for (nodeStateIterator = nodeState.begin(); nodeStateIterator != nodeState.end(); ++nodeStateIterator)
 	{
 	    argTypes = lo_message_get_types(*nodeStateIterator);
 	    argc = lo_message_get_argc(*nodeStateIterator);
@@ -395,9 +395,9 @@ void ReferencedNode::debug()
 	{
 		std::cout << "   children:" << std::endl;
 		vector<ReferencedNode*>::iterator childIter;
-		for (childIter = this->children.begin(); childIter != this->children.end() ; childIter++)
+		for (childIter = this->children.begin(); childIter != this->children.end(); ++childIter)
 		{
-			std::cout << "      " << (*childIter)->id->s_name;
+			std::cout << "      " << (*childIter)->id->s_name << std::endl;
 		}
 	}
 

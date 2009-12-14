@@ -159,7 +159,7 @@ void ViewerManipulator::setMover(bool b)
 	if (1)//(mover!=b)
 	{
 		this->mover = b;
-		if (mover) std::cout << "Camera motion controls:\tDisabled" << std::endl;
+		if (mover) std::cout << "Camera motion controls:\tEnabled" << std::endl;
 		else std::cout << "Camera motion controls:\tDisabled" << std::endl;	
 	}
 }
@@ -169,7 +169,10 @@ bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
 	if (ea.getEventType()==GUIEventAdapter::FRAME)
 	{
 		// update from NodeTrackerManipulator:
-		if (_thrown) aa.requestRedraw();
+		if (user->s_thing)
+		{
+			if (_thrown) aa.requestRedraw();
+		}
 	}
 	
 	else if ((ea.getEventType()==GUIEventAdapter::MOVE)||

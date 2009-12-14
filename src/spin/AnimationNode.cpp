@@ -63,15 +63,21 @@ AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupN
 	this->setName(string(id->s_name) + ".AnimationNode");
 	nodeType = "AnimationNode";
 
+	setReportMode(GroupNode::GLOBAL_6DOF);
+	
 	_record = false;
 
 	_animationPath = new osg::AnimationPath;
 	_animationPath->setLoopMode(osg::AnimationPath::LOOP);
 	
-	_animationPathCallback = new osg::AnimationPathCallback(_animationPath,0.0,1.0);
-    mainTransform->setUpdateCallback(_animationPathCallback);
+	
+	_animationPathCallback = new osg::AnimationPathCallback(_animationPath.get(),0.0,1.0);
+    
+	mainTransform->setDataVariance(osg::Object::DYNAMIC);
+	//mainTransform->setUserData( dynamic_cast<osg::Referenced*>(mainTransform.get()) );
+	mainTransform->setUpdateCallback(_animationPathCallback.get());
 
-
+    _animationPathCallback->setPause(true);
 }
 
 // *****************************************************************************
@@ -86,8 +92,14 @@ AnimationNode::~AnimationNode()
 
 void AnimationNode::setPlay (int i)
 {
-	_animationPathCallback->setPause(!((bool)i));
-	if (getPlay()) setRecord(false);
+	if (i)
+	{
+		_animationPathCallback->setPause(false);
+		setRecord(0);
+	}
+	else {
+		_animationPathCallback->setPause(true);
+	}
 	
 	BROADCAST(this, "si", "setPlay", getPlay());
 }
@@ -106,11 +118,11 @@ void AnimationNode::setRecord (int i)
 		BROADCAST(this, "si", "setRecord", getRecord());
 	}
 }
-void AnimationNode::setLoopMode (osg::AnimationPath::LoopMode mode)
+void AnimationNode::setLoopMode (LoopMode mode)
 {
-	if (_animationPath->getLoopMode() != mode)
+	if (_animationPath->getLoopMode() != (osg::AnimationPath::LoopMode)mode)
 	{
-		_animationPath->setLoopMode(mode);
+		_animationPath->setLoopMode((osg::AnimationPath::LoopMode)mode);
 		BROADCAST(this, "si", "setLoopMode", getLoopMode());
 	}
 }
@@ -176,20 +188,24 @@ std::vector<lo_message> AnimationNode::getState ()
 
 	lo_message msg;
 	
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "sd", "currentTime", _animationPathCallback->getAnimationTime());
+	ret.push_back(msg);
+	
+	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setPlay", getPlay());
 	ret.push_back(msg);
 	
+	/*
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRecord", getRecord());
 	ret.push_back(msg);
+	*/
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setLoopMode", getLoopMode());
-	ret.push_back(msg);
-	
-	msg = lo_message_new();
-	lo_message_add(msg, "s", "clear");
 	ret.push_back(msg);
 	
 	osg::AnimationPath::TimeControlPointMap::iterator itr;
@@ -200,7 +216,7 @@ std::vector<lo_message> AnimationNode::getState ()
 		osg::Vec3 pos = (*itr).second.getPosition();
 		osg::Quat rot = (*itr).second.getRotation();
 		osg::Vec3 scl = (*itr).second.getScale();
-		lo_message_add(msg, "sdfffffff", "controlPoint", pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), rot.w(), scl.x(), scl.y(), scl.z());
+		lo_message_add(msg, "sdffffffffff", "controlPoint", (*itr).first, pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), rot.w(), scl.x(), scl.y(), scl.z());
 		ret.push_back(msg);
 	}
 

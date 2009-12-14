@@ -283,6 +283,7 @@ class ReferencedNode_callback : public osg::NodeCallback
 {
 
 	public:
+		
 		virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
 		{
 			osg::ref_ptr<ReferencedNode> thisNode = dynamic_cast<ReferencedNode*> (node->getUserData());
@@ -292,6 +293,7 @@ class ReferencedNode_callback : public osg::NodeCallback
 				//std::cout << "in ReferencedNode_callback for node: " << thisNode->id->s_name << std::endl;
 				thisNode->callbackUpdate();
 			}
+			
 			traverse(node, nv);
 		}
 };

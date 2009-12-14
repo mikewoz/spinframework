@@ -294,11 +294,13 @@ int main(int argc, char **argv)
 			pthread_mutex_unlock(&pthreadLock);
 		
 		} else {
+			
 			if (manipulator.valid())
 			{
 				view->setCameraManipulator(NULL);
 				manipulator.release();
 			}
+			
 			viewer.setDone(true);
 		}
 		

@@ -46,6 +46,7 @@
 
 #include <osg/AnimationPath>
 
+
 /**
  * \brief Node for encapsulating 3D animation
  */
@@ -57,12 +58,12 @@ public:
 	AnimationNode(SceneManager *sceneManager, char *initID);
 	virtual ~AnimationNode();
 	
-	// enum LoopMode { SWING, LOOP, NO_LOOPING };
+	enum LoopMode { SWING, LOOP, NO_LOOPING };
 
 	void setPlay (int onoff);
-	int getPlay() { (int) !_animationPathCallback->getPause(); }
+	int getPlay() { if (_animationPathCallback->getPause()) return 0; else return 1; }
 	
-	void reset() { _animationPathCallback->reset(); }
+	void reset(int i) { _animationPathCallback->reset(); }
 	
     /**
      * Turns on/off automatic recording. This implies that whenever the node
@@ -76,7 +77,7 @@ public:
 	/**
 	 * Sets the loop mode for the animation. eg, SWING, LOOP, NO_LOOPING.
 	 */
-	void setLoopMode (osg::AnimationPath::LoopMode mode);
+	void setLoopMode (LoopMode mode);
 	int getLoopMode() { return (int) _animationPath->getLoopMode(); }
 	
 	/**
@@ -111,12 +112,12 @@ public:
 	/**
 	 * Explicitely adds a control point into the animation sequence
 	 */
-	void controlPoint (double timestamp, float x, float y, float z, float rotX, float rotY, float rotY, float rotW, float scaleX, float scaleY, float scaleZ);
+	void controlPoint (double timestamp, float x, float y, float z, float rotX, float rotY, float rotZ, float rotW, float scaleX, float scaleY, float scaleZ);
 	
 	/**
 	 * Clears the current animation sequence
 	 */
-	void clear() { _animationPath->clear(); }
+	void clear(int i) { _animationPath->clear(); }
 
 	
 	
@@ -133,7 +134,7 @@ protected:
 	
 	bool _record;
 	osg::Timer_t _recordStart;
-	osg::AnimationPath::LoopMode _loopMode;
+	//LoopMode _loopMode;
 	
 	osg::ref_ptr<osg::AnimationPath> _animationPath;
 	osg::ref_ptr<osg::AnimationPathCallback> _animationPathCallback;
