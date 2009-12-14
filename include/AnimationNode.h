@@ -60,18 +60,20 @@ public:
 	
 	enum LoopMode { SWING, LOOP, NO_LOOPING };
 
-	void setPlay (int onoff);
-	int getPlay() { if (_animationPathCallback->getPause()) return 0; else return 1; }
 	
-	void reset(int i) { _animationPathCallback->reset(); }
 	
+	virtual void callbackUpdate();
+	
+	void setPlay (int p);
+	int getPlay() { return (int) _play; }
+		
     /**
      * Turns on/off automatic recording. This implies that whenever the node
      * gets an update of translation or orientation, a new position will be
      * saved. Each position will be added with a timestamp relative to the start
      * of the recording.
      */
-	void setRecord (int onoff);
+	void setRecord (int r);
 	int getRecord() { return (int) _record; }
 	
 	/**
@@ -117,7 +119,7 @@ public:
 	/**
 	 * Clears the current animation sequence
 	 */
-	void clear(int i) { _animationPath->clear(); }
+	void clear() { _animationPath->clear(); }
 
 	
 	
@@ -132,13 +134,12 @@ public:
 	
 protected:
 	
-	bool _record;
-	osg::Timer_t _recordStart;
+	bool _play, _record;
+	osg::Timer_t _startTime, _lastTick;
 	//LoopMode _loopMode;
 	
 	osg::ref_ptr<osg::AnimationPath> _animationPath;
-	osg::ref_ptr<osg::AnimationPathCallback> _animationPathCallback;
-
+	//osg::ref_ptr<osg::AnimationPathCallback> _animationPathCallback;
 
 
 };

@@ -39,9 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include <osgDB/ReadFile>
-#include <osg/Geometry>
-#include <osg/Billboard>
+//#include <osg/Matrix>
 
 #include "osgUtil.h"
 #include "AnimationNode.h"
@@ -65,12 +63,15 @@ AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupN
 
 	setReportMode(GroupNode::GLOBAL_6DOF);
 	
+	_play = false;
 	_record = false;
 
 	_animationPath = new osg::AnimationPath;
 	_animationPath->setLoopMode(osg::AnimationPath::LOOP);
 	
+	lastTick = osg::Timer::instance()->tick();
 	
+	/*
 	_animationPathCallback = new osg::AnimationPathCallback(_animationPath.get(),0.0,1.0);
     
 	mainTransform->setDataVariance(osg::Object::DYNAMIC);
@@ -78,6 +79,7 @@ AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupN
 	mainTransform->setUpdateCallback(_animationPathCallback.get());
 
     _animationPathCallback->setPause(true);
+	 */
 }
 
 // *****************************************************************************
@@ -87,34 +89,86 @@ AnimationNode::~AnimationNode()
 
 }
 
+
+
+// *****************************************************************************
+
+void AnimationNode::callbackUpdate()
+{
+
+    if ( !sceneManager->isSlave() && getPlay() && !_animationPath->empty())
+	{
+	    osg::Timer_t tick = osg::Timer::instance()->tick();
+		float dt = osg::Timer::instance()->delta_s(_lastTick,tick);
+		
+		
+		if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
+		//if (dt > 0.1) // only update when dt is at least 0.1s (ie 10hz):
+		{
+			double currentTime = osg::Timer::instance()->delta_s(_startTime,tick);
+			
+			osg::Matrix myMatrix;
+			if (_animationPath->getMatrix(currentTime, myMatrix))
+			{
+				osg::Vec3 myPos = myMatrix.getTrans();
+				osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
+				osg::Vec3 myScl = myMatrix.getScale();
+				
+				setTranslation(myPos.x(), myPos.y(), myPos.z());
+				setOrientation(myRot.x(), myRot.y(), myRot.z());
+				setScale(myScl.x(), myScl.y(), myScl.z());
+			}
+			
+			
+			/*
+			AnimationPath::ControlPoint cp;
+			if (_animationPath->getInterpolatedControlPoint(currentTime,cp))
+			{
+				mainTransform.setPosition(cp.getPosition());
+				mainTransform.setAttitude(cp.getRotation());
+				mainTransform.setScale(cp.getScale());
+			}
+			*/
+
+			lastTick = tick;
+		}
+	}
+
+}
+
 	
 // *****************************************************************************
 
-void AnimationNode::setPlay (int i)
+void AnimationNode::setPlay (int p)
 {
-	if (i)
+	if (_play != p)
 	{
-		_animationPathCallback->setPause(false);
-		setRecord(0);
+		_play = (bool)p;
+		
+		if (_play)
+		{
+			setRecord(0);
+			_startTime = osg::Timer::instance()->tick();
+		}
+		
+		BROADCAST(this, "si", "setPlay", getPlay());
 	}
-	else {
-		_animationPathCallback->setPause(true);
-	}
-	
-	BROADCAST(this, "si", "setPlay", getPlay());
 }
 
-void AnimationNode::setRecord (int i)
+void AnimationNode::setRecord (int r)
 {
-	if (_record!=i)
+	if (_record != r)
 	{
-		_record = (bool)i;
+		_record = (bool)r;
+		
 		if (_record)
 		{
-			setPlay(false);
-			_recordStart = osg::Timer::instance()->tick();
+			setPlay(0);
+			clear();
+			_startTime = osg::Timer::instance()->tick();
 			storeCurrentPosition(0.0); // record current pos as start position
 		}
+		
 		BROADCAST(this, "si", "setRecord", getRecord());
 	}
 }
@@ -158,17 +212,24 @@ void AnimationNode::setScale (float x, float y, float z)
 
 void AnimationNode::storeCurrentPosition()
 {
-	double dt = osg::Timer::instance()->delta_s(_recordStart,osg::Timer::instance()->tick());
+	double dt = osg::Timer::instance()->delta_s(_startTime,osg::Timer::instance()->tick());
 	storeCurrentPosition( dt );
 }
 
 void AnimationNode::storeCurrentPosition(double timestamp)
 {
+	/*
 	_animationPath->insert(timestamp, osg::AnimationPath::ControlPoint(
 			mainTransform->getPosition(),
 			mainTransform->getAttitude(),
 			mainTransform->getScale())
 	);
+	*/
+	
+	osg::Vec3 myPos = mainTransform->getPosition();
+	osg::Quat myRot = mainTransform->getAttitude();
+	osg::Vec3 myScl = mainTransform->getScale();
+	controlPoint( timestamp, myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z(), myRot.w(), myScl.x(), myScl.y(), myScl.z() );
 }
 
 void AnimationNode::controlPoint (double timestamp, float x, float y, float z, float rotX, float rotY, float rotZ, float rotW, float scaleX, float scaleY, float scaleZ)
@@ -178,6 +239,9 @@ void AnimationNode::controlPoint (double timestamp, float x, float y, float z, f
 			osg::Quat(rotX,rotY,rotZ,rotW),
 			osg::Vec3(scaleX,scaleY,scaleZ))
 	);
+	
+	BROADCAST(this, "sdffffffffff", "controlPoint", timestamp, x, y, z, rotX, rotY, rotZ, rotW, scaleX, scaleY, scaleZ);
+
 }
 
 // *****************************************************************************
@@ -188,12 +252,6 @@ std::vector<lo_message> AnimationNode::getState ()
 
 	lo_message msg;
 	
-	
-	msg = lo_message_new();
-	lo_message_add(msg, "sd", "currentTime", _animationPathCallback->getAnimationTime());
-	ret.push_back(msg);
-	
-	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setPlay", getPlay());
 	ret.push_back(msg);
@@ -203,7 +261,7 @@ std::vector<lo_message> AnimationNode::getState ()
 	lo_message_add(msg, "si", "setRecord", getRecord());
 	ret.push_back(msg);
 	*/
-
+	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setLoopMode", getLoopMode());
 	ret.push_back(msg);

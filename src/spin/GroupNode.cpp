@@ -370,24 +370,29 @@ void GroupNode::setClipping(float x, float y, float z)
 
 void GroupNode::setTranslation (float x, float y, float z)
 {
-	mainTransform->setPosition(osg::Vec3d(x,y,z));
-
-	BROADCAST(this, "sfff", "setTranslation", x, y, z);
+	osg::Vec3 newTranslation = osg::Vec3(x,y,z);
+	
+	if (newTranslation != getTranslation())
+	{
+		mainTransform->setPosition(newTranslation);
+		BROADCAST(this, "sfff", "setTranslation", x, y, z);
+	}
 }
 
 
 void GroupNode::setOrientation (float p, float r, float y)
 {
-
-	_orientation = osg::Vec3(p, r, y);
-
-	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-
-	mainTransform->setAttitude(q);
-
-	BROADCAST(this, "sfff", "setOrientation", p, r, y);
+	osg::Vec3 newOrientation = osg::Vec3(p, r, y);
+	
+	if (newOrientation != getOrientation())
+	{
+		_orientation = newOrientation;
+		osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
+								 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
+								 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
+		mainTransform->setAttitude(q);
+		BROADCAST(this, "sfff", "setOrientation", p, r, y);
+	}
 }
 
 
@@ -404,8 +409,13 @@ void GroupNode::setOrientationQuat (float x, float y, float z, float w)
 
 void GroupNode::setScale (float x, float y, float z)
 {
-	mainTransform->setScale(osg::Vec3(x,y,z));
-	BROADCAST(this, "sfff", "setScale", x, y, z);
+	osg::Vec3 newScale = osg::Vec3(x,y,z);
+		
+	if (newScale != getScale())
+	{
+		mainTransform->setScale(newScale);
+		BROADCAST(this, "sfff", "setScale", x, y, z);
+	}
 }
 
 void GroupNode::setVelocity (float dx, float dy, float dz)

@@ -273,6 +273,7 @@ int main(int argc, char **argv)
 	//while( !viewer.done() && spin.isRunning() )
 	while( !viewer.done() )
 	{
+		//std::cout << "frame: " << view->getFrameStamp()->getSimulationTime() << std::endl;
 		
 		if (spin.isRunning())
 		{
