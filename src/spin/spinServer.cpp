@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 	
 	while (spin.isRunning())
 	{
-		sleep(1);
+		//sleep(1);
 		// loop until a quit message is received (TODO)
 	}
 	

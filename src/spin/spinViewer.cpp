@@ -259,14 +259,6 @@ int main(int argc, char **argv)
 		spin.sceneManager->worldNode->addChild(argScene.get());
 	}
 
-	if (0)
-	{
-		osg::ref_ptr<ShapeNode> shp = dynamic_cast<ShapeNode*>(spin.sceneManager->createNode("shp", "ShapeNode"));
-		shp->setShape(ShapeNode::SPHERE);
-		shp->setTranslation(0,5,0);
-		shp->setInteractionMode(GroupNode::PUSH);
-	}
-
 	// *************************************************************************
 	// start threads:
 	viewer.realize();
