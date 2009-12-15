@@ -68,6 +68,17 @@ class UserNode : public GroupNode
 		UserNode(SceneManager *sceneManager, char *initID);
 		virtual ~UserNode();
 
+	
+		/**
+		 * The UserNode is used by OSG's NodeTrackerManipulator to position a
+		 * camera for the user. However, NodeTrackerManipulator doesn't check if
+		 * the nodepath has changed, so we override updateNodePath() and set an
+		 * nodepathUpdate flag for the manipulator to see.
+		 */
+		virtual void updateNodePath();
+		bool nodepathUpdate;
+		
+		
 		// SET methods:
 		void setDescription (const char *s);
 
@@ -82,22 +93,11 @@ class UserNode : public GroupNode
 		 */
 		virtual std::vector<lo_message> getState();
 
-		/**
-		 * We must include a stateDump() method that simply invokes the base class
-		 * method. Simple C++ inheritance is not enough, because osg::Introspection
-		 * won't see it.
-		 */
-		//virtual void stateDump() { ReferencedNode::stateDump(); };
-
-
-		// We must redefine any methods from out base class (GroupNode) so
-		// that osg::Introspection will see them. This is really only necessary
-		// for methods for which we want handlers (OSC/WX/etc).
-
 
 
 
 	private:
+
 
 		std::string _description;
 

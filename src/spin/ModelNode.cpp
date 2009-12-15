@@ -133,7 +133,7 @@ void ModelNode::setModelFromFile (const char* filename)
 
 	drawModel();
 
-	BROADCAST(this, "ss", "setModelFromFile", modelPath.c_str());
+	BROADCAST(this, "ss", "setModelFromFile", getModelFromFile());
 }
 
 void ModelNode::setPlay (int i)
@@ -164,7 +164,9 @@ void ModelNode::drawModel()
 		this->getAttachmentNode()->removeChild(model.get());
 		model = NULL;
 		
+		/*
 		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+		*/
 		
 		for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
 		{
@@ -187,9 +189,10 @@ void ModelNode::drawModel()
 
 		if (model.valid())
 		{
+			/*
 			if (sceneManager->sharedStateManager.valid())
 				sceneManager->sharedStateManager->share(model);
-
+			 */
 			
 			SearchVisitor getAnimInterface;
 			char buf[16];

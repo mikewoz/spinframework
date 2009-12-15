@@ -45,7 +45,7 @@
 using namespace std;
 
 
-// ===================================================================
+// *****************************************************************************
 // constructor:
 UserNode::UserNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
@@ -58,18 +58,22 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 
 }
 
-// ===================================================================
 // destructor
 UserNode::~UserNode()
 {
 	std::cout << "Destroying UserNode: " << id->s_name << std::endl;
 }
 
+// *****************************************************************************
 
+void UserNode::updateNodePath()
+{
+	GroupNode::updateNodePath();
+	this->nodepathUpdate = true;
+}
 
-// ===================================================================
-// ======================== SET METHODS: =============================
-// ===================================================================
+// *****************************************************************************
+// *****************************************************************************
 
 void UserNode::setDescription (const char *newvalue)
 {

@@ -64,6 +64,31 @@ public:
 	
 	virtual void callbackUpdate();
 	
+	/**
+	 * Performs the actual update of translation, orientation, and scale given
+	 * a timestamp into the animation
+	 */
+	bool doUpdate(double timestamp);
+	
+	/**
+	 * A client interface that allows for setting the animation time using a
+	 * normalized index in the range [0,1]
+	 */
+	void setIndex (float index);
+	
+	
+    /**
+     * \brief Set the update rate (in Hz).
+     * 
+     * The animation will send setTranslation, setOrientation, and setScale
+     * events at this rate (assuming there is a change). Values will be
+     * interpolated in between control points.
+     */
+	void setUpdateRate (float hz);
+	float getUpdateRate() { return _updateRate; }
+	
+	
+	
 	void setPlay (int p);
 	int getPlay() { return (int) _play; }
 		
@@ -136,6 +161,7 @@ protected:
 	
 	bool _play, _record;
 	osg::Timer_t _startTime, _lastTick;
+	float _updateRate;
 	//LoopMode _loopMode;
 	
 	osg::ref_ptr<osg::AnimationPath> _animationPath;

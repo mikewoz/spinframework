@@ -61,6 +61,7 @@ AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupN
 	this->setName(string(id->s_name) + ".AnimationNode");
 	nodeType = "AnimationNode";
 	
+	_updateRate = 15; // hz
 	_play = false;
 	_record = false;
 
@@ -99,43 +100,69 @@ void AnimationNode::callbackUpdate()
 	    osg::Timer_t tick = osg::Timer::instance()->tick();
 		float dt = osg::Timer::instance()->delta_s(_lastTick,tick);
 		
-		
-		if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
-		//if (dt > 0.1) // only update when dt is at least 0.1s (ie 10hz):
+		//if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
+		if (dt > (1/_updateRate)) 
 		{
-			double currentTime = osg::Timer::instance()->delta_s(_startTime,tick);
-			
-			osg::Matrix myMatrix;
-			if (_animationPath->getMatrix(currentTime, myMatrix))
-			{
-				osg::Vec3 myPos = myMatrix.getTrans();
-				osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
-				osg::Vec3 myScl = myMatrix.getScale();
-				
-				setTranslation(myPos.x(), myPos.y(), myPos.z());
-				setOrientation(myRot.x(), myRot.y(), myRot.z());
-				setScale(myScl.x(), myScl.y(), myScl.z());
-			}
-			
-			
-			/*
-			AnimationPath::ControlPoint cp;
-			if (_animationPath->getInterpolatedControlPoint(currentTime,cp))
-			{
-				mainTransform.setPosition(cp.getPosition());
-				mainTransform.setAttitude(cp.getRotation());
-				mainTransform.setScale(cp.getScale());
-			}
-			*/
-
+			doUpdate(osg::Timer::instance()->delta_s(_startTime,tick));
 			lastTick = tick;
 		}
 	}
 
 }
 
+bool AnimationNode::doUpdate(double timestamp)
+{
+	osg::Matrix myMatrix;
+	if (_animationPath->getMatrix(timestamp, myMatrix))
+	{
+		osg::Vec3 myPos = myMatrix.getTrans();
+		osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
+		osg::Vec3 myScl = myMatrix.getScale();
+		
+		setTranslation(myPos.x(), myPos.y(), myPos.z());
+		setOrientation(myRot.x(), myRot.y(), myRot.z());
+		setScale(myScl.x(), myScl.y(), myScl.z());
+		
+		return true;
+	}
 	
+	
+	/*
+	AnimationPath::ControlPoint cp;
+	if (_animationPath->getInterpolatedControlPoint(currentTime,cp))
+	{
+		mainTransform.setPosition(cp.getPosition());
+		mainTransform.setAttitude(cp.getRotation());
+		mainTransform.setScale(cp.getScale());
+	}
+	*/
+		
+	return false;
+}
+
 // *****************************************************************************
+
+
+void AnimationNode::setIndex (float index)
+{
+	setPlay(0);
+	setRecord(0);
+
+	// make sure index is in normalized range [0,1]:
+	if (index > 1) index=1.0;
+	if (index < 0) index=0.0;
+	
+	double scale = _animationPath->getLastTime() - _animationPath->getFirstTime();
+
+	doUpdate(index * scale);
+}
+
+
+void AnimationNode::setUpdateRate (float hz)
+{
+	_updateRate = hz;
+	BROADCAST(this, "sf", "setUpdateRate", hz);
+}
 
 void AnimationNode::setPlay (int p)
 {
@@ -170,6 +197,7 @@ void AnimationNode::setRecord (int r)
 		BROADCAST(this, "si", "setRecord", getRecord());
 	}
 }
+
 void AnimationNode::setLoopMode (LoopMode mode)
 {
 	if (_animationPath->getLoopMode() != (osg::AnimationPath::LoopMode)mode)
@@ -252,6 +280,10 @@ std::vector<lo_message> AnimationNode::getState ()
 	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setPlay", getPlay());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setUpdateRate", getUpdateRate());
 	ret.push_back(msg);
 	
 	/*

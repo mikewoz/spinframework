@@ -76,6 +76,7 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 	
 	clipNode = new osg::ClipNode();
 	clipNode->setCullingActive(false);
+	clipNode->setName(string(id->s_name) + ".clipNode");
 	mainTransform->addChild(clipNode.get());
 	
 	
@@ -185,6 +186,7 @@ void GroupNode::updateNodePath()
 		std::cout << " > " << (*iter)->getName() << std::endl;
 	}
 	*/
+	
 }
 
 

@@ -527,6 +527,10 @@ void SceneManager::debug()
 	std::cout << "\n SCENE GRAPH:" << std::endl;
 	DebugVisitor ev;
 	ev.apply(*(this->rootNode.get()));
+	
+	// send debug message to all clients:
+	SCENE_MSG(this,"s","debug");
+	
 }
 
 

@@ -168,9 +168,20 @@ bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
 {
 	if (ea.getEventType()==GUIEventAdapter::FRAME)
 	{
+		spinContext &spin = spinContext::Instance();
+		
 		// update from NodeTrackerManipulator:
-		if (user->s_thing)
+		if (spin.userNode.valid())
 		{
+			// if the userNode's nodepath has changed, we must call setTrackNode
+			// again to force NodeTrackerManipulator to store the proper nodePath
+			if (spin.userNode->nodepathUpdate)
+			{
+				setTrackNode(spin.userNode->getAttachmentNode());
+				spin.userNode->nodepathUpdate = false;
+			}
+			
+			// update camera from NodeTrackerManipulator:
 			if (_thrown) aa.requestRedraw();
 		}
 	}
