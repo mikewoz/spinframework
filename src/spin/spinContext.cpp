@@ -71,10 +71,32 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 static void sigHandler(int signum)
 {
 	std::cout << " Caught signal: " << signum << std::endl;
-	
+
 	spinContext &spin = spinContext::Instance();
 	
+	// unlock mutex so we can clean up:
+	pthread_mutex_unlock(&pthreadLock);
+
+	if (spin.userNode.valid())
+	{
+		std::cout << "userNode still there" << std::endl;
+		
+		ReferencedNode *heldPointer = spin.userNode.get();
+		//spin.userNode.release();
+		spin.userNode = NULL;
+		// now deleting the node in the sceneManager should release the last instance:
+		spin.sceneManager->doDelete(heldPointer);
+		
+	}
+	
 	spin.stop();
+
+	/*
+	if (spin.userNode.valid())
+	{
+		spin.userNode.release();
+	}
+	*/
 
 }
 
@@ -87,7 +109,7 @@ spinContext::spinContext()
 	spinContextMode  initMode = spinContext::LISTENER_MODE;
 	
 	// default is hostname:
-	user = gensym(getHostname().c_str());
+	//user = gensym(getHostname().c_str());
 	
 	
 #ifdef __Darwin
@@ -300,9 +322,6 @@ void spinContext::stop()
 
 void spinContext::registerUser (const char *id)
 {
-	UserNode *n = 0;
-	
-	user = gensym(id);
 	
 	if (isRunning())
 	{
@@ -311,7 +330,7 @@ void spinContext::registerUser (const char *id)
 		// our ViewerManipulator, and tracker node before receiver the official
 		// createNode message from the server.
 		
-		n = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(id, "UserNode"));
+		userNode = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(id, "UserNode"));
 
 		// We then send a message to the server to create the node. If the
 		// server doesn't exist yet, it doesn't really matter, since we are
@@ -319,12 +338,12 @@ void spinContext::registerUser (const char *id)
 		// it will send a 'userRefresh' method that will inform it of this node
 		// (see the spinContext_sceneCallback method)
 		
-		SceneMessage("sss", "createNode", user->s_name, "UserNode", LO_ARGS_END);
+		SceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
 
-		std::cout << "  Registered user '" << user->s_name << "'" << std::endl;
+		std::cout << "  Registered user '" << userNode->id->s_name << "'" << std::endl;
 	}
 
-	if (!n)
+	if (!userNode.valid())
 	{
 		std::cout << "ERROR: Could not registerUser '" << id <<	"'. Perhaps SPIN is not running?" << std::endl;
 	}
@@ -514,7 +533,7 @@ static void *spinListenerThread(void *arg)
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			spin.InfoMessage("/ping/user", "s", (char*) spin.user->s_name, LO_ARGS_END);
+			if (spin.userNode.valid()) spin.InfoMessage("/ping/user", "s", (char*) spin.userNode->id->s_name, LO_ARGS_END);
 			lastTick = frameTick;
 		}
 		
@@ -628,7 +647,7 @@ static int spinContext_sceneCallback(const char *path, const char *types, lo_arg
 	
 	if (theMethod=="userRefresh")
 	{
-		spin.SceneMessage("sss", "createNode", spin.user->s_name, "UserNode", LO_ARGS_END);
+		if (spin.userNode.valid()) spin.SceneMessage("sss", "createNode", spin.userNode->id->s_name, "UserNode", LO_ARGS_END);
 	}
 	
 	//return spin.sceneCallback(types, argv, argc);

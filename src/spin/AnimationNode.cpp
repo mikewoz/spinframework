@@ -60,8 +60,6 @@ AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupN
 {
 	this->setName(string(id->s_name) + ".AnimationNode");
 	nodeType = "AnimationNode";
-
-	setReportMode(GroupNode::GLOBAL_6DOF);
 	
 	_play = false;
 	_record = false;

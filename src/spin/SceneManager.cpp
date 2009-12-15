@@ -837,7 +837,6 @@ void SceneManager::deleteGraph(const char *id)
 // *****************************************************************************
 void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 {
-
 	// hold on to a referenced pointer, while we remove all others
 	osg::ref_ptr<ReferencedNode> n = nodeToDelete;
 
@@ -846,7 +845,7 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 
 	// remove from our storage nodeMap:
 	nodeMapType::iterator it;
-	for ( it=nodeMap.begin(); it!=nodeMap.end(); it++)
+	for ( it=nodeMap.begin(); it!=nodeMap.end(); ++it)
 	{
 		vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
 		iter = std::find( (*it).second.begin(), (*it).second.end(), n );
@@ -860,7 +859,6 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 	iter = std::find( nodeMap[n->nodeType].second.begin(), nodeMap[n->nodeType].second.end(), n );
 	if ( iter != nodeMap[n->nodeType].second.end() ) nodeMap[n->nodeType].second.erase(iter);
 	*/
-
 
 	// have to unregister the callback function to remove the last ref_ptr:
 	pthread_mutex_lock(&pthreadLock);

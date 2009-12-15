@@ -186,9 +186,8 @@ void ReferencedNode::attach()
 // remove this node from the scenegraph:
 void ReferencedNode::detach()
 {
-	
 	pthread_mutex_lock(&pthreadLock);
-	
+
 	if (parent == WORLD_SYMBOL)
 	{
 		if (sceneManager->worldNode->containsNode(this)) sceneManager->worldNode->removeChild(this);

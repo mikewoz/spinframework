@@ -177,7 +177,6 @@ int main(int argc, char **argv)
 	spin.registerUser(id.c_str());
 		
 
-
 	// *************************************************************************
 	// get details on keyboard and mouse bindings used by the viewer.
 	viewer.getUsage(*arguments.getApplicationUsage());
@@ -223,20 +222,13 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// create a camera manipulator
 
-	osg::ref_ptr<ViewerManipulator> manipulator;
-	if (1) // if (spin.user.valid())
-	{
-		//manipulator = new ViewerManipulator(spin.user.get());
-		manipulator = new ViewerManipulator(spin.user);
-		
-		manipulator->setPicker(picker);
-		manipulator->setMover(mover);
-		if (!redirectAddr.empty() && !redirectPort.empty())
-			manipulator->setRedirection(redirectAddr, redirectPort);
+	osg::ref_ptr<ViewerManipulator> manipulator = new ViewerManipulator();
+	manipulator->setPicker(picker);
+	manipulator->setMover(mover);
+	if (!redirectAddr.empty() && !redirectPort.empty())
+		manipulator->setRedirection(redirectAddr, redirectPort);
 
-		view->setCameraManipulator(manipulator.get());
-	}
-	
+	view->setCameraManipulator(manipulator.get());
 	
 
 	// *************************************************************************
@@ -277,15 +269,6 @@ int main(int argc, char **argv)
 		
 		if (spin.isRunning())
 		{
-			/*
-			frameTick = osg::Timer::instance()->tick();
-			if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
-			{
-				spin.InfoMessage("/ping/user", "s", (char*) id.c_str(), LO_ARGS_END);
-				lastTick = frameTick;
-			}
-			*/
-
 			pthread_mutex_lock(&pthreadLock);
 			spin.sceneManager->update();
 			pthread_mutex_unlock(&pthreadLock);

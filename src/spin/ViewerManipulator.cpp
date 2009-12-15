@@ -49,16 +49,16 @@ using namespace osgGA;
 
 //ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
 //ViewerManipulator::ViewerManipulator(UserNode *u)
-ViewerManipulator::ViewerManipulator(t_symbol *u)
+ViewerManipulator::ViewerManipulator()
 {
-	this->user = u;
+	spinContext &spin = spinContext::Instance();
 	
-	UserNode *n = dynamic_cast<UserNode*>(user->s_thing);
-	if (!n)
+	if (spin.userNode.valid())
 	{
-		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
+		this->user = spin.userNode->id;
+		setTrackNode(spin.userNode->getAttachmentNode());
 	} else {
-		setTrackNode(n->getAttachmentNode());
+		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
 	}
 	
 	this->picker = false;
@@ -302,49 +302,6 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 	
 	if (this->picker)
 	{
-		/*
-		if (selectedNode!=gensym("NULL"))
-		{
-			switch(ea.getEventType())
-			{
-				case(GUIEventAdapter::MOVE):
-	    			sendEvent(selectedNode->s_name,
-	    					"sisfffff",
-	    					"event",
-	    					(int)ea.getEventType(),
-	    					user->s_name,
-	    					dX,
-	    					dY,
-	    					LO_ARGS_END);
-	    			break;	
-	    			
-	    		case(GUIEventAdapter::DRAG):
-	    			sendEvent(selectedNode->s_name,
-	    					"sisfffff",
-	    					"event",
-	    					(int)ea.getEventType(),
-	    					user->s_name,
-	    					dX,
-	    					dY,
-	    					LO_ARGS_END);
-	    			break;	
-	    		case(GUIEventAdapter::RELEASE):
-	    			sendEvent(selectedNode->s_name,
-			    			"sisfffff",
-			    			"event",
-			    			(int)ea.getEventType(),
-			    			user->s_name,
-			    			(float) ea.getModKeyMask(),
-			    			(float) ea.getButtonMask(),
-							0, 0, 0,
-			    			LO_ARGS_END);
-	    			selectedNode = gensym("NULL");
-	    			break;
-			}
-		}
-		
-		*/
-		
 		// This is how the Picker works:
 		//
 		// A node is "selected" when the user does a PUSH on an GroupNode that
@@ -557,7 +514,8 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				    }
 				}
 			
-			    else if ( modkeyMask==GUIEventAdapter::MODKEY_CTRL )
+			    else if ( (modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_CTRL) )
+			    	
 			    {
 			    	int dXsign, dYsign;
 			    	(dXclick<0) ? dXsign=-1 : dXsign=1;
@@ -585,8 +543,8 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				break;
 				
 			case(GUIEventAdapter::RELEASE):
-				//sendEvent(user->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
-				//sendEvent(user->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(user->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(user->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 				break;
 				
 			case(GUIEventAdapter::SCROLL):

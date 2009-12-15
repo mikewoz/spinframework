@@ -127,8 +127,8 @@ class spinContext
 
 		spinContextMode mode;
 
-		//osg::ref_ptr<UserNode> user;
-		t_symbol *user;
+		osg::ref_ptr<UserNode> userNode;
+		//t_symbol *user;
 		
 		std::string id;
 		std::string rxAddr, rxPort;
