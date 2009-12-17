@@ -8,10 +8,10 @@ LIBNAME = libSPINwrappers
 all: $(OS)
 
 NODELIST = ReferencedNode GroupNode ShapeNode ModelNode TextNode \
-	   VideoNode LightSource RayNode Contour ConstraintsNode \
+	   LightSource RayNode Contour ConstraintsNode \
 	   GridNode PointerNode MeasurementNode SoundNode SoundSpace \
 	   DSPNode Listener SoundConnection UserNode \
-	   AnimationNode
+	   AnimationNode VideoTexture
 
 ifdef SHARED_VIDEO_LIB
   NODELIST += SharedVideoNode

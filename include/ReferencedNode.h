@@ -196,10 +196,6 @@ public:
 
 	/**
 	 * StateDump() is a request to broadcast the node state via SceneManager.
-	 *
-	 * Note that even though this function is declared virtual, each derived
-	 * class must declare it in it's class definition. Simple C++ inheritance is
-	 * not enough, because osg::Introspection won't see it.
 	 */
 	virtual void stateDump();
 

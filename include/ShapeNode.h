@@ -90,6 +90,11 @@ public:
 	osg::Vec4 getColor() { return _color; };
 	int getRenderBin() { return renderBin; }
 
+	
+	void addSharedVideoTexture(osg::Node *n, std::string shID);
+	void addVideoTexture(osg::Node *n, std::string texturePath);
+	void addImageTexture(osg::Node *n, std::string texturePath);
+	
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
@@ -109,7 +114,7 @@ public:
 
 	int renderBin;
 
-	osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
+	//osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
 
 	osg::ref_ptr<osg::Geode> shapeGeode;
 
