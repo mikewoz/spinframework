@@ -389,7 +389,7 @@ void ShapeNode::addSharedVideoTexture(osg::Node *n, std::string shID)
 	ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 	
-	std::cout << "  replaced '" << texturePath.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
+	std::cout << "  replaced placeholder with SharedVideoTexture: " << shID << std::endl;
 
 #endif
 
