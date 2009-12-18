@@ -14,7 +14,8 @@ NODELIST = ReferencedNode GroupNode ShapeNode ModelNode TextNode \
 	   AnimationNode VideoTexture
 
 ifdef SHARED_VIDEO_LIB
-  NODELIST += SharedVideoNode
+  #NODELIST += SharedVideoNode
+  #NODELIST += SharedVideoTexture
 endif
 
 # turn nodelist into an object list of form: wrapper_<name>.o
