@@ -48,7 +48,7 @@
 #include <iostream>
 #include <fstream>
 
-
+#include <osg/Object>
 
 
 // *****************************************************************************
@@ -136,7 +136,10 @@ std::string getSpinPath(std::string path);
 
 #include <stddef.h>     // just for size_t -- how lame!
 
-class ReferencedNode;
+//class ReferencedNode;
+
+enum ReferencedType { REFERENCED_NODE, REFERENCED_STATE };
+
 
 #define EXTERN extern
 #define EXTERN_STRUCT extern struct
@@ -144,8 +147,10 @@ class ReferencedNode;
 typedef struct _symbol
 {
     char *s_name;
-    ReferencedNode *s_thing;
+//    ReferencedNode *s_thing;
+    osg::Object *s_thing;
     struct _symbol *s_next;
+    ReferencedType s_type;
 } t_symbol;
 
 

@@ -50,7 +50,8 @@
 #include <osgIntrospection/Value>
 
 #include "ReferencedNode.h"
-//#include "MediaManager.h"
+#include "ReferencedState.h"
+
 #include "UserNode.h"
 #include "spinLog.h"
 #include "spinContext.h"
@@ -65,6 +66,9 @@
 typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
 typedef std::map< std::string, nodeListType > nodeMapType;
 typedef std::pair< std::string, nodeListType > nodeMapPair;
+
+typedef std::vector<t_symbol*> ReferencedStateList;
+
 
 
 
@@ -114,6 +118,10 @@ class SceneManager
 		void setLog(spinLog& log);
 
 		void setTXaddress (std::string addr, std::string port);
+		
+		void registerState(t_symbol *id);
+		void unregisterState(t_symbol *id);
+		
 		
 		void sendNodeList(std::string type);
 		void sendConnectionList();
@@ -247,7 +255,7 @@ class SceneManager
 	private:
 		//std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
 		nodeMapType nodeMap; // the nodeList arranged by type
-
+		ReferencedStateList stateList;
 };
 
 

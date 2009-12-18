@@ -92,7 +92,7 @@ void ConstraintsNode::updateNodePath()
 	currentNodePath.clear();
 	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
 	{
-		osg::ref_ptr<ReferencedNode> parentNode = parent->s_thing;
+		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
 		if (parentNode.valid())
 		{
 			currentNodePath = parentNode->currentNodePath;
@@ -151,7 +151,7 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 	
 	if (this->_mode == DROP_TO_SURFACE)
 	{
-		osg::ref_ptr<ReferencedNode> parentNode = parent->s_thing;
+		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
 		if (parentNode.valid())
 		{
 			v = computeDropIntersection(parentNode.get(), x, y);

@@ -290,9 +290,6 @@ void ShapeNode::drawShape()
 void ShapeNode::drawTexture()
 {
 
-	if (!sceneManager->isGraphical()) return;
-	
-	
 	//std::cout << "debug texturepath: " << texturePath <<  std::endl;
 
 
@@ -312,7 +309,9 @@ void ShapeNode::drawTexture()
 
 		if (osgDB::getDirectoryContents(getAbsolutePath(texturePath)).size())
 		{
-			addVideoTexture(shapeGeode, texturePath);
+			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/VideoTexture").c_str());
+			vid->setVideoPath(texturePath.c_str());
+			shapeGeode->setStateSet( vid.get() );
 		}
 		
 		else if ((pos=texturePath.find("shared_video_texture")) != string::npos)
@@ -326,7 +325,9 @@ void ShapeNode::drawTexture()
 		        (pos=texturePath.find(".avi") != string::npos) ||
 		        (pos=texturePath.find(".mov") != string::npos) )
     	{
-			addVideoTexture(shapeGeode, texturePath);
+			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/VideoTexture").c_str());
+			vid->setVideoPath(texturePath.c_str());
+			shapeGeode->setStateSet( vid.get() );
     	}
 		
 		else
@@ -339,6 +340,8 @@ void ShapeNode::drawTexture()
 			
 void ShapeNode::addSharedVideoTexture(osg::Node *n, std::string shID)
 {
+	if (!sceneManager->isGraphical()) return;
+	
 #ifdef WITH_SHARED_VIDEO		
 
 
@@ -350,7 +353,7 @@ void ShapeNode::addSharedVideoTexture(osg::Node *n, std::string shID)
 	 //std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr;
 	 std::vector<SharedVideoTexture*>::iterator shvItr;
 	 
-	 for (shvItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
+	 for (sh	vItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
 	 {
 		 std::cout << "comparing id with " << (*shvItr)->getTextureID() << std::endl;
 		 if (string((*shvItr)->getTextureID())==shID)
@@ -394,7 +397,7 @@ void ShapeNode::addSharedVideoTexture(osg::Node *n, std::string shID)
 #endif
 
 }
-
+/*
 void ShapeNode::addVideoTexture(osg::Node *n, std::string texturePath)
 {
 	osg::ref_ptr<VideoTexture> vid = new VideoTexture("foo");
@@ -416,10 +419,12 @@ void ShapeNode::addVideoTexture(osg::Node *n, std::string texturePath)
 	
 	
 }
-
+*/
 
 void ShapeNode::addImageTexture(osg::Node *n, std::string texturePath)
 {
+	if (!sceneManager->isGraphical()) return;
+	
 	osg::StateSet *ss = n->getOrCreateStateSet();
 		
 	//osg::ref_ptr<osg::Image> image;

@@ -57,18 +57,17 @@
  * This uses osg::ImageStream, so it can load several different movie formats,
  * including live feeds on the Mac via devices.live.
  */
-//class VideoTexture : virtual public osg::TextureRectangle
-class VideoTexture : virtual public osg::StateSet
+class VideoTexture : public ReferencedState
 {
 
 public:
 
-	VideoTexture(const char *initID);
+	VideoTexture(SceneManager *sceneManager, const char *initID);
 	~VideoTexture();
 
-	//void updateCallback();
+	//virtual void updateCallback();
 	
-	void debugPrint ();
+	virtual void debug();
 	
 	/**
 	 * Creates a video from a path on disk. This can either be a single movie
@@ -78,10 +77,6 @@ public:
 	void setVideoPath (const char* newPath);
 	const char *getVideoPath() { return _path.c_str(); }
 
-	
-	void setFlip (int i);
-	int getFlip() { return (int)_flip; }
-	
 	/**
 	 * Enable (1) or disable (0) looping of the video
 	 */
@@ -98,6 +93,7 @@ public:
 	 * Only for image sequences; tells OSG how fast to play the sequence
 	 */
 	void setFrameRate (float f);
+	float getFrameRate() { return _framerate; }
 	
 	/**
 	 * Play (1) or Pause (0) the video
@@ -105,10 +101,15 @@ public:
 	void setPlay (int i);
 	int getPlay() { return (int)_play; }
 
+	
 	/**
 	 * Seek to beginning of video (quivalent to setIndex(0);
 	 */
-	void rewind ();
+	void rewind();
+	
+	
+	void flipHorizontal();
+	void flipVertical();
 	
 	
 	/**
@@ -117,12 +118,16 @@ public:
 	bool isValid() { return (_imageStream.valid()); }
 	//bool isValid() { return (_imageStream.valid() || _imageSequence.valid()); }
 
-private:
+	// must reimplement
+	virtual std::vector<lo_message> getState();
+
 	
-	t_symbol *_id;
+private:
 	
 	std::string _path;
 	bool _flip, _loop, _play;
+	
+	float _framerate;
 	float _index;
 	
 	bool _useTextureRectangle;
@@ -132,21 +137,5 @@ private:
 	//osg::ref_ptr<osg::ImageSequence> _imageSequence;
 };
 
-/*
-class VideoTexture_callback : public osg::StateAttribute::StateAttribute::Callback
-{
-
-	public:
-		virtual void operator()(osg::StateAttribute* attr, osg::NodeVisitor* nv)
-		{
-			osg::ref_ptr<VideoTexture> thisAttr = dynamic_cast<VideoTexture*> (attr->getUserData());
-
-			if (thisAttr != NULL)
-			{
-				thisAttr->updateCallback();
-			}
-		}
-};
-*/
 
 #endif

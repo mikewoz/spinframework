@@ -310,6 +310,36 @@ void SceneManager::setTXaddress (std::string addr, std::string port)
 	}
 }
 
+// *****************************************************************************
+
+void SceneManager::registerState(t_symbol *id)
+{
+	stateList.push_back(id);
+	
+	string oscPattern = "/SPIN/" + sceneID + "/" + string(id->s_name);
+	lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)id);
+	std::cout << "registered state with sceneManager: " << oscPattern << std::endl;
+}
+
+void SceneManager::unregisterState(t_symbol *id)
+{
+	string oscPattern = "/SPIN/" + sceneID + "/" + string(id->s_name);
+	lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
+
+	ReferencedStateList::iterator itr;
+	for (itr=stateList.begin(); itr!=stateList.end(); ++itr)
+	{
+		if ((*itr) == id)
+		{
+			stateList.erase(itr);
+			break;
+		}
+	}
+}
+
+// *****************************************************************************
+
+
 void SceneManager::sendNodeList(std::string typeFilter)
 {
 	// TODO: typeFilter not used yet
@@ -560,7 +590,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 	if (nodeType == "SoundConnection") return NULL;
 
 	// check if a node with that name already exists:
-	osg::ref_ptr<ReferencedNode> n = nodeID->s_thing;
+	osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(nodeID->s_thing);
 
 	if (n.valid())
 	{
@@ -699,6 +729,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
 }
 
+
 // *****************************************************************************
 // returns a pointer to a node given an id:
 ReferencedNode* SceneManager::getNode(string id)
@@ -708,7 +739,7 @@ ReferencedNode* SceneManager::getNode(string id)
 }
 ReferencedNode* SceneManager::getNode(const char *id)
 {
-	osg::ref_ptr<ReferencedNode> n = gensym(id)->s_thing;
+	osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(gensym(id)->s_thing);
 
 	if (n.valid()) return n.get();
 	else return NULL;
@@ -719,7 +750,7 @@ ReferencedNode* SceneManager::getNode(const char *id)
 // returns a pointer to an node given an id and type:
 ReferencedNode* SceneManager::getNode(const char *id, const char *type)
 {
-	osg::ref_ptr<ReferencedNode> n = gensym(id)->s_thing;
+	osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(gensym(id)->s_thing);
 
 	if (n.valid())
 	{
@@ -1612,11 +1643,14 @@ static int invokeMethod(const osgIntrospection::Value classInstance, const osgIn
 
 	// TODO: we should try to store this globally somewhere, so that we don't do
 	// a lookup every time there is a message:
+
+	/*
 	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
 
 
 	if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
     {
+    */
     	try {
     		classType.invokeMethod(method, classInstance, theArgs, true);
     		// if we get this far, then the method invocation succeeded and
@@ -1634,7 +1668,7 @@ static int invokeMethod(const osgIntrospection::Value classInstance, const osgIn
     	{
     		if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs)) return 1;
     	}
-    }
+   // }
 
 	return 0;
 }
@@ -1660,35 +1694,45 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
 	// get the instance of the node, which is the last token of the OSCpath:
 	// TODO: use user_data instead!
+	/*
 	nodeStr = string(path);
 	nodeStr = nodeStr.substr(nodeStr.rfind("/")+1);
 	t_symbol *s = gensym(nodeStr.c_str());
-	osg::ref_ptr<ReferencedNode> n = s->s_thing;
-	if (!n.valid())
+	*/
+	t_symbol *s = (t_symbol*) user_data;
+	
+	if (!s->s_thing)
 	{
-		std::cout << "oscParser: Could not find node: " << nodeStr << std::endl;
+		std::cout << "oscParser: Could not find referenced object named: " << nodeStr << std::endl;
 		return 0;
 	}
 
-	//pthread_mutex_lock(&pthreadLock);
+	// get osgInrospection::Value from passed UserData by casting as the proper
+	// referenced object pointer:
 
-
-	// get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
-	const osgIntrospection::Value classInstance = osgIntrospection::Value(n.get());
-
-
+	osgIntrospection::Value classInstance;
+	if (s->s_type == REFERENCED_STATE)
+	{
+		classInstance = osgIntrospection::Value(dynamic_cast<ReferencedState*>(s->s_thing));
+	}
+	else
+	{
+		classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
+	}
+	
+	
 	// the getInstanceType() method however, gives us the real type being pointed at:
 	const osgIntrospection::Type &classType = classInstance.getInstanceType();
 
 
+	
     if (!classType.isDefined())
     {
         std::cout << "ERROR: oscParser cound not process message '" << path << ". osgIntrospection has no data for that node." << std::endl;
         return 0;
     }
 
-	//introspect_print_type(classType);
-
+    //introspect_print_type(classType);
 
 	// If we have found a valid Type, then let's build an argument list and see
 	// if we can find a method that takes this list of argumets:
@@ -1706,10 +1750,13 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	// the message:
 	if (!invokeMethod(classInstance, classType, theMethod, theArgs))
 	{
-		if (n->sceneManager->isServer())
+		//std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl; 
+
+		// HACK: TODO: fix this
+		spinContext &spin = spinContext::Instance();
+		if (spin.sceneManager->isServer())
 		{
 
-			//std::cout << "Ignoring method '" << theMethod << "' for [" << n->id->s_name << "], but forwarding message anyway..." << std::endl; 
 			lo_message msg = lo_message_new();
 			for (i=0; i<argc; i++)
 			{
@@ -1721,8 +1768,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 				}
 			}
 			
-			lo_send_message_from(n->sceneManager->txAddr, n->sceneManager->txServ, ("/SPIN/"+n->sceneManager->sceneID+"/"+std::string(n->id->s_name)).c_str(), msg);
-			//n->sceneManager->sendNodeMessage(n->id, msg);
+			lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
 		}
 	}
 

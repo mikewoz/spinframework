@@ -92,7 +92,7 @@ public:
 
 	
 	void addSharedVideoTexture(osg::Node *n, std::string shID);
-	void addVideoTexture(osg::Node *n, std::string texturePath);
+	//void addVideoTexture(osg::Node *n, std::string texturePath);
 	void addImageTexture(osg::Node *n, std::string texturePath);
 	
 	/**

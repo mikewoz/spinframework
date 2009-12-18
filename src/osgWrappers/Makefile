@@ -7,7 +7,8 @@ LIBNAME = libSPINwrappers
 #all: $(OS) staticlib
 all: $(OS)
 
-NODELIST = ReferencedNode GroupNode ShapeNode ModelNode TextNode \
+NODELIST = ReferencedNode ReferencedState GroupNode \
+	   ShapeNode ModelNode TextNode \
 	   LightSource RayNode Contour ConstraintsNode \
 	   GridNode PointerNode MeasurementNode SoundNode SoundSpace \
 	   DSPNode Listener SoundConnection UserNode \

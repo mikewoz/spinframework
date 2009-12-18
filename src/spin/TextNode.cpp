@@ -100,7 +100,7 @@ void TextNode::updateNodePath()
 	currentNodePath.clear();
 	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
 	{
-		osg::ref_ptr<ReferencedNode> parentNode = parent->s_thing;
+		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
 		if (parentNode.valid())
 		{
 			currentNodePath = parentNode->currentNodePath;

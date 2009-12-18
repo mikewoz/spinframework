@@ -382,7 +382,7 @@ ReferencedNode *PointerNode::getNodeFromIntersections()
 
 	if (!intersectList.size()) return NULL;
 		
-	ReferencedNode *t = intersectList[0]->s_thing; // intersectList stores t_symbols
+	ReferencedNode *t = dynamic_cast<ReferencedNode*>(intersectList[0]->s_thing); // intersectList stores t_symbols
 
 	while (t)
 	{
@@ -390,7 +390,7 @@ ReferencedNode *PointerNode::getNodeFromIntersections()
 		{
 			return t; // return first basicNode encountered
 		}
-		t = t->parent->s_thing;
+		t = dynamic_cast<ReferencedNode*>(t->parent->s_thing);
 	}
 	
 	return NULL;
@@ -651,7 +651,7 @@ void PointerNode::grab (int b)
 		if (previousParent==gensym("world"))
 			srcMatrix = osg::Matrix::identity();
 		else
-			srcMatrix = osg::computeLocalToWorld(previousParent->s_thing->currentNodePath);
+			srcMatrix = osg::computeLocalToWorld(dynamic_cast<ReferencedNode*>(previousParent->s_thing)->currentNodePath);
 
 		dstMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);	
 			

@@ -42,6 +42,8 @@
 
 
 #include <osgDB/ReadFile>
+#include <osgDB/FileUtils>
+#include <osgDB/FileNameUtils>
 #include <osg/Group>
 
 //#include <osgFX/Scribe>
@@ -57,7 +59,7 @@
 #include "SceneManager.h"
 #include "MediaManager.h"
 #include "nodeVisitors.h"
-
+#include "VideoTexture.h"
 
 
 
@@ -134,19 +136,6 @@ void ModelNode::setModelFromFile (const char* filename)
 	drawModel();
 
 	BROADCAST(this, "ss", "setModelFromFile", getModelFromFile());
-}
-
-void ModelNode::setPlay (int i)
-{
-	_play = (bool)i;
-
-	if (imagestream.valid())
-	{
-		if (_play) imagestream->play();
-		else imagestream->pause();
-	}
-	
-	BROADCAST(this, "si", "setPlay", getPlay());
 }
 
 // ===================================================================
@@ -253,9 +242,11 @@ void ModelNode::drawModel()
 			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << "  numTextures=" << statesets.size() << std::endl;
 
 		    // Here, we replace some custom placeholder textures with custom
-		    // classes. However, we ONLY do this for GRAPHICAL clients (viewers)
-		    if (sceneManager->isGraphical())
+		    // classes.
+		    
 		    {
+		    	
+		    	int texNum = 0;
 			    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); itr++)
 			    {
 			    	// check if this stateset has a special texture
@@ -265,137 +256,101 @@ void ModelNode::drawModel()
 			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 			    		size_t pos;
 			    		
+			    		// check if the imagefile (minus extension) is a directory, and replace if necessary
+			    		if (osgDB::getDirectoryContents(imageFile).size())
+			    		{
+			    			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getSimpleFileName(imageFile)).c_str());
+			    			vid->setVideoPath(imageFile.c_str());
+			    			(*itr)= vid.get();
+			    		}
+			    		
 #ifdef WITH_SHARED_VIDEO			    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
 			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
 			    		{
-				    		
-							// find the shared memory id from the filename:
-				    		std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
-				    					
-							// see if an instance already exists:
-							/*
-							SharedVideoTexture *shTex=0;
-							std::cout << "num existing sharedtextures: " << sharedVideoTextures.size() << std::endl;
-							
-							//std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr;
-							std::vector<SharedVideoTexture*>::iterator shvItr;
-							
-							for (shvItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
-							{
-								std::cout << "comparing id with " << (*shvItr)->getTextureID() << std::endl;
-								if (string((*shvItr)->getTextureID())==shID)
-								{
-									std::cout << "... already exists" << std::endl;
-									//shTex = (*shvItr).get();
-									shTex = (*shvItr);
-								}
-							}
-							
-							// if it doesn't exist, create a new one:
-							if (!shTex)
-							{
-								std::cout << "... doesn't exist. creating." << std::endl;
-								shTex = new SharedVideoTexture(shID.c_str());
-				    		
-								// add it to the list:
-								sharedVideoTextures.push_back(shTex);
+			    			if (sceneManager->isGraphical())
+				    		{
+								// find the shared memory id from the filename:
+					    		std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
+					    					
+								// see if an instance already exists:
+								/*
+								SharedVideoTexture *shTex=0;
+								std::cout << "num existing sharedtextures: " << sharedVideoTextures.size() << std::endl;
 								
-							}
-							*/
-							
-							if (!sceneManager->shTex.valid())
-							{
-								std::cout << "making new SharedVideoTexture" << std::endl;
-								sceneManager->shTex = new SharedVideoTexture(shID.c_str());
-							}
-								//sharedVideoTextures.push_back(shTex);
-							
-							
-							
-							// Finally, replace the texture attribute:
-							(*itr)->setTextureAttributeAndModes(0, sceneManager->shTex, osg::StateAttribute::ON);
-							
-				    		// turn off lighting 
-				    		(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-			    			
-				    		/*
-						    osg::ref_ptr<osg::TexMat> texmat(new osg::TexMat);
-						    texmat->setScaleByTextureRectangleSize(true);
-				
-						    osg::ref_ptr<osg::TexEnv> texenv(new osg::TexEnv);
-						    texenv->setMode(osg::TexEnv::REPLACE);
-				
-						    (*itr)->setTextureAttributeAndModes(0, textureRect.get(), osg::StateAttribute::ON);
-						    (*itr)->setTextureAttributeAndModes(0, texmat.get(), osg::StateAttribute::ON);
-						    (*itr)->setTextureAttributeAndModes(0, texenv.get(), osg::StateAttribute::ON);
-				
-						    // turn off lighting 
-						    (*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-						    */
+								//std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr;
+								std::vector<SharedVideoTexture*>::iterator shvItr;
+								
+								for (shvItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
+								{
+									std::cout << "comparing id with " << (*shvItr)->getTextureID() << std::endl;
+									if (string((*shvItr)->getTextureID())==shID)
+									{
+										std::cout << "... already exists" << std::endl;
+										//shTex = (*shvItr).get();
+										shTex = (*shvItr);
+									}
+								}
+								
+								// if it doesn't exist, create a new one:
+								if (!shTex)
+								{
+									std::cout << "... doesn't exist. creating." << std::endl;
+									shTex = new SharedVideoTexture(shID.c_str());
+					    		
+									// add it to the list:
+									sharedVideoTextures.push_back(shTex);
+									
+								}
+								*/
+								
+								if (!sceneManager->shTex.valid())
+								{
+									std::cout << "making new SharedVideoTexture" << std::endl;
+									sceneManager->shTex = new SharedVideoTexture(shID.c_str());
+								}
+									//sharedVideoTextures.push_back(shTex);
+								
+								
+								
+								// Finally, replace the texture attribute:
+								(*itr)->setTextureAttributeAndModes(0, sceneManager->shTex, osg::StateAttribute::ON);
+								
+					    		// turn off lighting 
+					    		(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	
 				    			
-				    		std::cout << "  replaced '" << imageFile.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
+					    		/*
+							    osg::ref_ptr<osg::TexMat> texmat(new osg::TexMat);
+							    texmat->setScaleByTextureRectangleSize(true);
+					
+							    osg::ref_ptr<osg::TexEnv> texenv(new osg::TexEnv);
+							    texenv->setMode(osg::TexEnv::REPLACE);
+					
+							    (*itr)->setTextureAttributeAndModes(0, textureRect.get(), osg::StateAttribute::ON);
+							    (*itr)->setTextureAttributeAndModes(0, texmat.get(), osg::StateAttribute::ON);
+							    (*itr)->setTextureAttributeAndModes(0, texenv.get(), osg::StateAttribute::ON);
+					
+							    // turn off lighting 
+							    (*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+							    */
+					    			
+					    		std::cout << "  replaced '" << imageFile.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
+			    		
+				    		}
 			    		}
 #endif
 			    		
 			    		// if filename is a movie format, create an ImageStream
 			    		// and replace the current TextureAttribute:
-			    		if ((pos=imageFile.find(".mp4") != string::npos) ||
+			    		else if ((pos=imageFile.find(".mp4") != string::npos) ||
 					        (pos=imageFile.find(".avi") != string::npos) ||
 					        (pos=imageFile.find(".mov") != string::npos) )
 			    		{
-							
-			    			image = osgDB::readImageFile(imageFile.substr(0,imageFile.length()-4));
-			    			//osg::ImageStream* imagestream = dynamic_cast<osg::ImageStream*>(image);
-			    			imagestream = dynamic_cast<osg::ImageStream*>(image.get());
-			    			
-			    			
-			    			if (image.valid())
-			    			{
-			    				std::cout<<"image->s()="<<image->s()<<" image-t()="<<image->t()<<std::endl;
-
-								osg::Texture *vidTexture;
-								if (0) //(useTextureRectangle)
-								{
-									vidTexture = new osg::TextureRectangle(image.get());
-								} else {
-									vidTexture = new osg::Texture2D(image.get());
-									vidTexture->setResizeNonPowerOfTwoHint(false);
-									vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
-								}
-			    				
-			    				vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-			    				vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-
-								(*itr) = new osg::StateSet();
-								
-					    		(*itr)->setTextureAttributeAndModes(0, vidTexture, osg::StateAttribute::ON);
-
-					    		std::cout << "  found video and replaced texture: " << imageFile.substr(0,imageFile.length()-4) << std::endl;
-
-								// turn off lighting 
-				    			(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-				    			
-				    			if (image->isImageTranslucent())
-				    			{
-				    				std::cout << "  Transparent movie, enabling blending." << std::endl;
-				    				(*itr)->setMode(GL_BLEND, osg::StateAttribute::ON);
-				    				(*itr)->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-				    			}
-				    			
-								
-								//if (imagestream.valid()) imagestream->play();
-								//_play = true;
-
-			    			}
-			    			
-			    			else
-			    			{
-			    				std::cout << "Found video (" << imageFile << "), but could not read it" << std::endl;
-			    			}
+			    			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getSimpleFileName(imageFile)).c_str());
+			    			vid->setVideoPath(imageFile.c_str());
+			    			(*itr)= vid.get();
 			    		}
 			    		
 			    		
@@ -427,10 +382,6 @@ std::vector<lo_message> ModelNode::getState ()
 	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
 	ret.push_back(msg);
 
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setPlay", getPlay());
-	ret.push_back(msg);
-	
 	
 	return ret;
 }

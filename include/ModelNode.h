@@ -81,9 +81,6 @@ public:
 	void setModelFromFile	(const char *filename);
 	const char* getModelFromFile() { return modelPath.c_str(); }
 
-	void setPlay(int i);
-	int getPlay() { return (int) _play; }
-
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
@@ -108,10 +105,6 @@ private:
 #endif
 
 	osg::ref_ptr<osg::Group> model;
-
-	osg::ref_ptr<osg::Image> image;
-	osg::ref_ptr<osg::ImageStream> imagestream;
-	bool _play;
 
 	// animation stuff for gfx:
 	t_float state[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)

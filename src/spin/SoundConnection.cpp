@@ -55,7 +55,7 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	sceneManager = s;
 	
 	id = gensym( (string(src->id->s_name) + "-" + string(snk->id->s_name) + ".conn" ).c_str() );
-	//id->s_thing = this; // can't do this because SoundConnection doesn't extend ReferencedNode
+	//id->s_thing = this; // can't do this because SoundConnection doesn't extend osg::Object
 
 	// set pointers:
 	source = src.get();

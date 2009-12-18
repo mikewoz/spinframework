@@ -47,7 +47,6 @@
 
 #include <iostream>
 
-#include "SceneManager.h"
 #include "VideoTexture.h"
 
 
@@ -58,51 +57,41 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-//VideoTexture::VideoTexture (const char *initID) : osg::TextureRectangle()
-VideoTexture::VideoTexture (const char *initID) : osg::StateSet()
+VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedState(s, initID)
 {
-	_id = gensym(initID);
-	
+	classType = "VideoTexture";
+
 	_useTextureRectangle = false;
 	
-	
+	_loop = true;
+	_play = true;
+	_framerate = 24;
 }
 
 // destructor
 VideoTexture::~VideoTexture()
 {
 	if (_imageStream.valid()) _imageStream->quit();
-	this->clear();
 }
 
 // *****************************************************************************
 
-
-/*
-void VideoTexture::updateCallback()
+void VideoTexture::debug()
 {
-
-    // do update here
-    
-}
-*/
-
-void VideoTexture::debugPrint ()
-{	
-	std::cout << "VideoTexture (" << _id->s_name << "):" << std::endl;
+	ReferencedState::debug();
 	
 	osg::ref_ptr<osg::ImageSequence> _imageSequence = dynamic_cast<osg::ImageSequence*>(_imageStream.get());
 
 	if (_imageSequence.valid())
 	{
-		std::cout << "  Type:\t\tImage sequence" << std::endl;
-		std::cout << "  NumFrames:\t" << _imageSequence->getNumImages() << std::endl;
+		std::cout << "  Type: Image sequence" << std::endl;
+		std::cout << "  NumFrames: " << _imageSequence->getNumImages() << std::endl;
 	}
 	else if (_imageStream.valid())
 	{
-		std::cout << "  Type:\t\tVideo file" << std::endl;
+		std::cout << "  Type: Video file" << std::endl;
 	} else {
-		std::cout << "  NOT VALID" << std::endl;
+		std::cout << "  Type: NOT VALID" << std::endl;
 	}
 	
 	// additional info
@@ -121,15 +110,8 @@ void VideoTexture::debugPrint ()
 		case osg::ImageStream::REWINDING:
 			std::cout << "REWINDING" << std::endl; break;
 		}
-		std::cout << "  Looping?\t" << _imageStream->getLoopingMode() << std::endl;
 		std::cout << "  Transparency?\t" << _imageStream->isImageTranslucent() << std::endl;
 	}
-	
-	else {
-	}
-	
-	std::cout << "  Path:\t\t" << _path << std::endl;
-	
 }
 
 
@@ -140,6 +122,8 @@ void VideoTexture::setVideoPath (const char* newPath)
 	if (_path == std::string(newPath)) return;
 
 	_path = std::string(newPath);
+	
+	if (!sceneManager->isGraphical()) return;
 
 	std::string fullPath = getAbsolutePath(_path);
 	
@@ -197,8 +181,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 			
 			this->_imageStream = _imageSequence.get();
 			
-			// assume 24fps as a default;
-			setFrameRate(24);
+			setFrameRate(_framerate);
 
 			this->_isSequence = true;	
 		}
@@ -230,6 +213,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 	// Once we have the imageStream, add it to the StateSet
 	if (_imageStream.valid())
 	{
+
 		// add texture to stateset:
 		this->setTextureAttributeAndModes(0, vidTexture, osg::StateAttribute::ON);
 
@@ -241,19 +225,14 @@ void VideoTexture::setVideoPath (const char* newPath)
 		{
 			this->setMode(GL_BLEND, osg::StateAttribute::ON);
 			this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-		}	
+		}
+		
+		// apply current play/loop state, overriding OSG defaults:
+		if (_play) _imageStream->play();
+		if (!_loop) _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
 	}
 	
-}
-
-void VideoTexture::setFlip (int i)
-{
-	if (_flip != (int)i)
-	{
-		_flip = i;
-		_imageStream->flipHorizontal();
-		//BROADCAST(this, "si", "setFlip", getFlip());
-	}
+	BROADCAST(this, "ss", "setVideoPath", getVideoPath());
 }
 
 void VideoTexture::setLoop (int i)
@@ -268,7 +247,7 @@ void VideoTexture::setLoop (int i)
 			else _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
 		}
 		
-		//BROADCAST(this, "si", "setLoop", getLoop());
+		BROADCAST(this, "si", "setLoop", getLoop());
 	}
 }
 
@@ -281,7 +260,7 @@ void VideoTexture::setIndex (float f)
 		_imageStream->seek(f);
 	}
 	
-	//BROADCAST(this, "sf", "setIndex", getIndex());
+	BROADCAST(this, "sf", "setIndex", getIndex());
 }
 
 void VideoTexture::setFrameRate (float f)
@@ -306,15 +285,7 @@ void VideoTexture::setPlay (int i)
 			else _imageStream->pause();
 		}
 		
-		/*
-		if (_imageSequence.valid())
-		{
-			if (_play) _imageSequence->play();
-			else _imageSequence->pause();
-		}
-		*/
-		
-		//BROADCAST(this, "si", "setPlay", getPlay());
+		BROADCAST(this, "si", "setPlay", getPlay());
 	}
 }
 
@@ -326,5 +297,58 @@ void VideoTexture::rewind ()
 		_imageStream->rewind();
 		if (_play) _imageStream->play();
 	}
+	
+	BROADCAST(this, "s", "rewind");
+}
+
+void VideoTexture::flipHorizontal()
+{
+	if (_imageStream.valid())
+	{
+		_imageStream->flipHorizontal();
+	}
+	BROADCAST(this, "s", "flipHorizontal");
+}
+
+void VideoTexture::flipVertical()
+{
+	if (_imageStream.valid())
+	{
+		_imageStream->flipVertical();
+	}
+	BROADCAST(this, "s", "flipVertical");
+}
+
+
+
+// *****************************************************************************
+std::vector<lo_message> VideoTexture::getState ()
+{
+	// inherit state from base class
+	std::vector<lo_message> ret = ReferencedState::getState();
+		
+	lo_message msg;
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "ss", "setVideoPath", getVideoPath());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setLoop", getLoop());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setIndex", getIndex());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setFrameRate", getFrameRate());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setPlay", getPlay());
+	ret.push_back(msg);
+
+	return ret;
 }
 

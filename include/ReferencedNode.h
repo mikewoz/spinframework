@@ -47,16 +47,14 @@
 
 #include "spinUtil.h"
 #include "libloUtil.h"
-//#include "SceneManager.h"
 #include "MediaManager.h"
 
 #include <osg/Group>
 #include <osg/Node>
 
 
-
+// forward declaration of SceneManager
 class SceneManager;
-//class MediaManager;
 
 
 typedef std::map< std::string, std::string > stringParamType;

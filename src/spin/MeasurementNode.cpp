@@ -78,7 +78,7 @@ MeasurementNode::~MeasurementNode()
 
 void MeasurementNode::callbackUpdate()
 {
-	osg::ref_ptr<ReferencedNode> targetNode = targetName->s_thing;
+	osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(targetName->s_thing);
 	if (!targetNode.valid()) return;
 	
 	osg::Matrix mthis = osg::computeLocalToWorld(this->currentNodePath);

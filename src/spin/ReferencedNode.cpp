@@ -59,6 +59,7 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
 {
 	id = gensym(initID);
 	id->s_thing = this;
+	id->s_type = REFERENCED_NODE;
 
 	nodeType = "ReferencedNode";
 
@@ -141,7 +142,7 @@ void ReferencedNode::attach()
 	
 	pthread_mutex_lock(&pthreadLock);
 	
-	osg::ref_ptr<ReferencedNode> newParentNode = newParent->s_thing;
+	osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent->s_thing);
 
 	// if the parent is invalid (which will be the case, for example, if the user
 	// specified 'world' as the parent), we attach to the worldNode:
@@ -194,7 +195,7 @@ void ReferencedNode::detach()
 	}
 
 	else {
-		osg::ref_ptr<ReferencedNode> pNode = parent->s_thing;
+		osg::ref_ptr<ReferencedNode> pNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
 		if (pNode.valid())
 		{
 			if (pNode->attachmentNode->containsNode(this))
@@ -221,7 +222,7 @@ void ReferencedNode::updateNodePath()
 	currentNodePath.clear();
 	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
 	{
-		osg::ref_ptr<ReferencedNode> parentNode = parent->s_thing;
+		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
 		if (parentNode.valid())
 		{
 			currentNodePath = parentNode->currentNodePath;
