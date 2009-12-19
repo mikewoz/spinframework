@@ -259,7 +259,9 @@ void ModelNode::drawModel()
 			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 			    		size_t pos;
 
-			    		//std::cout << "checking texture: " << imageFile << ", minus extension: " << osgDB::getNameLessExtension(imageFile) << std::endl;
+						std::cout << "checking texture: " << imageFile << std::endl;
+						std::cout << "  real full path: " << osgDB::findDataFile(imageFile) << std::endl;
+						std::cout << "    no extension: " << osgDB::getNameLessExtension(osgDB::findDataFile(imageFile)) << std::endl;
 
 			    		
 			    		
@@ -282,7 +284,7 @@ void ModelNode::drawModel()
 #ifdef WITH_SHARED_VIDEO			    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
-			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
+			    		if (0)//((pos=imageFile.find("shared_video_texture01")) != string::npos)
 			    		{
 			    			if (sceneManager->isGraphical())
 				    		{
