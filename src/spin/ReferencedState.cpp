@@ -53,6 +53,8 @@ using namespace std;
 
 
 
+
+
 // *****************************************************************************
 // constructor:
 ReferencedState::ReferencedState(SceneManager *s, const char *initID)
@@ -75,8 +77,6 @@ ReferencedState::ReferencedState(SceneManager *s, const char *initID)
 	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
 	this->setUpdateCallback(new ReferencedState_callback);
 	
-	// register with SceneManager
-	sceneManager->registerState(id);
 }
 
 // destructor
@@ -88,7 +88,7 @@ ReferencedState::~ReferencedState()
 	this->clear();
 	
 	// unregister from sceneManager:
-	sceneManager->unregisterState(id);
+	sceneManager->unregisterState(this);
 
 	/*
 	// set the UserData to NULL (removing the ref_ptr):
@@ -107,6 +107,31 @@ void ReferencedState::updateCallback()
     // derived classes can do updates here   
 }
 
+
+void ReferencedState::replace(osg::StateSet *ss)
+{
+	//vid->addParent((*itr)->getParent(0));
+	//(*itr)->removeParent(*itr)->getParent(0));
+
+	osg::StateSet::ParentList::iterator itr;
+	osg::StateSet::ParentList parents = ss->getParents();	
+	
+	for (itr=parents.begin(); itr!=parents.end(); ++itr)
+	{
+		osg::Node *node = dynamic_cast<osg::Node*>(*itr);
+		if (node)
+		{
+			node->setStateSet(this);
+		}
+		else {
+			osg::Drawable *drawable = dynamic_cast<osg::Drawable*>(*itr);
+			if (drawable) drawable->setStateSet(this);
+		}
+	}
+
+}
+
+
 // *****************************************************************************
 void ReferencedState::debug()
 {
@@ -117,8 +142,17 @@ void ReferencedState::debug()
 	std::cout << "****************************************" << std::endl;
 	std::cout << "************* STATE DEBUG: *************" << std::endl;
 
-	std::cout << "\nstate: " << id->s_name << ", type: " << classType << std::endl;
+	std::cout << "\nReferencedState: " << id->s_name << ", type: " << classType << std::endl;
 
+	
+	std::cout << "   Shared by:";
+	for (i=0; i<getNumParents(); i++)
+	{
+		std::cout << " " << getParent(i)->getName();
+	}
+	std::cout << std::endl;
+	
+	
 	vector<lo_message> nodeState = this->getState();
 	vector<lo_message>::iterator nodeStateIterator;
 	for (nodeStateIterator = nodeState.begin(); nodeStateIterator != nodeState.end(); ++nodeStateIterator)
@@ -141,7 +175,8 @@ void ReferencedState::debug()
 	    }
 	    std::cout << std::endl;
 	}
-
+	
+	BROADCAST(this, "s", "debug");
 }
 
 // *****************************************************************************

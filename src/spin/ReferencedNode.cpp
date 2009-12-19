@@ -397,6 +397,7 @@ void ReferencedNode::debug()
 		}
 	}
 
+	BROADCAST(this, "s", "debug");
 }
 
 std::vector<lo_message> ReferencedNode::getState ()

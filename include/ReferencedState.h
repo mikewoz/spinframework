@@ -65,6 +65,12 @@ public:
 
 	virtual void updateCallback();
 
+	/**
+	 * Replaces a StateSet in the scene graph with this one. ie, goes through
+	 * all parents of the provided stateset and replaces the object's state with
+	 * this.
+	 */ 
+	void replace(osg::StateSet *ss);
 	
 	virtual void debug();
 	

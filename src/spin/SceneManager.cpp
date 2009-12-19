@@ -95,8 +95,9 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	rxAddr = lo_address_new(addr.c_str(), port.c_str());
 
 	// initialize storage vectors:
-	nodeTypes.clear();
+	//nodeTypes.clear();
 	nodeMap.clear();
+	stateMap.clear();
 	//nodeList.clear();
 
 	// set up OSC event listener:
@@ -130,8 +131,9 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
 	// discover all relevant nodeTypes by introspection, and fill the nodeMap
 	// with empty vectors:
+	{
 	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-	nodeTypes.clear();
+	//nodeTypes.clear();
 	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
 	osgIntrospection::TypeMap::const_iterator it;
 	for ( it=allTypes.begin(); it!=allTypes.end(); it++)
@@ -142,11 +144,31 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 			if ( ((*it).second)->isSubclassOf(ReferencedNodeType) )
 			{
 				string theType = ((*it).second)->getName();
-				nodeTypes.push_back(theType);
+				//nodeTypes.push_back(theType);
 				nodeListType emptyVector;
 				nodeMap.insert(nodeMapPair(theType, emptyVector));
 			}
 		}
+	}
+	}
+	
+	// Same thing for ReferencedStates:
+	{
+	const osgIntrospection::Type &ReferencedStateType = osgIntrospection::Reflection::getType("ReferencedState");
+	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
+	osgIntrospection::TypeMap::const_iterator it;
+	for ( it=allTypes.begin(); it!=allTypes.end(); it++)
+	{
+		if (((*it).second)->isDefined())
+		{
+			if ( ((*it).second)->isSubclassOf(ReferencedStateType) )
+			{
+				string theType = ((*it).second)->getName();
+				ReferencedStateList emptyVector;
+				stateMap.insert(ReferencedStatePair(theType, emptyVector));
+			}
+		}
+	}
 	}
 
 	// need to remove DSPNode???
@@ -312,29 +334,39 @@ void SceneManager::setTXaddress (std::string addr, std::string port)
 
 // *****************************************************************************
 
-void SceneManager::registerState(t_symbol *id)
+void SceneManager::registerState(ReferencedState *s)
 {
-	stateList.push_back(id);
+	//stateList.push_back(s->id);
+	stateMap[s->classType].push_back(s->id);
 	
-	string oscPattern = "/SPIN/" + sceneID + "/" + string(id->s_name);
-	lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)id);
-	std::cout << "registered state with sceneManager: " << oscPattern << std::endl;
+	string oscPattern = "/SPIN/" + sceneID + "/" + string(s->id->s_name);
+	lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
+	
+	SCENE_MSG(this, "sss", "registerState", s->id->s_name, s->classType.c_str());
 }
 
-void SceneManager::unregisterState(t_symbol *id)
+void SceneManager::unregisterState(ReferencedState *s)
 {
-	string oscPattern = "/SPIN/" + sceneID + "/" + string(id->s_name);
+	string oscPattern = "/SPIN/" + sceneID + "/" + string(s->id->s_name);
 	lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
 
 	ReferencedStateList::iterator itr;
+	/*
 	for (itr=stateList.begin(); itr!=stateList.end(); ++itr)
 	{
-		if ((*itr) == id)
+		if ((*itr) == s->id)
 		{
 			stateList.erase(itr);
 			break;
 		}
 	}
+	*/
+	itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );
+	if ( itr != stateMap[s->classType].end() ) stateMap[s->classType].erase(itr);
+
+	
+	
+	SCENE_MSG(this, "ss", "unregisterState", s->id->s_name);
 }
 
 // *****************************************************************************
@@ -349,36 +381,73 @@ void SceneManager::sendNodeList(std::string typeFilter)
 	int i;
 	string OSCpath = "/SPIN/" + sceneID;
 	lo_message msg;
+	
+	std::vector<lo_message> msgs;
 
-	nodeMapType::iterator it;
-	nodeListType::iterator iter;
 
 	if ((typeFilter.empty()) || (typeFilter=="*"))
 	{
-		// for each type, send an OSC message:
-		for ( it=nodeMap.begin(); it!=nodeMap.end(); it++ )
 		{
-			//std::cout << "Nodes of type '" << (*it).first << "':";
-			//for (i=0; i<(*it).second.size(); i++) std::cout << " " << (*it).second[i];
-			//std::cout << std::endl;
-
-			msg = lo_message_new();
-			
-			lo_message_add_string(msg, "nodeList" );
-			lo_message_add_string(msg, (*it).first.c_str() );
-
-			if ( (*it).second.size() )
+			// for each type, send an OSC message:
+			nodeMapType::iterator it;
+			nodeListType::iterator iter;
+			for ( it=nodeMap.begin(); it!=nodeMap.end(); it++ )
 			{
-				for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+				//std::cout << "Nodes of type '" << (*it).first << "':";
+				//for (i=0; i<(*it).second.size(); i++) std::cout << " " << (*it).second[i];
+				//std::cout << std::endl;
+	
+				msg = lo_message_new();
+				
+				lo_message_add_string(msg, "nodeList" );
+				lo_message_add_string(msg, (*it).first.c_str() );
+	
+				if ( (*it).second.size() )
 				{
-					lo_message_add_string(msg, (char*) (*iter)->id->s_name );
+					for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+					{
+						lo_message_add_string(msg, (char*) (*iter)->id->s_name );
+					}
+				} else {
+					lo_message_add_string(msg, "NULL");
 				}
-			} else {
-				lo_message_add_string(msg, "NULL");
+				
+				msgs.push_back(msg);
+				//lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 			}
-
-			lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 		}
+		
+		{
+			// for each type, send an OSC message:
+			ReferencedStateMap::iterator it;
+			ReferencedStateList::iterator iter;
+	
+			for ( it=stateMap.begin(); it!=stateMap.end(); it++ )
+			{
+				std::cout << "Nodes of type '" << (*it).first << "':";
+				for (i=0; i<(*it).second.size(); i++) std::cout << " " << (*it).second[i]->s_name;
+				std::cout << std::endl;
+	
+				msg = lo_message_new();
+				
+				lo_message_add_string(msg, "stateList" );
+				lo_message_add_string(msg, (*it).first.c_str() );
+	
+				if ( (*it).second.size() )
+				{
+					for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+					{
+						lo_message_add_string(msg, (char*) (*iter)->s_name );
+					}
+				} else {
+					lo_message_add_string(msg, "NULL");
+				}
+	
+				msgs.push_back(msg);
+				//lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
+			}
+		}
+		
 		// remember to send connections as well
 		sendConnectionList();
 	}
@@ -392,27 +461,60 @@ void SceneManager::sendNodeList(std::string typeFilter)
 		}
 		else
 		{
-			it = nodeMap.find(typeFilter);
-			if ( it != nodeMap.end() )
 			{
-				msg = lo_message_new();
-	
-				lo_message_add_string(msg, "nodeList" );
-				lo_message_add_string(msg, (*it).first.c_str() );
-				if ( (*it).second.size() )
+				nodeMapType::iterator it;
+				nodeListType::iterator iter;
+				it = nodeMap.find(typeFilter);
+				if ( it != nodeMap.end() )
 				{
-					for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+					msg = lo_message_new();
+		
+					lo_message_add_string(msg, "nodeList" );
+					lo_message_add_string(msg, (*it).first.c_str() );
+					if ( (*it).second.size() )
 					{
-						lo_message_add_string(msg, (char*) (*iter)->id->s_name );
+						for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+						{
+							lo_message_add_string(msg, (char*) (*iter)->id->s_name );
+						}
+					} else {
+						lo_message_add_string(msg, "NULL");
 					}
-				} else {
-					lo_message_add_string(msg, "NULL");
+		
+					msgs.push_back(msg);
+					//lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 				}
-	
-				lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
 			}
+			{
+				ReferencedStateMap::iterator it;
+				ReferencedStateList::iterator iter;
+				it = stateMap.find(typeFilter);
+				if ( it != stateMap.end() )
+				{
+					msg = lo_message_new();
+		
+					lo_message_add_string(msg, "stateList" );
+					lo_message_add_string(msg, (*it).first.c_str() );
+					if ( (*it).second.size() )
+					{
+						for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+						{
+							lo_message_add_string(msg, (char*) (*iter)->s_name );
+						}
+					} else {
+						lo_message_add_string(msg, "NULL");
+					}
+		
+					msgs.push_back(msg);
+					//lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
+				}
+			}
+
 		}
 	}
+	
+	sendSceneBundle(msgs);
+	
 }
 
 void SceneManager::sendConnectionList()
@@ -443,12 +545,22 @@ void SceneManager::sendConnectionList()
 
 void SceneManager::sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
 {
+	string OSCpath = "/SPIN/" + sceneID + "/" + string(nodeSym->s_name);
+	sendBundle(OSCpath,msgs);
+}
+
+void SceneManager::sendSceneBundle(std::vector<lo_message> msgs)
+{
+	string OSCpath = "/SPIN/" + sceneID;
+	sendBundle(OSCpath,msgs);
+}
+
+void SceneManager::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
+{
 	if (!txServ) return;
 
 	lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
 	
-	string OSCpath = "/SPIN/" + sceneID + "/" + string(nodeSym->s_name);
-
 	vector<lo_message>::iterator iter = msgs.begin();
 	while (iter != msgs.end())
 	{
@@ -729,7 +841,6 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
 }
 
-
 // *****************************************************************************
 // returns a pointer to a node given an id:
 ReferencedNode* SceneManager::getNode(string id)
@@ -770,6 +881,86 @@ ReferencedNode* SceneManager::getOrCreateNode(const char *id, const char *type)
 	if (n.valid()) return n.get();
 	else return createNode(id, type);
 }
+
+
+
+ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type)
+{
+	t_symbol *theID = gensym(id);
+	std::string theType = string(type);
+
+	// disallow node with the name "NULL" or bad things might happen
+	if (theID == gensym("NULL"))
+	{
+		std::cout << "Oops. Cannot create a state with the reserved name: 'NULL'" << std::endl;
+		return NULL;
+	}
+		
+	// check if a node with that name already exists:
+	osg::ref_ptr<ReferencedState> n = dynamic_cast<ReferencedState*>(theID->s_thing);
+
+	if (n.valid())
+	{
+		if (n->classType != theType)
+		{
+			std::cout << "ERROR: Tried to create " << type << " with id '" << id << "', but that id already exists as an " << n->classType << "." << std::endl;
+			return NULL;
+		} else {
+			return n.get();
+		}
+	}
+
+	osgIntrospection::Value sceneManagerPtr = osgIntrospection::Value(this);
+
+	try {	
+
+		// Let's use osgIntrospection to create a node of the proper type:
+		const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(type);
+
+		//std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
+		//introspect_print_type(t);
+		
+		osgIntrospection::ValueList args;
+		args.push_back(sceneManagerPtr);
+		args.push_back((const char*)theID->s_name);
+		osgIntrospection::Value v = t.createInstance(args);
+
+		n = osgIntrospection::variant_cast<ReferencedState*>(v);
+
+	}
+	
+	catch (osgIntrospection::Exception & ex)
+	{
+		std::cout << "ERROR: Could not create " << type << " with id '" << id <<"'. Perhaps that type is not defined?" << std::endl;
+		return NULL;
+	}
+
+	if (n.valid())
+	{
+		std::cout << "created new state: " << id << " of type " << type << std::endl;
+		registerState(n.get());
+		return n.get();
+	}
+	else
+	{
+		std::cout << "ERROR: Could not create " << theType << ". Invalid type?" << std::endl;
+		return NULL;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // *****************************************************************************

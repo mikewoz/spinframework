@@ -144,6 +144,8 @@ void ModelNode::setModelFromFile (const char* filename)
 void ModelNode::drawModel()
 {
 	int i,j;
+	
+	std::cout << "in drawModel()" << std::endl;
 
 	pthread_mutex_lock(&pthreadLock);
 
@@ -247,21 +249,34 @@ void ModelNode::drawModel()
 		    {
 		    	
 		    	int texNum = 0;
-			    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); itr++)
+			    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
 			    {
 			    	// check if this stateset has a special texture
 			    	osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
 			    	if (attr)
 			    	{
+			    		
 			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 			    		size_t pos;
+
+			    		//std::cout << "checking texture: " << imageFile << ", minus extension: " << osgDB::getNameLessExtension(imageFile) << std::endl;
+
+			    		
 			    		
 			    		// check if the imagefile (minus extension) is a directory, and replace if necessary
-			    		if (osgDB::getDirectoryContents(imageFile).size())
+			    		if (osgDB::getDirectoryContents(osgDB::getNameLessExtension(imageFile)).size())
 			    		{
-			    			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getSimpleFileName(imageFile)).c_str());
-			    			vid->setVideoPath(imageFile.c_str());
-			    			(*itr)= vid.get();
+			    			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState(osgDB::getStrippedName(imageFile).c_str(), "VideoTexture"));
+			    			//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
+					    	//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
+			    			if (vid.valid())
+			    			{
+			    				vid->setVideoPath(osgDB::getNameLessExtension(imageFile).c_str());
+			    				vid->replace((*itr).get());
+			    				//(*itr) = vid.get();
+			    				std::cout << "  Replaced placeholder texture with " << vid->classType << ": " << vid->id->s_name << std::endl;
+			    			}
+			    			
 			    		}
 			    		
 #ifdef WITH_SHARED_VIDEO			    		
@@ -348,9 +363,15 @@ void ModelNode::drawModel()
 					        (pos=imageFile.find(".avi") != string::npos) ||
 					        (pos=imageFile.find(".mov") != string::npos) )
 			    		{
-			    			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getSimpleFileName(imageFile)).c_str());
-			    			vid->setVideoPath(imageFile.c_str());
-			    			(*itr)= vid.get();
+			    			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState(osgDB::getStrippedName(imageFile).c_str(), "VideoTexture"));
+			    			//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
+			    			//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
+			    			if (vid.valid())
+			    			{
+			    				vid->setVideoPath(imageFile.c_str());
+			    				vid->replace((*itr).get());
+			    				//(*itr) = vid.get();
+			    			}
 			    		}
 			    		
 			    		

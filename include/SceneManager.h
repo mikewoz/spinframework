@@ -68,13 +68,14 @@ typedef std::map< std::string, nodeListType > nodeMapType;
 typedef std::pair< std::string, nodeListType > nodeMapPair;
 
 typedef std::vector<t_symbol*> ReferencedStateList;
+typedef std::map< std::string, ReferencedStateList > ReferencedStateMap;
+typedef std::pair< std::string, ReferencedStateList > ReferencedStatePair;
 
 
 
 
 // forward declarations:
 class MediaManager;
-class ReferencedNode;
 class GroupNode;
 class UserNode;
 class SoundConnection;
@@ -119,13 +120,15 @@ class SceneManager
 
 		void setTXaddress (std::string addr, std::string port);
 		
-		void registerState(t_symbol *id);
-		void unregisterState(t_symbol *id);
+		void registerState(ReferencedState *s);
+		void unregisterState(ReferencedState *s);
 		
 		
 		void sendNodeList(std::string type);
 		void sendConnectionList();
 		void sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
+		void sendSceneBundle(std::vector<lo_message> msgs);
+		void sendBundle(std::string OSCpath, std::vector<lo_message> msgs);
 
 
         ReferencedNode *createNode(std::string id, std::string type);
@@ -134,6 +137,8 @@ class SceneManager
 		ReferencedNode *getNode(const char *id);
 		ReferencedNode *getNode(const char *id, const char *type);
 		ReferencedNode *getOrCreateNode(const char *id, const char *type);
+		
+		ReferencedState* getOrCreateState(const char *id, const char *type);
 		
 		std::vector<SoundConnection*> getConnections();
 
@@ -221,7 +226,8 @@ class SceneManager
 		/**
 		 * We keep a list of all nodeTypes so that we can fill GUIs
 		 */
-		std::vector<std::string> nodeTypes;
+		//std::vector<std::string> nodeTypes;
+		//std::vector<std::string> stateTypes;
 
 		std::string getStateAsXML(std::vector<lo_message> nodeState);
 		std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
@@ -255,7 +261,8 @@ class SceneManager
 	private:
 		//std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
 		nodeMapType nodeMap; // the nodeList arranged by type
-		ReferencedStateList stateList;
+		//ReferencedStateList stateList;
+		ReferencedStateMap stateMap;
 };
 
 

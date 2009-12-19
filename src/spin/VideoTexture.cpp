@@ -63,6 +63,7 @@ VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedSta
 
 	_useTextureRectangle = false;
 	
+	_index = 0.0;
 	_loop = true;
 	_play = true;
 	_framerate = 24;
@@ -80,25 +81,28 @@ void VideoTexture::debug()
 {
 	ReferencedState::debug();
 	
+	std::cout << "   ---------" << std::endl;
+	
 	osg::ref_ptr<osg::ImageSequence> _imageSequence = dynamic_cast<osg::ImageSequence*>(_imageStream.get());
 
+	
 	if (_imageSequence.valid())
 	{
-		std::cout << "  Type: Image sequence" << std::endl;
-		std::cout << "  NumFrames: " << _imageSequence->getNumImages() << std::endl;
+		std::cout << "   Type: Image sequence" << std::endl;
+		std::cout << "   NumFrames: " << _imageSequence->getNumImages() << std::endl;
 	}
 	else if (_imageStream.valid())
 	{
-		std::cout << "  Type: Video file" << std::endl;
+		std::cout << "   Type: Video file" << std::endl;
 	} else {
-		std::cout << "  Type: NOT VALID" << std::endl;
+		std::cout << "   Type: NOT VALID" << std::endl;
 	}
 	
 	// additional info
 	if (_imageStream.valid())
 	{
-		std::cout << "  Duration:\t" << _imageStream->getLength() << "s" << std::endl;
-		std::cout << "  Status:\t";
+		std::cout << "   Duration: " << _imageStream->getLength() << "s" << std::endl;
+		std::cout << "   Status: ";
 		switch (_imageStream->getStatus())
 		{
 		case osg::ImageStream::INVALID:
@@ -110,7 +114,7 @@ void VideoTexture::debug()
 		case osg::ImageStream::REWINDING:
 			std::cout << "REWINDING" << std::endl; break;
 		}
-		std::cout << "  Transparency?\t" << _imageStream->isImageTranslucent() << std::endl;
+		std::cout << "   Transparency? " << _imageStream->isImageTranslucent() << std::endl;
 	}
 }
 
@@ -123,7 +127,11 @@ void VideoTexture::setVideoPath (const char* newPath)
 
 	_path = std::string(newPath);
 	
-	if (!sceneManager->isGraphical()) return;
+	if (!sceneManager->isGraphical())
+	{
+		BROADCAST(this, "ss", "setVideoPath", getVideoPath());
+		return;
+	}
 
 	std::string fullPath = getAbsolutePath(_path);
 	
@@ -221,7 +229,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 		this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 		// if image has transparency, enable blending:
-		if (_imageStream->isImageTranslucent())
+		if (1)//(_imageStream->isImageTranslucent())
 		{
 			this->setMode(GL_BLEND, osg::StateAttribute::ON);
 			this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
@@ -232,7 +240,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 		if (!_loop) _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
 	}
 	
-	BROADCAST(this, "ss", "setVideoPath", getVideoPath());
+	
 }
 
 void VideoTexture::setLoop (int i)

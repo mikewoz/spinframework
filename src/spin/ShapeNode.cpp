@@ -115,11 +115,16 @@ void ShapeNode::setBillboard (billboardType t)
 
 void ShapeNode::setColor (float r, float g, float b, float a)
 {
-	_color = osg::Vec4(r,g,b,a);
+	osg::Vec4 newColor = osg::Vec4(r,g,b,a);
 
-	drawShape();
-
-	BROADCAST(this, "sffff", "setColor", r, g, b, a);
+	if (_color != newColor)
+	{
+		_color = newColor;
+	
+		drawShape();
+	
+		BROADCAST(this, "sffff", "setColor", r, g, b, a);
+	}
 }
 
 // ===================================================================
@@ -158,7 +163,7 @@ void ShapeNode::setRenderBin (int i)
 // ===================================================================
 void ShapeNode::drawShape()
 {
-
+	std::cout << "in drawShape()" << std::endl;
     pthread_mutex_lock(&pthreadLock);
 
 	// remove the old shape:
@@ -289,6 +294,7 @@ void ShapeNode::drawShape()
 // ===================================================================
 void ShapeNode::drawTexture()
 {
+	
 
 	//std::cout << "debug texturepath: " << texturePath <<  std::endl;
 
@@ -302,6 +308,8 @@ void ShapeNode::drawTexture()
 	else if (shapeGeode.valid())
 	{
 			
+		std::cout << "in drawTexture()" << std::endl;
+		
 		// if filename contains "shared_video_texture", then replace
 		// current TextureAttribute with a SharedVideoTexture
 		

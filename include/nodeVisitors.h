@@ -229,7 +229,7 @@ class UpdateSceneVisitor : public osg::NodeVisitor
 /**
  * \brief A NodeVisitor class that finds all textured statesets in a node:
  */
-typedef std::vector< osg::observer_ptr<osg::StateSet> > StateSetList;
+typedef std::vector< osg::ref_ptr<osg::StateSet> > StateSetList;
 class TextureStateSetFinder : public osg::NodeVisitor
     {
     public:
@@ -240,18 +240,15 @@ class TextureStateSetFinder : public osg::NodeVisitor
         
         virtual void apply(osg::Node& node)
         {
-        	std::cout << "checking stateset on node" << std::endl;
             apply(node.getStateSet());
             traverse(node);
         }
     	
         virtual void apply(osg::Geode& geode)
         {
-        	std::cout << "checking stateset on geode" << std::endl;
             apply(geode.getStateSet());
             for(unsigned int i=0;i<geode.getNumDrawables();++i)
             {
-            	std::cout << "checking stateset on drawable" << std::endl;
                 apply(geode.getDrawable(i)->getStateSet());
             }
         
