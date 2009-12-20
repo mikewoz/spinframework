@@ -2058,7 +2058,10 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 			if (strcmp((char*)argv[i],"NULL")!=0) sceneManager->createNode((char*)argv[i], (char*)argv[1]);
 		}
 	}
-	
+	else if ((theMethod=="stateList") && (argc>2))
+	{
+		// ??
+	}	
 	else if ((theMethod=="exportScene") && (argc==3))
 		sceneManager->exportScene((char*)argv[1], (char*)argv[2]);
 	else if ((theMethod=="load") && (argc==2))

@@ -258,10 +258,17 @@ void ModelNode::drawModel()
 			    		
 			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 			    		size_t pos;
+			    		
+			    		// in Linux, imageFile is relative, so check if it
+			    		// exists and prepend the modelPath in case:
 
-						std::cout << "checking texture: " << imageFile << std::endl;
-						std::cout << "  real full path: " << osgDB::findDataFile(imageFile) << std::endl;
-						std::cout << "    no extension: " << osgDB::getNameLessExtension(osgDB::findDataFile(imageFile)) << std::endl;
+						std::cout << "original texture: " << imageFile << std::endl;
+			    		if (!osgDB::fileExists(imageFile))
+			    		{
+			    			imageFile = osgDB::getFilePath(modelPath) + imageFile;
+			    		}
+			    		std::cout << "  with modelpath: " << imageFile << std::endl;
+						std::cout << "  less extension: " << osgDB::getNameLessExtension(imageFile) << std::endl;
 
 			    		
 			    		
