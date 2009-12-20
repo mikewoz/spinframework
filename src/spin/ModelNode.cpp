@@ -258,19 +258,16 @@ void ModelNode::drawModel()
 			    		
 			    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 			    		size_t pos;
+						
+						// If file came from other OS, we should fix it:
+						imageFile = osgDB::convertFileNameToNativeStyle(imageFile);
 			    		
 			    		// in Linux, imageFile is relative, so check if it
 			    		// exists and prepend the modelPath in case:
-
-						std::cout << "original texture: " << imageFile << std::endl;
 			    		if (!osgDB::fileExists(imageFile))
 			    		{
-			    			imageFile = osgDB::getFilePath(modelPath) + imageFile;
-			    		}
-			    		std::cout << "  with modelpath: " << imageFile << std::endl;
-						std::cout << "  less extension: " << osgDB::getNameLessExtension(imageFile) << std::endl;
-
-			    		
+							imageFile = osgDB::concatPaths(osgDB::getFilePath(getAbsolutePath(modelPath)), imageFile);
+			    		}	
 			    		
 			    		// check if the imagefile (minus extension) is a directory, and replace if necessary
 			    		if (osgDB::getDirectoryContents(osgDB::getNameLessExtension(imageFile)).size())
@@ -291,7 +288,7 @@ void ModelNode::drawModel()
 #ifdef WITH_SHARED_VIDEO			    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
-			    		if (0)//((pos=imageFile.find("shared_video_texture01")) != string::npos)
+			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
 			    		{
 			    			if (sceneManager->isGraphical())
 				    		{
