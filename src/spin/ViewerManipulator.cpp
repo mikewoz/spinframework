@@ -346,7 +346,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 				{
 					osg::ref_ptr<GroupNode> testNode = getNodeFromIntersection(*itr);
-					if (testNode->id == selectedNode)
+					if (testNode.valid() && (testNode->id == selectedNode))
 					{
 						lastHitPoint = (*itr).getLocalIntersectPoint();
 						break;
@@ -393,9 +393,9 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 							  LO_ARGS_END);
 					break;
 					
-					// DRAG will only occur if someone clicks elsewhere
-					// and rolls onto this node, so we shouldn't send
-					// anything, should we?
+				// DRAG will only occur if someone clicks elsewhere
+				// and rolls onto this node, so we shouldn't send
+				// anything, should we?
 				case(GUIEventAdapter::DRAG):
 					sendEvent(hitNode->id->s_name,
 							  "sisfffff",
@@ -410,9 +410,9 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 							  LO_ARGS_END);
 					break;
 					
-					// Same goes for the case where someone rolls onto a
-					// node with the mouse button down, and releases.
-					// However, just to be safe, we'll also ensure that
+				// Same goes for the case where someone rolls onto a
+				// node with the mouse button down, and releases.
+				// However, just to be safe, we'll also ensure that
 				// there is no selected node anymore:
 				case(GUIEventAdapter::RELEASE):
 					sendEvent(hitNode->id->s_name,
@@ -429,8 +429,8 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 					selectedNode = gensym("NULL");
 					break;
 					
-					// SCROLLING (with the mouse wheel) is cool. It
-					// could be used to scale for example.
+				// SCROLLING (with the mouse wheel) is cool. It
+				// could be used to scale for example.
 				case(GUIEventAdapter::SCROLL):
 					sendEvent(hitNode->id->s_name,
 							  "sisfffff",
@@ -445,8 +445,8 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 							  LO_ARGS_END);
 					break;
 					
-					// Finally, in the case of a PUSH, we both send the
-					// event, and set the selectedNode
+				// Finally, in the case of a PUSH, we both send the
+				// event, and set the selectedNode
 				case(GUIEventAdapter::PUSH):
 					sendEvent(hitNode->id->s_name,
 							  "sisfffff",
