@@ -74,6 +74,7 @@ public:
 	SearchVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
 	{
 		// Flag all osg object as NULL
+		GroupNode = NULL;
 		GeodeNode = NULL;
 		MTNode = NULL;
 		PATNode = NULL;
@@ -86,6 +87,15 @@ public:
 		traverse(searchNode);
 	}
 	
+	virtual void apply(osg::Group &searchNode)
+	{
+		osg::ref_ptr<osg::Group> n = dynamic_cast<osg::Group*> (&searchNode);
+		if (n.valid())
+		{
+			if (searchForName == searchNode.getName()) GroupNode = n;
+		}
+		traverse(searchNode);
+	}
 	virtual void apply(osg::Geode &searchNode)
 	{
 		osg::ref_ptr<osg::Geode> n = dynamic_cast<osg::Geode*> (&searchNode);
@@ -135,6 +145,7 @@ public:
 	// search for node with given name starting at the search node
 	void searchNode(osg::Node* searchFromMe, std::string searchName)
 	{
+		GroupNode = NULL;
 		GeodeNode = NULL;
 		MTNode = NULL;
 		PATNode = NULL;
@@ -145,6 +156,7 @@ public:
 		searchFromMe->accept(*this);
 	}
 
+	osg::ref_ptr<osg::Group> getGroup() { return GroupNode; }
 	osg::ref_ptr<osg::MatrixTransform> getMT() { return MTNode; }
 	osg::ref_ptr<osg::Geode> getGeode() { return GeodeNode; }
 	osg::ref_ptr<osg::PositionAttitudeTransform> getPAT() { return PATNode; }
@@ -155,6 +167,7 @@ private:
 
 	std::string searchForName;
 	
+	osg::ref_ptr<osg::Group> GroupNode;
 	osg::ref_ptr<osg::Geode> GeodeNode;
 	osg::ref_ptr<osg::MatrixTransform> MTNode;
 	osg::ref_ptr<osg::PositionAttitudeTransform> PATNode;
