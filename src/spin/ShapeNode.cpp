@@ -163,7 +163,6 @@ void ShapeNode::setRenderBin (int i)
 // ===================================================================
 void ShapeNode::drawShape()
 {
-	std::cout << "in drawShape()" << std::endl;
     pthread_mutex_lock(&pthreadLock);
 
 	// remove the old shape:
@@ -307,136 +306,56 @@ void ShapeNode::drawTexture()
 
 	else if (shapeGeode.valid())
 	{
-			
-		std::cout << "in drawTexture()" << std::endl;
+		
+		std::string fullPath = getAbsolutePath(texturePath);
 		
 		// if filename contains "shared_video_texture", then replace
 		// current TextureAttribute with a SharedVideoTexture
 		
 		size_t pos;
 
-		if (osgDB::getDirectoryContents(getAbsolutePath(texturePath)).size())
-		{
-			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/VideoTexture").c_str());
-			vid->setVideoPath(texturePath.c_str());
-			shapeGeode->setStateSet( vid.get() );
-		}
-		
-		else if ((pos=texturePath.find("shared_video_texture")) != string::npos)
+		if ((pos=fullPath.find("shared_video_texture")) != string::npos)
 		{
 			// find the shared memory id from the filename:
-			std::string shID = "shvid_"+texturePath.substr(pos+20, texturePath.rfind(".")-(pos+20));
-			addSharedVideoTexture(shapeGeode, shID);
+			std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
+			osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->getOrCreateState(shID.c_str(), "SharedVideoTexture"));
+			if (shvid.valid())
+			{
+				shapeGeode->setStateSet( shvid.get() );
+			} else {
+				std::cout << "ERROR creating SharedVideoTexture '" << shID << "' for ShapeNode: " << id->s_name << std::endl;
+			}
+
 		}
-			
-		else if ((pos=texturePath.find(".mp4") != string::npos) ||
-		        (pos=texturePath.find(".avi") != string::npos) ||
-		        (pos=texturePath.find(".mov") != string::npos) )
-    	{
-			osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/VideoTexture").c_str());
-			vid->setVideoPath(texturePath.c_str());
-			shapeGeode->setStateSet( vid.get() );
-    	}
+
+		else if (isVideoPath(fullPath))
+		{
+			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState((string(id->s_name)+"/VideoTexture").c_str(), "VideoTexture"));
+			if (vid.valid())
+			{
+				vid->setVideoPath(fullPath.c_str());
+				shapeGeode->setStateSet( vid.get() );
+			} else {
+				std::cout << "ERROR creating VideoTexture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
+			}
+		}
 		
 		else
 		{
-			addImageTexture(shapeGeode, texturePath);
+			addImageTexture(shapeGeode, fullPath);
 		}
 	}
 }
 			
 			
-void ShapeNode::addSharedVideoTexture(osg::Node *n, std::string shID)
-{
-	if (!sceneManager->isGraphical()) return;
-	
-#ifdef WITH_SHARED_VIDEO		
-
-
-	// see if an instance already exists:
-	/*
-	 SharedVideoTexture *shTex=0;
-	 std::cout << "num existing sharedtextures: " << sharedVideoTextures.size() << std::endl;
-	 
-	 //std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr;
-	 std::vector<SharedVideoTexture*>::iterator shvItr;
-	 
-	 for (sh	vItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
-	 {
-		 std::cout << "comparing id with " << (*shvItr)->getTextureID() << std::endl;
-		 if (string((*shvItr)->getTextureID())==shID)
-		 {
-			 std::cout << "... already exists" << std::endl;
-			 //shTex = (*shvItr).get();
-			 shTex = (*shvItr);
-	}
-	}
-	
-	// if it doesn't exist, create a new one:
-	if (!shTex)
-	{
-		std::cout << "... doesn't exist. creating." << std::endl;
-		shTex = new SharedVideoTexture(shID.c_str());
-		
-		// add it to the list:
-		sharedVideoTextures.push_back(shTex);
-		
-	}
-	*/
-	
-	if (!sceneManager->shTex.valid())
-	{
-		std::cout << "making new SharedVideoTexture with id: " << shID << std::endl;
-		sceneManager->shTex = new SharedVideoTexture(shID.c_str());
-	}
-	//sharedVideoTextures.push_back(shTex);
-	
-	osg::StateSet *ss = n->getOrCreateStateSet();
-
-	// Finally, replace the texture attribute:
-	ss->setTextureAttributeAndModes(0, sceneManager->shTex, osg::StateAttribute::ON);
-	
-	// turn off lighting 
-	ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-	
-	std::cout << "  replaced placeholder with SharedVideoTexture: " << shID << std::endl;
-
-#endif
-
-}
-/*
-void ShapeNode::addVideoTexture(osg::Node *n, std::string texturePath)
-{
-	osg::ref_ptr<VideoTexture> vid = new VideoTexture("foo");
-	vid->setVideoPath(texturePath.c_str());
-
-	if (vid->isValid())
-	{
-		n->setStateSet( vid );
-		
-		// merge previous stateset into videotexture
-		//vid->merge(n->getOrCreateStateSet());
-		
-		vid->setLoop(1);
-		vid->setPlay(1);
-		
-		vid->debugPrint();
-
-	} else std::cout << "ERROR: Could not create VideoTexture" << std::endl;
-	
-	
-}
-*/
-
-void ShapeNode::addImageTexture(osg::Node *n, std::string texturePath)
+void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 {
 	if (!sceneManager->isGraphical()) return;
 	
 	osg::StateSet *ss = n->getOrCreateStateSet();
 		
 	//osg::ref_ptr<osg::Image> image;
-	osg::ref_ptr<osg::Image> textureImage = osgDB::readImageFile( getAbsolutePath(texturePath).c_str() );
+	osg::ref_ptr<osg::Image> textureImage = osgDB::readImageFile( path.c_str() );
 	if (textureImage.valid())
 	{
 
@@ -480,7 +399,7 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string texturePath)
 
 
 	} else {
-		std::cout << "ERROR (setTexture): The file " << texturePath << " is not a valid texture." << std::endl;
+		std::cout << "ERROR (setTexture): The file " << path << " is not a valid texture." << std::endl;
 	}
 
 

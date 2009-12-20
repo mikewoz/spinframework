@@ -254,11 +254,7 @@ SceneManager::~SceneManager()
 {
 	std::cout << "Cleaning up SceneManager..." << std::endl;
 	
-#ifdef WITH_SHARED_VIDEO
-	shTex->stop();
-#endif
-	
-	
+
 	// Force a delete (and destructor call) for all nodes still in the scene:
 	int i = 0;
 	ReferencedNode *n;
@@ -276,6 +272,10 @@ SceneManager::~SceneManager()
 			i++;
 		}
 	}
+	
+	// clear any states that are left over:
+	clearStates();
+	
 	
 	// stop sceneManager OSC threads:
 	lo_server_thread_stop(rxServ);
@@ -351,20 +351,8 @@ void SceneManager::unregisterState(ReferencedState *s)
 	lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
 
 	ReferencedStateList::iterator itr;
-	/*
-	for (itr=stateList.begin(); itr!=stateList.end(); ++itr)
-	{
-		if ((*itr) == s->id)
-		{
-			stateList.erase(itr);
-			break;
-		}
-	}
-	*/
 	itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );
 	if ( itr != stateMap[s->classType].end() ) stateMap[s->classType].erase(itr);
-
-	
 	
 	SCENE_MSG(this, "ss", "unregisterState", s->id->s_name);
 }
@@ -424,9 +412,9 @@ void SceneManager::sendNodeList(std::string typeFilter)
 	
 			for ( it=stateMap.begin(); it!=stateMap.end(); it++ )
 			{
-				std::cout << "Nodes of type '" << (*it).first << "':";
-				for (i=0; i<(*it).second.size(); i++) std::cout << " " << (*it).second[i]->s_name;
-				std::cout << std::endl;
+				//std::cout << "Nodes of type '" << (*it).first << "':";
+				//for (i=0; i<(*it).second.size(); i++) std::cout << " " << (*it).second[i]->s_name;
+				//std::cout << std::endl;
 	
 				msg = lo_message_new();
 				
@@ -1206,16 +1194,49 @@ void SceneManager::clearUsers()
 
 }
 
+void SceneManager::clearStates()
+{
+	ReferencedStateMap::iterator it;
+	ReferencedStateList::iterator iter;
+	
+	for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
+	{
+		for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+		{
+			if ((*iter)->s_thing) 
+			{
+				std::cout << "removing left over " << (*iter)->s_type << ": " << (*iter)->s_name << std::endl;
+				ReferencedState *s = dynamic_cast<ReferencedState*>((*iter)->s_thing);
+				s->removeFromScene();
+			}
+		}
+	}
+	
+	for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
+	{
+		for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+		{
+			std::cout << "why is " << (*iter)->s_type << " '" << (*iter)->s_name << "' still here?!" << std::endl;
+		}
+	}
+	
+	// TODO: separate sendNodeList to sendStateList as well
+	sendNodeList("*");
+	
+	std::cout << "Cleared all states." << std::endl;
+}
+
+
 // *****************************************************************************
 void SceneManager::refresh()
 {
 	sendNodeList("*");
 
 	nodeMapType::iterator it;
-	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
+	for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
 	{
 		nodeListType::iterator iter;
-		for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+		for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
 		{
 			(*iter)->stateDump();
 		}
@@ -1223,7 +1244,7 @@ void SceneManager::refresh()
 	
 	// must do connections manually:
 	vector<SoundConnection*> connections = getConnections();
-	for (vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
+	for (vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
 	{
 		(*iter)->stateDump();
 	}
@@ -1267,7 +1288,7 @@ void SceneManager::update()
 {
 	
 #ifdef WITH_SHARED_VIDEO
-	if (shTex.valid()) shTex->updateCallback();
+	//if (shTex.valid()) shTex->updateCallback();
 #endif
 
 }
@@ -2082,7 +2103,25 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 //		if (lo_is_numerical_type((lo_type)types[1])) sceneManager->setGrid((int) lo_hires_val((lo_type)types[1], argv[1]));
 
 	else {
-		std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
+		
+		spinContext &spin = spinContext::Instance();
+		if (spin.sceneManager->isServer())
+		{
+			lo_message msg = lo_message_new();
+			for (int i=0; i<argc; i++)
+			{
+				if (lo_is_numerical_type((lo_type)types[i]))
+				{
+					lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+				} else {
+					lo_message_add_string(msg, (const char*) argv[i] );
+				}
+			}
+			lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+			std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args), but forwarding the message anyway." << std::endl;
+		} else {
+			std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
+		}
 	}
 
 	//pthread_mutex_unlock(&pthreadLock);

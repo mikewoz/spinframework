@@ -66,6 +66,12 @@ public:
 	virtual void updateCallback();
 
 	/**
+	* Remove this stateset from all parents... essentially destroying the state,
+	* since no reference to it will exist anymore, and OSG will kill it.
+	*/
+	void removeFromScene();
+		
+	/**
 	 * Replaces a StateSet in the scene graph with this one. ie, goes through
 	 * all parents of the provided stateset and replaces the object's state with
 	 * this.

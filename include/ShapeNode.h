@@ -91,7 +91,7 @@ public:
 	int getRenderBin() { return renderBin; }
 
 	
-	void addSharedVideoTexture(osg::Node *n, std::string shID);
+	//void addSharedVideoTexture(osg::Node *n, std::string shID);
 	//void addVideoTexture(osg::Node *n, std::string texturePath);
 	void addImageTexture(osg::Node *n, std::string texturePath);
 	

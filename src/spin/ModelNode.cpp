@@ -145,8 +145,6 @@ void ModelNode::drawModel()
 {
 	int i,j;
 	
-	std::cout << "in drawModel()" << std::endl;
-
 	pthread_mutex_lock(&pthreadLock);
 
 	if (model.valid())
@@ -284,84 +282,20 @@ void ModelNode::drawModel()
 			    			}
 			    			
 			    		}
-			    		
-#ifdef WITH_SHARED_VIDEO			    		
+			    				    		
 			    		// if filename contains "shared_video_texture", then replace
 			    		// current TextureAttribute with a SharedVideoTexture
 			    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
 			    		{
-			    			if (sceneManager->isGraphical())
-				    		{
-								// find the shared memory id from the filename:
-					    		std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
-					    					
-								// see if an instance already exists:
-								/*
-								SharedVideoTexture *shTex=0;
-								std::cout << "num existing sharedtextures: " << sharedVideoTextures.size() << std::endl;
-								
-								//std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr;
-								std::vector<SharedVideoTexture*>::iterator shvItr;
-								
-								for (shvItr=sharedVideoTextures.begin(); shvItr!=sharedVideoTextures.end(); ++shvItr)
-								{
-									std::cout << "comparing id with " << (*shvItr)->getTextureID() << std::endl;
-									if (string((*shvItr)->getTextureID())==shID)
-									{
-										std::cout << "... already exists" << std::endl;
-										//shTex = (*shvItr).get();
-										shTex = (*shvItr);
-									}
-								}
-								
-								// if it doesn't exist, create a new one:
-								if (!shTex)
-								{
-									std::cout << "... doesn't exist. creating." << std::endl;
-									shTex = new SharedVideoTexture(shID.c_str());
-					    		
-									// add it to the list:
-									sharedVideoTextures.push_back(shTex);
-									
-								}
-								*/
-								
-								if (!sceneManager->shTex.valid())
-								{
-									std::cout << "making new SharedVideoTexture" << std::endl;
-									sceneManager->shTex = new SharedVideoTexture(shID.c_str());
-								}
-									//sharedVideoTextures.push_back(shTex);
-								
-								
-								
-								// Finally, replace the texture attribute:
-								(*itr)->setTextureAttributeAndModes(0, sceneManager->shTex, osg::StateAttribute::ON);
-								
-					    		// turn off lighting 
-					    		(*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	
-				    			
-					    		/*
-							    osg::ref_ptr<osg::TexMat> texmat(new osg::TexMat);
-							    texmat->setScaleByTextureRectangleSize(true);
-					
-							    osg::ref_ptr<osg::TexEnv> texenv(new osg::TexEnv);
-							    texenv->setMode(osg::TexEnv::REPLACE);
-					
-							    (*itr)->setTextureAttributeAndModes(0, textureRect.get(), osg::StateAttribute::ON);
-							    (*itr)->setTextureAttributeAndModes(0, texmat.get(), osg::StateAttribute::ON);
-							    (*itr)->setTextureAttributeAndModes(0, texenv.get(), osg::StateAttribute::ON);
-					
-							    // turn off lighting 
-							    (*itr)->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-							    */
-					    			
-					    		std::cout << "  replaced '" << imageFile.substr(pos) << "' with SharedVideoTexture: " << shID << std::endl;
-			    		
-				    		}
+							std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
+							osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->getOrCreateState(shID.c_str(), "SharedVideoTexture"));
+			    			if (shvid.valid())
+			    			{
+								(*itr)->removeAttribute(attr);
+			    				shvid->replace((*itr).get());
+			    				std::cout << "  Replaced placeholder texture with " << shvid->classType << ": " << shvid->id->s_name << std::endl;
+			    			}
 			    		}
-#endif
 			    		
 			    		// if filename is a movie format, create an ImageStream
 			    		// and replace the current TextureAttribute:

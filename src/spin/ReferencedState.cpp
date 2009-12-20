@@ -98,6 +98,8 @@ ReferencedState::~ReferencedState()
 	// finally, by nulling the ref_ptr in s_thing, we should have removed all
 	// references to this object, so OSG can clean up
 	id->s_thing = 0;
+	
+	std::cout << "Killed ReferencedState " << id->s_name << std::endl;
 
 }
 
@@ -107,12 +109,55 @@ void ReferencedState::updateCallback()
     // derived classes can do updates here   
 }
 
+void ReferencedState::removeFromScene()
+{
+	osg::StateSet::ParentList::iterator itr;
+	osg::StateSet::ParentList parents = this->getParents();	
+	
+	for (itr=parents.begin(); itr!=parents.end(); ++itr)
+	{
+		osg::Node *node = dynamic_cast<osg::Node*>(*itr);
+		if (node)
+		{
+			node->setStateSet(0);
+		}
+		else {
+			osg::Drawable *drawable = dynamic_cast<osg::Drawable*>(*itr);
+			if (drawable) drawable->setStateSet(0);
+		}
+	}
+	
+	this->clear();
+}
+
+
 
 void ReferencedState::replace(osg::StateSet *ss)
 {
-	//vid->addParent((*itr)->getParent(0));
-	//(*itr)->removeParent(*itr)->getParent(0));
+	// first, try to inherit as much of the StateSet's attributes as possible:
+	
+	// but make sure to remove texture attribute 0 first:
+	//osg::StateAttribute* attr = stateset->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
+	
+	//ss->removeTextureAttribute(0, osg::StateAttribute::TEXTURE);
+	
+	//this->merge(*ss); // oops. this will replace our textures
+	
+	//this->setModeList(ss->getModeList());
 
+	/*
+	osg::StateSet::AttributeList attribs = ss->getAttributeList();
+	osg::StateSet::AttributeList::iterator attr;
+	for (attr=attribs.begin(); attr!=attribs.end(); ++attr)
+	{
+		osg::StateAttribute *a = (*attr).second.first;
+		std::cout << "attrib: " << a->className() <<  std::endl;
+		//std::cout << "attrib: " << (int)(*attr).first.first << " " << (*attr).second.first->getName <<  std::endl;
+	}
+	*/
+	
+	
+	// now replace ss in each of his parents with our stateset:
 	osg::StateSet::ParentList::iterator itr;
 	osg::StateSet::ParentList parents = ss->getParents();	
 	

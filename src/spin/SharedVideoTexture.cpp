@@ -39,18 +39,9 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-
-#include <osg/TexMat>
-#include <osg/TexEnv>
-#include <osg/StateSet>
-#include <osg/StateAttribute>
-
-
 #include <iostream>
-
-
 #include "SharedVideoTexture.h"
-
+#include "SceneManager.h"
 
 
 static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
@@ -62,9 +53,11 @@ using namespace std;
 // ===================================================================
 // constructor:
 //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
-SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
+SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : ReferencedState(s, initID)
 {
-
+	classType = "SharedVideoTexture";
+	
+	
 	// worker thread is in killed state to start:
 	killed_ = true;
 	
@@ -75,30 +68,35 @@ SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
 	img = new osg::Image;
 	//img->setOrigin(osg::Image::TOP_LEFT); 
 	img->setOrigin(osg::Image::BOTTOM_LEFT); 
-
-
-    // setup texture:
-	setImage(img.get());
-	setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-    setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-    setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-    setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+   
+	// setup texture:
+	tex = new osg::Texture2D; //(img.get());
+	tex->setImage(img.get());
+	tex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+    tex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+    tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
 	
 	// It is important to disable resizing of this texture if
 	// resolution is not a power of two. Othwerwise, there will
 	// be a very slow resize every update. NOTE: this might cause
 	// problems on harware that doesn't support NPOT textures.
-	setResizeNonPowerOfTwoHint(false);
-    
-    // register callback:
-	//this->setUserData( dynamic_cast<osg::StateAttribute*>(this) );
-	//this->setUpdateCallback(new SharedVideoTexture_callback);
+	tex->setResizeNonPowerOfTwoHint(false);
+
+		
+	// add the texture to this (StateSet)
+	this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
 	
+	// turn off lighting 
+	this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
 	// keep a timer for reload attempts:
 	lastTick = osg::Timer::instance()->tick();
 	
+	std::cout << "created SharedVideoTexture with id: " << this->id->s_name << std::endl;
+
 	// set initial textureID:
-	setTextureID(initID);
+	setTextureID(this->id->s_name);
 	
 }
 
@@ -106,9 +104,59 @@ SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::Texture2D()
 // destructor
 SharedVideoTexture::~SharedVideoTexture()
 {
+	std::cout << "SharedVideoTexture destructor" << std::endl;
+#ifdef WITH_SHARED_VIDEO
 	stop();
+#endif
 }
 
+
+// ===================================================================
+void SharedVideoTexture::setTextureID (const char* newID)
+{
+	
+	// only do this if the id has changed:
+	if (textureID == std::string(newID)) return;
+	
+	textureID = std::string(newID);
+	this->setName("SharedVideoTexture("+textureID+")");
+	
+	if (sceneManager->isGraphical())
+	{
+#ifdef WITH_SHARED_VIDEO
+		start();
+#endif
+	}
+	
+	else
+	{
+		BROADCAST(this, "ss", "setTextureID", getTextureID());
+	}
+}
+
+// *****************************************************************************
+std::vector<lo_message> SharedVideoTexture::getState ()
+{
+	// inherit state from base class
+	std::vector<lo_message> ret = ReferencedState::getState();
+		
+	lo_message msg;
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "ss", "setTextureID", getTextureID());
+	ret.push_back(msg);
+
+	return ret;
+}
+
+
+// *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************
+// The rest of this stuff is only valid if we are using the shared_video library
+// from Miville (configurable option in build)
+
+#ifdef WITH_SHARED_VIDEO
 
 void SharedVideoTexture::updateCallback()
 {
@@ -132,7 +180,7 @@ void SharedVideoTexture::updateCallback()
 	            1);
 	    		
 	    // set texture:
-	    setImage(img.get());
+	    tex->setImage(img.get());
 
 		// flip image from camera space:
 		//img->flipHorizontal();
@@ -161,7 +209,7 @@ void SharedVideoTexture::updateCallback()
     
     
 }
-
+		
 
 /// This function is executed in the worker thread
 void SharedVideoTexture::consumeFrame()
@@ -231,27 +279,7 @@ void SharedVideoTexture::signalKilled ()
     textureUploadedCondition_.notify_one(); // in case we're waiting in consumeFrame
 }
 
-
 // ===================================================================
-void SharedVideoTexture::setTextureID (const char* newID)
-{
-	
-	// only do this if the id has changed:
-	if (textureID == std::string(newID)) return;
-	
-	textureID = std::string(newID);
-	this->setName("SharedVideoTexture("+textureID+")");
-	
-	start();
-	
-}
-
-
-
-// ===================================================================
-
-
-
 void SharedVideoTexture::start()
 {
 	// first kill any existing thread:
@@ -312,3 +340,5 @@ void SharedVideoTexture::stop()
 		std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
 	}
 }
+
+#endif

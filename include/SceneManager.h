@@ -179,6 +179,12 @@ class SceneManager
 		void clearUsers();
 		
 		/**
+		 * Forces a removal of all states from the scene graph. This should only
+		 * be used to clean up upon exit.
+		 */
+		void clearStates();
+		
+		/**
 		 * The refresh method results in a broadcast of all nodelists so that
 		 * clients can create any missing nodes. Then, the full node state is
 		 * broadcasted, for ALL nodes.
@@ -222,13 +228,6 @@ class SceneManager
 
 		bool activeLights[OSG_NUM_LIGHTS];
 
-
-		/**
-		 * We keep a list of all nodeTypes so that we can fill GUIs
-		 */
-		//std::vector<std::string> nodeTypes;
-		//std::vector<std::string> stateTypes;
-
 		std::string getStateAsXML(std::vector<lo_message> nodeState);
 		std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
 		
@@ -240,8 +239,6 @@ class SceneManager
 		bool createConnectionsFromXML(TiXmlElement *XMLnode);
 		bool loadXML(const char *filename);
 
-		//void setGrid(int gridSize);
-
 		std::string resourcesPath;
 		
 		MediaManager *mediaManager;
@@ -250,18 +247,10 @@ class SceneManager
 
 		//pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;
 
-
-#ifdef WITH_SHARED_VIDEO
-	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;
-	//std::vector<SharedVideoTexture*> sharedVideoTextures;
-	osg::ref_ptr<SharedVideoTexture> shTex;
-#endif
-
 		
 	private:
 		//std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
 		nodeMapType nodeMap; // the nodeList arranged by type
-		//ReferencedStateList stateList;
 		ReferencedStateMap stateMap;
 };
 

@@ -84,7 +84,7 @@ public:
 	int getLoop() { return (int)_loop; }
 
 	/**
-	 * Seek to a particular part of the movie
+	 * Normalized seek to a part of the video. ie, index in range [0,1]
 	 */
 	void setIndex (float f);
 	float getIndex() { return _index; }

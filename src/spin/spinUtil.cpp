@@ -47,6 +47,10 @@
 #include <ifaddrs.h>
 #include <arpa/inet.h>
 
+#include <osgDB/ReadFile>
+#include <osgDB/FileNameUtils>
+#include <osgDB/FileUtils>
+
 #include <osgIntrospection/Reflection>
 #include <osgIntrospection/Value>
 #include <osgIntrospection/variant_cast>
@@ -280,6 +284,38 @@ std::string getAbsolutePath(std::string path)
 	{
 		return getenv("HOME") + path.substr(1);
 	} else return path;
+}
+
+bool isVideoPath(std::string path)
+{
+	using namespace std;
+	
+	string extension = osgDB::getLowerCaseFileExtension(path);
+	
+	if (osgDB::getDirectoryContents(getAbsolutePath(path)).size())
+	{
+		return true;
+	}
+	else if ((extension=="mp4") ||
+			 (extension=="avi") ||
+			 (extension=="mpg") ||
+			 (extension=="mpeg") ||
+			 (extension=="mov") ||
+			 (extension=="wmv") ||
+			 (extension=="qt") ||
+			 (extension=="ogm") ||
+			 (extension=="m4v") ||
+			 (extension=="dv") ||
+			 (extension=="3gp") ||
+			 (extension=="vob") ||
+			 (extension=="tgas") ||
+			 (extension=="divx") ||
+			 (extension=="flv"))
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 /**

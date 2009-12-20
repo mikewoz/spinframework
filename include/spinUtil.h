@@ -129,6 +129,8 @@ bool fileExists(const std::string& fileName);
 std::string getRelativePath(std::string path);
 std::string getAbsolutePath(std::string path);
 
+bool isVideoPath(std::string path);
+
 std::string getSpinPath(std::string path);
 
 // *****************************************************************************

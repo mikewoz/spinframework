@@ -42,69 +42,91 @@
 #ifndef __SharedVideoTexture_H
 #define __SharedVideoTexture_H
 
-#include <osg/TextureRectangle>
+#include <osg/Image>
 #include <osg/Texture2D>
 #include <osg/Timer>
 
+#include "ReferencedState.h"
+
+#ifdef WITH_SHARED_VIDEO		
+#include "sharedVideoBuffer.h"
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
-
-#include "sharedVideoBuffer.h"
+#endif
 
 
 /**
- * \brief This shares a GL texture from memory with another process
+ * \brief Allows sharing of a dynamc (video) GL texture from another process
  *
- * This is accomplished by the use of boost/interprocess/shared_memory_object
+ * This is accomplished by the use of Miville's shared_video library, which in
+ * turn uses boost/interprocess/shared_memory_object.
+ *
+ * Miville must be poperly installed for this to work, which really only works
+ * in Linux. See the following URL for more info:
+ *
+ * https://svn.sat.qc.ca/trac/miville
+ *
+ * Note however, that this node will be available regardless of the library's
+ * presence. This is because we still want to know about it on ALL servers or
+ * clients, regardless of platform or available libraries.
+ *
+ * ie, this node still has reduced funtionality on non-supported platforms.
  */
-//class SharedVideoTexture : virtual public osg::TextureRectangle
-class SharedVideoTexture : virtual public osg::Texture2D
+class SharedVideoTexture : public ReferencedState
 {
 
 public:
 
-	SharedVideoTexture(const char *initID);
+	SharedVideoTexture(SceneManager *sceneManager, const char *initID);
 	~SharedVideoTexture();
-
-	void updateCallback();
-	
-	// from tristan:
-	void consumeFrame();
-	void signalKilled();
 
 	void setTextureID(const char *id);
 	const char* getTextureID() { return textureID.c_str(); }
+		
+	std::vector<lo_message> getState ();
 	
+#ifdef WITH_SHARED_VIDEO
+	void updateCallback();
+	
+	void consumeFrame();
+	void signalKilled();
+
 	void start();
 	void stop();
+#endif
+		
 
 private:
 	
 	std::string textureID;
 	
+	osg::ref_ptr<osg::Texture2D> tex;
 	osg::ref_ptr<osg::Image> img;
 	
 	int width, height;
+		
+	osg::Timer_t lastTick;
+		
+	bool killed_;
 	
-	// from tristan:
+
+#ifdef WITH_SHARED_VIDEO		
 	boost::thread worker;
 	boost::mutex displayMutex_;
 	boost::condition_variable textureUploadedCondition_;
 	SharedVideoBuffer *sharedBuffer;
-	
-	boost::interprocess::shared_memory_object *shm;
-	boost::interprocess::mapped_region *region;    
-    
-	osg::Timer_t lastTick;
 		
-	bool killed_;
-
+	boost::interprocess::shared_memory_object *shm;
+	boost::interprocess::mapped_region *region;
+#endif
+		
 };
 
+/*
 class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::Callback
 {
 
@@ -119,6 +141,6 @@ class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::
 			}
 		}
 };
-
+*/
 
 #endif

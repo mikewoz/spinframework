@@ -12,7 +12,7 @@ NODELIST = ReferencedNode ReferencedState GroupNode \
 	   LightSource RayNode Contour ConstraintsNode \
 	   GridNode PointerNode MeasurementNode SoundNode SoundSpace \
 	   DSPNode Listener SoundConnection UserNode \
-	   AnimationNode VideoTexture
+	   AnimationNode VideoTexture SharedVideoTexture
 
 ifdef SHARED_VIDEO_LIB
   #NODELIST += SharedVideoNode

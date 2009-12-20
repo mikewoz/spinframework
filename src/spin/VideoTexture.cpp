@@ -102,6 +102,7 @@ void VideoTexture::debug()
 	if (_imageStream.valid())
 	{
 		std::cout << "   Duration: " << _imageStream->getLength() << "s" << std::endl;
+		std::cout << "   TimeMultiplier: " << _imageStream->getTimeMultiplier() << "s" << std::endl;
 		std::cout << "   Status: ";
 		switch (_imageStream->getStatus())
 		{
@@ -160,8 +161,10 @@ void VideoTexture::setVideoPath (const char* newPath)
 	if (dir.size())
 	{
 		std::cout << "Creating VideoTexture from image sequence";
-
 		osg::ref_ptr<osg::ImageSequence> _imageSequence = new osg::ImageSequence();
+
+		// sort directory contents:
+		std::sort(dir.begin(), dir.end());
 
 		// search for image files
 		for (osgDB::DirectoryContents::iterator itr = dir.begin(); itr != dir.end(); ++itr)
@@ -265,7 +268,8 @@ void VideoTexture::setIndex (float f)
 	
 	if (_imageStream.valid())
 	{
-		_imageStream->seek(f);
+		std::cout << "seeking to " << (double) (f * _imageStream->getLength()) << std::endl;
+		_imageStream->seek((double) (f * _imageStream->getLength()));
 	}
 	
 	BROADCAST(this, "sf", "setIndex", getIndex());
