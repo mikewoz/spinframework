@@ -135,12 +135,12 @@ public:
 	 * A translational velocity (m/s). This is computed in the callbackUpdate()
 	 * function.
 	 */
-	void setVelocity (float dx, float dy, float dz);
+	virtual void setVelocity (float dx, float dy, float dz);
 
 	/**
 	 * A rotational velocity (deg/sec), computed in callbackUpdate().
 	 */
-	void setSpin (float dp, float dr, float dy);
+	virtual void setSpin (float dp, float dr, float dy);
 
 	/**
 	 * A Damping value (negative acceleration) that gets applied to velocity
@@ -148,26 +148,26 @@ public:
 	 * - zero damping will not change velocity/spin values
 	 * - any positive value will decrease the speeds
 	 */
-	void setDamping (float d);
+	virtual void setDamping (float d);
 	
 	/**
 	 * The translate command increments the node's current translation values
 	 * (ie, it's position in the scene with respect to it's parent)
 	 */
-    void translate (float x, float y, float z);
+    virtual void translate (float x, float y, float z);
     
 	/**
 	 * The move command adds a relative translation with respect to the
 	 * node's current orientation. That is, the node will translate along it's
 	 * direction vector (Y-axis) by the supplied number of units
 	 */
-    void move (float x, float y, float z);
+    virtual void move (float x, float y, float z);
 
 	/**
 	 * The rotate command adds a relative rotation to the node's current
 	 * orientation.
 	 */
-	void rotate (float pitch, float roll, float yaw);
+	virtual void rotate (float pitch, float roll, float yaw);
 
 
 	//int getReportGlobals() { return (int)_reportGlobals; };
@@ -183,6 +183,7 @@ public:
 
 
 	osg::Matrix getGlobalMatrix();
+	osg::Vec3 getCenter();
 
 	
 	/**

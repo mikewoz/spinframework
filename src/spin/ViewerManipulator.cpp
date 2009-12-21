@@ -135,7 +135,9 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 
 	if (!err)
 	{
-		if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
+		// TODO: fix this:
+		//if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
+		if (redirectAddr) lo_send_message(redirectAddr, ("/"+string(nodeId)).c_str(), msg);
 		else spin.NodeMessage(nodeId, msg);
 		
 	} else {

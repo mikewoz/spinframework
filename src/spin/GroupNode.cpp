@@ -101,7 +101,7 @@ GroupNode::~GroupNode()
 
 }
 
-#define EPSILON 0.00001
+#define EPSILON 0.0001
 
 void GroupNode::callbackUpdate()
 {
@@ -124,31 +124,17 @@ void GroupNode::callbackUpdate()
 			if (_velocity.length() > EPSILON) // != osg::Vec3(0,0,0))
 			{
             	this->translate( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
-            	if (_damping > EPSILON) _velocity -= osg::Vec3(_damping*dt,_damping*dt,_damping*dt);
+            	if (_damping > EPSILON) _velocity *= 1 - (_damping*dt);
 			}
+			else _velocity = osg::Vec3(0,0,0);
+			
 			if (_spin.length() > EPSILON) // != osg::Vec3(0,0,0))
 			{
 				this->rotate( _spin.x()*dt, _spin.y()*dt, _spin.z()*dt );
-            	if (_damping > EPSILON) _spin -= osg::Vec3(_damping*dt,_damping*dt,_damping*dt);
+            	if (_damping > EPSILON) _spin *= 1 - (_damping*dt);
 			}
+			else _spin = osg::Vec3(0,0,0);
  
-            
-            // apply damping to _velocity and _spin (units are -m/sec^2)
-			/*
-            if (_damping > EPSILON)
-            {
-	            osg::Vec3 dampingVec = osg::Vec3(_damping*dt,_damping*dt,_damping*dt);
-	            _velocity = _velocity - dampingVec;
-	            _spin = _spin - dampingVec;
-            }
-            */
-			
-			/*
-            std::cout << "update(" << id->s_name << "): damping=" << _damping << ", ";
-			std::cout << "_velocity="<<_velocity.x()<<","<<_velocity.y()<<","<<_velocity.z();
-			std::cout << "_spin="<<_spin.x()<<","<<_spin.y()<<","<<_spin.z();
-			std::cout << std::endl;
-			*/
 			
 			lastTick = tick;
 		}
@@ -482,6 +468,12 @@ osg::Matrix GroupNode::getGlobalMatrix()
 	}
 	
 	return _globalMatrix;
+}
+
+osg::Vec3 GroupNode::getCenter()
+{
+	const osg::BoundingSphere& bs = this->getBound();
+	return bs.center();
 }
 
 

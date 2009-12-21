@@ -41,10 +41,10 @@
 
 
 #ifndef __ConstraintsNode_H
-#define __ASSONSTRAINTS_H
+#define __ConstraintsNode_H
 
 
-#include "ReferencedNode.h"
+#include "GroupNode.h"
 
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform> 
@@ -55,7 +55,6 @@
 #include <map>
 
 
-enum constraintMode { NONE, DROP_TO_SURFACE };
 
 /**
  * \brief A node with constrained motion
@@ -66,7 +65,7 @@ enum constraintMode { NONE, DROP_TO_SURFACE };
  * of movement. For example, the node will only move along the surface of the
  * parent, or along one axis of the parent, etc.
  */
-class ConstraintsNode : public ReferencedNode
+class ConstraintsNode : public GroupNode
 {
 
 public:
@@ -75,29 +74,22 @@ public:
 	ConstraintsNode(SceneManager *sceneManager, char *initID);
 	virtual ~ConstraintsNode();
 	
+	enum constraintMode {	UNCONSTRAINED,
+							DROP_TO_PARENT, // follows Z axis and sits on surface
+							BOUNCE_OFF_PARENT,
+							PARENT_CONTOUR, 
+							PARENT_CONTOUR_WITH_NORMAL
+						};
+
+		
 	virtual void callbackUpdate();
 	
-	/**
-	 * IMPORTANT:
-	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
-	 * and can also change their attachmentNode so that children are attached
-	 * anywhere in this subgraph. If that is the case, the updateNodePath()
-	 * function MUST be overridden, and extra nodes must be manually pushed onto
-	 * the currentNodePath.
-	 */
-	virtual void updateNodePath();
 	
-	
-	void setMode(int m);
+	void setMode(constraintMode m);
+	int getMode() { return (int)_mode; };
 	
 	void setTranslation (float x, float y, float z);
-	void setOrientation (float p, float r, float y);
-	void move (float x, float y, float z);
-	void rotate (float p, float r, float y);
-	
-	int getMode() { return (int)_mode; };
-	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
-	osg::Vec3 getOrientation() { return _orientation; };
+	void translate (float x, float y, float z);
 	
 	
 	/**
@@ -106,14 +98,7 @@ public:
 	 */
 	virtual std::vector<lo_message> getState();
 	
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
 
-	
 	// ***********************************************************
 	// data:
 	

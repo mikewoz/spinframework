@@ -54,22 +54,12 @@ using namespace std;
 
 // ***********************************************************
 // constructor:
-ConstraintsNode::ConstraintsNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+ConstraintsNode::ConstraintsNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
 	nodeType = "ConstraintsNode";
 	this->setName(string(id->s_name) + ".ConstraintsNode");
 
-	
-	_mode = NONE;
-
-	mainTransform = new osg::PositionAttitudeTransform();
-	mainTransform->setName(string(id->s_name) + ".mainTransform");
-	this->addChild(mainTransform.get());
-
-	  
-	// When children are attached to this, they get added to the attachNode:
-	// NOTE: by changing this, we MUST override the updateNodePath() method!
-	setAttachmentNode(mainTransform.get());
+	_mode = UNCONSTRAINED;
 
 }
 
@@ -85,30 +75,6 @@ void ConstraintsNode::callbackUpdate()
 {
 
 }
-	
-
-void ConstraintsNode::updateNodePath()
-{
-	currentNodePath.clear();
-	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
-	{
-		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
-		if (parentNode.valid())
-		{
-			currentNodePath = parentNode->currentNodePath;
-		}
-	}
-	
-	// here, the nodePath includes the base osg::group, PLUS the mainTransform
-	currentNodePath.push_back(this);
-	currentNodePath.push_back(mainTransform.get());
-	
-	// now update NodePaths for all children:
-	updateChildNodePaths();
-	
-}
-
-
 
 // *****************************************************************************
 // *****************************************************************************
@@ -139,17 +105,20 @@ osg::Vec3 computeDropIntersection(osg::Node* subgraph,float x,float y)
 // *****************************************************************************
 // *****************************************************************************
 
-void ConstraintsNode::setMode (int m)
+void ConstraintsNode::setMode (constraintMode m)
 {
-	this->_mode = (constraintMode) m;
-	BROADCAST(this, "si", "setMode", (int)_mode);
+	if (this->_mode != (int)m)
+	{
+		this->_mode = m;
+		BROADCAST(this, "si", "setMode", (int)_mode);
+	}
 }
 
 void ConstraintsNode::setTranslation (float x, float y, float z)
 {	
-	osg::Vec3 v;
+	osg::Vec3 v = osg::Vec3(x,y,z);
 	
-	if (this->_mode == DROP_TO_SURFACE)
+	if (_mode == DROP_TO_PARENT)
 	{
 		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
 		if (parentNode.valid())
@@ -157,71 +126,71 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 			v = computeDropIntersection(parentNode.get(), x, y);
 		}
 	}
+	
+	
+	GroupNode::setTranslation(v.x(), v.y(), v.z());
+}
+
+
+void ConstraintsNode::translate (float x, float y, float z)
+{
+	osg::Vec3 v = osg::Vec3(x,y,z);
+	
+	if (_mode == BOUNCE_OFF_PARENT)
+	{
+		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
+		if (parentNode.valid())
+		{
+			osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = 
+				new osgUtil::LineSegmentIntersector(this->getCenter(),mainTransform->getPosition()+v);
+
+			osgUtil::IntersectionVisitor iv(intersector.get());
+
+			parentNode->accept(iv);
+
+			if (intersector->containsIntersections())
+			{
+				osgUtil::LineSegmentIntersector::Intersections intersections;
+				osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+				
+				intersections = intersector->getIntersections();
+				
+				for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+				{
+					ReferencedNode *testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[0]);
+					if (testNode)
+					{
+					
+						// TODO
+					
+					}
+				}
+			}
+		}
 		
-	else {
-		v = osg::Vec3(x,y,z);
+		
+		
+		
 	}
 	
-	mainTransform->setPosition(v);
-	BROADCAST(this, "sfff", "setTranslation", v.x(), v.y(), v.z());
+	
+	GroupNode::translate(v.x(), v.y(), v.z());
 }
 
 
-void ConstraintsNode::setOrientation (float p, float r, float y)
-{
-	
-	_orientation = osg::Vec3(p, r, y);
-	
-	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-	
-	mainTransform->setAttitude(q);
-	
-	BROADCAST(this, "sfff", "setOrientation", p, r, y);
-}
-
-void ConstraintsNode::move (float x, float y, float z)
-{
-	osg::Vec3 newPos = mainTransform->getPosition() + ( mainTransform->getAttitude() * osg::Vec3(x,y,z) );
-	setTranslation(newPos.x(), newPos.y(), newPos.z());
-}
-
-void ConstraintsNode::rotate (float p, float r, float y)
-{
-	this->setOrientation(_orientation.x()+p, _orientation.y()+r, _orientation.z()+y);
-}
 
 // *****************************************************************************
-
-
-
-
 std::vector<lo_message> ConstraintsNode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 	
 	lo_message msg;
 	osg::Vec3 v;
-	
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setMode", this->getMode());
 	ret.push_back(msg);
-
-	msg = lo_message_new();
-	v = this->getTranslation();
-	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-	
-	msg = lo_message_new();
-	v = this->getOrientation();
-	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-	
-	
-	//lo_message_free(msg);
 	
 	return ret;
 }
