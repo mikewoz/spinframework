@@ -51,7 +51,7 @@
 #include "MediaManager.h"
 
 #include "VideoTexture.h"
-
+#include "SharedVideoTexture.h"
 
 
 using namespace std;

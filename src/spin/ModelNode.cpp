@@ -60,6 +60,7 @@
 #include "MediaManager.h"
 #include "nodeVisitors.h"
 #include "VideoTexture.h"
+#include "SharedVideoTexture.h"
 
 
 
