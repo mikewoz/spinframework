@@ -196,6 +196,9 @@ void ReferencedState::debug()
 		std::cout << " " << getParent(i)->getName();
 	}
 	std::cout << std::endl;
+
+	//osg::ref_ptr<ReferencedState> test = this;
+	//std::cout << "ref_count=" << test->getReferenceCount() << std::endl;
 	
 	
 	vector<lo_message> nodeState = this->getState();

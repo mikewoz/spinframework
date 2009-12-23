@@ -640,6 +640,20 @@ void SceneManager::debug()
 	}
 	*/
 
+	
+	std::cout << "Nodes with textures: " << std::endl;
+	StateSetList statesets;
+	TextureStateSetFinder f(statesets);
+    rootNode->accept(f);
+    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
+    {
+    	osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
+    	if (attr)
+    	{
+    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
+    		std::cout << (*itr)->getParent(0)->getName() << ": " << imageFile << std::endl;
+    	}
+    }
 
 	nodeMapType::iterator it;
 	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
@@ -1231,7 +1245,7 @@ void SceneManager::clearStates()
 void SceneManager::refresh()
 {
 	sendNodeList("*");
-
+	
 	nodeMapType::iterator it;
 	for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
 	{

@@ -96,7 +96,7 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
 	std::cout << "created SharedVideoTexture with id: " << this->id->s_name << std::endl;
 
 	// set initial textureID:
-	setTextureID(this->id->s_name);
+	//setTextureID(this->id->s_name);
 	
 }
 
@@ -191,7 +191,7 @@ void SharedVideoTexture::updateCallback()
 	    
 	    textureUploadedCondition_.notify_one();
 
-    } else {
+    } else if (!textureID.empty()) {
 		
 		// if the shared memory has not been set, we will recheck
 		// every 5 seconds or so

@@ -179,6 +179,42 @@ private:
 
 
 
+typedef std::vector< osg::ref_ptr<osg::Node> > NodeList;
+class NodeSearcher : public osg::NodeVisitor
+{
+    public:
+    	NodeSearcher(NodeList& list):_nodeList(list)
+    	{
+    		setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN );
+    	}
+        
+        virtual void apply(osg::Node& node)
+        {
+    		if (_searchName == node.getName())
+    		{
+     			_nodeList.push_back(&node);
+    		}
+            traverse(node);
+        }
+	    	
+		// search for node with given name in the provided subgraph
+		void search(osg::Node* subgraph, std::string s)
+		{
+			_nodeList.clear();
+			_searchName = s;
+			subgraph->accept(*this);
+		}
+
+		std::string _searchName;
+        NodeList& _nodeList;
+        
+    protected:
+    
+    	NodeSearcher& operator = (const NodeSearcher&) { return *this; }
+};
+
+
+
 /**
  * \brief An OSG NodeVisitor class that pretty prints the scene graph
  */
