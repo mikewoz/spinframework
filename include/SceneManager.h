@@ -138,6 +138,7 @@ class SceneManager
 		ReferencedNode *getNode(const char *id, const char *type);
 		ReferencedNode *getOrCreateNode(const char *id, const char *type);
 		
+		ReferencedState* getState(const char *id);
 		ReferencedState* getOrCreateState(const char *id, const char *type);
 		
 		std::vector<SoundConnection*> getConnections();

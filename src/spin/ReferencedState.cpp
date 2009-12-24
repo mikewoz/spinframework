@@ -52,8 +52,7 @@
 using namespace std;
 
 
-
-
+extern pthread_mutex_t pthreadLock;
 
 // *****************************************************************************
 // constructor:
@@ -89,11 +88,6 @@ ReferencedState::~ReferencedState()
 	
 	// unregister from sceneManager:
 	sceneManager->unregisterState(this);
-
-	/*
-	// set the UserData to NULL (removing the ref_ptr):
-	setUserData( NULL );
-	*/
 	
 	// finally, by nulling the ref_ptr in s_thing, we should have removed all
 	// references to this object, so OSG can clean up
@@ -111,6 +105,8 @@ void ReferencedState::updateCallback()
 
 void ReferencedState::removeFromScene()
 {
+	//pthread_mutex_lock(&pthreadLock);
+	
 	osg::StateSet::ParentList::iterator itr;
 	osg::StateSet::ParentList parents = this->getParents();	
 	
@@ -127,7 +123,9 @@ void ReferencedState::removeFromScene()
 		}
 	}
 	
-	this->clear();
+	this->setUserData( NULL );
+	
+	//pthread_mutex_unlock(&pthreadLock);
 }
 
 

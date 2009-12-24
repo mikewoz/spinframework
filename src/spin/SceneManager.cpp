@@ -858,7 +858,6 @@ ReferencedNode* SceneManager::getNode(const char *id)
 	else return NULL;
 }
 
-
 // *****************************************************************************
 // returns a pointer to an node given an id and type:
 ReferencedNode* SceneManager::getNode(const char *id, const char *type)
@@ -885,6 +884,13 @@ ReferencedNode* SceneManager::getOrCreateNode(const char *id, const char *type)
 }
 
 
+ReferencedState* SceneManager::getState(const char *id)
+{
+	osg::ref_ptr<ReferencedState> s = dynamic_cast<ReferencedState*>(gensym(id)->s_thing);
+
+	if (s.valid()) return s.get();
+	else return NULL;
+}
 
 ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type)
 {
@@ -1011,6 +1017,7 @@ void SceneManager::deleteNode(const char *id)
 	// the function, and we want to ensure the destructor is called in doDelete
 	ReferencedNode *n = getNode(id);
 
+	
 	if (n)
 	{
 		// for the deleteNode method, all children nodes will remain, so we just
@@ -1024,8 +1031,13 @@ void SceneManager::deleteNode(const char *id)
 		doDelete(n);
 		if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
 		
+	} else if (ReferencedState *s = getState(id))
+	{
+		s->removeFromScene();
+		sendNodeList("*");
+		if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
 	}
-	else std::cout << "ERROR: tried to deleteNode " << id << ", but that node does not exist." << std::endl;
+	else std::cout << "ERROR: tried to delete " << id << ", but not node or state by that name exists." << std::endl;
 
 	// if delete was successful and removed all other references to the node,
 	// then by this point, the node will be deleted, and it's destructor will
@@ -1215,14 +1227,14 @@ void SceneManager::clearStates()
 	
 	for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
 	{
-		for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+		//for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+		while ((iter=(*it).second.begin()) != (*it).second.end())
 		{
 			if ((*iter)->s_thing) 
 			{
-				std::cout << "removing left over " << (*iter)->s_type << ": " << (*iter)->s_name << std::endl;
 				ReferencedState *s = dynamic_cast<ReferencedState*>((*iter)->s_thing);
 				s->removeFromScene();
-			}
+			} else (*it).second.erase(iter);
 		}
 	}
 	
