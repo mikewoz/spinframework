@@ -17,7 +17,11 @@ OBJ_FILES = $(SRC_FILES:.cpp=.o)
 ifeq ($(shell uname -s),Darwin)
 	LIBS += -lxml2 -lc -lboost_regex-mt -L/opt/local/lib
 else
+  ifneq ($(wildcard /usr/lib/libboost_regex-mt.*),)
+	LIBS += -lxml2 -lc -lboost_regex-mt -L/opt/local/lib
+  else
 	LIBS += -lxml2 -lc -lboost_regex -L/opt/local/lib
+  endif
 endif
 CFLAGS += -I/usr/include/libxml2 -I/usr/include/boost -I/opt/local/include/boost-1_35 -I/opt/local/include
 
