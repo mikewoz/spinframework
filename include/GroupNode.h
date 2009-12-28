@@ -119,16 +119,19 @@ public:
 	 * The local translation offset for this node with respect to it's parent
 	 */
 	virtual void setTranslation (float x, float y, float z);
+	//void setTranslation(osg::Vec3 v) { setTranslation(v.x(),v.y(),v.z()); }
 
 	/**
 	 * The local orientation offset for this node with respect to it's parent
 	 */
 	virtual void setOrientation (float pitch, float roll, float yaw);
+	//void setOrientation(osg::Vec3 v) { setOrientation(v.x(),v.y(),v.z()); }
 
 	/**
 	 * A grouped scale operation
 	 */
 	virtual void setScale (float x, float y, float z);
+	//void setScale(osg::Vec3 v) { setScale(v.x(),v.y(),v.z()); }
 
 	
 	/**
@@ -136,11 +139,13 @@ public:
 	 * function.
 	 */
 	virtual void setVelocity (float dx, float dy, float dz);
+	//void setVelocity(osg::Vec3 v) { setVelocity(v.x(),v.y(),v.z()); }
 
 	/**
 	 * A rotational velocity (deg/sec), computed in callbackUpdate().
 	 */
 	virtual void setSpin (float dp, float dr, float dy);
+	//void setSpin(osg::Vec3 v) { setSpin(v.x(),v.y(),v.z()); }
 
 	/**
 	 * A Damping value (negative acceleration) that gets applied to velocity
@@ -155,6 +160,7 @@ public:
 	 * (ie, it's position in the scene with respect to it's parent)
 	 */
     virtual void translate (float x, float y, float z);
+	//void translate(osg::Vec3 v) { translate(v.x(),v.y(),v.z()); }
     
 	/**
 	 * The move command adds a relative translation with respect to the
@@ -162,12 +168,14 @@ public:
 	 * direction vector (Y-axis) by the supplied number of units
 	 */
     virtual void move (float x, float y, float z);
+	//void move(osg::Vec3 v) { move(v.x(),v.y(),v.z()); }
 
 	/**
 	 * The rotate command adds a relative rotation to the node's current
 	 * orientation.
 	 */
 	virtual void rotate (float pitch, float roll, float yaw);
+	//void rotate(osg::Vec3 v) { rotate(v.x(),v.y(),v.z()); }
 
 
 	//int getReportGlobals() { return (int)_reportGlobals; };
@@ -219,6 +227,7 @@ protected:
 	
 	interactionMode _interactionMode;
 	osg::ref_ptr<UserNode> owner;
+	std::vector<osg::Vec3> _trajectory;
 	
 	osg::ref_ptr<osg::ClipNode> clipNode;
 	osg::Vec3 _clipping;

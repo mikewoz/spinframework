@@ -87,29 +87,7 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 // destructor
 ModelNode::~ModelNode()
 {
-	std::cout << "Destroying ModelNode: " << this->id->s_name << std::endl;
-
-#ifdef WITH_SHARED_VIDEO
-	// unload any registered shared memory textures:
-	/*
-	std::vector<SharedVideoTexture*>::iterator shvItr = sharedVideoTextures.begin();
-	while (shvItr!=sharedVideoTextures.end())
-	{
-		std::cout << "cleaning SharedVideoTexture " << (*shvItr)->getTextureID() << std::endl;
-		(*shvItr)->unload(); 
-		sharedVideoTextures.erase(shvItr);
-	}
-
-	std::vector< osg::ref_ptr<SharedVideoTexture> >::iterator shvItr = sharedVideoTextures.begin();
-	while (shvItr!=sharedVideoTextures.end())
-	{
-		std::cout << "cleaning SharedVideoTexture " << (*shvItr)->getTextureID() << std::endl;
-		(*shvItr)->unload(); 
-		sharedVideoTextures.erase(shvItr);
-	}
-*/
-
-#endif
+	//std::cout << "Destroying ModelNode: " << this->id->s_name << std::endl;
 }
 
 
@@ -186,7 +164,15 @@ void ModelNode::drawModel()
 				sceneManager->sharedStateManager->share(model);
 			 */
 			
+		    
+			optimizer.optimize(model.get());
+			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
+
+			
+			
 			// *****************************************************************
+			
+			
 			
 			SearchVisitor searchVisitor;
 			char buf[16];
@@ -399,16 +385,13 @@ void ModelNode::drawModel()
 			
 			// *****************************************************************
 
+			this->getAttachmentNode()->addChild(model.get());
 
 			std::cout << "Created model " << modelPath << std::endl;
 			osg::BoundingSphere bound = model->computeBound();
 			osg::Vec3 c = bound.center();
 			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << "  numTextures=" << statesets.size() << std::endl;
 
-		    
-			//optimizer.optimize(model.get());
-			this->getAttachmentNode()->addChild(model.get());
-			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 			//osg::StateSet *modelStateSet = new osg::StateSet();
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);

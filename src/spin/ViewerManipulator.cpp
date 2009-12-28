@@ -65,6 +65,7 @@ ViewerManipulator::ViewerManipulator()
 	this->mover = true;
 	selectedNode=gensym("NULL");
 	
+	redirectAddr = NULL;
 	redirectServ = NULL;
 
 	// set up user node tracker:
@@ -133,8 +134,15 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 
+	if (0)
+	{
+		std::cout << "ViewerManipulator sending: " << nodeId << std::endl;
+		lo_message_pp(msg);
+	}
+	
 	if (!err)
 	{
+		
 		// TODO: fix this:
 		//if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
 		if (redirectAddr) lo_send_message(redirectAddr, ("/"+string(nodeId)).c_str(), msg);
@@ -384,7 +392,7 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				case(GUIEventAdapter::MOVE):
 					sendEvent(hitNode->id->s_name,
 							  "sisfffff",
-							  "picevent",
+							  "event",
 							  (int)ea.getEventType(),
 							  user->s_name,
 							  dX,

@@ -292,9 +292,7 @@ SceneManager::~SceneManager()
 void SceneManager::setLog(spinLog &log)
 {
 	// remove existing callback:
-	
 
-			
 	lo_server_thread_add_method(rxServ, NULL, NULL, SceneManagerCallback_log, &log);
 }
 
@@ -630,7 +628,7 @@ void SceneManager::debug()
 	std::cout << "****************************************" << std::endl;
 	std::cout << "************* SCENE DEBUG: *************" << std::endl;
 
-	std::cout << "\n NODE LIST for scene with id '" << sceneID << "':" << std::endl;
+	std::cout << "\nNODE LIST for scene with id '" << sceneID << "':" << std::endl;
 
 	/*
 	vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
@@ -640,25 +638,10 @@ void SceneManager::debug()
 	}
 	*/
 
-	
-	std::cout << "Nodes with textures: " << std::endl;
-	StateSetList statesets;
-	TextureStateSetFinder f(statesets);
-    rootNode->accept(f);
-    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
-    {
-    	osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
-    	if (attr)
-    	{
-    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
-    		std::cout << (*itr)->getParent(0)->getName() << ": " << imageFile << std::endl;
-    	}
-    }
-
 	nodeMapType::iterator it;
 	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
 	{
-		std::cout << "  nodes with type '" << (*it).first << "':" << std::endl;
+		std::cout << "-> " << (*it).first << "s:" << std::endl;
 
 		nodeListType::iterator iter;
 		for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
@@ -668,7 +651,27 @@ void SceneManager::debug()
 	}
 
 
-	std::cout << "\n SCENE GRAPH:" << std::endl;
+	/*
+	std::cout << "\n Nodes with textures: " << std::endl;
+	StateSetList statesets;
+	TextureStateSetFinder f(statesets);
+    rootNode->accept(f);
+    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
+    {
+    	osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
+    	if (attr)
+    	{
+    		if (attr->asTexture()->getImage(0))
+    		{
+	    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
+	    		std::cout << (*itr)->getParent(0)->getName() << ": " << imageFile << std::endl;
+    		}
+    	}
+    }
+    */
+	
+
+	std::cout << "\nSCENE GRAPH:" << std::endl;
 	DebugVisitor ev;
 	ev.apply(*(this->rootNode.get()));
 	
@@ -1919,9 +1922,21 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	string    theMethod, nodeStr;
 	ValueList theArgs;
 
-
 	// make sure there is at least one argument (ie, a method to call):
 	if (!argc) return 0;
+	
+	if (0)
+	{
+		printf("************ SceneManagerCallback_node() got message: %s\n", (char*)path);
+		for (int i=0; i<argc; i++) {
+			printf("arg %d '%c' ", i, types[i]);
+	    	lo_arg_pp((lo_type) types[i], argv[i]);
+	    	printf("\n");
+		}
+		printf("\n");
+		fflush(stdout);
+	}
+	
 
 	// get the method (argv[0]):
 	if (lo_is_string_type((lo_type)types[0]))
@@ -2088,6 +2103,8 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 		sceneManager->clear();
 	else if (theMethod=="clearUsers")
 		sceneManager->clearUsers();
+	else if (theMethod=="clearStates")
+		sceneManager->clearStates();
 	else if (theMethod=="userRefresh")
 	{
 		SCENE_MSG(sceneManager, "s", "userRefresh");

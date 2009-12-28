@@ -268,7 +268,7 @@ void VideoTexture::setIndex (float f)
 	
 	if (_imageStream.valid())
 	{
-		std::cout << "seeking to " << (double) (f * _imageStream->getLength()) << std::endl;
+		//std::cout << "seeking to " << (double) (f * _imageStream->getLength()) << std::endl;
 		_imageStream->seek((double) (f * _imageStream->getLength()));
 	}
 	
@@ -303,7 +303,6 @@ void VideoTexture::setPlay (int i)
 
 void VideoTexture::rewind ()
 {
-	std::cout << "Rewinding" << std::endl;
 	if (_imageStream.valid())
 	{
 		_imageStream->rewind();

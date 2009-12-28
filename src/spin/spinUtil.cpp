@@ -168,7 +168,8 @@ std::string stringify(float x)
 
 std::string leadingSpaces(int n)
 {
-	return std::string(n, '\t');
+	//return std::string(n, '\t');
+	return std::string(n, ' ');
 }
 
 

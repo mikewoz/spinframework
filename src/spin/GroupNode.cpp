@@ -119,19 +119,26 @@ void GroupNode::callbackUpdate()
 		if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
 		//if (dt > 0.1) // only update when dt is at least 0.1s (ie 10hz):
 		{
-
 			
 			if (_velocity.length() > EPSILON) // != osg::Vec3(0,0,0))
 			{
             	this->translate( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
-            	if (_damping > EPSILON) _velocity *= 1 - (_damping*dt);
+            	if (_damping > EPSILON)
+            	{
+            		double dv = 1 - (_damping*dt);
+            		this->setVelocity(_velocity.x()*dv, _velocity.y()*dv, _velocity.z()*dv);
+            	}
 			}
 			else _velocity = osg::Vec3(0,0,0);
 			
 			if (_spin.length() > EPSILON) // != osg::Vec3(0,0,0))
 			{
 				this->rotate( _spin.x()*dt, _spin.y()*dt, _spin.z()*dt );
-            	if (_damping > EPSILON) _spin *= 1 - (_damping*dt);
+            	if (_damping > EPSILON)
+            	{
+            		double ds = 1 - (_damping*dt);
+            		this->setSpin(_spin.x()*ds, _spin.y()*ds, _spin.z()*ds);
+            	}
 			}
 			else _spin = osg::Vec3(0,0,0);
  
@@ -237,6 +244,9 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				{
 					this->owner = user.get();
 				}
+			
+				_trajectory.clear();
+				
 				break;
 				
 			case(osgGA::GUIEventAdapter::RELEASE):
@@ -245,14 +255,25 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				// that he had ownership in the first place):
 				if (this->owner == user) this->owner = NULL;
 			
-				// Take average of stored motion vectors, and set velocity in
-				// that direction. Note: _damping should be set so that node 
-				// gradually stops:
 			
-			
-				// TODO
-				// osg::Vec3 vel = ??
-				//this->setVelocity(vel.x(), vel.y(), vel.z());
+				if (_interactionMode==PUSH)
+				{
+					// Take average of stored motion vectors, and set velocity in
+					// that direction. Note: _damping should be set so that node 
+					// gradually stops:
+				
+					vector<osg::Vec3>::iterator it;
+					osg::Vec3 avg = osg::Vec3(0,0,0);
+					for (it=_trajectory.begin(); it!=_trajectory.end(); ++it)
+					{
+						avg += (*it);
+					}
+					avg /= _trajectory.size();
+				
+					// TODO
+					// osg::Vec3 vel = ??
+					//this->setVelocity(vel.x(), vel.y(), vel.z());
+				}
 				
 				break;
 			
@@ -277,7 +298,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				this->setTranslation(newPos.x(), newPos.y(), newPos.z());
 				
 				// save last N motion vectors, so we can setVelocity on RELEASE:
-				// TODO
+				_trajectory.insert(_trajectory.begin(), newPos);
+				if (_trajectory.size() > 10) _trajectory.pop_back();
 
 				break;
 
@@ -473,6 +495,7 @@ osg::Matrix GroupNode::getGlobalMatrix()
 osg::Vec3 GroupNode::getCenter()
 {
 	const osg::BoundingSphere& bs = this->getBound();
+	//osg::BoundingSphere& bs = this->computeBound();
 	return bs.center();
 }
 

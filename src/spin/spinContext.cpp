@@ -387,9 +387,7 @@ void spinContext::NodeMessage(const char *nodeId, const char *types, ...)
 }
 
 void spinContext::NodeMessage(const char *nodeId, const char *types, va_list ap)
-{
-	std::cout << "msg " << nodeId << " " << types << std::endl;
-	
+{	
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 

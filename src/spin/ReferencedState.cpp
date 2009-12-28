@@ -81,7 +81,9 @@ ReferencedState::ReferencedState(SceneManager *s, const char *initID)
 // destructor
 ReferencedState::~ReferencedState()
 {
-	// This will be called when the parent node is killed
+	// This will only be called when all references to the state are released,
+	// AND the UserData is set to null. ie, the removeFromScene() method needs
+	// to be called.
 	
 	// clear the stateset
 	this->clear();
@@ -92,9 +94,6 @@ ReferencedState::~ReferencedState()
 	// finally, by nulling the ref_ptr in s_thing, we should have removed all
 	// references to this object, so OSG can clean up
 	id->s_thing = 0;
-	
-	std::cout << "Killed ReferencedState " << id->s_name << std::endl;
-
 }
 
 // *****************************************************************************

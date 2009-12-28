@@ -88,8 +88,8 @@ public:
 	void setMode(constraintMode m);
 	int getMode() { return (int)_mode; };
 	
-	void setTranslation (float x, float y, float z);
-	void translate (float x, float y, float z);
+	virtual void setTranslation (float x, float y, float z);
+	virtual void translate (float x, float y, float z);
 	
 	
 	/**
@@ -97,12 +97,6 @@ public:
 	 * fill the vector with the correct set of methods for this particular node
 	 */
 	virtual std::vector<lo_message> getState();
-	
-
-	// ***********************************************************
-	// data:
-	
-	osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
 
 	
 private:

@@ -277,6 +277,13 @@ void ShapeNode::drawShape()
 		//modelGroup->addChild(scribe);
 		//scribe->addChild(shapeGeode.get());
 		// end wireframe test
+		
+		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+		ss->setMode( GL_BLEND, osg::StateAttribute::ON );
+		ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+		
+		
 		this->getAttachmentNode()->addChild(shapeGeode.get());
 		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
 		optimizer.optimize(shapeGeode.get()); // ?
