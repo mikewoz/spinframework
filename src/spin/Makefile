@@ -73,7 +73,11 @@ endif
 ifeq ($(OS),Darwin)
   BOOST_LIBS += -lboost_thread-mt -lboost_filesystem-mt
 else
-  BOOST_LIBS += -lboost_thread -lboost_filesystem
+  ifneq ($(wildcard /usr/lib/libboost_thread-mt.*),)
+    BOOST_LIBS += -lboost_thread-mt -lboost_filesystem-mt
+  else
+    BOOST_LIBS += -lboost_thread -lboost_filesystem
+  endif
 endif
 
 ###################################################################
