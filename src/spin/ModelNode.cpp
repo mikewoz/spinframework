@@ -338,7 +338,7 @@ void ModelNode::drawModel()
 				    	//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
 		    			if (vid.valid())
 		    			{
-		    				vid->setVideoPath(osgDB::getNameLessExtension(imageFile).c_str());
+		    				vid->setVideoPath(osgDB::getNameLessExtension(getRelativePath(imageFile)).c_str());
 		    				vid->replace((*itr).get());
 		    				//(*itr) = vid.get();
 		    				std::cout << "  Replaced placeholder texture with " << vid->classType << ": " << vid->id->s_name << std::endl;
