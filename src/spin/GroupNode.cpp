@@ -245,6 +245,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 					this->owner = user.get();
 				}
 			
+				this->setVelocity(0,0,0);
+				this->setSpin(0,0,0);
 				_trajectory.clear();
 				
 				break;
@@ -263,16 +265,15 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 					// gradually stops:
 				
 					vector<osg::Vec3>::iterator it;
-					osg::Vec3 avg = osg::Vec3(0,0,0);
+					osg::Vec3 vel = osg::Vec3(0,0,0);
 					for (it=_trajectory.begin(); it!=_trajectory.end(); ++it)
 					{
-						avg += (*it);
+						vel += (*it);
 					}
-					avg /= _trajectory.size();
+					vel /= _trajectory.size();
+					vel *= 3; // motion vectors were typically small, so scale
 				
-					// TODO
-					// osg::Vec3 vel = ??
-					//this->setVelocity(vel.x(), vel.y(), vel.z());
+					this->setVelocity(vel.x(), vel.y(), vel.z());
 				}
 				
 				break;
@@ -298,8 +299,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				this->setTranslation(newPos.x(), newPos.y(), newPos.z());
 				
 				// save last N motion vectors, so we can setVelocity on RELEASE:
-				_trajectory.insert(_trajectory.begin(), newPos);
-				if (_trajectory.size() > 10) _trajectory.pop_back();
+				_trajectory.insert(_trajectory.begin(), motionVec);
+				if (_trajectory.size() > 5) _trajectory.pop_back();
 
 				break;
 
