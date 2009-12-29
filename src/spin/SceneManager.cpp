@@ -629,15 +629,6 @@ void SceneManager::debug()
 	std::cout << "************* SCENE DEBUG: *************" << std::endl;
 
 	std::cout << "\nNODE LIST for scene with id '" << sceneID << "':" << std::endl;
-
-	/*
-	vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
-	for (iter = nodeList.begin(); iter != nodeList.end() ; iter++)
-	{
-		std::cout << (*iter)->id->s_name << " (parent=" << (*iter)->parent->s_name << ")" << std::endl;
-	}
-	*/
-
 	nodeMapType::iterator it;
 	for (it = nodeMap.begin(); it != nodeMap.end(); it++)
 	{
@@ -650,6 +641,27 @@ void SceneManager::debug()
 		}
 	}
 
+	std::cout << "\n STATE LIST: " << std::endl;
+	ReferencedStateMap::iterator sIt;
+	for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
+	{
+		std::cout << "-> " << (*sIt).first << "s:" << std::endl;
+
+		ReferencedStateList::iterator sIter;
+		for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
+		{
+			if ((*sIter)->s_thing)
+			{
+				ReferencedState *s = dynamic_cast<ReferencedState*>((*sIter)->s_thing);
+				std::cout << "    " << (*sIter)->s_name << " (parents=";
+				for (int i=0; i<s->getNumParents(); i++)
+				{
+					std::cout << " " << s->getParent(i)->getName();
+				}
+				std::cout << ")" << std::endl;
+			}
+		}
+	}
 
 	/*
 	std::cout << "\n Nodes with textures: " << std::endl;
@@ -663,6 +675,7 @@ void SceneManager::debug()
     	{
     		if (attr->asTexture()->getImage(0))
     		{
+				// ARGH... can't do this, because image doesn't store filename after load!
 	    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 	    		std::cout << (*itr)->getParent(0)->getName() << ": " << imageFile << std::endl;
     		}
