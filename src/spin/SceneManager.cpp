@@ -2003,7 +2003,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	if (s->s_type == REFERENCED_STATE)
 	{
 		classInstance = osgIntrospection::Value(dynamic_cast<ReferencedState*>(s->s_thing));
-		if (1)
+		if (0)
 		{
 			std::cout << "got state message for " << s->s_name << ":" << std::endl;
 			for (int i=0; i<argc; i++) {
