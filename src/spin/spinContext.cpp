@@ -79,14 +79,11 @@ static void sigHandler(int signum)
 
 	if (spin.userNode.valid())
 	{
-		std::cout << "userNode still there" << std::endl;
-		
 		ReferencedNode *heldPointer = spin.userNode.get();
 		//spin.userNode.release();
 		spin.userNode = NULL;
 		// now deleting the node in the sceneManager should release the last instance:
 		spin.sceneManager->doDelete(heldPointer);
-		
 	}
 	
 	spin.stop();
@@ -499,7 +496,10 @@ int spinContext::sceneCallback(const char *types, lo_arg **argv, int argc)
         }
     }
     */
-	
+
+	// Always return 1 from callbacks in SPIN so that other handlers will get
+	// called. A return of 0 tells liblo NOT to pass the message to any further
+	// handlers.
     return 1;
 }
 
@@ -618,7 +618,7 @@ static int spinContext_sceneCallback(const char *path, const char *types, lo_arg
 	spinContext &spin = spinContext::Instance();
 	
 	// make sure there is at least one argument (ie, a method to call):
-	if (!argc) return 0;
+	if (!argc) return 1;
 
 	// get the method (argv[0]):
 	string theMethod;
@@ -626,7 +626,7 @@ static int spinContext_sceneCallback(const char *path, const char *types, lo_arg
 	{
 		theMethod = string((char *)argv[0]);
 	}
-	else return 0;
+	else return 1;
 	
 	// bundle all other arguments
 	vector<float> floatArgs;
@@ -649,7 +649,7 @@ static int spinContext_sceneCallback(const char *path, const char *types, lo_arg
 	}
 	
 	//return spin.sceneCallback(types, argv, argc);
-	
+	return 1;
 }
 
 static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
@@ -676,5 +676,6 @@ static int spinContext_infoCallback(const char *path, const char *types, lo_arg 
 		// TODO: monitor /ping/user messages, keep timeout handlers, 
 		
 	}
-	
+
+	return 1;
 }

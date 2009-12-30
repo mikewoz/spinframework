@@ -1936,7 +1936,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	ValueList theArgs;
 
 	// make sure there is at least one argument (ie, a method to call):
-	if (!argc) return 0;
+	if (!argc) return 1;
 	
 	if (0)
 	{
@@ -1956,7 +1956,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	{
 		theMethod = string((char *)argv[0]);
 	}
-	else return 0;
+	else return 1;
 
 	// get the instance of the node, which is the last token of the OSCpath:
 	// TODO: use user_data instead!
@@ -1970,7 +1970,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	if (!s->s_thing)
 	{
 		std::cout << "oscParser: Could not find referenced object named: " << nodeStr << std::endl;
-		return 0;
+		return 1;
 	}
 
 	// get osgInrospection::Value from passed UserData by casting as the proper
@@ -1995,7 +1995,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     if (!classType.isDefined())
     {
         std::cout << "ERROR: oscParser cound not process message '" << path << ". osgIntrospection has no data for that node." << std::endl;
-        return 0;
+        return 1;
     }
 
     //introspect_print_type(classType);
@@ -2097,7 +2097,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 	}
 	
 	// make sure there is at least one argument (ie, a method to call):
-	if (!argc) return 0;
+	if (!argc) return 1;
 
 	// get the method (argv[0]):
 	string theMethod;
@@ -2105,7 +2105,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 	{
 		theMethod = string((char *)argv[0]);
 	}
-	else return 0;
+	else return 1;
 	
 	//pthread_mutex_lock(&pthreadLock);
 
@@ -2192,21 +2192,21 @@ int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv
 
 
 	// make sure there is at least one argument (ie, a method to call):
-	if (!argc) return 0;
+	if (!argc) return 1;
 
 	// get the method (argv[0]):
 	if (lo_is_string_type((lo_type)types[0]))
 	{
 		theMethod = string((char *)argv[0]);
 	}
-	else return 0;
+	else return 1;
 
 	// get the instance of the connection:
 	SoundConnection *conn = (SoundConnection*) user_data;
 	if (!conn)
 	{
 		std::cout << "oscParser: Could not find connection: " << idStr << std::endl;
-		return 0;
+		return 1;
 	}
 
 	// TODO: replace method call with osg::Introspection
@@ -2236,6 +2236,7 @@ int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv
 	else
 		std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
 
+	return 1;
 }
 void oscParser_error(int num, const char *msg, const char *path)
 {
