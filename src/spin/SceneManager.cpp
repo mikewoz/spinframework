@@ -131,44 +131,67 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
 	// discover all relevant nodeTypes by introspection, and fill the nodeMap
 	// with empty vectors:
+
+	try
 	{
-	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-	//nodeTypes.clear();
-	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-	osgIntrospection::TypeMap::const_iterator it;
-	for ( it=allTypes.begin(); it!=allTypes.end(); it++)
-	{
-		if (((*it).second)->isDefined())
+								
 		{
-			//std::cout << ((*it).second)->getName() << " isSubclassOf(ReferencedNode)? " << ((*it).second)->isSubclassOf(ReferencedNodeType) << std::endl;
-			if ( ((*it).second)->isSubclassOf(ReferencedNodeType) )
+		const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+		//nodeTypes.clear();
+		const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
+		osgIntrospection::TypeMap::const_iterator it;
+		for ( it=allTypes.begin(); it!=allTypes.end(); it++)
+		{
+			if (((*it).second)->isDefined())
 			{
-				string theType = ((*it).second)->getName();
-				//nodeTypes.push_back(theType);
-				nodeListType emptyVector;
-				nodeMap.insert(nodeMapPair(theType, emptyVector));
+				//std::cout << ((*it).second)->getName() << " isSubclassOf(ReferencedNode)? " << ((*it).second)->isSubclassOf(ReferencedNodeType) << std::endl;
+				if ( ((*it).second)->isSubclassOf(ReferencedNodeType) )
+				{
+					string theType = ((*it).second)->getName();
+					//nodeTypes.push_back(theType);
+					nodeListType emptyVector;
+					nodeMap.insert(nodeMapPair(theType, emptyVector));
+				}
 			}
 		}
-	}
-	}
+		}
 	
-	// Same thing for ReferencedStates:
-	{
-	const osgIntrospection::Type &ReferencedStateType = osgIntrospection::Reflection::getType("ReferencedState");
-	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-	osgIntrospection::TypeMap::const_iterator it;
-	for ( it=allTypes.begin(); it!=allTypes.end(); it++)
-	{
-		if (((*it).second)->isDefined())
+		// Same thing for ReferencedStates:
 		{
-			if ( ((*it).second)->isSubclassOf(ReferencedStateType) )
+		const osgIntrospection::Type &ReferencedStateType = osgIntrospection::Reflection::getType("ReferencedState");
+		const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
+		osgIntrospection::TypeMap::const_iterator it;
+		for ( it=allTypes.begin(); it!=allTypes.end(); it++)
+		{
+			if (((*it).second)->isDefined())
 			{
-				string theType = ((*it).second)->getName();
-				ReferencedStateList emptyVector;
-				stateMap.insert(ReferencedStatePair(theType, emptyVector));
+				if ( ((*it).second)->isSubclassOf(ReferencedStateType) )
+				{
+					string theType = ((*it).second)->getName();
+					ReferencedStateList emptyVector;
+					stateMap.insert(ReferencedStatePair(theType, emptyVector));
+				}
 			}
 		}
+		}
 	}
+	catch (osgIntrospection::Exception & ex)
+    {
+   		std::cerr << "SceneManager could not set up:\n" << ex.what() << std::endl;
+		std::cout << "These nodes were defined:";
+		for (nodeMapType::iterator it = nodeMap.begin(); it != nodeMap.end(); it++)
+		{
+			std::cout << " " << (*it).first;
+		}
+		std::cout << std::endl;
+		std::cout << "These states were defined:";
+		for (ReferencedStateMap::iterator sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
+		{
+			std::cout << " " << (*sIt).first;
+		}
+		std::cout << std::endl;
+		
+		exit(1);
 	}
 
 	// need to remove DSPNode???
@@ -1980,6 +2003,17 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 	if (s->s_type == REFERENCED_STATE)
 	{
 		classInstance = osgIntrospection::Value(dynamic_cast<ReferencedState*>(s->s_thing));
+		if (1)
+		{
+			std::cout << "got state message for " << s->s_name << ":" << std::endl;
+			for (int i=0; i<argc; i++) {
+				printf("arg %d '%c' ", i, types[i]);
+				lo_arg_pp((lo_type) types[i], argv[i]);
+				printf("\n");
+			}
+			printf("\n");
+			fflush(stdout);
+		}
 	}
 	else
 	{

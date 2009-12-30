@@ -60,7 +60,8 @@ ViewerManipulator::ViewerManipulator()
 	} else {
 		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
 	}
-	
+
+	this->raw = false;
 	this->picker = false;
 	this->mover = true;
 	selectedNode=gensym("NULL");
@@ -174,6 +175,16 @@ void ViewerManipulator::setMover(bool b)
 	}
 }
 
+void ViewerManipulator::setRaw(bool b)
+{
+	if (1)//(picker!=b)
+	{
+		this->raw = b;
+		if (raw) std::cout << "Raw mouse events:\tEnabled" << std::endl;
+		else std::cout << "Raw mouse events:\tDisabled" << std::endl;
+	}
+}
+
 bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
 {
 	if (ea.getEventType()==GUIEventAdapter::FRAME)
@@ -204,20 +215,20 @@ bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
 			(ea.getEventType()==GUIEventAdapter::SCROLL))
 	{
 		osgViewer::View* view = dynamic_cast<osgViewer::View*>(&aa);
-		if (view) processEvent(view,ea);
+		if (view) handleMouse(view,ea);
 	}
 	
 	
 	else if (ea.getEventType()==GUIEventAdapter::KEYUP)
 	{
-		processKeypress(ea);
+		handleKeypress(ea);
 	}
 	
 	return false;
 }
 
 
-void ViewerManipulator::processKeypress(const GUIEventAdapter& ea)
+void ViewerManipulator::handleKeypress(const GUIEventAdapter& ea)
 {
 	if (ea.getKey()=='r')
 	{
@@ -244,7 +255,7 @@ GroupNode* ViewerManipulator::getNodeFromIntersection(osgUtil::LineSegmentInters
 	return NULL;
 }
 
-void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapter& ea)
+void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter& ea)
 {
 	osgUtil::LineSegmentIntersector::Intersections intersections;
 	osgUtil::LineSegmentIntersector::Intersections::iterator itr;
@@ -476,7 +487,6 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 		} // if hitNode.valid()
 	} // end picker
 	
-    
     // scene event processing (eg, camera motion):
 	if (this->mover && (selectedNode==gensym("NULL")))
 	{
@@ -575,6 +585,20 @@ void ViewerManipulator::processEvent(osgViewer::View* view, const GUIEventAdapte
 				// here we could pop up an HUD menu if someone double-clicks or right-clicks
 				break;
 		}
+	}
+
+	// send raw events if user requests them
+	if (this->raw)
+	{
+		sendEvent(user->s_name,
+		    "siiiff",
+		    "mouseEvent",
+			(int)ea.getEventType(),
+			(int) ea.getModKeyMask(),
+			(int) ea.getButtonMask(),
+		    (float) ea.getXnormalized(),
+		    (float) ea.getYnormalized(),
+		    LO_ARGS_END);
 	}
 
 	lastX = ea.getXnormalized();

@@ -61,6 +61,7 @@ ReferencedState::ReferencedState(SceneManager *s, const char *initID)
 	// concatenate
 	//string thisID = string(n->id->s_name)+"/"+initID;
 
+	
 	id = gensym(initID);
 	id->s_thing = this;
 	id->s_type = REFERENCED_STATE;

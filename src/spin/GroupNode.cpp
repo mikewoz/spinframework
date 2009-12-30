@@ -184,8 +184,14 @@ void GroupNode::updateNodePath()
 
 
 // *****************************************************************************
+
+void GroupNode::mouseEvent (int event, int keyMask, int buttonMask, float x, float y)
+{
+	// TODO
+	BROADCAST(this, "siiiff", "mouseEvent", keyMask, buttonMask, x, y);
+}
+
 void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
-//void GroupNode::event (int event, const char* userString, float eData1, float eData2)
 {
 	
 	if (0)

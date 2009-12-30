@@ -78,12 +78,13 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		
 		void setPicker(bool b);
 		void setMover(bool b);
+		void setRaw(bool b);
 		
 	    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
-	    void processKeypress(const osgGA::GUIEventAdapter& ea);
+	    void handleKeypress(const osgGA::GUIEventAdapter& ea);
 		
 		GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
-	    void processEvent(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
+	    void handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
 
 	protected:
 		virtual ~ViewerManipulator();
@@ -97,7 +98,7 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		lo_address redirectAddr;
 		lo_server_thread  redirectServ;
 		
-		bool picker, mover;
+		bool picker, mover, raw;
 		float lastX, lastY;
 		float clickX, clickY;
 		

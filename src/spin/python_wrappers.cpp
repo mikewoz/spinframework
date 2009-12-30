@@ -109,10 +109,10 @@ int sceneCallback_wrapped(const char *path, const char *types, lo_arg **argv, in
 {
 	pySpinContext *spin = (pySpinContext*) user_data;
 
-	if (!spin) return 0;
+	if (!spin) return 1;
 	
 	// make sure there is at least one argument (ie, a method to call):
-	if (!argc) return 0;
+	if (!argc) return 1;
 
 	// get the method (argv[0]):
 	string theMethod;
@@ -120,7 +120,7 @@ int sceneCallback_wrapped(const char *path, const char *types, lo_arg **argv, in
 	{
 		theMethod = string((char *)argv[0]);
 	}
-	else return 0;
+	else return 1;
 	
 	// create list from rest of args:
 	boost::python::list args;
@@ -143,7 +143,7 @@ int sceneCallback_wrapped(const char *path, const char *types, lo_arg **argv, in
 	
 	try {
 		call_method<int>(spin->self, "sceneCallback", d);
-		return 0;
+		return 1;
 	} catch (error_already_set) {
 		std::cout << "Error calling sceneCallback" << std::endl;
 		// exception will be thrown if virtual method was not overridden.

@@ -83,13 +83,13 @@ void VideoTexture::debug()
 	
 	std::cout << "   ---------" << std::endl;
 	
-	osg::ref_ptr<osg::ImageSequence> _imageSequence = dynamic_cast<osg::ImageSequence*>(_imageStream.get());
+	osg::ref_ptr<osg::ImageSequence> tmpImageSequence = dynamic_cast<osg::ImageSequence*>(_imageStream.get());
 
 	
-	if (_imageSequence.valid())
+	if (tmpImageSequence.valid())
 	{
 		std::cout << "   Type: Image sequence" << std::endl;
-		std::cout << "   NumFrames: " << _imageSequence->getNumImages() << std::endl;
+		std::cout << "   NumFrames: " << tmpImageSequence->getNumImages() << std::endl;
 	}
 	else if (_imageStream.valid())
 	{
@@ -128,122 +128,122 @@ void VideoTexture::setVideoPath (const char* newPath)
 
 	_path = std::string(newPath);
 	
-	if (!sceneManager->isGraphical())
+	if (sceneManager->isGraphical())
 	{
-		BROADCAST(this, "ss", "setVideoPath", getVideoPath());
-		return;
-	}
 
-	std::string fullPath = getAbsolutePath(_path);
+		osg::ref_ptr<osg::ImageStream> test;
+		
+		std::string fullPath = getAbsolutePath(_path);
 	
-	
-	// create a texture object
-	osg::Texture *vidTexture;
-	if (_useTextureRectangle)
-	{
-		vidTexture = new osg::TextureRectangle;
-	} else {
-		vidTexture = new osg::Texture2D;
-	}
-	
-	vidTexture->setResizeNonPowerOfTwoHint(false);
-	vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
-	vidTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-	//vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
-	vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-	vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-
-	
-	// Check if _path is a directory. If so, load all contained image
-	// files into an osg::ImageSequence.
-	osgDB::DirectoryContents dir = osgDB::getDirectoryContents(fullPath);
-	
-	if (dir.size())
-	{
-		std::cout << "Creating VideoTexture from image sequence";
-		osg::ref_ptr<osg::ImageSequence> _imageSequence = new osg::ImageSequence();
-
-		// sort directory contents:
-		std::sort(dir.begin(), dir.end());
-
-		// search for image files
-		for (osgDB::DirectoryContents::iterator itr = dir.begin(); itr != dir.end(); ++itr)
+		// create a texture object
+		osg::Texture *vidTexture;
+		if (_useTextureRectangle)
 		{
-			// ignore filenames that start with a .
-			if ((*itr)[0] != '.')
+			vidTexture = new osg::TextureRectangle;
+		} else {
+			vidTexture = new osg::Texture2D;
+		}
+	
+		vidTexture->setResizeNonPowerOfTwoHint(false);
+		vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+		vidTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+		//vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
+		vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+		vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+
+	
+		// Check if _path is a directory. If so, load all contained image
+		// files into an osg::ImageSequence.
+		osgDB::DirectoryContents dir = osgDB::getDirectoryContents(fullPath);
+	
+		if (dir.size())
+		{
+			std::cout << "Creating VideoTexture from image sequence";
+			osg::ref_ptr<osg::ImageSequence> tmpImageSequence = new osg::ImageSequence();
+
+			// sort directory contents:
+			std::sort(dir.begin(), dir.end());
+
+			// search for image files
+			for (osgDB::DirectoryContents::iterator itr = dir.begin(); itr != dir.end(); ++itr)
 			{
-				std::cout << "."; fflush(stdout);
-				
-				//_imageSequence->addImageFile(osgDB::concatPaths(fullPath,*itr));
-				osg::ref_ptr<osg::Image> image = osgDB::readImageFile(osgDB::concatPaths(fullPath,*itr));
-				if (image.valid())
+				// ignore filenames that start with a .
+				if ((*itr)[0] != '.')
 				{
-					_imageSequence->addImage(image.get());
-				} else {
-					std::cout << std::endl << "invalid image: " << (*itr) << std::endl;
+					std::cout << "."; fflush(stdout);
+				
+					//tmpImageSequence->addImageFile(osgDB::concatPaths(fullPath,*itr));
+					osg::ref_ptr<osg::Image> image = osgDB::readImageFile(osgDB::concatPaths(fullPath,*itr));
+					if (image.valid())
+					{
+						tmpImageSequence->addImage(image.get());
+					} else {
+						std::cout << std::endl << "invalid image: " << (*itr) << std::endl;
+					}
 				}
 			}
-		}
-		std::cout << std::endl;
+			std::cout << std::endl;
 		
-		if (_imageSequence->getNumImages())
-		{		
-			vidTexture->setImage(0,_imageSequence.get());
+			if (tmpImageSequence->getNumImages())
+			{
+				test = tmpImageSequence.get();
+				
+				vidTexture->setImage(0,tmpImageSequence.get());
 			
-			this->_imageStream = _imageSequence.get();
-			
-			setFrameRate(_framerate);
+				setFrameRate(_framerate);
 
-			this->_isSequence = true;	
-		}
+				this->_isSequence = true;	
+			}
 		
+			else {
+				std::cout << "Oops. The specified folder did not contain an image sequence: " << _path << std::endl;
+				tmpImageSequence.release();
+			}
+		
+		}
+	
+		// Otherwise, assume it is a file and use osgDB::readImageFile to let
+		// osgPlugins try to load it
 		else {
-			std::cout << "Oops. The specified folder did not contain an image sequence: " << _path << std::endl;
-			_imageSequence.release();
-		}
-		
-	}
-	
-	// Otherwise, assume it is a file and use osgDB::readImageFile to let
-	// osgPlugins try to load it
-	else {
 
-		osg::ref_ptr<osg::Image> image = osgDB::readImageFile(fullPath);
-		_imageStream = dynamic_cast<osg::ImageStream*>(image.get());
+			osg::ref_ptr<osg::Image> image = osgDB::readImageFile(fullPath);
+			test = dynamic_cast<osg::ImageStream*>(image.get());
 		
-		if (_imageStream.valid())
+			if (test.valid())
+			{
+				this->setName("VideoTexture("+_path+")");			
+				vidTexture->setImage(0,_imageStream.get());
+			}
+			else {	
+				std::cout << "VideoTexture ERROR. Not a video format?: " << _path << std::endl;
+			}	
+		}
+	
+		// Once we have the imageStream, add it to the StateSet
+		if (test.valid())
 		{
-			this->setName("VideoTexture("+_path+")");			
-			vidTexture->setImage(0,_imageStream.get());
-		}
-		else {	
-			std::cout << "VideoTexture ERROR. Not a video format?: " << _path << std::endl;
-		}	
-	}
-	
-	// Once we have the imageStream, add it to the StateSet
-	if (_imageStream.valid())
-	{
+			this->_imageStream = test.get();
 
-		// add texture to stateset:
-		this->setTextureAttributeAndModes(0, vidTexture, osg::StateAttribute::ON);
+			// add texture to stateset:
+			this->setTextureAttributeAndModes(0, vidTexture, osg::StateAttribute::ON);
 
-		// turn off lighting 
-		this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+			// turn off lighting 
+			this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-		// if image has transparency, enable blending:
-		if (1)//(_imageStream->isImageTranslucent())
-		{
-			this->setMode(GL_BLEND, osg::StateAttribute::ON);
-			this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-		}
+			// if image has transparency, enable blending:
+			if (1)//(_imageStream->isImageTranslucent())
+			{
+				this->setMode(GL_BLEND, osg::StateAttribute::ON);
+				this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+			}
 		
-		// apply current play/loop state, overriding OSG defaults:
-		if (_play) _imageStream->play();
-		if (!_loop) _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
+			// apply current play/loop state, overriding OSG defaults:
+			if (_play) _imageStream->play();
+			if (!_loop) _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
+		}
 	}
-	
-	
+
+	BROADCAST(this, "ss", "setVideoPath", getVideoPath());
 }
 
 void VideoTexture::setLoop (int i)
@@ -277,11 +277,11 @@ void VideoTexture::setIndex (float f)
 
 void VideoTexture::setFrameRate (float f)
 {	
-	osg::ref_ptr<osg::ImageSequence> _imageSequence = dynamic_cast<osg::ImageSequence*>(_imageStream.get());
+	osg::ref_ptr<osg::ImageSequence> tmpImageSequence = dynamic_cast<osg::ImageSequence*>(_imageStream.get());
 	
-	if (_imageSequence.valid())
+	if (tmpImageSequence.valid())
 	{
-		_imageSequence->setLength(_imageSequence->getNumImages() / f);
+		tmpImageSequence->setLength(tmpImageSequence->getNumImages() / f);
 	}
 }
 
