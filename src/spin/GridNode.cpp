@@ -102,7 +102,8 @@ void GridNode::setColor (float r, float g, float b, float a)
 
 void GridNode::drawGrid()
 {
-
+	if (!sceneManager->isGraphical()) return;
+	
     pthread_mutex_lock(&pthreadLock);
 
 	// remove the old ray:

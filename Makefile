@@ -16,7 +16,8 @@ doc:
 
 osgWrappers:
 	@echo ""; \
-	echo ">>>>>>>>>>>>>>>>>>>>> Generating osgWrappers <<<<<<<<<<<<<<<<<<<<<"; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Generating osgWrappers <<<<<<<<<<<<<<<<<<<<<";
+	-rm include/*.h~
 	$(GENWRAPPER_BIN) -d . doxygen | doxygen -
 	$(GENWRAPPER_BIN) -v QUIET -c genwrapper.conf doxygen .
 	

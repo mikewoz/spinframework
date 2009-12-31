@@ -219,6 +219,7 @@ protected:
 	interactionMode _interactionMode;
 	osg::ref_ptr<UserNode> owner;
 	std::vector<osg::Vec3> _trajectory;
+	int _drawMod;
 	
 	osg::ref_ptr<osg::ClipNode> clipNode;
 	osg::Vec3 _clipping;

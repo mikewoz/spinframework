@@ -323,9 +323,13 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 		switch(event)
 		{
 			case(osgGA::GUIEventAdapter::PUSH):
+
+				if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 1;
+				else _drawMod = 0;
+				
 			case(osgGA::GUIEventAdapter::DRAG):
-		
-				BROADCAST(this, "ssfff", "draw", userString, x, y, z);
+
+				BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
 			
 			default:
 				// nothing else

@@ -758,7 +758,6 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 		}
 	}
 
-
 	osgIntrospection::Value sceneManagerPtr = osgIntrospection::Value(this);
 
 	/*
@@ -783,8 +782,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 	std::cout << "is type defined? " << tt.isDefined() << std::endl;
 	*/
 
-	try {	
-
+	try {
 		// Let's use osgIntrospection to create a node of the proper type:
 		const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(type);
 
@@ -795,6 +793,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 		args.push_back(sceneManagerPtr);
 		//args.push_back(this);
 		args.push_back(nodeID->s_name);
+		
 		osgIntrospection::Value v = t.createInstance(args);
 
 
@@ -849,8 +848,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 	}
 
 	if (n.valid())
-	{
-
+	{	
 		// Must call this for newly created nodes. the function registers the node
 		// with an OSC callback, and sets a pointer to this SceneManager
 		//n->registerNode(this);
@@ -2119,8 +2117,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 
 	if (0)
 	{
-		printf("************ oscCallback_debug() got message: %s\n", (char*)path);
-		printf("sceneManager passed as user_data: sceneID=%s\n", (sceneManager->sceneID).c_str());
+		printf("************ SceneManagerCallback_admin() got message: %s\n", (char*)path);
 		for (int i=0; i<argc; i++) {
 			printf("arg %d '%c' ", i, types[i]);
 	    	lo_arg_pp((lo_type) types[i], argv[i]);

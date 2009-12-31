@@ -165,9 +165,9 @@ void SharedVideoTexture::updateCallback()
     
 
     if (!killed_ && img.valid())
-    {
+    {	
     	boost::mutex::scoped_lock displayLock(displayMutex_);
-
+		
     	// update image from shared memory:
 	    img->setImage(width, 
 	    		height, 

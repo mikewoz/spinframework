@@ -139,7 +139,7 @@ void ReferencedNode::callbackUpdate()
 void ReferencedNode::attach()
 {
 	if (this->newParent==NULL_SYMBOL) return;
-	
+
 	pthread_mutex_lock(&pthreadLock);
 	
 	osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent->s_thing);
@@ -163,8 +163,7 @@ void ReferencedNode::attach()
 	}
 
 	pthread_mutex_unlock(&pthreadLock);
-	
-	
+
 	// remove node from current parent (make sure to release the mutex first!)
 	if (this->parent != this->newParent)
 	{
