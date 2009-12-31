@@ -238,25 +238,53 @@ void ViewerManipulator::handleKeypress(const GUIEventAdapter& ea)
 
 GroupNode* ViewerManipulator::getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection)
 {
-	osg::ref_ptr<GroupNode> testNode;
-	
-	// intersections are ordered from nearest to furthest, so we
-	// iterate through and return the first intersection that can
-	// be cast as an interactive SPIN node
-	for (int i=intersection.nodePath.size()-1; i>=0; i--)
+    osg::ref_ptr<GroupNode> testNode;
+
+    // intersections are ordered from nearest to furthest, so we
+    // iterate through and return the first intersection that can
+    // be cast as an interactive SPIN node
+    for (int i=intersection.nodePath.size()-1; i>=0; i--)
+    {
+        testNode = dynamic_cast<GroupNode*>(intersection.nodePath[i]);
+        if (testNode.valid() && (testNode->getInteractionMode()))
+        {
+            return testNode.get();
+        }
+    }
+
+    return NULL;
+}
+
+std::vector<GroupNode*> ViewerManipulator::getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections)
+{
+	vector<GroupNode*> nodes;
+
+	// intersections are ordered from nearest to furthest, so we iterate and
+	// a return list of all nodes that can be cast as interactive SPIN nodes
+
+	osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+	for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 	{
-		testNode = dynamic_cast<GroupNode*>(intersection.nodePath[i]);
-		if (testNode.valid() && (testNode->getInteractionMode()))
+		for (int i=(*itr).nodePath.size()-1; i>=0; i--)
 		{
-			return testNode.get();
+			osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
+			if (testNode.valid() && (testNode->getInteractionMode()))
+			{
+				// but only add it once (the intersector can intersect with the
+				// same node several times:
+				if (std::find( nodes.begin(), nodes.end(), testNode.get() ) == nodes.end())
+					nodes.push_back(testNode.get());
+				break;
+			}
 		}
 	}
 	
-	return NULL;
+	return nodes;
 }
 
 void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter& ea)
 {
+	int i;
 	osgUtil::LineSegmentIntersector::Intersections intersections;
 	osgUtil::LineSegmentIntersector::Intersections::iterator itr;
 		    
@@ -355,133 +383,193 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		// anymore. So if we don't find the selectedNode in the intersections
 		// list, we just provide the last hitPoint for the event.
 		
-		osg::ref_ptr<GroupNode> hitNode;
 		bool haveIntersections = view->computeIntersections(ea.getX(),ea.getY(),intersections);
+
+		// first, we fill 2 vectors with data (the pointer to the node, and the
+		// local intersect point)
+		vector<GroupNode*> hitNodes;
+		vector<osg::Vec3> hitPoints;
+
+		// intersections are ordered from nearest to furthest, so we iterate and
+		// a return list of all nodes that can be cast as interactive SPIN nodes
+		osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+		for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+		{
+			for (i=(*itr).nodePath.size()-1; i>=0; i--)
+			{
+				osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
+				if (testNode.valid() && (testNode->getInteractionMode()>0))
+				{
+					// but only add it once (the intersector can intersect with the
+					// same node several times:
+					if (std::find( hitNodes.begin(), hitNodes.end(), testNode.get() ) == hitNodes.end())
+					{
+						hitPoints.push_back((*itr).getLocalIntersectPoint());
+						hitNodes.push_back(testNode.get());
+					}
+					// found an interactive SPIN node, so we can break and go
+					// to next intersection
+					break;
+				}
+			}
+		}
+
+
+		// for DRAG and PUSH interactions, we are only interested in one node,
+		// the "hitNode"
+		osg::ref_ptr<GroupNode> hitNode;
 			
+		// if a node has previously been selected, the hitNode is set to that
+		// node. We also see if it was in the intersection list, so that we can
+		// update the hitPoint:
 		if (selectedNode!=gensym("NULL"))
 		{
 			hitNode = dynamic_cast<GroupNode*>(selectedNode->s_thing);
-			
-			if (haveIntersections)
+			for (i=0; i<hitNodes.size(); i++)
 			{
-				for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+				if (hitNodes[i] == hitNode.get())
 				{
-					osg::ref_ptr<GroupNode> testNode = getNodeFromIntersection(*itr);
-					if (testNode.valid() && (testNode->id == selectedNode))
-					{
-						lastHitPoint = (*itr).getLocalIntersectPoint();
-						break;
-					}
+					lastHitPoint = hitPoints[i];
+					break;
 				}
 			}
 		}
 		
 		
-		// If no node is selected, then the picker only cares if there is an
-		// intersection:
-		else if (haveIntersections)
-	    {  
-			
-			for (itr = intersections.begin(); itr != intersections.end(); ++itr)
-			{
-				hitNode = getNodeFromIntersection(*itr);
-				
-				if (hitNode.valid())
-				{
-					lastHitPoint = (*itr).getLocalIntersectPoint();
-					break;
-				}
-			}
+		// If no node is selected, then the hitNode is set to the first in the
+		// list
+		else if (hitNodes.size())
+	    {
+			hitNode = hitNodes[0];
+			lastHitPoint = hitPoints[0];
 		}
 		
 		// So now we should have a hitNode to work on and the lastHitPoint		
 		if (hitNode.valid())				
 		{
-			switch(ea.getEventType())
+			if (( hitNode->getInteractionMode()==GroupNode::DRAG) ||
+			    ( hitNode->getInteractionMode()==GroupNode::PUSH))
 			{
-				// send MOVE events (eg, for drawing on nodes)
-				case(GUIEventAdapter::MOVE):
-					sendEvent(hitNode->id->s_name,
-							  "sisfffff",
-							  "event",
-							  (int)ea.getEventType(),
-							  user->s_name,
-							  dX,
-							  dY,
-							  lastHitPoint.x(),
-							  lastHitPoint.y(),
-							  lastHitPoint.z(),
-							  LO_ARGS_END);
-					break;
+				switch(ea.getEventType())
+				{
+					// send MOVE events (eg, for drawing on nodes)
+					case(GUIEventAdapter::MOVE):
+						sendEvent(hitNode->id->s_name,
+								  "sisfffff",
+								  "event",
+								  (int)ea.getEventType(),
+								  user->s_name,
+								  dX,
+								  dY,
+								  lastHitPoint.x(),
+								  lastHitPoint.y(),
+								  lastHitPoint.z(),
+								  LO_ARGS_END);
+						break;
 					
-				// DRAG will only occur if someone clicks elsewhere
-				// and rolls onto this node, so we shouldn't send
-				// anything, should we?
-				case(GUIEventAdapter::DRAG):
-					sendEvent(hitNode->id->s_name,
-							  "sisfffff",
-							  "event",
-							  (int)ea.getEventType(),
-							  user->s_name,
-							  dX,
-							  dY,
-							  lastHitPoint.x(),
-							  lastHitPoint.y(),
-							  lastHitPoint.z(),
-							  LO_ARGS_END);
-					break;
+					// DRAG will only occur if someone clicks elsewhere
+					// and rolls onto this node, so we shouldn't send
+					// anything, should we?
+					case(GUIEventAdapter::DRAG):
+						sendEvent(hitNode->id->s_name,
+								  "sisfffff",
+								  "event",
+								  (int)ea.getEventType(),
+								  user->s_name,
+								  dX,
+								  dY,
+								  lastHitPoint.x(),
+								  lastHitPoint.y(),
+								  lastHitPoint.z(),
+								  LO_ARGS_END);
+						break;
 					
-				// Same goes for the case where someone rolls onto a
-				// node with the mouse button down, and releases.
-				// However, just to be safe, we'll also ensure that
-				// there is no selected node anymore:
-				case(GUIEventAdapter::RELEASE):
-					sendEvent(hitNode->id->s_name,
-			    			"sisfffff",
-			    			"event",
-			    			(int)ea.getEventType(),
-			    			user->s_name,
-			    			(float) ea.getModKeyMask(),
-			    			(float) ea.getButtonMask(),
+					// Same goes for the case where someone rolls onto a
+					// node with the mouse button down, and releases.
+					// However, just to be safe, we'll also ensure that
+					// there is no selected node anymore:
+					case(GUIEventAdapter::RELEASE):
+						sendEvent(hitNode->id->s_name,
+								"sisfffff",
+								"event",
+								(int)ea.getEventType(),
+								user->s_name,
+								(float) ea.getModKeyMask(),
+								(float) ea.getButtonMask(),
+								lastHitPoint.x(),
+								lastHitPoint.y(),
+								lastHitPoint.z(),
+								LO_ARGS_END);
+						selectedNode = gensym("NULL");
+						break;
+					
+					// SCROLLING (with the mouse wheel) is cool. It
+					// could be used to scale for example.
+					case(GUIEventAdapter::SCROLL):
+						sendEvent(hitNode->id->s_name,
+								  "sisfffff",
+								  "event",
+								  (int)ea.getEventType(),
+								  user->s_name,
+								  scrollX,
+								  scrollY,
+								  lastHitPoint.x(),
+								  lastHitPoint.y(),
+								  lastHitPoint.z(),
+								  LO_ARGS_END);
+						break;
+					
+					// Finally, in the case of a PUSH, we both send the
+					// event, and set the selectedNode
+					case(GUIEventAdapter::PUSH):
+						sendEvent(hitNode->id->s_name,
+								  "sisfffff",
+								  "event",
+								  (int)ea.getEventType(),
+								  user->s_name,
+								  (float) ea.getModKeyMask(),
+								  (float) ea.getButtonMask(),
+								  lastHitPoint.x(),
+								  lastHitPoint.y(),
+								  lastHitPoint.z(),
+								  LO_ARGS_END);
+						selectedNode = hitNode->id;
+						break;
+				} // switch
+			} // if ((mode==GroupNode::DRAG) || (mode==GroupNode::PUSH))
+
+			else if (hitNode->getInteractionMode()==GroupNode::DRAW)
+			{
+				switch(ea.getEventType())
+				{
+					case(GUIEventAdapter::DRAG):
+						sendEvent(hitNode->id->s_name,
+							"sisfffff",
+							"event",
+							(int)ea.getEventType(),
+							user->s_name,
+							dX,
+							dY,
 							lastHitPoint.x(),
 							lastHitPoint.y(),
 							lastHitPoint.z(),
-			    			LO_ARGS_END);
-					selectedNode = gensym("NULL");
-					break;
-					
-				// SCROLLING (with the mouse wheel) is cool. It
-				// could be used to scale for example.
-				case(GUIEventAdapter::SCROLL):
-					sendEvent(hitNode->id->s_name,
-							  "sisfffff",
-							  "event",
-							  (int)ea.getEventType(),
-							  user->s_name,
-							  scrollX,
-							  scrollY,
-							  lastHitPoint.x(),
-							  lastHitPoint.y(),
-							  lastHitPoint.z(),
-							  LO_ARGS_END);
-					break;
-					
-				// Finally, in the case of a PUSH, we both send the
-				// event, and set the selectedNode
-				case(GUIEventAdapter::PUSH):
-					sendEvent(hitNode->id->s_name,
-							  "sisfffff",
-							  "event",
-							  (int)ea.getEventType(),
-							  user->s_name,
-							  (float) ea.getModKeyMask(),
-							  (float) ea.getButtonMask(),
-							  lastHitPoint.x(),
-							  lastHitPoint.y(),
-							  lastHitPoint.z(),
-							  LO_ARGS_END);
-					selectedNode = hitNode->id;
-					break;
+							LO_ARGS_END);
+						break;
+
+					case(GUIEventAdapter::PUSH):
+						sendEvent(hitNode->id->s_name,
+							"sisfffff",
+							"event",
+							(int)ea.getEventType(),
+							user->s_name,
+							(float) ea.getModKeyMask(),
+							(float) ea.getButtonMask(),
+							lastHitPoint.x(),
+							lastHitPoint.y(),
+							lastHitPoint.z(),
+							LO_ARGS_END);
+						break;
+				}
 			}
 			
 		} // if hitNode.valid()

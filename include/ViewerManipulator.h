@@ -84,7 +84,9 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 	    void handleKeypress(const osgGA::GUIEventAdapter& ea);
 		
 		GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
+		std::vector<GroupNode*> getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections);
 	    void handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
+
 
 	protected:
 		virtual ~ViewerManipulator();
