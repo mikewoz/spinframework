@@ -73,8 +73,6 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		ViewerManipulator();
 		
 		void setRedirection(std::string addr, std::string port);
-		void sendEvent(const char *nodeId, const char *types, ...);
-		void sendEvent(const char *nodeId, const char *types, va_list ap);
 		
 		void setPicker(bool b);
 		void setMover(bool b);
@@ -82,10 +80,14 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		
 	    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
 	    void handleKeypress(const osgGA::GUIEventAdapter& ea);
-		
-		GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
-		std::vector<GroupNode*> getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections);
 	    void handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
+		
+		//GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
+		//std::vector<GroupNode*> getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections);
+
+	    void sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint);
+		void sendEvent(const char *nodeId, const char *types, ...);
+		void sendEvent(const char *nodeId, const char *types, va_list ap);
 
 
 	protected:
@@ -96,6 +98,7 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		t_symbol *user;
 		
 		t_symbol *selectedNode;
+		std::vector<t_symbol*> selectedNodes;
 		
 		lo_address redirectAddr;
 		lo_server_thread  redirectServ;

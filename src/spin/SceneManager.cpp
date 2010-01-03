@@ -1305,6 +1305,17 @@ void SceneManager::refresh()
 		}
 	}
 	
+	ReferencedStateMap::iterator sIt;
+	for (sIt = stateMap.begin(); sIt != stateMap.end(); ++sIt)
+	{
+		ReferencedStateList::iterator sIter;
+		for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
+		{
+			osg::ref_ptr<ReferencedState> s = dynamic_cast<ReferencedState*>((*sIter)->s_thing);
+			if (s.valid()) s->stateDump();
+		}
+	}
+	
 	// must do connections manually:
 	vector<SoundConnection*> connections = getConnections();
 	for (vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)

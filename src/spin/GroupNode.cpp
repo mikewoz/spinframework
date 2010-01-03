@@ -248,65 +248,73 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				// and if not, we give ownnerhip to the event's user:
 				if (!this->owner.valid())
 				{
+					this->setVelocity(0,0,0);
+					this->setSpin(0,0,0);
+					_trajectory.clear();
+					
 					this->owner = user.get();
 				}
-			
-				this->setVelocity(0,0,0);
-				this->setSpin(0,0,0);
-				_trajectory.clear();
-				
+
 				break;
 				
 			case(osgGA::GUIEventAdapter::RELEASE):
 				
 				// on release, the user gives up ownership of the node (assuming
 				// that he had ownership in the first place):
-				if (this->owner == user) this->owner = NULL;
-			
-			
-				if (_interactionMode==PUSH)
+				if (this->owner == user)
 				{
-					// Take average of stored motion vectors, and set velocity in
-					// that direction. Note: _damping should be set so that node 
-					// gradually stops:
-				
-					vector<osg::Vec3>::iterator it;
-					osg::Vec3 vel = osg::Vec3(0,0,0);
-					for (it=_trajectory.begin(); it!=_trajectory.end(); ++it)
+			
+					if (_interactionMode==PUSH)
 					{
-						vel += (*it);
+						// Take average of stored motion vectors, and set velocity in
+						// that direction. Note: _damping should be set so that node 
+						// gradually stops:
+					
+						vector<osg::Vec3>::iterator it;
+						osg::Vec3 vel = osg::Vec3(0,0,0);
+						for (it=_trajectory.begin(); it!=_trajectory.end(); ++it)
+						{
+							vel += (*it);
+						}
+						vel /= _trajectory.size();
+						vel *= 3; // motion vectors were typically small, so scale
+					
+						this->setVelocity(vel.x(), vel.y(), vel.z());
 					}
-					vel /= _trajectory.size();
-					vel *= 3; // motion vectors were typically small, so scale
 				
-					this->setVelocity(vel.x(), vel.y(), vel.z());
+					this->owner = NULL;
+					
 				}
-				
 				break;
 			
 			case(osgGA::GUIEventAdapter::DRAG):
 				
-				// if this node is owned by the event's user, then we apply the
-				// motion relative to the user's current position/orientation:
+				if (this->owner == user)
+				{
 				
-				osg::Matrix targMatrix = this->getGlobalMatrix();
-				osg::Matrix userMatrix = user->getGlobalMatrix();
-				
-				float distance = (targMatrix.getTrans() - userMatrix.getTrans()).length();
-				
-				// perspective projection:
-				//float f = 29.1489;
-				float f = 3.9;  // why this number?
-				float dx = distance * -eData1 / f;
-				float dy = distance * -eData2 / f;
-
-				osg::Vec3 motionVec = userMatrix.getRotate() * osg::Vec3(dx,0,dy);
-				osg::Vec3 newPos = mainTransform->getPosition() + motionVec;
-				this->setTranslation(newPos.x(), newPos.y(), newPos.z());
-				
-				// save last N motion vectors, so we can setVelocity on RELEASE:
-				_trajectory.insert(_trajectory.begin(), motionVec);
-				if (_trajectory.size() > 5) _trajectory.pop_back();
+					// if this node is owned by the event's user, then we apply the
+					// motion relative to the user's current position/orientation:
+					
+					osg::Matrix targMatrix = this->getGlobalMatrix();
+					osg::Matrix userMatrix = user->getGlobalMatrix();
+					
+					float distance = (targMatrix.getTrans() - userMatrix.getTrans()).length();
+					
+					// perspective projection:
+					//float f = 29.1489;
+					float f = 3.9;  // why this number?
+					float dx = distance * -eData1 / f;
+					float dy = distance * -eData2 / f;
+	
+					osg::Vec3 motionVec = userMatrix.getRotate() * osg::Vec3(dx,0,dy);
+					osg::Vec3 newPos = mainTransform->getPosition() + motionVec;
+					this->setTranslation(newPos.x(), newPos.y(), newPos.z());
+					
+					// save last N motion vectors, so we can setVelocity on RELEASE:
+					_trajectory.insert(_trajectory.begin(), motionVec);
+					if (_trajectory.size() > 5) _trajectory.pop_back();
+					
+				}
 
 				break;
 
@@ -322,14 +330,23 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 	{
 		switch(event)
 		{
-			case(osgGA::GUIEventAdapter::PUSH):
-
-				if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 1;
+			case(osgGA::GUIEventAdapter::RELEASE):
+				if ((int)eData2==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) _drawMod = 1;
+				else if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 2;
 				else _drawMod = 0;
+				break;
+				
+			case(osgGA::GUIEventAdapter::PUSH):
+				if ((int)eData2==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) _drawMod = 1;
+				else if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 2;
+				else _drawMod = 0;
+				BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
+				break;
 				
 			case(osgGA::GUIEventAdapter::DRAG):
 
 				BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
+				break;
 			
 			default:
 				// nothing else

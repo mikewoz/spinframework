@@ -39,68 +39,59 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __UserNode_H
-#define __UserNode_H
+#ifndef SwitchNode_H_
+#define SwitchNode_H_
+
+#include <osg/Switch>
 
 
-#include "GroupNode.h"
-
-
+#include "ReferencedNode.h"
 
 /**
- * \brief Represents a user in the scene.
+ * \brief Allows for selectively enabling/disabling child nodes
  *
- * This class is used to differentiate users from scene content. The subgraph
- * may contain:
- * - cameras that render according the user's perspective
- * - a graphical avatar to provide an objective representation of the user
- * - various soundNodes that correspond the ther users loudspeaker setup
- * - etc.
- *
- * It is important to note that anything attached to a UserNode's subgraph will
- * not be saved with the scene.
  */
-class UserNode : public GroupNode
+class SwitchNode : public ReferencedNode
 {
 
-	public:
+public:
 
-		UserNode(SceneManager *sceneManager, char *initID);
-		virtual ~UserNode();
+	SwitchNode(SceneManager *sceneManager, char *initID);
+	virtual ~SwitchNode();
 
+	/**
+	 * IMPORTANT:
+	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
+	 * and can also change their attachmentNode so that children are attached
+	 * anywhere in that subgraph. If that is the case, the updateNodePath()
+	 * function MUST be overridden, and extra nodes must be manually pushed onto
+	 * currentNodePath.
+	 */
+	virtual void updateNodePath();
+
+	/**
+	 * This enables/disables a child of a certain id
+	 */
+	void setEnabled (const char* id, int enabled);
 	
-		/**
-		 * The UserNode is used by OSG's NodeTrackerManipulator to position a
-		 * camera for the user. However, NodeTrackerManipulator doesn't check if
-		 * the nodepath has changed, so we override updateNodePath() and set an
-		 * nodepathUpdate flag for the manipulator to see.
-		 */
-		virtual void updateNodePath();
-		bool nodepathUpdate;
-		
-		
-		// SET methods:
-		void setDescription (const char *s);
 
+	/**
+	 * Set all child noded to be either disabled or enabled
+	 */
+	void setAll(int enabled);
+	
 
-		// GET methods:
-		const char* getDescription() { return _description.c_str(); }
+	/**
+	 * For each subclass of ReferencedNode, we override the getState() method to
+	 * fill the vector with the correct set of methods for this particular node
+	 */
+	virtual std::vector<lo_message> getState();
 
+private:
 
-		/**
-		 * For each subclass of ReferencedNode, we override the getState() method to
-		 * fill the vector with the correct set of methods for this particular node
-		 */
-		virtual std::vector<lo_message> getState();
-
-
-
-
-	private:
-
-		std::string _description;
-
+	osg::ref_ptr<osg::Switch> switcher;
 };
+
 
 
 #endif
