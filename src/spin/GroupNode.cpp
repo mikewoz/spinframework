@@ -193,6 +193,9 @@ void GroupNode::mouseEvent (int event, int keyMask, int buttonMask, float x, flo
 
 void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
 {
+	osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+	if (!user.valid()) return;
+		
 	
 	if (0)
 	{
@@ -231,40 +234,26 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 		
 
 	
-	if (_interactionMode==DRAG || _interactionMode==PUSH)
+	if (_interactionMode==DRAG || _interactionMode==THROW)
 	{
-		osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
-		if (!user.valid()) return;
-		
-		
-
 		switch(event)
 		{
-		
-		
 			case(osgGA::GUIEventAdapter::PUSH):
 				
-				// on push, we check if the current node is owned by anyone,
-				// and if not, we give ownnerhip to the event's user:
-				if (!this->owner.valid())
+				if (!this->owner.valid())					
 				{
 					this->setVelocity(0,0,0);
 					this->setSpin(0,0,0);
 					_trajectory.clear();
-					
-					this->owner = user.get();
 				}
 
 				break;
 				
 			case(osgGA::GUIEventAdapter::RELEASE):
 				
-				// on release, the user gives up ownership of the node (assuming
-				// that he had ownership in the first place):
 				if (this->owner == user)
 				{
-			
-					if (_interactionMode==PUSH)
+					if (_interactionMode==THROW)
 					{
 						// Take average of stored motion vectors, and set velocity in
 						// that direction. Note: _damping should be set so that node 
@@ -281,9 +270,6 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 					
 						this->setVelocity(vel.x(), vel.y(), vel.z());
 					}
-				
-					this->owner = NULL;
-					
 				}
 				break;
 			
@@ -317,8 +303,6 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				}
 
 				break;
-
-				
 		}
 		
 		// broadcast event
@@ -328,32 +312,47 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 	
 	else if (_interactionMode==DRAW)
 	{
-		switch(event)
+		if ((event==osgGA::GUIEventAdapter::PUSH) || (event==osgGA::GUIEventAdapter::RELEASE))
 		{
-			case(osgGA::GUIEventAdapter::RELEASE):
-				if ((int)eData2==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) _drawMod = 1;
-				else if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 2;
-				else _drawMod = 0;
-				break;
-				
-			case(osgGA::GUIEventAdapter::PUSH):
-				if ((int)eData2==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) _drawMod = 1;
-				else if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 2;
-				else _drawMod = 0;
-				BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
-				break;
-				
-			case(osgGA::GUIEventAdapter::DRAG):
+			if ((int)eData2==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) _drawMod = 1;
+			else if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 2;
+			else _drawMod = 0;
 
-				BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
-				break;
-			
-			default:
-				// nothing else
-				break;
-		
+			BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
+		}
+		else if (event==osgGA::GUIEventAdapter::DRAG)
+		{
+			BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
 		}
 	}
+
+	// after all is done, we update ownership (if this was a PUSH or RELEASE)
+	if (_interactionMode==SELECT || _interactionMode==DRAG || _interactionMode==THROW)
+	{
+		switch(event)
+		{
+			case(osgGA::GUIEventAdapter::PUSH):
+				
+				// on push, we check if the current node is owned by anyone,
+				// and if not, we give ownnerhip to the event's user:
+				if (!this->owner.valid())
+				{
+					this->owner = user.get();
+				}
+				break;
+				
+			case(osgGA::GUIEventAdapter::RELEASE):
+				
+				// on release, the user gives up ownership of the node (assuming
+				// that he had ownership in the first place):
+				if (this->owner == user)
+				{
+					this->owner = NULL;
+				}
+				break;
+		}
+	}
+
 }
 
 // ***********************************************************
@@ -384,6 +383,14 @@ void GroupNode::setInteractionMode (interactionMode mode)
 	if (this->_interactionMode != (int)mode)
 	{
 		this->_interactionMode = mode;
+
+		// set the node mask so that an intersection visitor will only test
+		// for interactive nodes (note: nodemask info in spinUtil.h)
+		if ((int)_interactionMode > 0)
+			this->setNodeMask(INTERACTIVE_NODE_MASK);
+		else
+			this->setNodeMask(GEOMETRIC_NODE_MASK);
+			
 		BROADCAST(this, "si", "setInteractionMode", (int) this->_interactionMode);
 	}
 }

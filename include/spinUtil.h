@@ -76,14 +76,18 @@
 // intersections, etc.
 #define GEOMETRIC_NODE_MASK 0x00000001
 
+// INTERACTIVE nodes are those that can be picked and drawn upon.
+#define INTERACTIVE_NODE_MASK 0x00000010
+
+
 // DEBUGVIEW nodes are those that should be visible in a viewing window, but do
 // not count when doing collision detection or intersection testing.
-#define DEBUGVIEW_NODE_MASK 0x00000010
+#define DEBUGVIEW_NODE_MASK 0x00000100
 
 // STATSDATA nodes are those which do not need a visual representation, and so
 // they are culled in camera traversals. These nodes are typically used to hold
 // information for interaction.
-#define STATSDATA_NODE_MASK 0x00000100
+#define STATSDATA_NODE_MASK 0x10000000
 
 
 

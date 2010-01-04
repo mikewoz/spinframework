@@ -334,7 +334,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		// This is how the Picker works:
 		//
 		// A node is "selected" when the user does a PUSH on an GroupNode that
-		// has an appropriate interactionMode property (eg, DRAG, PUSH)
+		// has an appropriate interactionMode property (eg, DRAG, THROW)
 		//
 		// We store the id of the selectedNodes, so that we can disable camera
 		// motion if anything is selected.
@@ -346,6 +346,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 
 		osgUtil::LineSegmentIntersector::Intersections intersections;
 		bool haveIntersections = view->computeIntersections(ea.getX(),ea.getY(),intersections);
+		//bool haveIntersections = view->computeIntersections(ea.getX(),ea.getY(),intersections, INTERACTIVE_NODE_MASK);
 
 		// first, we fill 2 vectors with data (the pointer to the node, and the
 		// local intersect point)
@@ -357,28 +358,47 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		osgUtil::LineSegmentIntersector::Intersections::iterator itr;
 		for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 		{
+			// look down the nodePath for the first SPIN node:
 			for (i=(*itr).nodePath.size()-1; i>=0; i--)
 			{
 				osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
-				if (testNode.valid() && (testNode->getInteractionMode()>0))
+				if (testNode.valid())
 				{
-					// but only add it once (the intersector can intersect with the
-					// same node several times:
-					if (std::find( hitNodes.begin(), hitNodes.end(), testNode.get() ) == hitNodes.end())
+					if (testNode->getInteractionMode()>0)
 					{
-						hitPoints.push_back((*itr).getLocalIntersectPoint());
-						hitNodes.push_back(testNode.get());
+						// Yes. This is an interactive SPIN node, so add it to 
+						// the list, but only once! ... we must check if it has
+						// already been added since the intersector can
+						// intersect with the same node several times:
+						if (std::find( hitNodes.begin(), hitNodes.end(), testNode.get() ) == hitNodes.end())
+						{
+							osg::Vec3 v = (*itr).getLocalIntersectPoint();
+							hitPoints.push_back((*itr).getLocalIntersectPoint());
+							hitNodes.push_back(testNode.get());
+						}
 					}
-					// found an interactive SPIN node, so we can break and go
-					// to next intersection
+
+					// Once we've found the first SPIN node, we break and move
+					// to the next intersection. We don't look up the nodePath
+					// to see if parentNodes are interactive, otherwise we'll
+					// get bad intersect points.
 					break;
 				}
 			}
 		}
 
+		if (0)
+		{
+			std::cout << "SPIN intersections: " << std::endl;
+			for (i=0; i<hitNodes.size(); i++)
+			{
+				std::cout << hitNodes[i]->id->s_name << " @ " << hitPoints[i].x()<<","<<hitPoints[i].y()<<","<<hitPoints[i].z()<< std::endl;
+			}
+		}
+		
 
 		// ******
-
+	
 		// If any nodes are currently "selected" (ie, the user did a PUSH but
 		// hasn't done a RELEASE yet), we are ONLY interested in subsequent
 		// events to those node(s). ie, we do not select additional nodes until
@@ -408,13 +428,13 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 				if (!found)
 				{
 					sendPick(n, ea.getEventType(), modkeyMask, buttonMask,
-							scrollX, scrollY, dX, dY, osg::Vec3(0,0,0));
+							scrollX, scrollY, dX, dY, osg::Vec3(0.0,0.0,0.0));
 				}
 			}
 		}
 		
 		// if no nodes are selected, then we go through the intersect list and
-		// send events to the first DRAG/PUSH node in the list, and the first
+		// send events to the first DRAG/THROW node in the list, and the first
 		// DRAW node. We NEVER send to more, or we will end up selecting several
 		// nodes of the same interaction type:
 		else
@@ -425,7 +445,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 			for (i=0; i<hitNodes.size(); i++)
 			{
 				if (( hitNodes[i]->getInteractionMode()==GroupNode::DRAG) ||
-					( hitNodes[i]->getInteractionMode()==GroupNode::PUSH))
+					( hitNodes[i]->getInteractionMode()==GroupNode::THROW))
 				{
 					if (!foundDrag)
 					{

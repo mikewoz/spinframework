@@ -2216,9 +2216,9 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 				}
 			}
 			lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
-			std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args), but forwarding the message anyway." << std::endl;
+			//std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args), but forwarding the message anyway." << std::endl;
 		} else {
-			std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
+			//std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
 		}
 	}
 
