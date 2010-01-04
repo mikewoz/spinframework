@@ -63,8 +63,7 @@ ViewerManipulator::ViewerManipulator()
 
 	this->raw = false;
 	this->picker = false;
-	this->mover = true;
-	selectedNode=gensym("NULL");
+	this->mover = true;	
 	
 	redirectAddr = NULL;
 	redirectServ = NULL;
@@ -324,8 +323,13 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 			case(osgGA::GUIEventAdapter::SCROLL):
 				std::cout << "SCROLL ("<<ea.getEventType()<<")"; break;
 		}
-		std::cout << " buttonMask=" << buttonMask << ", modkeyMask=" << modkeyMask << std::endl;
-		std::cout << " selectedNode="<<selectedNode->s_name << ", dXYclick: " << dXclick<<","<<dYclick << std::endl;
+		std::cout << " buttonMask=" << buttonMask << ", modkeyMask=" << modkeyMask << ", dXYclick: " << dXclick<<","<<dYclick << std::endl;
+		std::cout << " currently selected nodes:";
+		for (j=0; j<selectedNodes.size(); j++)
+		{
+			std::cout << " " << selectedNodes[j]->s_name;
+		}
+		std::cout << std::endl;
 	}
 	
 	
@@ -439,33 +443,34 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		// nodes of the same interaction type:
 		else
 		{	
-			bool foundDrag = false;
-			bool foundDraw = false;
+			bool foundSelectable = false;
+			bool foundDrawable = false;
 			
 			for (i=0; i<hitNodes.size(); i++)
 			{
-				if (( hitNodes[i]->getInteractionMode()==GroupNode::DRAG) ||
-					( hitNodes[i]->getInteractionMode()==GroupNode::THROW))
+				if ( hitNodes[i]->getInteractionMode()==GroupNode::DRAW )
 				{
-					if (!foundDrag)
+					if (!foundDrawable)
 					{
 						sendPick(hitNodes[i], ea.getEventType(), modkeyMask, buttonMask,
 								scrollX, scrollY, dX, dY, hitPoints[i]);
-						foundDrag = true;
+						foundDrawable = true;
 					}
 				}
 				
-				else if ( hitNodes[i]->getInteractionMode()==GroupNode::DRAW )
+				else if ((int) hitNodes[i]->getInteractionMode()>0)
 				{
-					if (!foundDraw)
+					if (!foundSelectable)
 					{
 						sendPick(hitNodes[i], ea.getEventType(), modkeyMask, buttonMask,
 								scrollX, scrollY, dX, dY, hitPoints[i]);
-						foundDraw = true;
+						foundSelectable = true;
 					}
 				}
 				
-				if (foundDrag && foundDraw) break;
+
+				
+				if (foundSelectable && foundDrawable) break;
 			}
 		}
 
@@ -664,7 +669,7 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 					LO_ARGS_END);
 			break;
 		
-		// Finally, in the case of a PUSH, we both send the
+		// In the case of a PUSH, we both send the
 		// event, and set the selectedNode
 		case(GUIEventAdapter::PUSH):
 			sendEvent(hitNode->id->s_name,
@@ -680,6 +685,20 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 					LO_ARGS_END);
 			selectedNodes.push_back(hitNode->id);
 			break;
+
+		case(GUIEventAdapter::DOUBLECLICK):
+			sendEvent(hitNode->id->s_name,
+					"sisfffff",
+					"event",
+					(int)eventType,
+					user->s_name,
+					(float) modKeyMask,
+					(float) buttonMask,
+					hitPoint.x(),
+					hitPoint.y(),
+					hitPoint.z(),
+					LO_ARGS_END);
+			break;	
 	}
 }
 

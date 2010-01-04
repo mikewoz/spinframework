@@ -97,7 +97,7 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		//osg::ref_ptr<UserNode> user;
 		t_symbol *user;
 		
-		t_symbol *selectedNode;
+		//t_symbol *selectedNode;
 		std::vector<t_symbol*> selectedNodes;
 		
 		lo_address redirectAddr;
