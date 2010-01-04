@@ -231,7 +231,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 		
 		std::cout << std::endl;
 	}
-		
+
+	/*
 	if (_interactionMode==SELECT)
 	{
 		switch(event)
@@ -248,6 +249,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				break;
 		}
 	}
+	 */
 	
 	else if (_interactionMode==DRAG || _interactionMode==THROW)
 	{
@@ -353,6 +355,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				if (!this->owner.valid())
 				{
 					this->owner = user.get();
+					BROADCAST(this, "ssi", "select", userString, 1);
 				}
 				break;
 				
@@ -363,7 +366,11 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				if (this->owner == user)
 				{
 					this->owner = NULL;
+					BROADCAST(this, "ssi", "select", userString, 0);
 				}
+				break;
+			case(osgGA::GUIEventAdapter::DOUBLECLICK):
+				BROADCAST(this, "ssi", "doubleclick", userString);
 				break;
 		}
 
