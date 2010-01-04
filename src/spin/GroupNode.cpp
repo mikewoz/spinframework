@@ -197,7 +197,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 	if (!user.valid()) return;
 		
 	
-	if (1)
+	if (0)
 	{
 		std::cout << this->id->s_name << ".event (interactionMode="<<_interactionMode<<") from '" << userString << "': ";
 		switch(event)
@@ -251,7 +251,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 	}
 	 */
 	
-	else if (_interactionMode==DRAG || _interactionMode==THROW)
+	if (_interactionMode==DRAG || _interactionMode==THROW)
 	{
 		switch(event)
 		{
