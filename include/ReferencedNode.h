@@ -184,7 +184,7 @@ public:
 	/**
 	 * Debug print (to log/console)
 	 */
-	void debug();
+	virtual void debug();
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to

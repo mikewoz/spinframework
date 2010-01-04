@@ -103,6 +103,8 @@ public:
 
 	void mouseEvent (int event, int keyMask, int buttonMask, float x, float y);
 	void event (int event, const char* userString, float eData1, float eData2, float x, float y, float z);
+
+	virtual void debug();
 	
 	void setReportMode(globalsReportMode mode);
 	
