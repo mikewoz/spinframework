@@ -102,7 +102,6 @@ static void sigHandler(int signum)
 //spinContext::spinContext(spinContextMode initMode)
 spinContext::spinContext()
 {
-
 	spinContextMode  initMode = spinContext::LISTENER_MODE;
 	
 	// default is hostname:
@@ -219,7 +218,6 @@ spinContext::spinContext()
 	lo_server_thread_start(lo_infoServ);
 	
 
-	std::cout << "  INFO channel:\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
 }
 
 spinContext::~spinContext()
@@ -277,6 +275,15 @@ bool spinContext::setMode(spinContextMode m)
 
 bool spinContext::start()
 {
+	if (mode==SERVER_MODE)
+		std::cout << "\nSPIN :: Starting in SERVER mode" << std::endl;
+	else
+		std::cout << "\nSPIN :: Starting in LISTENER mode" << std::endl;
+	std::cout << std::endl;
+	
+	std::cout << "  INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
+
+	
 	lo_txAddr = lo_address_new(txAddr.c_str(), txPort.c_str());
 
 	signalStop = false;
@@ -511,8 +518,6 @@ static void *spinListenerThread(void *arg)
 	//spinContext *spin = (spinContext*) arg;
 	spinContext &spin = spinContext::Instance();
 
-	std::cout << "  spinContext mode:\t\tLISTENER (slave)" << std::endl;
-
 	spin.sceneManager = new SceneManager(spin.id, spin.rxAddr, spin.rxPort);
 
 	// register our special scene callback:
@@ -548,9 +553,6 @@ static void *spinServerThread(void *arg)
 {
 	//spinContext *spin = (spinContext*) arg;
 	spinContext &spin = spinContext::Instance();
-
-	std::cout << "  spinContext mode:\t\tSERVER" << std::endl;
-	std::cout << "  broadcasting on:\t\t" << spin.txAddr << ", port: " << spin.infoPort << std::endl;
 
 	spin.sceneManager = new SceneManager(spin.id, spin.rxAddr, spin.rxPort);
 	spin.sceneManager->setTXaddress(spin.txAddr, spin.txPort);

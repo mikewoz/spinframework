@@ -91,16 +91,28 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
 	graphicalMode = false;
 
-
-	rxAddr = lo_address_new(addr.c_str(), port.c_str());
-
 	// initialize storage vectors:
 	//nodeTypes.clear();
 	nodeMap.clear();
 	stateMap.clear();
 	//nodeList.clear();
+	
+	// Set resourcesPath:
+	std::string currentDir = getenv("PWD");
+	if ((currentDir.length()>8) && (currentDir.substr(currentDir.length()-9))==string("/src/spin"))
+	{
+		resourcesPath = "../Resources";
+	} else {
+		resourcesPath = "/usr/local/share/spinFramework";
+	}
+	std::cout << "  Resources path:\t\t" << resourcesPath << std::endl;
+	
+	mediaManager = new MediaManager(resourcesPath);
+
 
 	// set up OSC event listener:
+
+	rxAddr = lo_address_new(addr.c_str(), port.c_str());
 
 	if (isMulticastAddress(addr))
 	{
@@ -126,8 +138,9 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	// start the listener:
 	lo_server_thread_start(rxServ);
 
-	std::cout << "  SceneManager ID:\t\t'" << id << std::endl;
-	std::cout << "  ... listening on:\t\t" << addr << ", port: " << port << std::endl;
+	std::cout << "  SceneManager ID:\t\t" << id << std::endl;
+	//std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
+	std::cout << "  SceneManager receiving on:\t" << lo_address_get_url(rxAddr) << std::endl;
 
 
 	// discover all relevant nodeTypes by introspection, and fill the nodeMap
@@ -229,17 +242,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	rootNode->setStateSet(rootStateSet);
 
 
-	// Set resourcesPath:
-	std::string currentDir = getenv("PWD");
-	if ((currentDir.length()>8) && (currentDir.substr(currentDir.length()-9))==string("/src/spin"))
-	{
-		resourcesPath = "../Resources";
-	} else {
-		resourcesPath = "/usr/local/share/spinFramework";
-	}
-	std::cout << "  Resources path:\t\t" << resourcesPath << std::endl;
-	
-	mediaManager = new MediaManager(resourcesPath);
 
 
 	// To prevent same external texture from being loaded multiple times,
@@ -349,7 +351,7 @@ void SceneManager::setTXaddress (std::string addr, std::string port)
 	if (!txServ) std::cout << "ERROR: SceneManager::setTXaddress(). Bad address?: " << addr << ":" << port << std::endl;
 	else
 	{
-		std::cout << "  SceneManager is sending scene updates to: " << lo_address_get_url(txAddr) << std::endl;
+		std::cout << "  SceneManager sending to:\t" << lo_address_get_url(txAddr) << std::endl;
 		//std::cout << "  ... via liblo server: " << lo_server_get_url(txServ) << std::endl;
 	}
 }
