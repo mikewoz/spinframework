@@ -174,9 +174,14 @@ void ShapeNode::drawShape()
 
 	bool ignoreOnThisHost = (sceneManager->isSlave() && (host==getHostname()));
 
+	std::cout << "ShapeNode " << this->id->s_name << " ignore? " << (int)ignoreOnThisHost << std::endl;
+
+
 	// TODO: this should only be added if this application is a graphical renderer.
 	// There is no point to actually add the memory of the ShapeDrawable for apps
 	// that do not need to use it!
+	// ACTUALLY, the server needs to know about the geometry to compute 
+	// intersections, determine bounding regions, radius, etc...
 	if (shape && !ignoreOnThisHost)
 	{
 
@@ -205,7 +210,7 @@ void ShapeNode::drawShape()
 
 
 
-		if (shape==PLANE) // OSG doesn't support planes yet (?!)
+		if (shape==PLANE) // OSG doesn't support planes
 		{
 			shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
 		}
