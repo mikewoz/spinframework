@@ -172,11 +172,12 @@ void ShapeNode::drawShape()
 		shapeGeode = NULL;
 	}
 
+	bool ignoreOnThisHost = (sceneManager->isSlave() && (host==getHostname()));
 
 	// TODO: this should only be added if this application is a graphical renderer.
 	// There is no point to actually add the memory of the ShapeDrawable for apps
 	// that do not need to use it!
-	if (shape)
+	if (shape && !ignoreOnThisHost)
 	{
 
 		osg::TessellationHints* hints = new osg::TessellationHints;
