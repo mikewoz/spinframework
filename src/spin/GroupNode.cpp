@@ -197,7 +197,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 	if (!user.valid()) return;
 		
 	
-	if (0)
+	if (0) // (event!=osgGA::GUIEventAdapter::MOVE)
 	{
 		std::cout << this->id->s_name << ".event (interactionMode="<<_interactionMode<<") from '" << userString << "': ";
 		switch(event)
@@ -355,7 +355,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				if (!this->owner.valid())
 				{
 					this->owner = user.get();
-					std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
+					//std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
 					//BROADCAST(this, "ssi", "select", userString, 1);
 					BROADCAST(this, "ss", "owner", owner->id->s_name);
 				}
@@ -367,7 +367,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				// that he had ownership in the first place):
 				if (this->owner == user)
 				{
-					std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
+					//std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
 					this->owner = NULL;
 					//BROADCAST(this, "ssi", "select", userString, 0);
 					BROADCAST(this, "ss", "owner", "NULL");

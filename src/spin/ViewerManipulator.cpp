@@ -306,7 +306,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	}
 	
 	
-	if (0)
+	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
 	{
 		switch(ea.getEventType())
 		{
@@ -412,10 +412,11 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		
 		if (selectedNodes.size())
 		{
-			for (j=0; j<selectedNodes.size(); j++)
-			{
+			//for (j=0; j<selectedNodes.size(); j++)
+			for (std::vector<t_symbol*>::iterator it=selectedNodes.begin(); it!=selectedNodes.end();)
+			{	
 				bool found = false;
-				GroupNode *n = dynamic_cast<GroupNode*>(selectedNodes[j]->s_thing);
+				GroupNode *n = dynamic_cast<GroupNode*>((*it)->s_thing);
 				for (i=0; i<hitNodes.size(); i++)
 				{
 					if (hitNodes[i] == n)
@@ -434,6 +435,12 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 					sendPick(n, ea.getEventType(), modkeyMask, buttonMask,
 							scrollX, scrollY, dX, dY, osg::Vec3(0.0,0.0,0.0));
 				}
+
+				// if the event is a RELEASE, then remove it from selectedNodes
+				if (ea.getEventType()==GUIEventAdapter::RELEASE)
+					selectedNodes.erase(it);
+				else
+					++it;
 			}
 		}
 		
@@ -454,6 +461,11 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 					{
 						sendPick(hitNodes[i], ea.getEventType(), modkeyMask, buttonMask,
 								scrollX, scrollY, dX, dY, hitPoints[i]);
+						
+						// add it to the selectedNodes in the case of a PUSH
+						if (ea.getEventType()==GUIEventAdapter::PUSH)
+							selectedNodes.push_back(hitNodes[i]->id);
+						
 						foundDrawable = true;
 					}
 				}
@@ -464,12 +476,16 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 					{
 						sendPick(hitNodes[i], ea.getEventType(), modkeyMask, buttonMask,
 								scrollX, scrollY, dX, dY, hitPoints[i]);
+						
+						// add it to the selectedNodes in the case of a PUSH
+						if (ea.getEventType()==GUIEventAdapter::PUSH)
+							selectedNodes.push_back(hitNodes[i]->id);
+						
 						foundSelectable = true;
 					}
 				}
 				
-
-				
+				// if we've found one of each, we can stop:
 				if (foundSelectable && foundDrawable) break;
 			}
 		}
@@ -650,7 +666,16 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 					hitPoint.y(),
 					hitPoint.z(),
 					LO_ARGS_END);
-			selectedNodes.clear();
+			/*
+			for (std::vector<t_symbol*>::iterator it=selectedNodes.begin(); it!=selectedNodes.end(); ++it)
+			{
+				if ((*it)==hitNode->id)
+				{
+					selectedNodes.erase(it);
+					//break;
+				}
+			}
+			 */
 			break;
 		
 		// SCROLLING (with the mouse wheel) is cool. It
@@ -683,7 +708,7 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 					hitPoint.y(),
 					hitPoint.z(),
 					LO_ARGS_END);
-			selectedNodes.push_back(hitNode->id);
+			//selectedNodes.push_back(hitNode->id);
 			break;
 
 		case(GUIEventAdapter::DOUBLECLICK):
