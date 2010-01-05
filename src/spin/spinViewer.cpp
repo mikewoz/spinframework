@@ -265,6 +265,7 @@ int main(int argc, char **argv)
 
 	// ask for refresh:
 	spin.SceneMessage("s", "refresh", LO_ARGS_END);
+
 	
 	double minFrameTime = 1.0 / maxFrameRate;
 	

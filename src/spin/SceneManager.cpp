@@ -126,7 +126,8 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	// start the listener:
 	lo_server_thread_start(rxServ);
 
-	std::cout << "  SceneManager '" << id << "' is listening on " << addr << ", port: " << port << std::endl;
+	std::cout << "  SceneManager ID:\t\t'" << id << std::endl;
+	std::cout << "  ... listening on:\t\t" << addr << ", port: " << port << std::endl;
 
 
 	// discover all relevant nodeTypes by introspection, and fill the nodeMap
@@ -236,7 +237,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	} else {
 		resourcesPath = "/usr/local/share/spinFramework";
 	}
-	std::cout << "  Resources path: " << resourcesPath << std::endl;
+	std::cout << "  Resources path:\t\t" << resourcesPath << std::endl;
 	
 	mediaManager = new MediaManager(resourcesPath);
 

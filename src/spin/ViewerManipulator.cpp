@@ -123,32 +123,23 @@ void ViewerManipulator::setRedirection(std::string addr, std::string port)
 
 void ViewerManipulator::setPicker(bool b)
 {
-	if (1)//(picker!=b)
-	{
-		this->picker = b;
-		if (picker) std::cout << "Mouse picking:\t\tEnabled" << std::endl;
-		else std::cout << "Mouse picking:\t\tDisabled" << std::endl;
-	}
+	this->picker = b;
+	if (picker) std::cout << "  Mouse picking:\t\tEnabled" << std::endl;
+	else std::cout << "  Mouse picking:\t\tDisabled" << std::endl;
 }
 
 void ViewerManipulator::setMover(bool b)
 {
-	if (1)//(mover!=b)
-	{
-		this->mover = b;
-		if (mover) std::cout << "Camera motion controls:\tEnabled" << std::endl;
-		else std::cout << "Camera motion controls:\tDisabled" << std::endl;	
-	}
+	this->mover = b;
+	if (mover) std::cout << "  Camera motion controls:\tEnabled" << std::endl;
+	else std::cout << "  Camera motion controls:\tDisabled" << std::endl;	
 }
 
 void ViewerManipulator::setRaw(bool b)
 {
-	if (1)//(picker!=b)
-	{
-		this->raw = b;
-		if (raw) std::cout << "Raw mouse events:\tEnabled" << std::endl;
-		else std::cout << "Raw mouse events:\tDisabled" << std::endl;
-	}
+	this->raw = b;
+	if (raw) std::cout << "  Raw mouse events:\tEnabled" << std::endl;
+	else std::cout << "  Raw mouse events:\tDisabled" << std::endl;
 }
 
 bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
