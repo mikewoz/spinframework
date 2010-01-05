@@ -84,6 +84,9 @@ int main(int argc, char **argv)
 	bool mover = true;
 	
 	bool fullscreen = false;
+	bool hideCursor=false;
+
+	double maxFrameRate = -1;
 	
 	int x=50;
 	int y=50;
@@ -112,8 +115,10 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin.rxPort + ")");
 
 	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
+    arguments.getApplicationUsage()->addCommandLineOption("--hideCursor", "Hide the mouse cursor");
 	arguments.getApplicationUsage()->addCommandLineOption("--window <x y w h>", "Set the position (x,y) and size (w,h) of the viewer window (Default: 50 50 640 480)");
 	arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
+	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
 
 	
 	arguments.getApplicationUsage()->addCommandLineOption("--disabled", "Disable camera controls for this user");
@@ -141,9 +146,11 @@ int main(int argc, char **argv)
 	arguments.read("-serverPort", param_spinPort);
 
 	if (arguments.read("--fullscreen")) fullscreen=true;
+    if (arguments.read("--hideCursor")) hideCursor=true;
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
-	
+	while (arguments.read("--framerate",maxFrameRate)) {}
+
 	
 	if (arguments.read("--disabled")) mover=false;
 	if (arguments.read("--picker")) picker=true;
@@ -202,6 +209,7 @@ int main(int argc, char **argv)
     for (wIter=windows.begin(); wIter!=windows.end(); wIter++)
     {
     	(*wIter)->setWindowName("spinViewer");
+		if (hideCursor) (*wIter)->useCursor(false);
     }
     
     view->setSceneData(spin.sceneManager->rootNode.get());
@@ -258,17 +266,17 @@ int main(int argc, char **argv)
 	// ask for refresh:
 	spin.SceneMessage("s", "refresh", LO_ARGS_END);
 	
-	osg::Timer_t lastTick = osg::Timer::instance()->tick();
-	osg::Timer_t frameTick = lastTick;
-
+	double minFrameTime = 1.0 / maxFrameRate;
+	
 	// program loop:
-	//while( !viewer.done() && spin.isRunning() )
 	while( !viewer.done() )
 	{
 		//std::cout << "frame: " << view->getFrameStamp()->getSimulationTime() << std::endl;
 		
 		if (spin.isRunning())
 		{
+			osg::Timer_t startFrameTick = osg::Timer::instance()->tick();
+			
 			pthread_mutex_lock(&pthreadLock);
 			spin.sceneManager->update();
 			pthread_mutex_unlock(&pthreadLock);
@@ -276,6 +284,15 @@ int main(int argc, char **argv)
 			pthread_mutex_lock(&pthreadLock);
 			viewer.frame();
 			pthread_mutex_unlock(&pthreadLock);
+
+			if (maxFrameRate>0)
+			{
+				// work out if we need to force a sleep to hold back the frame rate
+				osg::Timer_t endFrameTick = osg::Timer::instance()->tick();
+				double frameTime = osg::Timer::instance()->delta_s(startFrameTick, endFrameTick);
+				if (frameTime < minFrameTime) OpenThreads::Thread::microSleep(static_cast<unsigned int>(1000000.0*(minFrameTime-frameTime)));
+			}
+
 		
 		} else {
 			
