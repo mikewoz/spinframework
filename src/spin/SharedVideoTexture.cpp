@@ -104,7 +104,7 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
 // destructor
 SharedVideoTexture::~SharedVideoTexture()
 {
-	std::cout << "SharedVideoTexture destructor" << std::endl;
+	std::cout << "SharedVideoTexture destructor for id:" << this->id->s_name << std::endl;
 #ifdef WITH_SHARED_VIDEO
 	stop();
 #endif
