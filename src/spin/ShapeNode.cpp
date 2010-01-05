@@ -430,10 +430,6 @@ std::vector<lo_message> ShapeNode::getState ()
 	//std::cout << "in getState. shape=" << shape << ", textureName=" << textureName << std::endl;
 
 	msg = lo_message_new();
-	lo_message_add(msg, "si", "setShape", getShape());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
 	lo_message_add(msg, "si", "setBillboard", getBillboard());
 	ret.push_back(msg);
 	
@@ -449,6 +445,12 @@ std::vector<lo_message> ShapeNode::getState ()
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
+
+	// put this one last:	
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setShape", getShape());
+	ret.push_back(msg);
+
 
 
 	return ret;
