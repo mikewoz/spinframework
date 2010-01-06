@@ -54,7 +54,6 @@
 using namespace std;
 
 
-
 // *****************************************************************************
 // constructor:
 VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedState(s, initID)
@@ -130,7 +129,6 @@ void VideoTexture::setVideoPath (const char* newPath)
 	
 	if (sceneManager->isGraphical())
 	{
-
 		osg::ref_ptr<osg::ImageStream> test;
 		
 		std::string fullPath = getAbsolutePath(_path);
@@ -146,7 +144,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 	
 		vidTexture->setResizeNonPowerOfTwoHint(false);
 		vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
-		vidTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+		//vidTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
 		//vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
 		vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 		vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
@@ -212,7 +210,9 @@ void VideoTexture::setVideoPath (const char* newPath)
 			if (test.valid())
 			{
 				this->setName("VideoTexture("+_path+")");			
-				vidTexture->setImage(0,_imageStream.get());
+				vidTexture->setImage(0,test.get());
+				test->rewind();
+				std::cout << "loaded video " << _path << ". Duration: " << test->getLength() << std::endl;
 			}
 			else {	
 				std::cout << "VideoTexture ERROR. Not a video format?: " << _path << std::endl;
@@ -241,6 +241,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 			if (_play) _imageStream->play();
 			if (!_loop) _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
 		}
+
 	}
 
 	BROADCAST(this, "ss", "setVideoPath", getVideoPath());

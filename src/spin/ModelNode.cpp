@@ -214,41 +214,43 @@ void ModelNode::drawModel()
 			
 			// *****************************************************************
 			// search for special "billboard" nodes
-			
-			NodeList foundNodes;
-			NodeSearcher nodeSearcher(foundNodes);
-			nodeSearcher.search(model.get(), "billboard");
 
-			if (foundNodes.size())
-				std::cout << "found " << foundNodes.size() << " nodes to be converted into billboards" << std::endl;
-			
-			for (NodeList::iterator itr=foundNodes.begin(); itr!=foundNodes.end(); ++itr)
+			if (0)
 			{
+				NodeList foundNodes;
+				NodeSearcher nodeSearcher(foundNodes);
+				nodeSearcher.search(model.get(), "billboard");
+
+				if (foundNodes.size())
+					std::cout << "found " << foundNodes.size() << " nodes to be converted into billboards" << std::endl;
 				
-				// keep reference of node:
-				osg::ref_ptr<osg::Group> n = (*itr)->asGroup();
-				if (n)
+				for (NodeList::iterator itr=foundNodes.begin(); itr!=foundNodes.end(); ++itr)
 				{
-					// create autotranform node, and attach it to the parent(s) of
-					// the billboard node
-					osg::AutoTransform *at = new osg::AutoTransform();
-					//at->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_SCREEN);
-					at->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_CAMERA);
 					
-					for (i=0; i<n->getNumParents(); i++)
+					// keep reference of node:
+					osg::ref_ptr<osg::Group> n = (*itr)->asGroup();
+					if (n)
 					{
-						n->getParent(i)->addChild(at);
+						// create autotranform node, and attach it to the parent(s) of
+						// the billboard node
+						osg::AutoTransform *at = new osg::AutoTransform();
+						//at->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_SCREEN);
+						at->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_CAMERA);
+						
+						for (i=0; i<n->getNumParents(); i++)
+						{
+							n->getParent(i)->addChild(at);
+						}
+						
+						// now remove the node from it's parent(s) and attach it to the
+						// autotransform:
+						while (n->getNumParents())
+						{
+							n->getParent(0)->removeChild(n.get());
+						}
+						at->addChild(n.get());
 					}
-					
-					// now remove the node from it's parent(s) and attach it to the
-					// autotransform:
-					while (n->getNumParents())
-					{
-						n->getParent(0)->removeChild(n.get());
-					}
-					at->addChild(n.get());
-				}
-				
+				}	
 				
 				/*
 				// should be a group:
@@ -316,13 +318,15 @@ void ModelNode::drawModel()
 		    	osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
 		    	if (attr)
 		    	{
-		    		
+					
+					
 		    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
 		    		size_t pos;
-					
+
 					// If file came from other OS, we should fix it:
 					imageFile = osgDB::convertFileNameToNativeStyle(imageFile);
-		    		
+					std::string imageFileLessExtension = imageFile.substr(0, imageFile.rfind("."));
+					
 		    		// in Linux, imageFile is relative, so check if it
 		    		// exists and prepend the modelPath in case:
 		    		if (!osgDB::fileExists(imageFile))
@@ -361,18 +365,26 @@ void ModelNode::drawModel()
 		    			}
 		    		}
 		    		
-		    		// if filename is a movie format, create an ImageStream
-		    		// and replace the current TextureAttribute:
-		    		else if ((pos=imageFile.find(".mp4") != string::npos) ||
-				        (pos=imageFile.find(".avi") != string::npos) ||
-				        (pos=imageFile.find(".mov") != string::npos) )
+		    		// Check if filename (minus extension) is a movie format:
+					//
+					// ... the idea is that the model was created with using
+					// a placeholder image with a name like: texture.avi.jpg
+					//
+					// ... we look for a video file in the same path, but with
+					// the image extension stripped off: eg, texture.avi
+					// 
+					// We replace the image with an ImageStream, and all YUV
+					// texture mapping will remain (assuming the image and video
+					// have identical resolutions.
+					else if (isVideoPath(imageFileLessExtension))
 		    		{
-		    			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState(osgDB::getStrippedName(imageFile).c_str(), "VideoTexture"));
+						
+		    			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState(osgDB::getStrippedName(imageFileLessExtension).c_str(), "VideoTexture"));
 		    			//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
 		    			//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
 		    			if (vid.valid())
 		    			{
-		    				vid->setVideoPath(imageFile.c_str());
+		    				vid->setVideoPath(imageFileLessExtension.c_str());
 		    				vid->replace((*itr).get());
 		    				//(*itr) = vid.get();
 		    			}

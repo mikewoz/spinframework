@@ -174,7 +174,7 @@ void ShapeNode::drawShape()
 
 	bool ignoreOnThisHost = (sceneManager->isSlave() && (host==getHostname()));
 
-	std::cout << "ShapeNode " << this->id->s_name << " ignore? " << (int)ignoreOnThisHost << std::endl;
+	//std::cout << "ShapeNode " << this->id->s_name << " ignore? " << (int)ignoreOnThisHost << std::endl;
 
 
 	// TODO: this should only be added if this application is a graphical renderer.
@@ -319,6 +319,7 @@ void ShapeNode::drawTexture()
 
 	else if (shapeGeode.valid())
 	{
+		pthread_mutex_lock(&pthreadLock);
 		
 		std::string fullPath = getAbsolutePath(texturePath);
 		
@@ -357,6 +358,8 @@ void ShapeNode::drawTexture()
 		{
 			addImageTexture(shapeGeode, fullPath);
 		}
+
+		pthread_mutex_unlock(&pthreadLock);
 	}
 }
 			
