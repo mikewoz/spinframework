@@ -58,6 +58,7 @@
 #include <osgDB/WriteFile>
 
 
+
 #include <osgIntrospection/Reflection>
 #include <osgIntrospection/Type>
 #include <osgIntrospection/Value>
@@ -262,14 +263,15 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 	// and when a node is deleted:
 	// 		osgDB::Registry::instance()->getSharedStateManager()->prune();
 
+	
+	//Another way?:
 	/*
-	Another way?:
-		osgDB::Options* opt = osgDB::Registry::instance()->getOptions();
-		if (opt == NULL) {
-			opt = new osgDB::Options();
-		}
-		opt->setObjectCacheHint(osgDB::Options::CACHE_ALL);
-		osgDB::Registry::instance()->setOptions(opt);
+	osgDB::Options* opt = osgDB::Registry::instance()->getOptions();
+	if (opt == NULL) {
+		opt = new osgDB::Options();
+	}
+	opt->setObjectCacheHint(osgDB::Options::CACHE_ALL);
+	osgDB::Registry::instance()->setOptions(opt);
 	*/
 	
 }
