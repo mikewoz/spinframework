@@ -42,8 +42,7 @@ OBJS = spinContext.o osgUtil.o spinUtil.o libloUtil.o \
        AnimationNode.o VideoTexture.o SharedVideoTexture.o
 
 ifdef SHARED_VIDEO_LIB
-  #OBJS += SharedVideoNode.o SharedVideoTexture.o  
-  #OBJS += SharedVideoTexture.o  
+  OBJS += SharedVideoNode.o
 endif
 
 

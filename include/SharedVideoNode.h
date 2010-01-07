@@ -92,6 +92,8 @@ private:
 	std::string textureID;
 	osg::ref_ptr<osg::TextureRectangle> textureRect;
 
+	osg::ref_ptr<osg::Image> textureImage;
+	
 	int width, height;
 	
 	// from tristan:
