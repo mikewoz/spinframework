@@ -162,17 +162,9 @@ void ModelNode::drawModel()
 			
 			if (sceneManager->sharedStateManager.valid())
 				sceneManager->sharedStateManager->share(model);
-			
-			
-		    
-			optimizer.optimize(model.get());
-			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
-
-			
+		
 			
 			// *****************************************************************
-			
-			
 			
 			SearchVisitor searchVisitor;
 			char buf[16];
@@ -219,86 +211,142 @@ void ModelNode::drawModel()
 			{
 				NodeList foundNodes;
 				NodeSearcher nodeSearcher(foundNodes);
-				nodeSearcher.search(model.get(), "billboard");
+				nodeSearcher.search(model.get(), "bill");
 
+				std::cout << "looking for billboards...." << std::endl;
+				
 				if (foundNodes.size())
 					std::cout << "found " << foundNodes.size() << " nodes to be converted into billboards" << std::endl;
 				
+				
+				int count = 0;
 				for (NodeList::iterator itr=foundNodes.begin(); itr!=foundNodes.end(); ++itr)
 				{
+					///if (count++ > 300) break;
+					
+					std::cout << "checking potential billboard: " << (*itr)->className() << ", " << (*itr)->getName() << std::endl;
 					
 					// keep reference of node:
-					osg::ref_ptr<osg::Group> n = (*itr)->asGroup();
-					if (n)
+					//osg::ref_ptr<osg::Group> n = (*itr)->asGroup();
+					osg::ref_ptr<osg::Node> n = (*itr);
+										
+					
+					if (n.valid())
 					{
+						const osg::BoundingSphere& bs = n->getBound();
+						//osg::BoundingSphere bs = n->computeBound();
+						std::cout << "good billboard @ " << bs.center().x()<<","<<bs.center().y()<<","<<bs.center().z()<< std::endl;
+						
+						// AUTOTRANSFORM METHOD:
+
+						
 						// create autotranform node, and attach it to the parent(s) of
 						// the billboard node
 						osg::AutoTransform *at = new osg::AutoTransform();
 						//at->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_SCREEN);
 						at->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_CAMERA);
 						
+						// attach the autotransform to the parent(s) of the 
+						// group
+						/*
 						for (i=0; i<n->getNumParents(); i++)
 						{
 							n->getParent(i)->addChild(at);
 						}
+						*/
+						model->addChild(at);
 						
-						// now remove the node from it's parent(s) and attach it to the
-						// autotransform:
+						// now remove the group from it's parent(s) and attach
+						// it to the autotransform:
 						while (n->getNumParents())
 						{
 							n->getParent(0)->removeChild(n.get());
 						}
 						at->addChild(n.get());
-					}
-				}	
-				
-				/*
-				// should be a group:
-				osg::Group *group = (*itr)->asGroup();
-				if (group)
-				{
-					i=0;
-					//for (i=0; i<group->getNumChildren(); i++)
-					{
-						// keep ref_ptr for geode
-						osg::ref_ptr<osg::Geode> g = group->getChild(i)->asGeode();
 						
-						if (g.valid())
+						//at->setPosition(bs.center());
+						//at->setPivotPoint(-bs.center());
+					
+						
+						
+						
+						
+						// BILLBOARD METHOD:
+						
+						
+						/*
+						//i=0;
+						for (i=0; i<n->getNumChildren(); i++)
 						{
+							// keep ref_ptr for geode
+							osg::ref_ptr<osg::Geode> g = n->getChild(i)->asGeode();
 							
-							// create a billboard:
-							osg::Billboard *b = new osg::Billboard();
-							//osg::Billboard *b = dynamic_castMosg::Billboard*)g->clone(); // new osg::Billboard(g.get());
-							b->setName("generated Billboard");
-							
-							
-							// attach all of the geode's drawables to the billboard:
-							for (j=0; j<g->getNumDrawables(); j++)
+							if (g.valid())
 							{
-								osg::Drawable *drawable = g->getDrawable(j);
-								b->addDrawable(drawable);
-							}
+								
+								// create a billboard:
+								osg::Billboard *b = new osg::Billboard();
+								//osg::Billboard *b = dynamic_castMosg::Billboard*)g->clone(); // new osg::Billboard(g.get());
+								b->setName("generated Billboard");
+								//b->setMode(osg::Billboard::AXIAL_ROT);
+								//b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
+								//b->setNormal(osg::Vec3(1.0f,0.0f,0.0f));
+								b->setMode(osg::Billboard::POINT_ROT_EYE);
+								//b->setMode(osg::Billboard::POINT_ROT_WORLD);
+								
+								
+								osg::PositionAttitudeTransform *PAT = new osg::PositionAttitudeTransform();
+								model->addChild(PAT);
+								PAT->setPosition(bs.center());
+								
+								
+								
+								// attach the billboard to the group
+								PAT->addChild(b);
+								
+								
+								// attach all of the geode's drawables to the billboard:
+								for (j=0; j<g->getNumDrawables(); j++)
+								{
+									osg::Drawable *drawable = g->getDrawable(j);
+									b->addDrawable(drawable);
+									
+								}
+								
+								// set pivot points of each drawable:
+								for (j=0; j<b->getNumDrawables(); j++)
+								{
+									osg::Vec3 newPos = -bs.center();
+									osg::Vec3 origPos = b->getPosition(j);
+									std::cout << "setting drawable " << j << " from " <<  origPos.x()<<","<<origPos.y()<<","<<origPos.z()<<" to " << newPos.x()<<","<<newPos.y()<<","<<newPos.z()<< std::endl;
+									b->setPosition(j, newPos);
+									//b->setPosition(j, osg::Vec3(0,0,0));
+								}
+								
+								// remove the geode from it's parent(s)
+								n->removeChild(g.get());
+								
 
-							// remove the geode from it's parent(s)
-							group->removeChild(g.get());
-							
-							//while (g->getNumParents())
-							//{
-							//	g->getParent(0)->removeChild(g.get());
-							//}
-							
-				
-							
-							// attach the billboard to the group
-							group->addChild(b);
+							}
 						}
-					}
-				}
-				*/
+						*/
+						
+						
+						
+						
+					} // if (n.valid())
+				} // end for
+				
 				
 				
 			}
 			
+			
+		    
+			optimizer.optimize(model.get());
+			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
+
+
 			
 			// *****************************************************************
 			// search for all statesets with textures:
