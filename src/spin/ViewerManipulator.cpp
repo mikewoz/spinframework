@@ -436,9 +436,14 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		}
 		
 		// if no nodes are selected, then we go through the intersect list and
-		// send events to the first DRAG/THROW node in the list, and the first
-		// DRAW node. We NEVER send to more, or we will end up selecting several
-		// nodes of the same interaction type:
+		// send events to the first selectable (ie, type SELECT, DRAG, or THROW)
+		// in the list, and the first DRAW node. We NEVER send to more than one
+		// selectable, or we will end up selecting several nodes at once.
+		//
+		// Also, the rule with DRAW nodes is that once we find one, we no longer
+		// look for selectables. ie, a selectable node can be selected in front
+		// of a drawable (eg, for a brush), but we cannot select nodes behind
+		// a drawable.
 		else
 		{	
 			bool foundSelectable = false;
@@ -460,6 +465,10 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 						foundDrawable = true;
 					}
 				}
+
+				// If we've found a drawable, thus we stop right away so that
+				// nodes behind cannot be selected
+				if (foundDrawable) break;
 				
 				else if ((int) hitNodes[i]->getInteractionMode()>0)
 				{
@@ -478,6 +487,9 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 				
 				// if we've found one of each, we can stop:
 				if (foundSelectable && foundDrawable) break;
+
+				// otherwise we keep looking, allowing one selectable in front
+				// of one drawable
 			}
 		}
 
