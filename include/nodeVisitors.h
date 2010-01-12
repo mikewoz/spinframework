@@ -190,8 +190,12 @@ class NodeSearcher : public osg::NodeVisitor
         
         virtual void apply(osg::Node& node)
         {
-    		if (_searchName == node.getName())
+        	//std::cout << "checking " << node.getName() << std::endl;
+    		//if (_searchName == node.getName())
+        	std::string n = node.getName();
+       		if (n.find(_searchName) != string::npos )
     		{
+    			//std::cout << "found " << node.className() << std::endl;
      			_nodeList.push_back(&node);
     		}
             traverse(node);

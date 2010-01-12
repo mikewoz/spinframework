@@ -207,13 +207,13 @@ void ModelNode::drawModel()
 			// *****************************************************************
 			// search for special "billboard" nodes
 
-			if (0)
+			if (1)
 			{
 				NodeList foundNodes;
 				NodeSearcher nodeSearcher(foundNodes);
 				nodeSearcher.search(model.get(), "bill");
 
-				std::cout << "looking for billboards...." << std::endl;
+				//std::cout << "looking for billboards...." << std::endl;
 				
 				if (foundNodes.size())
 					std::cout << "found " << foundNodes.size() << " nodes to be converted into billboards" << std::endl;
@@ -224,18 +224,18 @@ void ModelNode::drawModel()
 				{
 					///if (count++ > 300) break;
 					
-					std::cout << "checking potential billboard: " << (*itr)->className() << ", " << (*itr)->getName() << std::endl;
+					//std::cout << "checking potential billboard: " << (*itr)->className() << ", " << (*itr)->getName() << std::endl;
 					
 					// keep reference of node:
-					//osg::ref_ptr<osg::Group> n = (*itr)->asGroup();
-					osg::ref_ptr<osg::Node> n = (*itr);
+					osg::ref_ptr<osg::Group> n = (*itr)->asGroup();
+					//osg::ref_ptr<osg::Node> n = (*itr);
 										
 					
 					if (n.valid())
 					{
 						const osg::BoundingSphere& bs = n->getBound();
 						//osg::BoundingSphere bs = n->computeBound();
-						std::cout << "good billboard @ " << bs.center().x()<<","<<bs.center().y()<<","<<bs.center().z()<< std::endl;
+						//std::cout << "good billboard @ " << bs.center().x()<<","<<bs.center().y()<<","<<bs.center().z()<< std::endl;
 						
 						// AUTOTRANSFORM METHOD:
 
@@ -248,13 +248,13 @@ void ModelNode::drawModel()
 						
 						// attach the autotransform to the parent(s) of the 
 						// group
-						/*
+						
 						for (i=0; i<n->getNumParents(); i++)
 						{
 							n->getParent(i)->addChild(at);
 						}
-						*/
-						model->addChild(at);
+						
+						//model->addChild(at);
 						
 						// now remove the group from it's parent(s) and attach
 						// it to the autotransform:
@@ -264,8 +264,8 @@ void ModelNode::drawModel()
 						}
 						at->addChild(n.get());
 						
-						//at->setPosition(bs.center());
-						//at->setPivotPoint(-bs.center());
+						at->setPosition(bs.center());
+						at->setPivotPoint(bs.center());
 					
 						
 						
