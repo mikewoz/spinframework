@@ -207,7 +207,7 @@ void ModelNode::drawModel()
 			// *****************************************************************
 			// search for special "billboard" nodes
 
-			if (1)
+			if (0)
 			{
 				NodeList foundNodes;
 				NodeSearcher nodeSearcher(foundNodes);
@@ -266,14 +266,12 @@ void ModelNode::drawModel()
 						
 						at->setPosition(bs.center());
 						at->setPivotPoint(bs.center());
-					
-						
+
 						
 						
 						
 						// BILLBOARD METHOD:
-						
-						
+
 						/*
 						//i=0;
 						for (i=0; i<n->getNumChildren(); i++)
@@ -288,17 +286,16 @@ void ModelNode::drawModel()
 								osg::Billboard *b = new osg::Billboard();
 								//osg::Billboard *b = dynamic_castMosg::Billboard*)g->clone(); // new osg::Billboard(g.get());
 								b->setName("generated Billboard");
-								//b->setMode(osg::Billboard::AXIAL_ROT);
-								//b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
-								//b->setNormal(osg::Vec3(1.0f,0.0f,0.0f));
-								b->setMode(osg::Billboard::POINT_ROT_EYE);
+								b->setMode(osg::Billboard::AXIAL_ROT);
+								b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
+								//b->setNormal(osg::Vec3(0.0f,1.0f,0.0f));
+								//b->setMode(osg::Billboard::POINT_ROT_EYE);
 								//b->setMode(osg::Billboard::POINT_ROT_WORLD);
 								
 								
 								osg::PositionAttitudeTransform *PAT = new osg::PositionAttitudeTransform();
 								model->addChild(PAT);
 								PAT->setPosition(bs.center());
-								
 								
 								
 								// attach the billboard to the group
@@ -309,20 +306,13 @@ void ModelNode::drawModel()
 								for (j=0; j<g->getNumDrawables(); j++)
 								{
 									osg::Drawable *drawable = g->getDrawable(j);
+
+									osg::Vec3 origPos = g->getPosition(j);
+									std::cout << "drawable " << j << " origPos: " <<  origPos.x()<<","<<origPos.y()<<","<<origPos.z() << std::endl;
+																	
 									b->addDrawable(drawable);
-									
 								}
-								
-								// set pivot points of each drawable:
-								for (j=0; j<b->getNumDrawables(); j++)
-								{
-									osg::Vec3 newPos = -bs.center();
-									osg::Vec3 origPos = b->getPosition(j);
-									std::cout << "setting drawable " << j << " from " <<  origPos.x()<<","<<origPos.y()<<","<<origPos.z()<<" to " << newPos.x()<<","<<newPos.y()<<","<<newPos.z()<< std::endl;
-									b->setPosition(j, newPos);
-									//b->setPosition(j, osg::Vec3(0,0,0));
-								}
-								
+							
 								// remove the geode from it's parent(s)
 								n->removeChild(g.get());
 								
@@ -331,8 +321,7 @@ void ModelNode::drawModel()
 						}
 						*/
 						
-						
-						
+
 						
 					} // if (n.valid())
 				} // end for
