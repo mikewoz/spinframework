@@ -529,7 +529,10 @@ static void *spinListenerThread(void *arg)
 	spin.running = true;
 	while (!spin.signalStop)
 	{
-		usleep(200);
+
+		
+		usleep(1000000 * 0.25); // 1/4 second sleep
+		
 		// do nothing (assume the app is doing updates - eg, in a draw loop)
 		
 		// just send a ping so the server knows we are still here

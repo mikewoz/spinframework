@@ -222,7 +222,7 @@ void TextNode::drawText()
 std::vector<lo_message> TextNode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
 
