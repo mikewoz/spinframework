@@ -95,8 +95,9 @@ void TextNode::setText (const char *s)
 		//getText().createUTF8EncodedString();
 		
 		//this->_text = string(s);
+		pthread_mutex_lock(&pthreadLock);
 		textLabel->setText(s);
-
+		pthread_mutex_unlock(&pthreadLock);
 		//drawText();
 
 		BROADCAST(this, "ss", "setText", getText());
@@ -108,7 +109,9 @@ void TextNode::setFont (const char *s)
 	if (this->_font != string(s))
 	{
 		this->_font = string(s);
+		pthread_mutex_lock(&pthreadLock);
 		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
+		pthread_mutex_unlock(&pthreadLock);
 		//drawText();
 
 		BROADCAST(this, "ss", "setFont", getFont());
