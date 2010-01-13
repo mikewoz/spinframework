@@ -72,6 +72,8 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	// By default osgText is not properly rotated for our use. We want the text
 	// to "face" in the direction of the parent's orientation.
 	setOrientation(0,0,180);
+
+	drawText();
 }
 
 // ===================================================================
