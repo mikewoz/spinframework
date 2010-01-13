@@ -108,8 +108,8 @@ void TextNode::setFont (const char *s)
 	if (this->_font != string(s))
 	{
 		this->_font = string(s);
-
-		drawText();
+		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
+		//drawText();
 
 		BROADCAST(this, "ss", "setFont", getFont());
 	}
@@ -130,7 +130,8 @@ void TextNode::setColor (float r, float g, float b, float a)
 {
 	_color = osg::Vec4(r,g,b,a);
 
-	drawText();
+	textLabel->setColor( _color );
+	//drawText();
 
 	BROADCAST(this, "sffff", "setColor", r, g, b, a);
 }
@@ -148,8 +149,10 @@ void TextNode::drawText()
 		textGeode = NULL;
 	}
 
-	// create a new text label if the labelFlag is set:
-	if (1) //(_text.length())
+	bool ignoreOnThisHost = (sceneManager->isSlave() && (host==getHostname()));
+	
+
+	if (!ignoreOnThisHost)
 	{
 		if (_billboard)
 		{
@@ -172,14 +175,11 @@ void TextNode::drawText()
 		}
 		textGeode->setName(string(id->s_name) + ".textGeode");
 		
-		// attach geode and text node:
+		// attach geode and textLabel:
 		this->getAttachmentNode()->addChild(textGeode.get());
-
 		
 		textGeode->addDrawable(textLabel);
 
-		// set text:
-		//textLabel->setText(this->_text);
 
 		// set some parameters for the text:
 		textLabel->setCharacterSize(0.1f);
