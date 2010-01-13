@@ -90,6 +90,16 @@ TextNode::~TextNode()
 // ===================================================================
 
 
+void TextNode::setHost (const char *newvalue)
+{
+	// need to redraw after setHost() is called:
+	if (host != string(newvalue))
+	{
+		ReferencedNode::setHost(newvalue);
+		drawText();
+	}
+}
+
 void TextNode::setText (const char *s)
 {
 	if (textLabel->getText().createUTF8EncodedString() != string(s))

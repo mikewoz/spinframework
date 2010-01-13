@@ -66,7 +66,9 @@ public:
      * We provide several possible shapes
      */
     enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
-    
+
+	virtual void setHost	(const char *newvalue);	
+	
 	void setText			(const char* s);
 	void setFont			(const char* s);
 	void setBillboard		(billboardType t);
