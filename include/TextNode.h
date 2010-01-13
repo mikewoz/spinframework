@@ -42,7 +42,7 @@
 #ifndef __TextNode_H
 #define __TextNode_H
 
-#include "ReferencedNode.h"
+#include "GroupNode.h"
 
 
 #include <osgText/Text>
@@ -54,24 +54,13 @@
  * \brief Provides 3D text rendered in the scene
  *
  */
-class TextNode : public ReferencedNode
+class TextNode : public GroupNode
 {
 
 public:
 
 	TextNode(SceneManager *sceneManager, char *initID);
 	virtual ~TextNode();
-
-	/**
-	 * IMPORTANT:
-	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
-	 * and can also change their attachmentNode so that children are attached
-	 * anywhere in that subgraph. If that is the case, the updateNodePath()
-	 * function MUST be overridden, and extra nodes must be manually pushed onto
-	 * currentNodePath.
-	 */
-	virtual void updateNodePath();
-
 
     /**
      * We provide several possible shapes
@@ -83,29 +72,11 @@ public:
 	void setBillboard		(billboardType t);
 	void setColor			(float red, float green, float blue, float alpha);
 
-    /**
-     * This is a local translational offset from the parent
-     */
-	void setTranslation (float x, float y, float z);
 
-    /**
-     * This is a local orientation offset from the parent
-     */
-	void setOrientation (float pitch, float roll, float yaw);
-
-	 /**
-     * Allows for scaling in each axis
-     */
-	void setScale (float x, float y, float z);
-
-
-	const char *getText() { return _text.c_str(); }
+	const char *getText() { return textLabel->getText().createUTF8EncodedString().c_str(); }
 	const char *getFont() { return _font.c_str(); }
 	int getBillboard() { return (int)_billboard; }
 	osg::Vec4 getColor() { return _color; };
-    osg::Vec3 getTranslation() { return textTransform->getPosition(); };
-	osg::Vec3 getOrientation() { return _orientation; };
-	osg::Vec3 getScale() { return textTransform->getScale(); };
 
 
 	/**
@@ -115,22 +86,14 @@ public:
 	virtual std::vector<lo_message> getState();
 
 
+private:
 
-	std::string _text, _font;
-	
+	std::string _font;
 	billboardType _billboard;
-
 	osg::Vec4 _color;
 
-	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
-
-
-	osg::ref_ptr<osg::PositionAttitudeTransform> textTransform;
-
-
-private:
-	
 	osg::ref_ptr<osg::Geode> textGeode;
+	osg::ref_ptr<osgText::Text> textLabel;
 	
 	void drawText();
 

@@ -57,24 +57,18 @@ extern pthread_mutex_t pthreadLock;
 
 // ===================================================================
 // constructor:
-TextNode::TextNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".TextNode");
 	nodeType = "TextNode";
 
-	textTransform = new osg::PositionAttitudeTransform();
-	textTransform->setName(string(id->s_name) + ".textTransform");
-	this->addChild(textTransform.get());
-	
-	// When children are attached to this, they get added to the attachNode:
-	// NOTE: by changing this, we MUST override the updateNodePath() method!
-	setAttachmentNode(textTransform.get());
-
-	_text = "";
+	//_text = "";
 	_font = "arial.ttf";
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);
 	_billboard = RELATIVE; // ie, no billboard
 
+	textLabel = new osgText::Text();
+	
 	// By default osgText is not properly rotated for our use. We want the text
 	// to "face" in the direction of the parent's orientation.
 	setOrientation(0,0,180);
@@ -89,33 +83,6 @@ TextNode::~TextNode()
 
 // ===================================================================
 
-// IMPORTANT:
-// subclasses of ReferencedNode are allowed to contain complicated subgraphs, and
-// can also change their attachmentNode so that children are attached anywhere
-// in this subgraph. If that is the case, the updateNodePath() function MUST be
-// overridden, and extra nodes must be manually pushed onto the currentNodePath.
-
-void TextNode::updateNodePath()
-{
-	currentNodePath.clear();
-	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
-	{
-		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
-		if (parentNode.valid())
-		{
-			currentNodePath = parentNode->currentNodePath;
-		}
-	}
-
-	// here, the nodePath includes the base osg::group, PLUS the textTransform
-	currentNodePath.push_back(this);
-	currentNodePath.push_back(textTransform.get());
-
-	// now update NodePaths for all children:
-	updateChildNodePaths();
-
-}
-
 // ===================================================================
 // ======================== SET METHODS: =============================
 // ===================================================================
@@ -123,13 +90,14 @@ void TextNode::updateNodePath()
 
 void TextNode::setText (const char *s)
 {
-	if (this->_text != string(s))
+	if (textLabel->getText().createUTF8EncodedString() != string(s))
 	{
 		//getText().createUTF8EncodedString();
 		
-		this->_text = string(s);
+		//this->_text = string(s);
+		textLabel->setText(s);
 
-		drawText();
+		//drawText();
 
 		BROADCAST(this, "ss", "setText", getText());
 	}
@@ -167,35 +135,6 @@ void TextNode::setColor (float r, float g, float b, float a)
 	BROADCAST(this, "sffff", "setColor", r, g, b, a);
 }
 
-// ===================================================================
-
-void TextNode::setTranslation (float x, float y, float z)
-{
-	textTransform->setPosition(osg::Vec3(x,y,z));
-
-	BROADCAST(this, "sfff", "setTranslation", x, y, z);
-}
-
-void TextNode::setOrientation (float p, float r, float y)
-{
-	_orientation = osg::Vec3(p, r, y);
-
-	osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-							 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-							 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-
-	textTransform->setAttitude(q);
-
-	BROADCAST(this, "sfff", "setOrientation", p, r, y);
-}
-
-void TextNode::setScale (float x, float y, float z)
-{
-	textTransform->setScale(osg::Vec3(x,y,z));
-
-	BROADCAST(this, "sfff", "setScale", x, y, z);
-}
-
 // =============================================================================
 void TextNode::drawText()
 {
@@ -210,9 +149,8 @@ void TextNode::drawText()
 	}
 
 	// create a new text label if the labelFlag is set:
-	if (_text.length())
+	if (1) //(_text.length())
 	{
-		
 		if (_billboard)
 		{
 			osg::Billboard *b = new osg::Billboard();
@@ -237,11 +175,11 @@ void TextNode::drawText()
 		// attach geode and text node:
 		this->getAttachmentNode()->addChild(textGeode.get());
 
-		osgText::Text *textLabel = new osgText::Text();
+		
 		textGeode->addDrawable(textLabel);
 
 		// set text:
-		textLabel->setText(this->_text);
+		//textLabel->setText(this->_text);
 
 		// set some parameters for the text:
 		textLabel->setCharacterSize(0.1f);
@@ -284,24 +222,6 @@ std::vector<lo_message> TextNode::getState ()
 	std::vector<lo_message> ret = ReferencedNode::getState();
 
 	lo_message msg;
-	osg::Vec3 v;
-	osg::Vec4 v4;
-
-
-	msg = lo_message_new();
-	v = this->getTranslation();
-	lo_message_add(msg, "sfff", "setTranslation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	v = this->getOrientation();
-	lo_message_add(msg, "sfff", "setOrientation", v.x(), v.y(), v.z());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	v = this->getScale();
-	lo_message_add(msg, "sfff", "setScale", v.x(), v.y(), v.z());
-	ret.push_back(msg);
 
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setText", getText());
@@ -316,7 +236,7 @@ std::vector<lo_message> TextNode::getState ()
 	ret.push_back(msg);
 	
 	msg = lo_message_new();
-	v4 = this->getColor();
+	osg::Vec4 v4 = this->getColor();
 	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());
 	ret.push_back(msg);
 
