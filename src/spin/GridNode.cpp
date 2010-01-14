@@ -171,7 +171,7 @@ void GridNode::drawGrid()
 		gridGeode->addDrawable(gridLines);
 		
 		osgUtil::Optimizer optimizer;
-		optimizer.optimize(gridGeode);
+		optimizer.optimize(gridGeode.get());
 
 		osg::StateSet* stateset = new osg::StateSet;
 		stateset->setMode( GL_LIGHTING, osg::StateAttribute::OFF ); //(GL_LIGHTING, osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF)

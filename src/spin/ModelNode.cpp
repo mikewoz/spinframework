@@ -161,7 +161,7 @@ void ModelNode::drawModel()
 		{
 			
 			if (sceneManager->sharedStateManager.valid())
-				sceneManager->sharedStateManager->share(model);
+				sceneManager->sharedStateManager->share(model.get());
 		
 			
 			// *****************************************************************

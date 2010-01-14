@@ -85,7 +85,7 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
 
 		
 	// add the texture to this (StateSet)
-	this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
+	this->setTextureAttributeAndModes(0, tex.get(), osg::StateAttribute::ON);
 	
 	// turn off lighting 
 	this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);

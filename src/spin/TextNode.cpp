@@ -193,7 +193,7 @@ void TextNode::drawText()
 		// attach geode and textLabel:
 		this->getAttachmentNode()->addChild(textGeode.get());
 		
-		textGeode->addDrawable(textLabel);
+		textGeode->addDrawable(textLabel.get());
 
 
 		// set some parameters for the text:
