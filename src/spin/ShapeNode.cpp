@@ -356,7 +356,7 @@ void ShapeNode::drawTexture()
 		
 		else
 		{
-			addImageTexture(shapeGeode, fullPath);
+			addImageTexture(shapeGeode.get(), fullPath);
 		}
 
 		pthread_mutex_unlock(&pthreadLock);
