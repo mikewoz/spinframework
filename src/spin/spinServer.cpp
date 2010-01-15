@@ -132,6 +132,9 @@ int main(int argc, char **argv)
 	}
 
 	
+	// send a userRefresh message:
+	spin.SceneMessage("s", "userRefresh", LO_ARGS_END);
+	
 	// *************************************************************************
 	// loop:
 	
