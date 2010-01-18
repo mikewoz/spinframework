@@ -77,9 +77,11 @@ public:
 	virtual ~ModelNode();
 
 	virtual void setHost (const char *newvalue);	
-	
 	void setModelFromFile	(const char *filename);
+	void setRenderBin		(int i);
+	
 	const char* getModelFromFile() { return modelPath.c_str(); }
+	int getRenderBin() { return _renderBin; }
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
@@ -116,7 +118,7 @@ private:
 	osgUtil::Optimizer optimizer;
 
 
-
+	int _renderBin;
 };
 
 

@@ -359,6 +359,10 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 				osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
 				if (testNode.valid())
 				{
+					// we check if this node is interactive, or if it has an
+					// owner (since sometimes interactive mode can be unset
+					// before the RELEASE event gets sent)
+					//if ((testNode->getInteractionMode()>0) || (testNode->owner.valid()))
 					if (testNode->getInteractionMode()>0)
 					{
 						// Yes. This is an interactive SPIN node, so add it to 

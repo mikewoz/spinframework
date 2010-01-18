@@ -119,6 +119,20 @@ void ModelNode::setModelFromFile (const char* filename)
 	BROADCAST(this, "ss", "setModelFromFile", getModelFromFile());
 }
 
+void ModelNode::setRenderBin (int i)
+{
+	_renderBin = i;
+
+	if (model.valid())
+	{
+		osg::StateSet *ss = model->getOrCreateStateSet();
+		ss->setRenderBinDetails( (int)_renderBin, "RenderBin");
+	}
+
+	BROADCAST(this, "si", "setRenderBin", _renderBin);
+}
+
+
 // ===================================================================
 // ===================================================================
 // ===================================================================
@@ -446,6 +460,8 @@ void ModelNode::drawModel()
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);
 			//model->setStateSet(modelStateSet);
 
+			osg::StateSet *ss = model->getOrCreateStateSet();
+			ss->setRenderBinDetails( (int)_renderBin, "RenderBin");
 			
 			
 		} else {
@@ -469,6 +485,9 @@ std::vector<lo_message> ModelNode::getState ()
 	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
 	ret.push_back(msg);
 
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
+	ret.push_back(msg);
 	
 	return ret;
 }

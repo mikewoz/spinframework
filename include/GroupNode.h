@@ -107,9 +107,9 @@ public:
 	virtual void debug();
 	
 	void setReportMode(globalsReportMode mode);
-	
-	void setInteractionMode(interactionMode mode);
 
+	void setInteractionMode(interactionMode mode);
+	
 	/**
 	 * Set a clipping rectangle for the model so that geometry outside of the
 	 * region (+-x, +-y, +-z) will not be shown (or used in interactive events)
@@ -214,13 +214,14 @@ public:
 
 	osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
 
+	osg::ref_ptr<UserNode> owner;
+
 
 protected:
 	
 	
 	interactionMode _interactionMode;
-	osg::ref_ptr<UserNode> owner;
-	std::vector<osg::Vec3> _trajectory;
+	std::vector<osg::Vec4> _trajectory;
 	int _drawMod;
 	
 	osg::ref_ptr<osg::ClipNode> clipNode;

@@ -275,17 +275,29 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 						// Take average of stored motion vectors, and set velocity in
 						// that direction. Note: _damping should be set so that node 
 						// gradually stops:
-					
-						vector<osg::Vec3>::iterator it;
+
+						double currentTime = osg::Timer::instance()->time_m();
+
 						osg::Vec3 vel = osg::Vec3(0,0,0);
+						int count = 0;
+
+						vector<osg::Vec4>::iterator it;
 						for (it=_trajectory.begin(); it!=_trajectory.end(); ++it)
 						{
-							vel += (*it);
+							if (currentTime - (*it).w() < 500)
+							{
+								vel += osg::Vec3((*it).x(),(*it).y(),(*it).z());
+								count++;
+							}
 						}
-						vel /= _trajectory.size();
-						vel *= 3; // motion vectors were typically small, so scale
+
+						if (count)
+						{
+							vel /= count;
+							vel *= 10; // motion vectors were typically small, so scale
 					
-						this->setVelocity(vel.x(), vel.y(), vel.z());
+							this->setVelocity(vel.x(), vel.y(), vel.z());
+						}
 					}
 				}
 				break;
@@ -314,9 +326,11 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 					this->setTranslation(newPos.x(), newPos.y(), newPos.z());
 					
 					// save last N motion vectors, so we can setVelocity on RELEASE:
-					_trajectory.insert(_trajectory.begin(), motionVec);
-					if (_trajectory.size() > 5) _trajectory.pop_back();
-					
+					// (note, we use a vec4, and store a time in ms as the 4th value
+					_trajectory.insert(_trajectory.begin(), osg::Vec4(motionVec, osg::Timer::instance()->time_m()));
+					if (_trajectory.size() > 5) {
+						_trajectory.pop_back();
+					}
 				}
 
 				break;
@@ -356,7 +370,6 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				{
 					this->owner = user.get();
 					//std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
-					//BROADCAST(this, "ssi", "select", userString, 1);
 					BROADCAST(this, "ss", "owner", owner->id->s_name);
 				}
 				break;
@@ -369,7 +382,6 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 				{
 					//std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
 					this->owner = NULL;
-					//BROADCAST(this, "ssi", "select", userString, 0);
 					BROADCAST(this, "ss", "owner", "NULL");
 				}
 				break;
@@ -421,8 +433,22 @@ void GroupNode::setInteractionMode (interactionMode mode)
 {
 	if (this->_interactionMode != (int)mode)
 	{
+
+		// if this node previously had an owner, it will be lost with the change
+		// of mode
+		if (this->owner.valid())
+		{
+			this->owner = NULL;
+			BROADCAST(this, "ss", "owner", "NULL");
+		} else if (_interactionMode == DRAW)
+		{
+			BROADCAST(this, "ssifff", "draw", "NULL", 0, 0.0f, 0.0f, 0.0f);
+		}
+
 		this->_interactionMode = mode;
 
+		
+		
 		// set the node mask so that an intersection visitor will only test
 		// for interactive nodes (note: nodemask info in spinUtil.h)
 		if ((int)_interactionMode > 0)
