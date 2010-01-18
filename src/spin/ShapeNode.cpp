@@ -400,7 +400,7 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 
 		// Disable depth testing so geometry is drawn regardless of depth values
 		// of geometry already draw.
-		ss->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
+		//ss->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
 
 		// Disable lighting:
 		//ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
