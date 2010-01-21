@@ -78,6 +78,8 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	this->setName(string(id->s_name) + ".ModelNode");
 	nodeType = "ModelNode";
 
+    _renderBin = 10;
+
 	modelPath = "NULL";
 
 
@@ -460,7 +462,11 @@ void ModelNode::drawModel()
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);
 			//model->setStateSet(modelStateSet);
 
+
 			osg::StateSet *ss = model->getOrCreateStateSet();
+
+            // Should we override our _renderBin value using ss->getBinNumber(),
+            // or shoudld we apply our currently stored _renderBin to the model?
 			ss->setRenderBinDetails( (int)_renderBin, "RenderBin");
 			
 			
