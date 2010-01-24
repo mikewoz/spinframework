@@ -57,7 +57,7 @@
 
 #include <osgDB/WriteFile>
 
-
+#include <osgUtil/Optimizer>
 
 #include <osgIntrospection/Reflection>
 #include <osgIntrospection/Type>
@@ -573,18 +573,28 @@ void SceneManager::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
 {
 	if (!txServ) return;
 
+	/*
+	lo_timetag now;
+	lo_timetag_now(&now);
+	now.sec += 1;
+	lo_bundle b = lo_bundle_new(now);
+	 */
+
 	lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
 	
 	vector<lo_message>::iterator iter = msgs.begin();
 	while (iter != msgs.end())
 	{
+		//lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
 		lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
 		msgs.erase(iter); // iterator automatically advances after erase()
 	}
 
 	lo_send_bundle_from(txAddr, txServ, b);
+	//lo_send_bundle(txAddr, b);
 
 	lo_bundle_free_messages(b);
+	
 }
 
 /*
@@ -1378,8 +1388,19 @@ void SceneManager::exportScene (const char *nodeID, const char *filename)
 	std:: string fullPath = string(filename);
 	if (fullPath.substr(fullPath.size()-4) != ".osg") fullPath += ".osg";
 
+	// need a TextureVisitor to go over the graph and undo the unref on textures
+	osgUtil::Optimizer::TextureVisitor texVisitor(true, false, false, false, false, 1.0);
+	// TextureVisitor tv(true,true, // unref image 
+    //false,false, // client storage
+    //false,1.0, // anisotropic filtering
+    //this );
+
+	// 
+	
+	
 	if (strcmp(nodeID,"world")==0)
 	{
+		worldNode->accept(texVisitor);
 		osgDB::writeNodeFile(*worldNode.get(), fullPath);
 		std::cout << "Exported entire scene to: " << fullPath << std::endl;
 	}
@@ -1387,6 +1408,7 @@ void SceneManager::exportScene (const char *nodeID, const char *filename)
 		osg::ref_ptr<ReferencedNode> subgraph = getNode(nodeID);
 		if (subgraph.valid())
 		{
+			subgraph->accept(texVisitor);
 			osgDB::writeNodeFile(*subgraph.get(), fullPath);
 			std::cout << "Exported subgraph starting at node '" << subgraph->id->s_name << "' to: " << fullPath << std::endl;
 		}
