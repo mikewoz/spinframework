@@ -44,6 +44,8 @@
 
 #include <osg/MatrixTransform>
 #include <osgManipulator/Dragger>
+#include <osgManipulator/Selection>
+#include <osgManipulator/CommandManager>
 #include <osgUtil/LineSegmentIntersector>
 
 #include "ReferencedNode.h"
