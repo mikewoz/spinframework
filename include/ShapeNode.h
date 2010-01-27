@@ -83,12 +83,14 @@ public:
 	void setColor			(float red, float green, float blue, float alpha);
 	void setTextureFromFile	(const char* filename);
 	void setRenderBin		(int i);
+	void setLighting		(int i);
 
 
 	int getShape() { return (int)shape; }
 	int getBillboard() { return (int)billboard; }
 	osg::Vec4 getColor() { return _color; };
 	int getRenderBin() { return renderBin; }
+	int getLighting() { return (int)lightingEnabled; }
 
 	
 	//void addSharedVideoTexture(osg::Node *n, std::string shID);
@@ -113,6 +115,7 @@ public:
 	std::string texturePath;
 
 	int renderBin;
+	bool lightingEnabled;
 
 	//osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
 

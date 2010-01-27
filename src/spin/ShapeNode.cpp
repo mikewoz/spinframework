@@ -73,6 +73,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
 	renderBin = 11;
+	lightingEnabled = true;
 
 }
 
@@ -159,6 +160,21 @@ void ShapeNode::setRenderBin (int i)
 	BROADCAST(this, "si", "setRenderBin", renderBin);
 }
 
+void ShapeNode::setLighting (int i)
+{
+
+	lightingEnabled = (bool)i;
+
+	if (shapeGeode.valid())
+	{
+		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+	}
+
+	BROADCAST(this, "si", "setLighting", getLighting());
+
+}
 
 // ===================================================================
 void ShapeNode::drawShape()
@@ -288,7 +304,8 @@ void ShapeNode::drawShape()
 		ss->setMode( GL_BLEND, osg::StateAttribute::ON );
 		ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
-		
+		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 		
 		this->getAttachmentNode()->addChild(shapeGeode.get());
 		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
@@ -450,6 +467,10 @@ std::vector<lo_message> ShapeNode::getState ()
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setLighting", getLighting());
 	ret.push_back(msg);
 
 	// put this one last:	
