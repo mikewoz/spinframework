@@ -150,14 +150,25 @@ void SoundNode::setIntensity (float newvalue)
 	if (g > 1.0) g=1.0;
 	currentSoundColor = osg::Vec3(r, g, 0.0);
 	
+
 	// too heavy!:
 	
-	drawVUmeter();
-	drawLaser();
+	//drawVUmeter();
+	//drawLaser();
 	
-	
-	/*
-	if (this->getAttachmentNode()->containsNode(VUmeterTransform.get()) )
+	updateVUmeter();
+	updateLaser();
+
+	BROADCAST(this, "sf", "setIntensity", currentSoundIntensity);
+}
+
+// -----------------------------------------------------------------------------
+// Update methods:
+
+void SoundNode::updateVUmeter ()
+{
+
+	if (VUmeterTransform.valid())
 	{
 		
 		for (int i=0; i<VUmeterTransform->getNumChildren(); i++)
@@ -168,23 +179,36 @@ void SoundNode::setIntensity (float newvalue)
 			{
 				for (int j=0; j<tmpGeode->getNumDrawables(); j++)
 				{
-					osg::ref_ptr<osg::ShapeDrawable> tmpDrawable = dynamic_cast<osg::ShapeDrawable*>(tmpGeode->getDrawable(j));
-					if (tmpDrawable.valid())
-						tmpDrawable->setColor( osg::Vec4(currentSoundColor, 1.0) );
+					osg::ShapeDrawable *s = dynamic_cast<osg::ShapeDrawable*>(tmpGeode->getDrawable(j));
+					if (s) s->setColor( osg::Vec4(currentSoundColor, VUmeterFlag) );
 				}
 			}
 		}
+
+		VUmeterTransform->setScale( osg::Vec3(1, 1, 1 + currentSoundIntensity) );
+
 	}
-	*/
-	
-	
-	BROADCAST(this, "sf", "setIntensity", currentSoundIntensity);
+}
+
+void SoundNode::updateLaser()
+{
+
+	if (laserGeode.valid())
+	{
+		for (int j=0; j<laserGeode->getNumDrawables(); j++)
+		{
+			osg::ShapeDrawable *s = dynamic_cast<osg::ShapeDrawable*>(laserGeode->getDrawable(j));
+			if (s) s->setColor( osg::Vec4(currentSoundColor, laserFlag) );
+		}
+	}
 }
 
 
-// ===================================================================
-// ======================= DRAW METHODS: =============================
-// ===================================================================
+
+
+
+// -----------------------------------------------------------------------------
+// DRAW METHODS:
 
 void SoundNode::drawVUmeter()
 {
@@ -204,6 +228,7 @@ void SoundNode::drawVUmeter()
 		osg::StateSet* VUmeterStateSet = new osg::StateSet();
 		VUmeterStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
 		VUmeterStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF);
+		VUmeterStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
 		osg::Geode *VUmeterBaseGeode = new osg::Geode();
 		osg::Geode *VUmeterCapGeode = new osg::Geode();
@@ -211,13 +236,12 @@ void SoundNode::drawVUmeter()
 		osg::TessellationHints* hints = new osg::TessellationHints;
 		hints->setDetailRatio(0.5f);
 		
-		osg::ShapeDrawable* VUmeterBaseDrawable = new osg::ShapeDrawable(new osg::Capsule(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.1, AS_UNIT_SCALE),hints);
-		VUmeterBaseDrawable->setColor( osg::Vec4(currentSoundColor, VUmeterFlag) );
+		//osg::ShapeDrawable* VUmeterBaseDrawable = new osg::ShapeDrawable(new osg::Capsule(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.1, AS_UNIT_SCALE),hints);
+		osg::ShapeDrawable* VUmeterBaseDrawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.1, AS_UNIT_SCALE),hints);
 		VUmeterBaseGeode->setStateSet( VUmeterStateSet );
 		VUmeterBaseGeode->addDrawable( VUmeterBaseDrawable );
 	
-		osg::ShapeDrawable *VUmeterCapDrawable = new osg::ShapeDrawable(new osg::Cone(osg::Vec3(0.0f,0.0f,AS_UNIT_SCALE*.5),AS_UNIT_SCALE*.2,AS_UNIT_SCALE*.2),hints);
-		VUmeterCapDrawable->setColor( osg::Vec4(currentSoundColor, VUmeterFlag) );
+		osg::ShapeDrawable *VUmeterCapDrawable = new osg::ShapeDrawable(new osg::Cone(osg::Vec3(0.0f,0.0f,AS_UNIT_SCALE*.5+AS_UNIT_SCALE*.05),AS_UNIT_SCALE*.2,AS_UNIT_SCALE*.2),hints);
 		VUmeterCapGeode->setStateSet(VUmeterStateSet );
 		VUmeterCapGeode->addDrawable(VUmeterCapDrawable);
 		
@@ -225,7 +249,8 @@ void SoundNode::drawVUmeter()
 		VUmeterTransform->addChild(VUmeterBaseGeode);
 		VUmeterTransform->addChild(VUmeterCapGeode);
 			
-		VUmeterTransform->setScale( osg::Vec3(1, 1, 1 + currentSoundIntensity) );
+		// set the scale/color according to the current sound intensity:
+		updateVUmeter();
 
 		VUmeterTransform->setName(string(id->s_name) + ".VUmeterTransform");
 		this->getAttachmentNode()->addChild(VUmeterTransform.get());
@@ -328,7 +353,6 @@ void SoundNode::drawLaser()
 		osg::TessellationHints* hints = new osg::TessellationHints;
 		hints->setDetailRatio(GENERIC_SHAPE_RESOLUTION);
 		osg::ShapeDrawable* laserDrawable = new osg::ShapeDrawable(laser,hints);
-		laserDrawable->setColor( osg::Vec4(currentSoundColor, laserFlag) );
 		laserGeode->addDrawable(laserDrawable);
 		
 		// turn off lighting effects:
@@ -336,6 +360,9 @@ void SoundNode::drawLaser()
 		laserStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF);			
 		laserGeode->setStateSet ( laserStateSet );
 		
+		// update the color based on the current sound intensity:
+		updateLaser();
+
 		// add it to the node:
 		this->getAttachmentNode()->addChild( laserGeode.get() );
 	}

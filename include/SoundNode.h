@@ -86,6 +86,9 @@ class SoundNode : public DSPNode
 		float getDirectivityFlag() { return directivityFlag; }
 		float getLaserFlag() { return laserFlag; }
 		
+		void updateVUmeter();
+		void updateLaser();
+
 		
 		// DRAW methods:
 		void drawVUmeter();
