@@ -208,10 +208,9 @@ void DSPNode::disconnect(const char *snk)
 		
 		// now delete the actual object:
 		delete conn;
-		
-	}
 
-	BROADCAST(this, "ss", "disconnect", snk);
+		BROADCAST(this, "ss", "disconnect", snk);
+	}
 }
 
 
