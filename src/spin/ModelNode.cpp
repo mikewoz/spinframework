@@ -97,12 +97,12 @@ ModelNode::~ModelNode()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
-void ModelNode::setHost (const char *newvalue)
+void ModelNode::setContext (const char *newvalue)
 {
-	// need to redraw after setHost() is called:
-	if (host != string(newvalue))
+	// need to redraw after setContext() is called:
+	if (this->contextString != string(newvalue))
 	{
-		ReferencedNode::setHost(newvalue);
+		ReferencedNode::setContext(newvalue);
 		drawModel();
 	}
 }
@@ -165,7 +165,7 @@ void ModelNode::drawModel()
 		}
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (host==getHostname()));
+	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
 	
 	if ((modelPath != string("NULL")) && !ignoreOnThisHost)
 	{

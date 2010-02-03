@@ -157,17 +157,17 @@ public:
 	 * A node can 'belong' to a certain host machine, allowing it to be rendered
 	 * or behave differently than on other machines.
 	 *
-	 * NOTE: the "NULL" string means that it belongs to no host.
+	 * NOTE: the "NULL" string means that it belongs to no specific context.
 	 *
 	 * NOTE: a scene operating in SERVER_MODE will always create the node, so
 	 * this feature is only really relevant for clients applications.
 	 */
-	virtual void setHost (const char *newvalue);
+	virtual void setContext (const char *newvalue);
 	
 	/**
 	 * Returns the current host
 	 */
-	const char *getHost() { return host.c_str(); }
+	const char *getContext() { return contextString.c_str(); }
 	
 	void setParam (const char *paramName, const char *paramValue);
 	void setParam (const char *paramName, float paramValue);
@@ -205,7 +205,7 @@ public:
 	t_symbol *id;
 	std::string nodeType;
 
-	std::string host;
+	std::string contextString;
 
 	int pd_mail_id;
 	lo_method oscHandler;

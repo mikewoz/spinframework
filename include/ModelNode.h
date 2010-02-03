@@ -76,7 +76,7 @@ public:
 	ModelNode (SceneManager *sceneManager, char *initID);
 	virtual ~ModelNode();
 
-	virtual void setHost (const char *newvalue);	
+	virtual void setContext (const char *newvalue);
 	void setModelFromFile	(const char *filename);
 	void setRenderBin		(int i);
 	

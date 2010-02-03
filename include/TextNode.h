@@ -67,7 +67,7 @@ public:
      */
     enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
 
-	virtual void setHost	(const char *newvalue);	
+	virtual void setContext	(const char *newvalue);
 	
 	void setText			(const char* s);
 	void setFont			(const char* s);

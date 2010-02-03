@@ -63,7 +63,7 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
 
 	nodeType = "ReferencedNode";
 
-	host = "NULL";
+	contextString = "NULL";
 
 	this->setName(string(id->s_name) + ".ReferencedNode");
 
@@ -327,12 +327,12 @@ void ReferencedNode::setParent (const char *newvalue)
 	}
 }
 
-void ReferencedNode::setHost (const char *newvalue)
+void ReferencedNode::setContext (const char *newvalue)
 {
-	if (host != string(newvalue))
+	if (contextString != string(newvalue))
 	{
-		host = string(newvalue);
-		BROADCAST(this, "ss", "setHost", getHost());
+		contextString = string(newvalue);
+		BROADCAST(this, "ss", "setContext", getContext());
 	}
 }
 
@@ -410,7 +410,7 @@ std::vector<lo_message> ReferencedNode::getState ()
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setHost", this->getHost());
+	lo_message_add(msg, "ss", "setContext", this->getContext());
 	ret.push_back(msg);
 	
 	stringParamType::iterator stringIter;

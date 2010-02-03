@@ -138,13 +138,14 @@ SoundConnection *DSPNode::getConnection(const char *snk)
 void DSPNode::connect(DSPNode *snk)
 {
 	// check if this connection already exists:
-	if (this->getConnection(snk)) return;
-	
-	SoundConnection *conn = new SoundConnection(this->sceneManager, this, snk);
-	
-	// add to the connection lists for each node:
-	this->connectTO.push_back(conn);
-	conn->sink->connectFROM.push_back(conn);
+	if (!this->getConnection(snk))
+	{
+		SoundConnection *conn = new SoundConnection(this->sceneManager, this, snk);
+
+		// add to the connection lists for each node:
+		this->connectTO.push_back(conn);
+		conn->sink->connectFROM.push_back(conn);
+	}
 	
 	BROADCAST(this, "ss", "connect", snk->id->s_name);
 }
@@ -168,7 +169,6 @@ void DSPNode::disconnect(const char *snk)
 	
 	// check if this connection already exists:
 	SoundConnection *conn = this->getConnection(dynamic_cast<DSPNode*>( sceneManager->getNode(snk) ));
-	
 
 	if (conn)
 	{
@@ -209,8 +209,9 @@ void DSPNode::disconnect(const char *snk)
 		// now delete the actual object:
 		delete conn;
 		
-		BROADCAST(this, "ss", "disconnect", snk);
 	}
+
+	BROADCAST(this, "ss", "disconnect", snk);
 }
 
 

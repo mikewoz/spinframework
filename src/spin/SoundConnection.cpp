@@ -66,7 +66,7 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	distanceEffect = 100.0;
 	rolloffEffect = 100.0;
 	dopplerEffect = 100.0;
-	diffractionEffect = 0.0;
+	diffractionEffect = 100.0;
 	//proximityEffect = 0.0;
 	//headEffect = 0.0;
 

@@ -90,12 +90,12 @@ TextNode::~TextNode()
 // ===================================================================
 
 
-void TextNode::setHost (const char *newvalue)
+void TextNode::setContext (const char *newvalue)
 {
-	// need to redraw after setHost() is called:
-	if (host != string(newvalue))
+	// need to redraw after setContext() is called:
+	if (this->contextString != string(newvalue))
 	{
-		ReferencedNode::setHost(newvalue);
+		ReferencedNode::setContext(newvalue);
 		drawText();
 	}
 }
@@ -164,7 +164,7 @@ void TextNode::drawText()
 		textGeode = NULL;
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (host==getHostname()));
+	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
 	
 
 	if (!ignoreOnThisHost)

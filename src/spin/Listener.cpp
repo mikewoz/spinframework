@@ -51,7 +51,7 @@ Listener::Listener (SceneManager *sceneManager, char *initID) : SoundNode(sceneM
 {
 	nodeType = "Listener";
 	this->setPlugin("listener-stereo~");
-	type = "listener-stereo.connn~";
+	type = "listener-stereo.conn~";
 	this->setName(string(id->s_name) + ".Listener");
 }
 
