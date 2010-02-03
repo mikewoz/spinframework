@@ -207,6 +207,11 @@ public:
 	 */
 	virtual std::vector<lo_message> getState();
 
+	/**
+	 * We override stateDump so that we can additionally force a dumpGlobals()
+	 * call whenever a dump is requested
+	 */
+	virtual void stateDump();
 
 
 	// ***********************************************************

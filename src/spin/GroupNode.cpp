@@ -652,6 +652,11 @@ bool GroupNode::dumpGlobals(bool forced)
 	return false;
 }
 
+void GroupNode::stateDump ()
+{
+	ReferencedNode::stateDump();
+	dumpGlobals(true);
+}
 
 // *****************************************************************************
 
