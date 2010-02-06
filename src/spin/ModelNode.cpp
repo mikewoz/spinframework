@@ -100,11 +100,8 @@ ModelNode::~ModelNode()
 void ModelNode::setContext (const char *newvalue)
 {
 	// need to redraw after setContext() is called:
-	if (this->contextString != string(newvalue))
-	{
-		ReferencedNode::setContext(newvalue);
-		drawModel();
-	}
+	ReferencedNode::setContext(newvalue);
+	drawModel();
 }
 
 void ModelNode::setModelFromFile (const char* filename)

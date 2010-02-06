@@ -93,11 +93,8 @@ TextNode::~TextNode()
 void TextNode::setContext (const char *newvalue)
 {
 	// need to redraw after setContext() is called:
-	if (this->contextString != string(newvalue))
-	{
-		ReferencedNode::setContext(newvalue);
-		drawText();
-	}
+	ReferencedNode::setContext(newvalue);
+	drawText();
 }
 
 void TextNode::setText (const char *s)

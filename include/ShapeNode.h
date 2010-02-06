@@ -77,6 +77,8 @@ public:
     enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
     enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
     
+    virtual void setContext (const char *newvalue);
+
 	void setShape			(shapeType t);
 	void setBillboard		(billboardType t);
 

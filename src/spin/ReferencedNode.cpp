@@ -329,11 +329,8 @@ void ReferencedNode::setParent (const char *newvalue)
 
 void ReferencedNode::setContext (const char *newvalue)
 {
-	if (contextString != string(newvalue))
-	{
-		contextString = string(newvalue);
-		BROADCAST(this, "ss", "setContext", getContext());
-	}
+	contextString = string(newvalue);
+	BROADCAST(this, "ss", "setContext", getContext());
 }
 
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)

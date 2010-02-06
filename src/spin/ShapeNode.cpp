@@ -88,6 +88,12 @@ ShapeNode::~ShapeNode()
 // ======================== SET METHODS: =============================
 // ===================================================================
 
+void ShapeNode::setContext (const char *newvalue)
+{
+	// need to redraw after setContext() is called:
+	ReferencedNode::setContext(newvalue);
+	drawShape();
+}
 
 void ShapeNode::setShape (shapeType t)
 {

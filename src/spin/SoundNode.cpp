@@ -403,6 +403,12 @@ std::vector<lo_message> SoundNode::getState ()
 	lo_message_add(msg, "sf", "setIntensity", currentSoundIntensity);
 	ret.push_back(msg);
 	
+	// have to re-send setContext AFTER setPlugin, so that loaded plugins will
+	// have the up-to-date parameter
+	msg = lo_message_new();
+	lo_message_add(msg, "ss", "setContext", getContext());
+	ret.push_back(msg);
+
 	
 	
 	return ret;
