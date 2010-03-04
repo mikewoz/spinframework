@@ -170,6 +170,7 @@ int main(int argc, char **argv)
 
 	viewer.getUsage(*arguments.getApplicationUsage());
 
+
 	// *************************************************************************
 	// start the listener thread:
 
@@ -193,6 +194,8 @@ int main(int argc, char **argv)
     osg::ref_ptr<osgViewer::View> view = new osgViewer::View;
     viewer.addView(view.get());
 
+    view->getCamera()->setClearColor(osg::Vec4(0.0,0.0,0.0,0.0));
+
     if (fullscreen)
     {
     	if (screen<0) view->setUpViewAcrossAllScreens();
@@ -211,7 +214,7 @@ int main(int argc, char **argv)
     	(*wIter)->setWindowName("spinViewer");
 		if (hideCursor) (*wIter)->useCursor(false);
     }
-    
+
     view->setSceneData(spin.sceneManager->rootNode.get());
 
 	view->addEventHandler(new osgViewer::StatsHandler);
