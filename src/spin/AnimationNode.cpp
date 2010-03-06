@@ -209,31 +209,46 @@ void AnimationNode::setLoopMode (LoopMode mode)
 
 void AnimationNode::setTranslation (float x, float y, float z)
 {
-	// first, call the parent method
-	GroupNode::setTranslation(x,y,z);
+	osg::Vec3 newTranslation = osg::Vec3(x,y,z);
 	
-	// now, if _record mode is set, store the updated position
-	if (_record) storeCurrentPosition();
+	if (newTranslation != getTranslation())
+	{
+		// first, call the parent method
+		GroupNode::setTranslation(x,y,z);
+
+		// now, if _record mode is set, store the updated position
+		if (_record) storeCurrentPosition();
+	}
 }
 
 void AnimationNode::setOrientation (float p, float r, float y)
 {
-	// first, call the parent method
-	GroupNode::setOrientation(p,r,y);
+	osg::Vec3 newOrientation = osg::Vec3(p, r, y);
 	
-	// now, if _record mode is set, store the updated position
-	if (_record) storeCurrentPosition();
+	if (newOrientation != getOrientation())
+	{
+		// first, call the parent method
+		GroupNode::setOrientation(p,r,y);
+
+		// now, if _record mode is set, store the updated position
+		if (_record) storeCurrentPosition();
+	}
 }
 
 void AnimationNode::setScale (float x, float y, float z)
 {
-	// first, call the parent method
-	GroupNode::setScale(x,y,z);
-	
-	// now, if _record mode is set, store the updated position
-	if (_record) storeCurrentPosition();
-}
+	osg::Vec3 newScale = osg::Vec3(x,y,z);
 
+	if (newScale != getScale())
+	{
+		// first, call the parent method
+		GroupNode::setScale(x,y,z);
+
+		// now, if _record mode is set, store the updated position
+		if (_record) storeCurrentPosition();
+	}
+}
+	
 // *****************************************************************************
 
 void AnimationNode::storeCurrentPosition()
