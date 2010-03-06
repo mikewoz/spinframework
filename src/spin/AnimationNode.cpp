@@ -68,7 +68,7 @@ AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupN
 	_animationPath = new osg::AnimationPath;
 	_animationPath->setLoopMode(osg::AnimationPath::LOOP);
 	
-	lastTick = osg::Timer::instance()->tick();
+	_lastTick = osg::Timer::instance()->tick();
 	
 	/*
 	_animationPathCallback = new osg::AnimationPathCallback(_animationPath.get(),0.0,1.0);
@@ -95,16 +95,16 @@ AnimationNode::~AnimationNode()
 void AnimationNode::callbackUpdate()
 {
 
-    if ( !sceneManager->isSlave() && getPlay() && !_animationPath->empty())
+	if ( !sceneManager->isSlave() && getPlay() && !_animationPath->empty())
 	{
-	    osg::Timer_t tick = osg::Timer::instance()->tick();
+		osg::Timer_t tick = osg::Timer::instance()->tick();
 		float dt = osg::Timer::instance()->delta_s(_lastTick,tick);
 		
 		//if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
 		if (dt > (1/_updateRate)) 
 		{
 			doUpdate(osg::Timer::instance()->delta_s(_startTime,tick));
-			lastTick = tick;
+			_lastTick = tick;
 		}
 	}
 
@@ -145,7 +145,7 @@ bool AnimationNode::doUpdate(double timestamp)
 
 void AnimationNode::setIndex (float index)
 {
-	setPlay(0);
+	//setPlay(0);
 	setRecord(0);
 
 	// make sure index is in normalized range [0,1]:
@@ -155,6 +155,8 @@ void AnimationNode::setIndex (float index)
 	double scale = _animationPath->getLastTime() - _animationPath->getFirstTime();
 
 	doUpdate(index * scale);
+	
+	BROADCAST(this, "sf", "setIndex", index);
 }
 
 
