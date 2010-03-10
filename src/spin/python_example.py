@@ -12,7 +12,11 @@ class spinClient(pySpinContext):
 		print "in python sceneCallback"
 		print d
 
-spin = spinClient(pySpinContext.mode.LISTENER_MODE)
+# old way before singleton:
+#spin = spinClient(pySpinContext.mode.LISTENER_MODE)
+
+spin = spinClient()
+
 
 spin.start()
 
