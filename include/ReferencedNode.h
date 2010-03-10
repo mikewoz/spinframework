@@ -264,7 +264,7 @@ private:
 	
 	/**
 	 * The node that children get attached to:
-	/* We keep it private to force the use of setAttachmentNode(), which results
+	 * We keep it private to force the use of setAttachmentNode(), which results
 	 * in an update of the currentNodePath.
 	 */
 	osg::Group *attachmentNode;

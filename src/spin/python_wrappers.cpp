@@ -66,11 +66,15 @@
 using namespace boost::python;
 
 
-class pySpinContext : public spinContext
+// before singleton
+//class pySpinContext // : public spinContext
+class pySpinContext
 {
 	
 	public:
-		pySpinContext(PyObject *s, const spinContext& x) : spinContext(x), self(s) {}
+		//pySpinContext(PyObject *s, const spinContext& x) : spinContext(x), self(s) {}
+		pySpinContext() {
+		}
 		virtual ~pySpinContext() {}
 		
 		virtual bool start();
@@ -107,6 +111,7 @@ void (pySpinContext::*sendNodeMessage_fromPython)(PyObject* list) = &pySpinConte
 
 int sceneCallback_wrapped(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
+
 	pySpinContext *spin = (pySpinContext*) user_data;
 
 	if (!spin) return 1;
@@ -161,12 +166,13 @@ int sceneCallback_wrapped(const char *path, const char *types, lo_arg **argv, in
 
 bool pySpinContext::start()
 {
+	spinContext &spin = spinContext::Instance();
 	
-	if (spinContext::start())
+	if (spin.start())
 	{
 		// now, register our additional callbacks:
-		std::string OSCpath = std::string("/SPIN/") + this->id;
-		std::cout << "registering callback for " << OSCpath << " on " << lo_server_get_url(lo_server_thread_get_server(this->sceneManager->rxServ)) << std::endl;
+		std::string OSCpath = std::string("/SPIN/") + spin.id;
+		std::cout << "registering callback for " << OSCpath << " on " << lo_server_get_url(lo_server_thread_get_server(spin.sceneManager->rxServ)) << std::endl;
 		
 		//lo_server_thread_add_method(this->sceneManager->rxServ, OSCpath.c_str(), NULL, sceneCallback_wrapped, (void*)this);
 		
@@ -180,6 +186,8 @@ bool pySpinContext::start()
 
 void pySpinContext::sendInfoMessage(PyObject* list)
 {
+	spinContext &spin = spinContext::Instance();
+
 	// ensure 1st argument is an OSC string:
 	PyObject *oscPath = PyList_GetItem(list, 0);
 	if (!PyString_Check(oscPath))
@@ -190,17 +198,20 @@ void pySpinContext::sendInfoMessage(PyObject* list)
 	
 	// pass the list, minus the 1st item:
 	lo_message msg = lo_message_from_PyList(PyList_GetSlice(list, 1, PyList_Size(list)));
-	spinContext::sendNodeMessage(extract<char*>(oscPath), msg);
+	spin.NodeMessage(extract<char*>(oscPath), msg);
 }
 
 void pySpinContext::sendSceneMessage(PyObject* list)
 {
+	spinContext &spin = spinContext::Instance();
 	lo_message msg = lo_message_from_PyList(list);
-	spinContext::sendSceneMessage(msg);
+	spin.SceneMessage(msg);
 }
 
 void pySpinContext::sendNodeMessage(PyObject* list)
 {
+	spinContext &spin = spinContext::Instance();
+
 	// ensure 1st argument is a node name (ie, a string):
 	PyObject *nodeName = PyList_GetItem(list, 0);
 	if (!PyString_Check(nodeName))
@@ -211,7 +222,7 @@ void pySpinContext::sendNodeMessage(PyObject* list)
 
 	// pass the list, minus the 1st item:
 	lo_message msg = lo_message_from_PyList(PyList_GetSlice(list, 1, PyList_Size(list)));
-	spinContext::sendNodeMessage(extract<char*>(nodeName), msg);
+	spin.NodeMessage(extract<char*>(nodeName), msg);
 }
 
 lo_message pySpinContext::lo_message_from_PyList(PyObject *list)
@@ -271,8 +282,9 @@ BOOST_PYTHON_MODULE(spinFramework)
 	} // close scope for spinContext
 */
 	 
-	scope in_pySpinContext = class_< spinContext, pySpinContext >( "pySpinContext", init<const spinContext::spinContextMode&>() )
-	//scope in_pySpinContext = class_< pySpinContext, bases<spinContext> >("pySpinContext", init<spinContext::spinContextMode>())
+	scope in_pySpinContext = class_< pySpinContext >( "pySpinContext" )
+	//old way before singleton:
+	//scope in_pySpinContext = class_< spinContext, pySpinContext >( "pySpinContext", init<const spinContext::spinContextMode&>() )
 		
 		.def("sendInfoMessage", sendInfoMessage_fromPython)
 		.def("sendSceneMessage", sendSceneMessage_fromPython)
