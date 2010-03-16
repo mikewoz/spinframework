@@ -5,4 +5,4 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src/genwrapper src/tinyxml src/osgWrappers src/spin
 
-INCLUDES = src/tinyxml src/mivilleEngine
+INCLUDES = src/tinyxml
