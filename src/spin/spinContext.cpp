@@ -151,7 +151,7 @@ spinContext::spinContext()
     }
     catch (osgIntrospection::Exception & ex)
 	{    	
-		std::cout << "ERROR: " << ex.what() << ". This is likely a dynamic library problem. Make sure that libSPINwrappers exists and can be found." << std::endl;
+		std::cout << "ERROR: " << ex.what() << ". This is likely a dynamic library problem. Make sure that libSPIN exists and can be found." << std::endl;
 		exit(1);
 	}
 	

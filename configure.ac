@@ -4,7 +4,7 @@
 AC_PREREQ([2.61])
 AC_INIT([SPINFramework], [0.2])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
 AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -49,21 +49,31 @@ PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.0)
 #AC_SUBST(LIBXML_LIBS)
 #AC_SUBST(LIBXML_CFLAGS)
 
+# Checks for header files.
+AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
+
+
 # Check for Python:
 AX_PYTHON
 
 # Check for boost:
 AX_BOOST_BASE([1.35])
 AX_BOOST_REGEX
-
-# Checks for header files.
-AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
-
-
-# Checks for library functions.
-AC_FUNC_ERROR_AT_LINE
-AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
-
+if test "x${ax_cv_boost_regex}" = "xno" ; then
+    AC_MSG_ERROR([missing package: libboost-regex-dev])
+fi
+AX_BOOST_FILESYSTEM
+if test "x${ax_cv_boost_filesystem}" = "xno" ; then
+        AC_MSG_ERROR([missing package: libboost-filesystem-dev])
+fi
+AX_BOOST_THREAD
+if test "x${ax_cv_boost_thread}" = "xno" ; then
+    AC_MSG_ERROR([missing package: libboost-thread-dev])
+fi
 
 
 # Check for OpenSceneGraph:
@@ -94,7 +104,7 @@ AC_ARG_ENABLE([scenic],
 	[with_scenic=$enableval],
 	[with_scenic=no])
 AS_IF([test "x$with_scenic" = "xyes"],
-	AC_CHECK_LIB(shared_video, SharedVideoBuffer, SHARED_VIDEO_LIB="-lshared_video" , AC_MSG_ERROR([missing Scenic shared_video library]),)
+	AC_CHECK_LIB(shared_video, SharedVideoBuffer, SHARED_VIDEO_LIB="-lshared_video"; AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]), AC_MSG_ERROR([missing Scenic shared_video library]),)
 	[with_scenic=no])
 
 #AC_MSG_CHECKING([for Scenic shared_video support])

@@ -1,14 +1,19 @@
-AM_CPPFLAGS = $(all_includes)
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml
 
 # use noinst_LIBRARIES to create a library that won't be installed
-noinst_LIBRARIES = libSPINwrappers.a
+noinst_LTLIBRARIES = libSPINwrappers.la
+#noinst_LIBRARIES = libSPINwrappers.la
 
-libSPINwrappers_a_SOURCES = ReferencedNode.cpp GroupNode.cpp ShapeNode.cpp \
-	ModelNode.cpp VideoNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
+libSPINwrappers_la_SOURCES = \
+	ReferencedNode.cpp ReferencedState.cpp \
+	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
+	GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
 	ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
-	SoundNode.cpp SoundSpace.cpp DSPNode.cpp SoundConnection.cpp \
-	UserNode.cpp
+	AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
+	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
+	VideoTexture.cpp SharedVideoTexture.cpp 
 
-# SharedVideoNode.cpp
+#libSPINwrappers_la_LIBADD = -lm
 
-INCLUDES = -I$(top_srcdir)/src/tinyxml
+#SharedVideoNode.cpp
+
