@@ -399,9 +399,12 @@ std::vector<lo_message> SoundNode::getState ()
 	lo_message_add(msg, "sf", "setVUmeterFlag", VUmeterFlag);
 	ret.push_back(msg);
 
+	// not doing this anymore (not supposed to be saved or refreshed)
+	/*
 	msg = lo_message_new();
 	lo_message_add(msg, "sf", "setIntensity", currentSoundIntensity);
 	ret.push_back(msg);
+	*/
 	
 	// have to re-send setContext AFTER setPlugin, so that loaded plugins will
 	// have the up-to-date parameter
