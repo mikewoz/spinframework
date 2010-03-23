@@ -5,4 +5,18 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src/genwrapper src/tinyxml src/osgWrappers src/spin
 
+
+wrappers:
+	@echo ""; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Generating osgWrappers <<<<<<<<<<<<<<<<<<<<<"; \
+	$(MAKE) -C src/osgWrappers wrappers
+
+doc:
+	@echo ""; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Generating Documentation <<<<<<<<<<<<<<<<<<<<<"; \
+	doxygen ./doxygen_config        
+	$(MAKE) -C src/spin doc
+
+
+
 INCLUDES = src/tinyxml
