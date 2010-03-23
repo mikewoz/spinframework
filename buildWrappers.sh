@@ -1,6 +1,6 @@
 #!/bin/sh
 
-GENWRAPPER_PATH=src/genwrapper
+GENWRAPPER_PATH=`dirname $0`/src/genwrapper
 
 make -C ${GENWRAPPER_PATH}
 doxygen ./doxygen_config
