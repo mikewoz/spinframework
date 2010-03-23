@@ -81,7 +81,6 @@
 
 #include "spinContext.h"
 #include "SceneManager.h"
-#include "hello.h"
 
 using namespace boost::python;
 
@@ -215,6 +214,13 @@ int SceneManagerCallback_script(const char* symName, const char *types, std::str
             }
 
             lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+
+   class_<World>("World")
+        .def("greet", &World::greet)
+        .def("set", &World::set)
+    ;
+
+
             }*/
     }
 
@@ -229,10 +235,6 @@ int SceneManagerCallback_script(const char* symName, const char *types, std::str
 BOOST_PYTHON_MODULE(libSPINPyWrap)
 {
 
-    class_<World>("World")
-        .def("greet", &World::greet)
-        .def("set", &World::set)
-    ;
 
     def("callback", &SceneManagerCallback_script);
 
