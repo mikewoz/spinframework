@@ -191,7 +191,7 @@ void GroupNode::mouseEvent (int event, int keyMask, int buttonMask, float x, flo
 	BROADCAST(this, "siiiff", "mouseEvent", keyMask, buttonMask, x, y);
 }
 
-void GroupNode::event (int event, const char*  , float eData1, float eData2, float x, float y, float z)
+void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
 {
 	osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
 	if (!user.valid()) return;
