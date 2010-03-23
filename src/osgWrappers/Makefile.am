@@ -1,4 +1,4 @@
-AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
 
 # use noinst_LIBRARIES to create a library that won't be installed
 noinst_LTLIBRARIES = libSPINwrappers.la

@@ -68,17 +68,25 @@ AX_PYTHON
 
 # Check for boost:
 AX_BOOST_BASE([1.35])
+
 AX_BOOST_REGEX
 if test "x${ax_cv_boost_regex}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-regex-dev])
 fi
+
 AX_BOOST_FILESYSTEM
 if test "x${ax_cv_boost_filesystem}" = "xno" ; then
         AC_MSG_ERROR([missing package: libboost-filesystem-dev])
 fi
+
 AX_BOOST_THREAD
 if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
+fi
+
+AX_BOOST_PYTHON
+if test "x${ax_cv_boost_python}" = "xno" ; then
+    AC_MSG_ERROR([missing package: libboost-python-dev])
 fi
 
 

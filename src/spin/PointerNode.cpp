@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -64,33 +64,33 @@ extern pthread_mutex_t pthreadLock;
 // constructor:
 PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".PointerNode");
-	nodeType = "PointerNode";
+    this->setName(string(id->s_name) + ".PointerNode");
+    nodeType = "PointerNode";
 
-	//draggerType = "TabPlaneDragger";
-	//draggerType = "TrackballDragger";
-	//draggerType = "RotateCylinderDragger";
-	draggerType = "Grabber";
-	
-	// create a command manager
-	cmdMgr = new osgManipulator::CommandManager;
-	
-	selection = new osgManipulator::Selection;
-	selection->setName("asManipulator.selection");
-	
-	
-	ea = new osgGA::GUIEventAdapter();
-	
-	doManipulation = false;
-	
-	grabbedNode = NULL;
-	targetNode = NULL;
-	
-	intersectList.clear();
-	
-	
-	this->setNodeMask(STATSDATA_NODE_MASK); // nodemask info in spinUtil.h
-	
+    //draggerType = "TabPlaneDragger";
+    //draggerType = "TrackballDragger";
+    //draggerType = "RotateCylinderDragger";
+    draggerType = "Grabber";
+
+    // create a command manager
+    cmdMgr = new osgManipulator::CommandManager;
+
+    selection = new osgManipulator::Selection;
+    selection->setName("asManipulator.selection");
+
+
+    ea = new osgGA::GUIEventAdapter();
+
+    doManipulation = false;
+
+    grabbedNode = NULL;
+    targetNode = NULL;
+
+    intersectList.clear();
+
+
+    this->setNodeMask(STATSDATA_NODE_MASK); // nodemask info in spinUtil.h
+
 }
 
 // *****************************************************************************
@@ -103,199 +103,201 @@ PointerNode::~PointerNode()
 
 void PointerNode::callbackUpdate()
 {
-	
-	int i;
-	
-	// get parentNode:
-	osg::ref_ptr<RayNode> parentNode = dynamic_cast<RayNode*>(this->parent->s_thing);
-	
-	if (!parentNode.valid())
-	{
-		//std::cout << "Error: PointerNode [" << this->id->s_name << "] must be attached to an RayNode node." << std::endl;
-		return;
-	}
 
-	//osg::Timer_t startTick = osg::Timer::instance()->tick();
+    ReferencedNode::callbackUpdate();
 
-	// get line segment start and end points:
-	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
-	
-	// only proceed if myMatrix has changed since last time
-	// NO!, can't do that in case other objects move!
-	//if (this->previousMatrix == myMatrix) return;
-	
-	
-	osg::Vec3 start = myMatrix.getTrans();
-	osg::Vec3 end = start + ( myMatrix.getRotate() * osg::Vec3(0.0,parentNode->getLength(),0.0) );
+    int i;
 
-	
-	
-	// create an intersector and create an intersectorVisitor.
-	//osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector(start, end);
-	intersector = new osgUtil::LineSegmentIntersector(start, end);
-	osgUtil::IntersectionVisitor intersectVisitor( intersector.get() );
-	
-	// make sure to provide a nodemask so that only geometric nodes are checked
-	// for intersections:
-	intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK);
-	
-	// start the visitor:
-	sceneManager->worldNode->accept(intersectVisitor);
+    // get parentNode:
+    osg::ref_ptr<RayNode> parentNode = dynamic_cast<RayNode*>(this->parent->s_thing);
 
-	//osg::Timer_t endTick = osg::Timer::instance()->tick();
-	//std::cout<<"Intersection completed in "<<osg::Timer::instance()->delta_s(startTick,endTick)<<std::endl;
+    if (!parentNode.valid())
+    {
+        //std::cout << "Error: PointerNode [" << this->id->s_name << "] must be attached to an RayNode node." << std::endl;
+        return;
+    }
 
-	
+    //osg::Timer_t startTick = osg::Timer::instance()->tick();
 
-	
-	
-	// TODO: dragger event:
-	if ((doManipulation) && dragger.valid() & (this->previousMatrix != myMatrix))
-	{
-		// find change in translation and orientation from original:
-		osg::Quat r1 = origMatrix.getRotate();
-		osg::Quat r2 = myMatrix.getRotate();					
-		osg::Quat dr = r2 - r1;
-		
-		/*
-		osg::Vec3 p1 = origMatrix.getTrans();
-		osg::Vec3 p2 = myMatrix.getTrans();
-		osg::Vec3 dp = p2 - p1;		
-		*/
+    // get line segment start and end points:
+    osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
 
-		osg::Vec3 drVect = Vec3inDegrees(QuatToEuler(dr));
-			
-		_pointer._hitIter = _pointer._hitList.begin();
-		_pointer.setMousePosition(drVect.x(), drVect.z());
-			
-		ea->setEventType(osgGA::GUIEventAdapter::DRAG);
-		dragger->handle(_pointer, *ea.get(), aa);
-	}
-
-	
-	this->previousMatrix = myMatrix;
-
-	
-	
-	
-	
-	
-	
-	// Store our intersections:
-	
-	std::vector<t_symbol*> newIntersectList;
-	std::vector<osgUtil::LineSegmentIntersector::Intersection> newIntersectData;
-	std::vector<osg::Vec3> newItersectListOffsets;
-	vector<t_symbol*>::iterator iter;
-	
-	if ( intersector->containsIntersections() )
-	{
-		osg::ref_ptr<ReferencedNode> testNode;
-		
-		osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
-		osgUtil::LineSegmentIntersector::Intersections::iterator itr;
-
-		for (itr = intersections.begin(); itr != intersections.end(); ++itr)
-		{
-			const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
-			for (i=intersection.nodePath.size()-1; i>=0; i--)
-			{
-				testNode = dynamic_cast<ReferencedNode*>(intersection.nodePath[i]);
-				if (testNode.valid()) // && (testNode->nodeType != "RayNode"))
-				{
-					// only add the hit if not already in the list (note that
-					// one node might have several intersections, for each face
-					// that instersects with the line segment)
-					iter = std::find( newIntersectList.begin(), newIntersectList.end(), testNode->id );
-					if ( iter == newIntersectList.end() )
-					{
-						newIntersectList.push_back(testNode->id);
-						newIntersectData.push_back(intersection);
-						intersectListOffsets.push_back(intersection.getLocalIntersectPoint());
-					}
-					break;
-				}
-				//std::cout << " > " << intersection.nodePath[i]->getName();
-			}
-			
-			/*
-			std::cout << "Got intersection: " << std::endl;
-			osg::Vec3 dbgVect;
-			std::cout<<"  ratio "<<intersection.ratio<<std::endl;
-			dbgVect = intersection.getLocalIntersectPoint();
-			std::cout<<"  localPoint  ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
-			dbgVect = intersection.getLocalIntersectNormal();
-			std::cout<<"  localNormal ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
-			dbgVect = intersection.getWorldIntersectPoint();
-			std::cout<<"  worldPoint  ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
-			dbgVect = intersection.getWorldIntersectNormal();
-			std::cout<<"  worldNormal ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
-			 */
-			
+    // only proceed if myMatrix has changed since last time
+    // NO!, can't do that in case other objects move!
+    //if (this->previousMatrix == myMatrix) return;
 
 
-		}
-		
-		/*
-		std::cout << " OLD intersections:";
-		for (i=0; i<intersectList.size(); i++) std::cout << " " << intersectList[i]->s_name;
-		std::cout << std::endl;
-		
-		std::cout << " NEW intersections:";
-		for (i=0; i<newIntersectList.size(); i++) std::cout << " " << newIntersectList[i]->s_name;
-		std::cout << std::endl;
-		*/
-		
-	}
-		
-	// Check to see if the intersectList has changed from the previous one:
-	bool intersectChange = false;
-	if (intersectList.size()==newIntersectList.size())
-	{
-		if (!std::equal(intersectList.begin(), intersectList.end(), newIntersectList.begin())) intersectChange = true;
-	} else intersectChange = true;
-			
-	// if the intersectList has changed, then we replace our old one and
-	// broadcast the new list:
-	if (intersectChange)
-	{
-		
-		intersectList.clear();
-		intersectList.resize(newIntersectList.size());
-		std::copy(newIntersectList.begin(), newIntersectList.end(), intersectList.begin());
-		
-		intersectListOffsets.clear();
-		intersectListOffsets.resize(newItersectListOffsets.size());
-		std::copy(newItersectListOffsets.begin(), newItersectListOffsets.end(), intersectListOffsets.begin());
+    osg::Vec3 start = myMatrix.getTrans();
+    osg::Vec3 end = start + ( myMatrix.getRotate() * osg::Vec3(0.0,parentNode->getLength(),0.0) );
 
-		intersectData.clear();
-		intersectData.resize(newIntersectData.size());
-		std::copy(newIntersectData.begin(), newIntersectData.end(), intersectData.begin());
 
-		
-		lo_message msg = lo_message_new();
-		lo_message_add_string(msg, "intersectsWith");
-		if (intersectList.size())
-		{
-			for (i=0; i<intersectList.size(); i++) lo_message_add_string(msg, (char*)intersectList[i]->s_name);
-		} else lo_message_add_string(msg, "NULL");
-		
-		//sceneManager->sendNodeMessage(this->id, msg);
-		NODE_LO_MSG(sceneManager, this, msg);
-	}
-	
+
+    // create an intersector and create an intersectorVisitor.
+    //osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector(start, end);
+    intersector = new osgUtil::LineSegmentIntersector(start, end);
+    osgUtil::IntersectionVisitor intersectVisitor( intersector.get() );
+
+    // make sure to provide a nodemask so that only geometric nodes are checked
+    // for intersections:
+    intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK);
+
+    // start the visitor:
+    sceneManager->worldNode->accept(intersectVisitor);
+
+    //osg::Timer_t endTick = osg::Timer::instance()->tick();
+    //std::cout<<"Intersection completed in "<<osg::Timer::instance()->delta_s(startTick,endTick)<<std::endl;
+
+
+
+
+
+    // TODO: dragger event:
+    if ((doManipulation) && dragger.valid() & (this->previousMatrix != myMatrix))
+    {
+        // find change in translation and orientation from original:
+        osg::Quat r1 = origMatrix.getRotate();
+        osg::Quat r2 = myMatrix.getRotate();
+        osg::Quat dr = r2 - r1;
+
+        /*
+        osg::Vec3 p1 = origMatrix.getTrans();
+        osg::Vec3 p2 = myMatrix.getTrans();
+        osg::Vec3 dp = p2 - p1;
+        */
+
+        osg::Vec3 drVect = Vec3inDegrees(QuatToEuler(dr));
+
+        _pointer._hitIter = _pointer._hitList.begin();
+        _pointer.setMousePosition(drVect.x(), drVect.z());
+
+        ea->setEventType(osgGA::GUIEventAdapter::DRAG);
+        dragger->handle(_pointer, *ea.get(), aa);
+    }
+
+
+    this->previousMatrix = myMatrix;
+
+
+
+
+
+
+
+    // Store our intersections:
+
+    std::vector<t_symbol*> newIntersectList;
+    std::vector<osgUtil::LineSegmentIntersector::Intersection> newIntersectData;
+    std::vector<osg::Vec3> newItersectListOffsets;
+    vector<t_symbol*>::iterator iter;
+
+    if ( intersector->containsIntersections() )
+    {
+        osg::ref_ptr<ReferencedNode> testNode;
+
+        osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
+        osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+
+        for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+        {
+            const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
+            for (i=intersection.nodePath.size()-1; i>=0; i--)
+            {
+                testNode = dynamic_cast<ReferencedNode*>(intersection.nodePath[i]);
+                if (testNode.valid()) // && (testNode->nodeType != "RayNode"))
+                {
+                    // only add the hit if not already in the list (note that
+                    // one node might have several intersections, for each face
+                    // that instersects with the line segment)
+                    iter = std::find( newIntersectList.begin(), newIntersectList.end(), testNode->id );
+                    if ( iter == newIntersectList.end() )
+                    {
+                        newIntersectList.push_back(testNode->id);
+                        newIntersectData.push_back(intersection);
+                        intersectListOffsets.push_back(intersection.getLocalIntersectPoint());
+                    }
+                    break;
+                }
+                //std::cout << " > " << intersection.nodePath[i]->getName();
+            }
+
+            /*
+            std::cout << "Got intersection: " << std::endl;
+            osg::Vec3 dbgVect;
+            std::cout<<"  ratio "<<intersection.ratio<<std::endl;
+            dbgVect = intersection.getLocalIntersectPoint();
+            std::cout<<"  localPoint  ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
+            dbgVect = intersection.getLocalIntersectNormal();
+            std::cout<<"  localNormal ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
+            dbgVect = intersection.getWorldIntersectPoint();
+            std::cout<<"  worldPoint  ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
+            dbgVect = intersection.getWorldIntersectNormal();
+            std::cout<<"  worldNormal ("<<dbgVect.x()<<","<<dbgVect.y()<<","<<dbgVect.z()<<")"<<std::endl;
+             */
+
+
+
+        }
+
+        /*
+        std::cout << " OLD intersections:";
+        for (i=0; i<intersectList.size(); i++) std::cout << " " << intersectList[i]->s_name;
+        std::cout << std::endl;
+
+        std::cout << " NEW intersections:";
+        for (i=0; i<newIntersectList.size(); i++) std::cout << " " << newIntersectList[i]->s_name;
+        std::cout << std::endl;
+        */
+
+    }
+
+    // Check to see if the intersectList has changed from the previous one:
+    bool intersectChange = false;
+    if (intersectList.size()==newIntersectList.size())
+    {
+        if (!std::equal(intersectList.begin(), intersectList.end(), newIntersectList.begin())) intersectChange = true;
+    } else intersectChange = true;
+
+    // if the intersectList has changed, then we replace our old one and
+    // broadcast the new list:
+    if (intersectChange)
+    {
+
+        intersectList.clear();
+        intersectList.resize(newIntersectList.size());
+        std::copy(newIntersectList.begin(), newIntersectList.end(), intersectList.begin());
+
+        intersectListOffsets.clear();
+        intersectListOffsets.resize(newItersectListOffsets.size());
+        std::copy(newItersectListOffsets.begin(), newItersectListOffsets.end(), intersectListOffsets.begin());
+
+        intersectData.clear();
+        intersectData.resize(newIntersectData.size());
+        std::copy(newIntersectData.begin(), newIntersectData.end(), intersectData.begin());
+
+
+        lo_message msg = lo_message_new();
+        lo_message_add_string(msg, "intersectsWith");
+        if (intersectList.size())
+        {
+            for (i=0; i<intersectList.size(); i++) lo_message_add_string(msg, (char*)intersectList[i]->s_name);
+        } else lo_message_add_string(msg, "NULL");
+
+        //sceneManager->sendNodeMessage(this->id, msg);
+        NODE_LO_MSG(sceneManager, this, msg);
+    }
+
 }
-	
+
 // *****************************************************************************
 
 
 void PointerNode::enableDragger()
 {
-	if (!targetNode.valid()) return;
-	
-	// if dragger is currently attached somewhere, remove it first:
-	if (dragger.valid()) disableDragger();		
-	
+    if (!targetNode.valid()) return;
+
+    // if dragger is currently attached somewhere, remove it first:
+    if (dragger.valid()) disableDragger();
+
 
     if ("TabPlaneDragger" == this->draggerType)
     {
@@ -341,95 +343,95 @@ void PointerNode::enableDragger()
     }
     else
     {
-    	// NULL dragger
-    	return;
+        // NULL dragger
+        return;
     }
-	
-	pthread_mutex_lock(&pthreadLock);
-    
-	dragger->setName("asManipulator.dragger");
-	dragger->setNodeMask(GEOMETRIC_NODE_MASK); // make sure intersector sees it
-	
-	targetNode->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
-	targetNode->addChild(dragger.get());
 
-	float scale = targetNode->getBound().radius() * 1.1;
-	dragger->setMatrix(osg::Matrix::scale(scale, scale, scale) * osg::Matrix::translate(dragger->getBound().center()));
-	
-	cmdMgr->connect(*dragger.get(), *selection.get());
-	
-	pthread_mutex_unlock(&pthreadLock);
-	
+    pthread_mutex_lock(&pthreadLock);
+
+    dragger->setName("asManipulator.dragger");
+    dragger->setNodeMask(GEOMETRIC_NODE_MASK); // make sure intersector sees it
+
+    targetNode->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+    targetNode->addChild(dragger.get());
+
+    float scale = targetNode->getBound().radius() * 1.1;
+    dragger->setMatrix(osg::Matrix::scale(scale, scale, scale) * osg::Matrix::translate(dragger->getBound().center()));
+
+    cmdMgr->connect(*dragger.get(), *selection.get());
+
+    pthread_mutex_unlock(&pthreadLock);
+
 }
 
 void PointerNode::disableDragger()
 {
-	pthread_mutex_lock(&pthreadLock);
-	
-	if (dragger.valid() && targetNode.valid())
-	{
-		cmdMgr->disconnect(*dragger.get());
+    pthread_mutex_lock(&pthreadLock);
+
+    if (dragger.valid() && targetNode.valid())
+    {
+        cmdMgr->disconnect(*dragger.get());
         targetNode->removeChild(dragger.get());
-		dragger = NULL;
-	}
-	
-	pthread_mutex_unlock(&pthreadLock);
+        dragger = NULL;
+    }
+
+    pthread_mutex_unlock(&pthreadLock);
 }
 
 
 ReferencedNode *PointerNode::getNodeFromIntersections()
 {
 
-	if (!intersectList.size()) return NULL;
-		
-	ReferencedNode *t = dynamic_cast<ReferencedNode*>(intersectList[0]->s_thing); // intersectList stores t_symbols
+    if (!intersectList.size()) return NULL;
 
-	while (t)
-	{
-		if (t->nodeType == "GroupNode") 
-		{
-			return t; // return first basicNode encountered
-		}
-		t = dynamic_cast<ReferencedNode*>(t->parent->s_thing);
-	}
-	
-	return NULL;
+    ReferencedNode *t = dynamic_cast<ReferencedNode*>(intersectList[0]->s_thing); // intersectList stores t_symbols
+
+    while (t)
+    {
+        if (t->nodeType == "GroupNode")
+        {
+            return t; // return first basicNode encountered
+        }
+        t = dynamic_cast<ReferencedNode*>(t->parent->s_thing);
+    }
+
+    return NULL;
 }
 
 /*
 void PointerNode::computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T)
 {
 
-	osg::Matrix srcMatrix, dstMatrix;
-	
-	if (src==gensym("world"))
-		srcMatrix = osg::Matrix::identity();
-	else
-		srcMatrix = osg::computeLocalToWorld(src->s_thing->currentNodePath);
+    osg::Matrix srcMatrix, dstMatrix;
 
-	if (dst==gensym("world"))
-		dstMatrix = osg::Matrix::identity();
-	else
-		dstMatrix = osg::computeLocalToWorld(dst->s_thing->currentNodePath);	
-		
-	// find change in translation and orientation from src to dst:
+    if (src==gensym("world"))
+        srcMatrix = osg::Matrix::identity();
+    else
+        srcMatrix = osg::computeLocalToWorld(src->s_thing->currentNodePath);
 
-	
-	osg::Quat q1 = srcMatrix.getRotate();
-	//osg::Quat q2 = dstMatrix.getRotate();			
-	//Q = q2 - q1;
-	
-			
-	osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
-	osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));		
-	R = r2 - r1;
-			
-	osg::Vec3 p1 = srcMatrix.getTrans();
-	osg::Vec3 p2 = dstMatrix.getTrans();
-	osg::Vec3 dp = p2 - p1;
+    if (dst==gensym("world"))
+        dstMatrix = osg::Matrix::identity();
+    else
+        dstMatrix = osg::computeLocalToWorld(dst->s_thing->currentNodePath);
 
-	// position of dst if projected on src direction vector:
-	T = p1 + (q1 * osg::Vec3(0,dp.length(),0)) + grabbedOffset;
+    // find change in translation and orientation from src to dst:
+
+
+    osg::Quat q1 = srcMatrix.getRotate();
+    //osg::Quat q2 = dstMatrix.getRotate();
+    //Q = q2 - q1;
+
+
+    osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
+    osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));
+    R = r2 - r1;
+
+    osg::Vec3 p1 = srcMatrix.getTrans();
+    osg::Vec3 p2 = dstMatrix.getTrans();
+    osg::Vec3 dp = p2 - p1;
+
+    // position of dst if projected on src direction vector:
+    T = p1 + (q1 * osg::Vec3(0,dp.length(),0)) + grabbedOffset;
 }
 */
 
@@ -437,25 +439,25 @@ void PointerNode::computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec
 
 void PointerNode::setType (char *s)
 {
-	this->draggerType = s;
-	
-	BROADCAST(this, "ss", "setType", this->getType());
+    this->draggerType = s;
+
+    BROADCAST(this, "ss", "setType", this->getType());
 }
 
 
 void PointerNode::highlight (int b)
 {
 
-	if (b) {
-		this->targetNode = getNodeFromIntersections();
-		enableDragger();
-	}
-	else {
-		disableDragger();
-		this->targetNode = NULL;
-	}
-	
-	BROADCAST(this, "si", "highlight", this->getHighlight());
+    if (b) {
+        this->targetNode = getNodeFromIntersections();
+        enableDragger();
+    }
+    else {
+        disableDragger();
+        this->targetNode = NULL;
+    }
+
+    BROADCAST(this, "si", "highlight", this->getHighlight());
 }
 
 /**
@@ -466,83 +468,83 @@ void PointerNode::highlight (int b)
  */
 void PointerNode::manipulate (int b)
 {
-	if (sceneManager->isSlave() && !dragger.valid()) return;
-	
-	pthread_mutex_lock(&pthreadLock);
-	
+    if (sceneManager->isSlave() && !dragger.valid()) return;
 
-	
-	
-	// Start manipulation:
-	
-	// Note, the dragger should have been set by the highlight() method
+    pthread_mutex_lock(&pthreadLock);
 
-	
-	if (b && intersectList.size() && dragger.valid())
-	{
-		
-		// reset selection:
-		selection->setMatrix(osg::Matrix::identity());
-		
-		// insert the selection node between targetNode and it's parent:
-		selection->addChild(targetNode.get());
-		targetNode->getParent(0)->replaceChild(targetNode.get(), selection.get());
-		
-		origMatrix = osg::computeLocalToWorld(this->currentNodePath);
-		
-		// transfer the intersections to the _pointer
-		_pointer.reset();
-		_pointer.setCamera(NULL);
-		
-		osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
-		osgUtil::LineSegmentIntersector::Intersections::iterator hitr;
-		for (hitr = intersections.begin(); hitr != intersections.end(); ++hitr)
-		{
-			_pointer.addIntersection(hitr->nodePath, hitr->getLocalIntersectPoint());
-		}
 
-		// set event to PUSH and invoke the dragger:
-		ea->setEventType(osgGA::GUIEventAdapter::PUSH);
-		dragger->handle(_pointer, *ea.get(), aa);
 
-		doManipulation = true;
-	}
-	
-	// end manipulation:
-	else if (dragger.valid())
-	{		
-		//  set event to RELEASE and invoke handle()
 
-		_pointer._hitIter = _pointer._hitList.begin();
-		
-		ea->setEventType(osgGA::GUIEventAdapter::RELEASE);
-		dragger->handle(_pointer, *ea.get(), aa);
+    // Start manipulation:
 
-		// update the target's matrix based on selection node, then put the
-		// targetNode back on it's parent, and remove selection:
-			
-		osg::ref_ptr<GroupNode> targetGroupNode = dynamic_cast<GroupNode*>(targetNode.get());
-		if (targetGroupNode.valid())
-		{
-			osg::Matrix m = selection->getMatrix();
-			osg::Vec3 mPos = m.getTrans();
-			osg::Vec3 mRot = Vec3inDegrees(QuatToEuler(m.getRotate()));
-			targetGroupNode->setTranslation(mPos.x(), mPos.y(), mPos.z());
-			targetGroupNode->setOrientation(mRot.x(), mRot.y(), mRot.z());
-		}
-				
-		selection->removeChild(targetNode.get());
-		selection->getParent(0)->replaceChild(selection.get(), targetNode.get());
-		
-		targetNode = NULL;
-		doManipulation = false;
-	}
+    // Note, the dragger should have been set by the highlight() method
 
-	
-	pthread_mutex_unlock(&pthreadLock);
 
-	
-	BROADCAST(this, "si", "manipulate", this->getManipulate());
+    if (b && intersectList.size() && dragger.valid())
+    {
+
+        // reset selection:
+        selection->setMatrix(osg::Matrix::identity());
+
+        // insert the selection node between targetNode and it's parent:
+        selection->addChild(targetNode.get());
+        targetNode->getParent(0)->replaceChild(targetNode.get(), selection.get());
+
+        origMatrix = osg::computeLocalToWorld(this->currentNodePath);
+
+        // transfer the intersections to the _pointer
+        _pointer.reset();
+        _pointer.setCamera(NULL);
+
+        osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
+        osgUtil::LineSegmentIntersector::Intersections::iterator hitr;
+        for (hitr = intersections.begin(); hitr != intersections.end(); ++hitr)
+        {
+            _pointer.addIntersection(hitr->nodePath, hitr->getLocalIntersectPoint());
+        }
+
+        // set event to PUSH and invoke the dragger:
+        ea->setEventType(osgGA::GUIEventAdapter::PUSH);
+        dragger->handle(_pointer, *ea.get(), aa);
+
+        doManipulation = true;
+    }
+
+    // end manipulation:
+    else if (dragger.valid())
+    {
+        //  set event to RELEASE and invoke handle()
+
+        _pointer._hitIter = _pointer._hitList.begin();
+
+        ea->setEventType(osgGA::GUIEventAdapter::RELEASE);
+        dragger->handle(_pointer, *ea.get(), aa);
+
+        // update the target's matrix based on selection node, then put the
+        // targetNode back on it's parent, and remove selection:
+
+        osg::ref_ptr<GroupNode> targetGroupNode = dynamic_cast<GroupNode*>(targetNode.get());
+        if (targetGroupNode.valid())
+        {
+            osg::Matrix m = selection->getMatrix();
+            osg::Vec3 mPos = m.getTrans();
+            osg::Vec3 mRot = Vec3inDegrees(QuatToEuler(m.getRotate()));
+            targetGroupNode->setTranslation(mPos.x(), mPos.y(), mPos.z());
+            targetGroupNode->setOrientation(mRot.x(), mRot.y(), mRot.z());
+        }
+
+        selection->removeChild(targetNode.get());
+        selection->getParent(0)->replaceChild(selection.get(), targetNode.get());
+
+        targetNode = NULL;
+        doManipulation = false;
+    }
+
+
+    pthread_mutex_unlock(&pthreadLock);
+
+
+    BROADCAST(this, "si", "manipulate", this->getManipulate());
 }
 
 
@@ -555,151 +557,151 @@ void PointerNode::manipulate (int b)
  */
 void PointerNode::grab (int b)
 {
-	// return if this spinContext is a slave
-	if (sceneManager->isSlave()) return;
-	
-	
-	osg::Matrix srcMatrix, dstMatrix;
-	
-
-	// start grab:
-	if (b && intersectList.size())
-	{
-		
-		// What do we do if a node is already grabbed? let go and grab again?
-		// ... for now, let's do nothing.
-		if (grabbedNode.valid()) return;
-		
-		
-		grabbedNode = getNodeFromIntersections();
-		
-		//osg::Vec3 localIntersectPt = intersectListOffsets[0];
-		osg::Vec3 localIntersectPt = intersectData[0].getLocalIntersectPoint();
-		osg::Vec3 worldIntersectPt = intersectData[0].getWorldIntersectPoint();
-		
-		
-		if (!grabbedNode.valid()) return;
-		
-		osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
-		
-		// We will temporarily attach targetNode to this pointer, so we
-		// need to keep track of the old parent so we can reattach it:
-		previousParent = grabbedNode->parent;
-		
-		// we need to give grabbedNode an local offset equivalent to
-		// it's current difference from this node
-
-		srcMatrix = osg::computeLocalToWorld(this->currentNodePath);
-		dstMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);
-
-		osg::Vec3 p1 = srcMatrix.getTrans();
-		osg::Vec3 p2 = dstMatrix.getTrans();
-		osg::Vec3 dp = p2 - p1;
-		
-
-		/*
-		osg::Vec3 iv = ( srcMatrix.getRotate() * (worldIntersectPt-p1) );
-		std::cout << "p1=("<<p1.x()<<","<<p1.y()<<","<<p1.z()<< ")"<<std::endl;
-		std::cout << "iv=("<<iv.x()<<","<<iv.y()<<","<<iv.z()<< ")"<<std::endl;
-		std::cout << "dp=("<<dp.x()<<","<<dp.y()<<","<<dp.z()<< ")"<<std::endl;
-		std::cout << "localIntersectPt=("<<localIntersectPt.x()<<","<<localIntersectPt.y()<<","<<localIntersectPt.z()<< ")"<<std::endl;
-		std::cout << "worldIntersectPt=("<<worldIntersectPt.x()<<","<<worldIntersectPt.y()<<","<<worldIntersectPt.z()<< ")"<<std::endl;
-		std::cout << "world - p1 =     ("<<worldIntersectPt.x()-p1.x()<<","<<worldIntersectPt.y()-p1.y()<<","<<worldIntersectPt.z()-p1.z()<< ")"<<std::endl;
-		*/
-
-		// ARGH. localIntersectPt is not correct!! TODO
-		//osg::Vec3 T = osg::Vec3(-localIntersectPt.x(),dp.length(),-localIntersectPt.z());
-		osg::Vec3 T = osg::Vec3(0,dp.length(),0);
-
-		osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
-		osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));		
-		osg::Vec3 R = r2 - r1;
-		
-		
-		
-		//T = osg::Vec3(0,dp.length(),0);
-		//R = osgVec3(0,0,0);
-		
-		std::cout << "Attaching node [" << grabbedNode->id->s_name << "] to pointer with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
-		
-		// attach node to this pointer:
-		
-		pthread_mutex_lock(&pthreadLock);
-
-			grabbedNode->newParent = this->id;
-			grabbedNode->attach();
-		
-		pthread_mutex_unlock(&pthreadLock);
+    // return if this spinContext is a slave
+    if (sceneManager->isSlave()) return;
 
 
-		// now apply the offset:
-		//
-		// TODO: do this with sceneManager->invokeMethod() so that it need not
-		//       be a basicNode.
-	
-		
-		n->setTranslation(T.x(), T.y(), T.z());
-		n->setOrientation(R.x(), R.y(), R.z());
-	}
-		
-	// end grab:
-	else if (grabbedNode.valid())
-	{		
+    osg::Matrix srcMatrix, dstMatrix;
 
-		// get the global positions of our targetNode and oldTargetParent
-		
-		if (previousParent==gensym("world"))
-			srcMatrix = osg::Matrix::identity();
-		else
-			srcMatrix = osg::computeLocalToWorld(dynamic_cast<ReferencedNode*>(previousParent->s_thing)->currentNodePath);
 
-		dstMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);	
-			
-		// find change in translation and orientation from src to dst:
-		osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
-		osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));		
-		osg::Vec3 R = r2 - r1;
-				
-		osg::Vec3 p1 = srcMatrix.getTrans();
-		osg::Vec3 p2 = dstMatrix.getTrans();
-		osg::Vec3 T = p2 - p1;			
-		
-		
-		// re-attach node to it's old parent:
-		
-		pthread_mutex_lock(&pthreadLock);
-		
-			grabbedNode->newParent = previousParent;
-			grabbedNode->attach();
-		
-		pthread_mutex_unlock(&pthreadLock);
-		
-		//std::cout << "Re-attaching node [" << targetNode->id->s_name << "] to old parent [" << oldTargetParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
+    // start grab:
+    if (b && intersectList.size())
+    {
 
-		// now apply the offset:
-		// (TODO: use sceneManager->invokeMethod)
-		osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
-		n->setTranslation(T.x(), T.y(), T.z());
-		n->setOrientation(R.x(), R.y(), R.z());
-		
-		grabbedNode = NULL;
+        // What do we do if a node is already grabbed? let go and grab again?
+        // ... for now, let's do nothing.
+        if (grabbedNode.valid()) return;
 
-	}
-	
-	BROADCAST(this, "si", "grab", this->getGrab());
+
+        grabbedNode = getNodeFromIntersections();
+
+        //osg::Vec3 localIntersectPt = intersectListOffsets[0];
+        osg::Vec3 localIntersectPt = intersectData[0].getLocalIntersectPoint();
+        osg::Vec3 worldIntersectPt = intersectData[0].getWorldIntersectPoint();
+
+
+        if (!grabbedNode.valid()) return;
+
+        osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
+
+        // We will temporarily attach targetNode to this pointer, so we
+        // need to keep track of the old parent so we can reattach it:
+        previousParent = grabbedNode->parent;
+
+        // we need to give grabbedNode an local offset equivalent to
+        // it's current difference from this node
+
+        srcMatrix = osg::computeLocalToWorld(this->currentNodePath);
+        dstMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);
+
+        osg::Vec3 p1 = srcMatrix.getTrans();
+        osg::Vec3 p2 = dstMatrix.getTrans();
+        osg::Vec3 dp = p2 - p1;
+
+
+        /*
+        osg::Vec3 iv = ( srcMatrix.getRotate() * (worldIntersectPt-p1) );
+        std::cout << "p1=("<<p1.x()<<","<<p1.y()<<","<<p1.z()<< ")"<<std::endl;
+        std::cout << "iv=("<<iv.x()<<","<<iv.y()<<","<<iv.z()<< ")"<<std::endl;
+        std::cout << "dp=("<<dp.x()<<","<<dp.y()<<","<<dp.z()<< ")"<<std::endl;
+        std::cout << "localIntersectPt=("<<localIntersectPt.x()<<","<<localIntersectPt.y()<<","<<localIntersectPt.z()<< ")"<<std::endl;
+        std::cout << "worldIntersectPt=("<<worldIntersectPt.x()<<","<<worldIntersectPt.y()<<","<<worldIntersectPt.z()<< ")"<<std::endl;
+        std::cout << "world - p1 =     ("<<worldIntersectPt.x()-p1.x()<<","<<worldIntersectPt.y()-p1.y()<<","<<worldIntersectPt.z()-p1.z()<< ")"<<std::endl;
+        */
+
+        // ARGH. localIntersectPt is not correct!! TODO
+        //osg::Vec3 T = osg::Vec3(-localIntersectPt.x(),dp.length(),-localIntersectPt.z());
+        osg::Vec3 T = osg::Vec3(0,dp.length(),0);
+
+        osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
+        osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));
+        osg::Vec3 R = r2 - r1;
+
+
+
+        //T = osg::Vec3(0,dp.length(),0);
+        //R = osgVec3(0,0,0);
+
+        std::cout << "Attaching node [" << grabbedNode->id->s_name << "] to pointer with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
+
+        // attach node to this pointer:
+
+        pthread_mutex_lock(&pthreadLock);
+
+            grabbedNode->newParent = this->id;
+            grabbedNode->attach();
+
+        pthread_mutex_unlock(&pthreadLock);
+
+
+        // now apply the offset:
+        //
+        // TODO: do this with sceneManager->invokeMethod() so that it need not
+        //       be a basicNode.
+
+
+        n->setTranslation(T.x(), T.y(), T.z());
+        n->setOrientation(R.x(), R.y(), R.z());
+    }
+
+    // end grab:
+    else if (grabbedNode.valid())
+    {
+
+        // get the global positions of our targetNode and oldTargetParent
+
+        if (previousParent==gensym("world"))
+            srcMatrix = osg::Matrix::identity();
+        else
+            srcMatrix = osg::computeLocalToWorld(dynamic_cast<ReferencedNode*>(previousParent->s_thing)->currentNodePath);
+
+        dstMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);
+
+        // find change in translation and orientation from src to dst:
+        osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
+        osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));
+        osg::Vec3 R = r2 - r1;
+
+        osg::Vec3 p1 = srcMatrix.getTrans();
+        osg::Vec3 p2 = dstMatrix.getTrans();
+        osg::Vec3 T = p2 - p1;
+
+
+        // re-attach node to it's old parent:
+
+        pthread_mutex_lock(&pthreadLock);
+
+            grabbedNode->newParent = previousParent;
+            grabbedNode->attach();
+
+        pthread_mutex_unlock(&pthreadLock);
+
+        //std::cout << "Re-attaching node [" << targetNode->id->s_name << "] to old parent [" << oldTargetParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
+
+        // now apply the offset:
+        // (TODO: use sceneManager->invokeMethod)
+        osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
+        n->setTranslation(T.x(), T.y(), T.z());
+        n->setOrientation(R.x(), R.y(), R.z());
+
+        grabbedNode = NULL;
+
+    }
+
+    BROADCAST(this, "si", "grab", this->getGrab());
 }
 
 
 void PointerNode::pull (float f)
 {
-	if (grabbedNode.valid())
-	{
-		osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
-		osg::Vec3 T = n->getTranslation() + osg::Vec3(0,f,0);
-		
-		// (TODO: use sceneManager->invokeMethod)
-		n->setTranslation(T.x(), T.y(), T.z());
-	}
+    if (grabbedNode.valid())
+    {
+        osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
+        osg::Vec3 T = n->getTranslation() + osg::Vec3(0,f,0);
+
+        // (TODO: use sceneManager->invokeMethod)
+        n->setTranslation(T.x(), T.y(), T.z());
+    }
 }
 
 
@@ -707,24 +709,24 @@ void PointerNode::pull (float f)
 
 std::vector<lo_message> PointerNode::getState ()
 {
-	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedNode::getState();
-	
-	lo_message msg;
-	
-	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setType", this->getType());
-	ret.push_back(msg);
-	
-	/*
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "highlight", this->getHighlight());
-	ret.push_back(msg);
-	
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "manipulate", this->getManipulate());
-	ret.push_back(msg);
-	*/
-	
-	return ret;
+    // inherit state from base class
+    std::vector<lo_message> ret = ReferencedNode::getState();
+
+    lo_message msg;
+
+    msg = lo_message_new();
+    lo_message_add(msg, "ss", "setType", this->getType());
+    ret.push_back(msg);
+
+    /*
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "highlight", this->getHighlight());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "manipulate", this->getManipulate());
+    ret.push_back(msg);
+    */
+
+    return ret;
 }

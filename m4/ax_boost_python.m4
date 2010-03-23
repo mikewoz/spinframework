@@ -1,5 +1,5 @@
 # ===========================================================================
-#         http://www.nongnu.org/autoconf-archive/ax_boost_python.html
+#      http://www.gnu.org/software/autoconf-archive/ax_boost_python.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -51,6 +51,8 @@
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
+#serial 8
+
 AC_DEFUN([AX_BOOST_PYTHON],
 [AC_REQUIRE([AX_PYTHON])dnl
 AC_CACHE_CHECK(whether the Boost::Python library is available,
@@ -61,6 +63,7 @@ ac_cv_boost_python,
  if test x$PYTHON_INCLUDE_DIR != x; then
    CPPFLAGS=-I$PYTHON_INCLUDE_DIR $CPPFLAGS
  fi
+ ###AC_MSG_NOTICE([python_include_dir: $PYTHON_INCLUDE_DIR ])
  AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[
  #include <boost/python/module.hpp>
  using namespace boost::python;
@@ -72,14 +75,14 @@ ac_cv_boost_python,
 ])
 if test "$ac_cv_boost_python" = "yes"; then
   AC_DEFINE(HAVE_BOOST_PYTHON,,[define if the Boost::Python library is available])
-  ax_python_lib=boost_python
+  ax_python_lib=boost_python-mt
   AC_ARG_WITH([boost-python],AS_HELP_STRING([--with-boost-python],[specify the boost python library or suffix to use]),
   [if test "x$with_boost_python" != "xno"; then
      ax_python_lib=$with_boost_python
      ax_boost_python_lib=boost_python-$with_boost_python
    fi])
-  for ax_lib in $ax_python_lib $ax_boost_python_lib boost_python; do
-    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break])
+  for ax_lib in $ax_python_lib $ax_boost_python_lib boost_python-mt; do
+    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break], , -l$PYTHON_LIB)
   done
   AC_SUBST(BOOST_PYTHON_LIB)
 fi

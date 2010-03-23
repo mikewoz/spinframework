@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -51,7 +51,7 @@
 
 #include <osg/Group>
 #include <osg/Node>
-
+#include <boost/python.hpp>
 
 // forward declaration of SceneManager
 class SceneManager;
@@ -75,199 +75,206 @@ class ReferencedNode : virtual public osg::Group
 public:
 
 
-	// ***********************************************************
-	// methods:
+    // ***********************************************************
+    // methods:
 
-	ReferencedNode(SceneManager *sceneManager, char *initID);
-	~ReferencedNode();
+    ReferencedNode(SceneManager *sceneManager, char *initID);
+    ~ReferencedNode();
 
-	void registerNode(SceneManager *s);
+    void registerNode(SceneManager *s);
 
-	/**
-	 * For nodes that require regular programmatic control, there is a callback
-	 * that is evaluated with every refresh. This function can thus be used for
-	 * animations, or any other periodic updates.
-	 *
-	 * Note that changes to the scene graph structure (eg, moving/deleting nodes
-	 * should NOT be done within this callback because traversals stacks will
-	 * become corrupted. The technique is rather to enable a flag and then do
-	 * the actual change in the SceneManager::updateGraph() method.
-	 */
-	virtual void callbackUpdate();
+    /**
+     * For nodes that require regular programmatic control, there is a callback
+     * that is evaluated with every refresh. This function can thus be used for
+     * animations, or any other periodic updates.
+     *
+     * Note that changes to the scene graph structure (eg, moving/deleting nodes
+     * should NOT be done within this callback because traversals stacks will
+     * become corrupted. The technique is rather to enable a flag and then do
+     * the actual change in the SceneManager::updateGraph() method.
+     */
+    virtual void callbackUpdate();
 
-	/**
-	 * The attach() method is used to properly add a node to the scene graph.
-	 * Each node derived from ReferencedNode has an attachmentNode parameter that
-	 * can be overridden in derived classes, but to keep code simple, this is
-	 * the only this method that actually performs the attachment.
-	 *
-	 * In the default case, nodes should are attached directly to the parent
-	 * ReferencedNode instance.
-	 */
-	void attach();
-	/**
-	 * The detach() method is removes a node from the scene graph, depending on
-	 * it's attachment position (specified by attachmentNode).
-	 */
-	void detach();
+    /**
+     * The attach() method is used to properly add a node to the scene graph.
+     * Each node derived from ReferencedNode has an attachmentNode parameter that
+     * can be overridden in derived classes, but to keep code simple, this is
+     * the only this method that actually performs the attachment.
+     *
+     * In the default case, nodes should are attached directly to the parent
+     * ReferencedNode instance.
+     */
+    void attach();
+    /**
+     * The detach() method is removes a node from the scene graph, depending on
+     * it's attachment position (specified by attachmentNode).
+     */
+    void detach();
 
-	/**
-	 * IMPORTANT:
-	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
-	 * and can also change their attachmentNode so that children are attached
-	 * anywhere in that subgraph. If that is the case, the updateNodePath()
-	 * function MUST be overridden, and extra nodes must be manually pushed onto
-	 * currentNodePath.
-	 */
-	virtual void updateNodePath();
-	
-	int setAttachmentNode(osg::Group *n);
-	
+    /**
+     * IMPORTANT:
+     * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
+     * and can also change their attachmentNode so that children are attached
+     * anywhere in that subgraph. If that is the case, the updateNodePath()
+     * function MUST be overridden, and extra nodes must be manually pushed onto
+     * currentNodePath.
+     */
+    virtual void updateNodePath();
 
-	/**
-	 * An internal method that keeps track of the nodepath (for efficient
-	 * computation of global position, etc.
-	 */
-	void updateChildNodePaths();
+    int setAttachmentNode(osg::Group *n);
 
 
-
-	/**
-	 * This method schedules a change in parent for this node. The setParent()
-	 * does not immediately change the scenegraph, since it can be called at any
-	 * time, even while in a traversal. The graph is updated later using the
-	 * attach() method, which is called by SceneManager->updateGraph() when
-	 * there is a legal time to re-order the scenegraph.
-	 *
-	 * Internally, this method just sets the newParent property.
-	 */
-	void setParent (const char *newvalue);
-	
-	/**
-	 * Returns the current parent name (string)
-	 */
-	char *getParent() { return parent->s_name; }
-	
-	/**
-	 * Returns the current parent as an osg::Group
-	 */
-	osg::Group *getParent(unsigned int i) { return osg::Group::getParent(i); }
-
-	/**
-	 * A node can 'belong' to a certain host machine, allowing it to be rendered
-	 * or behave differently than on other machines.
-	 *
-	 * NOTE: the "NULL" string means that it belongs to no specific context.
-	 *
-	 * NOTE: a scene operating in SERVER_MODE will always create the node, so
-	 * this feature is only really relevant for clients applications.
-	 */
-	virtual void setContext (const char *newvalue);
-	
-	/**
-	 * Returns the current host
-	 */
-	const char *getContext() { return contextString.c_str(); }
-	
-	void setParam (const char *paramName, const char *paramValue);
-	void setParam (const char *paramName, float paramValue);
-	
-	/**
-	 * subclasses of ReferencedNode may contain complicated subgraphs, and any
-	 * children get attached not to the node pointer itself, but to an
-	 * attachmentNode. This attachmentNode essentially defines the origin of the
-	 * local coordinate system of this node (according to the subgraph). This
-	 * function returns a pointer to this node.
-	 */
-	osg::Group *getAttachmentNode() { return attachmentNode; }
-	
-	/**
-	 * Debug print (to log/console)
-	 */
-	virtual void debug();
-
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node.
-	 */
-	virtual std::vector<lo_message> getState();
-
-	/**
-	 * StateDump() is a request to broadcast the node state via SceneManager.
-	 */
-	virtual void stateDump();
-
-
-	// ***********************************************************
-	// data:
-
-
-	t_symbol *id;
-	std::string nodeType;
-
-	std::string contextString;
-
-	int pd_mail_id;
-	lo_method oscHandler;
-
-	t_symbol *parent, *newParent;
-
-	// debug
-
-	bool textFlag;
-	
-	stringParamType stringParams;
-	floatParamType floatParams;
+    /**
+     * An internal method that keeps track of the nodepath (for efficient
+     * computation of global position, etc.
+     */
+    void updateChildNodePaths();
 
 
 
+    /**
+     * This method schedules a change in parent for this node. The setParent()
+     * does not immediately change the scenegraph, since it can be called at any
+     * time, even while in a traversal. The graph is updated later using the
+     * attach() method, which is called by SceneManager->updateGraph() when
+     * there is a legal time to re-order the scenegraph.
+     *
+     * Internally, this method just sets the newParent property.
+     */
+    void setParent (const char *newvalue);
 
-	osg::NodePath currentNodePath;
+    /**
+     * Returns the current parent name (string)
+     */
+    char *getParent() { return parent->s_name; }
 
-	std::vector<ReferencedNode*> children;
+    /**
+     * Returns the current parent as an osg::Group
+     */
+    osg::Group *getParent(unsigned int i) { return osg::Group::getParent(i); }
 
-	
+    /**
+     * A node can 'belong' to a certain host machine, allowing it to be rendered
+     * or behave differently than on other machines.
+     *
+     * NOTE: the "NULL" string means that it belongs to no specific context.
+     *
+     * NOTE: a scene operating in SERVER_MODE will always create the node, so
+     * this feature is only really relevant for clients applications.
+     */
+    virtual void setContext (const char *newvalue);
 
-	//osg::ref_ptr<osg::Geode> textGeode;
+    /**
+     * Returns the current host
+     */
+    const char *getContext() { return contextString.c_str(); }
 
-	SceneManager *sceneManager;
-	MediaManager *mediaManager;
+    void setParam (const char *paramName, const char *paramValue);
+    void setParam (const char *paramName, float paramValue);
+
+    /**
+     * subclasses of ReferencedNode may contain complicated subgraphs, and any
+     * children get attached not to the node pointer itself, but to an
+     * attachmentNode. This attachmentNode essentially defines the origin of the
+     * local coordinate system of this node (according to the subgraph). This
+     * function returns a pointer to this node.
+     */
+    osg::Group *getAttachmentNode() { return attachmentNode; }
+
+    /**
+     * Debug print (to log/console)
+     */
+    virtual void debug();
+
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node.
+     */
+    virtual std::vector<lo_message> getState();
+
+    /**
+     * StateDump() is a request to broadcast the node state via SceneManager.
+     */
+    virtual void stateDump();
 
 
-private:
-	
-	/**
-	 * TO BE DEPRECATED?
-	 * It used to be that we wanted to keep a list of all child ReferencedNode
-	 * nodes that are attached. Was this so that we could differentiate SPIN
-	 * nodes from other scene graph node? That seems silly, since one can always
-	 * try a dynamic_cast or use osgIntrospection
-	 */
-	ReferencedNode *as_getChild(ReferencedNode *child);
-	/**
-	 * TO BE DEPRECATED?
-	 */
-	void as_addChild(ReferencedNode *child);
-	/**
-	 * TO BE DEPRECATED?
-	 */
-	void as_removeChild(ReferencedNode *child);
+    // ***********************************************************
+    // data:
 
-	/**
-	 * TO BE DEPRECATED?
-	 * The idea is that one type of node can only be attached to certain types
-	 * of other nodes, but that has not been implemented. Currently, the only
-	 * illegal parents include the node itself, or any children.
-	 */
-	bool legalParent (t_symbol *newParent);
-	
-	
-	/**
-	 * The node that children get attached to:
-	 * We keep it private to force the use of setAttachmentNode(), which results
-	 * in an update of the currentNodePath.
-	 */
-	osg::Group *attachmentNode;
+
+    t_symbol *id;
+    std::string nodeType;
+
+    std::string contextString;
+
+    int pd_mail_id;
+    lo_method oscHandler;
+
+    t_symbol *parent, *newParent;
+
+    // debug
+
+    bool textFlag;
+
+    stringParamType stringParams;
+    floatParamType floatParams;
+
+
+
+
+    osg::NodePath currentNodePath;
+
+    std::vector<ReferencedNode*> children;
+
+
+
+    //osg::ref_ptr<osg::Geode> textGeode;
+
+    SceneManager *sceneManager;
+    MediaManager *mediaManager;
+
+
+    bool setScript( const std::string& s );
+
+ protected:
+
+    std::string _scriptFile;
+    boost::python::object _scriptRun;
+
+ private:
+
+    /**
+     * TO BE DEPRECATED?
+     * It used to be that we wanted to keep a list of all child ReferencedNode
+     * nodes that are attached. Was this so that we could differentiate SPIN
+     * nodes from other scene graph node? That seems silly, since one can always
+     * try a dynamic_cast or use osgIntrospection
+     */
+    ReferencedNode *as_getChild(ReferencedNode *child);
+    /**
+     * TO BE DEPRECATED?
+     */
+    void as_addChild(ReferencedNode *child);
+    /**
+     * TO BE DEPRECATED?
+     */
+    void as_removeChild(ReferencedNode *child);
+
+    /**
+     * TO BE DEPRECATED?
+     * The idea is that one type of node can only be attached to certain types
+     * of other nodes, but that has not been implemented. Currently, the only
+     * illegal parents include the node itself, or any children.
+     */
+    bool legalParent (t_symbol *newParent);
+
+
+    /**
+     * The node that children get attached to:
+     * We keep it private to force the use of setAttachmentNode(), which results
+     * in an update of the currentNodePath.
+     */
+    osg::Group *attachmentNode;
 
 };
 
@@ -276,20 +283,20 @@ private:
 class ReferencedNode_callback : public osg::NodeCallback
 {
 
-	public:
-		
-		virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
-		{
-			osg::ref_ptr<ReferencedNode> thisNode = dynamic_cast<ReferencedNode*> (node->getUserData());
+    public:
 
-			if (thisNode != NULL)
-			{
-				//std::cout << "in ReferencedNode_callback for node: " << thisNode->id->s_name << std::endl;
-				thisNode->callbackUpdate();
-			}
-			
-			traverse(node, nv);
-		}
+        virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+        {
+            osg::ref_ptr<ReferencedNode> thisNode = dynamic_cast<ReferencedNode*> (node->getUserData());
+
+            if (thisNode != NULL)
+            {
+                //std::cout << "in ReferencedNode_callback for node: " << thisNode->id->s_name << std::endl;
+                thisNode->callbackUpdate();
+            }
+
+            traverse(node, nv);
+        }
 };
 
 

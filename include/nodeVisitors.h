@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -52,7 +52,7 @@
 #include <osg/Texture2D>
 #include <osg/TextureRectangle>
 
-
+#include <string>
 #include <iostream>
 
 #include "ReferencedNode.h"
@@ -62,118 +62,118 @@
 /**
  * \brief An OSG NodeVisitor class that allows us to search for a specific node
  *        name/type in the scene graph.
- * 
+ *
  * For example, this is used to find the switch & sequence nodes when loading
  * an OSG model in the ModelNode class, so that we may discover animation features
  */
 
 class SearchVisitor : public osg::NodeVisitor {
 
-public: 
+public:
 
-	SearchVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
-	{
-		// Flag all osg object as NULL
-		GroupNode = NULL;
-		GeodeNode = NULL;
-		MTNode = NULL;
-		PATNode = NULL;
-		SwitchNode = NULL;
-		SequenceNode = NULL;
-	}
+    SearchVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
+    {
+        // Flag all osg object as NULL
+        GroupNode = NULL;
+        GeodeNode = NULL;
+        MTNode = NULL;
+        PATNode = NULL;
+        SwitchNode = NULL;
+        SequenceNode = NULL;
+    }
 
-	virtual void apply(osg::Node &searchNode) 
-	{
-		traverse(searchNode);
-	}
-	
-	virtual void apply(osg::Group &searchNode)
-	{
-		osg::ref_ptr<osg::Group> n = dynamic_cast<osg::Group*> (&searchNode);
-		if (n.valid())
-		{
-			if (searchForName == searchNode.getName()) GroupNode = n;
-		}
-		traverse(searchNode);
-	}
-	virtual void apply(osg::Geode &searchNode)
-	{
-		osg::ref_ptr<osg::Geode> n = dynamic_cast<osg::Geode*> (&searchNode);
-		if (n.valid())
-		{
-			if (searchForName == searchNode.getName()) GeodeNode = n;
-		}
-		traverse(searchNode);
-	}
-	virtual void apply(osg::MatrixTransform &searchNode)
-	{
-		osg::ref_ptr<osg::MatrixTransform> n = dynamic_cast<osg::MatrixTransform*> (&searchNode);
-		if (n.valid())
-		{
-			if (searchForName == searchNode.getName()) MTNode = n;
-		}
-		traverse(searchNode);
-	}
-	virtual void apply(osg::PositionAttitudeTransform &searchNode)
-	{
-		osg::ref_ptr<osg::PositionAttitudeTransform> n = dynamic_cast<osg::PositionAttitudeTransform*> (&searchNode);
-		if (n.valid())
-		{
-			if (searchForName == searchNode.getName()) PATNode = n;
-		}
-		traverse(searchNode);
-	}
-	virtual void apply(osg::Switch &searchNode)
-	{
-		osg::ref_ptr<osg::Switch> n = dynamic_cast<osg::Switch*> (&searchNode);
-		if (n.valid())
-		{
-			if (searchForName == searchNode.getName()) SwitchNode = n;
-		}
-		traverse(searchNode);
-	}
-	virtual void apply(osg::Sequence &searchNode)
-	{
-		osg::ref_ptr<osg::Sequence> n = dynamic_cast<osg::Sequence*> (&searchNode);
-		if (n.valid())
-		{
-			if (searchForName == searchNode.getName()) SequenceNode = n;
-		}
-		traverse(searchNode);
-	}
+    virtual void apply(osg::Node &searchNode)
+    {
+        traverse(searchNode);
+    }
 
-	// search for node with given name starting at the search node
-	void searchNode(osg::Node* searchFromMe, std::string searchName)
-	{
-		GroupNode = NULL;
-		GeodeNode = NULL;
-		MTNode = NULL;
-		PATNode = NULL;
-		SwitchNode = NULL;
-		SequenceNode = NULL;
+    virtual void apply(osg::Group &searchNode)
+    {
+        osg::ref_ptr<osg::Group> n = dynamic_cast<osg::Group*> (&searchNode);
+        if (n.valid())
+        {
+            if (searchForName == searchNode.getName()) GroupNode = n;
+        }
+        traverse(searchNode);
+    }
+    virtual void apply(osg::Geode &searchNode)
+    {
+        osg::ref_ptr<osg::Geode> n = dynamic_cast<osg::Geode*> (&searchNode);
+        if (n.valid())
+        {
+            if (searchForName == searchNode.getName()) GeodeNode = n;
+        }
+        traverse(searchNode);
+    }
+    virtual void apply(osg::MatrixTransform &searchNode)
+    {
+        osg::ref_ptr<osg::MatrixTransform> n = dynamic_cast<osg::MatrixTransform*> (&searchNode);
+        if (n.valid())
+        {
+            if (searchForName == searchNode.getName()) MTNode = n;
+        }
+        traverse(searchNode);
+    }
+    virtual void apply(osg::PositionAttitudeTransform &searchNode)
+    {
+        osg::ref_ptr<osg::PositionAttitudeTransform> n = dynamic_cast<osg::PositionAttitudeTransform*> (&searchNode);
+        if (n.valid())
+        {
+            if (searchForName == searchNode.getName()) PATNode = n;
+        }
+        traverse(searchNode);
+    }
+    virtual void apply(osg::Switch &searchNode)
+    {
+        osg::ref_ptr<osg::Switch> n = dynamic_cast<osg::Switch*> (&searchNode);
+        if (n.valid())
+        {
+            if (searchForName == searchNode.getName()) SwitchNode = n;
+        }
+        traverse(searchNode);
+    }
+    virtual void apply(osg::Sequence &searchNode)
+    {
+        osg::ref_ptr<osg::Sequence> n = dynamic_cast<osg::Sequence*> (&searchNode);
+        if (n.valid())
+        {
+            if (searchForName == searchNode.getName()) SequenceNode = n;
+        }
+        traverse(searchNode);
+    }
 
-		searchForName = searchName;
-		searchFromMe->accept(*this);
-	}
+    // search for node with given name starting at the search node
+    void searchNode(osg::Node* searchFromMe, std::string searchName)
+    {
+        GroupNode = NULL;
+        GeodeNode = NULL;
+        MTNode = NULL;
+        PATNode = NULL;
+        SwitchNode = NULL;
+        SequenceNode = NULL;
 
-	osg::ref_ptr<osg::Group> getGroup() { return GroupNode; }
-	osg::ref_ptr<osg::MatrixTransform> getMT() { return MTNode; }
-	osg::ref_ptr<osg::Geode> getGeode() { return GeodeNode; }
-	osg::ref_ptr<osg::PositionAttitudeTransform> getPAT() { return PATNode; }
-	osg::ref_ptr<osg::Switch> getSwitchNode() { return SwitchNode; }
-	osg::ref_ptr<osg::Sequence> getSequenceNode() { return SequenceNode; }
-	
-private: 
+        searchForName = searchName;
+        searchFromMe->accept(*this);
+    }
 
-	std::string searchForName;
-	
-	osg::ref_ptr<osg::Group> GroupNode;
-	osg::ref_ptr<osg::Geode> GeodeNode;
-	osg::ref_ptr<osg::MatrixTransform> MTNode;
-	osg::ref_ptr<osg::PositionAttitudeTransform> PATNode;
-	osg::ref_ptr<osg::Switch> SwitchNode;
-	osg::ref_ptr<osg::Sequence> SequenceNode;
-	
+    osg::ref_ptr<osg::Group> getGroup() { return GroupNode; }
+    osg::ref_ptr<osg::MatrixTransform> getMT() { return MTNode; }
+    osg::ref_ptr<osg::Geode> getGeode() { return GeodeNode; }
+    osg::ref_ptr<osg::PositionAttitudeTransform> getPAT() { return PATNode; }
+    osg::ref_ptr<osg::Switch> getSwitchNode() { return SwitchNode; }
+    osg::ref_ptr<osg::Sequence> getSequenceNode() { return SequenceNode; }
+
+private:
+
+    std::string searchForName;
+
+    osg::ref_ptr<osg::Group> GroupNode;
+    osg::ref_ptr<osg::Geode> GeodeNode;
+    osg::ref_ptr<osg::MatrixTransform> MTNode;
+    osg::ref_ptr<osg::PositionAttitudeTransform> PATNode;
+    osg::ref_ptr<osg::Switch> SwitchNode;
+    osg::ref_ptr<osg::Sequence> SequenceNode;
+
 };
 
 
@@ -183,38 +183,38 @@ typedef std::vector< osg::ref_ptr<osg::Node> > NodeList;
 class NodeSearcher : public osg::NodeVisitor
 {
     public:
-    	NodeSearcher(NodeList& list):_nodeList(list)
-    	{
-    		setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN );
-    	}
-        
+        NodeSearcher(NodeList& list):_nodeList(list)
+        {
+            setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN );
+        }
+
         virtual void apply(osg::Node& node)
         {
-        	//std::cout << "checking " << node.getName() << std::endl;
-    		//if (_searchName == node.getName())
-        	std::string n = node.getName();
-       		if (n.find(_searchName) != string::npos )
-    		{
-    			//std::cout << "found " << node.className() << std::endl;
-     			_nodeList.push_back(&node);
-    		}
+            //std::cout << "checking " << node.getName() << std::endl;
+            //if (_searchName == node.getName())
+            std::string n = node.getName();
+            if (n.find(_searchName) != std::string::npos )
+            {
+                //std::cout << "found " << node.className() << std::endl;
+                _nodeList.push_back(&node);
+            }
             traverse(node);
         }
-	    	
-		// search for node with given name in the provided subgraph
-		void search(osg::Node* subgraph, std::string s)
-		{
-			_nodeList.clear();
-			_searchName = s;
-			subgraph->accept(*this);
-		}
 
-		std::string _searchName;
+        // search for node with given name in the provided subgraph
+        void search(osg::Node* subgraph, std::string s)
+        {
+            _nodeList.clear();
+            _searchName = s;
+            subgraph->accept(*this);
+        }
+
+        std::string _searchName;
         NodeList& _nodeList;
-        
+
     protected:
-    
-    	NodeSearcher& operator = (const NodeSearcher&) { return *this; }
+
+        NodeSearcher& operator = (const NodeSearcher&) { return *this; }
 };
 
 
@@ -224,36 +224,36 @@ class NodeSearcher : public osg::NodeVisitor
  */
 class DebugVisitor : public osg::NodeVisitor
 {
-	public:
-		
-		DebugVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
+    public:
 
-		virtual void apply(osg::Node &node)
-		{
-			osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "NODE:  " << node.getName() << std::endl;
-			traverse(node);
-		}
-		virtual void apply(osg::PositionAttitudeTransform &node)
-		{
-			osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "PAT:   " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
-			traverse(node);
-		}
-		virtual void apply(osg::Geode &node)
-		{
-			osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "GEODE: " << node.getName() << std::endl;
-			traverse(node);
-		}
-		virtual void apply(osg::Group &node)
-		{
-			ReferencedNode *n;
-						
-			if (n=dynamic_cast<ReferencedNode*>(&node)) {
-				osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->nodeType << ", id=" << n->id->s_name << "  (" << node.getNumChildren () << " children)" << std::endl;
-			} else {
-				osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "GROUP: " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
-			}
-			traverse(node);
-		}
+        DebugVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
+
+        virtual void apply(osg::Node &node)
+        {
+            osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "NODE:  " << node.getName() << std::endl;
+            traverse(node);
+        }
+        virtual void apply(osg::PositionAttitudeTransform &node)
+        {
+            osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "PAT:   " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
+            traverse(node);
+        }
+        virtual void apply(osg::Geode &node)
+        {
+            osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "GEODE: " << node.getName() << std::endl;
+            traverse(node);
+        }
+        virtual void apply(osg::Group &node)
+        {
+            ReferencedNode *n;
+
+            if (n=dynamic_cast<ReferencedNode*>(&node)) {
+                osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->nodeType << ", id=" << n->id->s_name << "  (" << node.getNumChildren () << " children)" << std::endl;
+            } else {
+                osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "GROUP: " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
+            }
+            traverse(node);
+        }
 };
 
 /**
@@ -261,22 +261,14 @@ class DebugVisitor : public osg::NodeVisitor
  */
 class UpdateSceneVisitor : public osg::NodeVisitor
 {
-	public:
+    public:
 
-		UpdateSceneVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
+        UpdateSceneVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
 
-		virtual void apply(osg::Node &node)
-		{
-			traverse(node);
-		}
-		virtual void apply(osg::Group &node)
-		{
-			ReferencedNode *n;
-			if (n=dynamic_cast<ReferencedNode*>(&node)) {
-				n->callbackUpdate();
-			}
-			traverse(node);
-		}
+    virtual void apply(osg::Node &node);
+
+    virtual void apply(osg::Group &node);
+
 };
 
 /**
@@ -286,17 +278,17 @@ typedef std::vector< osg::ref_ptr<osg::StateSet> > StateSetList;
 class TextureStateSetFinder : public osg::NodeVisitor
     {
     public:
-    	TextureStateSetFinder(StateSetList& list):_statesetList(list)
-    	{
-    		setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN );
-    	}
-        
+        TextureStateSetFinder(StateSetList& list):_statesetList(list)
+        {
+            setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN );
+        }
+
         virtual void apply(osg::Node& node)
         {
             apply(node.getStateSet());
             traverse(node);
         }
-    	
+
         virtual void apply(osg::Geode& geode)
         {
             apply(geode.getStateSet());
@@ -304,39 +296,39 @@ class TextureStateSetFinder : public osg::NodeVisitor
             {
                 apply(geode.getDrawable(i)->getStateSet());
             }
-        
+
             traverse(geode);
         }
-        
+
         inline void apply(osg::StateSet* stateset)
         {
             if (!stateset) return;
-            
+
 
             osg::StateAttribute* attr = stateset->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
             if (attr)
             {
-            	
-                // from doxygen:
-            	// attr->asTexture() is fast alternative to dynamic_cast<>
-            	// for determining if state attribute is a Texture. 
 
-            	osg::Texture2D* texture2D = dynamic_cast<osg::Texture2D*>(attr);
+                // from doxygen:
+                // attr->asTexture() is fast alternative to dynamic_cast<>
+                // for determining if state attribute is a Texture.
+
+                osg::Texture2D* texture2D = dynamic_cast<osg::Texture2D*>(attr);
                 if (texture2D)
                 {
-                	_statesetList.push_back(stateset);
-                	//apply(dynamic_cast<osg::Image*>(texture2D->getImage()));
+                    _statesetList.push_back(stateset);
+                    //apply(dynamic_cast<osg::Image*>(texture2D->getImage()));
                 }
 
                 osg::TextureRectangle* textureRec = dynamic_cast<osg::TextureRectangle*>(attr);
-                if (textureRec) 
+                if (textureRec)
                 {
-                	_statesetList.push_back(stateset);
-                	//apply(dynamic_cast<osg::Image*>(textureRec->getImage()));
+                    _statesetList.push_back(stateset);
+                    //apply(dynamic_cast<osg::Image*>(textureRec->getImage()));
                 }
             }
         }
-        
+
         /*
         inline void apply(osg::Image* img)
         {
@@ -347,12 +339,12 @@ class TextureStateSetFinder : public osg::NodeVisitor
             }
         }
         */
-        
+
         StateSetList& _statesetList;
-        
+
     protected:
-    
-    	TextureStateSetFinder& operator = (const TextureStateSetFinder&) { return *this; }
+
+        TextureStateSetFinder& operator = (const TextureStateSetFinder&) { return *this; }
     };
 
 

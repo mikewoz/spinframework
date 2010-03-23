@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -85,7 +85,7 @@ class SoundConnection;
 
 /**
  * \brief The main class that maintains the scene and handles OSC messages.
- * 
+ *
  * The SceneManager class should only be instantiated once for each process
  * or thread. However, this should rarely be done directly because the
  * spinContext instance (listener or server) have a better interface
@@ -94,165 +94,165 @@ class SoundConnection;
 class SceneManager
 {
 
-	public:
+    public:
 
-		SceneManager(std::string id, std::string addr, std::string port);
-		~SceneManager();
+        SceneManager(std::string id, std::string addr, std::string port);
+        ~SceneManager();
 
-		void init();
-		void debug();
+        void init();
+        void debug();
 
-		lo_address rxAddr;
-		lo_server_thread rxServ;
+        lo_address rxAddr;
+        lo_server_thread rxServ;
 
-		lo_address txAddr;
-		lo_server  txServ;
-		//lo_server_thread  txServ;
+        lo_address txAddr;
+        lo_server  txServ;
+        //lo_server_thread  txServ;
 
-		bool isServer() { return (bool) txServ; }
-		bool isSlave() { return (bool) !txServ; }
-		
-		void setGraphical(bool b) { graphicalMode = b; }
-		bool isGraphical() { return (bool) graphicalMode; }
-		
-		//void setLogFile(const char *logfile);
-		void setLog(spinLog& log);
+        bool isServer() { return (bool) txServ; }
+        bool isSlave() { return (bool) !txServ; }
 
-		void setTXaddress (std::string addr, std::string port);
-		
-		void registerState(ReferencedState *s);
-		void unregisterState(ReferencedState *s);
-		
-		
-		void sendNodeList(std::string type);
-		void sendConnectionList();
-		void sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
-		void sendSceneBundle(std::vector<lo_message> msgs);
-		void sendBundle(std::string OSCpath, std::vector<lo_message> msgs);
+        void setGraphical(bool b) { graphicalMode = b; }
+        bool isGraphical() { return (bool) graphicalMode; }
+
+        //void setLogFile(const char *logfile);
+        void setLog(spinLog& log);
+
+        void setTXaddress (std::string addr, std::string port);
+
+        void registerState(ReferencedState *s);
+        void unregisterState(ReferencedState *s);
+
+
+        void sendNodeList(std::string type);
+        void sendConnectionList();
+        void sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
+        void sendSceneBundle(std::vector<lo_message> msgs);
+        void sendBundle(std::string OSCpath, std::vector<lo_message> msgs);
 
 
         ReferencedNode *createNode(std::string id, std::string type);
-		ReferencedNode *createNode(const char *id, const char *type);
-		ReferencedNode *getNode(std::string id);
-		ReferencedNode *getNode(const char *id);
-		ReferencedNode *getNode(const char *id, const char *type);
-		ReferencedNode *getOrCreateNode(const char *id, const char *type);
-		
-		ReferencedState* getState(const char *id);
-		ReferencedState* getOrCreateState(const char *id, const char *type);
-		
-		std::vector<SoundConnection*> getConnections();
+        ReferencedNode *createNode(const char *id, const char *type);
+        ReferencedNode *getNode(std::string id);
+        ReferencedNode *getNode(const char *id);
+        ReferencedNode *getNode(const char *id, const char *type);
+        ReferencedNode *getOrCreateNode(const char *id, const char *type);
 
-		/**
-		 * This method removes a node from the scene, however the actual work is
-		 * done by the doDelete() method.
-		 * 
-		 * NOTE: All children of the node will remain, but will be re-attached
-		 * to the 'world' node instead. If you want to destroy all children as
-		 * well, then use deleteGraph().
-		 */
-		void deleteNode(const char *id);
-		
-		/**
-		 * deleteGraph() operates similarly to deleteNode(), except that all
-		 * children are also deleted.
-		 */
-		void deleteGraph(const char *id);
-		
-		/**
-		 * The doDelete method performs all of the necessary steps to remove a
-		 * node from the scene: The node's detach() method is called, which will
-		 * actually remove it from the scene graph, and eliminate the OSC
-		 * callback. The callbackUpdate() function is unregistered. And finally,
-		 * a message is broadcasted to all clients.
-		 */
-		void doDelete(ReferencedNode *n);
-		
-		/**
-		 * Clears scene elements that are not part of any user's subgraphs
-		 */
-		void clear();
-		
-		/**
-		 * Clears only the users from the scene (and any attached nodes in their
-		 * subgraphs
-		 */
-		void clearUsers();
-		
-		/**
-		 * Forces a removal of all states from the scene graph. This should only
-		 * be used to clean up upon exit.
-		 */
-		void clearStates();
-		
-		/**
-		 * The refresh method results in a broadcast of all nodelists so that
-		 * clients can create any missing nodes. Then, the full node state is
-		 * broadcasted, for ALL nodes.
-		 */
-		void refresh();
+        ReferencedState* getState(const char *id);
+        ReferencedState* getOrCreateState(const char *id, const char *type);
 
+        std::vector<SoundConnection*> getConnections();
 
-		/**
-		 * The update method is where any thread-safe changes to the scene graph
-		 * should go. The method is guaranteed to be called only when there are
-		 * no traversals being performed.
-		 */
-		void update();
-		
-		
-		
-		
-		osg::Matrix getWorldCoords(t_symbol *id);
+        /**
+         * This method removes a node from the scene, however the actual work is
+         * done by the doDelete() method.
+         *
+         * NOTE: All children of the node will remain, but will be re-attached
+         * to the 'world' node instead. If you want to destroy all children as
+         * well, then use deleteGraph().
+         */
+        void deleteNode(const char *id);
 
-		void exportScene (const char *nodeID, const char *filename);
+        /**
+         * deleteGraph() operates similarly to deleteNode(), except that all
+         * children are also deleted.
+         */
+        void deleteGraph(const char *id);
+
+        /**
+         * The doDelete method performs all of the necessary steps to remove a
+         * node from the scene: The node's detach() method is called, which will
+         * actually remove it from the scene graph, and eliminate the OSC
+         * callback. The callbackUpdate() function is unregistered. And finally,
+         * a message is broadcasted to all clients.
+         */
+        void doDelete(ReferencedNode *n);
+
+        /**
+         * Clears scene elements that are not part of any user's subgraphs
+         */
+        void clear();
+
+        /**
+         * Clears only the users from the scene (and any attached nodes in their
+         * subgraphs
+         */
+        void clearUsers();
+
+        /**
+         * Forces a removal of all states from the scene graph. This should only
+         * be used to clean up upon exit.
+         */
+        void clearStates();
+
+        /**
+         * The refresh method results in a broadcast of all nodelists so that
+         * clients can create any missing nodes. Then, the full node state is
+         * broadcasted, for ALL nodes.
+         */
+        void refresh();
 
 
-		std::string sceneID;
+        /**
+         * The update method is where any thread-safe changes to the scene graph
+         * should go. The method is guaranteed to be called only when there are
+         * no traversals being performed.
+         */
+        void update();
 
-		osg::ref_ptr<osg::Group> rootNode;
-		osg::ref_ptr<osg::Group> worldNode;
-		osg::ref_ptr<osg::Geode> gridGeode;
 
 
-		/**
-		 * The scene manager can operate in graphical mode or non-graphical.
-		 * > For graphical mode, the full scene graph structure is instantiated,
-		 *   and can thus be renderered by an OSG rendering process.
-		 * > Non-graphical mode only maintains the basic features in the scene
-		 *   graph that are needed for GUIs and information servers. Eg, lights
-		 *   are not created.
-		 */
-		bool graphicalMode;
 
-		osg::ref_ptr<GroupNode> globalObserver;
+        osg::Matrix getWorldCoords(t_symbol *id);
 
-		bool activeLights[OSG_NUM_LIGHTS];
+        void exportScene (const char *nodeID, const char *filename);
 
-		std::string getStateAsXML(std::vector<lo_message> nodeState);
-		std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
-		
-		std::string getConnectionsAsXML();
-		bool saveXML(const char *filename, bool withUsers);
-		bool saveUsers(const char *s);
-			
-		bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
-		bool createConnectionsFromXML(TiXmlElement *XMLnode);
-		bool loadXML(const char *filename);
 
-		std::string resourcesPath;
-		
-		MediaManager *mediaManager;
-		
-		osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
+        std::string sceneID;
 
-		//pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;
+        osg::ref_ptr<osg::Group> rootNode;
+        osg::ref_ptr<osg::Group> worldNode;
+        osg::ref_ptr<osg::Geode> gridGeode;
 
-		
-	private:
-		//std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
-		nodeMapType nodeMap; // the nodeList arranged by type
-		ReferencedStateMap stateMap;
+
+        /**
+         * The scene manager can operate in graphical mode or non-graphical.
+         * > For graphical mode, the full scene graph structure is instantiated,
+         *   and can thus be renderered by an OSG rendering process.
+         * > Non-graphical mode only maintains the basic features in the scene
+         *   graph that are needed for GUIs and information servers. Eg, lights
+         *   are not created.
+         */
+        bool graphicalMode;
+
+        osg::ref_ptr<GroupNode> globalObserver;
+
+        bool activeLights[OSG_NUM_LIGHTS];
+
+        std::string getStateAsXML(std::vector<lo_message> nodeState);
+        std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
+
+        std::string getConnectionsAsXML();
+        bool saveXML(const char *filename, bool withUsers);
+        bool saveUsers(const char *s);
+
+        bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
+        bool createConnectionsFromXML(TiXmlElement *XMLnode);
+        bool loadXML(const char *filename);
+
+        std::string resourcesPath;
+
+        MediaManager *mediaManager;
+
+        osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
+
+        //pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;
+
+
+    private:
+        //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
+        nodeMapType nodeMap; // the nodeList arranged by type
+        ReferencedStateMap stateMap;
 };
 
 
@@ -260,12 +260,15 @@ class SceneManager
 static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
 
 
-static int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
+int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
 
 int SceneManagerCallback_log(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 int SceneManagerCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+//int SceneManagerCallback_script(const char* symName,  char *types, lo_arg *argv, int argc);
+
 
 /**
  * The SoundConnection node is an exception that does not extend ReferencedNode.
@@ -280,12 +283,12 @@ void oscParser_error(int num, const char *msg, const char *path);
 
 /*
 #define BROADCAST(pNode, types, ...) \
-	if (sceneManager->isServer()) \
-	lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
+    if (sceneManager->isServer()) \
+    lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
 
 #define BROADCAST_MSG(pNode, msg) \
-	if (sceneManager->isServer()) \
-	lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
+    if (sceneManager->isServer()) \
+    lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
 */
 
 
@@ -294,20 +297,20 @@ void oscParser_error(int num, const char *msg, const char *path);
 // case, the macros always check that the passed SceneManager (s) is a server.
 
 #define SCENE_MSG(s, types, ...) \
-	if (s->isServer()) \
-	lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
+    if (s->isServer()) \
+    lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
 
 #define SCENE_LO_MSG(s, msg) \
-	if (s->isServer()) \
-	lo_send_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID).c_str(), msg)
+    if (s->isServer()) \
+    lo_send_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID).c_str(), msg)
 
 #define NODE_MSG(s, pNode, types, ...) \
-	if (s->isServer()) \
-	lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
+    if (s->isServer()) \
+    lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
 
 #define NODE_LO_MSG(s, pNode, msg) \
-	if (s->isServer()) \
-	lo_send_message_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
+    if (s->isServer()) \
+    lo_send_message_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
 
 
 // backwards compatibility (TODO: replace all BROADCAST messages with NODE_MSG)

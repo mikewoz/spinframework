@@ -42,6 +42,8 @@
 #ifndef SPINCONTEXT_H_
 #define SPINCONTEXT_H_
 
+#include <boost/python.hpp>
+
 #include "spinUtil.h"
 #include "SceneManager.h"
 #include "MediaManager.h"
@@ -65,116 +67,121 @@
 class spinContext
 {
 
-	public:
+    public:
 
 
-		//spinContext(spinContextMode initMode=LISTENER_MODE);
-		//virtual ~spinContext();
+        //spinContext(spinContextMode initMode=LISTENER_MODE);
+        //virtual ~spinContext();
 
-		// Meyers Singleton design pattern:
-		static spinContext& Instance() {
-			static spinContext spinInstance;
-			return spinInstance;
-		}
-		
-		enum spinContextMode { SERVER_MODE, LISTENER_MODE };
+        // Meyers Singleton design pattern:
+        static spinContext& Instance() {
+            static spinContext spinInstance;
+            return spinInstance;
+        }
 
-		bool isServer() { return (mode==SERVER_MODE); }
-		bool isSlave() { return (mode!=SERVER_MODE); }
-		
-		
-		bool setMode(spinContextMode m);
+        enum spinContextMode { SERVER_MODE, LISTENER_MODE };
 
-		virtual bool start();
-		virtual void stop();
-
-		/**
-		 * This method should be used to register a user for a listener-style
-		 * SPIN client. The user is definitively created and stored in the
-		 * current application context, even if a server is not running.
-		 */
-		void registerUser(const char *id);
-
-		/**
-		 * This sends a variable length message. 
-		 * 
-		 * IMPORTANT: the list must be terminated with LO_ARGS_END, or this call
-		 * will fail.  This is used to do simple error checking on the sizes of
-		 * parameters passed.
-		 */
-		void InfoMessage(std::string OSCpath, const char *types, ...);
-		void InfoMessage(std::string OSCpath, const char *types, va_list ap);
-		void InfoMessage(std::string OSCpath, lo_message msg);
-		
-		void SceneMessage(const char *types, ...);
-		void SceneMessage(const char *types, va_list ap);
-		void SceneMessage(lo_message msg);
-
-		void NodeMessage(const char *nodeId, const char *types, ...);
-		void NodeMessage(const char *nodeId, const char *types, va_list ap);
-		void NodeMessage(const char *nodeId, lo_message msg);
+        bool isServer() { return (mode==SERVER_MODE); }
+        bool isSlave() { return (mode!=SERVER_MODE); }
 
 
-		virtual int sceneCallback(const char *types, lo_arg **argv, int argc);
+        bool setMode(spinContextMode m);
 
-		bool isRunning() { return running; }
+        virtual bool start();
+        virtual void stop();
 
-		void setID(std::string s) { id = s; }
-		void setRxAddr(std::string s) { rxAddr = s; }
-		void setRxPort(std::string s) { rxPort = s; }
-		void setTxAddr(std::string s) { txAddr = s; }
-		void setTxPort(std::string s) { txPort = s; }
+        /**
+         * This method should be used to register a user for a listener-style
+         * SPIN client. The user is definitively created and stored in the
+         * current application context, even if a server is not running.
+         */
+        void registerUser(const char *id);
 
-		spinContextMode mode;
+        /**
+         * This sends a variable length message.
+         *
+         * IMPORTANT: the list must be terminated with LO_ARGS_END, or this call
+         * will fail.  This is used to do simple error checking on the sizes of
+         * parameters passed.
+         */
+        void InfoMessage(std::string OSCpath, const char *types, ...);
+        void InfoMessage(std::string OSCpath, const char *types, va_list ap);
+        void InfoMessage(std::string OSCpath, lo_message msg);
 
-		osg::ref_ptr<UserNode> userNode;
-		//t_symbol *user;
-		
-		std::string id;
-		std::string rxAddr, rxPort;
-		std::string txAddr, txPort;
-		std::string infoAddr, infoPort;
+        void SceneMessage(const char *types, ...);
+        void SceneMessage(const char *types, va_list ap);
+        void SceneMessage(lo_message msg);
 
-		lo_address lo_txAddr;
-
-		lo_address lo_infoAddr;
-		//lo_server  lo_infoServ;
-		lo_server_thread lo_infoServ;
-
-		SceneManager *sceneManager;
-		MediaManager *mediaManager;
-
-		bool signalStop;
-	    bool running;
-
-	    /**
-	     * We store a funciton pointer in the class, which can be dynamically
-	     * swapped depending on spinContextMode (ie, different thread for server
-	     * mode versus listener mode).
-	     */
-	    void *(*threadFunction) (void*);
+        void NodeMessage(const char *nodeId, const char *types, ...);
+        void NodeMessage(const char *nodeId, const char *types, va_list ap);
+        void NodeMessage(const char *nodeId, lo_message msg);
 
 
-		
-	protected:
+        virtual int sceneCallback(const char *types, lo_arg **argv, int argc);
 
-		std::string spinFolder;
+        bool isRunning() { return running; }
 
-	private:
-		
-		// singleton constructors & desctructor (hidden):
-		spinContext();
-		spinContext(spinContext const&); // copy constructor
-		// hide the assignment operator, otherwise it would be possible to
-		// assign the singleton spinContext to itself:
-		spinContext& operator=(spinContext const&);
-		~spinContext();
-		
-		
+        void setID(std::string s) { id = s; }
+        void setRxAddr(std::string s) { rxAddr = s; }
+        void setRxPort(std::string s) { rxPort = s; }
+        void setTxAddr(std::string s) { txAddr = s; }
+        void setTxPort(std::string s) { txPort = s; }
 
-		// pthread stuff
-		pthread_t pthreadID; // id of child thread
-		pthread_attr_t pthreadAttr;
+        spinContextMode mode;
+
+        osg::ref_ptr<UserNode> userNode;
+        //t_symbol *user;
+
+        std::string id;
+        std::string rxAddr, rxPort;
+        std::string txAddr, txPort;
+        std::string infoAddr, infoPort;
+
+        lo_address lo_txAddr;
+
+        lo_address lo_infoAddr;
+        //lo_server  lo_infoServ;
+        lo_server_thread lo_infoServ;
+
+        SceneManager *sceneManager;
+        MediaManager *mediaManager;
+
+        bool signalStop;
+        bool running;
+
+        /**
+         * We store a funciton pointer in the class, which can be dynamically
+         * swapped depending on spinContextMode (ie, different thread for server
+         * mode versus listener mode).
+         */
+        void *(*threadFunction) (void*);
+
+        bool initPython();
+        bool execPython( const std::string& cmd );
+        boost::python::object _pyMainModule;
+        boost::python::object _pyNamespace;
+        bool _pyInitialized;
+
+
+    protected:
+
+        std::string spinFolder;
+
+    private:
+
+        // singleton constructors & desctructor (hidden):
+        spinContext();
+        spinContext(spinContext const&); // copy constructor
+        // hide the assignment operator, otherwise it would be possible to
+        // assign the singleton spinContext to itself:
+        spinContext& operator=(spinContext const&);
+        ~spinContext();
+
+
+
+        // pthread stuff
+        pthread_t pthreadID; // id of child thread
+        pthread_attr_t pthreadAttr;
 
 
 };

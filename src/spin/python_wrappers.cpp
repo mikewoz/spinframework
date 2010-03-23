@@ -57,253 +57,183 @@
 #include <string>
 #include <string.h>
 
+#include <iostream>
+#include <sstream>
+
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
-#include "spinContext.h"
+#include <osgIntrospection/Reflection>
+#include <osgIntrospection/Type>
+#include <osgIntrospection/Value>
+#include <osgIntrospection/variant_cast>
+#include <osgIntrospection/Exceptions>
+#include <osgIntrospection/MethodInfo>
+#include <osgIntrospection/PropertyInfo>
 
+#include <osgIntrospection/ReflectionMacros>
+#include <osgIntrospection/TypedMethodInfo>
+#include <osgIntrospection/StaticMethodInfo>
+#include <osgIntrospection/Attributes>
+
+#include <osgIntrospection/ExtendedTypeInfo>
+
+
+#include "spinContext.h"
+#include "SceneManager.h"
+#include "hello.h"
 
 using namespace boost::python;
 
 
-// before singleton
-//class pySpinContext // : public spinContext
-class pySpinContext
-{
-	
-	public:
-		//pySpinContext(PyObject *s, const spinContext& x) : spinContext(x), self(s) {}
-		pySpinContext() {
-		}
-		virtual ~pySpinContext() {}
-		
-		virtual bool start();
-		
-		void sendInfoMessage(PyObject* list);
-		void sendSceneMessage(PyObject* list);
-		void sendNodeMessage(PyObject* list);
-		
-		// these functions need to be overridden in Python:
-		//virtual void sceneCallback(PyObject* dict) = 0; 
-		
-		virtual void sceneCallback(PyObject* dict) {
-			std::cout << "in sceneCallback" << std::endl;
-		}
-		
-		
-	
-		PyObject* self;
-		
-	private:
-		lo_message lo_message_from_PyList(PyObject* list);
-		
-};
-
-// If we have overloaded functions in C++, we need to explicitly define member
-// function pointer variables in order to expose them to Python:
-void (pySpinContext::*sendInfoMessage_fromPython)(PyObject* list) = &pySpinContext::sendInfoMessage;
-void (pySpinContext::*sendSceneMessage_fromPython)(PyObject* list) = &pySpinContext::sendSceneMessage;
-void (pySpinContext::*sendNodeMessage_fromPython)(PyObject* list) = &pySpinContext::sendNodeMessage;
 
 
-// =============================================================================
-// CALLBACK FUNCTIONS FROM LIBLO
 
-int sceneCallback_wrapped(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+//int SceneManagerCallback_script(const char* symName, const char *types, lo_arg **argv, int argc)
+int SceneManagerCallback_script(const char* symName, const char *types, std::string args, int argc)
 {
 
-	pySpinContext *spin = (pySpinContext*) user_data;
+    //int i;
+    std::string    theMethod;
+    osgIntrospection::ValueList theArgs;
 
-	if (!spin) return 1;
-	
-	// make sure there is at least one argument (ie, a method to call):
-	if (!argc) return 1;
+    printf("SceneManagerCallback_script: hi! %s, %s, [%s]\n", symName, types, args.c_str());
 
-	// get the method (argv[0]):
-	string theMethod;
-	if (lo_is_string_type((lo_type)types[0]))
-	{
-		theMethod = string((char *)argv[0]);
-	}
-	else return 1;
-	
-	// create list from rest of args:
-	boost::python::list args;
-	for (int i=1; i<argc; i++)
-	{
-		if (types[i]=='s') args.append((char*)argv[i]);
-		else if (types[i]=='i') args.append( (long)  lo_hires_val( (lo_type)types[i], argv[i] ));
-		else if (types[i]=='f') args.append( (float) lo_hires_val( (lo_type)types[i], argv[i] ) );
-		else if (types[i]=='d') args.append( (double) lo_hires_val( (lo_type)types[i], argv[i] ) );
-	}
-	
-	// create a dict to return:
-	boost::python::dict d;
-	d["fullpath"] = path;
-	d["method"] = theMethod.c_str();
-	d["args"] = args;
-	
-	std::cout << "pySpinContext is valid... about to call python callback." << std::endl;
-	
-	
-	try {
-		call_method<int>(spin->self, "sceneCallback", d);
-		return 1;
-	} catch (error_already_set) {
-		std::cout << "Error calling sceneCallback" << std::endl;
-		// exception will be thrown if virtual method was not overridden.
-		PyErr_Print();
-		PyErr_Clear();
-		return -1;
-	}
-	
-	return 1;
+    // make sure there is at least one argument (ie, a method to call):
+    //if (!argc) {
+    //    printf("SceneManagerCallback_script: no args -> no method to call\n");
+    //    return 1;
+    // }
+    // get the method (argv[0]):
+    //if (lo_is_string_type((lo_type)types[0])) {
+    //    theMethod = string((char *)argv[0]);
+    //} else return 1;
 
+    t_symbol *s = gensym( symName );
+
+    if (!s->s_thing)
+    {
+        std::cout << "oscParser: Could not find referenced object named: " << symName << std::endl;
+        return 1;
+    }
+
+    // get osgInrospection::Value from passed UserData by casting as the proper
+    // referenced object pointer:
+
+    osgIntrospection::Value classInstance;
+    if (s->s_type == REFERENCED_STATE)
+        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedState*>(s->s_thing));
+    else
+        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
+
+
+
+    // the getInstanceType() method however, gives us the real type being pointed at:
+    const osgIntrospection::Type &classType = classInstance.getInstanceType();
+
+    if (!classType.isDefined())
+    {
+        std::cout << "ERROR: oscParser cound not process message '" << symName << ". osgIntrospection has no data for that node." << std::endl;
+        return 1;
+    }
+
+    //introspect_print_type(classType);
+
+    // If we have found a valid Type, then let's build an argument list and see
+    // if we can find a method that takes this list of argumets:
+    /*for (i=1; i<argc; i++)
+    {
+        if (lo_is_numerical_type((lo_type)types[i]))
+        {
+            //   theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
+        } else {
+            theArgs.push_back( (const char*) argv[i] );
+        }
+        }*/
+
+    //char tmp[100];
+    //strcpy(tmp, args.c_str());
+    //const char* tok = strtok (tmp, " ");
+
+    /*   while (tok != NULL) {
+
+        printf ("tok: %s\n",tok);
+        if (lo_is_numerical_type((lo_type)types[argn])) {
+            //   theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
+            theArgs.push_back( (float) atof(tok) );
+        } else {
+            theArgs.push_back( (const char*) tok );
+        }
+
+        tok = strtok (NULL, " ");
+        argn++;
+    }
+
+    */
+
+
+    int argn = 1;
+    std::string tok;
+    std::istringstream iss(args);
+    getline(iss, tok, ' ');
+
+    theMethod = tok;
+
+    while ( getline(iss, tok, ' ') ) {
+
+        //std::cout << tok << std::endl;
+
+        if (lo_is_numerical_type((lo_type)types[argn])) {
+            //   theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
+            theArgs.push_back( (float) atof(tok.c_str() ) );
+        } else {
+            theArgs.push_back( tok );
+        }
+        argn++;
+    }
+
+     // invoke the method on the node, and if it doesn't work, then just forward
+    // the message:
+    if (!invokeMethod(classInstance, classType, theMethod, theArgs))
+    {
+        std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway...NOT!" << std::endl;
+
+        // HACK: TODO: fix this
+        /*spinContext &spin = spinContext::Instance();
+        if (spin.sceneManager->isServer())
+        {
+
+            lo_message msg = lo_message_new();
+            for (i=0; i<argc; i++)
+            {
+                if (lo_is_numerical_type((lo_type)types[i]))
+                {
+                    lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+                } else {
+                    lo_message_add_string(msg, (const char*) argv[i] );
+                }
+            }
+
+            lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+            }*/
+    }
+
+
+    //pthread_mutex_unlock(&pthreadLock);
+
+    return 1;
 }
-
-
-// =============================================================================
-
-bool pySpinContext::start()
-{
-	spinContext &spin = spinContext::Instance();
-	
-	if (spin.start())
-	{
-		// now, register our additional callbacks:
-		std::string OSCpath = std::string("/SPIN/") + spin.id;
-		std::cout << "registering callback for " << OSCpath << " on " << lo_server_get_url(lo_server_thread_get_server(spin.sceneManager->rxServ)) << std::endl;
-		
-		//lo_server_thread_add_method(this->sceneManager->rxServ, OSCpath.c_str(), NULL, sceneCallback_wrapped, (void*)this);
-		
-		return true;
-	}
-	else {
-		std::cout << "spinContext must be running in order to register callbacks. Use the start() method." << std::endl;
-		return false;
-	}
-}
-
-void pySpinContext::sendInfoMessage(PyObject* list)
-{
-	spinContext &spin = spinContext::Instance();
-
-	// ensure 1st argument is an OSC string:
-	PyObject *oscPath = PyList_GetItem(list, 0);
-	if (!PyString_Check(oscPath))
-	{
-		std::cout << "ERROR: sendInfoMessage() must provide an OSC-style string as the first item" << std::endl;
-		return;
-	}
-	
-	// pass the list, minus the 1st item:
-	lo_message msg = lo_message_from_PyList(PyList_GetSlice(list, 1, PyList_Size(list)));
-	spin.NodeMessage(extract<char*>(oscPath), msg);
-}
-
-void pySpinContext::sendSceneMessage(PyObject* list)
-{
-	spinContext &spin = spinContext::Instance();
-	lo_message msg = lo_message_from_PyList(list);
-	spin.SceneMessage(msg);
-}
-
-void pySpinContext::sendNodeMessage(PyObject* list)
-{
-	spinContext &spin = spinContext::Instance();
-
-	// ensure 1st argument is a node name (ie, a string):
-	PyObject *nodeName = PyList_GetItem(list, 0);
-	if (!PyString_Check(nodeName))
-	{
-		std::cout << "ERROR: sendNodeMessage() must specify a node name as the first item" << std::endl;
-		return;
-	}
-
-	// pass the list, minus the 1st item:
-	lo_message msg = lo_message_from_PyList(PyList_GetSlice(list, 1, PyList_Size(list)));
-	spin.NodeMessage(extract<char*>(nodeName), msg);
-}
-
-lo_message pySpinContext::lo_message_from_PyList(PyObject *list)
-{
-	lo_message msg = lo_message_new();
-	
-	// add args to lo_message:
-	PyObject *item;
-	for (int i=0; i<PyList_Size(list); i++)
-	{
-		item = PyList_GetItem(list, i);
-		if (PyInt_Check(item))
-		{
-			lo_message_add_int32(msg,extract<int>(item));
-		}
-		else if (PyFloat_Check(item))
-		{
-			lo_message_add_float(msg,extract<float>(item));	
-		}	
-		else if (PyString_Check(item))
-		{
-			lo_message_add_string(msg,extract<char*>(item));	
-		}
-	}
-	
-	//std::cout << "created liblo message from python:" << std::endl;
-	//lo_message_pp(msg);
-	return msg;
-}
-
-
 
 // =============================================================================
 
-BOOST_PYTHON_MODULE(spinFramework)
+BOOST_PYTHON_MODULE(libSPINPyWrap)
 {
-	// set the docstring of the current module scope
-    //scope().attr("__doc__") = "my module's docstring";
-/*
-	{
-	scope in_spinContext = class_<spinContext>("spinContext",  init<spinContext::spinContextMode>())
-		.def("start", &spinContext::start)
-		.def("stop", &spinContext::stop)		
-		.def("isRunning", &spinContext::isRunning)
-		.def("setID", &spinContext::setID)
-		.def("setRxAddr", &spinContext::setRxAddr)
-		.def("setRxPort", &spinContext::setRxPort)
-		.def("setTxAddr", &spinContext::setTxAddr)
-		.def("setTxPort", &spinContext::setTxPort)
-		;
-		
-	enum_<spinContext::spinContextMode>("mode")
-	    .value("SERVER_MODE", spinContext::SERVER_MODE)
-	    .value("LISTENER_MODE", spinContext::LISTENER_MODE)
-	    ;
-		
-	} // close scope for spinContext
-*/
-	 
-	scope in_pySpinContext = class_< pySpinContext >( "pySpinContext" )
-	//old way before singleton:
-	//scope in_pySpinContext = class_< spinContext, pySpinContext >( "pySpinContext", init<const spinContext::spinContextMode&>() )
-		
-		.def("sendInfoMessage", sendInfoMessage_fromPython)
-		.def("sendSceneMessage", sendSceneMessage_fromPython)
-		.def("sendNodeMessage", sendNodeMessage_fromPython)
 
-		.def("start", &pySpinContext::start)
-		.def("stop", &spinContext::stop)
-		.def("isRunning", &spinContext::isRunning)
-		/*
-		.def("setID", &spinContext::setID)
-		.def("setRxAddr", &spinContext::setRxAddr)
-		.def("setRxPort", &spinContext::setRxPort)
-		.def("setTxAddr", &spinContext::setTxAddr)
-		.def("setTxPort", &spinContext::setTxPort)
-		*/
-		;
-	
-	enum_<spinContext::spinContextMode>("mode")
-	    .value("SERVER_MODE", spinContext::SERVER_MODE)
-	    .value("LISTENER_MODE", spinContext::LISTENER_MODE)
-	    ;		
+    class_<World>("World")
+        .def("greet", &World::greet)
+        .def("set", &World::set)
+    ;
+
+    def("callback", &SceneManagerCallback_script);
+
 }
