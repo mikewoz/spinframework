@@ -32,14 +32,16 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = i686-pc-linux-gnu
-host_triplet = i686-pc-linux-gnu
+build_triplet = i386-apple-darwin9.8.0
+host_triplet = i386-apple-darwin9.8.0
 subdir = src/osgWrappers
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
+	$(top_srcdir)/m4/ax_boost_filesystem.m4 \
 	$(top_srcdir)/m4/ax_boost_regex.m4 \
+	$(top_srcdir)/m4/ax_boost_thread.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
 	$(top_srcdir)/m4/ax_check_glu.m4 \
 	$(top_srcdir)/m4/ax_check_glut.m4 \
@@ -54,18 +56,16 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-ARFLAGS = cru
-libSPINwrappers_a_AR = $(AR) $(ARFLAGS)
-libSPINwrappers_a_LIBADD =
-am_libSPINwrappers_a_OBJECTS = ReferencedNode.$(OBJEXT) \
-	GroupNode.$(OBJEXT) ShapeNode.$(OBJEXT) ModelNode.$(OBJEXT) \
-	VideoNode.$(OBJEXT) LightSource.$(OBJEXT) RayNode.$(OBJEXT) \
-	Contour.$(OBJEXT) ConstraintsNode.$(OBJEXT) \
-	PointerNode.$(OBJEXT) MeasurementNode.$(OBJEXT) \
-	SoundNode.$(OBJEXT) SoundSpace.$(OBJEXT) DSPNode.$(OBJEXT) \
-	SoundConnection.$(OBJEXT) UserNode.$(OBJEXT)
-libSPINwrappers_a_OBJECTS = $(am_libSPINwrappers_a_OBJECTS)
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+libSPINwrappers_la_LIBADD =
+am_libSPINwrappers_la_OBJECTS = ReferencedNode.lo ReferencedState.lo \
+	UserNode.lo GroupNode.lo ShapeNode.lo ModelNode.lo GridNode.lo \
+	LightSource.lo RayNode.lo Contour.lo ConstraintsNode.lo \
+	PointerNode.lo MeasurementNode.lo AnimationNode.lo \
+	SwitchNode.lo TextNode.lo DSPNode.lo SoundNode.lo \
+	SoundSpace.lo Listener.lo SoundConnection.lo VideoTexture.lo \
+	SharedVideoTexture.lo
+libSPINwrappers_la_OBJECTS = $(am_libSPINwrappers_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -79,26 +79,28 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libSPINwrappers_a_SOURCES)
-DIST_SOURCES = $(libSPINwrappers_a_SOURCES)
+SOURCES = $(libSPINwrappers_la_SOURCES)
+DIST_SOURCES = $(libSPINwrappers_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/mikewoz/svn/spinframework/missing --run aclocal-1.11
-AMTAR = ${SHELL} /home/mikewoz/svn/spinframework/missing --run tar
+ACLOCAL = ${SHELL} /Users/zack/svn/spinframework/missing --run aclocal-1.11
+AMTAR = ${SHELL} /Users/zack/svn/spinframework/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /home/mikewoz/svn/spinframework/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/mikewoz/svn/spinframework/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/mikewoz/svn/spinframework/missing --run automake-1.11
-AWK = mawk
-BOOST_CPPFLAGS = -I/usr/include
-BOOST_LDFLAGS = -L/usr/lib
+AUTOCONF = ${SHELL} /Users/zack/svn/spinframework/missing --run autoconf
+AUTOHEADER = ${SHELL} /Users/zack/svn/spinframework/missing --run autoheader
+AUTOMAKE = ${SHELL} /Users/zack/svn/spinframework/missing --run automake-1.11
+AWK = awk
+BOOST_CPPFLAGS = -pthread -I/opt/local/include
+BOOST_FILESYSTEM_LIB = -lboost_filesystem-mt
+BOOST_LDFLAGS = -L/opt/local/lib
 BOOST_REGEX_LIB = -lboost_regex-mt
+BOOST_THREAD_LIB = -lboost_thread-mt
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = 
+CPPFLAGS =  -I/opt/local/include
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
@@ -106,44 +108,44 @@ CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-DSYMUTIL = 
+DSYMUTIL = dsymutil
 DUMPBIN = 
-ECHO_C = 
-ECHO_N = -n
+ECHO_C = \c
+ECHO_N = 
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-FGREP = /bin/grep -F
+FGREP = /usr/bin/grep -F
 GLUT_CFLAGS = 
 GLUT_LIBS = 
-GLU_CFLAGS = -pthread
-GLU_LIBS = -lGLU -lGL  -lm
-GL_CFLAGS = -pthread
-GL_LIBS = -lGL  -lm
-GREP = /bin/grep
-INSTALL = /usr/bin/install -c
+GLU_CFLAGS = -I/usr/X11/include -D_THREAD_SAFE 
+GLU_LIBS = -lGLU -lGL -L/usr/X11/lib -lX11  -lm
+GL_CFLAGS = -I/usr/X11/include -D_THREAD_SAFE 
+GL_LIBS = -lGL -L/usr/X11/lib -lX11  -lm
+GREP = /usr/bin/grep
+INSTALL = /opt/local/bin/ginstall -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LD = /usr/bin/ld
-LDFLAGS =  -L/usr/local/lib
+LD = /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld
+LDFLAGS =  -L/opt/local/lib -L/usr/local/lib
 LIBLO_LDFLAGS = -llo
-LIBOBJS = 
+LIBOBJS =  ${LIBOBJDIR}error$U.o
 LIBS = -lm 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
-LIPO = 
+LIPO = lipo
 LN_S = ln -s
-LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/mikewoz/svn/spinframework/missing --run makeinfo
-MKDIR_P = /bin/mkdir -p
-NM = /usr/bin/nm -B
-NMEDIT = 
-OBJDUMP = objdump
+LTLIBOBJS =  ${LIBOBJDIR}error$U.lo
+MAKEINFO = ${SHELL} /Users/zack/svn/spinframework/missing --run makeinfo
+MKDIR_P = /opt/local/bin/gmkdir -p
+NM = /usr/bin/nm -p
+NMEDIT = nmedit
+OBJDUMP = false
 OBJEXT = o
 OSGINTROSPECTION_LIB = -losgIntrospection
-OTOOL = 
-OTOOL64 = 
+OTOOL = otool
+OTOOL64 = :
 OpenSceneGraph_CFLAGS = -I/usr/local/include  
 OpenSceneGraph_LIBS = -L/usr/local/lib -losg -losgDB -losgFX -losgGA -losgParticle -losgSim -losgText -losgUtil -losgTerrain -losgManipulator -losgViewer -losgWidget -losgShadow -losgAnimation -losgVolume -lOpenThreads  
 PACKAGE = spinframework
@@ -154,30 +156,30 @@ PACKAGE_TARNAME = spinframework
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.2
 PATH_SEPARATOR = :
-PKG_CONFIG = /usr/bin/pkg-config
+PKG_CONFIG = /opt/local/bin/pkg-config
 PTHREAD_CC = gcc
-PTHREAD_CFLAGS = -pthread
+PTHREAD_CFLAGS = -D_THREAD_SAFE 
 PTHREAD_LIBS = 
-PYTHON_BIN = python2.6
-PYTHON_INCLUDE_DIR = /usr/include/python2.6
-PYTHON_LIB = python2.6
+PYTHON_BIN = python2.5
+PYTHON_INCLUDE_DIR = /usr/include/python2.5
+PYTHON_LIB = python2.5
 RANLIB = ranlib
-SED = /bin/sed
+SED = /usr/bin/sed
 SET_MAKE = 
-SHELL = /bin/bash
+SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.2
 XMKMF = 
-XML_CFLAGS = -I/usr/include/libxml2  
-XML_LIBS = -lxml2  
-X_CFLAGS = 
+XML_CFLAGS = -I/opt/local/include/libxml2  
+XML_LIBS = -L/opt/local/lib -lxml2 -lpthread -lz -liconv -lm  
+X_CFLAGS =  -I/usr/X11/include
 X_EXTRA_LIBS = 
-X_LIBS = 
+X_LIBS =  -L/usr/X11/lib -R/usr/X11/lib
 X_PRE_LIBS =  -lSM -lICE
-abs_builddir = /home/mikewoz/svn/spinframework/src/osgWrappers
-abs_srcdir = /home/mikewoz/svn/spinframework/src/osgWrappers
-abs_top_builddir = /home/mikewoz/svn/spinframework
-abs_top_srcdir = /home/mikewoz/svn/spinframework
+abs_builddir = /Users/zack/svn/spinframework/src/osgWrappers
+abs_srcdir = /Users/zack/svn/spinframework/src/osgWrappers
+abs_top_builddir = /Users/zack/svn/spinframework
+abs_top_srcdir = /Users/zack/svn/spinframework
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 ac_ct_DUMPBIN = 
@@ -188,33 +190,33 @@ am__quote =
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
-build = i686-pc-linux-gnu
+build = i386-apple-darwin9.8.0
 build_alias = 
-build_cpu = i686
-build_os = linux-gnu
-build_vendor = pc
+build_cpu = i386
+build_os = darwin9.8.0
+build_vendor = apple
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = i686-pc-linux-gnu
+host = i386-apple-darwin9.8.0
 host_alias = 
-host_cpu = i686
-host_os = linux-gnu
-host_vendor = pc
+host_cpu = i386
+host_os = darwin9.8.0
+host_vendor = apple
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/mikewoz/svn/spinframework/install-sh
+install_sh = ${SHELL} /Users/zack/svn/spinframework/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
-lt_ECHO = echo
+lt_ECHO = /bin/echo
 mandir = ${datarootdir}/man
-mkdir_p = /bin/mkdir -p
+mkdir_p = /opt/local/bin/gmkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
 prefix = /usr/local
@@ -228,19 +230,20 @@ target_alias =
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
-AM_CPPFLAGS = $(all_includes)
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml
 
 # use noinst_LIBRARIES to create a library that won't be installed
-noinst_LIBRARIES = libSPINwrappers.a
-libSPINwrappers_a_SOURCES = ReferencedNode.cpp GroupNode.cpp ShapeNode.cpp \
-	ModelNode.cpp VideoNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
+noinst_LTLIBRARIES = libSPINwrappers.la
+#noinst_LIBRARIES = libSPINwrappers.la
+libSPINwrappers_la_SOURCES = \
+	ReferencedNode.cpp ReferencedState.cpp \
+	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
+	GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
 	ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
-	SoundNode.cpp SoundSpace.cpp DSPNode.cpp SoundConnection.cpp \
-	UserNode.cpp
+	AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
+	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
+	VideoTexture.cpp SharedVideoTexture.cpp 
 
-
-# SharedVideoNode.cpp
-INCLUDES = -I$(top_srcdir)/src/tinyxml
 all: all-am
 
 .SUFFIXES:
@@ -254,9 +257,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/osgWrappers/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/osgWrappers/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/osgWrappers/Makefile
+	  $(AUTOMAKE) --foreign src/osgWrappers/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -276,12 +279,16 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libSPINwrappers.a: $(libSPINwrappers_a_OBJECTS) $(libSPINwrappers_a_DEPENDENCIES) 
-	-rm -f libSPINwrappers.a
-	$(libSPINwrappers_a_AR) libSPINwrappers.a $(libSPINwrappers_a_OBJECTS) $(libSPINwrappers_a_LIBADD)
-	$(RANLIB) libSPINwrappers.a
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libSPINwrappers.la: $(libSPINwrappers_la_OBJECTS) $(libSPINwrappers_la_DEPENDENCIES) 
+	$(CXXLINK)  $(libSPINwrappers_la_OBJECTS) $(libSPINwrappers_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -289,40 +296,50 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/ConstraintsNode.Po
-include ./$(DEPDIR)/Contour.Po
-include ./$(DEPDIR)/DSPNode.Po
-include ./$(DEPDIR)/GroupNode.Po
-include ./$(DEPDIR)/LightSource.Po
-include ./$(DEPDIR)/MeasurementNode.Po
-include ./$(DEPDIR)/ModelNode.Po
-include ./$(DEPDIR)/PointerNode.Po
-include ./$(DEPDIR)/RayNode.Po
-include ./$(DEPDIR)/ReferencedNode.Po
-include ./$(DEPDIR)/ShapeNode.Po
-include ./$(DEPDIR)/SoundConnection.Po
-include ./$(DEPDIR)/SoundNode.Po
-include ./$(DEPDIR)/SoundSpace.Po
-include ./$(DEPDIR)/UserNode.Po
-include ./$(DEPDIR)/VideoNode.Po
+include ./$(DEPDIR)/AnimationNode.Plo
+include ./$(DEPDIR)/ConstraintsNode.Plo
+include ./$(DEPDIR)/Contour.Plo
+include ./$(DEPDIR)/DSPNode.Plo
+include ./$(DEPDIR)/GridNode.Plo
+include ./$(DEPDIR)/GroupNode.Plo
+include ./$(DEPDIR)/LightSource.Plo
+include ./$(DEPDIR)/Listener.Plo
+include ./$(DEPDIR)/MeasurementNode.Plo
+include ./$(DEPDIR)/ModelNode.Plo
+include ./$(DEPDIR)/PointerNode.Plo
+include ./$(DEPDIR)/RayNode.Plo
+include ./$(DEPDIR)/ReferencedNode.Plo
+include ./$(DEPDIR)/ReferencedState.Plo
+include ./$(DEPDIR)/ShapeNode.Plo
+include ./$(DEPDIR)/SharedVideoTexture.Plo
+include ./$(DEPDIR)/SoundConnection.Plo
+include ./$(DEPDIR)/SoundNode.Plo
+include ./$(DEPDIR)/SoundSpace.Plo
+include ./$(DEPDIR)/SwitchNode.Plo
+include ./$(DEPDIR)/TextNode.Plo
+include ./$(DEPDIR)/UserNode.Plo
+include ./$(DEPDIR)/VideoTexture.Plo
 
 .cpp.o:
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(CXXCOMPILE) -c -o $@ $<
 
 .cpp.obj:
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .cpp.lo:
-	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Plo
 #	source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(LTCXXCOMPILE) -c -o $@ $<
@@ -417,7 +434,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LTLIBRARIES)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -446,7 +463,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -518,7 +535,7 @@ uninstall-am:
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLIBRARIES ctags distclean \
+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
@@ -530,6 +547,10 @@ uninstall-am:
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
+
+#libSPINwrappers_la_LIBADD = -lm
+
+#SharedVideoNode.cpp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

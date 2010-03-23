@@ -33,15 +33,17 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = i686-pc-linux-gnu
-host_triplet = i686-pc-linux-gnu
+build_triplet = i386-apple-darwin9.8.0
+host_triplet = i386-apple-darwin9.8.0
 bin_PROGRAMS = spinServer$(EXEEXT) spinViewer$(EXEEXT)
 subdir = src/spin
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
+	$(top_srcdir)/m4/ax_boost_filesystem.m4 \
 	$(top_srcdir)/m4/ax_boost_regex.m4 \
+	$(top_srcdir)/m4/ax_boost_thread.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
 	$(top_srcdir)/m4/ax_check_glu.m4 \
 	$(top_srcdir)/m4/ax_check_glut.m4 \
@@ -80,16 +82,24 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libSPIN_la_DEPENDENCIES =  \
-	$(top_srcdir)/src/osgWrappers/libSPINwrappers.a \
-	$(top_srcdir)/src/tinyxml/libtinyxml.a
-am_libSPIN_la_OBJECTS = spinContext.lo osgUtil.lo spinUtil.lo \
-	libloUtil.lo SceneManager.lo MediaManager.lo \
-	ViewerManipulator.lo ReferencedNode.lo ReferencedState.lo \
-	GroupNode.lo ShapeNode.lo ModelNode.lo LightSource.lo \
-	RayNode.lo Contour.lo ConstraintsNode.lo PointerNode.lo \
-	AnimationNode.lo MeasurementNode.lo UserNode.lo GridNode.lo \
-	SwitchNode.lo TextNode.lo VideoTexture.lo DSPNode.lo \
-	SoundNode.lo SoundSpace.lo Listener.lo SoundConnection.lo
+	$(top_srcdir)/src/osgWrappers/libSPINwrappers.la \
+	$(top_srcdir)/src/tinyxml/libtinyxml.la
+am_libSPIN_la_OBJECTS = libSPIN_la-spinContext.lo \
+	libSPIN_la-osgUtil.lo libSPIN_la-spinUtil.lo \
+	libSPIN_la-libloUtil.lo libSPIN_la-SceneManager.lo \
+	libSPIN_la-MediaManager.lo libSPIN_la-ViewerManipulator.lo \
+	libSPIN_la-ReferencedNode.lo libSPIN_la-ReferencedState.lo \
+	libSPIN_la-UserNode.lo libSPIN_la-GroupNode.lo \
+	libSPIN_la-ShapeNode.lo libSPIN_la-ModelNode.lo \
+	libSPIN_la-GridNode.lo libSPIN_la-LightSource.lo \
+	libSPIN_la-RayNode.lo libSPIN_la-Contour.lo \
+	libSPIN_la-ConstraintsNode.lo libSPIN_la-PointerNode.lo \
+	libSPIN_la-MeasurementNode.lo libSPIN_la-AnimationNode.lo \
+	libSPIN_la-SwitchNode.lo libSPIN_la-TextNode.lo \
+	libSPIN_la-DSPNode.lo libSPIN_la-SoundNode.lo \
+	libSPIN_la-SoundSpace.lo libSPIN_la-Listener.lo \
+	libSPIN_la-SoundConnection.lo libSPIN_la-VideoTexture.lo \
+	libSPIN_la-SharedVideoTexture.lo
 libSPIN_la_OBJECTS = $(am_libSPIN_la_OBJECTS)
 libSPIN_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -97,7 +107,7 @@ libSPIN_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 PROGRAMS = $(bin_PROGRAMS)
 am_spinServer_OBJECTS = spinServer.$(OBJEXT)
 spinServer_OBJECTS = $(am_spinServer_OBJECTS)
-spinServer_DEPENDENCIES =
+spinServer_DEPENDENCIES = $(top_srcdir)/src/spin/libSPIN.la
 am_spinViewer_OBJECTS = spinViewer.$(OBJEXT)
 spinViewer_OBJECTS = $(am_spinViewer_OBJECTS)
 spinViewer_LDADD = $(LDADD)
@@ -124,21 +134,23 @@ DIST_SOURCES = $(libSPIN_la_SOURCES) $(spinServer_SOURCES) \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/mikewoz/svn/spinframework/missing --run aclocal-1.11
-AMTAR = ${SHELL} /home/mikewoz/svn/spinframework/missing --run tar
+ACLOCAL = ${SHELL} /Users/zack/svn/spinframework/missing --run aclocal-1.11
+AMTAR = ${SHELL} /Users/zack/svn/spinframework/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /home/mikewoz/svn/spinframework/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/mikewoz/svn/spinframework/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/mikewoz/svn/spinframework/missing --run automake-1.11
-AWK = mawk
-BOOST_CPPFLAGS = -I/usr/include
-BOOST_LDFLAGS = -L/usr/lib
+AUTOCONF = ${SHELL} /Users/zack/svn/spinframework/missing --run autoconf
+AUTOHEADER = ${SHELL} /Users/zack/svn/spinframework/missing --run autoheader
+AUTOMAKE = ${SHELL} /Users/zack/svn/spinframework/missing --run automake-1.11
+AWK = awk
+BOOST_CPPFLAGS = -pthread -I/opt/local/include
+BOOST_FILESYSTEM_LIB = -lboost_filesystem-mt
+BOOST_LDFLAGS = -L/opt/local/lib
 BOOST_REGEX_LIB = -lboost_regex-mt
+BOOST_THREAD_LIB = -lboost_thread-mt
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = 
+CPPFLAGS =  -I/opt/local/include
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
@@ -146,44 +158,44 @@ CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-DSYMUTIL = 
+DSYMUTIL = dsymutil
 DUMPBIN = 
-ECHO_C = 
-ECHO_N = -n
+ECHO_C = \c
+ECHO_N = 
 ECHO_T = 
-EGREP = /bin/grep -E
+EGREP = /usr/bin/grep -E
 EXEEXT = 
-FGREP = /bin/grep -F
+FGREP = /usr/bin/grep -F
 GLUT_CFLAGS = 
 GLUT_LIBS = 
-GLU_CFLAGS = -pthread
-GLU_LIBS = -lGLU -lGL  -lm
-GL_CFLAGS = -pthread
-GL_LIBS = -lGL  -lm
-GREP = /bin/grep
-INSTALL = /usr/bin/install -c
+GLU_CFLAGS = -I/usr/X11/include -D_THREAD_SAFE 
+GLU_LIBS = -lGLU -lGL -L/usr/X11/lib -lX11  -lm
+GL_CFLAGS = -I/usr/X11/include -D_THREAD_SAFE 
+GL_LIBS = -lGL -L/usr/X11/lib -lX11  -lm
+GREP = /usr/bin/grep
+INSTALL = /opt/local/bin/ginstall -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LD = /usr/bin/ld
-LDFLAGS =  -L/usr/local/lib
+LD = /usr/libexec/gcc/i686-apple-darwin9/4.0.1/ld
+LDFLAGS =  -L/opt/local/lib -L/usr/local/lib
 LIBLO_LDFLAGS = -llo
-LIBOBJS = 
+LIBOBJS =  ${LIBOBJDIR}error$U.o
 LIBS = -lm 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
-LIPO = 
+LIPO = lipo
 LN_S = ln -s
-LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/mikewoz/svn/spinframework/missing --run makeinfo
-MKDIR_P = /bin/mkdir -p
-NM = /usr/bin/nm -B
-NMEDIT = 
-OBJDUMP = objdump
+LTLIBOBJS =  ${LIBOBJDIR}error$U.lo
+MAKEINFO = ${SHELL} /Users/zack/svn/spinframework/missing --run makeinfo
+MKDIR_P = /opt/local/bin/gmkdir -p
+NM = /usr/bin/nm -p
+NMEDIT = nmedit
+OBJDUMP = false
 OBJEXT = o
 OSGINTROSPECTION_LIB = -losgIntrospection
-OTOOL = 
-OTOOL64 = 
+OTOOL = otool
+OTOOL64 = :
 OpenSceneGraph_CFLAGS = -I/usr/local/include  
 OpenSceneGraph_LIBS = -L/usr/local/lib -losg -losgDB -losgFX -losgGA -losgParticle -losgSim -losgText -losgUtil -losgTerrain -losgManipulator -losgViewer -losgWidget -losgShadow -losgAnimation -losgVolume -lOpenThreads  
 PACKAGE = spinframework
@@ -194,30 +206,30 @@ PACKAGE_TARNAME = spinframework
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.2
 PATH_SEPARATOR = :
-PKG_CONFIG = /usr/bin/pkg-config
+PKG_CONFIG = /opt/local/bin/pkg-config
 PTHREAD_CC = gcc
-PTHREAD_CFLAGS = -pthread
+PTHREAD_CFLAGS = -D_THREAD_SAFE 
 PTHREAD_LIBS = 
-PYTHON_BIN = python2.6
-PYTHON_INCLUDE_DIR = /usr/include/python2.6
-PYTHON_LIB = python2.6
+PYTHON_BIN = python2.5
+PYTHON_INCLUDE_DIR = /usr/include/python2.5
+PYTHON_LIB = python2.5
 RANLIB = ranlib
-SED = /bin/sed
+SED = /usr/bin/sed
 SET_MAKE = 
-SHELL = /bin/bash
+SHELL = /bin/sh
 STRIP = strip
 VERSION = 0.2
 XMKMF = 
-XML_CFLAGS = -I/usr/include/libxml2  
-XML_LIBS = -lxml2  
-X_CFLAGS = 
+XML_CFLAGS = -I/opt/local/include/libxml2  
+XML_LIBS = -L/opt/local/lib -lxml2 -lpthread -lz -liconv -lm  
+X_CFLAGS =  -I/usr/X11/include
 X_EXTRA_LIBS = 
-X_LIBS = 
+X_LIBS =  -L/usr/X11/lib -R/usr/X11/lib
 X_PRE_LIBS =  -lSM -lICE
-abs_builddir = /home/mikewoz/svn/spinframework/src/spin
-abs_srcdir = /home/mikewoz/svn/spinframework/src/spin
-abs_top_builddir = /home/mikewoz/svn/spinframework
-abs_top_srcdir = /home/mikewoz/svn/spinframework
+abs_builddir = /Users/zack/svn/spinframework/src/spin
+abs_srcdir = /Users/zack/svn/spinframework/src/spin
+abs_top_builddir = /Users/zack/svn/spinframework
+abs_top_srcdir = /Users/zack/svn/spinframework
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 ac_ct_DUMPBIN = 
@@ -228,33 +240,33 @@ am__quote =
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
-build = i686-pc-linux-gnu
+build = i386-apple-darwin9.8.0
 build_alias = 
-build_cpu = i686
-build_os = linux-gnu
-build_vendor = pc
+build_cpu = i386
+build_os = darwin9.8.0
+build_vendor = apple
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = i686-pc-linux-gnu
+host = i386-apple-darwin9.8.0
 host_alias = 
-host_cpu = i686
-host_os = linux-gnu
-host_vendor = pc
+host_cpu = i386
+host_os = darwin9.8.0
+host_vendor = apple
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/mikewoz/svn/spinframework/install-sh
+install_sh = ${SHELL} /Users/zack/svn/spinframework/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
-lt_ECHO = echo
+lt_ECHO = /bin/echo
 mandir = ${datarootdir}/man
-mkdir_p = /bin/mkdir -p
+mkdir_p = /opt/local/bin/gmkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
 prefix = /usr/local
@@ -268,18 +280,25 @@ target_alias =
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml
 
-#INCLUDES = -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/src/mivilleEngine
-INCLUDES = -I$(top_srcdir)/src/tinyxml
+#INCLUDES = -I$(top_srcdir)/src/tinyxml
 
 # use lib_LTLIBRARIES to build a shared lib:
 lib_LTLIBRARIES = libSPIN.la
-libSPIN_la_LIBADD = \
-	$(top_srcdir)/src/osgWrappers/libSPINwrappers.a \
-	$(top_srcdir)/src/tinyxml/libtinyxml.a
+libSPIN_la_CPPFLAGS = \
+	$(AM_CPPFLAGS) 
 
+libSPIN_la_LIBADD = \
+	$(top_srcdir)/src/osgWrappers/libSPINwrappers.la \
+	$(top_srcdir)/src/tinyxml/libtinyxml.la
+
+
+#$(top_srcdir)/src/osgWrappers/libSPINwrappers.a \
+#$(top_srcdir)/src/tinyxml/libtinyxml.a
 libSPIN_la_LDFLAGS = \
 	$(BOOST_LDFLAGS) \
+	$(BOOST_FILESYSTEM_LIB) \
 	-lOpenThreads -losg \
 	-losgGA -losgSim -losgDB -losgManipulator -losgText -losgUtil \
 	-losgFX -losgParticle -losgViewer \
@@ -289,12 +308,12 @@ libSPIN_la_SOURCES = \
 	spinContext.cpp osgUtil.cpp spinUtil.cpp libloUtil.cpp \
 	SceneManager.cpp MediaManager.cpp ViewerManipulator.cpp \
 	ReferencedNode.cpp ReferencedState.cpp \
-	GroupNode.cpp ShapeNode.cpp ModelNode.cpp LightSource.cpp \
-	RayNode.cpp Contour.cpp ConstraintsNode.cpp PointerNode.cpp \
-	AnimationNode.cpp MeasurementNode.cpp UserNode.cpp \
-	GridNode.cpp SwitchNode.cpp TextNode.cpp VideoTexture.cpp \
-	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp \
-	SoundConnection.cpp 
+	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
+	GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
+	ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
+	AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
+	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
+	VideoTexture.cpp SharedVideoTexture.cpp
 
 #bin_PROGRAMS = spinServer spinViewer spin
 
@@ -305,7 +324,8 @@ libSPIN_la_SOURCES = \
 # -losgManipulator -losgText -losgUtil -losgFX -losgParticle -losgViewer
 spinServer_SOURCES = spinServer.cpp
 #spinServer_LDADD = $(top_srcdir)/src/spin/libSPIN.so
-spinServer_LDADD = -lSPIN
+#spinServer_LDADD = -lSPIN
+spinServer_LDADD = $(top_srcdir)/src/spin/libSPIN.la
 #spinServer_LDADD = -lSPIN -lOpenThreads -losg -losgGA -losgSim -losgDB -losgManipulator -losgText -losgUtil -losgFX -losgParticle -losgViewer $(OSGINTROSPECTION_LIB) $(LIBLO_LIB)
 spinViewer_SOURCES = spinViewer.cpp
 #spinViewer_LDADD = $(top_srcdir)/src/spin/libSPIN.so
@@ -323,9 +343,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/spin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/spin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/spin/Makefile
+	  $(AUTOMAKE) --foreign src/spin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -433,58 +453,272 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/AnimationNode.Plo
-include ./$(DEPDIR)/ConstraintsNode.Plo
-include ./$(DEPDIR)/Contour.Plo
-include ./$(DEPDIR)/DSPNode.Plo
-include ./$(DEPDIR)/GridNode.Plo
-include ./$(DEPDIR)/GroupNode.Plo
-include ./$(DEPDIR)/LightSource.Plo
-include ./$(DEPDIR)/Listener.Plo
-include ./$(DEPDIR)/MeasurementNode.Plo
-include ./$(DEPDIR)/MediaManager.Plo
-include ./$(DEPDIR)/ModelNode.Plo
-include ./$(DEPDIR)/PointerNode.Plo
-include ./$(DEPDIR)/RayNode.Plo
-include ./$(DEPDIR)/ReferencedNode.Plo
-include ./$(DEPDIR)/ReferencedState.Plo
-include ./$(DEPDIR)/SceneManager.Plo
-include ./$(DEPDIR)/ShapeNode.Plo
-include ./$(DEPDIR)/SoundConnection.Plo
-include ./$(DEPDIR)/SoundNode.Plo
-include ./$(DEPDIR)/SoundSpace.Plo
-include ./$(DEPDIR)/SwitchNode.Plo
-include ./$(DEPDIR)/TextNode.Plo
-include ./$(DEPDIR)/UserNode.Plo
-include ./$(DEPDIR)/VideoTexture.Plo
-include ./$(DEPDIR)/ViewerManipulator.Plo
-include ./$(DEPDIR)/libloUtil.Plo
-include ./$(DEPDIR)/osgUtil.Plo
-include ./$(DEPDIR)/spinContext.Plo
+include ./$(DEPDIR)/libSPIN_la-AnimationNode.Plo
+include ./$(DEPDIR)/libSPIN_la-ConstraintsNode.Plo
+include ./$(DEPDIR)/libSPIN_la-Contour.Plo
+include ./$(DEPDIR)/libSPIN_la-DSPNode.Plo
+include ./$(DEPDIR)/libSPIN_la-GridNode.Plo
+include ./$(DEPDIR)/libSPIN_la-GroupNode.Plo
+include ./$(DEPDIR)/libSPIN_la-LightSource.Plo
+include ./$(DEPDIR)/libSPIN_la-Listener.Plo
+include ./$(DEPDIR)/libSPIN_la-MeasurementNode.Plo
+include ./$(DEPDIR)/libSPIN_la-MediaManager.Plo
+include ./$(DEPDIR)/libSPIN_la-ModelNode.Plo
+include ./$(DEPDIR)/libSPIN_la-PointerNode.Plo
+include ./$(DEPDIR)/libSPIN_la-RayNode.Plo
+include ./$(DEPDIR)/libSPIN_la-ReferencedNode.Plo
+include ./$(DEPDIR)/libSPIN_la-ReferencedState.Plo
+include ./$(DEPDIR)/libSPIN_la-SceneManager.Plo
+include ./$(DEPDIR)/libSPIN_la-ShapeNode.Plo
+include ./$(DEPDIR)/libSPIN_la-SharedVideoTexture.Plo
+include ./$(DEPDIR)/libSPIN_la-SoundConnection.Plo
+include ./$(DEPDIR)/libSPIN_la-SoundNode.Plo
+include ./$(DEPDIR)/libSPIN_la-SoundSpace.Plo
+include ./$(DEPDIR)/libSPIN_la-SwitchNode.Plo
+include ./$(DEPDIR)/libSPIN_la-TextNode.Plo
+include ./$(DEPDIR)/libSPIN_la-UserNode.Plo
+include ./$(DEPDIR)/libSPIN_la-VideoTexture.Plo
+include ./$(DEPDIR)/libSPIN_la-ViewerManipulator.Plo
+include ./$(DEPDIR)/libSPIN_la-libloUtil.Plo
+include ./$(DEPDIR)/libSPIN_la-osgUtil.Plo
+include ./$(DEPDIR)/libSPIN_la-spinContext.Plo
+include ./$(DEPDIR)/libSPIN_la-spinUtil.Plo
 include ./$(DEPDIR)/spinServer.Po
-include ./$(DEPDIR)/spinUtil.Plo
 include ./$(DEPDIR)/spinViewer.Po
 
 .cpp.o:
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(CXXCOMPILE) -c -o $@ $<
 
 .cpp.obj:
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Po
 #	source='$<' object='$@' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .cpp.lo:
-	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+	$(am__mv) $$depbase.Tpo $$depbase.Plo
 #	source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(LTCXXCOMPILE) -c -o $@ $<
+
+libSPIN_la-spinContext.lo: spinContext.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-spinContext.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-spinContext.Tpo -c -o libSPIN_la-spinContext.lo `test -f 'spinContext.cpp' || echo '$(srcdir)/'`spinContext.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-spinContext.Tpo $(DEPDIR)/libSPIN_la-spinContext.Plo
+#	source='spinContext.cpp' object='libSPIN_la-spinContext.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-spinContext.lo `test -f 'spinContext.cpp' || echo '$(srcdir)/'`spinContext.cpp
+
+libSPIN_la-osgUtil.lo: osgUtil.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-osgUtil.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-osgUtil.Tpo -c -o libSPIN_la-osgUtil.lo `test -f 'osgUtil.cpp' || echo '$(srcdir)/'`osgUtil.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-osgUtil.Tpo $(DEPDIR)/libSPIN_la-osgUtil.Plo
+#	source='osgUtil.cpp' object='libSPIN_la-osgUtil.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-osgUtil.lo `test -f 'osgUtil.cpp' || echo '$(srcdir)/'`osgUtil.cpp
+
+libSPIN_la-spinUtil.lo: spinUtil.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-spinUtil.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-spinUtil.Tpo -c -o libSPIN_la-spinUtil.lo `test -f 'spinUtil.cpp' || echo '$(srcdir)/'`spinUtil.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-spinUtil.Tpo $(DEPDIR)/libSPIN_la-spinUtil.Plo
+#	source='spinUtil.cpp' object='libSPIN_la-spinUtil.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-spinUtil.lo `test -f 'spinUtil.cpp' || echo '$(srcdir)/'`spinUtil.cpp
+
+libSPIN_la-libloUtil.lo: libloUtil.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-libloUtil.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-libloUtil.Tpo -c -o libSPIN_la-libloUtil.lo `test -f 'libloUtil.cpp' || echo '$(srcdir)/'`libloUtil.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-libloUtil.Tpo $(DEPDIR)/libSPIN_la-libloUtil.Plo
+#	source='libloUtil.cpp' object='libSPIN_la-libloUtil.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-libloUtil.lo `test -f 'libloUtil.cpp' || echo '$(srcdir)/'`libloUtil.cpp
+
+libSPIN_la-SceneManager.lo: SceneManager.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-SceneManager.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-SceneManager.Tpo -c -o libSPIN_la-SceneManager.lo `test -f 'SceneManager.cpp' || echo '$(srcdir)/'`SceneManager.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-SceneManager.Tpo $(DEPDIR)/libSPIN_la-SceneManager.Plo
+#	source='SceneManager.cpp' object='libSPIN_la-SceneManager.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-SceneManager.lo `test -f 'SceneManager.cpp' || echo '$(srcdir)/'`SceneManager.cpp
+
+libSPIN_la-MediaManager.lo: MediaManager.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-MediaManager.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-MediaManager.Tpo -c -o libSPIN_la-MediaManager.lo `test -f 'MediaManager.cpp' || echo '$(srcdir)/'`MediaManager.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-MediaManager.Tpo $(DEPDIR)/libSPIN_la-MediaManager.Plo
+#	source='MediaManager.cpp' object='libSPIN_la-MediaManager.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-MediaManager.lo `test -f 'MediaManager.cpp' || echo '$(srcdir)/'`MediaManager.cpp
+
+libSPIN_la-ViewerManipulator.lo: ViewerManipulator.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-ViewerManipulator.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-ViewerManipulator.Tpo -c -o libSPIN_la-ViewerManipulator.lo `test -f 'ViewerManipulator.cpp' || echo '$(srcdir)/'`ViewerManipulator.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-ViewerManipulator.Tpo $(DEPDIR)/libSPIN_la-ViewerManipulator.Plo
+#	source='ViewerManipulator.cpp' object='libSPIN_la-ViewerManipulator.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-ViewerManipulator.lo `test -f 'ViewerManipulator.cpp' || echo '$(srcdir)/'`ViewerManipulator.cpp
+
+libSPIN_la-ReferencedNode.lo: ReferencedNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-ReferencedNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-ReferencedNode.Tpo -c -o libSPIN_la-ReferencedNode.lo `test -f 'ReferencedNode.cpp' || echo '$(srcdir)/'`ReferencedNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-ReferencedNode.Tpo $(DEPDIR)/libSPIN_la-ReferencedNode.Plo
+#	source='ReferencedNode.cpp' object='libSPIN_la-ReferencedNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-ReferencedNode.lo `test -f 'ReferencedNode.cpp' || echo '$(srcdir)/'`ReferencedNode.cpp
+
+libSPIN_la-ReferencedState.lo: ReferencedState.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-ReferencedState.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-ReferencedState.Tpo -c -o libSPIN_la-ReferencedState.lo `test -f 'ReferencedState.cpp' || echo '$(srcdir)/'`ReferencedState.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-ReferencedState.Tpo $(DEPDIR)/libSPIN_la-ReferencedState.Plo
+#	source='ReferencedState.cpp' object='libSPIN_la-ReferencedState.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-ReferencedState.lo `test -f 'ReferencedState.cpp' || echo '$(srcdir)/'`ReferencedState.cpp
+
+libSPIN_la-UserNode.lo: UserNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-UserNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-UserNode.Tpo -c -o libSPIN_la-UserNode.lo `test -f 'UserNode.cpp' || echo '$(srcdir)/'`UserNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-UserNode.Tpo $(DEPDIR)/libSPIN_la-UserNode.Plo
+#	source='UserNode.cpp' object='libSPIN_la-UserNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-UserNode.lo `test -f 'UserNode.cpp' || echo '$(srcdir)/'`UserNode.cpp
+
+libSPIN_la-GroupNode.lo: GroupNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-GroupNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-GroupNode.Tpo -c -o libSPIN_la-GroupNode.lo `test -f 'GroupNode.cpp' || echo '$(srcdir)/'`GroupNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-GroupNode.Tpo $(DEPDIR)/libSPIN_la-GroupNode.Plo
+#	source='GroupNode.cpp' object='libSPIN_la-GroupNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-GroupNode.lo `test -f 'GroupNode.cpp' || echo '$(srcdir)/'`GroupNode.cpp
+
+libSPIN_la-ShapeNode.lo: ShapeNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-ShapeNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-ShapeNode.Tpo -c -o libSPIN_la-ShapeNode.lo `test -f 'ShapeNode.cpp' || echo '$(srcdir)/'`ShapeNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-ShapeNode.Tpo $(DEPDIR)/libSPIN_la-ShapeNode.Plo
+#	source='ShapeNode.cpp' object='libSPIN_la-ShapeNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-ShapeNode.lo `test -f 'ShapeNode.cpp' || echo '$(srcdir)/'`ShapeNode.cpp
+
+libSPIN_la-ModelNode.lo: ModelNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-ModelNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-ModelNode.Tpo -c -o libSPIN_la-ModelNode.lo `test -f 'ModelNode.cpp' || echo '$(srcdir)/'`ModelNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-ModelNode.Tpo $(DEPDIR)/libSPIN_la-ModelNode.Plo
+#	source='ModelNode.cpp' object='libSPIN_la-ModelNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-ModelNode.lo `test -f 'ModelNode.cpp' || echo '$(srcdir)/'`ModelNode.cpp
+
+libSPIN_la-GridNode.lo: GridNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-GridNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-GridNode.Tpo -c -o libSPIN_la-GridNode.lo `test -f 'GridNode.cpp' || echo '$(srcdir)/'`GridNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-GridNode.Tpo $(DEPDIR)/libSPIN_la-GridNode.Plo
+#	source='GridNode.cpp' object='libSPIN_la-GridNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-GridNode.lo `test -f 'GridNode.cpp' || echo '$(srcdir)/'`GridNode.cpp
+
+libSPIN_la-LightSource.lo: LightSource.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-LightSource.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-LightSource.Tpo -c -o libSPIN_la-LightSource.lo `test -f 'LightSource.cpp' || echo '$(srcdir)/'`LightSource.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-LightSource.Tpo $(DEPDIR)/libSPIN_la-LightSource.Plo
+#	source='LightSource.cpp' object='libSPIN_la-LightSource.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-LightSource.lo `test -f 'LightSource.cpp' || echo '$(srcdir)/'`LightSource.cpp
+
+libSPIN_la-RayNode.lo: RayNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-RayNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-RayNode.Tpo -c -o libSPIN_la-RayNode.lo `test -f 'RayNode.cpp' || echo '$(srcdir)/'`RayNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-RayNode.Tpo $(DEPDIR)/libSPIN_la-RayNode.Plo
+#	source='RayNode.cpp' object='libSPIN_la-RayNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-RayNode.lo `test -f 'RayNode.cpp' || echo '$(srcdir)/'`RayNode.cpp
+
+libSPIN_la-Contour.lo: Contour.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-Contour.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-Contour.Tpo -c -o libSPIN_la-Contour.lo `test -f 'Contour.cpp' || echo '$(srcdir)/'`Contour.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-Contour.Tpo $(DEPDIR)/libSPIN_la-Contour.Plo
+#	source='Contour.cpp' object='libSPIN_la-Contour.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-Contour.lo `test -f 'Contour.cpp' || echo '$(srcdir)/'`Contour.cpp
+
+libSPIN_la-ConstraintsNode.lo: ConstraintsNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-ConstraintsNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-ConstraintsNode.Tpo -c -o libSPIN_la-ConstraintsNode.lo `test -f 'ConstraintsNode.cpp' || echo '$(srcdir)/'`ConstraintsNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-ConstraintsNode.Tpo $(DEPDIR)/libSPIN_la-ConstraintsNode.Plo
+#	source='ConstraintsNode.cpp' object='libSPIN_la-ConstraintsNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-ConstraintsNode.lo `test -f 'ConstraintsNode.cpp' || echo '$(srcdir)/'`ConstraintsNode.cpp
+
+libSPIN_la-PointerNode.lo: PointerNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-PointerNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-PointerNode.Tpo -c -o libSPIN_la-PointerNode.lo `test -f 'PointerNode.cpp' || echo '$(srcdir)/'`PointerNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-PointerNode.Tpo $(DEPDIR)/libSPIN_la-PointerNode.Plo
+#	source='PointerNode.cpp' object='libSPIN_la-PointerNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-PointerNode.lo `test -f 'PointerNode.cpp' || echo '$(srcdir)/'`PointerNode.cpp
+
+libSPIN_la-MeasurementNode.lo: MeasurementNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-MeasurementNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-MeasurementNode.Tpo -c -o libSPIN_la-MeasurementNode.lo `test -f 'MeasurementNode.cpp' || echo '$(srcdir)/'`MeasurementNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-MeasurementNode.Tpo $(DEPDIR)/libSPIN_la-MeasurementNode.Plo
+#	source='MeasurementNode.cpp' object='libSPIN_la-MeasurementNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-MeasurementNode.lo `test -f 'MeasurementNode.cpp' || echo '$(srcdir)/'`MeasurementNode.cpp
+
+libSPIN_la-AnimationNode.lo: AnimationNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-AnimationNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-AnimationNode.Tpo -c -o libSPIN_la-AnimationNode.lo `test -f 'AnimationNode.cpp' || echo '$(srcdir)/'`AnimationNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-AnimationNode.Tpo $(DEPDIR)/libSPIN_la-AnimationNode.Plo
+#	source='AnimationNode.cpp' object='libSPIN_la-AnimationNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-AnimationNode.lo `test -f 'AnimationNode.cpp' || echo '$(srcdir)/'`AnimationNode.cpp
+
+libSPIN_la-SwitchNode.lo: SwitchNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-SwitchNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-SwitchNode.Tpo -c -o libSPIN_la-SwitchNode.lo `test -f 'SwitchNode.cpp' || echo '$(srcdir)/'`SwitchNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-SwitchNode.Tpo $(DEPDIR)/libSPIN_la-SwitchNode.Plo
+#	source='SwitchNode.cpp' object='libSPIN_la-SwitchNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-SwitchNode.lo `test -f 'SwitchNode.cpp' || echo '$(srcdir)/'`SwitchNode.cpp
+
+libSPIN_la-TextNode.lo: TextNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-TextNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-TextNode.Tpo -c -o libSPIN_la-TextNode.lo `test -f 'TextNode.cpp' || echo '$(srcdir)/'`TextNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-TextNode.Tpo $(DEPDIR)/libSPIN_la-TextNode.Plo
+#	source='TextNode.cpp' object='libSPIN_la-TextNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-TextNode.lo `test -f 'TextNode.cpp' || echo '$(srcdir)/'`TextNode.cpp
+
+libSPIN_la-DSPNode.lo: DSPNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-DSPNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-DSPNode.Tpo -c -o libSPIN_la-DSPNode.lo `test -f 'DSPNode.cpp' || echo '$(srcdir)/'`DSPNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-DSPNode.Tpo $(DEPDIR)/libSPIN_la-DSPNode.Plo
+#	source='DSPNode.cpp' object='libSPIN_la-DSPNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-DSPNode.lo `test -f 'DSPNode.cpp' || echo '$(srcdir)/'`DSPNode.cpp
+
+libSPIN_la-SoundNode.lo: SoundNode.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-SoundNode.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-SoundNode.Tpo -c -o libSPIN_la-SoundNode.lo `test -f 'SoundNode.cpp' || echo '$(srcdir)/'`SoundNode.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-SoundNode.Tpo $(DEPDIR)/libSPIN_la-SoundNode.Plo
+#	source='SoundNode.cpp' object='libSPIN_la-SoundNode.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-SoundNode.lo `test -f 'SoundNode.cpp' || echo '$(srcdir)/'`SoundNode.cpp
+
+libSPIN_la-SoundSpace.lo: SoundSpace.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-SoundSpace.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-SoundSpace.Tpo -c -o libSPIN_la-SoundSpace.lo `test -f 'SoundSpace.cpp' || echo '$(srcdir)/'`SoundSpace.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-SoundSpace.Tpo $(DEPDIR)/libSPIN_la-SoundSpace.Plo
+#	source='SoundSpace.cpp' object='libSPIN_la-SoundSpace.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-SoundSpace.lo `test -f 'SoundSpace.cpp' || echo '$(srcdir)/'`SoundSpace.cpp
+
+libSPIN_la-Listener.lo: Listener.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-Listener.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-Listener.Tpo -c -o libSPIN_la-Listener.lo `test -f 'Listener.cpp' || echo '$(srcdir)/'`Listener.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-Listener.Tpo $(DEPDIR)/libSPIN_la-Listener.Plo
+#	source='Listener.cpp' object='libSPIN_la-Listener.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-Listener.lo `test -f 'Listener.cpp' || echo '$(srcdir)/'`Listener.cpp
+
+libSPIN_la-SoundConnection.lo: SoundConnection.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-SoundConnection.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-SoundConnection.Tpo -c -o libSPIN_la-SoundConnection.lo `test -f 'SoundConnection.cpp' || echo '$(srcdir)/'`SoundConnection.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-SoundConnection.Tpo $(DEPDIR)/libSPIN_la-SoundConnection.Plo
+#	source='SoundConnection.cpp' object='libSPIN_la-SoundConnection.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-SoundConnection.lo `test -f 'SoundConnection.cpp' || echo '$(srcdir)/'`SoundConnection.cpp
+
+libSPIN_la-VideoTexture.lo: VideoTexture.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-VideoTexture.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-VideoTexture.Tpo -c -o libSPIN_la-VideoTexture.lo `test -f 'VideoTexture.cpp' || echo '$(srcdir)/'`VideoTexture.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-VideoTexture.Tpo $(DEPDIR)/libSPIN_la-VideoTexture.Plo
+#	source='VideoTexture.cpp' object='libSPIN_la-VideoTexture.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-VideoTexture.lo `test -f 'VideoTexture.cpp' || echo '$(srcdir)/'`VideoTexture.cpp
+
+libSPIN_la-SharedVideoTexture.lo: SharedVideoTexture.cpp
+	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPIN_la-SharedVideoTexture.lo -MD -MP -MF $(DEPDIR)/libSPIN_la-SharedVideoTexture.Tpo -c -o libSPIN_la-SharedVideoTexture.lo `test -f 'SharedVideoTexture.cpp' || echo '$(srcdir)/'`SharedVideoTexture.cpp
+	$(am__mv) $(DEPDIR)/libSPIN_la-SharedVideoTexture.Tpo $(DEPDIR)/libSPIN_la-SharedVideoTexture.Plo
+#	source='SharedVideoTexture.cpp' object='libSPIN_la-SharedVideoTexture.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPIN_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPIN_la-SharedVideoTexture.lo `test -f 'SharedVideoTexture.cpp' || echo '$(srcdir)/'`SharedVideoTexture.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -696,7 +930,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
-       #SharedVideoNode.cpp sharedVideoBuffer.cpp
 
 #spin_SOURCES = spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
 #      wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \

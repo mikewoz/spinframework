@@ -22,6 +22,12 @@ case "$host" in *-darwin* | *-macos10*)
   ;;
 esac
 
+# OSX does not include /usr/local/lib/pkgconfig path, so we export it here
+# (for everyone, just in case)
+PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH
+
+
 LDFLAGS="$LDFLAGS -L/usr/local/lib"
 
 AC_CONFIG_FILES([Makefile src/genwrapper/Makefile src/tinyxml/Makefile src/osgWrappers/Makefile src/spin/Makefile])
@@ -77,7 +83,7 @@ fi
 
 
 # Check for OpenSceneGraph:
-PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.2.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
+PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
 
 # and osgIntrospection:
 AC_CHECK_LIB(osgIntrospection, osgIntrospectionGetVersion, OSGINTROSPECTION_LIB="-losgIntrospection", AC_MSG_ERROR([missing OpenSceneGraph Introspection library]),)

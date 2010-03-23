@@ -19,7 +19,8 @@
 #touch ChangeLog
 #fi
 
-if [ $? -eq 0 && `uname` = 'Darwin' ]; then
+#if [ $? -eq 0 && `uname` = 'Darwin' ]; then
+if [ `uname -s` = 'Darwin' ]; then
   LIBTOOLIZE="glibtoolize"
 else
   LIBTOOLIZE="libtoolize"
