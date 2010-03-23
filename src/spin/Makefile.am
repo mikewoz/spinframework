@@ -6,7 +6,6 @@ AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml
 lib_LTLIBRARIES = libSPIN.la
 
 libSPIN_la_CPPFLAGS = \
-	-Ibralf \
 	$(AM_CPPFLAGS) 
 
 libSPIN_la_LIBADD = \

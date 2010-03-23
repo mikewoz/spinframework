@@ -13,10 +13,10 @@ libSPINwrappers_la_SOURCES = \
 	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
 	VideoTexture.cpp SharedVideoTexture.cpp 
 
-GENWRAPPER_BIN= $(top_srcdir)/src/genwrapper/genwrapper
+all-local: wrappers
 
 wrappers:
 	-rm $(top_srcdir)/include/*.h~
-	$(GENWRAPPER_BIN) -d . doxygen | doxygen -
-	$(GENWRAPPER_BIN) -v QUIET -c genwrapper.conf doxygen .
+	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -
+	cd $(top_srcdir) && src/genwrapper/genwrapper -v QUIET -c genwrapper.conf doxygen . && cd -
 
