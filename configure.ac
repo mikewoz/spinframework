@@ -85,7 +85,7 @@ if test "x${ax_cv_boost_thread}" = "xno" ; then
 fi
 
 AX_BOOST_PYTHON
-if test "x${ax_cv_boost_python}" = "xno" ; then
+if test "x${ac_cv_boost_python}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-python-dev])
 fi
 
