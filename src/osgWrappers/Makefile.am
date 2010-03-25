@@ -1,10 +1,6 @@
-AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
+#AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
 
-# use noinst_LIBRARIES to create a library that won't be installed
-noinst_LTLIBRARIES = libSPINwrappers.la
-#noinst_LIBRARIES = libSPINwrappers.la
-
-libSPINwrappers_la_SOURCES = \
+BUILT_SOURCES = \
 	ReferencedNode.cpp ReferencedState.cpp \
 	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
 	GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
@@ -13,10 +9,15 @@ libSPINwrappers_la_SOURCES = \
 	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
 	VideoTexture.cpp SharedVideoTexture.cpp 
 
-all-local: wrappers
-
-wrappers:
+$(BUILT_SOURCES):
 	-rm $(top_srcdir)/include/*.h~
 	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -
 	cd $(top_srcdir) && src/genwrapper/genwrapper -v QUIET -c genwrapper.conf doxygen . && cd -
+
+# use noinst_LIBRARIES to create a library that won't be installed
+noinst_LTLIBRARIES = libSPINwrappers.la
+#noinst_LIBRARIES = libSPINwrappers.la
+
+libSPINwrappers_la_SOURCES = $(BUILT_SOURCES)
+libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
 

@@ -89,6 +89,9 @@ if test "x${ax_cv_boost_python}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-python-dev])
 fi
 
+#AC_LANG_PUSH([C++])
+#AC_CHECK_HEADER([boost/python.hpp], , AC_MSG_ERROR([missing Boost Python headers]), )
+#AC_LANG_POP([C++])
 
 # Check for OpenSceneGraph:
 PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
