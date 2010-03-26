@@ -1,5 +1,5 @@
 # ===========================================================================
-#               http://autoconf-archive.cryp.to/ax_python.html
+#         http://www.gnu.org/software/autoconf-archive/ax_python.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -10,7 +10,7 @@
 #
 #   This macro does a complete Python development environment check.
 #
-#   It recurses through several python versions (from 2.1 to 2.5 in this
+#   It recurses through several python versions (from 2.1 to 2.6 in this
 #   version), looking for an executable. When it finds an executable, it
 #   looks to find the header files and library.
 #
@@ -21,11 +21,7 @@
 #   This macro calls AC_SUBST on PYTHON_BIN (via AC_CHECK_PROG),
 #   PYTHON_INCLUDE_DIR and PYTHON_LIB.
 #
-# LAST MODIFICATION
-#
-#   2008-04-12
-#
-# COPYLEFT
+# LICENSE
 #
 #   Copyright (c) 2008 Michael Tindal
 #
@@ -51,10 +47,11 @@
 #   all other use of the material that constitutes the Autoconf Macro.
 #
 #   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Macro Archive. When you make and
-#   distribute a modified version of the Autoconf Macro, you may extend this
-#   special exception to the GPL to apply to your modified version as well.
-#\locate $ax_python_bin/Python.h | sed -e s,/Python.h,,\]],
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 9
 
 AC_DEFUN([AX_PYTHON],
 [AC_MSG_CHECKING(for python build information)
@@ -64,24 +61,9 @@ AC_CHECK_PROGS(PYTHON_BIN, [$python])
 ax_python_bin=$PYTHON_BIN
 if test x$ax_python_bin != x; then
    AC_CHECK_LIB($ax_python_bin, main, ax_python_lib=$ax_python_bin, ax_python_lib=no)
-   
-   if test -e [/usr/local/include/$ax_python_bin/Python.h]; then
-      AC_CHECK_HEADER([$ax_python_bin/Python.h],
-      [ax_python_header=/usr/local/include/$ax_python_bin],
-      ax_python_header=no)
-   else
-   if test -e [/usr/include/$ax_python_bin/Python.h]; then
-      AC_CHECK_HEADER([$ax_python_bin/Python.h],
-      [ax_python_header=/usr/include/$ax_python_bin],
-      ax_python_header=no)
-   else
-      AC_MSG_WARN([Python.h not found in /usr/include/$ax_python_bin doing !!bad!! locate as backup method.])
-      AC_CHECK_HEADER([$ax_python_bin/Python.h],
-      [ax_python_header=`locate $ax_python_bin/Python.h | sed -e s,/Python.h,,`],
-      ax_python_header=no)
-   fi
-   fi
-
+   AC_CHECK_HEADER([$ax_python_bin/Python.h],
+   [[ax_python_header=`locate $ax_python_bin/Python.h | sed -e s,/Python.h,,`]],
+   ax_python_header=no)
    if test $ax_python_lib != no; then
      if test $ax_python_header != no; then
        break;
@@ -113,4 +95,3 @@ if test x$ax_python_lib != xno; then
   AC_SUBST(PYTHON_LIB)
 fi
 ])dnl
-

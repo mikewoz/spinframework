@@ -19,5 +19,12 @@ noinst_LTLIBRARIES = libSPINwrappers.la
 #noinst_LIBRARIES = libSPINwrappers.la
 
 libSPINwrappers_la_SOURCES = $(BUILT_SOURCES)
-libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
+
+#if PYTHON_INCLUDE_DIR
+#	BOOST_PYTHON_FLAGS = -I$(PYTHON_INCLUDE_DIR)
+#else
+#	BOOST_PYTHON_FLAGS = $(PYTHON_CSPEC)
+#fi
+
+libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CSPEC)
 

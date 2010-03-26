@@ -51,7 +51,8 @@ AX_CHECK_GLUT
 
 # Checks for libraries
 AC_CHECK_LIB([m],[sqrt])
-PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.0)
+#PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.0)
+PKG_CHECK_MODULES([LIBXML2], libxml-2.0 >= 2.0)
 #AC_SUBST(LIBXML_LIBS)
 #AC_SUBST(LIBXML_CFLAGS)
 
@@ -65,6 +66,23 @@ AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
 # Check for Python:
 AX_PYTHON
+
+# Using AX_PYTHON_DEVEL:
+#AX_PYTHON_DEVEL
+
+# Using AX_PYTHON_EMBED:
+#AX_PYTHON_DEFAULT( )
+AX_PYTHON_WITH( )
+AX_PYTHON_INSIST( )
+AX_PYTHON_VERSION_ENSURE( [2.5] )
+AX_PYTHON_CSPEC
+AX_PYTHON_LSPEC
+
+AC_MSG_NOTICE([python: ${PYTHON}])
+AC_MSG_NOTICE([python bin: ${PYTHON_BIN}])
+AC_MSG_NOTICE([python include: ${PYTHON_INCLUDE_DIR}])
+AC_MSG_NOTICE([python CSPEC: ${PYTHON_CSPEC}])
+AC_MSG_NOTICE([python LSPEC: ${PYTHON_LSPEC}])
 
 # Check for boost:
 AX_BOOST_BASE([1.35])
@@ -84,7 +102,8 @@ if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 
-AX_BOOST_PYTHON
+#AX_BOOST_PYTHON
+AX_BOOST_PYTHON_EMBED
 if test "x${ac_cv_boost_python}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-python-dev])
 fi
