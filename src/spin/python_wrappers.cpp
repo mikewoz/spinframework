@@ -136,41 +136,6 @@ int SceneManagerCallback_script(const char* symName, const char *types, std::str
         return 1;
     }
 
-    //introspect_print_type(classType);
-
-    // If we have found a valid Type, then let's build an argument list and see
-    // if we can find a method that takes this list of argumets:
-    /*for (i=1; i<argc; i++)
-    {
-        if (lo_is_numerical_type((lo_type)types[i]))
-        {
-            //   theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-        } else {
-            theArgs.push_back( (const char*) argv[i] );
-        }
-        }*/
-
-    //char tmp[100];
-    //strcpy(tmp, args.c_str());
-    //const char* tok = strtok (tmp, " ");
-
-    /*   while (tok != NULL) {
-
-        printf ("tok: %s\n",tok);
-        if (lo_is_numerical_type((lo_type)types[argn])) {
-            //   theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-            theArgs.push_back( (float) atof(tok) );
-        } else {
-            theArgs.push_back( (const char*) tok );
-        }
-
-        tok = strtok (NULL, " ");
-        argn++;
-    }
-
-    */
-
-
     int argn = 1;
     std::string tok;
     std::istringstream iss(args);

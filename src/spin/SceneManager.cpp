@@ -2060,6 +2060,8 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     else
     {
         classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
+        printf("calling eventscript...\n");
+        dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod );
     }
 
 
@@ -2090,6 +2092,9 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
     // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
+
+
+
     if (!invokeMethod(classInstance, classType, theMethod, theArgs))
     {
         //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;

@@ -56,9 +56,11 @@
 // forward declaration of SceneManager
 class SceneManager;
 
-
 typedef std::map< std::string, std::string > stringParamType;
 typedef std::map< std::string, float > floatParamType;
+typedef std::map< const std::string, boost::python::object > EventScriptList;
+
+
 
 
 /**
@@ -233,13 +235,15 @@ public:
     SceneManager *sceneManager;
     MediaManager *mediaManager;
 
-
-    bool setScript( const std::string& s );
+    bool setScript( const std::string& s, const std::string& params );
+    bool addEventScript( const std::string& eventName, const std::string& scr, const std::string& params );
+    bool callEventScript( const std::string& eventName );
 
  protected:
 
     std::string _scriptFile;
     boost::python::object _scriptRun;
+    EventScriptList _eventScriptList;
 
  private:
 

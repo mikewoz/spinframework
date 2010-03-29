@@ -90,14 +90,16 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
 
 
     if (strcmp(initID, "potato") == 0) {
-        setScript("hello.py");
+        //setScript("hello.py");
+        printf("I am potato\n");
+        addEventScript("setScale","hello.py", "");
     }
 
 
     this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
 
     attach();
-    printf("referencednode ctor done.\n");
+    //printf("referencednode ctor done.\n");
 
 }
 
@@ -511,7 +513,7 @@ void ReferencedNode::stateDump ()
 
 // *****************************************************************************
 
-bool ReferencedNode::setScript( const std::string& scr ) {
+bool ReferencedNode::setScript( const std::string& scr, const std::string& params ) {
 
     spinContext &spin = spinContext::Instance();
     printf("moo?\n");
@@ -530,7 +532,8 @@ bool ReferencedNode::setScript( const std::string& scr ) {
         std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
-        sprintf(cmd, "script%p = mod%p.Script('%s')", this, this, id->s_name);
+        if (params != "") sprintf(cmd, "script%p = mod%p.Script('%s')", this, this, id->s_name);
+        else sprintf(cmd, "script%p = mod%p.Script('%s', %s)", this, this, id->s_name, params.c_str());
         std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
@@ -557,6 +560,104 @@ bool ReferencedNode::setScript( const std::string& scr ) {
         _scriptFile = "";
         return false;
     }
+
+    return true;
+
+}
+
+
+
+
+// *****************************************************************************
+
+bool ReferencedNode::addEventScript( const std::string& eventName, const std::string& scr, const std::string& params ) {
+
+    spinContext &spin = spinContext::Instance();
+    printf("moo?\n");
+
+
+    std::string sf = sceneManager->resourcesPath + "/scripts/" + scr;
+    printf("moo! [%s]\n", sf.c_str());
+
+    boost::python::object s, p;
+    //char hexAddr[20];
+    //sprintf(hexAddr, "%p", this);
+    //printf("ReferencedNode: address = %p\n", this);
+    //printf("ReferencedNode: id = %s\n", id->s_name);
+    char cmd[100];
+
+    try {
+        sprintf(cmd, "mod%p = spin.load_module('%s')", this, sf.c_str());
+        std::cout << "Python cmd: " << cmd << std::endl;
+        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+
+        if (params != "") sprintf(cmd, "script%p = mod%p.Script('%s')", this, this, id->s_name);
+        else sprintf(cmd, "script%p = mod%p.Script('%s', %s)", this, this, id->s_name, params.c_str());
+        std::cout << "Python cmd: " << cmd << std::endl;
+        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+
+        sprintf(cmd, "script%p", this);
+        s = spin._pyNamespace[cmd];
+        p = s.attr("run");
+        //_scriptRun = s.attr("run"); // extract instead?
+        _eventScriptList.insert( pair<const std::string, boost::python::object>(eventName, p) );
+
+    } catch (boost::python::error_already_set const & ) {
+        std::cout << "0: Python error: " << std::endl;
+        PyErr_Print();
+        return false;
+    } catch ( std::exception& e ) {
+        std::cout << "0: what? " << e.what() << std::endl;
+
+        return false;
+    } catch(...) {                        // catch all other exceptions
+        std::cout << "0: Caught... something??\n";
+        return false;
+    }
+
+    return true;
+
+}
+
+
+// *****************************************************************************
+
+bool ReferencedNode::callEventScript( const std::string& eventName ) {
+
+    printf("callEventScript( '%s' )...\n", eventName.c_str());
+    if (_eventScriptList.empty()) return false;
+    printf("callEventScript... doing stuff\n");
+    boost::python::object p;
+    EventScriptList::iterator iter;
+
+    try {
+
+        iter = _eventScriptList.find( eventName );
+        if( iter != _eventScriptList.end() ) {
+            cout << "Value is: " << eventName << '\n';
+            p = iter->second;
+            p();
+
+        }
+        else {
+            cout << "Key is not in myMap" << '\n';
+
+        }
+
+
+
+    } catch (boost::python::error_already_set const & ) {
+        std::cout << "0: Python error: " << std::endl;
+        PyErr_Print();
+        return false;
+    } catch ( std::exception& e ) {
+        std::cout << "0: what? " << e.what() << std::endl;
+        return false;
+    } catch(...) {
+        std::cout << "0: Caught... something??\n";
+        return false;
+    }
+
 
     return true;
 
