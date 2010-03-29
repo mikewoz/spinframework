@@ -68,7 +68,7 @@ AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 AX_PYTHON
 
 # Using AX_PYTHON_DEVEL:
-AX_PYTHON_DEVEL
+#AX_PYTHON_DEVEL
 
 # Using AX_PYTHON_EMBED:
 #AX_PYTHON_WITH
@@ -104,7 +104,7 @@ if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 
-#AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), $PYTHON_LDFLAGS)
+#AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), -l$PYTHON_LIB)
 
 AX_BOOST_PYTHON
 if test -z "$BOOST_PYTHON_LIB" ; then
@@ -152,7 +152,7 @@ AS_IF([test "x$with_scenic" = "xyes"],
 
 AC_MSG_NOTICE([============================================])
 AC_MSG_NOTICE([PYTHON_LIB: ${PYTHON_LIB}])
-#AC_MSG_NOTICE([PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}])
+AC_MSG_NOTICE([PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}])
 AC_MSG_NOTICE([PYTHON_CPPFLAGS: ${PYTHON_CPPFLAGS}])
 AC_MSG_NOTICE([PYTHON_LDFLAGS: ${PYTHON_LDFLAGS}])
 AC_MSG_NOTICE([PYTHON_EXTRA_CPPFLAGS: ${PYTHON_EXTRA_CPPFLAGS}])

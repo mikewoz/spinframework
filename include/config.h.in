@@ -63,9 +63,6 @@
 /* Define to 1 if the system has the type `ptrdiff_t'. */
 #undef HAVE_PTRDIFF_T
 
-/* If available, contains the Python version number currently in use. */
-#undef HAVE_PYTHON
-
 /* Define to 1 if you have the `setenv' function. */
 #undef HAVE_SETENV
 

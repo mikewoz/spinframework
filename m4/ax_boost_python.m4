@@ -54,13 +54,14 @@
 #serial 8
 
 AC_DEFUN([AX_BOOST_PYTHON],
-[AC_REQUIRE([AX_PYTHON_DEVEL])dnl
+[AC_REQUIRE([AX_PYTHON])dnl
 AC_CACHE_CHECK(whether the Boost::Python library is available,
 ac_cv_boost_python,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
  CPPFLAGS_SAVE=$CPPFLAGS
- CPPFLAGS="${PYTHON_CPPFLAGS} ${CPPFLAGS}"
+ $CPPFLAGS="${PYTHON_CPPFLAGS} ${CPPFLAGS}"
+ CPPFLAGS="-I${PYTHON_INCLUDE_DIR} ${CPPFLAGS}"
 
  #LDFLAGS_SAVE=$LDFLAGS
  #LDFLAGS="${PYTHON_LDFLAGS} ${LDFLAGS}" 
@@ -85,7 +86,7 @@ if test "$ac_cv_boost_python" = "yes"; then
      ax_boost_python_lib=boost_python-$with_boost_python
    fi])
   for ax_lib in $ax_python_lib $ax_boost_python_lib ${ax_python_lib}-mt boost_python boost_python-mt; do
-    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break], , $PYTHON_LDFLAGS)
+    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break], , -l$PYTHON_LIB)
   done
   AC_SUBST(BOOST_PYTHON_LIB)
 fi
