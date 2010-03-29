@@ -1,5 +1,3 @@
-#AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
-
 BUILT_SOURCES = \
 	ReferencedNode.cpp ReferencedState.cpp \
 	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
@@ -20,7 +18,5 @@ noinst_LTLIBRARIES = libSPINwrappers.la
 
 libSPINwrappers_la_SOURCES = $(BUILT_SOURCES)
 
-
-#libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CSPEC)
-libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
+libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
 

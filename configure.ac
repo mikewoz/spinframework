@@ -68,7 +68,7 @@ AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 AX_PYTHON
 
 # Using AX_PYTHON_DEVEL:
-#AX_PYTHON_DEVEL
+AX_PYTHON_DEVEL
 
 # Using AX_PYTHON_EMBED:
 #AX_PYTHON_WITH
@@ -84,7 +84,6 @@ AX_PYTHON
 #if test -z "$PYTHON_INCLUDES" || test -z "$PYTHON_LIBS"; then
 #AC_MSG_ERROR([Could not find Python])
 #fi
-
 
 # Check for boost:
 AX_BOOST_BASE([1.35])
@@ -105,10 +104,9 @@ if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 
-#AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), -l$PYTHON_LIB)
+#AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), $PYTHON_LDFLAGS)
 
 AX_BOOST_PYTHON
-#AX_BOOST_PYTHON_EMBED
 if test -z "$BOOST_PYTHON_LIB" ; then
     AC_MSG_ERROR([missing package. libboost-python-dev.])
 fi
@@ -154,7 +152,11 @@ AS_IF([test "x$with_scenic" = "xyes"],
 
 AC_MSG_NOTICE([============================================])
 AC_MSG_NOTICE([PYTHON_LIB: ${PYTHON_LIB}])
-AC_MSG_NOTICE([PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}])
+#AC_MSG_NOTICE([PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}])
+AC_MSG_NOTICE([PYTHON_CPPFLAGS: ${PYTHON_CPPFLAGS}])
+AC_MSG_NOTICE([PYTHON_LDFLAGS: ${PYTHON_LDFLAGS}])
+AC_MSG_NOTICE([PYTHON_EXTRA_CPPFLAGS: ${PYTHON_EXTRA_CPPFLAGS}])
+AC_MSG_NOTICE([PYTHON_EXTRA_LDFLAGS: ${PYTHON_EXTRA_LDFLAGS}])
 AC_MSG_NOTICE([BOOST_LDFLAGS: ${BOOST_LDFLAGS}])
 AC_MSG_NOTICE([BOOST_CPPFLAGS: ${BOOST_CPPFLAGS}])
 AC_MSG_NOTICE([BOOST_PYTHON_LIB: ${BOOST_PYTHON_LIB}])

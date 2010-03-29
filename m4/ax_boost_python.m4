@@ -54,15 +54,17 @@
 #serial 8
 
 AC_DEFUN([AX_BOOST_PYTHON],
-[AC_REQUIRE([AX_PYTHON])dnl
+[AC_REQUIRE([AX_PYTHON_DEVEL])dnl
 AC_CACHE_CHECK(whether the Boost::Python library is available,
 ac_cv_boost_python,
 [AC_LANG_SAVE
  AC_LANG_CPLUSPLUS
  CPPFLAGS_SAVE=$CPPFLAGS
- if test x$PYTHON_INCLUDE_DIR != x; then
-   CPPFLAGS=-I$PYTHON_INCLUDE_DIR $CPPFLAGS
- fi
+ CPPFLAGS="${PYTHON_CPPFLAGS} ${CPPFLAGS}"
+
+ #LDFLAGS_SAVE=$LDFLAGS
+ #LDFLAGS="${PYTHON_LDFLAGS} ${LDFLAGS}" 
+
  AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[
  #include <boost/python/module.hpp>
  using namespace boost::python;
@@ -71,7 +73,9 @@ ac_cv_boost_python,
   			   ac_cv_boost_python=yes, ac_cv_boost_python=no)
  AC_LANG_RESTORE
  CPPFLAGS=$CPPFLAGS_SAVE
+ #LDFLAGS=$LDFLAGS_SAVE
 ])
+
 if test "$ac_cv_boost_python" = "yes"; then
   AC_DEFINE(HAVE_BOOST_PYTHON,,[define if the Boost::Python library is available])
   ax_python_lib=boost_python
@@ -80,8 +84,8 @@ if test "$ac_cv_boost_python" = "yes"; then
      ax_python_lib=$with_boost_python
      ax_boost_python_lib=boost_python-$with_boost_python
    fi])
-  for ax_lib in $ax_python_lib $ax_boost_python_lib boost_python; do
-    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break])
+  for ax_lib in $ax_python_lib $ax_boost_python_lib ${ax_python_lib}-mt boost_python boost_python-mt; do
+    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break], , $PYTHON_LDFLAGS)
   done
   AC_SUBST(BOOST_PYTHON_LIB)
 fi

@@ -1,36 +1,25 @@
-AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(PYTHON_INCLUDE_DIR)
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
 
 
-
-#INCLUDES = -I$(top_srcdir)/src/tinyxml
 
 # use lib_LTLIBRARIES to build a shared lib:
 lib_LTLIBRARIES = libSPIN.la libSPINPyWrap.la
 
-libSPIN_la_CPPFLAGS = \
-	$(AM_CPPFLAGS)
-
-
-#-I$(top_srcdir)/src/tinyxml \
-#-I$(BOOST_CPPFLAGS) \
-#-I$(PYTHON_INCLUDE_DIR)
-
+#libSPIN_la_CPPFLAGS = $(SPIN_CPPFLAGS)
 
 libSPIN_la_LIBADD = \
 	$(top_srcdir)/src/osgWrappers/libSPINwrappers.la \
 	$(top_srcdir)/src/tinyxml/libtinyxml.la
 
 libSPIN_la_LDFLAGS = \
+	$(PYTHON_LDFLAGS) \
 	$(BOOST_LDFLAGS) \
 	$(BOOST_FILESYSTEM_LIB) \
-	$(BOOST_PYTHON_LIB) \
+	-l$(BOOST_PYTHON_LIB) \
 	-lOpenThreads -losg \
 	-losgGA -losgSim -losgDB -losgManipulator -losgText -losgUtil \
 	-losgFX -losgParticle -losgViewer \
-	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS) \
-	-l$(PYTHON_LIB)
-
-# -l$(BOOST_PYTHON_LIB) 
+	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS)
 
 libSPIN_la_SOURCES = \
 	spinContext.cpp osgUtil.cpp spinUtil.cpp libloUtil.cpp \
@@ -43,28 +32,20 @@ libSPIN_la_SOURCES = \
 	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
 	VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
 
-libSPINPyWrap_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(PYTHON_INCLUDE_DIR) -I$(top_srcdir)/src/tinyxml
-libSPINPyWrap_la_LIBADD = libSPIN.la
-libSPINPyWrap_la_LDFLAGS = $(BOOST_LDFLAGS) -losg $(OSGINTROSPECTION_LIB) -l$(PYTHON_LIB) $(BOOST_PYTHON_LIB) 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
+libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
+libSPINPyWrap_la_LIBADD = libSPIN.la
 
 bin_PROGRAMS = spinServer spinViewer spinDocGenerator
-#bin_PROGRAMS = spinServer spinViewer spin
-
-#AM_LDFLAGS = -llo
-
-#  OSG_LIBS += -lc -lm -ldl -lGL -lX11 -lpthread \
-#  -lOpenThreads -losg -losgGA -losgSim -losgDB -losgIntrospection \
-# -losgManipulator -losgText -losgUtil -losgFX -losgParticle -losgViewer
 
 spinServer_SOURCES = spinServer.cpp
-spinServer_LDFLAGS = -lSPIN -l$(PYTHON_LIB) $(BOOST_LDFLAGS) $(BOOST_PYTHON_LIB) 
+spinServer_LDFLAGS = -lSPIN # $(SPIN_LDFLAGS)
 
 spinViewer_SOURCES = spinViewer.cpp
-spinViewer_LDFLAGS = -lSPIN -l$(PYTHON_LIB) $(BOOST_LDFLAGS) $(BOOST_PYTHON_LIB) 
+spinViewer_LDFLAGS = -lSPIN # $(SPIN_LDFLAGS)
 
 spinDocGenerator_SOURCES = docGenerator.cpp
-spinDocGenerator_LDFLAGS = -lSPIN -l$(PYTHON_LIB) $(BOOST_LDFLAGS) $(BOOST_PYTHON_LIB) 
+spinDocGenerator_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 
 scriptsdir = $(datadir)/spinFramework/scripts
 scripts_DATA = scripts/hello.py scripts/spin.py
