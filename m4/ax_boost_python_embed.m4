@@ -63,9 +63,7 @@ ac_cv_boost_python,
  AC_LANG_CPLUSPLUS
  CPPFLAGS_SAVE=$CPPFLAGS
  if test x$PYTHON != x; then
-   CPPFLAGS="${PYTHON_CSPEC} ${CPPFLAGS}"
-   #CPPFLAGS="${CPPFLAGS} ${PYTHON_CSPEC}"
-   #AC_MSG_NOTICE([PYTHON_CSPEC=${CPPFLAGS}])
+   CPPFLAGS="${PYTHON_CSPEC} ${BOOST_CPPFLAGS} ${CPPFLAGS}"
  fi
  AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[
  #include <boost/python/module.hpp>
@@ -84,8 +82,10 @@ if test "$ac_cv_boost_python" = "yes"; then
      ax_python_lib=$with_boost_python
      ax_boost_python_lib=boost_python-$with_boost_python
    fi])
-  for ax_lib in $ax_python_lib $ax_boost_python_lib boost_python; do
-    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break])
+  BOOSTLIBDIR=`echo $BOOST_LDFLAGS | sed -e 's/@<:@^\/@:>@*//'`
+  #for ax_lib in $ax_python_lib $ax_boost_python_lib boost_python boost_python; do
+  for ax_lib in $ax_boost_python_lib $ax_python_lib `ls $BOOSTLIBDIR/libboost_python*.{so,dylib,a}* 2>/dev/null | sed 's,.*/,,' | sed -e 's;^lib\(boost_python.*\)\.so.*$;\1;' -e 's;^lib\(boost_python.*\)\.a*$;\1;' -e 's;^lib\(boost_python.*\)\.dylib$;\1;'` ; do
+    AC_CHECK_LIB($ax_lib, main, [BOOST_PYTHON_LIB=$ax_lib break])
   done
   AC_SUBST(BOOST_PYTHON_LIB)
 fi

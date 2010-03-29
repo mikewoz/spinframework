@@ -71,21 +71,24 @@ AX_PYTHON
 #AX_PYTHON_DEVEL
 
 # Using AX_PYTHON_EMBED:
-#AX_PYTHON_DEFAULT( )
-AX_PYTHON_WITH( )
-AX_PYTHON_INSIST( )
-AX_PYTHON_VERSION_ENSURE( [2.5] )
-AX_PYTHON_CSPEC
-AX_PYTHON_LSPEC
+#AX_PYTHON_WITH
+#AX_PYTHON_PATH
+#AX_PYTHON_VERSION_ENSURE( [2.5] )
+#AX_PYTHON_CSPEC
+#AX_PYTHON_LSPEC
 
-AC_MSG_NOTICE([python: ${PYTHON}])
-AC_MSG_NOTICE([python bin: ${PYTHON_BIN}])
-AC_MSG_NOTICE([python include: ${PYTHON_INCLUDE_DIR}])
-AC_MSG_NOTICE([python CSPEC: ${PYTHON_CSPEC}])
-AC_MSG_NOTICE([python LSPEC: ${PYTHON_LSPEC}])
+# Another python check: 
+#AM_PATH_PYTHON
+#AM_CHECK_PYTHON_HEADERS
+#AM_CHECK_PYTHON_LIB
+#if test -z "$PYTHON_INCLUDES" || test -z "$PYTHON_LIBS"; then
+#AC_MSG_ERROR([Could not find Python])
+#fi
+
 
 # Check for boost:
 AX_BOOST_BASE([1.35])
+
 
 AX_BOOST_REGEX
 if test "x${ax_cv_boost_regex}" = "xno" ; then
@@ -102,15 +105,16 @@ if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 
-#AX_BOOST_PYTHON
-AX_BOOST_PYTHON_EMBED
-if test "x${ac_cv_boost_python}" = "xno" ; then
-    AC_MSG_ERROR([missing package: libboost-python-dev])
+#AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), -l$PYTHON_LIB)
+
+AX_BOOST_PYTHON
+#AX_BOOST_PYTHON_EMBED
+if test -z "$BOOST_PYTHON_LIB" ; then
+    AC_MSG_ERROR([missing package. libboost-python-dev.])
 fi
 
-#AC_LANG_PUSH([C++])
-#AC_CHECK_HEADER([boost/python.hpp], , AC_MSG_ERROR([missing Boost Python headers]), )
-#AC_LANG_POP([C++])
+
+
 
 # Check for OpenSceneGraph:
 PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
@@ -148,6 +152,13 @@ AS_IF([test "x$with_scenic" = "xyes"],
 
 
 
+AC_MSG_NOTICE([============================================])
+AC_MSG_NOTICE([PYTHON_LIB: ${PYTHON_LIB}])
+AC_MSG_NOTICE([PYTHON_INCLUDE_DIR: ${PYTHON_INCLUDE_DIR}])
+AC_MSG_NOTICE([BOOST_LDFLAGS: ${BOOST_LDFLAGS}])
+AC_MSG_NOTICE([BOOST_CPPFLAGS: ${BOOST_CPPFLAGS}])
+AC_MSG_NOTICE([BOOST_PYTHON_LIB: ${BOOST_PYTHON_LIB}])
+AC_MSG_NOTICE([============================================])
 
 
 #AC_OUTPUT(Makefile src/genwrapper/Makefile src/osgWrappers/Makefile src/spin/Makefile)
