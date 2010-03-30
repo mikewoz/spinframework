@@ -2060,8 +2060,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     else
     {
         classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
-        printf("calling eventscript...\n");
-        dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod );
+
     }
 
 
@@ -2118,8 +2117,10 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
             lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
         }
     }
-
-
+    if (s->s_type == REFERENCED_NODE) {
+        //printf("calling eventscript...\n");
+        dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod );
+    }
     //pthread_mutex_unlock(&pthreadLock);
 
     return 1;

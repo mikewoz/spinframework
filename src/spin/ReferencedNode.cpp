@@ -89,17 +89,17 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
     registerNode(sceneManager);
 
 
-    if (strcmp(initID, "potato") == 0) {
-        //setScript("hello.py");
+    if (strcmp(initID, "potato") == 0 && !sceneManager->isSlave() ) {
         printf("I am potato\n");
-        addEventScript("setScale","hello.py", "");
+        setScript("orbit.py", "");
+        addEventScript("setTranslation","hotspot.py", "");
     }
 
 
     this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
 
     attach();
-    //printf("referencednode ctor done.\n");
+    printf("referencednode ctor done.\n");
 
 }
 
@@ -624,9 +624,9 @@ bool ReferencedNode::addEventScript( const std::string& eventName, const std::st
 
 bool ReferencedNode::callEventScript( const std::string& eventName ) {
 
-    printf("callEventScript( '%s' )...\n", eventName.c_str());
+    //printf("callEventScript( '%s' )...\n", eventName.c_str());
     if (_eventScriptList.empty()) return false;
-    printf("callEventScript... doing stuff\n");
+    //printf("callEventScript... doing stuff\n");
     boost::python::object p;
     EventScriptList::iterator iter;
 
@@ -634,13 +634,13 @@ bool ReferencedNode::callEventScript( const std::string& eventName ) {
 
         iter = _eventScriptList.find( eventName );
         if( iter != _eventScriptList.end() ) {
-            cout << "Value is: " << eventName << '\n';
+            //cout << "Value is: " << eventName << '\n';
             p = iter->second;
             p();
 
         }
         else {
-            cout << "Key is not in myMap" << '\n';
+            //cout << "Key is not in myMap" << '\n';
 
         }
 

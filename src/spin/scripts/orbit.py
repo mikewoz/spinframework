@@ -7,10 +7,9 @@ class Script:
     angle = 0
     radius = 5
     def __init__(self, id):
-        print "why hello there!"
+        print "orbit init!"
         self.c = 1000
         self.nodeID = id
-        print "script for node '", self.nodeID, "' initialized"
 
     def run(self): 
         if self.angle % 10 == 0:
@@ -21,12 +20,5 @@ class Script:
         method = "setTranslation " + `x` + " " + `y` + " 0.0"
         #print "the method is: ", method
         libSPINPyWrap.callback(self.nodeID, "sfff", method, 4)
-        
-        method = "setDamping 0.234"
-        libSPINPyWrap.callback(self.nodeID, "sf", method, 2)
 
-        ret = libSPINPyWrap.callback(self.nodeID, "s", "getTranslation", 1)
-        print "ret?? = ", ret.getVector()
-
-
-print "module loaded."
+print "orbit module loaded."

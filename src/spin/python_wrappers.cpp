@@ -77,6 +77,7 @@
 #include <osgIntrospection/Attributes>
 
 #include <osgIntrospection/ExtendedTypeInfo>
+#include <osgIntrospection/variant_cast>
 
 
 #include "spinContext.h"
@@ -84,36 +85,184 @@
 
 using namespace boost::python;
 
+/******************************************************************************/
+
+class ValueWrapper {
+
+public:
+    ValueWrapper();
+    ValueWrapper(osgIntrospection::Value& v);
+    ValueWrapper(int v);
+    ValueWrapper(float v);
+    ValueWrapper(std::string& v);
+    ValueWrapper(const std::string& v);
+    ~ValueWrapper();
+
+
+    int getInt();
+    float getFloat();
+    std::string getString();
+    boost::python::tuple getVector();
+
+protected:
+    osgIntrospection::Value _value;
+};
+/******************************************************************************/
+ValueWrapper::ValueWrapper() {
+    _value = osgIntrospection::Value(0);
+}
+/******************************************************************************/
+ValueWrapper::ValueWrapper(osgIntrospection::Value& v) {
+    _value = v;
+}
+
+/******************************************************************************/
+ValueWrapper::ValueWrapper(int v) {
+    _value = osgIntrospection::Value(v);
+}
+
+/******************************************************************************/
+ValueWrapper::ValueWrapper(float v) {
+    _value = osgIntrospection::Value(v);
+}
+
+/******************************************************************************/
+ValueWrapper::ValueWrapper(std::string& v) {
+    _value = osgIntrospection::Value(v);
+}
+
+/******************************************************************************/
+ValueWrapper::ValueWrapper(const std::string& v) {
+    _value = osgIntrospection::Value(v);
+}
+
+/******************************************************************************/
+ValueWrapper::~ValueWrapper() {
+}
+
+
+/******************************************************************************/
+
+int ValueWrapper::getInt() {
+    int i = osgIntrospection::variant_cast<int>(_value);
+    return i;
+}
+
+/******************************************************************************/
+
+float ValueWrapper::getFloat() {
+    float i = osgIntrospection::variant_cast<float>(_value);
+    return i;
+}
+
+/******************************************************************************/
+
+std::string ValueWrapper::getString() {
+    return _value.toString();
+
+}
+/******************************************************************************/
+
+boost::python::tuple ValueWrapper::getVector() {
+
+    osg::Vec2 v2;
+    osg::Vec3 v3;
+    osg::Vec4 v4;
+
+    try {
+        v2 = osgIntrospection::variant_cast<osg::Vec2>(_value);
+        return make_tuple( v2.x(), v2.y() );
+    } catch (...) {
+        // not it..
+    }
+
+    try {
+        v3 = osgIntrospection::variant_cast<osg::Vec3>(_value);
+        return make_tuple( v3.x(), v3.y(), v3.z() );
+    } catch (...) {
+        // still not it
+    }
+
+    try {
+        v4 = osgIntrospection::variant_cast<osg::Vec4>(_value);
+        return make_tuple( v4.x(), v4.y(), v4.z(), v4.w() );
+    } catch (...) {
+        // damn
+    }
 
 
 
 
-//int SceneManagerCallback_script(const char* symName, const char *types, lo_arg **argv, int argc)
-int SceneManagerCallback_script(const char* symName, const char *types, std::string args, int argc)
+    return make_tuple(0);
+
+
+}
+
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+
+int invokeMethod(const osgIntrospection::Value classInstance,
+                 const osgIntrospection::Type &classType,
+                 const std::string& method,
+                 osgIntrospection::ValueList theArgs,
+                 osgIntrospection::Value &rval)
+{
+
+    // TODO: we should try to store this globally somewhere, so that we don't do
+    // a lookup every time there is a message:
+
+    /*
+    const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+
+
+    if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
+    {
+    */
+        try {
+            rval = classType.invokeMethod(method, classInstance, theArgs, true);
+            // if we get this far, then the method invocation succeeded and
+            // we can return:
+            return 1;
+        }
+        catch (osgIntrospection::Exception & ex)
+        {
+            //std::cerr << "catch exception: " << ex.what() << std::endl;
+        }
+
+        // If the method wasn't found in the classInstance, then we need to go
+        // through all base classes to see if method is contained in a parent class:
+        for (int i=0; i<classType.getNumBaseTypes(); i++)
+        {
+            if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs, rval)) return 1;
+        }
+   // }
+
+    return 0;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+ValueWrapper SceneManagerCallback_script(const char* symName, const char *types,
+                                         std::string args, int argc)
 {
 
     //int i;
     std::string    theMethod;
     osgIntrospection::ValueList theArgs;
 
-    printf("SceneManagerCallback_script: hi! %s, %s, [%s]\n", symName, types, args.c_str());
-
-    // make sure there is at least one argument (ie, a method to call):
-    //if (!argc) {
-    //    printf("SceneManagerCallback_script: no args -> no method to call\n");
-    //    return 1;
-    // }
-    // get the method (argv[0]):
-    //if (lo_is_string_type((lo_type)types[0])) {
-    //    theMethod = string((char *)argv[0]);
-    //} else return 1;
+    //printf("SceneManagerCallback_script: hi! %s, %s, [%s]\n", symName, types, args.c_str());
 
     t_symbol *s = gensym( symName );
 
     if (!s->s_thing)
     {
         std::cout << "oscParser: Could not find referenced object named: " << symName << std::endl;
-        return 1;
+        return ValueWrapper(0);
     }
 
     // get osgInrospection::Value from passed UserData by casting as the proper
@@ -132,8 +281,9 @@ int SceneManagerCallback_script(const char* symName, const char *types, std::str
 
     if (!classType.isDefined())
     {
-        std::cout << "ERROR: oscParser cound not process message '" << symName << ". osgIntrospection has no data for that node." << std::endl;
-        return 1;
+        std::cout << "ERROR: oscParser cound not process message '" << symName
+                  << ". osgIntrospection has no data for that node." << std::endl;
+        return ValueWrapper(0);
     }
 
     int argn = 1;
@@ -158,49 +308,50 @@ int SceneManagerCallback_script(const char* symName, const char *types, std::str
 
      // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
-    if (!invokeMethod(classInstance, classType, theMethod, theArgs))
-    {
-        std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway...NOT!" << std::endl;
 
-        // HACK: TODO: fix this
-        /*spinContext &spin = spinContext::Instance();
-        if (spin.sceneManager->isServer())
-        {
+    osgIntrospection::Value v;
 
-            lo_message msg = lo_message_new();
-            for (i=0; i<argc; i++)
-            {
-                if (lo_is_numerical_type((lo_type)types[i]))
-                {
-                    lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
-                } else {
-                    lo_message_add_string(msg, (const char*) argv[i] );
-                }
-            }
+    if (invokeMethod(classInstance, classType, theMethod, theArgs, v)) {
 
-            lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+        if (s->s_type == REFERENCED_NODE) {
+            //printf("calling eventscript...\n");
+            dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod );
+        }
 
-   class_<World>("World")
-        .def("greet", &World::greet)
-        .def("set", &World::set)
-    ;
+        return ValueWrapper(v);
 
-
-            }*/
+    } else {
+        std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name
+                  << "], but forwarding message anyway...NOT!" << std::endl;
     }
 
 
     //pthread_mutex_unlock(&pthreadLock);
 
-    return 1;
+    return ValueWrapper(0);
 }
+
+
+
+
+
+
+
+
+
 
 // =============================================================================
 
 BOOST_PYTHON_MODULE(libSPINPyWrap)
 {
-
-
     def("callback", &SceneManagerCallback_script);
+
+
+    class_<ValueWrapper>("Value")
+        .def("getInt", &ValueWrapper::getInt)  // Add a regular member function.
+        .def("getFloat", &ValueWrapper::getFloat)  // Add a regular member function.
+        .def("getString", &ValueWrapper::getString)  // Add a regular member function.
+        .def("getVector", &ValueWrapper::getVector)
+    ;
 
 }

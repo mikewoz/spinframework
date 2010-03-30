@@ -676,7 +676,7 @@ static void *spinServerThread(void *arg)
         visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
         pthread_mutex_unlock(&pthreadLock);
 
-        usleep(10);
+        usleep(1000);
     }
     spin.running = false;
 

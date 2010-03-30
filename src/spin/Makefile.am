@@ -48,7 +48,7 @@ spinDocGenerator_SOURCES = docGenerator.cpp
 spinDocGenerator_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 
 scriptsdir = $(datadir)/spinFramework/scripts
-scripts_DATA = scripts/hello.py scripts/spin.py
+scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot.py 
 
 #spin_SOURCES = spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
 #      wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \
