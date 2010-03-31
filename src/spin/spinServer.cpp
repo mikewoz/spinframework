@@ -69,16 +69,22 @@ int main(int argc, char **argv)
 
 	osg::ArgumentParser arguments(&argc,argv);
 
+	std::string rxHost = lo_address_get_hostname(spin.lo_rxAddr);
+	std::string rxPort = lo_address_get_port(spin.lo_rxAddr);
+	std::string txHost = lo_address_get_hostname(spin.lo_txAddr);
+	std::string txPort = lo_address_get_port(spin.lo_txAddr);
+	std::string syncPort = lo_address_get_port(spin.lo_rxAddr);
+
 	// set up the usage document, which a user can acess with -h or --help
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] <scene-to-load.xml>");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify a unique ID for this scene.");
-	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <addr>", "Set the transmission address where the server sends update (Default is broadcast: " + spin.txAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-txPort <port>", "Set the transmission port where the server sends updates (Default: " + spin.txPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin.rxAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-rxPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin.rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <hostname> <port>", "Set the transmission address where the server sends updates (Default: " + txHost + " " + txPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-syncPort <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
+
 
 	// PARSE ARGS:
 
@@ -90,6 +96,17 @@ int main(int argc, char **argv)
 	}
 	osg::ArgumentParser::Parameter param_spinID(spin.id);
 	arguments.read("-sceneID", param_spinID);
+
+	while (arguments.read("-txAddr", txHost, txPort)) {
+		spin.lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
+	}
+	while (arguments.read("-rxAddr", rxHost, rxPort)) {
+		spin.lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
+	}
+	while (arguments.read("-syncPort", syncPort)) {
+		spin.lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
+	}
+	/*
 	osg::ArgumentParser::Parameter param_txAddr(spin.txAddr);
 	arguments.read("-txAddr", param_txAddr);
 	osg::ArgumentParser::Parameter param_txPort(spin.txPort);
@@ -98,6 +115,7 @@ int main(int argc, char **argv)
 	arguments.read("-rxAddr", param_rxAddr);
 	osg::ArgumentParser::Parameter param_rxPort(spin.rxPort);
 	arguments.read("-rxPort", param_rxPort);
+	*/
 	
 	// any option left unread are converted into errors to write out later
 	arguments.reportRemainingOptionsAsUnrecognized();

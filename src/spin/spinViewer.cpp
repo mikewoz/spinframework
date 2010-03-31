@@ -96,6 +96,10 @@ int main(int argc, char **argv)
 	
 	std::string redirectAddr, redirectPort;
 
+	std::string rxHost = lo_address_get_hostname(spin.lo_rxAddr);
+	std::string rxPort = lo_address_get_port(spin.lo_rxAddr);
+	std::string syncPort = lo_address_get_port(spin.lo_rxAddr);
+
 
 	// *************************************************************************
 
@@ -111,8 +115,8 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify an ID for this viewer (Default is hostname: '" + id + "')");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + spin.id + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <addr>", "Set the receiving address for incoming OSC messages (Default: " + spin.rxAddr + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-serverPort <port>", "Set the receiving port for incoming OSC messages (Default: " + spin.rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <host> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("-serverSync <port>", "Set the receiving port for timecode sync (Default: " + syncPort + ")");
 
 	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
     arguments.getApplicationUsage()->addCommandLineOption("--hideCursor", "Hide the mouse cursor");
@@ -123,7 +127,7 @@ int main(int argc, char **argv)
 	
 	arguments.getApplicationUsage()->addCommandLineOption("--disabled", "Disable camera controls for this user");
 	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server");
-	arguments.getApplicationUsage()->addCommandLineOption("--redirection <addr port>", "Redirect events to the specified address/port instead of the SPIN server");
+	arguments.getApplicationUsage()->addCommandLineOption("--redirection <host> <port>", "Redirect events to the specified address/port instead of the SPIN server");
 
 
 	// *************************************************************************
@@ -140,10 +144,13 @@ int main(int argc, char **argv)
 	arguments.read("-id", param_id);
 	osg::ArgumentParser::Parameter param_spinID(spin.id);
 	arguments.read("-sceneID", param_spinID);
-	osg::ArgumentParser::Parameter param_spinAddr(spin.rxAddr);
-	arguments.read("-serverAddr", param_spinAddr);
-	osg::ArgumentParser::Parameter param_spinPort(spin.rxPort);
-	arguments.read("-serverPort", param_spinPort);
+
+	while (arguments.read("-serverAddr", rxHost, rxPort)) {
+		spin.lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
+	}
+	while (arguments.read("-syncPort", syncPort)) {
+		spin.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
+	}
 
 	if (arguments.read("--fullscreen")) fullscreen=true;
     if (arguments.read("--hideCursor")) hideCursor=true;

@@ -87,8 +87,20 @@ class spinContext
 
         bool setMode(spinContextMode m);
 
+        /**
+         * Starts the thread (pointed to by *threadFunction), according to the
+         * current spinContextMode
+         */
         virtual bool start();
+        /**
+         * Stops the currently running thread
+         */
         virtual void stop();
+
+        /**
+         * Starts the thread that sends synchronization timecode (syncThread)
+         */
+        void startSync();
 
         /**
          * This method should be used to register a user for a listener-style
@@ -122,10 +134,13 @@ class spinContext
         bool isRunning() { return running; }
 
         void setID(std::string s) { id = s; }
+
+        /*
         void setRxAddr(std::string s) { rxAddr = s; }
         void setRxPort(std::string s) { rxPort = s; }
         void setTxAddr(std::string s) { txAddr = s; }
         void setTxPort(std::string s) { txPort = s; }
+        */
 
         spinContextMode mode;
 
@@ -133,15 +148,18 @@ class spinContext
         //t_symbol *user;
 
         std::string id;
-        std::string rxAddr, rxPort;
-        std::string txAddr, txPort;
-        std::string infoAddr, infoPort;
+        //std::string rxAddr, rxPort;
+        //std::string txAddr, txPort;
+        //std::string infoAddr, infoPort;
 
-        lo_address lo_txAddr;
+        lo_address lo_rxAddr, lo_txAddr;
 
         lo_address lo_infoAddr;
         //lo_server  lo_infoServ;
         lo_server_thread lo_infoServ;
+
+        lo_address lo_syncAddr;
+        lo_server_thread lo_syncServ;  // client only
 
         SceneManager *sceneManager;
         MediaManager *mediaManager;
@@ -150,7 +168,7 @@ class spinContext
         bool running;
 
         /**
-         * We store a funciton pointer in the class, which can be dynamically
+         * We store a function pointer in the class, which can be dynamically
          * swapped depending on spinContextMode (ie, different thread for server
          * mode versus listener mode).
          */
@@ -183,6 +201,8 @@ class spinContext
         pthread_t pthreadID; // id of child thread
         pthread_attr_t pthreadAttr;
 
+        pthread_t syncThreadID; // id of sync thread
+        pthread_attr_t syncthreadAttr;
 
 };
 
@@ -207,9 +227,15 @@ static void *spinListenerThread(void *arg);
  */
 static void *spinServerThread(void *arg);
 
+/**
+ * The syncThread just sends timecode on an independent multicast UDP port
+ */
+static void *syncThread(void *arg);
+
 
 static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+static int spinContext_syncCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 
 #endif

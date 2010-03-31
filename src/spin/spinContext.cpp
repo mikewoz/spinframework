@@ -184,40 +184,43 @@ spinContext::spinContext()
     }
 
     // default infoAddr:
-    infoAddr = "224.0.0.1";
-    infoPort = "54320";
+    //infoAddr = "224.0.0.1";
+    //infoPort = "54320";
 
     // override infoPort based on environment variable:
     char *infoPortStr = getenv("AS_INFOPORT");
     if (infoPortStr)
     {
         string tmpStr = string(infoPortStr);
-        infoAddr = tmpStr.substr(0,tmpStr.rfind(":"));
-        infoPort = tmpStr.substr(tmpStr.find(":")+1);
+        string infoAddr = tmpStr.substr(0,tmpStr.rfind(":"));
+        string infoPort = tmpStr.substr(tmpStr.find(":")+1);
+        lo_infoAddr = lo_address_new(infoAddr.c_str(), infoPort.c_str());
+    }
+    else {
+        lo_infoAddr = lo_address_new("224.0.0.1", "54320");
     }
 
-    lo_infoAddr = lo_address_new(infoAddr.c_str(), infoPort.c_str());
 
-    if (isMulticastAddress(infoAddr))
-    {
-        lo_infoServ = lo_server_thread_new_multicast(infoAddr.c_str(), infoPort.c_str(), oscParser_error);
 
-    } else if (isBroadcastAddress(infoAddr))
+    if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
-        lo_infoServ = lo_server_thread_new(infoPort.c_str(), oscParser_error);
+        lo_infoServ = lo_server_thread_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
+
+    } else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
+    {
+        lo_infoServ = lo_server_thread_new(lo_address_get_port(lo_infoAddr), oscParser_error);
         int sock = lo_server_get_socket_fd(lo_server_thread_get_server(lo_infoServ));
         int sockopt = 1;
         setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
 
     } else {
-        lo_infoServ = lo_server_thread_new(infoPort.c_str(), oscParser_error);
+        lo_infoServ = lo_server_thread_new(lo_address_get_port(lo_infoAddr), oscParser_error);
     }
 
     // info channel callback (receives pings from client apps):
     lo_server_thread_add_method(lo_infoServ, NULL, NULL, spinContext_infoCallback, this);
 
     lo_server_thread_start(lo_infoServ);
-
 
 }
 
@@ -253,21 +256,27 @@ bool spinContext::setMode(spinContextMode m)
 
     if (m==SERVER_MODE)
     {
-        rxAddr = getMyIPaddress();
-        rxPort = "54324";
-        txAddr = "224.0.0.1";
-        txPort = "54323";
+    	lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
+    	lo_txAddr = lo_address_new("224.0.0.1", "54323");
+        //rxAddr = getMyIPaddress();
+        //rxPort = "54324";
+        //txAddr = "224.0.0.1";
+        //txPort = "54323";
         threadFunction = &spinServerThread;
     }
 
     else
     {
-        rxAddr = "224.0.0.1";
-        rxPort = "54323";
-        txAddr = "224.0.0.1";
-        txPort = "54324";
+    	lo_rxAddr = lo_address_new("224.0.0.1", "54323");
+    	lo_txAddr = lo_address_new("224.0.0.1", "54324");
+        //rxAddr = "224.0.0.1";
+        //rxPort = "54323";
+        //txAddr = "224.0.0.1";
+        //txPort = "54324";
         threadFunction = &spinListenerThread;
     }
+
+    lo_syncAddr = lo_address_new("224.0.0.1", "54321");
 
     this->mode = m;
 
@@ -283,9 +292,7 @@ bool spinContext::start()
     std::cout << std::endl;
 
     std::cout << "  INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
-
-
-    lo_txAddr = lo_address_new(txAddr.c_str(), txPort.c_str());
+    std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
 
     signalStop = false;
 
@@ -324,6 +331,23 @@ void spinContext::stop()
     }
 }
 
+
+void spinContext::startSync()
+{
+    // create thread:
+    if (pthread_attr_init(&syncthreadAttr) < 0)
+    {
+        std::cout << "spinContext: could not prepare sync thread" << std::endl;
+    }
+    if (pthread_attr_setdetachstate(&syncthreadAttr, PTHREAD_CREATE_DETACHED) < 0)
+    {
+        std::cout << "spinContext: could not prepare sync thread" << std::endl;
+    }
+    if (pthread_create( &syncThreadID, &syncthreadAttr, syncThread, this) < 0)
+    {
+        std::cout << "spinContext: could not create sync thread" << std::endl;
+    }
+}
 
 void spinContext::registerUser (const char *id)
 {
@@ -583,13 +607,29 @@ static void *spinListenerThread(void *arg)
     //spinContext *spin = (spinContext*) arg;
     spinContext &spin = spinContext::Instance();
 
-    spin.sceneManager = new SceneManager(spin.id, spin.rxAddr, spin.rxPort);
+    spin.sceneManager = new SceneManager(spin.id, lo_address_get_hostname(spin.lo_rxAddr), lo_address_get_port(spin.lo_rxAddr));
 
     // register our special scene callback:
     lo_server_thread_add_method(spin.sceneManager->rxServ, ("/SPIN/" + spin.id).c_str(), NULL, spinContext_sceneCallback, NULL);
 
+    // sync (timecode) receiver:
+    if (isMulticastAddress(lo_address_get_hostname(spin.lo_syncAddr)))
+    {
+    	spin.lo_syncServ = lo_server_thread_new_multicast(lo_address_get_hostname(spin.lo_syncAddr), lo_address_get_port(spin.lo_syncAddr), oscParser_error);
+    } else {
+    	spin.lo_syncServ = lo_server_thread_new(lo_address_get_port(spin.lo_syncAddr), oscParser_error);
+    }
+    lo_server_thread_add_method(spin.lo_syncServ, string("/SPIN/"+spin.id).c_str(), NULL, spinContext_syncCallback, &spin);
+    lo_server_thread_start(spin.lo_syncServ);
+
+
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
+
+    // convert port to integers for sending:
+    string myIP = getMyIPaddress();
+    int i_rxPort;
+    fromString<int>(i_rxPort, lo_address_get_port(spin.lo_rxAddr));
 
     spin.running = true;
     while (!spin.signalStop)
@@ -604,7 +644,7 @@ static void *spinListenerThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            if (spin.userNode.valid()) spin.InfoMessage("/ping/user", "s", (char*) spin.userNode->id->s_name, LO_ARGS_END);
+            if (spin.userNode.valid()) spin.InfoMessage("/ping/user", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
             lastTick = frameTick;
         }
 
@@ -612,6 +652,8 @@ static void *spinListenerThread(void *arg)
     spin.running = false;
 
     // clean up:
+    lo_server_thread_stop(spin.lo_syncServ);
+    lo_server_thread_free(spin.lo_syncServ);
     delete spin.sceneManager;
 
     pthread_exit(NULL);
@@ -622,8 +664,9 @@ static void *spinServerThread(void *arg)
     //spinContext *spin = (spinContext*) arg;
     spinContext &spin = spinContext::Instance();
 
-    spin.sceneManager = new SceneManager(spin.id, spin.rxAddr, spin.rxPort);
-    spin.sceneManager->setTXaddress(spin.txAddr, spin.txPort);
+//    spin.sceneManager = new SceneManager(spin.id, spin.rxAddr, spin.rxPort);
+    spin.sceneManager = new SceneManager(spin.id, lo_address_get_hostname(spin.lo_rxAddr), lo_address_get_port(spin.lo_rxAddr));
+    spin.sceneManager->setTXaddress(lo_address_get_hostname(spin.lo_txAddr), lo_address_get_port(spin.lo_txAddr));
 
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
@@ -651,14 +694,18 @@ static void *spinServerThread(void *arg)
     osg::Timer_t frameTick = lastTick;
 
     // convert ports to integers for sending:
-    int i_rxPort, i_txPort;
-    fromString<int>(i_rxPort, spin.rxPort);
-    fromString<int>(i_txPort, spin.txPort);
+    int i_rxPort, i_txPort, i_syncPort;
+    fromString<int>(i_rxPort, lo_address_get_port(spin.lo_rxAddr));
+    fromString<int>(i_txPort, lo_address_get_port(spin.lo_txAddr));
+    fromString<int>(i_syncPort, lo_address_get_port(spin.lo_syncAddr));
 
     UpdateSceneVisitor visitor;
 
 
     //lo_server_thread_add_method(spin->sceneManager->rxServ, NULL, NULL, sceneCallback, spin);
+
+    // start sync (timecode) thread:
+    spin.startSync();
 
 
     spin.running = true;
@@ -667,7 +714,11 @@ static void *spinServerThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            spin.InfoMessage("/ping/SPIN", "ssisi", spin.id.c_str(), myIP.c_str(), i_rxPort, spin.txAddr.c_str(), i_txPort, LO_ARGS_END);
+            spin.InfoMessage("/ping/SPIN", "ssisii", spin.id.c_str(),
+            		myIP.c_str(), i_rxPort,
+            		lo_address_get_hostname(spin.lo_txAddr), i_txPort,
+            		i_syncPort,
+            		LO_ARGS_END);
             //lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
             lastTick = frameTick;
         }
@@ -687,6 +738,23 @@ static void *spinServerThread(void *arg)
     pthread_exit(NULL);
 }
 
+static void *syncThread(void *arg)
+{
+	spinContext &spin = spinContext::Instance();
+
+    osg::Timer_t startTick = osg::Timer::instance()->tick();
+    osg::Timer_t frameTick = startTick;
+
+    while (spin.isRunning())
+    {
+    	//usleep(1000000 * 0.25); // 1/4 second sleep
+    	usleep(1000000 * 0.5); // 1/2 second sleep
+
+    	frameTick = osg::Timer::instance()->tick();
+
+    	lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sf", "sync", (float)osg::Timer::instance()->delta_m(startTick,frameTick) );
+    }
+}
 
 static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
 {
@@ -755,4 +823,36 @@ static int spinContext_infoCallback(const char *path, const char *types, lo_arg 
     }
 
     return 1;
+}
+
+static int spinContext_syncCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+{
+	spinContext &spin = spinContext::Instance();
+
+	// the incoming message should look like this: /SPIN/default sync 234.723
+
+	if (argc != 2) return 1;
+
+	string theMethod;
+	if (lo_is_string_type((lo_type)types[0]))
+	{
+	    theMethod = string((char *)argv[0]);
+	}
+	else return 1;
+
+	if (theMethod != "sync") return 1;
+
+	if (lo_is_numerical_type((lo_type)types[1]))
+	{
+		float newSyncTime = (float) lo_hires_val((lo_type)types[1], argv[1]);
+
+		// Here is where we make sure that the local client timer is resync'd
+		// with the global time coming from SPIN:
+
+		//std::cout << "got new sync time: " << newSyncTime << std::endl;
+
+
+	}
+
+	return 1;
 }
