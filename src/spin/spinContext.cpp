@@ -745,12 +745,14 @@ static void *syncThread(void *arg)
     osg::Timer_t startTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = startTick;
 
-    while (spin.isRunning())
+    //while (spin.isRunning())
+    while (1)
     {
     	//usleep(1000000 * 0.25); // 1/4 second sleep
     	usleep(1000000 * 0.5); // 1/2 second sleep
 
     	frameTick = osg::Timer::instance()->tick();
+
 
     	lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sf", "sync", (float)osg::Timer::instance()->delta_m(startTick,frameTick) );
     }
