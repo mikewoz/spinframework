@@ -759,7 +759,7 @@ static void *syncThread(void *arg)
 
         frameTick = timer->tick();
 
-        std::cout << "sync time: " << timer->time_s() << "  tick = " << (frameTick - startTick ) << std::endl;
+        ///std::cout << "sync time: " << timer->time_s() << "  tick = " << (frameTick - startTick ) << std::endl;
         lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sh", "sync", (long long)(frameTick - startTick) );
     }
 }
@@ -882,14 +882,8 @@ static int spinContext_syncCallback(const char *path, const char *types, lo_arg 
 
         }
 
-        std::cout << "start = " <<  startTick << " m=" <<  masterTick << " s=" << slaveTick << " o=" <<  off << std::endl;
-
-        //double newSyncTime = (double) lo_hires_val((lo_type)types[1], argv[1]);
-
-        // Here is where we make sure that the local client timer is resync'd
-        // with the global time coming from SPIN:
-
-        std::cout << "got new sync time: " << timer->time_s() << std::endl;
+        //std::cout << "start = " <<  startTick << " m=" <<  masterTick << " s=" << slaveTick << " o=" <<  off << std::endl;
+        //std::cout << "got new sync time: " << timer->time_s() << std::endl;
 
 
     }
