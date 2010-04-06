@@ -102,6 +102,10 @@ class spinContext
          */
         void startSync();
 
+        void setSyncStart(osg::Timer_t t) { _syncStartTick = t; }
+        osg::Timer_t getSyncStart() { return _syncStartTick; }
+        osg::Timer_t _syncStartTick;
+
         /**
          * This method should be used to register a user for a listener-style
          * SPIN client. The user is definitively created and stored in the

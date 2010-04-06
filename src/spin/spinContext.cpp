@@ -133,7 +133,7 @@ spinContext::spinContext()
 
     _pyInitialized = false;
 
-
+    _syncStartTick = 0;
 
     // Make sure that our OSG nodekit    is loaded (by checking for existance of
     // the ReferencedNode node type):
@@ -256,8 +256,8 @@ bool spinContext::setMode(spinContextMode m)
 
     if (m==SERVER_MODE)
     {
-    	lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
-    	lo_txAddr = lo_address_new("224.0.0.1", "54323");
+        lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
+        lo_txAddr = lo_address_new("224.0.0.1", "54323");
         //rxAddr = getMyIPaddress();
         //rxPort = "54324";
         //txAddr = "224.0.0.1";
@@ -267,8 +267,8 @@ bool spinContext::setMode(spinContextMode m)
 
     else
     {
-    	lo_rxAddr = lo_address_new("224.0.0.1", "54323");
-    	lo_txAddr = lo_address_new("224.0.0.1", "54324");
+        lo_rxAddr = lo_address_new("224.0.0.1", "54323");
+        lo_txAddr = lo_address_new("224.0.0.1", "54324");
         //rxAddr = "224.0.0.1";
         //rxPort = "54323";
         //txAddr = "224.0.0.1";
@@ -615,9 +615,9 @@ static void *spinListenerThread(void *arg)
     // sync (timecode) receiver:
     if (isMulticastAddress(lo_address_get_hostname(spin.lo_syncAddr)))
     {
-    	spin.lo_syncServ = lo_server_thread_new_multicast(lo_address_get_hostname(spin.lo_syncAddr), lo_address_get_port(spin.lo_syncAddr), oscParser_error);
+        spin.lo_syncServ = lo_server_thread_new_multicast(lo_address_get_hostname(spin.lo_syncAddr), lo_address_get_port(spin.lo_syncAddr), oscParser_error);
     } else {
-    	spin.lo_syncServ = lo_server_thread_new(lo_address_get_port(spin.lo_syncAddr), oscParser_error);
+        spin.lo_syncServ = lo_server_thread_new(lo_address_get_port(spin.lo_syncAddr), oscParser_error);
     }
     lo_server_thread_add_method(spin.lo_syncServ, string("/SPIN/"+spin.id).c_str(), NULL, spinContext_syncCallback, &spin);
     lo_server_thread_start(spin.lo_syncServ);
@@ -715,10 +715,10 @@ static void *spinServerThread(void *arg)
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
             spin.InfoMessage("/ping/SPIN", "ssisii", spin.id.c_str(),
-            		myIP.c_str(), i_rxPort,
-            		lo_address_get_hostname(spin.lo_txAddr), i_txPort,
-            		i_syncPort,
-            		LO_ARGS_END);
+                    myIP.c_str(), i_rxPort,
+                    lo_address_get_hostname(spin.lo_txAddr), i_txPort,
+                    i_syncPort,
+                    LO_ARGS_END);
             //lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
             lastTick = frameTick;
         }
@@ -740,21 +740,27 @@ static void *spinServerThread(void *arg)
 
 static void *syncThread(void *arg)
 {
-	spinContext &spin = spinContext::Instance();
+    spinContext &spin = spinContext::Instance();
+    osg::Timer* timer = osg::Timer::instance();
 
-    osg::Timer_t startTick = osg::Timer::instance()->tick();
+
+    osg::Timer_t startTick = timer->tick();
+    timer->setStartTick(startTick);
+    spin.setSyncStart(startTick);
     osg::Timer_t frameTick = startTick;
+
+    //double t;
 
     //while (spin.isRunning())
     while (1)
     {
-    	//usleep(1000000 * 0.25); // 1/4 second sleep
-    	usleep(1000000 * 0.5); // 1/2 second sleep
+        //usleep(1000000 * 0.25); // 1/4 second sleep
+        usleep(1000000 * 0.5); // 1/2 second sleep
 
-    	frameTick = osg::Timer::instance()->tick();
+        frameTick = timer->tick();
 
-
-    	lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sf", "sync", (float)osg::Timer::instance()->delta_m(startTick,frameTick) );
+        std::cout << "sync time: " << timer->time_s() << "  tick = " << (frameTick - startTick ) << std::endl;
+        lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sh", "sync", (long long)(frameTick - startTick) );
     }
 }
 
@@ -827,34 +833,66 @@ static int spinContext_infoCallback(const char *path, const char *types, lo_arg 
     return 1;
 }
 
+
 static int spinContext_syncCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
 {
-	spinContext &spin = spinContext::Instance();
+    spinContext &spin = spinContext::Instance();
+    osg::Timer* timer = osg::Timer::instance();
 
-	// the incoming message should look like this: /SPIN/default sync 234.723
+    osg::Timer_t masterTick, slaveTick, off, startTick;
 
-	if (argc != 2) return 1;
+    // the incoming message should look like this: /SPIN/default sync 234.723
 
-	string theMethod;
-	if (lo_is_string_type((lo_type)types[0]))
-	{
-	    theMethod = string((char *)argv[0]);
-	}
-	else return 1;
+    if (argc != 2) return 1;
 
-	if (theMethod != "sync") return 1;
+    string theMethod;
+    if (lo_is_string_type((lo_type)types[0]))
+    {
+        theMethod = string((char *)argv[0]);
+    }
+    else return 1;
 
-	if (lo_is_numerical_type((lo_type)types[1]))
-	{
-		float newSyncTime = (float) lo_hires_val((lo_type)types[1], argv[1]);
+    if (theMethod != "sync") return 1;
 
-		// Here is where we make sure that the local client timer is resync'd
-		// with the global time coming from SPIN:
+    if (lo_is_numerical_type((lo_type)types[1])) {
+        masterTick = (osg::Timer_t) lo_hires_val((lo_type)types[1], argv[1]);
+        ////std::cout << "MASTERTICK = " << masterTick << std::endl;
 
-		//std::cout << "got new sync time: " << newSyncTime << std::endl;
+        startTick = spin.getSyncStart();
+        if (startTick == 0) {
+            ///printf("setSyncStart....\n");
+            startTick = timer->tick() - masterTick;
+            timer->setStartTick(startTick);
+            spin.setSyncStart(startTick);
+        }
+
+        slaveTick = timer->tick() - startTick;
+
+        if (slaveTick > masterTick) { // EARLY!
+            off = slaveTick - masterTick;
+            startTick += off * 0.1;  /////SYNC_CONVERGE_FACTOR
+            timer->setStartTick(startTick);
+            spin.setSyncStart(startTick);// useless?
+
+        } else if (slaveTick < masterTick) { // WE'RE LATE!
+            off = masterTick - slaveTick;
+            startTick -= off * 0.1;
+            timer->setStartTick(startTick);
+            spin.setSyncStart(startTick);
+
+        }
+
+        std::cout << "start = " <<  startTick << " m=" <<  masterTick << " s=" << slaveTick << " o=" <<  off << std::endl;
+
+        //double newSyncTime = (double) lo_hires_val((lo_type)types[1], argv[1]);
+
+        // Here is where we make sure that the local client timer is resync'd
+        // with the global time coming from SPIN:
+
+        std::cout << "got new sync time: " << timer->time_s() << std::endl;
 
 
-	}
+    }
 
-	return 1;
+    return 1;
 }

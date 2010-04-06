@@ -332,20 +332,32 @@ ValueWrapper SceneManagerCallback_script(const char* symName, const char *types,
 }
 
 
+/******************************************************************************/
 
+double time_s() {
+    return osg::Timer::instance()->time_s();
+}
+double time_m() {
+    return osg::Timer::instance()->time_m();
+}
+double time_u() {
+    return osg::Timer::instance()->time_u();
+}
+double time_n() {
+    return osg::Timer::instance()->time_n();
+}
 
-
-
-
-
-
-
-// =============================================================================
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
 BOOST_PYTHON_MODULE(libSPINPyWrap)
 {
     def("callback", &SceneManagerCallback_script);
-
+    def("time_s", &time_s);
+    def("time_m", &time_m);
+    def("time_u", &time_u);
+    def("time_n", &time_n);
 
     class_<ValueWrapper>("Value")
         .def("getInt", &ValueWrapper::getInt)  // Add a regular member function.
@@ -355,3 +367,6 @@ BOOST_PYTHON_MODULE(libSPINPyWrap)
     ;
 
 }
+
+
+/******************************************************************************/
