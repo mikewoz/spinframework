@@ -1,7 +1,6 @@
 AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
 
 
-
 # use lib_LTLIBRARIES to build a shared lib:
 lib_LTLIBRARIES = libSPIN.la libSPINPyWrap.la
 
@@ -47,6 +46,19 @@ spinViewer_LDFLAGS = -lSPIN # $(SPIN_LDFLAGS)
 spinDocGenerator_SOURCES = docGenerator.cpp
 spinDocGenerator_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 
+
+
+# tell automake that the Resources folder is required
+EXTRA_DIST = ../Resources
+
+# install data to $(datadir) ie, /usr/local/share/spinFramework
+
+imagesdir = $(datadir)/spinFramework/images
+images_DATA = ../Resources/images/*
+
+fontsdir = $(datadir)/spinFramework/fonts
+fonts_DATA = ../Resources/fonts/*
+
 scriptsdir = $(datadir)/spinFramework/scripts
 scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot.py 
 
@@ -54,6 +66,7 @@ scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot
 #      wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \
 #      wxSpinTreeCtrl.cpp
 #spin_LDADD = libSPIN
+
 
 
 doc:
