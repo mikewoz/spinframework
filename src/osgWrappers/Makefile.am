@@ -5,15 +5,7 @@ BUILT_SOURCES = \
         ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
         AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
         DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-        VideoTexture.cpp SharedVideoTexture.cpp 
-
-#	ReferencedNode.h ReferencedState.h \
-#	UserNode.h GroupNode.h ShapeNode.h ModelNode.h \
-#	GridNode.h LightSource.h RayNode.h Contour.h \
-#	ConstraintsNode.h PointerNode.h MeasurementNode.h \
-#	AnimationNode.h SwitchNode.h TextNode.h \
-#	DSPNode.h SoundNode.h SoundSpace.h Listener.h SoundConnection.h \
-#	VideoTexture.h SharedVideoTexture.h 
+        Texture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
 
 %.cpp: %.h
 

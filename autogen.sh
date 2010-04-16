@@ -31,6 +31,7 @@ ${LIBTOOLIZE} --force
 aclocal -I m4
 autoheader
 autoconf -f
+./buildWrappers.sh
 automake -a -f -Wno-portability 
 #if [ ! "x$LOGNAME" = "xbbslave" ]; then
 #  ./configure $@ --enable-svn-revision

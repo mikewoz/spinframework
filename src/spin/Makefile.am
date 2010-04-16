@@ -29,7 +29,10 @@ libSPIN_la_SOURCES = \
 	ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
 	AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
 	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-	VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
+	Texture.cpp VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
+
+libSPIN_la_includedir = $(includedir)/spinFramework
+libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
@@ -61,6 +64,7 @@ fonts_DATA = ../Resources/fonts/*
 
 scriptsdir = $(datadir)/spinFramework/scripts
 scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot.py 
+
 
 #spin_SOURCES = spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
 #      wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \

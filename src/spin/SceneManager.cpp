@@ -369,6 +369,8 @@ void SceneManager::registerState(ReferencedState *s)
     lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
 
     SCENE_MSG(this, "sss", "registerState", s->id->s_name, s->classType.c_str());
+
+    sendNodeList("*");
 }
 
 void SceneManager::unregisterState(ReferencedState *s)
@@ -381,6 +383,8 @@ void SceneManager::unregisterState(ReferencedState *s)
     if ( itr != stateMap[s->classType].end() ) stateMap[s->classType].erase(itr);
 
     SCENE_MSG(this, "ss", "unregisterState", s->id->s_name);
+
+    sendNodeList("*");
 }
 
 // *****************************************************************************
@@ -969,7 +973,7 @@ ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type
     {
         if (n->classType != theType)
         {
-            std::cout << "ERROR: Tried to create " << type << " with id '" << id << "', but that id already exists as an " << n->classType << "." << std::endl;
+            std::cout << "ERROR: Tried to create " << type << " with id '" << id << "', but that id already exists as a " << n->classType << "." << std::endl;
             return NULL;
         } else {
             return n.get();
@@ -1005,6 +1009,8 @@ ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type
     {
         std::cout << "created new state: " << id << " of type " << type << std::endl;
         registerState(n.get());
+        // broadcast (only if this is the server):
+        //SCENE_MSG(this, "sss", "createState", id, type);
         return n.get();
     }
     else

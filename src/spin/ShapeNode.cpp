@@ -50,6 +50,7 @@
 #include "SceneManager.h"
 #include "MediaManager.h"
 
+#include "Texture.h"
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
@@ -380,7 +381,16 @@ void ShapeNode::drawTexture()
 		
 		else
 		{
-			addImageTexture(shapeGeode.get(), fullPath);
+			//addImageTexture(shapeGeode.get(), fullPath);
+			osg::ref_ptr<Texture> tex = dynamic_cast<Texture*>(sceneManager->getOrCreateState((string(id->s_name)+"/Texture").c_str(), "Texture"));
+			if (tex.valid())
+			{
+				tex->setPath(fullPath.c_str());
+				shapeGeode->setStateSet( tex.get() );
+			} else {
+				std::cout << "ERROR creating Texture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
+			}
+
 		}
 
 		pthread_mutex_unlock(&pthreadLock);

@@ -66,6 +66,16 @@ VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedSta
 	_loop = true;
 	_play = true;
 	_framerate = 24;
+
+	/*
+	// force removal of xine plugin (encourage ffmpeg):
+	osgDB::ReaderWriter *rw = osgDB::Registry::instance()->getReaderWriterForExtension("xine");
+	if (rw) osgDB::Registry::instance()->removeReaderWriter(rw);
+
+	std::string xineLib = osgDB::Registry::instance()->createLibraryNameForExtension("xine");
+	std::cout << "closing xineLib: " << xineLib << std::endl;
+	std::cout << osgDB::Registry::instance()->closeLibrary(xineLib) << std::endl;
+	*/
 }
 
 // destructor
@@ -203,6 +213,10 @@ void VideoTexture::setVideoPath (const char* newPath)
 		// Otherwise, assume it is a file and use osgDB::readImageFile to let
 		// osgPlugins try to load it
 		else {
+
+			// preload ffmpeg plugin
+			std::string libName = osgDB::Registry::instance()->createLibraryNameForExtension("ffmpeg");
+			osgDB::Registry::instance()->loadLibrary(libName);
 
 			osg::ref_ptr<osg::Image> image = osgDB::readImageFile(fullPath);
 			test = dynamic_cast<osg::ImageStream*>(image.get());
