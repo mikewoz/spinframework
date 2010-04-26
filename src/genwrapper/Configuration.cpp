@@ -172,6 +172,7 @@ StringMatcher::StringMatcher(const std::string &s)
 
 bool StringMatcher::matches(const std::string &s) const
 {
+	//Notify::debug("literal="+literal);
     if (!literal.empty()) return s == literal;
     return regex_match(s.begin(), s.end(), re);
 }

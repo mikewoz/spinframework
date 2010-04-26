@@ -7,5 +7,6 @@ doxygen ./doxygen_config
 
 rm include/*.h~
 ${GENWRAPPER_PATH}/genwrapper -d . doxygen | doxygen -
-${GENWRAPPER_PATH}/genwrapper -v QUIET -c genwrapper.conf doxygen .
+#${GENWRAPPER_PATH}/genwrapper -v QUIET -c genwrapper.conf doxygen .
+${GENWRAPPER_PATH}/genwrapper -v DEBUG -c genwrapper.conf doxygen .
 

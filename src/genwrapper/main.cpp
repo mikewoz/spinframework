@@ -287,6 +287,8 @@ int main(int argc, char *argv[])
         Notify::notice("consolidating type registry");
         registry.consolidate();
 
+        Notify::notice("done");
+
         WrapperGenerator generator(registry, output_dir, "src/osgWrappers/", appdir, create_lists, cfg);
 
         Notify::notice("generating wrappers");

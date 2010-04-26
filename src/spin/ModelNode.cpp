@@ -99,6 +99,8 @@ ModelNode::~ModelNode()
 
 void ModelNode::setContext (const char *newvalue)
 {
+	if (contextString==string(newvalue)) return;
+
 	// need to redraw after setContext() is called:
 	ReferencedNode::setContext(newvalue);
 	drawModel();
