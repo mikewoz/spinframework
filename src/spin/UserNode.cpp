@@ -47,7 +47,7 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-UserNode::UserNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
 {
 	nodeType = "UserNode";
 	this->setName(string(id->s_name) + ".UserNode");
@@ -85,7 +85,7 @@ void UserNode::setDescription (const char *newvalue)
 std::vector<lo_message> UserNode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = GroupNode::getState();
+	std::vector<lo_message> ret = ConstraintsNode::getState();
 
 	lo_message msg;
 

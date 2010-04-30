@@ -570,12 +570,14 @@ void GroupNode::translate (float x, float y, float z)
     setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
+
 void GroupNode::move (float x, float y, float z)
 {
     // take the orientation into account, and move along that vector:
     osg::Vec3 newPos = mainTransform->getPosition() + ( mainTransform->getAttitude() * osg::Vec3(x,y,z) );
     setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
+
 
 void GroupNode::rotate (float p, float r, float y)
 {

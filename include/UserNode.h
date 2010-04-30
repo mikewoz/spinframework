@@ -44,6 +44,7 @@
 
 
 #include "GroupNode.h"
+#include "ConstraintsNode.h"
 
 
 
@@ -60,7 +61,7 @@
  * It is important to note that anything attached to a UserNode's subgraph will
  * not be saved with the scene.
  */
-class UserNode : public GroupNode
+class UserNode : public ConstraintsNode
 {
 
 	public:

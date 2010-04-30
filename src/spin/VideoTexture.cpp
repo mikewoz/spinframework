@@ -239,7 +239,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 			this->_imageStream = test.get();
 
 			// add texture to stateset:
-			this->setTextureAttributeAndModes(0, vidTexture, osg::StateAttribute::ON);
+			this->setTextureAttributeAndModes( 0, vidTexture, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
 			// turn off lighting 
 			this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);

@@ -59,11 +59,17 @@
 /**
  * \brief A node with constrained motion
  * 
- * This node operates much like GroupNode, where children can be attached and
- * positioned somewhere in the scene, but motion is constrained. Typically, the
- * contraints look at properties of the parent node to determine the limitation
- * of movement. For example, the node will only move along the surface of the
- * parent, or along one axis of the parent, etc.
+ * This node operates much like GroupNode, allowing children to be attached, but
+ * motion is constrained in a certain way.
+ *
+ * Foremost, there is one BASIC form of constraint where motion of the node is
+ * bound within a cubic volume.
+ *
+ * Additionally, there are several ConstraintModes, where properties of a target
+ * node are used to limit movement of this node. For example, the node will only
+ * move along the surface of the target, or bounce off.
+ *
+ * One needs to specify the target node for some of these special modes to work.
  */
 class ConstraintsNode : public GroupNode
 {
@@ -74,23 +80,56 @@ public:
 	ConstraintsNode(SceneManager *sceneManager, char *initID);
 	virtual ~ConstraintsNode();
 	
-	enum constraintMode {	UNCONSTRAINED,
-							DROP_TO_PARENT, // follows Z axis and sits on surface
-							BOUNCE_OFF_PARENT,
-							PARENT_CONTOUR, 
-							PARENT_CONTOUR_WITH_NORMAL
+	/**
+	 * The following constraints are available:
+	 *
+	 * BASIC:
+	 * The node is just constrained within a cubic volume. Important note: the
+	 * BASIC constraint is always maintained, even if another mode is chosen.
+	 *
+	 * DROP:
+	 * The node sits on the surface of the target subgraph (ie, follows local
+	 * Z-axis down until it finds an intersection with the target surface)
+	 *
+	 * BOUNCE:
+	 * A form of collision detection, where the node bounces off of the parent's
+	 * surface, and travels in the reflected direction (ie, the orientation of
+	 * the node is changed). Note: this only works when node is moved using the
+	 * "translate" command.
+	 *
+	 * COLLIDE:
+	 * A form of collision detection, where the node is blocked by the parent's
+	 * surface. Note: this only works when node is moved using the
+	 * "translate" command.
+	 *
+	 */
+	enum constraintMode {	BASIC,
+							DROP,
+							BOUNCE,
+							COLLIDE
 						};
 
 		
 	virtual void callbackUpdate();
 	
+	void setTarget(const char *id);
+	const char *getTarget() { return _target->s_name; }
 	
-	void setMode(constraintMode m);
-	int getMode() { return (int)_mode; };
+	void setConstraintMode(constraintMode m);
+	int getConstraintMode() { return (int)_mode; };
 	
+	void setCubeSize(float xScale, float yScale, float zScale);
+	void setCubeOffset(float x, float y, float z);
+
+	osg::Vec3 getCubeSize() { return _cubeSize; }
+	osg::Vec3 getCubeOffset() { return _cubeOffset; }
+
 	virtual void setTranslation (float x, float y, float z);
 	virtual void translate (float x, float y, float z);
+	virtual void move (float x, float y, float z);
 	
+	void applyConstrainedTranslation(osg::Vec3 v);
+
 	
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
@@ -103,8 +142,10 @@ private:
 	
 	enum constraintMode _mode;
 	
-	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
-		
+	t_symbol* _target;
+
+	osg::Vec3 _cubeSize;
+	osg::Vec3 _cubeOffset;
 };
 
 

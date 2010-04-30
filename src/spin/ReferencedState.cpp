@@ -139,8 +139,11 @@ void ReferencedState::replace(osg::StateSet *ss)
 	
 	//ss->removeTextureAttribute(0, osg::StateAttribute::TEXTURE);
 	
-	//this->merge(*ss); // oops. this will replace our textures
 	
+
+
+	this->merge(*ss); // oops. this will replace our textures (unless the OVERRIDE flag is set!)
+
 	//this->setModeList(ss->getModeList());
 
 	/*
