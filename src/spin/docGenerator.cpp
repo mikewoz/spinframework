@@ -254,7 +254,7 @@ int main()
 	}
 	
 	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-	const osgIntrospection::Type &ReferencedStateType = osgIntrospection::Reflection::getType("ReferencedState");
+	const osgIntrospection::Type &ReferencedStateSetType = osgIntrospection::Reflection::getType("ReferencedStateSet");
 	
 	output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
 	output << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n";
@@ -326,7 +326,7 @@ int main()
 		if (classType->isDefined())
 		{
 		
-			if ( classType->isSubclassOf(ReferencedStateType) )
+			if ( classType->isSubclassOf(ReferencedStateSetType) )
 			{
 				output << "  <li><a href='#" << classType->getName() << "'>" << classType->getName() << "</a></li>\n";
 				
@@ -343,7 +343,7 @@ int main()
 		if (classType->isDefined())
 		{
 		
-			if ( classType->isSubclassOf(ReferencedNodeType) || classType->isSubclassOf(ReferencedStateType) )
+			if ( classType->isSubclassOf(ReferencedNodeType) || classType->isSubclassOf(ReferencedStateSetType) )
 			{
 
 				output << "<hr\n";
@@ -358,7 +358,7 @@ int main()
 		            const Type &BaseClassType = classType->getBaseType(i);
 		            
 		            if ((BaseClassType==ReferencedNodeType) || (BaseClassType.isSubclassOf(ReferencedNodeType)) ||
-		            	(BaseClassType==ReferencedStateType) || (BaseClassType.isSubclassOf(ReferencedStateType)))
+		            	(BaseClassType==ReferencedStateSetType) || (BaseClassType.isSubclassOf(ReferencedStateSetType)))
 		            {
 		            	GenerateHTML(BaseClassType, output);
 		            }

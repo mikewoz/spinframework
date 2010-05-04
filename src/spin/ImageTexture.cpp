@@ -47,7 +47,7 @@
 
 #include <iostream>
 
-#include "Texture.h"
+#include "ImageTexture.h"
 
 
 
@@ -56,9 +56,9 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-Texture::Texture (SceneManager *s, const char *initID) : ReferencedState(s, initID)
+ImageTexture::ImageTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 {
-	classType = "Texture";
+	classType = "ImageTexture";
 
 	_path = "NULL";
 	_renderBin = 11;
@@ -67,15 +67,15 @@ Texture::Texture (SceneManager *s, const char *initID) : ReferencedState(s, init
 }
 
 // destructor
-Texture::~Texture()
+ImageTexture::~ImageTexture()
 {
 }
 
 // *****************************************************************************
 
-void Texture::debug()
+void ImageTexture::debug()
 {
-	ReferencedState::debug();
+	ReferencedStateSet::debug();
 	
 	std::cout << "   ---------" << std::endl;
 
@@ -88,7 +88,7 @@ void Texture::debug()
 
 
 // *****************************************************************************
-void Texture::setPath (const char* newPath)
+void ImageTexture::setPath (const char* newPath)
 {
 	// only do this if the id has changed:
 	if (_path == std::string(newPath)) return;
@@ -99,11 +99,14 @@ void Texture::setPath (const char* newPath)
 	{
 
 		std::string fullPath = getAbsolutePath(_path);
+
+		std::cout << "Loading image: " << fullPath << std::endl;
+
 		osg::ref_ptr<osg::Image> test = osgDB::readImageFile(fullPath);
 		
 		if (test.valid())
 		{
-			this->setName("Texture("+_path+")");
+			this->setName("ImageTexture("+_path+")");
 
 			// create a texture object
 			osg::Texture *tex;
@@ -128,7 +131,7 @@ void Texture::setPath (const char* newPath)
 			tex->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
 		
 			// add texture to stateset:
-			this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
+			this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
 			// set lighting:
 			if (_lightingEnabled) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
@@ -147,7 +150,7 @@ void Texture::setPath (const char* newPath)
 		}
 
 		else {
-			std::cout << "Texture ERROR. Bad format?: " << _path << std::endl;
+			std::cout << "ImageTexture ERROR. Bad format?: " << _path << std::endl;
 		}
 
 
@@ -156,7 +159,7 @@ void Texture::setPath (const char* newPath)
 	BROADCAST(this, "ss", "setPath", getPath());
 }
 
-void Texture::setLighting (int i)
+void ImageTexture::setLighting (int i)
 {
 	_lightingEnabled = (bool)i;
 
@@ -166,7 +169,7 @@ void Texture::setLighting (int i)
 	BROADCAST(this, "si", "setLighting", getLighting());
 }
 
-void Texture::setRenderBin (int i)
+void ImageTexture::setRenderBin (int i)
 {
 	_renderBin = i;
 	this->setRenderBinDetails( (int)_renderBin, "RenderBin");
@@ -175,10 +178,10 @@ void Texture::setRenderBin (int i)
 }
 
 // *****************************************************************************
-std::vector<lo_message> Texture::getState ()
+std::vector<lo_message> ImageTexture::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedState::getState();
+	std::vector<lo_message> ret = ReferencedStateSet::getState();
 		
 	lo_message msg;
 	

@@ -57,7 +57,7 @@
  * This uses osg::ImageStream, so it can load several different movie formats,
  * including live feeds on the Mac via devices.live.
  */
-class VideoTexture : public ReferencedState
+class VideoTexture : public ReferencedStateSet
 {
 
 public:

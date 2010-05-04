@@ -50,7 +50,7 @@
 #include "SceneManager.h"
 #include "MediaManager.h"
 
-#include "Texture.h"
+#include "ImageTexture.h"
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
@@ -73,6 +73,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	shape = NONE; //"NULL";
 	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
+	stateset = gensym("NULL");
 	renderBin = 11;
 	lightingEnabled = true;
 
@@ -144,9 +145,40 @@ void ShapeNode::setTextureFromFile (const char* s)
 	if (path==texturePath) return;
 	else texturePath=path;
 	
-	drawTexture();
+	//drawTeœxture();
 
 	BROADCAST(this, "ss", "setTextureFromFile", texturePath.c_str());
+}
+
+void ShapeNode::setStateSetFromFile(const char* filename)
+{
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
+	if (ss.valid())
+	{
+		if (ss->id == stateset) return; // we're already using that stateset
+		stateset = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSet());
+	}
+}
+
+void ShapeNode::setStateSet (const char* s)
+{
+	if (gensym(s)==stateset) return;
+
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
+	if (ss.valid())
+	{
+		stateset = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSet());
+	}
+}
+
+void ShapeNode::updateStateSet()
+{
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset->s_thing);
+	if (shapeGeode.valid() && ss.valid()) shapeGeode->setStateSet( ss.get() );
 }
 
 // ===================================================================
@@ -322,8 +354,9 @@ void ShapeNode::drawShape()
 	pthread_mutex_unlock(&pthreadLock);
 
 	
-	drawTexture();
-	
+	//drawTexture();
+	updateStateSet();
+
 }
 
 
@@ -357,7 +390,7 @@ void ShapeNode::drawTexture()
 		{
 			// find the shared memory id from the filename:
 			std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
-			osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->getOrCreateState(shID.c_str(), "SharedVideoTexture"));
+			osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->createStateSet(shID.c_str(), "SharedVideoTexture"));
 			if (shvid.valid())
 			{
 				shapeGeode->setStateSet( shvid.get() );
@@ -369,7 +402,7 @@ void ShapeNode::drawTexture()
 
 		else if (isVideoPath(fullPath))
 		{
-			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState((string(id->s_name)+"/VideoTexture").c_str(), "VideoTexture"));
+			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/VideoTexture").c_str(), "VideoTexture"));
 			if (vid.valid())
 			{
 				vid->setVideoPath(fullPath.c_str());
@@ -382,13 +415,13 @@ void ShapeNode::drawTexture()
 		else
 		{
 			//addImageTexture(shapeGeode.get(), fullPath);
-			osg::ref_ptr<Texture> tex = dynamic_cast<Texture*>(sceneManager->getOrCreateState((string(id->s_name)+"/Texture").c_str(), "Texture"));
+			osg::ref_ptr<ImageTexture> tex = dynamic_cast<ImageTexture*>(sceneManager->createStateSet((string(id->s_name)+"/Texture").c_str(), "ImageTexture"));
 			if (tex.valid())
 			{
 				tex->setPath(fullPath.c_str());
 				shapeGeode->setStateSet( tex.get() );
 			} else {
-				std::cout << "ERROR creating Texture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
+				std::cout << "ERROR creating ImageTexture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
 			}
 
 		}
@@ -479,6 +512,10 @@ std::vector<lo_message> ShapeNode::getState ()
 
 	msg = lo_message_new();
 	lo_message_add(msg,  "ss", "setTextureFromFile", texturePath.c_str());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg,  "ss", "setStateSet", getStateSet());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

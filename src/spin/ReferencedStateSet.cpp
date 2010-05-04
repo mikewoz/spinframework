@@ -45,7 +45,7 @@
 #include <iostream>
 
 #include "SceneManager.h"
-#include "ReferencedState.h"
+#include "ReferencedStateSet.h"
 
 
 
@@ -56,7 +56,7 @@ extern pthread_mutex_t pthreadLock;
 
 // *****************************************************************************
 // constructor:
-ReferencedState::ReferencedState(SceneManager *s, const char *initID)
+ReferencedStateSet::ReferencedStateSet(SceneManager *s, const char *initID)
 {
 	// concatenate
 	//string thisID = string(n->id->s_name)+"/"+initID;
@@ -64,23 +64,23 @@ ReferencedState::ReferencedState(SceneManager *s, const char *initID)
 	
 	id = gensym(initID);
 	id->s_thing = this;
-	id->s_type = REFERENCED_STATE;
+	id->s_type = REFERENCED_STATESET;
 	
 	sceneManager = s;
 	
-	classType = "ReferencedState";
+	classType = "ReferencedStateSet";
 	
-	this->setName(string(id->s_name) + ".ReferencedState");
+	this->setName(string(id->s_name) + ".ReferencedStateSet");
 	
 	// We need to set up a callback. This should be on the topmost node, so that during node
 	// traversal, we update our parameters before anything is drawn.
 	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
-	this->setUpdateCallback(new ReferencedState_callback);
+	this->setUpdateCallback(new ReferencedStateSet_callback);
 	
 }
 
 // destructor
-ReferencedState::~ReferencedState()
+ReferencedStateSet::~ReferencedStateSet()
 {
 	// This will only be called when all references to the state are released,
 	// AND the UserData is set to null. ie, the removeFromScene() method needs
@@ -90,7 +90,7 @@ ReferencedState::~ReferencedState()
 	this->clear();
 	
 	// unregister from sceneManager:
-	sceneManager->unregisterState(this);
+	sceneManager->unregisterStateSet(this);
 	
 	// finally, by nulling the ref_ptr in s_thing, we should have removed all
 	// references to this object, so OSG can clean up
@@ -98,12 +98,13 @@ ReferencedState::~ReferencedState()
 }
 
 // *****************************************************************************
-void ReferencedState::updateCallback()
+void ReferencedStateSet::updateCallback()
 {
     // derived classes can do updates here   
 }
 
-void ReferencedState::removeFromScene()
+
+void ReferencedStateSet::removeFromScene()
 {
 	//pthread_mutex_lock(&pthreadLock);
 	
@@ -130,7 +131,7 @@ void ReferencedState::removeFromScene()
 
 
 
-void ReferencedState::replace(osg::StateSet *ss)
+void ReferencedStateSet::replace(osg::StateSet *ss)
 {
 	// first, try to inherit as much of the StateSet's attributes as possible:
 	
@@ -139,10 +140,8 @@ void ReferencedState::replace(osg::StateSet *ss)
 	
 	//ss->removeTextureAttribute(0, osg::StateAttribute::TEXTURE);
 	
-	
-
-
 	this->merge(*ss); // oops. this will replace our textures (unless the OVERRIDE flag is set!)
+
 
 	//this->setModeList(ss->getModeList());
 
@@ -179,7 +178,7 @@ void ReferencedState::replace(osg::StateSet *ss)
 
 
 // *****************************************************************************
-void ReferencedState::debug()
+void ReferencedStateSet::debug()
 {
 	lo_arg **args;
 	int i, argc;
@@ -188,7 +187,7 @@ void ReferencedState::debug()
 	std::cout << "****************************************" << std::endl;
 	std::cout << "************* STATE DEBUG: *************" << std::endl;
 
-	std::cout << "\nReferencedState: " << id->s_name << ", type: " << classType << std::endl;
+	std::cout << "\nReferencedStateSet: " << id->s_name << ", type: " << classType << std::endl;
 
 	
 	std::cout << "   Shared by:";
@@ -198,7 +197,7 @@ void ReferencedState::debug()
 	}
 	std::cout << std::endl;
 
-	//osg::ref_ptr<ReferencedState> test = this;
+	//osg::ref_ptr<ReferencedStateSet> test = this;
 	//std::cout << "ref_count=" << test->getReferenceCount() << std::endl;
 	
 	
@@ -229,7 +228,7 @@ void ReferencedState::debug()
 }
 
 // *****************************************************************************
-std::vector<lo_message> ReferencedState::getState ()
+std::vector<lo_message> ReferencedStateSet::getState ()
 {
 	std::vector<lo_message> ret;
 
@@ -237,7 +236,7 @@ std::vector<lo_message> ReferencedState::getState ()
 }
 
 
-void ReferencedState::stateDump()
+void ReferencedStateSet::stateDump()
 {
 	sceneManager->sendNodeBundle(this->id, this->getState());
 }

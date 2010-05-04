@@ -53,7 +53,7 @@ using namespace std;
 // ===================================================================
 // constructor:
 //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
-SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : ReferencedState(s, initID)
+SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 {
 	classType = "SharedVideoTexture";
 	
@@ -85,7 +85,7 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
 
 		
 	// add the texture to this (StateSet)
-	this->setTextureAttributeAndModes(0, tex.get(), osg::StateAttribute::ON);
+	this->setTextureAttributeAndModes(0, tex.get(), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 	
 	// turn off lighting 
 	this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
@@ -138,7 +138,7 @@ void SharedVideoTexture::setTextureID (const char* newID)
 std::vector<lo_message> SharedVideoTexture::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedState::getState();
+	std::vector<lo_message> ret = ReferencedStateSet::getState();
 		
 	lo_message msg;
 	

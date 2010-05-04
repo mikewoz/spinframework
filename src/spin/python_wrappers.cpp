@@ -269,8 +269,8 @@ ValueWrapper SceneManagerCallback_script(const char* symName, const char *types,
     // referenced object pointer:
 
     osgIntrospection::Value classInstance;
-    if (s->s_type == REFERENCED_STATE)
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedState*>(s->s_thing));
+    if (s->s_type == REFERENCED_STATESET)
+        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
     else
         classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
 

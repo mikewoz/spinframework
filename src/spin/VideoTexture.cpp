@@ -56,7 +56,7 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedState(s, initID)
+VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 {
 	classType = "VideoTexture";
 
@@ -88,7 +88,7 @@ VideoTexture::~VideoTexture()
 
 void VideoTexture::debug()
 {
-	ReferencedState::debug();
+	ReferencedStateSet::debug();
 	
 	std::cout << "   ---------" << std::endl;
 	
@@ -351,7 +351,7 @@ void VideoTexture::flipVertical()
 std::vector<lo_message> VideoTexture::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedState::getState();
+	std::vector<lo_message> ret = ReferencedStateSet::getState();
 		
 	lo_message msg;
 	

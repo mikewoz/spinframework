@@ -87,6 +87,10 @@ public:
 	void setRenderBin		(int i);
 	void setLighting		(int i);
 
+	void setStateSetFromFile(const char* filename);
+	void setStateSet		(const char* s);
+	const char *getStateSet () { return stateset->s_name; }
+	void updateStateSet		();
 
 	int getShape() { return (int)shape; }
 	int getBillboard() { return (int)billboard; }
@@ -99,6 +103,9 @@ public:
 	//void addVideoTexture(osg::Node *n, std::string texturePath);
 	void addImageTexture(osg::Node *n, std::string texturePath);
 	
+
+
+
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
@@ -109,6 +116,8 @@ public:
 
 	shapeType shape;
 	
+	t_symbol *stateset;
+
 	billboardType billboard;
 
 	osg::Vec4 _color;

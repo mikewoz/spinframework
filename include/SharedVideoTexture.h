@@ -46,7 +46,7 @@
 #include <osg/Texture2D>
 #include <osg/Timer>
 
-#include "ReferencedState.h"
+#include "ReferencedStateSet.h"
 
 #ifdef WITH_SHARED_VIDEO		
 #include "sharedVideoBuffer.h"
@@ -76,7 +76,7 @@
  *
  * ie, this node still has reduced funtionality on non-supported platforms.
  */
-class SharedVideoTexture : public ReferencedState
+class SharedVideoTexture : public ReferencedStateSet
 {
 
 public:

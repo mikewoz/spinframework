@@ -144,7 +144,7 @@ std::string getSpinPath(std::string path);
 
 //class ReferencedNode;
 
-enum ReferencedType { REFERENCED_NODE, REFERENCED_STATE };
+enum ReferencedType { REFERENCED_NODE, REFERENCED_STATESET };
 
 
 #define EXTERN extern

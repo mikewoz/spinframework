@@ -49,6 +49,8 @@
 
 
 #include "GroupNode.h"
+#include "SceneManager.h"
+#include "ReferencedStateSet.h"
 
 #ifdef WITH_SHARED_VIDEO
 #include "SharedVideoTexture.h"
@@ -65,7 +67,9 @@ enum animationModeType { OFF, SWITCH, SEQUENCE };
  * This class allows us to attach an external 3D model from a file. Popular
  * formats (.3ds, .obj, .osg, etc) are supported as long as an OSG plugin exists
  * to read it. The model can be offset and scaled. Animations are also supported
- * as long as the model has an osg::Switch or osg::Sequence node inside.
+ * as long as the model has an osg::Switch or osg::Sequence node inside. Texture
+ * and shader information can be parsed out (using the StateRegistraion flag),
+ * and automatically create referenced statesets controllable by SPIN.
  */
 
 class ModelNode : public GroupNode
@@ -76,11 +80,38 @@ public:
 	ModelNode (SceneManager *sceneManager, char *initID);
 	virtual ~ModelNode();
 
-	virtual void setContext (const char *newvalue);
-	void setModelFromFile	(const char *filename);
-	void setRenderBin		(int i);
-	
+	/**
+	 * The context is an arbitrary keyword that associates this node with a
+	 * particular behaviour. Currently, it is used to *prevent* display if the
+	 * context matches the name of a machine. ie, allowing it to be seen on all
+	 * machines except for the one that is named by setContext.
+	 */
+	virtual void setContext 	(const char *newvalue);
+
+	/**
+	 * Load a 3D model from a file (eg, .osg, .3ds, .obj, .dae, etc).
+	 * Make sure that StateRegistration flag is set if you want to have control
+	 * over any textures or shaders withing the model
+	 */
+	void setModelFromFile		(const char *filename);
 	const char* getModelFromFile() { return modelPath.c_str(); }
+	
+	/**
+	 * The StateRegistration flag should be set if you want any textures or
+	 * shaders to be parsed out when loading a model. Any statesets found in
+	 * the file will generate corresponding ReferencedStateSets for use within
+	 * SPIN. This way, you'll be able to swap textures, control videos, adjust
+	 * shader parameters, etc.
+	 */
+	void setStateRegistration	(int i);
+	int getStateRegistration() { return (int)_registerStates; }
+
+	/**
+	 * Render bins allow you to control drawing order, and manage Z-fighting.
+	 * The higher the number, the later it gets processed (ie, appears on top).
+	 * Default renderBin = 11
+	 */
+	void setRenderBin			(int i);
 	int getRenderBin() { return _renderBin; }
 
 	/**
@@ -93,13 +124,12 @@ private:
 
 	void drawModel();
 
-	// ModelNode supports simple loading of 3D models (eg, those that
-	// have been designed in 3DSMax, Maya, Blender, etc.)
-
 	// the model:
 	//std::string modelName;
 	std::string modelPath;
 	
+	ReferencedStateSetList statesetList;
+
 #ifdef WITH_SHARED_VIDEO
 	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;
 	//std::vector<SharedVideoTexture*> sharedVideoTextures;
@@ -117,7 +147,7 @@ private:
 
 	osgUtil::Optimizer optimizer;
 
-
+	bool _registerStates;
 	int _renderBin;
 };
 

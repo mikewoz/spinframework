@@ -47,6 +47,10 @@
 #include "spinUtil.h"
 #include "osgUtil.h"
 
+#include "ImageTexture.h"
+#include "VideoTexture.h"
+#include "SharedVideoTexture.h"
+
 
 #include "nodeVisitors.h"
 
@@ -56,6 +60,8 @@
 #include <sstream>
 
 #include <osgDB/WriteFile>
+#include <osgDB/FileUtils>
+#include <osgDB/FileNameUtils>
 
 #include <osgUtil/Optimizer>
 
@@ -171,20 +177,20 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         }
         }
 
-        // Same thing for ReferencedStates:
+        // Same thing for ReferencedStateSets:
         {
-        const osgIntrospection::Type &ReferencedStateType = osgIntrospection::Reflection::getType("ReferencedState");
+        const osgIntrospection::Type &ReferencedStateSetType = osgIntrospection::Reflection::getType("ReferencedStateSet");
         const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
         osgIntrospection::TypeMap::const_iterator it;
         for ( it=allTypes.begin(); it!=allTypes.end(); it++)
         {
             if (((*it).second)->isDefined())
             {
-                if ( ((*it).second)->isSubclassOf(ReferencedStateType) )
+                if ( ((*it).second)->isSubclassOf(ReferencedStateSetType) )
                 {
                     string theType = ((*it).second)->getName();
-                    ReferencedStateList emptyVector;
-                    stateMap.insert(ReferencedStatePair(theType, emptyVector));
+                    ReferencedStateSetList emptyVector;
+                    stateMap.insert(ReferencedStateSetPair(theType, emptyVector));
                 }
             }
         }
@@ -200,7 +206,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         }
         std::cout << std::endl;
         std::cout << "These states were defined:";
-        for (ReferencedStateMap::iterator sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
+        for (ReferencedStateSetMap::iterator sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
         {
             std::cout << " " << (*sIt).first;
         }
@@ -360,7 +366,7 @@ void SceneManager::setTXaddress (std::string addr, std::string port)
 
 // *****************************************************************************
 
-void SceneManager::registerState(ReferencedState *s)
+void SceneManager::registerStateSet(ReferencedStateSet *s)
 {
     //stateList.push_back(s->id);
     stateMap[s->classType].push_back(s->id);
@@ -373,12 +379,12 @@ void SceneManager::registerState(ReferencedState *s)
     sendNodeList("*");
 }
 
-void SceneManager::unregisterState(ReferencedState *s)
+void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 {
     string oscPattern = "/SPIN/" + sceneID + "/" + string(s->id->s_name);
     lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
 
-    ReferencedStateList::iterator itr;
+    ReferencedStateSetList::iterator itr;
     itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );
     if ( itr != stateMap[s->classType].end() ) stateMap[s->classType].erase(itr);
 
@@ -437,8 +443,8 @@ void SceneManager::sendNodeList(std::string typeFilter)
 
         {
             // for each type, send an OSC message:
-            ReferencedStateMap::iterator it;
-            ReferencedStateList::iterator iter;
+            ReferencedStateSetMap::iterator it;
+            ReferencedStateSetList::iterator iter;
 
             for ( it=stateMap.begin(); it!=stateMap.end(); it++ )
             {
@@ -504,8 +510,8 @@ void SceneManager::sendNodeList(std::string typeFilter)
                 }
             }
             {
-                ReferencedStateMap::iterator it;
-                ReferencedStateList::iterator iter;
+                ReferencedStateSetMap::iterator it;
+                ReferencedStateSetList::iterator iter;
                 it = stateMap.find(typeFilter);
                 if ( it != stateMap.end() )
                 {
@@ -684,17 +690,17 @@ void SceneManager::debug()
     }
 
     std::cout << "\n STATE LIST: " << std::endl;
-    ReferencedStateMap::iterator sIt;
+    ReferencedStateSetMap::iterator sIt;
     for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
     {
         std::cout << "-> " << (*sIt).first << "s:" << std::endl;
 
-        ReferencedStateList::iterator sIter;
+        ReferencedStateSetList::iterator sIter;
         for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
         {
             if ((*sIter)->s_thing)
             {
-                ReferencedState *s = dynamic_cast<ReferencedState*>((*sIter)->s_thing);
+                ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
                 std::cout << "    " << (*sIter)->s_name << " (parents=";
                 for (int i=0; i<s->getNumParents(); i++)
                 {
@@ -945,16 +951,17 @@ ReferencedNode* SceneManager::getOrCreateNode(const char *id, const char *type)
     else return createNode(id, type);
 }
 
+// *****************************************************************************
 
-ReferencedState* SceneManager::getState(const char *id)
+ReferencedStateSet* SceneManager::getStateSet(const char *id)
 {
-    osg::ref_ptr<ReferencedState> s = dynamic_cast<ReferencedState*>(gensym(id)->s_thing);
+    osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>(gensym(id)->s_thing);
 
     if (s.valid()) return s.get();
     else return NULL;
 }
 
-ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type)
+ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *type)
 {
     t_symbol *theID = gensym(id);
     std::string theType = string(type);
@@ -967,7 +974,7 @@ ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type
     }
 
     // check if a node with that name already exists:
-    osg::ref_ptr<ReferencedState> n = dynamic_cast<ReferencedState*>(theID->s_thing);
+    osg::ref_ptr<ReferencedStateSet> n = dynamic_cast<ReferencedStateSet*>(theID->s_thing);
 
     if (n.valid())
     {
@@ -995,7 +1002,7 @@ ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type
         args.push_back((const char*)theID->s_name);
         osgIntrospection::Value v = t.createInstance(args);
 
-        n = osgIntrospection::variant_cast<ReferencedState*>(v);
+        n = osgIntrospection::variant_cast<ReferencedStateSet*>(v);
 
     }
 
@@ -1008,9 +1015,9 @@ ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type
     if (n.valid())
     {
         std::cout << "created new state: " << id << " of type " << type << std::endl;
-        registerState(n.get());
+        registerStateSet(n.get());
         // broadcast (only if this is the server):
-        //SCENE_MSG(this, "sss", "createState", id, type);
+        SCENE_MSG(this, "sss", "createStateSet", id, type);
         return n.get();
     }
     else
@@ -1021,12 +1028,72 @@ ReferencedState* SceneManager::getOrCreateState(const char *id, const char *type
 
 }
 
+ReferencedStateSet* SceneManager::createStateSet(const char *fname)
+{
+	// check if stateset already exists:
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(gensym(fname)->s_thing);
+    if (ss.valid())
+    {
+    	return ss.get();
+    }
+
+    // go through all existing statesets and see if any have fname as the
+    // source for the image/video in question
+
+    // TODO
 
 
+	// otherwise, we assume this is a filename, and try to create a stateset of
+    // the appropriate type
+
+	std::cout << "Trying to create statestet from filename: " << fname << std::endl;
+
+	std::string fullPath = getAbsolutePath(fname);
+
+	std::cout << "Trying to create statestet from full filename: " << fullPath << std::endl;
 
 
+	//std::string newID = osgDB::getStrippedName(fullPath);
+	std::string newID = osgDB::getSimpleFileName(fullPath);
 
+	size_t pos;
+	if ((pos=fullPath.find("shared_video_texture")) != string::npos)
+	{
+		// create the shared memory id from the filename:
+		std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
+		osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(createStateSet(shID.c_str(), "SharedVideoTexture"));
+		if (shvid.valid())
+		{
+			return shvid.get();
+		}
+	}
 
+	// check if the path is a video, or a directory (potentially containing a
+	// sequence of images)
+	else if (isVideoPath(fullPath) || osgDB::getDirectoryContents(fullPath).size())
+	{
+		osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(createStateSet(newID.c_str(), "VideoTexture"));
+		if (vid.valid())
+		{
+			vid->setVideoPath(fullPath.c_str());
+			return vid.get();
+		}
+	}
+
+	// otherwise, assume a static image texture:
+	else
+	{
+		osg::ref_ptr<ImageTexture> img = dynamic_cast<ImageTexture*>(createStateSet(newID.c_str(), "ImageTexture"));
+		if (img.valid())
+		{
+			img->setPath(fullPath.c_str());
+			return img.get();
+		}
+	}
+
+	std::cout << "ERROR creating ReferencedStateSet from file: " << fname << std::endl;
+	return NULL;
+}
 
 
 
@@ -1095,7 +1162,7 @@ void SceneManager::deleteNode(const char *id)
         doDelete(n);
         if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
 
-    } else if (ReferencedState *s = getState(id))
+    } else if (ReferencedStateSet *s = getStateSet(id))
     {
         s->removeFromScene();
         sendNodeList("*");
@@ -1286,8 +1353,8 @@ void SceneManager::clearUsers()
 
 void SceneManager::clearStates()
 {
-    ReferencedStateMap::iterator it;
-    ReferencedStateList::iterator iter;
+    ReferencedStateSetMap::iterator it;
+    ReferencedStateSetList::iterator iter;
 
     for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
     {
@@ -1296,7 +1363,7 @@ void SceneManager::clearStates()
         {
             if ((*iter)->s_thing)
             {
-                ReferencedState *s = dynamic_cast<ReferencedState*>((*iter)->s_thing);
+                ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*iter)->s_thing);
                 s->removeFromScene();
             } else (*it).second.erase(iter);
         }
@@ -1332,13 +1399,13 @@ void SceneManager::refresh()
         }
     }
 
-    ReferencedStateMap::iterator sIt;
+    ReferencedStateSetMap::iterator sIt;
     for (sIt = stateMap.begin(); sIt != stateMap.end(); ++sIt)
     {
-        ReferencedStateList::iterator sIter;
+        ReferencedStateSetList::iterator sIter;
         for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
         {
-            osg::ref_ptr<ReferencedState> s = dynamic_cast<ReferencedState*>((*sIter)->s_thing);
+            osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
             if (s.valid()) s->stateDump();
         }
     }
@@ -2048,9 +2115,9 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     // referenced object pointer:
 
     osgIntrospection::Value classInstance;
-    if (s->s_type == REFERENCED_STATE)
+    if (s->s_type == REFERENCED_STATESET)
     {
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedState*>(s->s_thing));
+        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
         if (0)
         {
             std::cout << "got state message for " << s->s_name << ":" << std::endl;
@@ -2168,7 +2235,7 @@ int SceneManagerCallback_script(const char* symName, const char *types, lo_arg *
     osgIntrospection::Value classInstance;
     if (s->s_type == REFERENCED_STATE)
     {
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedState*>(s->s_thing));
+        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
         if (0)
         {
             std::cout << "got state message for " << s->s_name << ":" << std::endl;
@@ -2338,7 +2405,10 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
     }
     else if ((theMethod=="stateList") && (argc>2))
     {
-        // ??
+        for (int i=2; i<argc; i++)
+        {
+            if (strcmp((char*)argv[i],"NULL")!=0) sceneManager->createStateSet((char*)argv[i], (char*)argv[1]);
+        }
     }
     else if ((theMethod=="exportScene") && (argc==3))
         sceneManager->exportScene((char*)argv[1], (char*)argv[2]);
@@ -2352,6 +2422,10 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
         sceneManager->saveUsers((char*)argv[1]);
     else if ((theMethod=="createNode") && (argc==3))
         sceneManager->createNode((char*)argv[1], (char*)argv[2]);
+    else if ((theMethod=="createStateSet") && (argc==3))
+        sceneManager->createStateSet((char*)argv[1], (char*)argv[2]);
+    else if ((theMethod=="createStateSet") && (argc==2))
+        sceneManager->createStateSet((char*)argv[1]);
     else if ((theMethod=="deleteNode") && (argc==2))
         sceneManager->deleteNode((char*)argv[1]);
     else if ((theMethod=="deleteGraph") && (argc==2))

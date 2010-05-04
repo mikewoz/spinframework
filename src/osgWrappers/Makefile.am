@@ -1,11 +1,11 @@
 BUILT_SOURCES = \
-        ReferencedNode.cpp ReferencedState.cpp \
+        ReferencedNode.cpp ReferencedStateSet.cpp \
         UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
         GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
         ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
         AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
         DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-        Texture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
+        ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
 
 %.cpp: %.h
 
@@ -21,7 +21,7 @@ noinst_LTLIBRARIES = libSPINwrappers.la
 
 libSPINwrappers_la_SOURCES = $(BUILT_SOURCES)
 
-#        ReferencedNode.cpp ReferencedState.cpp \
+#        ReferencedNode.cpp ReferencedStateSet.cpp \
 #        UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
 #        GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
 #        ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \

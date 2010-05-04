@@ -50,7 +50,7 @@
 #include <osgIntrospection/Value>
 
 #include "ReferencedNode.h"
-#include "ReferencedState.h"
+#include "ReferencedStateSet.h"
 
 #include "UserNode.h"
 #include "spinLog.h"
@@ -67,9 +67,9 @@ typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
 typedef std::map< std::string, nodeListType > nodeMapType;
 typedef std::pair< std::string, nodeListType > nodeMapPair;
 
-typedef std::vector<t_symbol*> ReferencedStateList;
-typedef std::map< std::string, ReferencedStateList > ReferencedStateMap;
-typedef std::pair< std::string, ReferencedStateList > ReferencedStatePair;
+typedef std::vector<t_symbol*> ReferencedStateSetList;
+typedef std::map< std::string, ReferencedStateSetList > ReferencedStateSetMap;
+typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
 
 
 
@@ -120,8 +120,8 @@ class SceneManager
 
         void setTXaddress (std::string addr, std::string port);
 
-        void registerState(ReferencedState *s);
-        void unregisterState(ReferencedState *s);
+        void registerStateSet(ReferencedStateSet *s);
+        void unregisterStateSet(ReferencedStateSet *s);
 
 
         void sendNodeList(std::string type);
@@ -138,8 +138,9 @@ class SceneManager
         ReferencedNode *getNode(const char *id, const char *type);
         ReferencedNode *getOrCreateNode(const char *id, const char *type);
 
-        ReferencedState* getState(const char *id);
-        ReferencedState* getOrCreateState(const char *id, const char *type);
+        ReferencedStateSet* getStateSet(const char *id);
+        ReferencedStateSet* createStateSet(const char *id, const char *type);
+        ReferencedStateSet* createStateSet(const char *fname);
 
         std::vector<SoundConnection*> getConnections();
 
@@ -252,7 +253,7 @@ class SceneManager
     private:
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
         nodeMapType nodeMap; // the nodeList arranged by type
-        ReferencedStateMap stateMap;
+        ReferencedStateSetMap stateMap;
 };
 
 

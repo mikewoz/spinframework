@@ -39,83 +39,71 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __ReferencedState_H
-#define __ReferencedState_H
+#ifndef __ImageTexture_H
+#define __ImageTexture_H
 
-#include "spinUtil.h"
-#include "libloUtil.h"
+#include "SceneManager.h"
 
-#include <osg/StateSet>
-
-// forward declaration of SceneManager
-class SceneManager;
+#include <osg/ImageStream>
+#include <osg/ImageSequence>
+#include <osg/TextureRectangle>
+#include <osg/Texture2D>
+#include <osg/Timer>
 
 
 /**
- * \brief ReferencedState is the base class for StateSets attached to nodes
+ * \brief A texture state that holds a static image
+ *
  */
-
-class ReferencedState : virtual public osg::StateSet
+class ImageTexture : public ReferencedStateSet
 {
 
 public:
 
-	ReferencedState(SceneManager *sceneManager, const char *initID);
-	~ReferencedState();
+	ImageTexture(SceneManager *sceneManager, const char *initID);
+	~ImageTexture();
 
-	virtual void updateCallback();
-
-	/**
-	* Remove this stateset from all parents... essentially destroying the state,
-	* since no reference to it will exist anymore, and OSG will kill it.
-	*/
-	void removeFromScene();
-		
-	/**
-	 * Replaces a StateSet in the scene graph with this one. ie, goes through
-	 * all parents of the provided stateset and replaces the object's state with
-	 * this.
-	 */ 
-	void replace(osg::StateSet *ss);
-	
 	virtual void debug();
 	
 	/**
-	 * Just like a ReferencedNode, each subclass of ReferencedState must
-	 * override the getState() method to pass it's current state.
+	 * Returns whether there is a currently valid image texture
 	 */
-	virtual std::vector<lo_message> getState();
+	bool isValid() { return (_image.valid()); }
 
 	/**
-	 * StateDump() is a request to broadcast the node state via SceneManager.
+	 * Creates a texture from a path on disk.
 	 */
-	virtual void stateDump();
-	
-	
-	SceneManager *sceneManager;
-	t_symbol *id;
-	std::string classType;
+	void setPath (const char* newPath);
+	const char *getPath() { return _path.c_str(); }
 
+	/**
+	 * Set whether the texture is influenced by lighting
+	 */
+	void setLighting(int i);
+	int getLighting() { return (int)_lightingEnabled; }
+
+	/**
+	 * Set the render bin for this texture. The higher the number, the later it
+	 * gets processed (ie, it appears on top). Default renderBin = 11
+	 */
+	void setRenderBin (int i);
+	int getRenderBin() { return _renderBin; }
+
+
+
+	// must reimplement
+	virtual std::vector<lo_message> getState();
+
+	
 private:
 	
+	osg::ref_ptr<osg::Image> _image;
 
+	std::string _path;
 
-};
-
-
-class ReferencedState_callback : public osg::StateSet::StateSet::Callback
-{
-	public:
-		
-		virtual void operator()(osg::StateSet* ss, osg::NodeVisitor* nv)
-		{
-			osg::ref_ptr<ReferencedState> thisState = dynamic_cast<ReferencedState*> (ss->getUserData());
-
-			if (thisState.valid())
-			{
-				thisState->updateCallback();
-			}
-		}
+	bool _lightingEnabled;
+	int  _renderBin;
+	bool _useTextureRectangle;
 };
 
 

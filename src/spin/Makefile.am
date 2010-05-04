@@ -23,13 +23,13 @@ libSPIN_la_LDFLAGS = \
 libSPIN_la_SOURCES = \
 	spinContext.cpp osgUtil.cpp spinUtil.cpp libloUtil.cpp \
 	SceneManager.cpp MediaManager.cpp ViewerManipulator.cpp \
-	ReferencedNode.cpp ReferencedState.cpp \
+	ReferencedNode.cpp ReferencedStateSet.cpp \
 	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
 	GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
 	ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
 	AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
 	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-	Texture.cpp VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
+	ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
 
 libSPIN_la_includedir = $(includedir)/spinFramework
 libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h

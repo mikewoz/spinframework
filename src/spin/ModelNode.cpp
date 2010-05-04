@@ -61,6 +61,8 @@
 #include "SceneManager.h"
 #include "MediaManager.h"
 #include "nodeVisitors.h"
+
+#include "ImageTexture.h"
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
@@ -78,6 +80,7 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	this->setName(string(id->s_name) + ".ModelNode");
 	nodeType = "ModelNode";
 
+	_registerStates = "NULL";
     _renderBin = 10;
 
 	modelPath = "NULL";
@@ -120,6 +123,13 @@ void ModelNode::setModelFromFile (const char* filename)
 	BROADCAST(this, "ss", "setModelFromFile", getModelFromFile());
 }
 
+void ModelNode::setStateRegistration (int i)
+{
+	_registerStates = (bool)i;
+
+	BROADCAST(this, "si", "setStateRegistration", getStateRegistration());
+}
+
 void ModelNode::setRenderBin (int i)
 {
 	_renderBin = i;
@@ -149,6 +159,7 @@ void ModelNode::drawModel()
 		this->getAttachmentNode()->removeChild(model.get());
 		model = NULL;
 		
+		statesetList.clear();
 		
 		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 		
@@ -351,117 +362,139 @@ void ModelNode::drawModel()
 			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 
-			
-			// *****************************************************************
-			// search for all statesets with textures:
 			StateSetList statesets;
 			TextureStateSetFinder f(statesets);
-		    model->accept(f);
+			model->accept(f);
 			
+			// *****************************************************************
+			// Here, we search through all statesets and replace them with our
+			// own generated RegisteredStateSet objects. This way, we're able to
+			// control texture and shader information via OSC
+			if (_registerStates)
+			{
+				int texNum = 0;
+				for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
+				{
+					// check if this stateset has a special texture
+					osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
+					if (attr)
+					{
 
-		    // Here, we replace some custom placeholder textures with custom
-		    // classes.
-		    
+						std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
+						size_t pos;
 
-	    	int texNum = 0;
-		    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
-		    {
-		    	// check if this stateset has a special texture
-		    	osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
-		    	if (attr)
-		    	{
-					
-					
-		    		std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
-		    		size_t pos;
+						// If file came from other OS, we should fix it:
+						imageFile = osgDB::convertFileNameToNativeStyle(imageFile);
+						std::string imageFileLessExtension = imageFile.substr(0, imageFile.rfind("."));
 
-					// If file came from other OS, we should fix it:
-					imageFile = osgDB::convertFileNameToNativeStyle(imageFile);
-					std::string imageFileLessExtension = imageFile.substr(0, imageFile.rfind("."));
-					
-		    		// in Linux, imageFile is relative, so check if it
-		    		// exists and prepend the modelPath in case:
-		    		if (!osgDB::fileExists(imageFile))
-		    		{
-						imageFile = osgDB::concatPaths(osgDB::getFilePath(getAbsolutePath(modelPath)), imageFile);
-		    		}	
-		    		
-		    		// check if the imagefile (minus extension) is a directory, and replace if necessary
-		    		if (osgDB::getDirectoryContents(osgDB::getNameLessExtension(imageFile)).size())
-		    		{
-		    			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState(osgDB::getStrippedName(imageFile).c_str(), "VideoTexture"));
-		    			//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
-				    	//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
-		    			if (vid.valid())
-		    			{
-		    				vid->setVideoPath(osgDB::getNameLessExtension(getRelativePath(imageFile)).c_str());
-		    				vid->replace((*itr).get());
-		    				//(*itr) = vid.get();
-		    				std::cout << "  Replaced placeholder texture with " << vid->classType << ": " << vid->id->s_name << std::endl;
-		    			}
-		    			
-		    		}
-		    				    		
-		    		// if filename contains "shared_video_texture", then replace
-		    		// current TextureAttribute with a SharedVideoTexture
-		    		if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
-		    		{
-						std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
-						osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->getOrCreateState(shID.c_str(), "SharedVideoTexture"));
-		    			if (shvid.valid())
-		    			{
-		    				shvid->setTextureID(shID.c_str());
-							(*itr)->removeAttribute(attr);
-		    				shvid->replace((*itr).get());
-		    				std::cout << "  Replaced placeholder texture with " << shvid->classType << ": " << shvid->id->s_name << std::endl;
-		    			}
-		    		}
-		    		
-		    		// Check if filename (minus extension) is a movie format:
-					//
-					// ... the idea is that the model was created with using
-					// a placeholder image with a name like: texture.avi.jpg
-					//
-					// ... we look for a video file in the same path, but with
-					// the image extension stripped off: eg, texture.avi
-					// 
-					// We replace the image with an ImageStream, and all YUV
-					// texture mapping will remain (assuming the image and video
-					// have identical resolutions.
+						// in Linux, imageFile is relative, so check if it
+						// exists and prepend the modelPath in case:
+						if (!osgDB::fileExists(imageFile))
+						{
+							imageFile = osgDB::concatPaths(osgDB::getFilePath(getAbsolutePath(modelPath)), imageFile);
+						}
 
-		    		else if (isVideoPath(imageFileLessExtension))
-		    		{
-		    			std::string vidPath;
-		    			if (imageFileLessExtension.substr(1)=="/")
-		    			{
-		    				// absolute path, so don't change it
-		    				vidPath = imageFileLessExtension;
-		    			}
-		    			else {
-		    				// relative path:
-		    				vidPath = osgDB::concatPaths(osgDB::getFilePath(getAbsolutePath(modelPath)), imageFileLessExtension);
-		    			}
-
-			    		std::cout << "... imageFileLessExtension: " << imageFileLessExtension << std::endl;
-			    		std::cout << "... vidPath: " << vidPath << std::endl;
-			    		std::cout << "--> " << (string(id->s_name)+"/"+osgDB::getStrippedName(imageFileLessExtension)).c_str() << std::endl;
-
-		    			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState(osgDB::getStrippedName(imageFileLessExtension).c_str(), "VideoTexture"));
-		    			//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->getOrCreateState((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
-		    			//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
-		    			if (vid.valid())
-		    			{
-		    				vid->setVideoPath(vidPath.c_str());
-		    				vid->replace((*itr).get());
-		    				//(*itr) = vid.get();
-		    			}
-		    		}
-		    		
+						/*
+						std::string vidPath;
+						if (imageFileLessExtension.substr(1)=="/")
+						{
+							// absolute path, so don't change it
+							vidPath = imageFileLessExtension;
+						}
+						else {
+							// relative path:
+							vidPath = osgDB::concatPaths(osgDB::getFilePath(getAbsolutePath(modelPath)), imageFileLessExtension);
+						}
+						*/
 
 
-		    		
-		    	} // if texture attribute
-		    } // stateset iterator
+						// NEW
+						osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(osgDB::getNameLessExtension(imageFile).c_str());
+						if (ss.valid())
+						{
+							ss->replace((*itr).get());
+							std::cout << "  Replaced placeholder texture with " << ss->classType << ": " << ss->id->s_name << std::endl;
+						}
+
+						// OLD:
+						/*
+						// check if the imagefile (minus extension) is a directory, and replace if necessary
+						if (osgDB::getDirectoryContents(osgDB::getNameLessExtension(imageFile)).size())
+						{
+							osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet(osgDB::getStrippedName(imageFile).c_str(), "VideoTexture"));
+
+							//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
+							//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
+							if (vid.valid())
+							{
+								vid->setVideoPath(osgDB::getNameLessExtension(getRelativePath(imageFile)).c_str());
+								vid->replace((*itr).get());
+								//(*itr) = vid.get();
+								std::cout << "  Replaced placeholder texture with " << vid->classType << ": " << vid->id->s_name << std::endl;
+							}
+						}
+
+						// if filename contains "shared_video_texture", then replace
+						// current TextureAttribute with a SharedVideoTexture
+						if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
+						{
+							std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
+							osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->createStateSet(shID.c_str(), "SharedVideoTexture"));
+							if (shvid.valid())
+							{
+								shvid->setTextureID(shID.c_str());
+								(*itr)->removeAttribute(attr);
+								shvid->replace((*itr).get());
+								std::cout << "  Replaced placeholder texture with " << shvid->classType << ": " << shvid->id->s_name << std::endl;
+							}
+						}
+
+						// Check if filename (minus extension) is a movie format:
+						//
+						// ... the idea is that the model was created with using
+						// a placeholder image with a name like: texture.avi.jpg
+						//
+						// ... we look for a video file in the same path, but with
+						// the image extension stripped off: eg, texture.avi
+						//
+						// We replace the image with an ImageStream, and all YUV
+						// texture mapping will remain (assuming the image and video
+						// have identical resolutions.
+
+						else if (isVideoPath(imageFileLessExtension))
+						{
+							std::string vidPath;
+							if (imageFileLessExtension.substr(1)=="/")
+							{
+								// absolute path, so don't change it
+								vidPath = imageFileLessExtension;
+							}
+							else {
+								// relative path:
+								vidPath = osgDB::concatPaths(osgDB::getFilePath(getAbsolutePath(modelPath)), imageFileLessExtension);
+							}
+
+							std::cout << "... imageFileLessExtension: " << imageFileLessExtension << std::endl;
+							std::cout << "... vidPath: " << vidPath << std::endl;
+							std::cout << "--> " << (string(id->s_name)+"/"+osgDB::getStrippedName(imageFileLessExtension)).c_str() << std::endl;
+
+							osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet(osgDB::getStrippedName(imageFileLessExtension).c_str(), "VideoTexture"));
+							//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
+							//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
+							if (vid.valid())
+							{
+								vid->setVideoPath(vidPath.c_str());
+								vid->replace((*itr).get());
+								//(*itr) = vid.get();
+							}
+						}
+						*/
+
+
+
+					} // if texture attribute
+				} // stateset iterator
+			} // if _registerStates
 		    
 			
 			// *****************************************************************
@@ -505,6 +538,10 @@ std::vector<lo_message> ModelNode::getState ()
 
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setStateRegistration", getStateRegistration());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
