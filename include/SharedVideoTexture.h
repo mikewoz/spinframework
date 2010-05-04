@@ -86,6 +86,9 @@ public:
 
 	void setTextureID(const char *id);
 	const char* getTextureID() { return textureID.c_str(); }
+
+	// hack to get SceneManager::createStateSet to work:
+	const char* getPath() { return textureID.c_str(); }
 		
 	std::vector<lo_message> getState ();
 	

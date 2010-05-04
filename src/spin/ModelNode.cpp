@@ -80,7 +80,8 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	this->setName(string(id->s_name) + ".ModelNode");
 	nodeType = "ModelNode";
 
-	_registerStates = "NULL";
+	_registerStates = false;
+	_statesetList.clear();
     _renderBin = 10;
 
 	modelPath = "NULL";
@@ -143,6 +144,34 @@ void ModelNode::setRenderBin (int i)
 	BROADCAST(this, "si", "setRenderBin", _renderBin);
 }
 
+void ModelNode::setStateSet (int i, const char *replacement)
+{
+	osg::ref_ptr<ReferencedStateSet> ssOrig, ssReplacement;
+
+	if ( i < _statesetList.size() )
+	{
+		ssOrig = dynamic_cast<ReferencedStateSet*>(_statesetList[i]->s_thing);
+	}
+
+	ssReplacement = sceneManager->getStateSet(replacement);
+
+	if (ssOrig.valid() && ssReplacement.valid())
+	{
+		for (int j=0; j < ssOrig->getNumParents(); j++)
+		{
+			// stateset can be shared by several parents within the model, but
+			// they must be either of type osg::Drawable or osg::Node
+			osg::Drawable *drawable = dynamic_cast<osg::Drawable*>(ssOrig->getParent(j));
+			osg::Node *node = dynamic_cast<osg::Node*>(ssOrig->getParent(j));
+			if (drawable) drawable->setStateSet(ssReplacement.get());
+			else if (node) node->setStateSet(ssReplacement.get());
+			else std::cout << "ERROR: setStateSet for model " << id->s_name << " had problems." << std::endl;
+		}
+		_statesetList[i] = ssReplacement->id;
+		BROADCAST(this, "sis", "setStateSet", i, _statesetList[i]->s_name);
+	}
+}
+
 
 // ===================================================================
 // ===================================================================
@@ -159,7 +188,7 @@ void ModelNode::drawModel()
 		this->getAttachmentNode()->removeChild(model.get());
 		model = NULL;
 		
-		statesetList.clear();
+		_statesetList.clear();
 		
 		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 		
@@ -413,7 +442,9 @@ void ModelNode::drawModel()
 						if (ss.valid())
 						{
 							ss->replace((*itr).get());
+							this->_statesetList.push_back(ss->id);
 							std::cout << "  Replaced placeholder texture with " << ss->classType << ": " << ss->id->s_name << std::endl;
+
 						}
 
 						// OLD:
@@ -537,16 +568,24 @@ std::vector<lo_message> ModelNode::getState ()
 	lo_message msg;
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
+	// note: this method MUST precede "setModelFromFile"
+	lo_message_add(msg, "si", "setStateRegistration", getStateRegistration());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg, "si", "setStateRegistration", getStateRegistration());
+	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 	
+	for (int i=0; _statesetList.size(); i++)
+	{
+		msg = lo_message_new();
+        lo_message_add(msg, "sis", "setStateSet", i, _statesetList[i]->s_name);
+        ret.push_back(msg);
+	}
+
 	return ret;
 }

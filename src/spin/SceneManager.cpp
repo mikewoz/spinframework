@@ -1037,12 +1037,6 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
     	return ss.get();
     }
 
-    // go through all existing statesets and see if any have fname as the
-    // source for the image/video in question
-
-    // TODO
-
-
 	// otherwise, we assume this is a filename, and try to create a stateset of
     // the appropriate type
 
@@ -1053,8 +1047,31 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 	std::cout << "Trying to create statestet from full filename: " << fullPath << std::endl;
 
 
-	//std::string newID = osgDB::getStrippedName(fullPath);
-	std::string newID = osgDB::getSimpleFileName(fullPath);
+
+    // go through all existing statesets and see if any have fname as the
+    // source for the image/video in question
+
+    ReferencedStateSetMap::iterator sIt;
+    ReferencedStateSetList::iterator sIter;
+    for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
+    {
+        for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
+        {
+            if ((*sIter)->s_thing)
+            {
+                ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
+                if (string(s->getPath())==string(fullPath))
+                {
+                	std::cout << "already exists: " << fullPath << std::endl;
+                	return s;
+                }
+            }
+        }
+    }
+
+
+	//std::string newID = osgDB::getStrippedName(fullPath); // no path, or ext
+	std::string newID = osgDB::getSimpleFileName(fullPath); // no path, keep ext
 
 	size_t pos;
 	if ((pos=fullPath.find("shared_video_texture")) != string::npos)
@@ -1072,10 +1089,23 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 	// sequence of images)
 	else if (isVideoPath(fullPath) || osgDB::getDirectoryContents(fullPath).size())
 	{
+		/*
+		// check if a VideoTexture already exists with this path:
+		for (sIter = stateMap["VideoTexture"].begin(); sIter != stateMap["VideoTexture"].end(); ++sIter)
+		{
+			if ((*sIter)->s_thing)
+			{
+				ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
+				if (string(s->getPath())==string(fullPath)) return s;
+			}
+		}
+		*/
+
+
 		osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(createStateSet(newID.c_str(), "VideoTexture"));
 		if (vid.valid())
 		{
-			vid->setVideoPath(fullPath.c_str());
+			vid->setPath(fullPath.c_str());
 			return vid.get();
 		}
 	}

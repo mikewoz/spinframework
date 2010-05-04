@@ -74,8 +74,8 @@ public:
 	 * file (ie, a format that OSG knows how to read), or a folder name that
 	 * contains a sequence of images to stitch into a video.
 	 */
-	void setVideoPath (const char* newPath);
-	const char *getVideoPath() { return _path.c_str(); }
+	void setPath (const char* newPath);
+	const char *getPath() { return _path.c_str(); }
 
 	/**
 	 * Enable (1) or disable (0) looping of the video
@@ -123,8 +123,9 @@ public:
 
 	
 private:
-	
+
 	std::string _path;
+
 	bool _flip, _loop, _play;
 	
 	float _framerate;

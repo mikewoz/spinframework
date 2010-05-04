@@ -114,6 +114,16 @@ public:
 	void setRenderBin			(int i);
 	int getRenderBin() { return _renderBin; }
 
+
+	/**
+	 * For statesets embedded in the model, it is possible to swap with some
+	 * other (already existing) stateset.
+	 *
+	 * Note: for this to work, stateRegistration must be enabled.
+	 */
+	void setStateSet (int index, const char *replacement);
+
+
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
@@ -128,7 +138,7 @@ private:
 	//std::string modelName;
 	std::string modelPath;
 	
-	ReferencedStateSetList statesetList;
+	std::vector<t_symbol*> _statesetList;
 
 #ifdef WITH_SHARED_VIDEO
 	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;

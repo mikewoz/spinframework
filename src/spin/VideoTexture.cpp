@@ -130,7 +130,7 @@ void VideoTexture::debug()
 
 
 // *****************************************************************************
-void VideoTexture::setVideoPath (const char* newPath)
+void VideoTexture::setPath (const char* newPath)
 {
 	// only do this if the id has changed:
 	if (_path == std::string(newPath)) return;
@@ -258,7 +258,7 @@ void VideoTexture::setVideoPath (const char* newPath)
 
 	}
 
-	BROADCAST(this, "ss", "setVideoPath", getVideoPath());
+	BROADCAST(this, "ss", "setPath", getPath());
 }
 
 void VideoTexture::setLoop (int i)
@@ -356,7 +356,7 @@ std::vector<lo_message> VideoTexture::getState ()
 	lo_message msg;
 	
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setVideoPath", getVideoPath());
+	lo_message_add(msg, "ss", "setPath", getPath());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

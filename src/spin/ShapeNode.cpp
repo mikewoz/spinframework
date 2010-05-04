@@ -405,7 +405,7 @@ void ShapeNode::drawTexture()
 			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/VideoTexture").c_str(), "VideoTexture"));
 			if (vid.valid())
 			{
-				vid->setVideoPath(fullPath.c_str());
+				vid->setPath(fullPath.c_str());
 				shapeGeode->setStateSet( vid.get() );
 			} else {
 				std::cout << "ERROR creating VideoTexture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;

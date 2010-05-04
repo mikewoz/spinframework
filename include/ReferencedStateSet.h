@@ -66,6 +66,11 @@ public:
 	virtual void updateCallback();
 
 	/**
+	 * Abstract method getPath needs to be implemented
+	 */
+	virtual const char *getPath() = 0;
+
+	/**
 	* Remove this stateset from all parents... essentially destroying the state,
 	* since no reference to it will exist anymore, and OSG will kill it.
 	*/
