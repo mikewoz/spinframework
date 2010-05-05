@@ -237,15 +237,20 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
                         osg::Vec3 hitPoint = (*itr).getWorldIntersectPoint();
                         osg::Vec3 hitNormal = (*itr).getWorldIntersectNormal();
 
-                        std::cout << "hitPoint = " << hitPoint.x()<<","<<hitPoint.y()<<","<<hitPoint.z() << std::endl;
-                        std::cout << "hitNormal = " << hitNormal.x()<<","<<hitNormal.y()<<","<<hitNormal.z() << std::endl;
+                        osg::Vec3 localHitPoint = (*itr).getWorldIntersectPoint();
+                        osg::Vec3 localHitNormal = (*itr).getWorldIntersectNormal();
+
+                        std::cout << "hitPoint =\t" << hitPoint.x()<<","<<hitPoint.y()<<","<<hitPoint.z() << std::endl;
+                        std::cout << "hitNormal =\t" << hitNormal.x()<<","<<hitNormal.y()<<","<<hitNormal.z() << std::endl;
+                        std::cout << "localHitPoint =\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
+                        std::cout << "localHitNormal =\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
                         if (_mode==COLLIDE)
                         {
                         	// just set translation to the hitpoint, but back
                         	// along the normal by a bit
 
-                        	v = hitPoint + (hitNormal * 0.1);
+                        	v = localHitPoint + (localHitNormal	 * 0.1);
 							// oops.. that's a global coord... have to convert
                         }
 

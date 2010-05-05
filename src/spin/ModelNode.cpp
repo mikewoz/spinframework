@@ -580,7 +580,7 @@ std::vector<lo_message> ModelNode::getState ()
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 	
-	for (int i=0; _statesetList.size(); i++)
+	for (int i=0; i<_statesetList.size(); i++)
 	{
 		msg = lo_message_new();
         lo_message_add(msg, "sis", "setStateSet", i, _statesetList[i]->s_name);

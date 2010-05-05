@@ -109,6 +109,8 @@ void TextNode::setText (const char *s)
 		pthread_mutex_unlock(&pthreadLock);
 		//drawText();
 
+		std::cout << "debug: setting text label to: " << s << ", getText() reports: " << getText() << std::endl;
+
 		BROADCAST(this, "ss", "setText", getText());
 	}
 }
