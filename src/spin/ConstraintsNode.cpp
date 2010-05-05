@@ -194,6 +194,8 @@ void ConstraintsNode::move (float x, float y, float z)
 
 void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 {
+	osg::Vec3 newPos = getTranslation() + v;
+
     if ( !sceneManager->isGraphical() && ((_mode==BOUNCE)||(_mode==COLLIDE)) )
     {
     	std::cout << "got translate for: " << this->id->s_name << ". Cheking for collision." << std::endl;
@@ -250,8 +252,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
                         	// just set translation to the hitpoint, but back
                         	// along the normal by a bit
 
-                        	v = localHitPoint + (localHitNormal	 * 0.1);
-							// oops.. that's a global coord... have to convert
+                        	newPos = localHitPoint + (localHitNormal * 0.1);
                         }
 
                         /*
@@ -277,7 +278,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 							newVec *= ratio;
 							std::cout << "newVec = " << newVec.x()<<","<<newVec.y()<<","<<newVec.z() << std::endl;
 
-							//v = newVec;
+							//newPos = newVec;
                         }
                         */
                         break;
@@ -292,7 +293,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
     }
 
-    GroupNode::translate(v.x(), v.y(), v.z());
+    GroupNode::setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
 
