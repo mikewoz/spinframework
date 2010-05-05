@@ -198,12 +198,10 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
     if ( !sceneManager->isGraphical() && ((_mode==BOUNCE)||(_mode==COLLIDE)) )
     {
-    	std::cout << "got translate for: " << this->id->s_name << ". Cheking for collision." << std::endl;
 
         osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(_target->s_thing);
         if (targetNode.valid())
         {
-        	std::cout << "checking for a collision between " << this->id->s_name << " and " << _target->s_name << std::endl;
 
             // get line segment start and end points:
             osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
@@ -220,7 +218,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
             // apply intersector:
             targetNode->accept(iv);
 
-            std::cout << "checking intersections with " << targetNode->id->s_name << ", start=("<< start.x()<<","<<start.y()<<","<<start.z()<<"), end=("<<end.x()<<","<<end.y()<<","<<end.z()<<")" << std::endl;
+            //std::cout << "checking intersections with " << targetNode->id->s_name << ", start=("<< start.x()<<","<<start.y()<<","<<start.z()<<"), end=("<<end.x()<<","<<end.y()<<","<<end.z()<<")" << std::endl;
 
             if (intersector->containsIntersections())
             {
@@ -231,7 +229,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
                 for (itr = intersections.begin(); itr != intersections.end(); ++itr)
                 {
-                    std::cout << "testing intersection with " << (*itr).nodePath[0]->getName() << std::endl;
+                    //std::cout << "testing intersection with " << (*itr).nodePath[0]->getName() << std::endl;
 
                     ReferencedNode *testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[0]);
                     if (testNode==targetNode)
@@ -242,17 +240,21 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
                         osg::Vec3 localHitPoint = (*itr).getWorldIntersectPoint();
                         osg::Vec3 localHitNormal = (*itr).getWorldIntersectNormal();
 
+                        std::cout << id->s_name << " collision @ " << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
+
+                        /*
                         std::cout << "hitPoint =\t" << hitPoint.x()<<","<<hitPoint.y()<<","<<hitPoint.z() << std::endl;
                         std::cout << "hitNormal =\t" << hitNormal.x()<<","<<hitNormal.y()<<","<<hitNormal.z() << std::endl;
                         std::cout << "localHitPoint =\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
                         std::cout << "localHitNormal =\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
+                         */
 
                         if (_mode==COLLIDE)
                         {
                         	// just set translation to the hitpoint, but back
                         	// along the normal by a bit
 
-                        	newPos = localHitPoint + (localHitNormal * 0.1);
+                        	newPos = localHitPoint + (localHitNormal * 0.01);
                         }
 
                         /*
@@ -285,7 +287,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
                     }
                 }
-            } else std::cout << "no intersections" << std::endl;
+            } //else std::cout << "no intersections" << std::endl;
         }
 
 
@@ -293,7 +295,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
     }
 
-    GroupNode::setTranslation(newPos.x(), newPos.y(), newPos.z());
+    setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
 

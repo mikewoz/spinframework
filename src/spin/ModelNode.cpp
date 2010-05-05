@@ -157,6 +157,10 @@ void ModelNode::setStateSet (int i, const char *replacement)
 
 	if (ssOrig.valid() && ssReplacement.valid())
 	{
+
+		// oops. this method might replace other model's stateset (if more than
+		// one model is currently using ssOrig:
+		/*
 		for (int j=0; j < ssOrig->getNumParents(); j++)
 		{
 			// stateset can be shared by several parents within the model, but
@@ -167,6 +171,28 @@ void ModelNode::setStateSet (int i, const char *replacement)
 			else if (node) node->setStateSet(ssReplacement.get());
 			else std::cout << "ERROR: setStateSet for model " << id->s_name << " had problems." << std::endl;
 		}
+		*/
+
+
+		// We need to search through the drawables and nodes that originally had
+		// statesets and replace ssOrig with ssReplacement:
+		std::vector<osg::Drawable*>::iterator dItr;
+		for (dItr=_ssDrawableList.begin(); dItr!=_ssDrawableList.end(); ++dItr)
+		{
+			if ((*dItr)->getStateSet() == ssOrig.get())
+			{
+				(*dItr)->setStateSet(ssReplacement.get());
+			}
+		}
+		std::vector<osg::Node*>::iterator nItr;
+		for (nItr=_ssNodeList.begin(); nItr!=_ssNodeList.end(); ++nItr)
+		{
+			if ((*nItr)->getStateSet() == ssOrig.get())
+			{
+				(*nItr)->setStateSet(ssReplacement.get());
+			}
+		}
+
 		_statesetList[i] = ssReplacement->id;
 		BROADCAST(this, "sis", "setStateSet", i, _statesetList[i]->s_name);
 	}
@@ -190,6 +216,9 @@ void ModelNode::drawModel()
 		
 		_statesetList.clear();
 		
+		_ssDrawableList.clear();
+		_ssNodeList.clear();
+
 		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 		
 		
@@ -436,6 +465,23 @@ void ModelNode::drawModel()
 						}
 						*/
 
+						// Now, in order to replace this stateset with another
+						// in the future, we need to have pointers to all of the
+						// drawables/nodes that originally used it. So before we
+						// do anything, we store a big ugly array of all these
+						// pointers:
+						for (int i=0; i < (*itr)->getNumParents(); i++)
+						{
+							// stateset can be shared by several parents within
+							// the model, but they must be of type osg::Drawable
+							// or osg::Node
+
+							osg::Drawable *drawable = dynamic_cast<osg::Drawable*>((*itr)->getParent(i));
+							osg::Node *node = dynamic_cast<osg::Node*>((*itr)->getParent(i));
+							if (drawable) _ssDrawableList.push_back(drawable);
+							if (node) _ssNodeList.push_back(node);
+						}
+
 
 						// NEW
 						osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(osgDB::getNameLessExtension(imageFile).c_str());
@@ -446,6 +492,8 @@ void ModelNode::drawModel()
 							std::cout << "  Replaced placeholder texture with " << ss->classType << ": " << ss->id->s_name << std::endl;
 
 						}
+
+
 
 						// OLD:
 						/*

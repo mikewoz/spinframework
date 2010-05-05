@@ -140,6 +140,9 @@ private:
 	
 	std::vector<t_symbol*> _statesetList;
 
+	std::vector<osg::Drawable*> _ssDrawableList;
+	std::vector<osg::Node*> _ssNodeList;
+
 #ifdef WITH_SHARED_VIDEO
 	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;
 	//std::vector<SharedVideoTexture*> sharedVideoTextures;
