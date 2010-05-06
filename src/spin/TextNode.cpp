@@ -222,6 +222,7 @@ void TextNode::drawText()
 		labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 		labelStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
 		labelStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+		labelStateSet->setRenderBinDetails( 100, "RenderBin");
 		textLabel->setStateSet( labelStateSet );
 	}
 
