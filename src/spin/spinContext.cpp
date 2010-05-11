@@ -759,7 +759,7 @@ static void *syncThread(void *arg)
 
         frameTick = timer->tick();
 
-        std::cout << "sync time: " << timer->time_s() << "s = " << timer->time_m() << "ms ...  tick = " << (frameTick - startTick ) << std::endl;
+        //std::cout << "sync time: " << timer->time_s() << "s = " << timer->time_m() << "ms ...  tick = " << (frameTick - startTick ) << std::endl;
         //lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sh", "sync", (long long)(frameTick - startTick) );
         //lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sh", "sync", (long long)(timer->time_m()) );
         lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sd", "sync", (double)(timer->time_m()) );
