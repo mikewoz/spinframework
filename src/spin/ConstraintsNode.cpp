@@ -255,6 +255,8 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
                         	// along the normal by a bit
 
                         	newPos = localHitPoint + (localHitNormal * 0.01);
+
+                        	//BROADCAST(this, "ssffff", "event", "collision", hitPoint.x(), hitPoint.y(), hitPoint.z(), v.length());
                         }
 
                         /*

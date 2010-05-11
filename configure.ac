@@ -66,6 +66,12 @@ AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
 # Check for Python:
 AX_PYTHON
+AM_PATH_PYTHON
+
+case "$host" in *-darwin* | *-macos10*)
+  pythondir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+  pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+esac
 
 # Using AX_PYTHON_DEVEL:
 #AX_PYTHON_DEVEL
@@ -158,6 +164,8 @@ AC_MSG_NOTICE([PYTHON_LDFLAGS:      ${PYTHON_LDFLAGS}])
 AC_MSG_NOTICE([BOOST_LDFLAGS:       ${BOOST_LDFLAGS}])
 AC_MSG_NOTICE([BOOST_CPPFLAGS:      ${BOOST_CPPFLAGS}])
 AC_MSG_NOTICE([BOOST_PYTHON_LIB:    ${BOOST_PYTHON_LIB}])
+AC_MSG_NOTICE([pythondir:           ${pythondir}])
+AC_MSG_NOTICE([pythonexecdir:       ${pyexecdir}])
 AC_MSG_NOTICE([============================================])
 
 

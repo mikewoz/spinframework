@@ -2,7 +2,9 @@ AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
 
 
 # use lib_LTLIBRARIES to build a shared lib:
-lib_LTLIBRARIES = libSPIN.la libSPINPyWrap.la
+#lib_LTLIBRARIES = libSPIN.la libSPINPyWrap.la
+lib_LTLIBRARIES = libSPIN.la
+python_LTLIBRARIES = libSPINPyWrap.la
 
 #libSPIN_la_CPPFLAGS = $(SPIN_CPPFLAGS)
 
@@ -37,6 +39,10 @@ libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
 libSPINPyWrap_la_LIBADD = libSPIN.la
+
+libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+# `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
+
 
 bin_PROGRAMS = spinServer spinViewer spinDocGenerator
 
