@@ -80,5 +80,5 @@ scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot
 
 
 doc:
-	./docGenerator
+	./spinDocGenerator
 	-cp *.html ../../doxygen/html
