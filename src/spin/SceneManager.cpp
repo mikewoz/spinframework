@@ -1088,7 +1088,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 		osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(createStateSet(newID.c_str(), "VideoTexture"));
 		if (vid.valid())
 		{
-			vid->setPath(fname);
+			vid->setPath(getRelativePath(fname).c_str());
 			return vid.get();
 		}
 	}
@@ -1099,7 +1099,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 		osg::ref_ptr<ImageTexture> img = dynamic_cast<ImageTexture*>(createStateSet(newID.c_str(), "ImageTexture"));
 		if (img.valid())
 		{
-			img->setPath(fname);
+			img->setPath(getRelativePath(fname).c_str());
 			return img.get();
 		}
 	}

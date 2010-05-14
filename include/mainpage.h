@@ -55,8 +55,9 @@
 * applications, which map the geometric events on to actions to control lights,
 * sound, graphics, etc., and audio and graphic renderers.
 * 
-* For more information and more detailed documentation, visit:
-* http://spinframework.sourceforge.net/
+* Official site: http://www.spinframework.org
+*
+* SourceForge site: https://sourceforge.net/projects/spinframework
 *
 * For code documentation, see the
 * @htmlonly <a href="annotated.html">Class List</a>@endhtmlonly
