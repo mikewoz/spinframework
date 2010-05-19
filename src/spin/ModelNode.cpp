@@ -484,7 +484,8 @@ void ModelNode::drawModel()
 
 
 						// NEW
-						osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(osgDB::getNameLessExtension(imageFile).c_str());
+						//osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(osgDB::getNameLessExtension(imageFile).c_str());
+						osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(imageFile.c_str());
 						if (ss.valid())
 						{
 							ss->replace((*itr).get());

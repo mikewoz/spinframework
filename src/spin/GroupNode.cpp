@@ -389,7 +389,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 }
                 break;
             case(osgGA::GUIEventAdapter::DOUBLECLICK):
-                BROADCAST(this, "ssi", "doubleclick", userString);
+                BROADCAST(this, "ss", "doubleclick", userString);
                 break;
         }
 

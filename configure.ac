@@ -147,9 +147,29 @@ AC_ARG_ENABLE([scenic],
 	AS_HELP_STRING([--enable-scenic], [Enables SharedVideoTexture by linking with the shared_video library from Scenic]),
 	[with_scenic=$enableval],
 	[with_scenic=no])
+
 AS_IF([test "x$with_scenic" = "xyes"],
 	AC_CHECK_LIB([shared_video], [shared_video_is_present], SHARED_VIDEO_LIB="-lshared_video"; AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]), AC_MSG_ERROR([missing Scenic shared_video library]),[-pthread])
 	[with_scenic=no])
+
+
+AC_ARG_ENABLE([fmod],
+	AS_HELP_STRING([--enable-fmod], [Enables audio rendering via FMOD]),
+	[with_fmod=$enableval],
+	[with_fmod=no])
+
+AS_IF([test "x$with_fmod" = "xyes"],
+	AC_CHECK_LIB([fmodex], [], FMOD_LDFLAGS="-lfmodex"; CPPFLAGS="$CPPFLAGS -I/Developer/FMOD\ Programmers\ API\ Mac/api/inc/"; AC_DEFINE([USE_FMOD],[],[A flag that enables audio rendering features using the FMOD engine]), AC_MSG_ERROR([missing FMOD libraries]),)
+	[with_fmod=no])
+
+
+AC_ARG_ENABLE([editor],
+	AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
+	[with_gui=$enableval],
+	[with_gui=no])
+
+AM_CONDITIONAL(ENABLE_EDITOR, [test "x$with_gui" = xyes])
+
 
 #AC_MSG_CHECKING([for Scenic shared_video support])
 #AC_MSG_RESULT($with_scenic)

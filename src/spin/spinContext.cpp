@@ -446,7 +446,7 @@ void spinContext::NodeMessage(const char *nodeId, lo_message msg)
         // directly to the OSC callback function:
         else SceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)gensym(nodeId));
 
-    } else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
+    } //else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
 
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);
@@ -489,7 +489,7 @@ void spinContext::SceneMessage(lo_message msg)
         // directly to the OSC callback function:
         else SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
 
-    } else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
+    } //else std::cout << "Error: tried to send message but SPIN is not running" << std::endl;
 
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);

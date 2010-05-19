@@ -99,7 +99,7 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
     this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
 
     attach();
-    printf("referencednode ctor done.\n");
+    //printf("referencednode ctor done.\n");
 
 }
 

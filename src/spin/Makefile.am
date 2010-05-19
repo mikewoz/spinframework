@@ -45,6 +45,9 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 
 
 bin_PROGRAMS = spinServer spinViewer spinDocGenerator
+if ENABLE_EDITOR
+  bin_PROGRAMS += spinEditor
+endif
 
 spinServer_SOURCES = spinServer.cpp
 spinServer_LDFLAGS = -lSPIN # $(SPIN_LDFLAGS)
@@ -55,6 +58,10 @@ spinViewer_LDFLAGS = -lSPIN # $(SPIN_LDFLAGS)
 spinDocGenerator_SOURCES = docGenerator.cpp
 spinDocGenerator_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 
+spinEditor_SOURCES =  spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
+		wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \
+		wxSpinTreeCtrl.cpp
+spinEditor_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 
 
 # tell automake that the Resources folder is required
@@ -71,11 +78,50 @@ fonts_DATA = ../Resources/fonts/*
 scriptsdir = $(datadir)/spinFramework/scripts
 scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot.py 
 
+###############################################################################
+# CUSTOM targets:
 
-#spin_SOURCES = spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
-#      wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \
-#      wxSpinTreeCtrl.cpp
-#spin_LDADD = libSPIN
+
+spinViewer.app: spinViewer$(EXEEXT)
+	@echo "\n--------------- Building $@: ---------------" 
+	-mkdir $@    
+	-mkdir $@/Contents
+	-mkdir $@/Contents/Frameworks
+	-mkdir $@/Contents/libs
+	-mkdir $@/Contents/MacOS
+	-mkdir $@/Contents/Resources
+	-mkdir $@/Contents/Resources/English.lproj
+	sed -e "s/IDENTIFIER/`echo ./ | sed -e 's,\.\./,,g' | sed -e 's,/,.,g'`/" \
+	-e "s/EXECUTABLE/$</" \
+	-e "s/VERSION/$(VERSION)/" \
+	spinViewer.plist.in >$@/Contents/Info.plist
+	echo -n 'APPL????' > $@/Contents/PkgInfo
+	cp .libs/spinViewer $@/Contents/MacOS
+	-cp -R /usr/local/lib/osgPlugins-2.8.2 $@/Contents
+	cp ../Resources/images/spinViewer.icns $@/Contents/Resources
+	./dylibbundler -of -b -x $@/Contents/MacOS/spinViewer -d $@/Contents/libs
+
+
+
+#install_name_tool -change libOpenThreads.11.dylib /usr/local/lib/libOpenThreads.11.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosg.55.dylib @executable_path/../libs/libosg.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgGA.55.dylib @executable_path/../libs/libosgGA.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgSim.55.dylib @executable_path/../libs/libosgSim.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgDB.55.dylib @executable_path/../libs/libosgDB.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgManipulator.55.dylib @executable_path/../libs/libosgManipulator.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgText.55.dylib @executable_path/../libs/libosgText.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgUtil.55.dylib @executable_path/../libs/libosgUtil.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgFX.55.dylib @executable_path/../libs/libosgFX.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgParticle.55.dylib @executable_path/../libs/libosgParticle.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgViewer.55.dylib @executable_path/../libs/libosgViewer.55.dylib $@/Contents/MacOS/spinViewer
+#install_name_tool -change libosgIntrospection.55.dylib @executable_path/../libs/libosgIntrospection.55.dylib $@/Contents/MacOS/spinViewer
+
+
+#install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinViewer
+#-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
+#-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
+#-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
+
 
 
 
