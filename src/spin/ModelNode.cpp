@@ -144,6 +144,24 @@ void ModelNode::setRenderBin (int i)
 	BROADCAST(this, "si", "setRenderBin", _renderBin);
 }
 
+void ModelNode::setKeyframe (int index, float keyframe)
+{
+	_keyframe[index] = keyframe;
+
+	if (switcher[index].valid())
+	{
+		for (int j=1; j<switcher[index]->getNumChildren(); j++) switcher[index]->setValue(j, false);
+		switcher[index]->setValue((int)(switcher[index]->getNumChildren()*_keyframe[index]), true);
+	}
+
+	else if (sequencer[index].valid())
+	{
+		sequencer[index]->setValue((int)(sequencer[index]->getNumChildren()*_keyframe[index]));
+	}
+
+	BROADCAST(this, "sif", "setKeyframe", index, _keyframe[index]);
+}
+
 void ModelNode::setStateSet (int i, const char *replacement)
 {
 	osg::ref_ptr<ReferencedStateSet> ssOrig, ssReplacement;
@@ -228,8 +246,7 @@ void ModelNode::drawModel()
 			switcher[i] = NULL;
 			sequencer[i] = NULL;
 			animationMode[i] = OFF;
-			animationNumFrames[i] = 0;
-			state[i] = 0;
+			_keyframe[i] = 0;
 		}
 	}
 
@@ -250,9 +267,25 @@ void ModelNode::drawModel()
 			
 			// *****************************************************************
 			
+
+			/*
+			// This is a better way to do this:
+			NodeList foundNodes;
+			NodeSearcher nodeSearcher(foundNodes);
+			nodeSearcher.search(model.get(), "OSG_Switch");
+			if (foundNodes.size())
+				std::cout << "found " << foundNodes.size() << " switch nodes" << std::endl;
+
+			int count = 0;
+			for (NodeList::iterator itr=foundNodes.begin(); itr!=foundNodes.end(); ++itr)
+			{
+
+
+			}
+			*/
+
 			SearchVisitor searchVisitor;
 			char buf[16];
-
 			for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
 			{
 
@@ -267,10 +300,9 @@ void ModelNode::drawModel()
 				{
 					std::cout << "found OSG_Switch0" << i << " with " << switcher[i]->getNumChildren() << " frames" << std::endl;
 					animationMode[i] = SWITCH;
-					animationNumFrames[i] = switcher[i]->getNumChildren();
 					// initialize so only first frame is visible:
 					switcher[i]->setValue(0, true);
-					for (j=1; j<animationNumFrames[i]; j++) switcher[i]->setValue(j, false);
+					for (j=1; j<switcher[i]->getNumChildren(); j++) switcher[i]->setValue(j, false);
 
 				}
 
@@ -281,7 +313,6 @@ void ModelNode::drawModel()
 				{
 					std::cout << "found OSG_Sequence0" << i << " with " << sequencer[i]->getNumChildren() << " frames" << std::endl;
 					animationMode[i] = SEQUENCE;
-					animationNumFrames[i] = sequencer[i]->getNumChildren();
 					sequencer[i]->setValue(0);
 					sequencer[i]->setMode(osg::Sequence::PAUSE);
 				}
@@ -610,10 +641,10 @@ void ModelNode::drawModel()
 
 std::vector<lo_message> ModelNode::getState ()
 {
-
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();
 
+	int i;
 	lo_message msg;
 
 	msg = lo_message_new();
@@ -629,7 +660,21 @@ std::vector<lo_message> ModelNode::getState ()
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 	
-	for (int i=0; i<_statesetList.size(); i++)
+	for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
+	{
+		if (switcher[i].valid() || sequencer[i].valid())
+		{
+			msg = lo_message_new();
+			lo_message_add(msg, "sif", "setKeyframe", i, _keyframe[i]);
+			ret.push_back(msg);
+		}
+	}
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
+	ret.push_back(msg);
+
+	for (i=0; i<_statesetList.size(); i++)
 	{
 		msg = lo_message_new();
         lo_message_add(msg, "sis", "setStateSet", i, _statesetList[i]->s_name);

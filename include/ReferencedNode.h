@@ -235,7 +235,8 @@ public:
     SceneManager *sceneManager;
     MediaManager *mediaManager;
 
-    bool setScript( const std::string& s, const std::string& params );
+    //bool setScript( const std::string& s, const std::string& params );
+    bool setScript( const char *scriptPath );
     bool addEventScript( const std::string& eventName, const std::string& scr, const std::string& params );
     bool callEventScript( const std::string& eventName );
 

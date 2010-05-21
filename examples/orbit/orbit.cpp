@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 			LO_ARGS_END);
 
 	float orbitRadius = 2.0;
-    double orbitDuration = 2.0;
+	double orbitDuration = 2.0;
 	int numSamples = 100;
 
 	std::cout << "\nRunning example. Press CTRL-C to quit..." << std::endl;

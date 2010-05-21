@@ -2,7 +2,7 @@ NAME=orbit
 
 all: $(NAME)
 
-
+###################################################################
 
 CPPFLAGS += -g -I/usr/include/boost $(shell python-config --cflags)
 LDFLAGS +=  -llo -lSPIN -lboost_python $(shell python-config --libs)
@@ -13,33 +13,23 @@ LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
 ifeq ($(shell uname -s),Darwin)
   CPPFLAGS += -I/opt/local/include
   LDFLAGS += -L/opt/local/lib
-
 else #linux
-
   LDFLAGS += -lc -lm -ldl -lGL -lX11 
-  #LDFLAGS += -L/usr/local/lib/osgPlugins \
-          -L/usr/local/lib64\
-          -L/usr/local/lib64/osgPlugins \
-          -L/usr/X11R6/lib 
 endif
 
 
-###################################################################
 # TARGETS:
 
 %.o:%.cpp
 	@echo "--------------- compiling $@ ---------------" 
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-$(NAME): 	$(NAME).o
+$(NAME): $(NAME).o
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-########################################################
 install:
 	-cp $(NAME) /usr/local/bin
 
-
-########################################################
 clean:
 	-rm -f $(NAME) *.o

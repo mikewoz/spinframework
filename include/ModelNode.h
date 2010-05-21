@@ -58,7 +58,6 @@
 
 #define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
 
-enum animationModeType { OFF, SWITCH, SEQUENCE };
 
 
 /**
@@ -79,6 +78,9 @@ public:
 
 	ModelNode (SceneManager *sceneManager, char *initID);
 	virtual ~ModelNode();
+
+	enum animationModeType { OFF, SWITCH, SEQUENCE };
+
 
 	/**
 	 * The context is an arbitrary keyword that associates this node with a
@@ -114,6 +116,13 @@ public:
 	void setRenderBin			(int i);
 	int getRenderBin() { return _renderBin; }
 
+	/**
+	 * Render bins allow you to control drawing order, and manage Z-fighting.
+	 * The higher the number, the later it gets processed (ie, appears on top).
+	 * Default renderBin = 11
+	 */
+	void setKeyframe (int index, float keyframe);
+	float getKeyframe(int index) { return _keyframe[index]; }
 
 	/**
 	 * For statesets embedded in the model, it is possible to swap with some
@@ -152,8 +161,7 @@ private:
 	osg::ref_ptr<osg::Group> model;
 
 	// animation stuff for gfx:
-	t_float state[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
-	int animationNumFrames[MODELNODE_NUM_ANIM_CONTROLS]; // number of keyframes
+	float _keyframe[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
 	animationModeType animationMode[MODELNODE_NUM_ANIM_CONTROLS]; // type of animation (switch vs. sequence vs. ??)
 	osg::ref_ptr<osg::Switch> switcher[MODELNODE_NUM_ANIM_CONTROLS];
 	osg::ref_ptr<osg::Sequence> sequencer[MODELNODE_NUM_ANIM_CONTROLS];

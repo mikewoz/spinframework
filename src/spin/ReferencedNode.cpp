@@ -91,7 +91,8 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
 
     if (strcmp(initID, "potato") == 0 && !sceneManager->isSlave() ) {
         printf("I am potato\n");
-        setScript("orbit.py", "");
+        //setScript("orbit.py", "");
+        setScript("orbit.py");
         addEventScript("setTranslation","hotspot.py", "");
     }
 
@@ -513,7 +514,11 @@ void ReferencedNode::stateDump ()
 
 // *****************************************************************************
 
-bool ReferencedNode::setScript( const std::string& scr, const std::string& params ) {
+//bool ReferencedNode::setScript( const std::string& scr, const std::string& params )
+bool ReferencedNode::setScript( const char *scriptPath )
+{
+	const std::string& scr = string(scriptPath);
+	const std::string& params = "";
 
     spinContext &spin = spinContext::Instance();
     printf("moo?\n");
