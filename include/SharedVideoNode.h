@@ -69,6 +69,8 @@ public:
 	virtual ~SharedVideoNode();
 
 	virtual void callbackUpdate();
+    void manualUpdate();
+
 	
 	// from tristan:
 	void consumeFrame();

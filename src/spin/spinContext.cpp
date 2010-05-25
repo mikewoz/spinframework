@@ -59,6 +59,8 @@
 #include "spinContext.h"
 #include "nodeVisitors.h"
 
+#include "SharedVideoNode.h"
+
 using namespace std;
 
 
@@ -531,8 +533,22 @@ static void *spinListenerThread(void *arg)
 	{
 
 		
-		usleep(1000000 * 0.25); // 1/4 second sleep
+		//usleep(1000000 * 0.25); // 1/4 second sleep
 		
+
+        usleep(1000000 / 30);
+	
+		//pthread_mutex_lock(&pthreadLock);
+
+        osg::ref_ptr<SharedVideoNode> n;
+        n = dynamic_cast<SharedVideoNode*>(spin.sceneManager->getNode("posture01-video"));
+        if (n.valid()) n->manualUpdate();
+        n = dynamic_cast<SharedVideoNode*>(spin.sceneManager->getNode("posture03-video"));
+        if (n.valid()) n->manualUpdate();
+                                      
+        //pthread_mutex_unlock(&pthreadLock);
+
+	
 		// do nothing (assume the app is doing updates - eg, in a draw loop)
 		
 		// just send a ping so the server knows we are still here
@@ -595,7 +611,7 @@ static void *spinServerThread(void *arg)
 		frameTick = osg::Timer::instance()->tick();
 		if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
 		{
-			spin.InfoMessage("/ping/SPIN", "ssisi", spin.id.c_str(), myIP.c_str(), i_rxPort, spin.txAddr.c_str(), i_txPort, LO_ARGS_END);
+			spin.InfoMessage("/ping/SPIN", "ssisii", spin.id.c_str(), myIP.c_str(), i_rxPort, spin.txAddr.c_str(), i_txPort, 0, LO_ARGS_END);
 			//lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
 			lastTick = frameTick;
 		}

@@ -97,7 +97,7 @@ void SharedVideoNode::callbackUpdate()
 {
 
     // do update here
-    
+   return; // mike hack. we do it in manualUpdate() now, from spinContext 
 
     if (!killed_ && sceneManager->isGraphical() && textureImage.valid() && textureRect.valid())
     {
@@ -131,6 +131,44 @@ void SharedVideoNode::callbackUpdate()
     
 }
 
+
+void SharedVideoNode::manualUpdate()
+{
+
+    
+
+    if (!killed_ && sceneManager->isGraphical() && textureImage.valid() && textureRect.valid())
+    {
+    	boost::mutex::scoped_lock displayLock(displayMutex_);
+
+    	// update image from shared memory:
+	    textureImage->setImage(width, 
+	    		height, 
+	            0, 
+	            GL_RGB, 
+	            GL_RGB, 
+	            PIXEL_TYPE, 
+	            sharedBuffer->pixelsAddress(), 
+	            osg::Image::NO_DELETE, 
+	            1);
+	    		
+	    // set texture:
+	    textureRect->setImage(textureImage.get());
+
+		// flip image from camera space:
+		//textureImage->flipHorizontal();
+		//textureImage->flipVertical();
+	
+	    //textureImage->setOrigin(osg::Image::TOP_LEFT); 
+
+	    
+	    textureUploadedCondition_.notify_one();
+
+    }
+
+
+
+}
 
 /// This function is executed in the worker thread
 void SharedVideoNode::consumeFrame()

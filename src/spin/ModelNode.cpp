@@ -348,7 +348,7 @@ void ModelNode::drawModel()
 			
 			
 		    
-			optimizer.optimize(model.get());
+			optimizer.optimize(model.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
 			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 
