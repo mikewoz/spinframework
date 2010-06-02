@@ -69,8 +69,8 @@ if test x$ax_python_bin != x; then
    AC_CHECK_HEADER([$ax_python_bin/Python.h],
    [[ax_python_header=`locate -l 1 $ax_python_bin/Python.h | sed -e s,/Python.h,,`]],
    ax_python_header=no)
-   if test $ax_python_lib != no; then
-     if test $ax_python_header != no; then
+   if test x$ax_python_lib != xno; then
+     if test x$ax_python_header != xno; then
        break;
      fi
    fi
@@ -95,14 +95,18 @@ AC_MSG_RESULT([    Include Dir: $ax_python_header])
 
 if test x$ax_python_header != xno; then
   PYTHON_INCLUDE_DIR=$ax_python_header
-  PYTHON_CPPFLAGS=-I$ax_python_header
+  PYTHON_CPPFLAGS=-I$ax_python_header `python-config --cflags`
   AC_SUBST(PYTHON_INCLUDE_DIR)
   AC_SUBST(PYTHON_CPPFLAGS)
 fi
 if test x$ax_python_lib != xno; then
   PYTHON_LIB=$ax_python_lib
-  PYTHON_LDFLAGS=-l$ax_python_lib
+  PYTHON_LDFLAGS=-l$ax_python_lib `python-config --ldflags`
   AC_SUBST(PYTHON_LIB)
   AC_SUBST(PYTHON_LDFLAGS)
 fi
+
+AC_MSG_RESULT([    PYTHON_LDFLAGS:     $PYTHON_LDFLAGS])
+AC_MSG_RESULT([    PYTHON_CPPFLAGS:    $PYTHON_CPPFLAGS])
+
 ])dnl

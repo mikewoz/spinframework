@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT([SPINFramework], [0.2])
+AC_INIT([SPINFramework], [0.3.2])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -28,7 +28,7 @@ PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
 
-LDFLAGS="$LDFLAGS -L/usr/local/lib"
+LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 AC_CONFIG_FILES([Makefile src/genwrapper/Makefile src/tinyxml/Makefile src/osgWrappers/Makefile src/spin/Makefile])
 
@@ -65,9 +65,20 @@ AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
 
 # Check for Python:
-AX_PYTHON
+#AX_PYTHON
 AM_PATH_PYTHON
 
+PYTHON_CPPFLAGS="`python-config --cflags`"
+PYTHON_LDFLAGS="`python-config --ldflags`"
+AC_SUBST(PYTHON_CPPFLAGS)
+AC_SUBST(PYTHON_LDFLAGS)
+
+AC_MSG_RESULT(["    PYTHON_LDFLAGS: $PYTHON_LDFLAGS"])
+AC_MSG_RESULT(["    PYTHON_CPPFLAGS: $PYTHON_CPPFLAGS"])
+
+
+# manually set pythondir (where site-packages is located)
+# and pyexecdir for OSX
 case "$host" in *-darwin* | *-macos10*)
   pythondir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
   pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
@@ -121,7 +132,8 @@ fi
 
 
 # Check for OpenSceneGraph:
-PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
+#PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
+AC_CHECK_LIB(osg, osgGetVersion, , AC_MSG_ERROR([missing OpenSceneGraph]),)
 
 # and osgIntrospection:
 AC_CHECK_LIB(osgIntrospection, osgIntrospectionGetVersion, OSGINTROSPECTION_LIB="-losgIntrospection", AC_MSG_ERROR([missing OpenSceneGraph Introspection library]),)
