@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT([SPINFramework], [0.3.2])
+AC_INIT(SPINFramework, [0.3.2], [https://sourceforge.net/apps/trac/spinframework/])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -35,6 +35,7 @@ AC_CONFIG_FILES([Makefile src/genwrapper/Makefile src/tinyxml/Makefile src/osgWr
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_RANLIB # for making libraries
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
@@ -49,7 +50,7 @@ AX_CHECK_GLUT
 
 # Checks for libraries
 AC_CHECK_LIB([m],[sqrt])
-#PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.0)
+PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.0)
 PKG_CHECK_MODULES([LIBXML2], libxml-2.0 >= 2.0)
 #AC_SUBST(LIBXML_LIBS)
 #AC_SUBST(LIBXML_CFLAGS)
@@ -183,8 +184,6 @@ AM_CONDITIONAL(ENABLE_EDITOR, [test "x$with_gui" = xyes])
 #AC_MSG_CHECKING([for Scenic shared_video support])
 #AC_MSG_RESULT($with_scenic)
 
-
-
 AC_MSG_NOTICE([============================================])
 AC_MSG_NOTICE([PYTHON_LIB:          ${PYTHON_LIB}])
 AC_MSG_NOTICE([PYTHON_INCLUDE_DIR:  ${PYTHON_INCLUDE_DIR}])
@@ -197,7 +196,5 @@ AC_MSG_NOTICE([pythondir:           ${pythondir}])
 AC_MSG_NOTICE([pythonexecdir:       ${pyexecdir}])
 AC_MSG_NOTICE([============================================])
 
-
 #AC_OUTPUT(Makefile src/genwrapper/Makefile src/osgWrappers/Makefile src/spin/Makefile)
 AC_OUTPUT
-

@@ -7,6 +7,7 @@ BUILT_SOURCES = \
         DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
         ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
 
+CLEANFILES=$(BUILT_SOURCES)
 %.cpp: %.h
 
 

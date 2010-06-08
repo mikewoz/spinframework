@@ -1,6 +1,5 @@
 AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
 
-
 # use lib_LTLIBRARIES to build a shared lib:
 #lib_LTLIBRARIES = libSPIN.la libSPINPyWrap.la
 lib_LTLIBRARIES = libSPIN.la
@@ -50,19 +49,20 @@ if ENABLE_EDITOR
 endif
 
 spinServer_SOURCES = spinServer.cpp
-spinServer_LDFLAGS = -lSPIN # $(SPIN_LDFLAGS)
+spinServer_LDADD = libSPIN.la # $(SPIN_LDFLAGS)
 
 spinViewer_SOURCES = spinViewer.cpp
-spinViewer_LDFLAGS = -lSPIN # $(SPIN_LDFLAGS)
+spinViewer_LDADD = libSPIN.la # $(SPIN_LDFLAGS)D
 
 spinDocGenerator_SOURCES = docGenerator.cpp
-spinDocGenerator_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
+spinDocGenerator_LDFLAGS = $(SPIN_LDFLAGS)
+spinDocGenerator_LDADD = libSPIN.la
 
 spinEditor_SOURCES =  spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
 		wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \
 		wxSpinTreeCtrl.cpp
 spinEditor_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
-
+spinEditor_LDADD = libSPIN.la
 
 # tell automake that the Resources folder is required
 EXTRA_DIST = ../Resources
@@ -121,9 +121,6 @@ spinViewer.app: spinViewer$(EXEEXT)
 #-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 #-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
 #-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
-
-
-
 
 doc:
 	./spinDocGenerator
