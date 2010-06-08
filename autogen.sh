@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ `uname -s` = 'Darwin' ]; then
-  LIBTOOLIZE="glibtoolize"
-else
-  LIBTOOLIZE="libtoolize"
-fi
+#if [ `uname -s` = 'Darwin' ]; then
+#  LIBTOOLIZE="glibtoolize"
+#else
+#  LIBTOOLIZE="libtoolize"
+#fi
 
 # could be replaced with autoreconf -fivI m4 (verbose, force rebuild of ltmain, .in files, etc.)
 #${LIBTOOLIZE} --force
