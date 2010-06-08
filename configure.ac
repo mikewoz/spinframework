@@ -4,7 +4,7 @@
 AC_PREREQ([2.61])
 AC_INIT([SPINFramework], [0.3.2])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
 AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -34,10 +34,8 @@ AC_CONFIG_FILES([Makefile src/genwrapper/Makefile src/tinyxml/Makefile src/osgWr
 
 # Checks for programs.
 AC_PROG_CXX
-#AC_PROG_CC
-AC_PROG_MAKE_SET # for recursive makefiles in subdirs
+AC_PROG_CC
 AC_PROG_INSTALL
-AC_PROG_RANLIB # for making libraries
 AC_PROG_LIBTOOL
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -174,7 +172,6 @@ AS_IF([test "x$with_fmod" = "xyes"],
 	AC_CHECK_LIB([fmodex], [], FMOD_LDFLAGS="-lfmodex"; CPPFLAGS="$CPPFLAGS -I/Developer/FMOD\ Programmers\ API\ Mac/api/inc/"; AC_DEFINE([USE_FMOD],[],[A flag that enables audio rendering features using the FMOD engine]), AC_MSG_ERROR([missing FMOD libraries]),)
 	[with_fmod=no])
 
-
 AC_ARG_ENABLE([editor],
 	AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
 	[with_gui=$enableval],
@@ -203,5 +200,4 @@ AC_MSG_NOTICE([============================================])
 
 #AC_OUTPUT(Makefile src/genwrapper/Makefile src/osgWrappers/Makefile src/spin/Makefile)
 AC_OUTPUT
-
 
