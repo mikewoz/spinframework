@@ -22,6 +22,8 @@ case "$host" in *-darwin* | *-macos10*)
   ;;
 esac
 
+CPPFLAGS+="-Wno-strict-prototypes"
+
 # OSX does not include /usr/local/lib/pkgconfig path, so we export it here
 # (for everyone, just in case)
 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
