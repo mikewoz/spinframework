@@ -5,6 +5,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src
 
+EXTRA_DIST = README LICENSE
+
 wrappers:
 	@echo ""; \
 	echo ">>>>>>>>>>>>>>>>>>>>> Generating osgWrappers <<<<<<<<<<<<<<<<<<<<<"; \

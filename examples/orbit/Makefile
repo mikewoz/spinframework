@@ -5,16 +5,16 @@ all: $(NAME)
 ###################################################################
 
 CPPFLAGS += -g -I/usr/include/boost $(shell python-config --cflags)
-LDFLAGS +=  -llo -lSPIN -lboost_python $(shell python-config --libs)
+LDFLAGS +=  -llo -lSPIN $(shell python-config --libs)
 LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
 		-losgIntrospection -losgManipulator -losgText -losgUtil \
 		-losgParticle -losgViewer
 
 ifeq ($(shell uname -s),Darwin)
   CPPFLAGS += -I/opt/local/include
-  LDFLAGS += -L/opt/local/lib
+  LDFLAGS += -lboost_python -L/opt/local/lib
 else #linux
-  LDFLAGS += -lc -lm -ldl -lGL -lX11 
+  LDFLAGS += -lc -lm -ldl -lGL -lX11 -lboost_python-mt
 endif
 
 
