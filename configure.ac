@@ -41,7 +41,6 @@ AC_CONFIG_FILES([
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_RANLIB # for making libraries
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
@@ -74,12 +73,13 @@ AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 AM_PATH_PYTHON
 
 PYTHON_CPPFLAGS="`python-config --cflags`"
+PYTHON_CPPFLAGS=${PYTHON_CPPFLAGS//"-Wstrict-prototypes"/}
 PYTHON_LDFLAGS="`python-config --ldflags`"
 AC_SUBST(PYTHON_CPPFLAGS)
 AC_SUBST(PYTHON_LDFLAGS)
 
-AC_MSG_RESULT(["    PYTHON_LDFLAGS: $PYTHON_LDFLAGS"])
-AC_MSG_RESULT(["    PYTHON_CPPFLAGS: $PYTHON_CPPFLAGS"])
+#AC_MSG_RESULT(["    PYTHON_LDFLAGS: $PYTHON_LDFLAGS"])
+#AC_MSG_RESULT(["    PYTHON_CPPFLAGS: $PYTHON_CPPFLAGS"])
 
 
 # manually set pythondir (where site-packages is located)
@@ -132,9 +132,6 @@ AX_BOOST_PYTHON
 if test -z "$BOOST_PYTHON_LIB" ; then
     AC_MSG_ERROR([missing package. libboost-python-dev.])
 fi
-
-
-
 
 # Check for OpenSceneGraph:
 #PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
