@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src/genwrapper src/tinyxml src/osgWrappers src/spin
+SUBDIRS = src
 
 wrappers:
 	@echo ""; \

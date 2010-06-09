@@ -18,20 +18,7 @@ $(BUILT_SOURCES):
 
 # use noinst_LIBRARIES to create a library that won't be installed
 noinst_LTLIBRARIES = libSPINwrappers.la
-#noinst_LIBRARIES = libSPINwrappers.la
 
 libSPINwrappers_la_SOURCES = $(BUILT_SOURCES)
-
-#        ReferencedNode.cpp ReferencedStateSet.cpp \
-#        UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
-#        GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
-#        ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
-#        AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
-#        DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-#        VideoTexture.cpp SharedVideoTexture.cpp 
-
-
-
-
 libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
 
