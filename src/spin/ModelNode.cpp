@@ -333,8 +333,6 @@ void ModelNode::drawModel()
 				if (foundNodes.size())
 					std::cout << "found " << foundNodes.size() << " nodes to be converted into billboards" << std::endl;
 				
-				
-				int count = 0;
 				for (NodeList::iterator itr=foundNodes.begin(); itr!=foundNodes.end(); ++itr)
 				{
 					///if (count++ > 300) break;
@@ -344,7 +342,6 @@ void ModelNode::drawModel()
 					// keep reference of node:
 					osg::ref_ptr<osg::Group> n = (*itr)->asGroup();
 					//osg::ref_ptr<osg::Node> n = (*itr);
-										
 					
 					if (n.valid())
 					{
@@ -461,7 +458,6 @@ void ModelNode::drawModel()
 			// control texture and shader information via OSC
 			if (_registerStates)
 			{
-				int texNum = 0;
 				for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
 				{
 					// check if this stateset has a special texture
@@ -470,7 +466,6 @@ void ModelNode::drawModel()
 					{
 
 						std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
-						size_t pos;
 
 						// If file came from other OS, we should fix it:
 						imageFile = osgDB::convertFileNameToNativeStyle(imageFile);

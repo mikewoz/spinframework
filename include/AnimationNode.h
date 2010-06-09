@@ -46,7 +46,6 @@
 
 #include <osg/AnimationPath>
 
-
 /**
  * \brief Node for encapsulating 3D animation
  */
@@ -162,13 +161,8 @@ protected:
 	bool _play, _record;
 	osg::Timer_t _startTime, _lastTick;
 	float _updateRate;
-	//LoopMode _loopMode;
 	
 	osg::ref_ptr<osg::AnimationPath> _animationPath;
-	//osg::ref_ptr<osg::AnimationPathCallback> _animationPathCallback;
-
-
 };
-
 
 #endif

@@ -116,8 +116,7 @@ void MeasurementNode::callbackUpdate()
 
     // NOTE: all output angles are in RADIANS::
 
-    lo_message msg;
-    if (reportingLevel>0)
+    if (reportingLevel > 0)
     {
         // direction: angle of connection_vector (projected on XY plane):
         float direction = AngleBetweenVectors(connection_vector, osg::Y_AXIS, 3);

@@ -42,7 +42,6 @@
 #ifndef __DSPNode_H
 #define __DSPNode_H
 
-//#include <vector>
 #include <osg/Referenced>
 
 #include "ReferencedNode.h"

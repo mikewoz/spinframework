@@ -48,20 +48,13 @@
 
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
-#include <osg/NodeVisitor>
 #include <osg/Timer>
 #include <osg/ClipNode>
 
-#include <string>
 #include <vector>
-#include <map>
-
 
 class UserNode;
-
-
 class SceneManager;
-
 
 /**
  * \brief A basic node to manage translation/orientation/scale of a subgraph.
@@ -246,7 +239,5 @@ protected:
 	osg::Timer_t lastTick;
 
 };
-
-
 
 #endif

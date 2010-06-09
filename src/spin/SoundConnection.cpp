@@ -42,6 +42,7 @@
 #include "SoundConnection.h"
 #include "DSPNode.h"
 #include "SceneManager.h"
+#include <iostream>
 
 using namespace std;
 

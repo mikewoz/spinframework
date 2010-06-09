@@ -171,13 +171,13 @@ void SoundNode::updateVUmeter ()
 	if (VUmeterTransform.valid())
 	{
 		
-		for (int i=0; i<VUmeterTransform->getNumChildren(); i++)
+		for (unsigned i=0; i < VUmeterTransform->getNumChildren(); i++)
 		{
 			// update color of all drawables:
 			osg::ref_ptr<osg::Geode> tmpGeode = dynamic_cast<osg::Geode*>(VUmeterTransform->getChild(i));
 			if (tmpGeode.valid())
 			{
-				for (int j=0; j<tmpGeode->getNumDrawables(); j++)
+				for (unsigned j=0; j<tmpGeode->getNumDrawables(); j++)
 				{
 					osg::ShapeDrawable *s = dynamic_cast<osg::ShapeDrawable*>(tmpGeode->getDrawable(j));
 					if (s) s->setColor( osg::Vec4(currentSoundColor, VUmeterFlag) );
@@ -195,7 +195,7 @@ void SoundNode::updateLaser()
 
 	if (laserGeode.valid())
 	{
-		for (int j=0; j<laserGeode->getNumDrawables(); j++)
+		for (unsigned j=0; j<laserGeode->getNumDrawables(); j++)
 		{
 			osg::ShapeDrawable *s = dynamic_cast<osg::ShapeDrawable*>(laserGeode->getDrawable(j));
 			if (s) s->setColor( osg::Vec4(currentSoundColor, laserFlag) );

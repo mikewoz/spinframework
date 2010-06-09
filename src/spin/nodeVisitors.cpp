@@ -16,7 +16,7 @@ void UpdateSceneVisitor::apply(osg::Node &node) {
 
 void UpdateSceneVisitor::apply(osg::Group &node)  {
     ReferencedNode *n;
-    if (n=dynamic_cast<ReferencedNode*>(&node)) {
+    if ((n = dynamic_cast<ReferencedNode*>(&node))) {
         //printf("UpdateSceneVisitor: we got ourselves a node here....\n");
         n->callbackUpdate();
     }

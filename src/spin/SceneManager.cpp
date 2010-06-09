@@ -92,8 +92,6 @@ extern pthread_mutex_t pthreadLock;
 
 SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 {
-    int i;
-
     this->sceneID = id;
 
     graphicalMode = false;
@@ -234,14 +232,14 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     worldNode->setName("world");
     rootNode->addChild(worldNode.get());
 
-    for (i=0; i<OSG_NUM_LIGHTS; i++)
+    for (int i=0; i<OSG_NUM_LIGHTS; i++)
     {
         activeLights[i] = false;
     }
 
     // why do we do this?:
     osg::StateSet* rootStateSet = new osg::StateSet;
-    for (i=0; i<OSG_NUM_LIGHTS; i++)
+    for (int i=0; i<OSG_NUM_LIGHTS; i++)
     {
         rootStateSet->setMode(GL_LIGHT0 + i, osg::StateAttribute::ON);
         //rootStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
@@ -1186,7 +1184,6 @@ void SceneManager::deleteNode(const char *id)
     // if delete was successful and removed all other references to the node,
     // then by this point, the node will be deleted, and it's destructor will
     // have been called.
-
 }
 
 
@@ -2475,8 +2472,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 
 int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
-    int i;
-    string    theMethod, idStr;
+    string theMethod, idStr;
 
 
     // make sure there is at least one argument (ie, a method to call):

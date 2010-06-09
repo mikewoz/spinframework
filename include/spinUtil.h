@@ -45,10 +45,11 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <iostream>
-#include <fstream>
 
-#include <osg/Object>
+// forward declaration
+namespace osg {
+    class Object;
+}
 
 
 // *****************************************************************************
@@ -142,8 +143,6 @@ std::string getSpinPath(std::string path);
 
 #include <stddef.h>     // just for size_t -- how lame!
 
-//class ReferencedNode;
-
 enum ReferencedType { REFERENCED_NODE, REFERENCED_STATESET };
 
 
@@ -153,7 +152,6 @@ enum ReferencedType { REFERENCED_NODE, REFERENCED_STATESET };
 typedef struct _symbol
 {
     char *s_name;
-//    ReferencedNode *s_thing;
     osg::Object *s_thing;
     struct _symbol *s_next;
     ReferencedType s_type;
@@ -183,10 +181,5 @@ bool introspect_type_order(const osgIntrospection::Type *v1, const osgIntrospect
 void introspect_print_method(const osgIntrospection::MethodInfo &mi);
 void introspect_print_type(const osgIntrospection::Type &type);
 void introspect_print_all_types();
-
-
-
-
-
 
 #endif
