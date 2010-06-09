@@ -98,7 +98,9 @@ public:
 	
 	// create a buffer and initialize our logfile
 	logbuf(const char* logpath) :
-		priority(INFO), buf(0), buflen(1024), bFILE(true), bCOUT(false)
+        bCOUT(false), bFILE(true), 
+        logfile(),
+		priority(INFO), buf(0), buflen(1024)
 	{
 		// create our buffer
 		buf = new char_type[buflen];
