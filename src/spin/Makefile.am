@@ -76,7 +76,8 @@ fontsdir = $(datadir)/spinFramework/fonts
 fonts_DATA = ../Resources/fonts/*
 
 scriptsdir = $(datadir)/spinFramework/scripts
-scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot.py 
+#scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot.py 
+scripts_DATA = ../Resources/scripts/*
 
 ###############################################################################
 # CUSTOM targets:
