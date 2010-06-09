@@ -10,7 +10,7 @@ BUILT_SOURCES = \
 CLEANFILES=$(BUILT_SOURCES)
 %.cpp: %.h
 
-
+#FIXME: These depend on the headers, and more specifically, each generated wrapper should only depend on one header
 $(BUILT_SOURCES):
 	-rm $(top_srcdir)/include/*.h~
 	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -

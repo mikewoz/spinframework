@@ -57,6 +57,7 @@
 
 #include "spinUtil.h"
 #include "spinContext.h"
+#include "spinLog.h"
 #include "nodeVisitors.h"
 
 using namespace std;
@@ -763,6 +764,7 @@ void *spinContext::syncThread(void *arg)
         //lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sh", "sync", (long long)(timer->time_m()) );
         lo_send( spin.lo_syncAddr, ("/SPIN/" + spin.id).c_str(), "sd", "sync", (double)(timer->time_m()) );
     }
+    return 0;
 }
 
 int spinContext::spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)

@@ -41,7 +41,10 @@
 
 //#include <osgGA/GUIEventAdapter>
 
+
 #include "ViewerManipulator.h"
+#include <string>
+#include <vector>
 #include "osgUtil.h"
 #include "spinUtil.h"
 
@@ -345,8 +348,8 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 
 		// first, we fill 2 vectors with data (the pointer to the node, and the
 		// local intersect point)
-		vector<GroupNode*> hitNodes;
-		vector<osg::Vec3> hitPoints;
+        std::vector<GroupNode*> hitNodes;
+        std::vector<osg::Vec3> hitPoints;
 
 		// intersections are ordered from nearest to furthest, so we iterate and
 		// a return list of all nodes that can be cast as interactive SPIN nodes
@@ -760,7 +763,7 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 		
 		// TODO: fix this:
 		//if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
-		if (redirectAddr) lo_send_message(redirectAddr, ("/"+string(nodeId)).c_str(), msg);
+		if (redirectAddr) lo_send_message(redirectAddr, ("/" + std::string(nodeId)).c_str(), msg);
 		else spin.NodeMessage(nodeId, msg);
 		
 	} else {

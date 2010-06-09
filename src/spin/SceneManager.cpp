@@ -51,8 +51,8 @@
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
-
 #include "nodeVisitors.h"
+#include "spinLog.h"
 
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
@@ -2024,7 +2024,7 @@ bool SceneManager::loadXML(const char *s)
 
 
 
-static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2)
+bool SceneManager::nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2)
 {
     return ( string(n1->id->s_name) < string(n2->id->s_name) );
 }

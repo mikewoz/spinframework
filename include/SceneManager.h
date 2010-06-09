@@ -53,7 +53,6 @@
 #include "ReferencedStateSet.h"
 
 #include "UserNode.h"
-#include "spinLog.h"
 #include "spinContext.h"
 
 #ifdef WITH_SHARED_VIDEO
@@ -71,17 +70,12 @@ typedef std::vector<t_symbol*> ReferencedStateSetList;
 typedef std::map< std::string, ReferencedStateSetList > ReferencedStateSetMap;
 typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
 
-
-
-
 // forward declarations:
 class MediaManager;
 class GroupNode;
 class UserNode;
 class SoundConnection;
-
-
-
+class spinLog;
 
 /**
  * \brief The main class that maintains the scene and handles OSC messages.
@@ -251,6 +245,7 @@ class SceneManager
 
 
     private:
+        static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
         nodeMapType nodeMap; // the nodeList arranged by type
         ReferencedStateSetMap stateMap;
@@ -258,7 +253,6 @@ class SceneManager
 
 
 
-static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
 
 
 int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
