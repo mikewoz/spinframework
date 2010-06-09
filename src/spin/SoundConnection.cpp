@@ -44,9 +44,6 @@
 #include "SceneManager.h"
 #include <iostream>
 
-using namespace std;
-
-
 // *****************************************************************************
 // constructors:
 
@@ -55,7 +52,7 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	
 	sceneManager = s;
 	
-	id = gensym( (string(src->id->s_name) + "-" + string(snk->id->s_name) + ".conn" ).c_str() );
+	id = gensym( (std::string(src->id->s_name) + "-" + std::string(snk->id->s_name) + ".conn" ).c_str() );
 	//id->s_thing = this; // can't do this because SoundConnection doesn't extend osg::Object
 
 	// set pointers:
@@ -73,7 +70,7 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 
 	
 	// register with OSC parser:
-	string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
+    std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
 	lo_server_thread_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_conn, (void*)this);
 
 	// store pointer to sceneManager
@@ -112,7 +109,7 @@ SoundConnection::~SoundConnection()
 	}	
 	*/
 
-	string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
+    std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
 	lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
 	
 	//id->s_thing = 0;
@@ -432,8 +429,8 @@ void SoundConnection::debug()
 	
 	std::cout << "\nSoundConnection [" << this->id << "]:" << std::endl;
 	
-	vector<lo_message> nodeState = this->getState();
-	vector<lo_message>::iterator nodeStateIterator;
+    std::vector<lo_message> nodeState = this->getState();
+    std::vector<lo_message>::iterator nodeStateIterator;
 	for (nodeStateIterator = nodeState.begin(); nodeStateIterator != nodeState.end() ; nodeStateIterator++)
 	{ 
 	    argTypes = lo_message_get_types(*nodeStateIterator);
