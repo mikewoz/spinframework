@@ -65,9 +65,6 @@ using namespace std;
 pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 
-
-
-
 static void sigHandler(int signum)
 {
     std::cout << " Caught signal: " << signum << std::endl;
@@ -128,8 +125,6 @@ spinContext::spinContext()
 
 
     signal(SIGINT, sigHandler);
-
-
 
     _pyInitialized = false;
 
@@ -245,7 +240,11 @@ spinContext::~spinContext()
     }
 }
 
-
+// Meyers Singleton design pattern:
+spinContext& spinContext::Instance() {
+    static spinContext spinInstance;
+    return spinInstance;
+}
 
 bool spinContext::setMode(spinContextMode m)
 {
@@ -602,7 +601,7 @@ bool spinContext::execPython( const std::string& cmd ) {
 // *****************************************************************************
 
 
-static void *spinListenerThread(void *arg)
+void *spinContext::spinListenerThread(void *arg)
 {
     //spinContext *spin = (spinContext*) arg;
     spinContext &spin = spinContext::Instance();
@@ -659,7 +658,7 @@ static void *spinListenerThread(void *arg)
     pthread_exit(NULL);
 }
 
-static void *spinServerThread(void *arg)
+void *spinContext::spinServerThread(void *arg)
 {
     //spinContext *spin = (spinContext*) arg;
     spinContext &spin = spinContext::Instance();
@@ -738,7 +737,7 @@ static void *spinServerThread(void *arg)
     pthread_exit(NULL);
 }
 
-static void *syncThread(void *arg)
+void *spinContext::syncThread(void *arg)
 {
     spinContext &spin = spinContext::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -766,7 +765,7 @@ static void *syncThread(void *arg)
     }
 }
 
-static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+int spinContext::spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
 {
     //std::cout << "got to spinContext_sceneCallback function" << std::endl;
 
@@ -807,7 +806,7 @@ static int spinContext_sceneCallback(const char *path, const char *types, lo_arg
     return 1;
 }
 
-static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int spinContext::spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     //spinContext *spin = (spinContext*) user_data;
     spinContext &spin = spinContext::Instance();
@@ -836,7 +835,7 @@ static int spinContext_infoCallback(const char *path, const char *types, lo_arg 
 }
 
 
-static int spinContext_syncCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+int spinContext::spinContext_syncCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
 {
     spinContext &spin = spinContext::Instance();
     osg::Timer* timer = osg::Timer::instance();

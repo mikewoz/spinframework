@@ -66,24 +66,14 @@
  */
 class spinContext
 {
-
     public:
-
-
-        //spinContext(spinContextMode initMode=LISTENER_MODE);
-        //virtual ~spinContext();
-
         // Meyers Singleton design pattern:
-        static spinContext& Instance() {
-            static spinContext spinInstance;
-            return spinInstance;
-        }
+        static spinContext& Instance();
 
         enum spinContextMode { SERVER_MODE, LISTENER_MODE };
 
         bool isServer() { return (mode==SERVER_MODE); }
         bool isSlave() { return (mode!=SERVER_MODE); }
-
 
         bool setMode(spinContextMode m);
 
@@ -199,7 +189,33 @@ class spinContext
         spinContext& operator=(spinContext const&);
         ~spinContext();
 
+        /**
+         * The spinListenerThread is a simple thread that starts a sceneManager and
+         * listens to incoming SPIN messages. It does NOT re-transmit those messages,
+         * and it does NOT perform an update traversal.
+         */
+        static void *spinListenerThread(void *arg);
 
+        /**
+         * The spinServerThread is mainly differentiated from a listener thread by the
+         * fact taht all received messages are re-transmit upon processing. This allows
+         * all clients to keep up-to-date whenever new state information is received by
+         * the server.
+         *
+         * Additionally, the spinServerThread will periodically broadcast a ping on
+         * infoport, and will perform an update traversal on the scene graph for any
+         * nodes who need periodic (scheduled) processing.
+         */
+        static void *spinServerThread(void *arg);
+
+        /**
+         * The syncThread just sends timecode on an independent multicast UDP port
+         */
+        static void *syncThread(void *arg);
+
+        static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+        static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+        static int spinContext_syncCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
         // pthread stuff
         pthread_t pthreadID; // id of child thread
@@ -207,39 +223,5 @@ class spinContext
 
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
-
 };
-
-
-
-/**
- * The spinListenerThread is a simple thread that starts a sceneManager and
- * listens to incoming SPIN messages. It does NOT re-transmit those messages,
- * and it does NOT perform an update traversal.
- */
-static void *spinListenerThread(void *arg);
-
-/**
- * The spinServerThread is mainly differentiated from a listener thread by the
- * fact taht all received messages are re-transmit upon processing. This allows
- * all clients to keep up-to-date whenever new state information is received by
- * the server.
- *
- * Additionally, the spinServerThread will periodically broadcast a ping on
- * infoport, and will perform an update traversal on the scene graph for any
- * nodes who need periodic (scheduled) processing.
- */
-static void *spinServerThread(void *arg);
-
-/**
- * The syncThread just sends timecode on an independent multicast UDP port
- */
-static void *syncThread(void *arg);
-
-
-static int spinContext_sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int spinContext_infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-static int spinContext_syncCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
-
 #endif
