@@ -1176,7 +1176,7 @@ void SceneManager::deleteNode(const char *id)
         sendNodeList("*");
         if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
     }
-    else std::cout << "ERROR: tried to delete " << id << ", but not node or state by that name exists." << std::endl;
+    else std::cout << "ERROR: tried to delete " << id << ", but no node or state by that name exists." << std::endl;
 
     // if delete was successful and removed all other references to the node,
     // then by this point, the node will be deleted, and it's destructor will
