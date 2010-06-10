@@ -1,7 +1,9 @@
 #include <spinFramework/spinUtil.h>
 #include <spinFramework/spinContext.h>
 #include <spinFramework/ShapeNode.h>
-
+#include <iostream>
+#include <cstdlib>
+#include <cmath>
 
 /**
  * This example shows how to send commands to a spin server. The result is an

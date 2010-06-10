@@ -61,11 +61,9 @@
 #include "spinLog.h"
 #include "nodeVisitors.h"
 
-using namespace std;
-
+#define UNUSED(x) ( (void)(x) )
 
 pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
-
 
 static void sigHandler(int signum)
 {
@@ -146,6 +144,7 @@ spinContext::spinContext()
         }
         */
         const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+        UNUSED(ReferencedNodeType);
     }
     catch (osgIntrospection::Exception & ex)
     {
@@ -188,9 +187,9 @@ spinContext::spinContext()
     char *infoPortStr = getenv("AS_INFOPORT");
     if (infoPortStr)
     {
-        string tmpStr = string(infoPortStr);
-        string infoAddr = tmpStr.substr(0,tmpStr.rfind(":"));
-        string infoPort = tmpStr.substr(tmpStr.find(":")+1);
+        std::string tmpStr = std::string(infoPortStr);
+        std::string infoAddr = tmpStr.substr(0,tmpStr.rfind(":"));
+        std::string infoPort = tmpStr.substr(tmpStr.find(":")+1);
         lo_infoAddr = lo_address_new(infoAddr.c_str(), infoPort.c_str());
     }
     else {
@@ -620,7 +619,7 @@ void *spinContext::spinListenerThread(void *arg)
     } else {
         spin.lo_syncServ = lo_server_thread_new(lo_address_get_port(spin.lo_syncAddr), oscParser_error);
     }
-    lo_server_thread_add_method(spin.lo_syncServ, string("/SPIN/"+spin.id).c_str(), NULL, spinContext_syncCallback, &spin);
+    lo_server_thread_add_method(spin.lo_syncServ, std::string("/SPIN/"+spin.id).c_str(), NULL, spinContext_syncCallback, &spin);
     lo_server_thread_start(spin.lo_syncServ);
 
 
@@ -628,7 +627,7 @@ void *spinContext::spinListenerThread(void *arg)
     osg::Timer_t frameTick = lastTick;
 
     // convert port to integers for sending:
-    string myIP = getMyIPaddress();
+    std::string myIP = getMyIPaddress();
     int i_rxPort;
     fromString<int>(i_rxPort, lo_address_get_port(spin.lo_rxAddr));
 
@@ -684,13 +683,13 @@ void *spinContext::spinServerThread(void *arg)
     strftime(dateString, sizeof(dateString), "%Y-%m-%d_%H-%M-%S", tmp);
 
     // start spinLog, and disable console printing:
-    string logFilename = SPIN_DIRECTORY + "/log/spinLog_" + string(dateString) + ".txt";
+    std::string logFilename = SPIN_DIRECTORY + "/log/spinLog_" + std::string(dateString) + ".txt";
     spinLog log(logFilename.c_str());
     log.enable_cout(false);
     spin.sceneManager->setLog(log);
 
 
-    string myIP = getMyIPaddress();
+    std::string myIP = getMyIPaddress();
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
 
@@ -778,16 +777,16 @@ int spinContext::spinContext_sceneCallback(const char *path, const char *types, 
     if (!argc) return 1;
 
     // get the method (argv[0]):
-    string theMethod;
+    std::string theMethod;
     if (lo_is_string_type((lo_type)types[0]))
     {
-        theMethod = string((char *)argv[0]);
+        theMethod = std::string((char *)argv[0]);
     }
     else return 1;
 
     // bundle all other arguments
-    vector<float> floatArgs;
-    vector<const char*> stringArgs;
+    std::vector<float> floatArgs;
+    std::vector<const char*> stringArgs;
     for (int i=1; i<argc; i++)
     {
         if (lo_is_numerical_type((lo_type)types[i]))
@@ -835,10 +834,10 @@ int spinContext::spinContext_syncCallback(const char *path, const char *types, l
 
     if (argc != 2) return 1;
 
-    string theMethod;
+    std::string theMethod;
     if (lo_is_string_type((lo_type)types[0]))
     {
-        theMethod = string((char *)argv[0]);
+        theMethod = std::string((char *)argv[0]);
     }
     else return 1;
 
