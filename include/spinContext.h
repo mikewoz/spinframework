@@ -43,12 +43,13 @@
 #define SPINCONTEXT_H_
 
 #include <boost/python.hpp>
+#include <osg/Timer>
 
+#include "UserNode.h"
 #include "spinUtil.h"
-#include "SceneManager.h"
-#include "MediaManager.h"
 
-
+class SceneManager;
+class MediaManager;
 
 /**
  * \brief A class to facilitate communication with SPIN from any application.

@@ -81,9 +81,7 @@
 
 #include <osgIntrospection/ExtendedTypeInfo>
 
-using namespace std;
 using namespace osgIntrospection;
-
 
 extern pthread_mutex_t pthreadLock;
 
@@ -104,7 +102,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
     // Set resourcesPath:
     std::string currentDir = getenv("PWD");
-    if ((currentDir.length()>8) && (currentDir.substr(currentDir.length()-9))==string("/src/spin"))
+    if ((currentDir.length()>8) && (currentDir.substr(currentDir.length()-9))==std::string("/src/spin"))
     {
         resourcesPath = "../Resources";
     } else {
@@ -136,7 +134,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 #endif
 
     // generic admin callback:
-    lo_server_thread_add_method(rxServ, string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);
+    lo_server_thread_add_method(rxServ, std::string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);
 
 
 
@@ -166,7 +164,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
                 //std::cout << ((*it).second)->getName() << " isSubclassOf(ReferencedNode)? " << ((*it).second)->isSubclassOf(ReferencedNodeType) << std::endl;
                 if ( ((*it).second)->isSubclassOf(ReferencedNodeType) )
                 {
-                    string theType = ((*it).second)->getName();
+                    std::string theType = ((*it).second)->getName();
                     //nodeTypes.push_back(theType);
                     nodeListType emptyVector;
                     nodeMap.insert(nodeMapPair(theType, emptyVector));
@@ -186,7 +184,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
             {
                 if ( ((*it).second)->isSubclassOf(ReferencedStateSetType) )
                 {
-                    string theType = ((*it).second)->getName();
+                    std::string theType = ((*it).second)->getName();
                     ReferencedStateSetList emptyVector;
                     stateMap.insert(ReferencedStateSetPair(theType, emptyVector));
                 }
@@ -369,7 +367,7 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
     //stateList.push_back(s->id);
     stateMap[s->classType].push_back(s->id);
 
-    string oscPattern = "/SPIN/" + sceneID + "/" + string(s->id->s_name);
+    std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
     lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
 
     SCENE_MSG(this, "sss", "registerState", s->id->s_name, s->classType.c_str());
@@ -379,7 +377,7 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
 
 void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 {
-    string oscPattern = "/SPIN/" + sceneID + "/" + string(s->id->s_name);
+    std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
     lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
 
     ReferencedStateSetList::iterator itr;
@@ -401,7 +399,7 @@ void SceneManager::sendNodeList(std::string typeFilter)
     if (!txServ) return;
 
     int i;
-    string OSCpath = "/SPIN/" + sceneID;
+    std::string OSCpath = "/SPIN/" + sceneID;
     lo_message msg;
 
     std::vector<lo_message> msgs;
@@ -547,11 +545,11 @@ void SceneManager::sendConnectionList()
     lo_message_add_string(msg, "nodeList" );
     lo_message_add_string(msg, "SoundConnection" );
 
-    vector<SoundConnection*> connections = getConnections();
+    std::vector<SoundConnection*> connections = getConnections();
 
     if (connections.size())
     {
-        for (vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
+        for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
         {
             lo_message_add_string(msg, (*iter)->id->s_name );
         }
@@ -567,13 +565,13 @@ void SceneManager::sendConnectionList()
 
 void SceneManager::sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
 {
-    string OSCpath = "/SPIN/" + sceneID + "/" + string(nodeSym->s_name);
+    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
     sendBundle(OSCpath,msgs);
 }
 
 void SceneManager::sendSceneBundle(std::vector<lo_message> msgs)
 {
-    string OSCpath = "/SPIN/" + sceneID;
+    std::string OSCpath = "/SPIN/" + sceneID;
     sendBundle(OSCpath,msgs);
 }
 
@@ -590,7 +588,7 @@ void SceneManager::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
 
     lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
 
-    vector<lo_message>::iterator iter = msgs.begin();
+    std::vector<lo_message>::iterator iter = msgs.begin();
     while (iter != msgs.end())
     {
         //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
@@ -742,7 +740,7 @@ void SceneManager::debug()
 
 // *****************************************************************************
 
-ReferencedNode* SceneManager::createNode(string id, string type)
+ReferencedNode* SceneManager::createNode(std::string id, std::string type)
 {
     const char *charID = id.c_str();
     const char *charType = type.c_str();
@@ -752,7 +750,7 @@ ReferencedNode* SceneManager::createNode(string id, string type)
 ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 {
     t_symbol *nodeID = gensym(id);
-    string nodeType = string(type);
+    std::string nodeType = std::string(type);
 
     // disallow node with the name "NULL" or bad things might happen
     if (nodeID == gensym("NULL"))
@@ -911,7 +909,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
 // *****************************************************************************
 // returns a pointer to a node given an id:
-ReferencedNode* SceneManager::getNode(string id)
+ReferencedNode* SceneManager::getNode(std::string id)
 {
     char *charID = (char*) id.c_str();
     return getNode(charID);
@@ -932,7 +930,7 @@ ReferencedNode* SceneManager::getNode(const char *id, const char *type)
 
     if (n.valid())
     {
-        if (n->nodeType == string(type))
+        if (n->nodeType == std::string(type))
         {
             return n.get();
         }
@@ -962,7 +960,7 @@ ReferencedStateSet* SceneManager::getStateSet(const char *id)
 ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *type)
 {
     t_symbol *theID = gensym(id);
-    std::string theType = string(type);
+    std::string theType = std::string(type);
 
     // disallow node with the name "NULL" or bad things might happen
     if (theID == gensym("NULL"))
@@ -1068,7 +1066,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 	std::string newID = osgDB::getSimpleFileName(fullPath); // no path, keep ext
 
 	size_t pos;
-	if ((pos=fullPath.find("shared_video_texture")) != string::npos)
+	if ((pos=fullPath.find("shared_video_texture")) != std::string::npos)
 	{
 		// create the shared memory id from the filename:
 		std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
@@ -1116,13 +1114,13 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 // *****************************************************************************
 std::vector<SoundConnection*> SceneManager::getConnections()
 {
-    vector<SoundConnection*> allConnections;
+    std::vector<SoundConnection*> allConnections;
 
     nodeMapType::iterator it;
     nodeListType::iterator iter;
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
-        string nodeType = (*it).first;
+        std::string nodeType = (*it).first;
 
         const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(nodeType);
         if (t.isDefined())
@@ -1136,7 +1134,7 @@ std::vector<SoundConnection*> SceneManager::getConnections()
 
                     if ((*iter).valid())
                     {
-                        vector<SoundConnection*>::iterator connIter;
+                        std::vector<SoundConnection*>::iterator connIter;
                         for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
                         {
                             allConnections.push_back((*connIter));
@@ -1164,7 +1162,7 @@ void SceneManager::deleteNode(const char *id)
     {
         // for the deleteNode method, all children nodes will remain, so we just
         // change their parent to the "world":
-        vector<ReferencedNode*>::iterator childIter = n->children.begin();
+        std::vector<ReferencedNode*>::iterator childIter = n->children.begin();
         while (childIter!=n->children.end()) // iterator should automatically advance once child has changed parent
         {
             (*childIter)->setParent("world");
@@ -1228,7 +1226,7 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     nodeMapType::iterator it;
     for ( it=nodeMap.begin(); it!=nodeMap.end(); ++it)
     {
-        vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
+        std::vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
         iter = std::find( (*it).second.begin(), (*it).second.end(), n );
         if ( iter != (*it).second.end() ) (*it).second.erase(iter);
         //else std::cout << "ERROR: node " << n->id->s_name << " was not found on the nodeList in SceneManager::removeNode()" << std::endl;
@@ -1248,7 +1246,7 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 
     // now force the actual delete by nulling this referenced pointer. At that
     // time, the destructor for the node should be called
-    char *nodeID = n->id->s_name; // but remember the name for the broadcast
+    //char *nodeID = n->id->s_name; // but remember the name for the broadcast
     n = NULL;
 
     // finally, broadcast:
@@ -1260,11 +1258,9 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 // *****************************************************************************
 void SceneManager::clear()
 {
-
-
     // first find all UserNodes and check move them to the worldNode:
     nodeListType::iterator iter;
-    for (iter = nodeMap[string("UserNode")].begin(); iter != nodeMap[string("UserNode")].end(); iter++)
+    for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); iter++)
     {
         (*iter)->setParent("world");
     }
@@ -1288,16 +1284,16 @@ void SceneManager::clear()
     }
     */
 
-    int i = 0;
+    unsigned i = 0;
     ReferencedNode *n;
     while (i < worldNode->getNumChildren())
     {
-        if (n=dynamic_cast<UserNode*>(worldNode->getChild(i)))
+        if ((n = dynamic_cast<UserNode*>(worldNode->getChild(i))))
         {
             // skip UserNodes
             i++;
         }
-        else if (n=dynamic_cast<ReferencedNode*>(worldNode->getChild(i)))
+        else if ((n = dynamic_cast<ReferencedNode*>(worldNode->getChild(i))))
         {
             // delete the graph of any ReferencedNode:
             deleteGraph(n->id->s_name);
@@ -1348,9 +1344,9 @@ void SceneManager::clear()
 
 void SceneManager::clearUsers()
 {
-    while (nodeMap[string("UserNode")].size())
+    while (nodeMap[std::string("UserNode")].size())
     {
-        deleteGraph(nodeMap[string("UserNode")][0]->id->s_name);
+        deleteGraph(nodeMap[std::string("UserNode")][0]->id->s_name);
     }
 
     if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "clearUsers");
@@ -1421,8 +1417,8 @@ void SceneManager::refresh()
     }
 
     // must do connections manually:
-    vector<SoundConnection*> connections = getConnections();
-    for (vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+    std::vector<SoundConnection*> connections = getConnections();
+    for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
     {
         (*iter)->stateDump();
     }
@@ -1474,7 +1470,7 @@ void SceneManager::update()
 // save scene as .osg
 void SceneManager::exportScene (const char *nodeID, const char *filename)
 {
-    std:: string fullPath = string(filename);
+    std::string fullPath = std::string(filename);
     if (fullPath.substr(fullPath.size()-4) != ".osg") fullPath += ".osg";
 
     // need a TextureVisitor to go over the graph and undo the unref on textures
@@ -1507,9 +1503,9 @@ void SceneManager::exportScene (const char *nodeID, const char *filename)
 }
 
 
-std::string SceneManager::getStateAsXML(vector<lo_message> nodeState)
+std::string SceneManager::getStateAsXML(std::vector<lo_message> nodeState)
 {
-    ostringstream output("");
+    std::ostringstream output("");
 
     lo_arg **args;
     int i, argc;
@@ -1518,7 +1514,7 @@ std::string SceneManager::getStateAsXML(vector<lo_message> nodeState)
 
 
     // iterate through all state messages and write as xml output:
-    vector<lo_message>::iterator nodeStateIterator = nodeState.begin();
+    std::vector<lo_message>::iterator nodeStateIterator = nodeState.begin();
     while (nodeStateIterator != nodeState.end())
     {
 
@@ -1557,7 +1553,7 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
         return "";
     }
 
-    ostringstream output("");
+    std::ostringstream output("");
 
     // open tag for this node:
     output << "<" << n->nodeType << " id=" << n->id->s_name << ">\n";
@@ -1568,7 +1564,7 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
     if (!n->children.empty())
     {
         output << "<subgraph>\n";
-        vector<ReferencedNode*>::iterator childIter;
+        std::vector<ReferencedNode*>::iterator childIter;
         for (childIter = n->children.begin(); childIter != n->children.end(); childIter++)
         {
             output << getNodeAsXML(*childIter, withUsers);
@@ -1585,7 +1581,7 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
 
 std::string SceneManager::getConnectionsAsXML()
 {
-    ostringstream output("");
+    std::ostringstream output("");
     output << "<connections>\n";
 
     // go through all DSPNodes (actually, all nodes that are subclasses of
@@ -1595,7 +1591,7 @@ std::string SceneManager::getConnectionsAsXML()
     nodeListType::iterator iter;
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
-        string nodeType = (*it).first;
+        std::string nodeType = (*it).first;
 
         const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(nodeType);
         if (t.isDefined())
@@ -1610,7 +1606,7 @@ std::string SceneManager::getConnectionsAsXML()
 
                     if ((*iter).valid())
                     {
-                        vector<SoundConnection*>::iterator connIter;
+                        std::vector<SoundConnection*>::iterator connIter;
                         for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
                         {
                             // open tag for this node:
@@ -1651,15 +1647,13 @@ std::string SceneManager::getConnectionsAsXML(ReferencedNode *n)
 bool SceneManager::saveXML(const char *s, bool withUsers = false)
 {
     // convert filename into valid path:
-    string filename = getSpinPath(s);
+    std::string filename = getSpinPath(s);
     // and make sure that there is an .xml extension:
-    if (filename.substr(filename.length()-4)!=string(".xml")) filename+=".xml";
-
-
-
+    if (filename.substr(filename.length() - 4) != std::string(".xml")) 
+        filename+=".xml";
 
     // start with XML Header:
-    ostringstream output("");
+    std::ostringstream output("");
     output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
             << "<!DOCTYPE SPIN SYSTEM>\n"
             << "<spinScene>\n";
@@ -1717,12 +1711,13 @@ bool SceneManager::saveXML(const char *s, bool withUsers = false)
 bool SceneManager::saveUsers(const char *s)
 {
     // convert filename into valid path:
-    string filename = getSpinPath(s);
+    std::string filename = getSpinPath(s);
     // and make sure that there is an .xml extension:
-    if (filename.substr(filename.length()-4)!=string(".xml")) filename+=".xml";
+    if (filename.substr(filename.length() - 4) != std::string(".xml")) 
+        filename += ".xml";
 
     // start with XML Header:
-    ostringstream output("");
+    std::ostringstream output("");
     output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
             << "<!DOCTYPE SPIN SYSTEM>\n"
             << "<spinScene>\n";
@@ -1755,10 +1750,9 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
 {
     TiXmlElement *child1, *child2;
     char *types;
-    string method;
+    std::string method;
     std::vector<std::string> argVector;
     osgIntrospection::ValueList args;
-    int i;
     float f;
 
     char *nodeType = (char*) XMLnode->Value();
@@ -1782,7 +1776,7 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
             for ( child1 = XMLnode->FirstChildElement(); child1; child1 = child1->NextSiblingElement() )
             {
                 // first check if this XML node is a list of Audiocape children:
-                if (child1->Value() == string("subgraph"))
+                if (child1->Value() == std::string("subgraph"))
                 {
 
                     for (child2 = child1->FirstChildElement(); child2; child2 = child2->NextSiblingElement() )
@@ -1813,7 +1807,7 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
                 }
 
                 args.clear();
-                for (i=0; i<strlen(types); i++)
+                for (unsigned i=0; i<strlen(types); i++)
                 {
                     if (lo_is_numerical_type((lo_type)types[i]))
                     {
@@ -1828,7 +1822,7 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
                     introspectType.invokeMethod(method, introspectValue, args, true); // the true means that it will try base classes as well
                 }
 
-                catch (osgIntrospection::Exception & ex)
+                catch (const osgIntrospection::Exception & ex)
                 {
                     std::cerr << "catch exception in loadXML: " << ex.what() << std::endl;
                 }
@@ -1847,7 +1841,6 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
         std::cout << "ERROR: Found XML node of type " << nodeType << ", but no such type is registered." << std::endl;
     }
 
-
     return true;
 }
 
@@ -1859,7 +1852,7 @@ bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
 
     TiXmlElement *child;
 
-    if (XMLnode->Value() == string("SoundConnection"))
+    if (XMLnode->Value() == std::string("SoundConnection"))
     {
 
         //std::cout << "found <SoundConnection>: " << XMLnode->Attribute("id") << std::endl;
@@ -1890,23 +1883,23 @@ bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
 
             // we know that each method takes exactly one float arg:
             float f;
-            if (child->Value() == string("setThru"))
+            if (child->Value() == std::string("setThru"))
             {
                 if (fromString<float>(f, child->FirstChild()->Value())) conn->setThru(f);
             }
-            else if (child->Value() == string("setDistanceEffect"))
+            else if (child->Value() == std::string("setDistanceEffect"))
             {
                 if (fromString<float>(f, child->FirstChild()->Value())) conn->setDistanceEffect(f);
             }
-            else if (child->Value() == string("setRolloffEffect"))
+            else if (child->Value() == std::string("setRolloffEffect"))
             {
                 if (fromString<float>(f, child->FirstChild()->Value())) conn->setRolloffEffect(f);
             }
-            else if (child->Value() == string("setDopplerEffect"))
+            else if (child->Value() == std::string("setDopplerEffect"))
             {
                 if (fromString<float>(f, child->FirstChild()->Value())) conn->setDopplerEffect(f);
             }
-            else if (child->Value() == string("setDiffractionEffect"))
+            else if (child->Value() == std::string("setDiffractionEffect"))
             {
                 if (fromString<float>(f, child->FirstChild()->Value())) conn->setDiffractionEffect(f);
             }
@@ -1914,6 +1907,7 @@ bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
         }
     }
 
+    return false;
 }
 
 /*
@@ -1961,9 +1955,10 @@ bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
 bool SceneManager::loadXML(const char *s)
 {
     // convert filename into valid path:
-    string filename = getSpinPath(s);
+    std::string filename = getSpinPath(s);
     // and make sure that there is an .xml extension:
-    if (filename.substr(filename.length()-4)!=string(".xml")) filename+=".xml";
+    if (filename.substr(filename.length() - 4) != std::string(".xml")) 
+        filename+=".xml";
 
 
     std::cout << "Loading scene: " << filename << std::endl;
@@ -1994,7 +1989,7 @@ bool SceneManager::loadXML(const char *s)
     }
 
     // Now see if there is a <connections> tag:
-    if (root = doc.FirstChild( "connections" ))
+    if ((root = doc.FirstChild( "connections" )))
     {
         // go through the file again, making sure that connections get created:
         for( child = root->FirstChildElement(); child; child = child->NextSiblingElement() )
@@ -2023,10 +2018,8 @@ bool SceneManager::loadXML(const char *s)
 
 bool SceneManager::nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2)
 {
-    return ( string(n1->id->s_name) < string(n2->id->s_name) );
+    return ( std::string(n1->id->s_name) < std::string(n2->id->s_name) );
 }
-
-
 
 
 // *****************************************************************************
@@ -2080,7 +2073,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     // NOTE: user_data is a t_symbol pointer
 
     int i;
-    string    theMethod, nodeStr;
+    std::string    theMethod, nodeStr;
     ValueList theArgs;
 
     // make sure there is at least one argument (ie, a method to call):
@@ -2102,7 +2095,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     // get the method (argv[0]):
     if (lo_is_string_type((lo_type)types[0]))
     {
-        theMethod = string((char *)argv[0]);
+        theMethod = std::string((char *)argv[0]);
     }
     else return 1;
 
@@ -2378,10 +2371,10 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
     if (!argc) return 1;
 
     // get the method (argv[0]):
-    string theMethod;
+    std::string theMethod;
     if (lo_is_string_type((lo_type)types[0]))
     {
-        theMethod = string((char *)argv[0]);
+        theMethod = std::string((char *)argv[0]);
     }
     else return 1;
 
@@ -2472,7 +2465,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 
 int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
-    string theMethod, idStr;
+    std::string theMethod, idStr;
 
 
     // make sure there is at least one argument (ie, a method to call):
@@ -2481,7 +2474,7 @@ int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv
     // get the method (argv[0]):
     if (lo_is_string_type((lo_type)types[0]))
     {
-        theMethod = string((char *)argv[0]);
+        theMethod = std::string((char *)argv[0]);
     }
     else return 1;
 

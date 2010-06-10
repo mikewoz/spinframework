@@ -59,6 +59,7 @@
 #include "spinContext.h"
 #include "osgUtil.h"
 #include "GroupNode.h"
+#include "SceneManager.h"
 #include "ShapeNode.h"
 
 using namespace std;

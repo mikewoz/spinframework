@@ -46,14 +46,10 @@
 #include <fstream>
 //#include <time.h>
 #include <sys/time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
-#include <string.h>
-
-using namespace std;
-
-
+#include <cstring>
 
 /* Subtract the `struct timeval' values X and Y, storing the result in RESULT.
  * Return 1 if the difference is negative, otherwise 0.
@@ -91,7 +87,7 @@ enum LogPriority
 	ERROR, // it's dead, jim
 };
 
-class logbuf : public streambuf
+class logbuf : public std::streambuf
 {
 	
 public:
@@ -107,11 +103,11 @@ public:
 		setp(buf, buf + buflen);
 
 		// open the log file
-		logfile.open(logpath, ios::app);
+		logfile.open(logpath, std::ios::app);
 
 		if (!logfile.is_open())
 		{
-			cout << "Error: Could not open log file: " << logpath << endl;
+            std::cout << "Error: Could not open log file: " << logpath << std::endl;
 			exit(1);
 		}
 		
@@ -159,7 +155,7 @@ private:
 		
 
 		// now we stream the time, then the priority, then the message
-		if (bCOUT) cout << shortTime << ' ';
+		if (bCOUT) std::cout << shortTime << ' ';
 		if (bFILE) logfile << longTime << ' ';
 		
 		logfile << (int)(-dt.tv_sec) << "." << (int)(dt.tv_usec) << ' ';
@@ -183,11 +179,11 @@ private:
 		*/
 
 
-		if (bCOUT) cout.write(pbase(), pptr() - pbase());
+		if (bCOUT) std::cout.write(pbase(), pptr() - pbase());
 		if (bFILE) logfile.write(pbase(), pptr() - pbase());
 		
 		// flush output
-		if (bCOUT) cout.flush();
+		if (bCOUT) std::cout.flush();
 		if (bFILE) logfile.flush();
 
 		// reset our priority to INFO
@@ -214,7 +210,7 @@ private:
 	}
 
 	// our log file
-	ofstream logfile;
+    std::ofstream logfile;
 
 	// current priority
 	LogPriority priority;
@@ -225,12 +221,12 @@ private:
 };
 
 
-class spinLog : public ostream
+class spinLog : public std::ostream
 {
 
 public:
 	// we initialize the ostream to use our logbuf
-	spinLog(const char* logpath) : ostream(new logbuf(logpath))
+	spinLog(const char* logpath) : std::ostream(new logbuf(logpath))
 	{
 		buf = (logbuf*) rdbuf();
 	}
@@ -264,6 +260,5 @@ static spinLog& operator<<(spinLog& vlog, LogPriority pr)
 	vlog.set_priority(pr);
 	return vlog;
 }
-
 
 #endif

@@ -46,12 +46,9 @@
 #include <osgDB/ReadFile>
 #include <osg/Timer>
 
+#include "SceneManager.h"
 #include "spinContext.h"
 #include "spinLog.h"
-
-
-using namespace std;
-
 
 // *****************************************************************************
 // *****************************************************************************

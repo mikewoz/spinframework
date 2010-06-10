@@ -39,14 +39,12 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-//#include <osgGA/GUIEventAdapter>
-
-
 #include "ViewerManipulator.h"
 #include <string>
 #include <vector>
 #include "osgUtil.h"
 #include "spinUtil.h"
+#include "SceneManager.h"
 
 using namespace osgGA;
 

@@ -55,6 +55,7 @@
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
+#include "SceneManager.h"
 #include "spinUtil.h"
 #include "spinContext.h"
 #include "spinLog.h"
