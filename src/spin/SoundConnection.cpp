@@ -190,15 +190,6 @@ void SoundConnection::updateSharedSpaces()
 
 		
 	}
-	
-	if (0) {
-		std::cout << "Found " << sharedSpaces.size() << " sharedSpaces between source (" << source->id->s_name << ") and sink (" << sink->id->s_name << ")" << std::endl;
-		vector< osg::ref_ptr<SoundSpace> >::iterator iter;
-		for (iter = sharedSpaces.begin(); iter != sharedSpaces.end(); iter++)
-		{
-			std::cout << "  sharedSpace: " << (*iter)->id->s_name << std::endl;
-		}
-	}	
 }
 	
 

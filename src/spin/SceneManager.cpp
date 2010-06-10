@@ -286,11 +286,11 @@ SceneManager::~SceneManager()
 
 
     // Force a delete (and destructor call) for all nodes still in the scene:
-    int i = 0;
+    unsigned i = 0;
     ReferencedNode *n;
     while (i < worldNode->getNumChildren())
     {
-        if (n=dynamic_cast<ReferencedNode*>(worldNode->getChild(i)))
+        if ((n = dynamic_cast<ReferencedNode*>(worldNode->getChild(i))))
         {
             // delete the graph of any ReferencedNode:
             deleteGraph(n->id->s_name);
@@ -398,7 +398,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
 
     if (!txServ) return;
 
-    int i;
     std::string OSCpath = "/SPIN/" + sceneID;
     lo_message msg;
 
@@ -698,7 +697,7 @@ void SceneManager::debug()
             {
                 ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
                 std::cout << "    " << (*sIter)->s_name << " (parents=";
-                for (int i=0; i<s->getNumParents(); i++)
+                for (unsigned i = 0; i < s->getNumParents(); i++)
                 {
                     std::cout << " " << s->getParent(i)->getName();
                 }
@@ -1787,11 +1786,13 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
                 }
 
                 // look for child nodes with a 'types' attribute
-                if (types = (char*) child1->Attribute("types"))
+                if ((types = (char*) child1->Attribute("types")))
                 {
                     method = child1->Value();
                     argVector = tokenize(child1->FirstChild()->Value());
-                } else continue;
+                } 
+                else 
+                    continue;
 
                 // special case if method is setParent():
                 if (method == "setParent")
@@ -1829,10 +1830,7 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
             }
 
             if (parentNode)
-            {
                 n->setParent(parentNode);
-            }
-
         } else {
             std::cout << "ERROR: Found XML node of type " << nodeType << " with no id attribute. Could not create." << std::endl;
         }
@@ -2079,25 +2077,13 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;
 
-    if (0)
-    {
-        printf("************ SceneManagerCallback_node() got message: %s\n", (char*)path);
-        for (int i=0; i<argc; i++) {
-            printf("arg %d '%c' ", i, types[i]);
-            lo_arg_pp((lo_type) types[i], argv[i]);
-            printf("\n");
-        }
-        printf("\n");
-        fflush(stdout);
-    }
-
-
     // get the method (argv[0]):
     if (lo_is_string_type((lo_type)types[0]))
     {
         theMethod = std::string((char *)argv[0]);
     }
-    else return 1;
+    else 
+        return 1;
 
     // get the instance of the node, which is the last token of the OSCpath:
     // TODO: use user_data instead!
@@ -2121,17 +2107,6 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     if (s->s_type == REFERENCED_STATESET)
     {
         classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
-        if (0)
-        {
-            std::cout << "got state message for " << s->s_name << ":" << std::endl;
-            for (int i=0; i<argc; i++) {
-                printf("arg %d '%c' ", i, types[i]);
-                lo_arg_pp((lo_type) types[i], argv[i]);
-                printf("\n");
-            }
-            printf("\n");
-            fflush(stdout);
-        }
     }
     else
     {
@@ -2239,17 +2214,6 @@ int SceneManagerCallback_script(const char* symName, const char *types, lo_arg *
     if (s->s_type == REFERENCED_STATE)
     {
         classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
-        if (0)
-        {
-            std::cout << "got state message for " << s->s_name << ":" << std::endl;
-            for (int i=0; i<argc; i++) {
-                printf("arg %d '%c' ", i, types[i]);
-                lo_arg_pp((lo_type) types[i], &(argv[i]));
-                printf("\n");
-            }
-            printf("\n");
-            fflush(stdout);
-        }
     }
     else
     {
@@ -2355,18 +2319,6 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 {
     SceneManager *sceneManager = (SceneManager*) user_data;
 
-    if (0)
-    {
-        printf("************ SceneManagerCallback_admin() got message: %s\n", (char*)path);
-        for (int i=0; i<argc; i++) {
-            printf("arg %d '%c' ", i, types[i]);
-            lo_arg_pp((lo_type) types[i], argv[i]);
-            printf("\n");
-        }
-        printf("\n");
-        fflush(stdout);
-    }
-
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;
 
@@ -2376,7 +2328,8 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
     {
         theMethod = std::string((char *)argv[0]);
     }
-    else return 1;
+    else 
+        return 1;
 
     //pthread_mutex_lock(&pthreadLock);
 
@@ -2515,6 +2468,7 @@ int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv
 
     return 1;
 }
+
 void oscParser_error(int num, const char *msg, const char *path)
 {
     printf("OSC (liblo) error %d in path %s: %s\n", num, path, msg);

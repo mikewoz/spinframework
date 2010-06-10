@@ -814,20 +814,6 @@ int spinContext::spinContext_infoCallback(const char *path, const char *types, l
     //spinContext *spin = (spinContext*) user_data;
     spinContext &spin = spinContext::Instance();
 
-    if (0)
-    {
-        printf("************ infoChannelCallback() got message: %s\n", (char*)path);
-        printf("user_data: %s\n", (char*) user_data);
-        for (int i=0; i<argc; i++) {
-            printf("arg %d '%c' ", i, types[i]);
-            lo_arg_pp((lo_type) types[i], argv[i]);
-            printf("\n");
-        }
-        printf("\n");
-        fflush(stdout);
-    }
-
-
     if (spin.isServer())
     {
         // TODO: monitor /ping/user messages, keep timeout handlers,

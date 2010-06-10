@@ -62,8 +62,6 @@
 #include "SceneManager.h"
 #include "ShapeNode.h"
 
-using namespace std;
-
 extern pthread_mutex_t pthreadLock;
 
 

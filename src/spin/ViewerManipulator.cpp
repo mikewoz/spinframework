@@ -297,34 +297,6 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		}
 	}
 	
-	
-	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
-	{
-		switch(ea.getEventType())
-		{
-			case(osgGA::GUIEventAdapter::PUSH):
-				std::cout << "PUSH ("<<ea.getEventType()<<")"; break;
-			case(osgGA::GUIEventAdapter::RELEASE):
-				std::cout << "RELEASE ("<<ea.getEventType()<<")"; break;
-			case(osgGA::GUIEventAdapter::DOUBLECLICK):
-				std::cout << "DOUBLECLICK ("<<ea.getEventType()<<")"; break;
-			case(osgGA::GUIEventAdapter::DRAG):
-				std::cout << "DRAG ("<<ea.getEventType()<<")"; break;
-			case(osgGA::GUIEventAdapter::MOVE):
-				std::cout << "MOVE ("<<ea.getEventType()<<")"; break;
-			case(osgGA::GUIEventAdapter::SCROLL):
-				std::cout << "SCROLL ("<<ea.getEventType()<<")"; break;
-		}
-		std::cout << " buttonMask=" << buttonMask << ", modkeyMask=" << modkeyMask << ", dXYclick: " << dXclick<<","<<dYclick << std::endl;
-		std::cout << " currently selected nodes:";
-		for (j=0; j<selectedNodes.size(); j++)
-		{
-			std::cout << " " << selectedNodes[j]->s_name;
-		}
-		std::cout << std::endl;
-	}
-	
-	
 	if (this->picker)
 	{
 		// This is how the Picker works:
@@ -386,16 +358,6 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 				}
 			}
 		}
-
-		if (0)
-		{
-			std::cout << "SPIN intersections: " << std::endl;
-			for (i=0; i<hitNodes.size(); i++)
-			{
-				std::cout << hitNodes[i]->id->s_name << " @ " << hitPoints[i].x()<<","<<hitPoints[i].y()<<","<<hitPoints[i].z()<< std::endl;
-			}
-		}
-		
 
 		// ******
 	
@@ -750,12 +712,6 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);
 
-	if (0)
-	{
-		std::cout << "ViewerManipulator sending: " << nodeId << std::endl;
-		lo_message_pp(msg);
-	}
-	
 	if (!err)
 	{
 		

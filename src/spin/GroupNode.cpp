@@ -199,61 +199,6 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
     osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
     if (!user.valid()) return;
 
-
-    if (0) // (event!=osgGA::GUIEventAdapter::MOVE)
-    {
-        std::cout << this->id->s_name << ".event (interactionMode="<<_interactionMode<<") from '" << userString << "': ";
-        switch(event)
-        {
-            case(osgGA::GUIEventAdapter::PUSH):
-                std::cout << "PUSH ("<<event<<")";
-                break;
-            case(osgGA::GUIEventAdapter::RELEASE):
-                std::cout << "RELEASE ("<<event<<")";
-                break;
-            case(osgGA::GUIEventAdapter::DOUBLECLICK):
-                std::cout << "DOUBLECLICK ("<<event<<")";
-                break;
-            case(osgGA::GUIEventAdapter::DRAG):
-                std::cout << "DRAG ("<<event<<")";
-                break;
-            case(osgGA::GUIEventAdapter::MOVE):
-                std::cout << "MOVE ("<<event<<")";
-                break;
-            case(osgGA::GUIEventAdapter::SCROLL):
-                std::cout << "SCROLL ("<<event<<")";
-                break;
-        }
-        std::cout << " with data=" << eData1 << "," << eData2;
-        std::cout << " @ local (" << x<<","<<y<<","<<z << ")";
-
-        if (this->owner.valid())
-            std::cout << ", Current owner: " << this->owner->id->s_name;
-        else
-            std::cout << ", Current owner: NULL";
-
-        std::cout << std::endl;
-    }
-
-    /*
-    if (_interactionMode==SELECT)
-    {
-        switch(event)
-        {
-            case(osgGA::GUIEventAdapter::PUSH):
-                if (!this->owner.valid()) BROADCAST(this, "ssi", "select", userString, 1);
-                break;
-
-            case(osgGA::GUIEventAdapter::RELEASE):
-                if (this->owner == user) BROADCAST(this, "ssi", "select", userString, 0);
-                break;
-            case(osgGA::GUIEventAdapter::DOUBLECLICK):
-                BROADCAST(this, "ssi", "doubleclick", userString);
-                break;
-        }
-    }
-     */
-
     if (_interactionMode==DRAG || _interactionMode==THROW)
     {
         switch(event)
