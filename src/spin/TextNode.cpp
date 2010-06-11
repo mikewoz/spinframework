@@ -97,7 +97,7 @@ void TextNode::setContext (const char *newvalue)
 	drawText();
 }
 
-void TextNode::setText (const char *s)
+void TextNode::setTextValue (const char *s)
 {
 	if (textLabel->getText().createUTF8EncodedString() != string(s))
 	{
@@ -109,9 +109,9 @@ void TextNode::setText (const char *s)
 		pthread_mutex_unlock(&pthreadLock);
 		//drawText();
 
-		std::cout << "debug: setting text label to: " << s << ", getText() reports: " << getText() << std::endl;
+		std::cout << "debug: setting text label to: " << s << ", getTextValue() reports: " << getTextValue() << std::endl;
 
-		BROADCAST(this, "ss", "setText", getText());
+		BROADCAST(this, "ss", "setTextValue", getTextValue());
 	}
 }
 
@@ -239,7 +239,7 @@ std::vector<lo_message> TextNode::getState ()
 	lo_message msg;
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setText", getText());
+	lo_message_add(msg, "ss", "setTextValue", getTextValue());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
