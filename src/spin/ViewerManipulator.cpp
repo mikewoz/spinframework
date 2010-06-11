@@ -293,6 +293,8 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 				case osgGA::GUIEventAdapter::SCROLL_DOWN:
 					scrollY = 1.0;
 					break;
+                default:
+                    break;
 			}
 		}
 	}

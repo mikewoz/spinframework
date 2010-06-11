@@ -46,6 +46,13 @@
 #include <osgViewer/View>
 #include <osgGA/NodeTrackerManipulator>
 
+// forward declarations
+class GroupNode;
+
+namespace osgViewer {
+    class View;
+}
+
 #include "spinContext.h"
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>

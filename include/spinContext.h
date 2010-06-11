@@ -44,6 +44,7 @@
 
 #include <boost/python.hpp>
 #include <osg/Timer>
+#include <lo/lo_types.h>
 
 #include "spinUtil.h"
 
