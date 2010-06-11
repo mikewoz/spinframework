@@ -119,11 +119,8 @@ void ConstraintsNode::setTarget(const char *id)
 
 void ConstraintsNode::setConstraintMode (constraintMode m)
 {
-    if (this->_mode != (int)m)
-    {
-        this->_mode = m;
-        BROADCAST(this, "si", "setConstraintMode", (int)_mode);
-    }
+	this->_mode = m;
+	BROADCAST(this, "si", "setConstraintMode", (int)_mode);
 }
 
 void ConstraintsNode::setCubeSize(float xScale, float yScale, float zScale)
@@ -181,123 +178,158 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 
 void ConstraintsNode::translate (float x, float y, float z)
 {
-	applyConstrainedTranslation(osg::Vec3(x,y,z));
+    if ( !sceneManager->isGraphical() && ((_mode==BOUNCE)||(_mode==COLLIDE)) )
+	{
+		osg::Vec3 newPos;
+		applyConstrainedTranslation(osg::Vec3(x,y,z));
+	}
 }
 
 
 void ConstraintsNode::move (float x, float y, float z)
 {
-	applyConstrainedTranslation( mainTransform->getAttitude() * osg::Vec3(x,y,z) );
+    if ( !sceneManager->isGraphical() && ((_mode==BOUNCE)||(_mode==COLLIDE)) )
+    {
+		osg::Vec3 newPos;
+		applyConstrainedTranslation(mainTransform->getAttitude() * osg::Vec3(x,y,z) );
+    }
 }
-
 
 
 void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 {
-	osg::Vec3 newPos = getTranslation() + v;
+	osg::Vec3 localPos = this->getTranslation();
 
-    if ( !sceneManager->isGraphical() && ((_mode==BOUNCE)||(_mode==COLLIDE)) )
-    {
+	/*
+	std::cout << std::endl << "checking for collisions" << std::endl;
+	std::cout << "start =  " << localPos.x()<<","<<localPos.y()<<","<<localPos.z() << std::endl;
+	std::cout << "v =      " << v.x()<<","<<v.y()<<","<<v.z() << std::endl;
+	*/
 
-        osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(_target->s_thing);
-        if (targetNode.valid())
-        {
+	osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(_target->s_thing);
+	if (targetNode.valid())
+	{
+		// get current position (including offset from previous bounces)
+		osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+		osg::Vec3 worldPos = thisMatrix.getTrans();
 
-            // get line segment start and end points:
-            osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
-            osg::Matrix targetMatrix = osg::computeLocalToWorld(targetNode->currentNodePath);
+		// set up intersector:
+		osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector(worldPos, worldPos + v);
+		osgUtil::IntersectionVisitor iv(intersector.get());
 
-            osg::Vec3 start = thisMatrix.getTrans();
-            //osg::Vec3 end = start + ( targetMatrix.getRotate() * v );
-            osg::Vec3 end = start + v;
+		// apply intersector:
+		targetNode->accept(iv);
 
-            // set up intersector:
-            osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector = new osgUtil::LineSegmentIntersector(start, end);
-            osgUtil::IntersectionVisitor iv(intersector.get());
+		if (intersector->containsIntersections())
+		{
+			osgUtil::LineSegmentIntersector::Intersections intersections;
+			osgUtil::LineSegmentIntersector::Intersections::iterator itr;
 
-            // apply intersector:
-            targetNode->accept(iv);
+			intersections = intersector->getIntersections();
 
-            //std::cout << "checking intersections with " << targetNode->id->s_name << ", start=("<< start.x()<<","<<start.y()<<","<<start.z()<<"), end=("<<end.x()<<","<<end.y()<<","<<end.z()<<")" << std::endl;
+			for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+			{
+				//std::cout << "testing intersection with " << (*itr).nodePath[0]->getName() << std::endl;
 
-            if (intersector->containsIntersections())
-            {
-                osgUtil::LineSegmentIntersector::Intersections intersections;
-                osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+				ReferencedNode *testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[0]);
+				if (testNode==targetNode)
+				{
+					osg::Vec3 localHitPoint = (*itr).getWorldIntersectPoint();
+					osg::Vec3 localHitNormal = (*itr).getWorldIntersectNormal();
+					localHitNormal.normalize();
 
-                intersections = intersector->getIntersections();
+					/*
+					std::cout << id->s_name << " collision!!! @ " << std::endl;
+					std::cout << "localHitPoint:\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
+					std::cout << "localHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
+					*/
 
-                for (itr = intersections.begin(); itr != intersections.end(); ++itr)
-                {
-                    //std::cout << "testing intersection with " << (*itr).nodePath[0]->getName() << std::endl;
+					// current direction vector:
+					osg::Vec3 dirVec = v;
+					dirVec.normalize();
 
-                    ReferencedNode *testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[0]);
-                    if (testNode==targetNode)
-                    {
-                        osg::Vec3 hitPoint = (*itr).getWorldIntersectPoint();
-                        osg::Vec3 hitNormal = (*itr).getWorldIntersectNormal();
+					// Find the rotation between the direction vector and the
+					// surface normal at the hit point:
+					osg::Quat rot;
+					rot.makeRotate(dirVec, localHitNormal);
+					//std::cout << "rot =    " << rot.x()<<","<<rot.y()<<","<<rot.z()<<","<<rot.w() << " ... angle=" << acos(rot.w())*2 << ", indegrees=" << osg::RadiansToDegrees(acos(rot.w()))*2 << std::endl;
 
-                        osg::Vec3 localHitPoint = (*itr).getWorldIntersectPoint();
-                        osg::Vec3 localHitNormal = (*itr).getWorldIntersectNormal();
+					// the surface normal may be in the opposite direction
+					// from us. If so, we need to flip it:
+					if (acos(rot.w()) * 2 > osg::PI_2)
+					{
+						localHitNormal *= -1;
+						rot.makeRotate(dirVec, localHitNormal);
+					}
 
-                        std::cout << id->s_name << " collision @ " << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
+					//std::cout << "newHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
-                        /*
-                        std::cout << "hitPoint =\t" << hitPoint.x()<<","<<hitPoint.y()<<","<<hitPoint.z() << std::endl;
-                        std::cout << "hitNormal =\t" << hitNormal.x()<<","<<hitNormal.y()<<","<<hitNormal.z() << std::endl;
-                        std::cout << "localHitPoint =\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
-                        std::cout << "localHitNormal =\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
-                         */
-
-                        if (_mode==COLLIDE)
-                        {
-                        	// just set translation to the hitpoint, but back
-                        	// along the normal by a bit
-
-                        	newPos = localHitPoint + (localHitNormal * 0.01);
-
-                        	//BROADCAST(this, "ssffff", "event", "collision", hitPoint.x(), hitPoint.y(), hitPoint.z(), v.length());
-                        }
-
-                        /*
-                        else if (_mode==BOUNCE)
-                        {
-							// TODO !!! still doesn't work!!
-							 *
-							// negative of current translation vector:
-							// (ie, from next position to current)
-							osg::Vec3 transVec = start - end;
-							std::cout << "transVec = " << transVec.x()<<","<<transVec.y()<<","<<transVec.z() << std::endl;
-
-							// rotation to normal
-							osg::Quat rot = RotationBetweenVectors(transVec, hitNormal);
-
-							osg::Vec3 newVec = rot * (rot * transVec);
-							std::cout << "newVec = " << newVec.x()<<","<<newVec.y()<<","<<newVec.z() << std::endl;
-
-							// Ratio of distance after bounce vs distance to hit
-							double ratio = 1 - ( (hitPoint-start).length() / transVec.length() );
-							std::cout << "ratio = " << ratio << std::endl;
-
-							newVec *= ratio;
-							std::cout << "newVec = " << newVec.x()<<","<<newVec.y()<<","<<newVec.z() << std::endl;
-
-							//newPos = newVec;
-                        }
-                        */
-                        break;
-
-                    }
-                }
-            } //else std::cout << "no intersections" << std::endl;
-        }
+					osg::Vec3 rotEulers = QuatToEuler(rot*2);
+					//std::cout << "rot_eu = " << osg::RadiansToDegrees(rotEulers.x())<<","<<osg::RadiansToDegrees(rotEulers.y())<<","<<osg::RadiansToDegrees(rotEulers.z()) << std::endl;
 
 
 
+					if (_mode==COLLIDE)
+					{
+						// just set translation to the hitpoint, but back
+						// along the normal by a bit
 
-    }
+						osg::Vec3 collisionPoint = localHitPoint + (localHitNormal * 0.01);
+						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
+						return;
+					}
 
-    setTranslation(newPos.x(), newPos.y(), newPos.z());
+
+					else if (_mode==BOUNCE)
+					{
+						// bounce returns a translation mirrored about the hit
+						// normal to the surface
+
+
+
+						// the new direction vector is a rotated version
+						// of the original, about the localHitNormal:
+						osg::Vec3 newDir = (rot * 2.0) * -dirVec;
+						newDir.normalize();
+						//std::cout << "newDir = " << newDir.x()<<","<<newDir.y()<<","<<newDir.z() << std::endl;
+
+
+						// amount of distance still to travel after bounce:
+						double dist = v.length() - (localHitPoint-localPos).length();
+						//std::cout << "dist =   " << dist << std::endl;
+
+
+
+						// in BOUNCE mode, we want to update the orientation of
+						// the node, rotated in 'bounced' direction // TODO
+						osg::Quat newQuat;
+						newQuat.makeRotate(osg::Vec3(0,1,0),  newDir);
+						osg::Vec3 newRot = Vec3inDegrees(QuatToEuler(newQuat));
+						//std::cout << "newrot = " << newRot.x()<<","<<newRot.y()<<","<<newRot.z() << std::endl;
+						setOrientation(newRot.x(), newRot.y(), newRot.z());
+
+
+						// the new position will be just at the hitpoint (plus
+						// a little bit, so that it doesn't intersect with the
+						// same surface again)
+						osg::Vec3 hitPoint_adj = localHitPoint + (newDir*0.0001*dist);
+						setTranslation(hitPoint_adj.x(), hitPoint_adj.y(), hitPoint_adj.z());
+
+						// pseudo-recursively apply remainder of bounce:
+						applyConstrainedTranslation(newDir*dist);
+
+						return;
+
+					}
+				}
+			}
+		} //else std::cout << "no intersections" << std::endl;
+	}
+
+
+	// no intersections, so just do regular translation:
+	osg::Vec3 newPos = localPos + v;
+	setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
 

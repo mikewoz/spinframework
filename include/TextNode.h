@@ -69,13 +69,13 @@ public:
 
 	virtual void setContext	(const char *newvalue);
 	
-	void setText			(const char* s);
+	void setTextValue		(const char* s);
 	void setFont			(const char* s);
 	void setBillboard		(billboardType t);
 	void setColor			(float red, float green, float blue, float alpha);
 
 
-	const char *getText() { return textLabel->getText().createUTF8EncodedString().c_str(); }
+	const char *getTextValue() { return textLabel->getText().createUTF8EncodedString().c_str(); }
 	const char *getFont() { return _font.c_str(); }
 	int getBillboard() { return (int)_billboard; }
 	osg::Vec4 getColor() { return _color; };

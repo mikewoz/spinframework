@@ -82,6 +82,7 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 
 
     _velocity = osg::Vec3(0.0,0.0,0.0);
+    _velocityMode = GroupNode::TRANSLATE;
     _spin = osg::Vec3(0.0,0.0,0.0);
     _damping = 0.0;
 
@@ -125,7 +126,11 @@ void GroupNode::callbackUpdate()
 
             if (_velocity.length() > EPSILON) // != osg::Vec3(0,0,0))
             {
-                this->translate( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
+            	if (this->_velocityMode==GroupNode::TRANSLATE)
+            		this->translate( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
+            	else
+            		this->move( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
+
                 if (_damping > EPSILON)
                 {
                     double dv = 1 - (_damping*dt);
@@ -487,6 +492,16 @@ void GroupNode::setVelocity (float dx, float dy, float dz)
     }
 }
 
+void GroupNode::setVelocityMode (velocityMode mode)
+{
+    if (this->_velocityMode != (int)mode)
+    {
+        this->_velocityMode = mode;
+        BROADCAST(this, "si", "setVelocityMode", (int) this->_velocityMode);
+    }
+}
+
+
 void GroupNode::setSpin (float dp, float dr, float dy)
 {
     osg::Vec3 newSpin = osg::Vec3(dp,dr,dy);
@@ -650,6 +665,10 @@ std::vector<lo_message> GroupNode::getState ()
     msg = lo_message_new();
     v = getVelocity();
     lo_message_add(msg, "sfff", "setVelocity", v.x(), v.y(), v.z());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setVelocityMode", getVelocityMode());
     ret.push_back(msg);
 
     msg = lo_message_new();

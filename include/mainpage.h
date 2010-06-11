@@ -45,21 +45,11 @@
 /** @mainpage SPIN (Spatial Interaction) Framework
 *
 *
-* @section intro Introduction
-* SPIN is a networked client/server framework, where a server maintains the
-* state of the interactive 3D scene, and computes geometric interaction events.
-* Various clients can connect to the server, sending messages to manipulate
-* content, or receiving messages from the server when the content has changed,
-* or when geometric events have occurred (e.g. an intersection). Clients
-* typically include edit/display programs, motion tracking systems, and mapping
-* applications, which map the geometric events on to actions to control lights,
-* sound, graphics, etc., and audio and graphic renderers.
+* @section intro SPIN Framework API Documentation
+*
+* This documentation is generated from source using Doxygen.
 * 
-* Official site: http://www.spinframework.org
-*
-* SourceForge site: https://sourceforge.net/projects/spinframework
-*
-* For code documentation, see the
+* For class API documentation, see the
 * @htmlonly <a href="annotated.html">Class List</a>@endhtmlonly
 *
 * For the full list of OSC messages accepted by SPIN, see the
@@ -69,6 +59,7 @@
 
 /** @page oscprotocol OSC Protocol
  */
+
 
 /** @page mscdiagrams Diagrams
  *

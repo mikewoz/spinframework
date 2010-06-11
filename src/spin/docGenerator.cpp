@@ -278,22 +278,7 @@ int main()
 	
 	output << "<p>The SPIN Framework is designed so multiple processes can "
 		   << "share state over a network via OpenSoundControl (OSC) messages. "
-		   << "By default, these messages are sent using multicast UDP to the "
-		   << "address of 224.0.0.1, which is known as the the all-hosts group. "
-		   << "Most network interfaces are already members of this multicast "
-		   << "group, so a typical client application need only to start a UDP "
-		   << "listener on the appropriate port to discover messages related to "
-		   << "SPIN.<p>\n";
-		   
-	output << "<p>The spinServer multicasts all "
-		   << "state information in a specific OSC format. Furthermore, if a "
-		   << "client wishes to update or modify state on the server, it must "
-		   << "send a properly formatted message. In most cases, the message "
-		   << "will be multicasted back out once it has been processed. This "
-		   << "allows several clients to maintain a synchronous state with the "
-		   << "server, while operating in a distributed fashion.</p>\n";
-	
-	output << "<p>Below is the complete list of accepted OSC messages for the "
+		   << "Below is the complete list of accepted OSC messages for the "
 		   << "following nodes:</p>\n";
 		   
 	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();

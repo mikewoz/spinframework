@@ -12,7 +12,7 @@ CLEANFILES=$(BUILT_SOURCES)
 
 #FIXME: These depend on the headers, and more specifically, each generated wrapper should only depend on one header
 $(BUILT_SOURCES):
-	-rm $(top_srcdir)/include/*.h~
+	-rm -f $(top_srcdir)/include/*.h~
 	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -
 	cd $(top_srcdir) && src/genwrapper/genwrapper -v QUIET -c genwrapper.conf doxygen . && cd -
 

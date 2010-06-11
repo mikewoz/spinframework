@@ -114,10 +114,13 @@ osg::Quat RotationBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
 	v1.normalize();
 	v2.normalize();
 	
+	// URGH. THIS SHOULD BE DEPRECATED. USE osg::Quat::makeRotate INSTEAD!!
+
 	// Get the dot product of the vectors
 	double dotProduct = v1 * v2;
 	osg::Vec3 crossProduct = v1 ^ v2;
 	
+	/*
     double qw = (double) sqrt(v1.length2()*v2.length2()) + dotProduct;
 	
 	if (qw < 0.0001) { // vectors are 180 degrees apart
@@ -125,6 +128,17 @@ osg::Quat RotationBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
 	}
 	
     return osg::Quat(qw, crossProduct);
+    */
+
+/*
+	crossProduct.normalize();
+	double angle = acos(dotProduct);
+	return osg::Quat(cos(angle/2), crossProduct*sin(angle/2));
+*/
+
+	crossProduct.normalize();
+	return osg::Quat(acos(dotProduct), crossProduct);
+
 } 
 
 

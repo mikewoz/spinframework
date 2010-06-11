@@ -91,22 +91,22 @@ public:
 	 * The node sits on the surface of the target subgraph (ie, follows local
 	 * Z-axis down until it finds an intersection with the target surface)
 	 *
+	 * COLLIDE:
+	 * A form of collision detection, where the node is blocked by the parent's
+	 * surface. Note: this only works when node is moved using the
+	 * "translate" command.
+	 *
 	 * BOUNCE:
 	 * A form of collision detection, where the node bounces off of the parent's
 	 * surface, and travels in the reflected direction (ie, the orientation of
 	 * the node is changed). Note: this only works when node is moved using the
 	 * "translate" command.
 	 *
-	 * COLLIDE:
-	 * A form of collision detection, where the node is blocked by the parent's
-	 * surface. Note: this only works when node is moved using the
-	 * "translate" command.
-	 *
 	 */
 	enum constraintMode {	BASIC,
 							DROP,
-							BOUNCE,
-							COLLIDE
+							COLLIDE,
+							BOUNCE
 						};
 
 		
@@ -128,8 +128,14 @@ public:
 	virtual void translate (float x, float y, float z);
 	virtual void move (float x, float y, float z);
 	
+	/**
+	 * A pseudo-recursive function that checks if a translation results in one
+	 * or more intersections with the target node. If no intersection, this
+	 * method defaults to just a setTranslation call. Otherwise, it will do a
+	 * setTranslation for the collision point, and call itself again until there
+	 * are no collisions left.
+	 */
 	void applyConstrainedTranslation(osg::Vec3 v);
-
 	
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to

@@ -80,6 +80,7 @@ public:
 
 	enum interactionMode { STATIC, SELECT, DRAG, THROW, DRAW };
 	enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
+	enum velocityMode { TRANSLATE, MOVE };
 	
 	virtual void callbackUpdate();
 
@@ -132,6 +133,17 @@ public:
 	 */
 	virtual void setVelocity (float dx, float dy, float dz);
 
+
+	/**
+	 * Applying velocity to an object can either result in translational motion,
+	 * where velocityMode is TRANSLATE (0). This is the default and applies and
+	 * motion is relative to the local coordinate system of the node. When
+	 * velocityMode is MOVE (1), then motion is relative to the current
+	 * orientation of the node, analogous to the move() command.
+	 */
+	virtual void setVelocityMode (velocityMode mode);
+
+
 	/**
 	 * A rotational velocity (deg/sec), computed in callbackUpdate().
 	 */
@@ -154,7 +166,7 @@ public:
 	/**
 	 * The move command adds a relative translation with respect to the
 	 * node's current orientation. That is, the node will translate along it's
-	 * direction vector (Y-axis) by the supplied number of units
+	 * direction vector by the supplied number of units.
 	 */
     virtual void move (float x, float y, float z);
 
@@ -172,6 +184,7 @@ public:
 	osg::Vec3 getOrientation() { return _orientation; };
 	osg::Vec3 getScale() { return mainTransform->getScale(); };
 	osg::Vec3 getVelocity() { return _velocity; };
+	int getVelocityMode() { return (int) _velocityMode; };
 	float getDamping() { return _damping; };
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
 
@@ -233,6 +246,7 @@ protected:
 	osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 
 	osg::Vec3 _velocity;
+	velocityMode _velocityMode;
 	osg::Vec3 _spin;
 	float _damping;
 	
