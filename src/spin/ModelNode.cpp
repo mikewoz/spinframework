@@ -150,7 +150,8 @@ void ModelNode::setKeyframe (int index, float keyframe)
 
 	if (switcher[index].valid())
 	{
-		for (int j=1; j<switcher[index]->getNumChildren(); j++) switcher[index]->setValue(j, false);
+		for (unsigned j = 1; j < switcher[index]->getNumChildren(); j++) 
+            switcher[index]->setValue(j, false);
 		switcher[index]->setValue((int)(switcher[index]->getNumChildren()*_keyframe[index]), true);
 	}
 
@@ -162,7 +163,7 @@ void ModelNode::setKeyframe (int index, float keyframe)
 	BROADCAST(this, "sif", "setKeyframe", index, _keyframe[index]);
 }
 
-void ModelNode::setStateSet (int i, const char *replacement)
+void ModelNode::setStateSet (unsigned i, const char *replacement)
 {
 	osg::ref_ptr<ReferencedStateSet> ssOrig, ssReplacement;
 

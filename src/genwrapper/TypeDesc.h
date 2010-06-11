@@ -54,8 +54,8 @@ struct FunctionDesc
     std::string briefHelp;
     std::string detailedHelp;
     
-    bool is_constructor(const TypeDesc &decltype) const;
-    bool is_default_constructor(const TypeDesc &decltype) const;
+    bool is_constructor(const TypeDesc &dtype) const;
+    bool is_default_constructor(const TypeDesc &dtype) const;
     bool is_destructor() const { return name[0] == '~'; }
     std::string get_signature() const;
     void gen_name_signature();

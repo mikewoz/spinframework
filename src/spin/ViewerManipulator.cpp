@@ -244,8 +244,6 @@ std::vector<GroupNode*> ViewerManipulator::getNodesFromIntersections(osgUtil::Li
 
 void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter& ea)
 {
-	int i,j;
-		    
 	osg::ref_ptr<GroupNode> hitNode, drawNode;
 	
 	float dX = lastX - ea.getXnormalized();
@@ -268,7 +266,8 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 
 
-	float scrollX, scrollY;
+	float scrollX = 0.0;
+    float scrollY = 0.0;
 	if (ea.getEventType()==osgGA::GUIEventAdapter::SCROLL)
 	{
 		scrollX = ea.getScrollingDeltaX();
@@ -315,7 +314,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		// a RELEASE event for that node, so the id must be stored.
 
 		osgUtil::LineSegmentIntersector::Intersections intersections;
-		bool haveIntersections = view->computeIntersections(ea.getX(),ea.getY(),intersections);
+		view->computeIntersections(ea.getX(),ea.getY(),intersections);
 		//bool haveIntersections = view->computeIntersections(ea.getX(),ea.getY(),intersections, INTERACTIVE_NODE_MASK);
 
 		// first, we fill 2 vectors with data (the pointer to the node, and the
@@ -329,7 +328,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 		{
 			// look down the nodePath for the first SPIN node:
-			for (i=(*itr).nodePath.size()-1; i>=0; i--)
+			for (unsigned i = (*itr).nodePath.size() - 1; i >= 0; i--)
 			{
 				osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
 				if (testNode.valid())
@@ -377,7 +376,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 			{	
 				bool found = false;
 				GroupNode *n = dynamic_cast<GroupNode*>((*it)->s_thing);
-				for (i=0; i<hitNodes.size(); i++)
+				for (unsigned i = 0; i < hitNodes.size(); i++)
 				{
 					if (hitNodes[i] == n)
 					{
@@ -418,7 +417,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 			bool foundSelectable = false;
 			bool foundDrawable = false;
 			
-			for (i=0; i<hitNodes.size(); i++)
+			for (unsigned i = 0; i < hitNodes.size(); i++)
 			{
 				if ( hitNodes[i]->getInteractionMode()==GroupNode::DRAW )
 				{

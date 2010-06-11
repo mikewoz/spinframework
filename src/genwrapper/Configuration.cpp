@@ -1,7 +1,7 @@
 #include "Configuration.h"
 #include "Notify.h"
 
-#include <boost/spirit.hpp>
+#include <boost/spirit/include/classic.hpp>
 #include <boost/regex.hpp>
 
 #include <algorithm>
@@ -9,7 +9,7 @@
 #include <vector>
 #include <iterator>
 
-using namespace boost::spirit;
+using namespace boost::spirit::classic;
 
 struct config_grammar: public grammar<config_grammar>
 {

@@ -293,7 +293,7 @@ bool isVideoPath(std::string path)
 	
 	string extension = osgDB::getLowerCaseFileExtension(path);
 	
-	if (osgDB::getDirectoryContents(getAbsolutePath(path)).size())
+	if ((osgDB::getDirectoryContents(getAbsolutePath(path)).size()))
 	{
 		return true;
 	}
@@ -393,7 +393,7 @@ t_symbol *dogensym(const char *s, t_symbol *oldsym)
         s2++;
     }
     sym1 = symhash + (hash2 & (HASHSIZE-1));
-    while (sym2 = *sym1)
+    while ((sym2 = *sym1))
     {
         if (!strcmp(sym2->s_name, s)) return(sym2);
         sym1 = &sym2->s_next;

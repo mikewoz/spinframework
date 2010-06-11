@@ -27,7 +27,7 @@ esac
 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
-CXXFLAGS+=" -Wfatal-errors"
+CXXFLAGS+=" -Wall -Wfatal-errors"
 LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 AC_CONFIG_FILES([

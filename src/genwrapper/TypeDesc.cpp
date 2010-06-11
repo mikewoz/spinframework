@@ -5,15 +5,15 @@
 
 #include <boost/algorithm/string.hpp>
 
-bool FunctionDesc::is_constructor(const TypeDesc &decltype) const
+bool FunctionDesc::is_constructor(const TypeDesc &dtype) const
 {
-    return (TypeNameUtils::getUnqualifiedIdentifier(decltype.type_name) == TypeNameUtils::getUnqualifiedIdentifier(name)) && 
+    return (TypeNameUtils::getUnqualifiedIdentifier(dtype.type_name) == TypeNameUtils::getUnqualifiedIdentifier(name)) && 
         return_type_specifier.empty() && !is_destructor(); 
 }
 
-bool FunctionDesc::is_default_constructor(const TypeDesc &decltype) const
+bool FunctionDesc::is_default_constructor(const TypeDesc &dtype) const
 {
-    if (!is_constructor(decltype)) return false;
+    if (!is_constructor(dtype)) return false;
 
     int na = 0;
     for (ParameterList::const_iterator i=params.begin(); i!=params.end(); ++i)

@@ -256,6 +256,8 @@ void ShapeNode::drawShape()
 					b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
 					b->setNormal(osg::Vec3(0.0f,1.0f,0.0f));
 					break;
+                default:
+                    break;
 			}
 			shapeGeode = b;
 			
