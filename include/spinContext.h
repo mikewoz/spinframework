@@ -45,11 +45,11 @@
 #include <boost/python.hpp>
 #include <osg/Timer>
 
-#include "UserNode.h"
 #include "spinUtil.h"
 
 class SceneManager;
 class MediaManager;
+class UserNode;
 
 /**
  * \brief A class to facilitate communication with SPIN from any application.
