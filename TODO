@@ -1,0 +1,4 @@
+Server side tcp handlers
+1)clients can connect on a port (in TCP) which is broadcast by the server in multicast. The client tells the server its listening port/ip (again for TCP), which the server maintains in a list. the server then changes the port that it broadcasts.
+2)a new callback for that TCP port that responds to the dumpState message. the server then dumps the state to the client in the connection maintained in its list of connections.
+3)generic handler that dispatches calls to its callbacks (see bottom of SceneManager)
