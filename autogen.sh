@@ -7,7 +7,7 @@
 #fi
 
 
-./buildWrappers.sh
+#./buildWrappers.sh
 
 # could be replaced with autoreconf -fivI m4 (verbose, force rebuild of ltmain, .in files, etc.)
 #${LIBTOOLIZE} --force
