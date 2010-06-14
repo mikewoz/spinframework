@@ -33,9 +33,8 @@ LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 AC_CONFIG_FILES([
         Makefile 
         src/Makefile 
-        src/genwrapper/Makefile 
         src/tinyxml/Makefile 
-        src/osgWrappers/Makefile 
+        src/osgWrappers/introspection/Makefile 
         src/spin/Makefile])
 
 # Checks for programs.
