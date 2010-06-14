@@ -44,7 +44,7 @@
 
 #include "spinClientContext.h"
 #include "spinApp.h"
-#include "sceneManager.h"
+#include "SceneManager.h"
 
 
 

@@ -45,7 +45,7 @@
 
 #include "spinApp.h"
 #include "spinServerContext.h"
-#include "sceneManager.h"
+#include "SceneManager.h"
 #include "spinLog.h"
 #include "nodeVisitors.h"
 

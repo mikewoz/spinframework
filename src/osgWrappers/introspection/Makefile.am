@@ -21,12 +21,12 @@ noinst_LTLIBRARIES = libSPINwrappers.la
 #libSPINwrappers_la_SOURCES = #$(BUILT_SOURCES)
 libSPINwrappers_la_SOURCES = \
 	ReferencedNode.cpp ReferencedStateSet.cpp \
-        UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
-        GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
-        ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
-        AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
-        DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-        ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
+    UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
+    GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
+    ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
+    AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
+    DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
+    ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
 
 
 libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
