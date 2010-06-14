@@ -46,6 +46,7 @@
 #include "SoundConnection.h"
 #include "spinUtil.h"
 #include "osgUtil.h"
+#include "spinApp.h"
 
 #include "ImageTexture.h"
 #include "VideoTexture.h"
@@ -128,7 +129,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
     // add OSC callback methods to match various incoming messages:
 
-#ifdef OSCDEBUG
+#if 0
     // oscCallback_debug() will match any path and args:
     lo_server_thread_add_method(rxServ, NULL, NULL, SceneManagerCallback_debug, NULL);
 #endif
@@ -2150,7 +2151,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
         //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
 
         // HACK: TODO: fix this
-        spinContext &spin = spinContext::Instance();
+    	spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())
         {
 
@@ -2288,7 +2289,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 
     else {
 
-        spinContext &spin = spinContext::Instance();
+    	spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())
         {
             lo_message msg = lo_message_new();

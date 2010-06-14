@@ -43,11 +43,13 @@
 #include <iostream>
 
 #include <osgViewer/CompositeViewer>
+#include <osg/ArgumentParser>
 #include <osgDB/ReadFile>
 #include <osg/Timer>
 
 #include "SceneManager.h"
-#include "spinContext.h"
+#include "spinApp.h"
+#include "spinServerContext.h"
 #include "spinLog.h"
 
 // *****************************************************************************
@@ -55,22 +57,19 @@
 // *****************************************************************************
 int main(int argc, char **argv)
 {
-
-
-	//spinContext *spin = new spinContext(spinContext::SERVER_MODE);
-	spinContext &spin = spinContext::Instance();
-	spin.setMode(spinContext::SERVER_MODE);
+	spinServerContext *server = new spinServerContext();
 
 	// *************************************************************************
 	// ARGUMENTS::
 
 	osg::ArgumentParser arguments(&argc,argv);
 
-	std::string rxHost = lo_address_get_hostname(spin.lo_rxAddr);
-	std::string rxPort = lo_address_get_port(spin.lo_rxAddr);
-	std::string txHost = lo_address_get_hostname(spin.lo_txAddr);
-	std::string txPort = lo_address_get_port(spin.lo_txAddr);
-	std::string syncPort = lo_address_get_port(spin.lo_rxAddr);
+	std::string sceneID = spinApp::Instance().getSceneID();
+	std::string txHost = lo_address_get_hostname(server->lo_txAddr);
+	std::string txPort = lo_address_get_port(server->lo_txAddr);
+	std::string rxHost = lo_address_get_hostname(server->lo_rxAddr);
+	std::string rxPort = lo_address_get_port(server->lo_rxAddr);
+	std::string syncPort = lo_address_get_port(server->lo_rxAddr);
 
 	// set up the usage document, which a user can acess with -h or --help
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
@@ -91,28 +90,19 @@ int main(int argc, char **argv)
 		arguments.getApplicationUsage()->write(std::cout);
 		return 1;
 	}
-	osg::ArgumentParser::Parameter param_spinID(spin.id);
+	osg::ArgumentParser::Parameter param_spinID(sceneID);
 	arguments.read("-sceneID", param_spinID);
 
 	while (arguments.read("-txAddr", txHost, txPort)) {
-		spin.lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
+		server->lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
 	}
 	while (arguments.read("-rxAddr", rxHost, rxPort)) {
-		spin.lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
+		server->lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
 	while (arguments.read("-syncPort", syncPort)) {
-		spin.lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
+		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
 	}
-	/*
-	osg::ArgumentParser::Parameter param_txAddr(spin.txAddr);
-	arguments.read("-txAddr", param_txAddr);
-	osg::ArgumentParser::Parameter param_txPort(spin.txPort);
-	arguments.read("-txPort", param_txPort);
-	osg::ArgumentParser::Parameter param_rxAddr(spin.rxAddr);
-	arguments.read("-rxAddr", param_rxAddr);
-	osg::ArgumentParser::Parameter param_rxPort(spin.rxPort);
-	arguments.read("-rxPort", param_rxPort);
-	*/
+
 	
 	// any option left unread are converted into errors to write out later
 	arguments.reportRemainingOptionsAsUnrecognized();
@@ -121,7 +111,7 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// start spin:
 
-	spin.start();
+	server->start();
 
 	
 	// *************************************************************************
@@ -133,7 +123,7 @@ int main(int argc, char **argv)
 		if (arguments[i][0]!='-')
 		{
 			// not an option so assume string is a filename
-			spin.sceneManager->loadXML(arguments[i]);
+			spinApp::Instance().sceneManager->loadXML(arguments[i]);
 		} else i++;
 	}
 	 	
@@ -148,12 +138,12 @@ int main(int argc, char **argv)
 
 	
 	// send a userRefresh message:
-	spin.SceneMessage("s", "userRefresh", LO_ARGS_END);
+	spinApp::Instance().SceneMessage("s", "userRefresh", LO_ARGS_END);
 	
 	// *************************************************************************
 	// loop:
 	
-	while (spin.isRunning())
+	while (server->isRunning())
 	{
 		sleep(1);
 		// loop until a quit message is received (TODO)

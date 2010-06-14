@@ -44,6 +44,7 @@
 #include <vector>
 #include "osgUtil.h"
 #include "spinUtil.h"
+#include "spinApp.h"
 #include "SceneManager.h"
 
 using namespace osgGA;
@@ -52,7 +53,7 @@ using namespace osgGA;
 //ViewerManipulator::ViewerManipulator(UserNode *u)
 ViewerManipulator::ViewerManipulator()
 {
-	spinContext &spin = spinContext::Instance();
+	spinApp &spin = spinApp::Instance();
 	
 	if (spin.userNode.valid())
 	{
@@ -147,7 +148,7 @@ bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
 {
 	if (ea.getEventType()==GUIEventAdapter::FRAME)
 	{
-		spinContext &spin = spinContext::Instance();
+		spinApp &spin = spinApp::Instance();
 		
 		// update from NodeTrackerManipulator:
 		if (spin.userNode.valid())
@@ -707,7 +708,7 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, ...)
 
 void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list ap)
 {
-	spinContext &spin = spinContext::Instance();
+	spinApp &spin = spinApp::Instance();
 		
 	lo_message msg = lo_message_new();
 	int err = lo_message_add_varargs(msg, types, ap);

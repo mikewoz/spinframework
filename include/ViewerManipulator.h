@@ -46,10 +46,12 @@
 #include <osgViewer/View>
 #include <osgGA/NodeTrackerManipulator>
 
-#include "spinContext.h"
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
+#include "spinUtil.h"
+
+class GroupNode;
 
 /**
  * \brief This class provides camera control and picking for viewers that render
