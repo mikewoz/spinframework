@@ -136,8 +136,5 @@ class spinApp
         osg::Timer_t _syncStartTick;
 
         spinBaseContext *context;
-
-
-
 };
 #endif

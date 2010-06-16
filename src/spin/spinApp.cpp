@@ -280,7 +280,7 @@ void spinApp::InfoMessage(std::string OSCpath, lo_message msg)
 {
 	if (context)
 	{
-		lo_send_message_from(context->lo_infoAddr, lo_server_thread_get_server(context->lo_infoServ), OSCpath.c_str(), msg);
+		lo_send_message_from(context->lo_infoAddr, context->lo_infoServ, OSCpath.c_str(), msg);
 
 		// Let's free the message after (not sure if this is necessary):
 		lo_message_free(msg);

@@ -97,19 +97,18 @@ spinBaseContext::spinBaseContext()
     // set up infoPort listener thread:
     if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
-        lo_infoServ = lo_server_thread_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
+        lo_infoServ = lo_server_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
 
     } else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
-        lo_infoServ = lo_server_thread_new(lo_address_get_port(lo_infoAddr), oscParser_error);
-        int sock = lo_server_get_socket_fd(lo_server_thread_get_server(lo_infoServ));
+        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+        int sock = lo_server_get_socket_fd(lo_infoServ);
         int sockopt = 1;
         setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
 
     } else {
-        lo_infoServ = lo_server_thread_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
     }
-    lo_server_thread_start(lo_infoServ);
 }
 
 spinBaseContext::~spinBaseContext()
@@ -118,8 +117,7 @@ spinBaseContext::~spinBaseContext()
 
     if (lo_infoServ)
     {
-        lo_server_thread_stop(lo_infoServ);
-        lo_server_thread_free(lo_infoServ);
+        lo_server_free(lo_infoServ);
     }
 
     if (lo_rxAddr) lo_address_free(lo_rxAddr);

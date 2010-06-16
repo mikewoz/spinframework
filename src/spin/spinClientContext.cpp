@@ -56,7 +56,7 @@ spinClientContext::spinClientContext()
 	// Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
-    lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+    lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
 }
 
 spinClientContext::~spinClientContext()
@@ -107,11 +107,10 @@ void *spinClientContext::spinClientThread(void *arg)
     fromString<int>(i_rxPort, lo_address_get_port(spin.getContext()->lo_rxAddr));
 
     thiss->running = true;
+    static const int TIMEOUT = 10;
     while (!spinBaseContext::signalStop)
     {
-        // TODO: lo_server_recv_noblock(lo_infoServ, TIMEOUT = 10)
-        usleep(1000000 * 0.25); // 1/4 second sleep
-
+        lo_server_recv_noblock(spin.getContext()->lo_infoServ, TIMEOUT); // was 250 ms before
         // do nothing (assume the app is doing updates - eg, in a draw loop)
 
         // just send a ping so the server knows we are still here

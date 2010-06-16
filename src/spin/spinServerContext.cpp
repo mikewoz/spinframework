@@ -65,8 +65,7 @@ spinServerContext::spinServerContext()
     lo_txAddr = lo_address_new("226.0.0.1", "54323");
 
     // add info channel callback (receives pings from client apps):
-    lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
-
+    lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
 }
 
 spinServerContext::~spinServerContext()
@@ -149,6 +148,7 @@ void *spinServerContext::spinServerThread(void *arg)
     thiss->startSyncThread();
 
     thiss->running = true;
+    static const int TIMEOUT = 10;
     while (!spinBaseContext::signalStop)
     {
         frameTick = osg::Timer::instance()->tick();
@@ -167,8 +167,7 @@ void *spinServerContext::spinServerThread(void *arg)
         visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
         pthread_mutex_unlock(&pthreadLock);
 
-        // TODO: lo_server_recv_noblock(lo_infoServ, TIMEOUT = 10)
-        usleep(1000);
+        lo_server_recv_noblock(spin.getContext()->lo_infoServ, TIMEOUT);
     }
     thiss->running = false;
 

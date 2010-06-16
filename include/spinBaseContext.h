@@ -99,11 +99,10 @@ class spinBaseContext
         lo_address lo_txAddr;
         lo_address lo_infoAddr;
         lo_address lo_syncAddr;
+        lo_server lo_infoServ;
 
     protected:
 
-        // This is justified because spinApp and spinBaseContext used to be one class
-        friend class spinApp;
         bool running;
         spinContextMode mode;
         /**
@@ -112,7 +111,6 @@ class spinBaseContext
          * ports to send messages. The server can listen to pings from clients
          * to determine if they are still alive and connected.
          */
-        lo_server_thread lo_infoServ;
 
 
     private:
