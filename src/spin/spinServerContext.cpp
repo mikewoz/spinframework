@@ -60,9 +60,6 @@ spinServerContext::spinServerContext()
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
 
-
-
-
 	// override sender and receiver addresses in server mode:
     lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
     lo_txAddr = lo_address_new("226.0.0.1", "54323");
@@ -74,7 +71,6 @@ spinServerContext::spinServerContext()
 
 spinServerContext::~spinServerContext()
 {
-
 }
 
 bool spinServerContext::start()
@@ -105,9 +101,6 @@ void spinServerContext::startSyncThread()
 }
 
 // *****************************************************************************
-
-
-
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -116,7 +109,6 @@ void *spinServerContext::spinServerThread(void *arg)
 {
 	spinServerContext *thiss = (spinServerContext*)(arg);
 	spinApp &spin = spinApp::Instance();
-
 
     spin.sceneManager = new SceneManager(spin.getSceneID(), lo_address_get_hostname(spin.getContext()->lo_rxAddr), lo_address_get_port(spin.getContext()->lo_rxAddr));
     spin.sceneManager->setTXaddress(lo_address_get_hostname(spin.getContext()->lo_txAddr), lo_address_get_port(spin.getContext()->lo_txAddr));
@@ -127,7 +119,6 @@ void *spinServerContext::spinServerThread(void *arg)
 
     spin.execPython(cmd);
     spin.execPython("import spin");
-
 
     // create log filename based on datetime:
     time_t t = time(NULL);
@@ -141,7 +132,6 @@ void *spinServerContext::spinServerThread(void *arg)
     log.enable_cout(false);
     spin.sceneManager->setLog(log);
 
-
     std::string myIP = getMyIPaddress();
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
@@ -154,12 +144,10 @@ void *spinServerContext::spinServerThread(void *arg)
 
     UpdateSceneVisitor visitor;
 
-
     //lo_server_thread_add_method(spin->sceneManager->rxServ, NULL, NULL, sceneCallback, spin);
 
     // start sync (timecode) thread:
     thiss->startSyncThread();
-
 
     thiss->running = true;
     while (!spinBaseContext::signalStop)
@@ -183,7 +171,6 @@ void *spinServerContext::spinServerThread(void *arg)
         usleep(1000);
     }
     thiss->running = false;
-
 
     // clean up:
     delete spin.sceneManager;

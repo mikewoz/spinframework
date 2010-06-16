@@ -70,15 +70,12 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 bool spinBaseContext::signalStop = false;
 
-
-
 spinBaseContext::spinBaseContext()
 {
 	signalStop = true;
     running = false;
 
     signal(SIGINT, sigHandler);
-
 
     // set default addresses (can be overridden):
     lo_infoAddr = lo_address_new("226.0.0.1", "54320");
@@ -113,7 +110,6 @@ spinBaseContext::spinBaseContext()
         lo_infoServ = lo_server_thread_new(lo_address_get_port(lo_infoAddr), oscParser_error);
     }
     lo_server_thread_start(lo_infoServ);
-
 }
 
 spinBaseContext::~spinBaseContext()
@@ -131,8 +127,6 @@ spinBaseContext::~spinBaseContext()
     if (lo_infoAddr) lo_address_free(lo_infoAddr);
     if (lo_syncAddr) lo_address_free(lo_syncAddr);
 }
-
-
 
 void spinBaseContext::sigHandler(int signum)
 {
@@ -157,8 +151,6 @@ void spinBaseContext::sigHandler(int signum)
     spinBaseContext::signalStop = true;
 
 }
-
-
 
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
