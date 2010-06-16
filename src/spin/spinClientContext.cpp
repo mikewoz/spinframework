@@ -58,8 +58,8 @@ spinClientContext::spinClientContext()
     spin.setContext(this);
 
 
-    lo_rxAddr = lo_address_new("224.0.0.1", "54323");
-    lo_txAddr = lo_address_new("224.0.0.1", "54324");
+    lo_rxAddr = lo_address_new("226.0.0.1", "54323");
+    lo_txAddr = lo_address_new("226.0.0.1", "54324");
 
 }
 

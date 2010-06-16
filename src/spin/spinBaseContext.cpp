@@ -81,10 +81,10 @@ spinBaseContext::spinBaseContext()
 
 
     // set default addresses (can be overridden):
-    lo_infoAddr = lo_address_new("224.0.0.1", "54320");
-    lo_rxAddr = lo_address_new("224.0.0.1", "54323");
-    lo_txAddr = lo_address_new("224.0.0.1", "54324");
-    lo_syncAddr = lo_address_new("224.0.0.1", "54321");
+    lo_infoAddr = lo_address_new("226.0.0.1", "54320");
+    lo_rxAddr = lo_address_new("226.0.0.1", "54323");
+    lo_txAddr = lo_address_new("226.0.0.1", "54324");
+    lo_syncAddr = lo_address_new("226.0.0.1", "54321");
 
 
     // override infoPort based on environment variable:
