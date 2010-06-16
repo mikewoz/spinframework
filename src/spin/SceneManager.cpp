@@ -338,6 +338,8 @@ void SceneManager::setTXaddress (std::string addr, std::string port)
 
     if (isMulticastAddress(addr))
     {
+        // This is just for a "slight" gain in efficiency, we never receive anything
+        // on this server, it's so we can use lo_send_message_from instead of lo_send
         txServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
     }
 

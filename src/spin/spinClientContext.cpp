@@ -56,11 +56,6 @@ spinClientContext::spinClientContext()
 	// Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
-
-
-    lo_rxAddr = lo_address_new("226.0.0.1", "54323");
-    lo_txAddr = lo_address_new("226.0.0.1", "54324");
-
 }
 
 spinClientContext::~spinClientContext()
@@ -113,8 +108,6 @@ void *spinClientContext::spinClientThread(void *arg)
     thiss->running = true;
     while (!spinBaseContext::signalStop)
     {
-
-
         usleep(1000000 * 0.25); // 1/4 second sleep
 
         // do nothing (assume the app is doing updates - eg, in a draw loop)
@@ -126,7 +119,6 @@ void *spinClientContext::spinClientThread(void *arg)
             if (spin.userNode.valid()) spin.InfoMessage("/ping/user", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
             lastTick = frameTick;
         }
-
     }
     thiss->running = false;
 
