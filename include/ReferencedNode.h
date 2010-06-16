@@ -153,7 +153,7 @@ public:
     /**
      * Returns the current parent as an osg::Group
      */
-    osg::Group *getParent(unsigned int i) { return osg::Group::getParent(i); }
+    osg::Group *getParent(int i) { return osg::Group::getParent(i); }
 
     /**
      * A node can 'belong' to a certain host machine, allowing it to be rendered

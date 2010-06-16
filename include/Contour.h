@@ -80,7 +80,7 @@ public:
 	virtual void callbackUpdate();
 	
 	void updateTransforms();
-	osg::Quat getOrientation(unsigned index);
+	osg::Quat getOrientation(int index);
 	osg::Vec3 getTranslation(float index);
 	
 	void setCurrentIndex (float newValue);

@@ -156,7 +156,7 @@ void Contour::updateTransforms()
 // This function gets the orientation of a given index into the soundLine. Note
 // that the orientation along a line has only 2 degrees of freedom (roll is not
 // defined). So we specify the Y_AXIS.
-osg::Quat Contour::getOrientation(unsigned index)
+osg::Quat Contour::getOrientation(int index)
 {
 	if (_vArray->size() < 2)
 	{

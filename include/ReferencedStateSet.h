@@ -113,7 +113,7 @@ class ReferencedStateSet_callback : public osg::StateSet::StateSet::Callback
 {
 	public:
 		
-		virtual void operator()(osg::StateSet* ss, osg::NodeVisitor* nv)
+		virtual void operator()(osg::StateSet* ss, osg::NodeVisitor* /*nv*/)
 		{
 			osg::ref_ptr<ReferencedStateSet> thisState = dynamic_cast<ReferencedStateSet*> (ss->getUserData());
 

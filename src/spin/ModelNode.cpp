@@ -163,7 +163,7 @@ void ModelNode::setKeyframe (int index, float keyframe)
 	BROADCAST(this, "sif", "setKeyframe", index, _keyframe[index]);
 }
 
-void ModelNode::setStateSet (unsigned i, const char *replacement)
+void ModelNode::setStateSet (int i, const char *replacement)
 {
 	osg::ref_ptr<ReferencedStateSet> ssOrig, ssReplacement;
 

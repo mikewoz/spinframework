@@ -72,9 +72,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __char_P1__getParent,
 	          "",
 	          "Returns the current parent name (string) ");
-	I_Method1(osg::Group *, getParent, IN, unsigned int, i,
+	I_Method1(osg::Group *, getParent, IN, int, i,
 	          Properties::NON_VIRTUAL,
-	          __osg_Group_P1__getParent__unsigned_int,
+	          __osg_Group_P1__getParent__int,
 	          "",
 	          "Returns the current parent as an osg::Group ");
 	I_Method1(void, setContext, IN, const char *, newvalue,
