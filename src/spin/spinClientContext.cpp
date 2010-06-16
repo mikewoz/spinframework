@@ -56,6 +56,7 @@ spinClientContext::spinClientContext()
 	// Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
+    lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
 }
 
 spinClientContext::~spinClientContext()
@@ -108,6 +109,7 @@ void *spinClientContext::spinClientThread(void *arg)
     thiss->running = true;
     while (!spinBaseContext::signalStop)
     {
+        // TODO: lo_server_recv_noblock(lo_infoServ, TIMEOUT = 10)
         usleep(1000000 * 0.25); // 1/4 second sleep
 
         // do nothing (assume the app is doing updates - eg, in a draw loop)
@@ -131,7 +133,8 @@ void *spinClientContext::spinClientThread(void *arg)
 }
 
 
-int spinClientContext::sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+int spinClientContext::sceneCallback(const char * /*path*/, const char *types, lo_arg **argv, 
+        int argc, lo_message /*msg*/, void * /*user_data*/)
 {
     spinApp &spin = spinApp::Instance();
 
@@ -170,7 +173,8 @@ int spinClientContext::sceneCallback(const char *path, const char *types, lo_arg
 }
 
 
-int spinClientContext::syncCallback(const char *path, const char *types, lo_arg **argv, int argc, lo_message msg, void *user_data)
+int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo_arg **argv, int argc, 
+        lo_message /*msg*/, void * /*user_data*/)
 {
 	spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -223,6 +227,15 @@ int spinClientContext::syncCallback(const char *path, const char *types, lo_arg 
 
 
     }
+
+    return 1;
+}
+
+int spinClientContext::infoCallback(const char * /*path*/, const char *types, lo_arg **argv, 
+        int argc, void *data, void * /*user_data*/)
+{
+    //spinApp &spin = spinApp::Instance();
+    // TODO: get server port upon which client can connect 
 
     return 1;
 }

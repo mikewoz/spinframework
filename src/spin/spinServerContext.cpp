@@ -167,6 +167,7 @@ void *spinServerContext::spinServerThread(void *arg)
         visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
         pthread_mutex_unlock(&pthreadLock);
 
+        // TODO: lo_server_recv_noblock(lo_infoServ, TIMEOUT = 10)
         usleep(1000);
     }
     thiss->running = false;

@@ -116,7 +116,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
     // set up OSC event listener:
 
-    rxAddr = lo_address_new(addr.c_str(), port.c_str());
+    //rxAddr = lo_address_new(addr.c_str(), port.c_str());
 
     if (isMulticastAddress(addr))
     {
@@ -144,7 +144,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
     std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
-    std::cout << "  SceneManager receiving on:\t" << lo_address_get_url(rxAddr) << std::endl;
+    std::cout << "  SceneManager receiving on:\t" << addr << std::endl;
 
 
     // discover all relevant nodeTypes by introspection, and fill the nodeMap

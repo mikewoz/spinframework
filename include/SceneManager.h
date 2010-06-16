@@ -95,7 +95,7 @@ class SceneManager
         void init();
         void debug();
 
-        lo_address rxAddr;
+        //lo_address rxAddr;
         lo_server_thread rxServ;
 
         lo_address txAddr;

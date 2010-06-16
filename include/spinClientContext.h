@@ -86,5 +86,12 @@ class spinClientContext : public spinBaseContext
          * the server, and adjust its internal clock to match the server
          */
         static int syncCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+        
+        /**
+         * The client uses infoCallback to find out which port it can connect to 
+         * on a server. 
+         */
+        static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
 };
 #endif
