@@ -145,7 +145,7 @@ void ShapeNode::setTextureFromFile (const char* s)
 	if (path==texturePath) return;
 	else texturePath=path;
 	
-	//drawTeœxture();
+	//drawTexture();
 
 	BROADCAST(this, "ss", "setTextureFromFile", texturePath.c_str());
 }

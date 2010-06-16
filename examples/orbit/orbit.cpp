@@ -1,5 +1,6 @@
 #include <spinFramework/spinUtil.h>
-#include <spinFramework/spinContext.h>
+#include <spinFramework/spinApp.h>
+#include <spinFramework/spinClientContext.h>
 #include <spinFramework/ShapeNode.h>
 #include <iostream>
 #include <cstdlib>
@@ -12,13 +13,16 @@
 
 int main(int argc, char **argv)
 {
-	spinContext &spin = spinContext::Instance();
+	spinClientContext *spinListener = new spinClientContext();
 
-	if (!spin.start())
+	if (!spinListener->start())
 	{
         std::cout << "ERROR: could not start SPIN client thread" << std::endl;
         exit(1);
 	}
+
+	spinApp &spin = spinApp::Instance();
+
 
 	spin.SceneMessage("sss",
 			"createNode",
@@ -38,7 +42,7 @@ int main(int argc, char **argv)
 	std::cout << "\nRunning example. Press CTRL-C to quit..." << std::endl;
 
 
-    while (spin.isRunning()) // send signal (eg, ctrl-c to stop)
+    while (spinListener->isRunning()) // send signal (eg, ctrl-c to stop)
     {
 		for (int i=0;i<numSamples;++i)
 		{

@@ -53,7 +53,6 @@
 #include "ReferencedStateSet.h"
 
 #include "UserNode.h"
-#include "spinContext.h"
 
 #ifdef WITH_SHARED_VIDEO
 #include "SharedVideoTexture.h"

@@ -1,2 +1,2 @@
-SUBDIRS=genwrapper tinyxml osgWrappers spin
+SUBDIRS= tinyxml osgWrappers/introspection spin
 

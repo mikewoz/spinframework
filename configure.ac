@@ -27,15 +27,14 @@ esac
 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
-CXXFLAGS+=" -Wall -Wfatal-errors"
+CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
 LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 AC_CONFIG_FILES([
         Makefile 
         src/Makefile 
-        src/genwrapper/Makefile 
         src/tinyxml/Makefile 
-        src/osgWrappers/Makefile 
+        src/osgWrappers/introspection/Makefile 
         src/spin/Makefile])
 
 # Checks for programs.

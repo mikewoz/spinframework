@@ -56,7 +56,8 @@
 
 #include "ViewerManipulator.h"
 #include "spinUtil.h"
-#include "spinContext.h"
+#include "spinApp.h"
+#include "spinClientContext.h"
 #include "osgUtil.h"
 #include "GroupNode.h"
 #include "SceneManager.h"
@@ -72,10 +73,8 @@ int main(int argc, char **argv)
 {
 	std::cout <<"\nspinViewer launching..." << std::endl;
 
-	//spinContext spin = new spinContext(spinContext::LISTENER_MODE);
-	// Singleton instance:
-	spinContext &spin = spinContext::Instance();
-	spin.setMode(spinContext::LISTENER_MODE);
+	spinClientContext *spinListener = new spinClientContext();
+	spinApp &spin = spinApp::Instance();
 
 	std::string id = getHostname();
 	
@@ -95,9 +94,10 @@ int main(int argc, char **argv)
 	
 	std::string redirectAddr, redirectPort;
 
-	std::string rxHost = lo_address_get_hostname(spin.lo_rxAddr);
-	std::string rxPort = lo_address_get_port(spin.lo_rxAddr);
-	std::string syncPort = lo_address_get_port(spin.lo_rxAddr);
+	std::string sceneID = spin.getSceneID();
+	std::string rxHost = lo_address_get_hostname(spinListener->lo_rxAddr);
+	std::string rxPort = lo_address_get_port(spinListener->lo_rxAddr);
+	std::string syncPort = lo_address_get_port(spinListener->lo_rxAddr);
 
 
 	// *************************************************************************
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
 	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify an ID for this viewer (Default is hostname: '" + id + "')");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + spin.id + "')");
+	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
 	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <host> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("-serverSync <port>", "Set the receiving port for timecode sync (Default: " + syncPort + ")");
 
@@ -141,14 +141,15 @@ int main(int argc, char **argv)
 
 	osg::ArgumentParser::Parameter param_id(id);
 	arguments.read("-id", param_id);
-	osg::ArgumentParser::Parameter param_spinID(spin.id);
+	osg::ArgumentParser::Parameter param_spinID(sceneID);
 	arguments.read("-sceneID", param_spinID);
+	spin.setSceneID(sceneID);
 
 	while (arguments.read("-serverAddr", rxHost, rxPort)) {
-		spin.lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
+		spinListener->lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
 	while (arguments.read("-syncPort", syncPort)) {
-		spin.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
+		spinListener->lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
 	}
 
 	if (arguments.read("--fullscreen")) fullscreen=true;
@@ -180,9 +181,9 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// start the listener thread:
 
-	if (!spin.start())
+	if (!spinListener->start())
 	{
-        std::cout << "ERROR: could not start SPIN listener thread" << std::endl;
+        std::cout << "ERROR: could not start SPIN listener" << std::endl;
         exit(1);
 	}
 
@@ -283,7 +284,7 @@ int main(int argc, char **argv)
 	{
 		//std::cout << "frame: " << view->getFrameStamp()->getSimulationTime() << std::endl;
 		
-		if (spin.isRunning())
+		if (spinListener->isRunning())
 		{
 			osg::Timer_t startFrameTick = osg::Timer::instance()->tick();
 			

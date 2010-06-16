@@ -57,6 +57,9 @@ namespace osgViewer {
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
+#include "spinUtil.h"
+
+class GroupNode;
 
 /**
  * \brief This class provides camera control and picking for viewers that render
@@ -116,7 +119,6 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		
 		osg::Vec3 lastHitPoint;
 };
-
 
 
 #endif

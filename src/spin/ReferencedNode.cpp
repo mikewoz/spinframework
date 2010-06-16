@@ -46,6 +46,7 @@
 
 #include <exception>
 
+#include "spinApp.h"
 #include "ReferencedNode.h"
 #include "SceneManager.h"
 
@@ -520,7 +521,7 @@ bool ReferencedNode::setScript( const char *scriptPath )
 	const std::string& scr = string(scriptPath);
 	const std::string& params = "";
 
-    spinContext &spin = spinContext::Instance();
+	spinApp &spin = spinApp::Instance();
     printf("moo?\n");
     _scriptFile = sceneManager->resourcesPath + "/scripts/" + scr;
     printf("moo! [%s]\n", _scriptFile.c_str());
@@ -577,7 +578,7 @@ bool ReferencedNode::setScript( const char *scriptPath )
 
 bool ReferencedNode::addEventScript( const std::string& eventName, const std::string& scr, const std::string& params ) {
 
-    spinContext &spin = spinContext::Instance();
+	spinApp &spin = spinApp::Instance();
     printf("moo?\n");
 
 

@@ -80,7 +80,7 @@
 #include <osgIntrospection/variant_cast>
 
 
-#include "spinContext.h"
+#include "spinApp.h"
 #include "SceneManager.h"
 
 using namespace boost::python;

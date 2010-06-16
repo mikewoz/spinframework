@@ -22,7 +22,8 @@ libSPIN_la_LDFLAGS = \
 	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS)
 
 libSPIN_la_SOURCES = \
-	spinContext.cpp osgUtil.cpp spinUtil.cpp libloUtil.cpp \
+	spinApp.cpp spinBaseContext.cpp spinClientContext.cpp spinServerContext.cpp \
+	osgUtil.cpp spinUtil.cpp libloUtil.cpp \
 	SceneManager.cpp MediaManager.cpp ViewerManipulator.cpp \
 	ReferencedNode.cpp ReferencedStateSet.cpp \
 	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
