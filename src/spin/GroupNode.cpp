@@ -119,7 +119,7 @@ void GroupNode::callbackUpdate()
     // Now we need to update translation/orientation based on our velocity/spin.
     // We find out how many seconds passed since the last time this was called,
     // and move by _velocity*dt (ie, m/s) and rotate by _spin*dt (ie, deg/sec)
-    if ( !sceneManager->isSlave() )
+    if ( spinApp::Instance().getContext()->isServer() )
     {
         osg::Timer_t tick = osg::Timer::instance()->tick();
         float dt = osg::Timer::instance()->delta_s(lastTick,tick);

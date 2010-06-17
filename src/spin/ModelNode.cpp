@@ -253,7 +253,7 @@ void ModelNode::drawModel()
 		}
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
+	bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() and (this->getContext()==getHostname()));
 	
 	if ((modelPath != string("NULL")) && !ignoreOnThisHost)
 	{

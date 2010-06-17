@@ -126,8 +126,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         rxServ = lo_server_thread_new(port.c_str(), oscParser_error);
     }
 
-    txServ = NULL;
-
     // add OSC callback methods to match various incoming messages:
 
 #if 0
@@ -307,10 +305,7 @@ SceneManager::~SceneManager()
     lo_server_thread_stop(rxServ);
     usleep(100);
 
-    if (txServ) lo_server_free(txServ);
     if (rxServ) lo_server_thread_free(rxServ);
-    //if (txAddr) lo_address_free(txAddr);
-    //if (rxAddr) lo_address_free(rxAddr);
 
 }
 
@@ -320,42 +315,6 @@ void SceneManager::setLog(spinLog &log)
     // remove existing callback:
 
     lo_server_thread_add_method(rxServ, NULL, NULL, SceneManagerCallback_log, &log);
-}
-
-void SceneManager::setTXaddress (std::string addr, std::string port)
-{
-    // Note that only a spinServer will set the txAddr, so that events are
-    // re-broadcasted. Other apps, such as simple renderers/editors/etc will
-    // leave the txAddr null.
-
-    // events for this scene are broadcasted to the following address:
-    txAddr = lo_address_new(addr.c_str(), port.c_str());
-
-    if (isMulticastAddress(addr))
-    {
-        // This is just for a "slight" gain in efficiency, we never receive anything
-        // on this server, it's so we can use lo_send_message_from instead of lo_send
-        txServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-    }
-
-    else if (isBroadcastAddress(addr))
-    {
-        txServ = lo_server_new(NULL, oscParser_error);
-        int sock = lo_server_get_socket_fd(txServ);
-        int sockopt = 1;
-        setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
-    }
-
-    else {
-        txServ = lo_server_new(NULL, oscParser_error);
-    }
-
-    if (!txServ) std::cout << "ERROR: SceneManager::setTXaddress(). Bad address?: " << addr << ":" << port << std::endl;
-    else
-    {
-        std::cout << "  SceneManager sending to:\t" << lo_address_get_url(txAddr) << std::endl;
-        //std::cout << "  ... via liblo server: " << lo_server_get_url(txServ) << std::endl;
-    }
 }
 
 // *****************************************************************************
@@ -393,9 +352,6 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 void SceneManager::sendNodeList(std::string typeFilter)
 {
     // TODO: typeFilter not used yet
-
-    if (!txServ) return;
-
     std::string OSCpath = "/SPIN/" + sceneID;
     lo_message msg;
 
@@ -430,7 +386,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
                 }
 
                 msgs.push_back(msg);
-                //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
             }
         }
 
@@ -461,7 +416,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
                 }
 
                 msgs.push_back(msg);
-                //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
             }
         }
 
@@ -499,7 +453,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
                     }
 
                     msgs.push_back(msg);
-                    //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
                 }
             }
             {
@@ -523,7 +476,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
                     }
 
                     msgs.push_back(msg);
-                    //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
                 }
             }
 
@@ -672,7 +624,6 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
             return NULL;
         } else {
             //SCENE_MSG(this, "sss", "createNode", id, type);
-            //if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
             return n.get();
         }
     }
@@ -782,13 +733,6 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
         // broadcast (only if this is the server):
         SCENE_MSG("sss", "createNode", id, type);
-        /*
-        if (this->isServer())
-        {
-            lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
-        }
-        */
-
         return n.get();
     }
     else
@@ -1139,10 +1083,6 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     // time, the destructor for the node should be called
     //char *nodeID = n->id->s_name; // but remember the name for the broadcast
     n = NULL;
-
-    // finally, broadcast:
-    //if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", nodeID);
-
 }
 
 
@@ -2056,7 +1996,6 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
                 }
             }
 
-            //lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
         }
 #endif
     }
@@ -2134,8 +2073,6 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
     else if (theMethod=="userRefresh")
     {
         SCENE_MSG("s", "userRefresh");
-        //lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID).c_str(), "s", "uesrRefresh");
-        //sceneManager->sendSceneMessage("s", "userRefresh", LO_ARGS_END);
     }
     else if (theMethod=="refresh")
         sceneManager->refresh();
@@ -2175,9 +2112,6 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
         sceneManager->deleteNode((char*)argv[1]);
     else if ((theMethod=="deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*)argv[1]);
-//  else if ((theMethod=="setGrid") && (argc==2))
-//      if (lo_is_numerical_type((lo_type)types[1])) sceneManager->setGrid((int) lo_hires_val((lo_type)types[1], argv[1]));
-
     else {
             // FIXME: this used to rebroadcast messages that did not match command
 #if 0

@@ -91,14 +91,6 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
     registerNode(sceneManager);
 
 
-    if (strcmp(initID, "potato") == 0 && !sceneManager->isSlave() ) {
-        printf("I am potato\n");
-        //setScript("orbit.py", "");
-        setScript("orbit.py");
-        addEventScript("setTranslation","hotspot.py", "");
-    }
-
-
     this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
 
     attach();

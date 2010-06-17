@@ -109,7 +109,6 @@ void *spinServerContext::spinServerThread(void *arg)
 	spinApp &spin = spinApp::Instance();
 
     spin.sceneManager = new SceneManager(spin.getSceneID(), lo_address_get_hostname(spin.getContext()->lo_rxAddr), lo_address_get_port(spin.getContext()->lo_rxAddr));
-    spin.sceneManager->setTXaddress(lo_address_get_hostname(spin.getContext()->lo_txAddr), lo_address_get_port(spin.getContext()->lo_txAddr));
 
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
@@ -159,7 +158,7 @@ void *spinServerContext::spinServerThread(void *arg)
                     lo_address_get_hostname(spin.getContext()->lo_txAddr), i_txPort,
                     i_syncPort,
                     LO_ARGS_END);
-            //lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
+            
             lastTick = frameTick;
         }
 

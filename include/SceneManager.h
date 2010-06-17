@@ -97,24 +97,14 @@ class SceneManager
 
         lo_server_thread rxServ;
 
-        lo_address txAddr;
-        lo_server  txServ;
-        //lo_server_thread  txServ;
-
-        bool isServer() { return (bool) txServ; }
-        bool isSlave() { return (bool) !txServ; }
-
         void setGraphical(bool b) { graphicalMode = b; }
         bool isGraphical() { return (bool) graphicalMode; }
 
         //void setLogFile(const char *logfile);
         void setLog(spinLog& log);
 
-        void setTXaddress (std::string addr, std::string port);
-
         void registerStateSet(ReferencedStateSet *s);
         void unregisterStateSet(ReferencedStateSet *s);
-
 
         void sendNodeList(std::string type);
         void sendConnectionList();

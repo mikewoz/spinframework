@@ -99,7 +99,8 @@ void AnimationNode::callbackUpdate()
 
     ReferencedNode::callbackUpdate();
 
-    if ( !sceneManager->isSlave() && getPlay() && !_animationPath->empty())
+    if ( spinApp::Instance().getContext()->isServer() and getPlay() 
+            and not _animationPath->empty())
     {
         osg::Timer_t tick = osg::Timer::instance()->tick();
         float dt = osg::Timer::instance()->delta_s(_lastTick,tick);

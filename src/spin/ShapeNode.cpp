@@ -228,7 +228,8 @@ void ShapeNode::drawShape()
 		shapeGeode = NULL;
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
+	bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() 
+            and (this->getContext()==getHostname()));
 
 	//std::cout << "ShapeNode " << this->id->s_name << " ignore? " << (int)ignoreOnThisHost << std::endl;
 

@@ -165,8 +165,7 @@ void TextNode::drawText()
 		textGeode = NULL;
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
-	
+	bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() && (this->getContext()==getHostname()));
 
 	if (!ignoreOnThisHost)
 	{
