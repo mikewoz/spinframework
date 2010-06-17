@@ -374,3 +374,33 @@ void spinApp::SceneMessage(lo_message msg)
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);
 }
+
+
+void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
+{
+    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name); 
+    sendBundle(OSCpath,msgs);
+}
+
+void spinApp::SceneBundle(std::vector<lo_message> msgs)
+{
+    std::string OSCpath = "/SPIN/" + sceneID;
+    sendBundle(OSCpath, msgs);
+}
+
+void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
+{
+    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+
+    std::vector<lo_message>::iterator iter = msgs.begin();
+    while (iter != msgs.end())
+    {
+        //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
+        lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+        msgs.erase(iter); // iterator automatically advances after erase()
+    }
+
+    lo_send_bundle(context->lo_txAddr, b);
+    lo_bundle_free_messages(b);
+}
+

@@ -208,7 +208,7 @@ void *spinServerContext::syncThread(void * /*arg*/)
     return 0;
 }
 
-int spinServerContext::infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int spinServerContext::infoCallback(const char * /*path*/, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     //spinApp &spin = spinApp::Instance();
 

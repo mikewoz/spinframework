@@ -231,7 +231,7 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
 }
 
 int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*/, lo_arg ** /*argv*/, 
-        int argc, void *data, void * /*user_data*/)
+        int /*argc*/, void * /*data*/, void * /*user_data*/)
 {
     //spinApp &spin = spinApp::Instance();
     // TODO: get server port upon which client can connect 

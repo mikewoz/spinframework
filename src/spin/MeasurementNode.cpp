@@ -157,7 +157,7 @@ void MeasurementNode::callbackUpdate()
         lo_message_add( msg, "sf", "targetIncidence", snkIncidence );
         msgs.push_back(msg);
 
-        sceneManager->sendNodeBundle(this->id, msgs);
+        spinApp::Instance().NodeBundle(this->id, msgs);
 
     }
 

@@ -95,7 +95,6 @@ class SceneManager
         void init();
         void debug();
 
-        //lo_address rxAddr;
         lo_server_thread rxServ;
 
         lo_address txAddr;
@@ -119,10 +118,6 @@ class SceneManager
 
         void sendNodeList(std::string type);
         void sendConnectionList();
-        void sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
-        void sendSceneBundle(std::vector<lo_message> msgs);
-        void sendBundle(std::string OSCpath, std::vector<lo_message> msgs);
-
 
         ReferencedNode *createNode(std::string id, std::string type);
         ReferencedNode *createNode(const char *id, const char *type);

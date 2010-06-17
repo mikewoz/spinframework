@@ -479,7 +479,7 @@ std::vector<lo_message> SoundConnection::getState ()
 void SoundConnection::stateDump ()
 {
 
-	sceneManager->sendNodeBundle(this->id, this->getState());
+    spinApp::Instance().NodeBundle(this->id, this->getState());
 	
 	/*
 	vector<lo_message> nodeState = this->getState();

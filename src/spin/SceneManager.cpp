@@ -530,8 +530,7 @@ void SceneManager::sendNodeList(std::string typeFilter)
         }
     }
 
-    sendSceneBundle(msgs);
-
+    spinApp::Instance().SceneBundle(msgs);
 }
 
 void SceneManager::sendConnectionList()
@@ -555,112 +554,8 @@ void SceneManager::sendConnectionList()
         lo_message_add_string(msg, "NULL" );
     }
 
-    std::string OSCpath = "/SPIN/" + sceneID;
-
-    lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
+    SCENE_LO_MSG(msg);
 }
-
-void SceneManager::sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
-{
-    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
-    sendBundle(OSCpath,msgs);
-}
-
-void SceneManager::sendSceneBundle(std::vector<lo_message> msgs)
-{
-    std::string OSCpath = "/SPIN/" + sceneID;
-    sendBundle(OSCpath,msgs);
-}
-
-void SceneManager::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
-{
-    if (!txServ) return;
-
-    /*
-    lo_timetag now;
-    lo_timetag_now(&now);
-    now.sec += 1;
-    lo_bundle b = lo_bundle_new(now);
-     */
-
-    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
-
-    std::vector<lo_message>::iterator iter = msgs.begin();
-    while (iter != msgs.end())
-    {
-        //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
-        lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
-        msgs.erase(iter); // iterator automatically advances after erase()
-    }
-
-    lo_send_bundle_from(txAddr, txServ, b);
-    //lo_send_bundle(txAddr, b);
-
-    lo_bundle_free_messages(b);
-
-}
-
-/*
-
-
-void SceneManager::sendSceneMessage(const char *types, ...)
-{
-    if (!txServ) return;
-
-
-    lo_message msg = lo_message_new();
-
-    va_list ap;
-    va_start(ap, types);
-
-    int err = lo_message_add_varargs(msg, types, ap);
-
-    if (!err)
-    {
-        string OSCpath = "/SPIN/" + sceneID;
-        lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
-    } else {
-        std::cout << "ERROR (lo_message_add_varargs): " << err << std::endl;
-    }
-
-    //lo_message_free(msg);
-}
-
-
-void SceneManager::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
-{
-    if (!txServ) return;
-
-    string OSCpath = "/SPIN/" + sceneID + "/" + string(nodeSym->s_name);
-    lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
-
-    //lo_message_pp(msg);
-    lo_message_free(msg);
-
-}
-
-void SceneManager::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
-{
-    if (!txServ) return;
-
-    int err;
-    lo_message msg = lo_message_new();
-
-    va_list ap;
-    va_start(ap, types);
-
-    err = lo_message_add_varargs(msg, types, ap);
-
-    if (!err)
-    {
-        sendNodeMessage(nodeSym, msg);
-    } else {
-        std::cout << "ERROR (lo_message_add_varargs): " << err << std::endl;
-    }
-
-}
-*/
-
 
 // *****************************************************************************
 void SceneManager::debug()
@@ -1166,13 +1061,13 @@ void SceneManager::deleteNode(const char *id)
         }
 
         doDelete(n);
-        if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
+        SCENE_MSG("ss", "deleteNode", id);
 
     } else if (ReferencedStateSet *s = getStateSet(id))
     {
         s->removeFromScene();
         sendNodeList("*");
-        if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
+        SCENE_MSG("ss", "deleteNode", id);
     }
     else std::cout << "ERROR: tried to delete " << id << ", but no node or state by that name exists." << std::endl;
 
@@ -1196,18 +1091,17 @@ void SceneManager::deleteGraph(const char *id)
         {
             char* childID = (*(n->children.begin()))->id->s_name;
             doDelete(*(n->children.begin()));
-            if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", childID);
+            SCENE_MSG("ss", "deleteNode", childID);
         }
 
         doDelete(n);
-        if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
+        SCENE_MSG("ss", "deleteNode", id);
     }
     else std::cout << "ERROR: tried to deleteGraph " << id << ", but that node does not exist." << std::endl;
 
     // if delete was successful and removed all other references to the node,
     // then by this point, the node will be deleted, and it's destructor will
     // have been called.
-
 }
 
 // *****************************************************************************
@@ -1331,12 +1225,11 @@ void SceneManager::clear()
     */
 
 
-    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "clear");
+    SCENE_MSG("s", "clear");
 
     sendNodeList("*");
 
     std::cout << "Cleared scene." << std::endl;
-
 }
 
 void SceneManager::clearUsers()
@@ -1346,7 +1239,7 @@ void SceneManager::clearUsers()
         deleteGraph(nodeMap[std::string("UserNode")][0]->id->s_name);
     }
 
-    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "clearUsers");
+    SCENE_MSG("s", "clearUsers");
 
     sendNodeList("*");
 
@@ -1420,8 +1313,7 @@ void SceneManager::refresh()
         (*iter)->stateDump();
     }
 
-    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "refresh");
-
+    SCENE_MSG("s", "refresh");
 }
 
 // *****************************************************************************
@@ -2145,9 +2037,10 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
     if (!invokeMethod(classInstance, classType, theMethod, theArgs))
     {
-        //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
+        std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], NOT forwarding message..." << std::endl;
 
-        // HACK: TODO: fix this
+        // HACK: TODO: fix this, this was rebroadcasting messages that did not correspond to one of our methods
+    #if 0
     	spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())
         {
@@ -2163,8 +2056,9 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
                 }
             }
 
-            lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+            //lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
         }
+#endif
     }
     if (s->s_type == REFERENCED_NODE) {
         //printf("calling eventscript...\n");
@@ -2285,7 +2179,8 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 //      if (lo_is_numerical_type((lo_type)types[1])) sceneManager->setGrid((int) lo_hires_val((lo_type)types[1], argv[1]));
 
     else {
-
+            // FIXME: this used to rebroadcast messages that did not match command
+#if 0
     	spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())
         {
@@ -2304,6 +2199,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
         } else {
             //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
         }
+#endif
     }
 
     //pthread_mutex_unlock(&pthreadLock);
@@ -2314,7 +2210,6 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     std::string theMethod, idStr;
-
 
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;

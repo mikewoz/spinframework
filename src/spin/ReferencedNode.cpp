@@ -496,21 +496,7 @@ std::vector<lo_message> ReferencedNode::getState ()
 // *****************************************************************************
 void ReferencedNode::stateDump ()
 {
-
-    sceneManager->sendNodeBundle(this->id, this->getState());
-
-    /*
-    vector<lo_message> nodeState = this->getState();
-
-    vector<lo_message>::iterator iter = nodeState.begin();
-    while (iter != nodeState.end())
-    {
-        sceneManager->sendNodeMessage(this->id, (*iter));
-        //if (sceneManager->txServ) lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/node/"+string(this->id->s_name)).c_str(), (*iter));
-        //lo_message_free(*iter);
-        nodeState.erase(iter); //note: iterator automatically advances after erase()
-    }
-    */
+    spinApp::Instance().NodeBundle(this->id, this->getState());
 }
 
 

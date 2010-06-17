@@ -238,5 +238,5 @@ std::vector<lo_message> ReferencedStateSet::getState ()
 
 void ReferencedStateSet::stateDump()
 {
-	sceneManager->sendNodeBundle(this->id, this->getState());
+    spinApp::Instance().NodeBundle(this->id, this->getState());
 }
