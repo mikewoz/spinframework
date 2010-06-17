@@ -44,6 +44,8 @@
 
 #include "ConstraintsNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 
 

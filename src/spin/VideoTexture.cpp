@@ -46,7 +46,8 @@
 #include <osgDB/FileNameUtils>
 
 #include <iostream>
-
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "VideoTexture.h"
 
 

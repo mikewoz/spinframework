@@ -45,8 +45,11 @@
 
 #include "GroupNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 #include "UserNode.h"
+#include "spinApp.h"
 
 
 
@@ -193,7 +196,7 @@ void GroupNode::updateNodePath()
 
 // *****************************************************************************
 
-void GroupNode::mouseEvent (int event, int keyMask, int buttonMask, float x, float y)
+void GroupNode::mouseEvent (int /*event*/, int keyMask, int buttonMask, float x, float y)
 {
     // TODO
     BROADCAST(this, "siiiff", "mouseEvent", keyMask, buttonMask, x, y);

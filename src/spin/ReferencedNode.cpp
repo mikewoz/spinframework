@@ -47,6 +47,7 @@
 #include <exception>
 
 #include "spinApp.h"
+#include "spinBaseContext.h"
 #include "ReferencedNode.h"
 #include "SceneManager.h"
 

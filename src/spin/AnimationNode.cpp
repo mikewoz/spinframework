@@ -44,6 +44,8 @@
 #include "osgUtil.h"
 #include "AnimationNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "MediaManager.h"
 
 

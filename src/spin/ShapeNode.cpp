@@ -44,7 +44,8 @@
 #include <osg/Geometry>
 #include <osg/Billboard>
 
-
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 #include "ShapeNode.h"
 #include "SceneManager.h"

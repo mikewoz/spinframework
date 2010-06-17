@@ -181,7 +181,7 @@ void *spinServerContext::spinServerThread(void *arg)
  * syncThread is an independent thread that just sends
  * timecode information on the sync port (multicast)
  */
-void *spinServerContext::syncThread(void *arg)
+void *spinServerContext::syncThread(void * /*arg*/)
 {
 	spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();

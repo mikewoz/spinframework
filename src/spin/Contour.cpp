@@ -45,6 +45,8 @@
 
 #include "Contour.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 
 using namespace std;
@@ -162,7 +164,6 @@ osg::Quat Contour::getOrientation(int index)
 	{
 		return osg::Quat();
 	}
-	
 	else if (index == _vArray->size() - 1)
 	{
 		return getOrientation(index-1);

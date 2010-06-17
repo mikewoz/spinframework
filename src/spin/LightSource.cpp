@@ -41,6 +41,8 @@
 
 #include "LightSource.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 
 #include <string>
 #include <iostream>

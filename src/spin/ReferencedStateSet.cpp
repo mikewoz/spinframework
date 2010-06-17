@@ -44,6 +44,8 @@
 
 #include <iostream>
 
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "SceneManager.h"
 #include "ReferencedStateSet.h"
 

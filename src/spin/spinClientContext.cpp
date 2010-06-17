@@ -230,7 +230,7 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
     return 1;
 }
 
-int spinClientContext::infoCallback(const char * /*path*/, const char *types, lo_arg **argv, 
+int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*/, lo_arg ** /*argv*/, 
         int argc, void *data, void * /*user_data*/)
 {
     //spinApp &spin = spinApp::Instance();

@@ -41,6 +41,8 @@
 
 #include "Listener.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 
 using namespace std;
 
@@ -69,7 +71,6 @@ void Listener::setType (const char* t)
 	type = std::string(t);
 	
     BROADCAST(this, "ss", "setType", getType());
-    
 }
 
 std::vector<lo_message> Listener::getState ()

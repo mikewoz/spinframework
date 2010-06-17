@@ -42,6 +42,8 @@
 #include "SoundConnection.h"
 #include "DSPNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include <iostream>
 
 // *****************************************************************************
@@ -77,7 +79,7 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	sceneManager = s;
 	
 	// broadcast the creation of this connection
-	SCENE_MSG(sceneManager, "sss", "createNode", id->s_name, "SoundConnection");
+	SCENE_MSG("sss", "createNode", id->s_name, "SoundConnection");
 }
 
 
@@ -93,7 +95,7 @@ SoundConnection::~SoundConnection()
 	
 	
 	// broadcast the delete message of this connection
-	SCENE_MSG(sceneManager, "ss", "deleteNode", id->s_name);
+	SCENE_MSG("ss", "deleteNode", id->s_name);
 
     std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
 	lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);

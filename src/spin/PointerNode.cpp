@@ -54,6 +54,8 @@
 #include "RayNode.h"
 #include "GroupNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 
 using namespace std;

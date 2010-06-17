@@ -41,6 +41,7 @@
 
 
 #include "SceneManager.h"
+#include "spinBaseContext.h"
 #include "MediaManager.h"
 #include "ReferencedNode.h"
 #include "SoundConnection.h"
@@ -193,7 +194,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         }
         }
     }
-    catch (osgIntrospection::Exception & ex)
+    catch (const osgIntrospection::Exception & ex)
     {
         std::cerr << "SceneManager could not set up:\n" << ex.what() << std::endl;
         std::cout << "These nodes were defined:";
@@ -209,7 +210,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         }
         std::cout << std::endl;
 
-        exit(1);
+        exit (EXIT_FAILURE);
     }
 
     // need to remove DSPNode???
@@ -245,9 +246,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     }
     rootNode->setStateSet(rootStateSet);
 
-
-
-
     // To prevent same external texture from being loaded multiple times,
     // we use the osgDB::SharedStateManager:
 
@@ -276,7 +274,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     opt->setObjectCacheHint(osgDB::Options::CACHE_ALL);
     osgDB::Registry::instance()->setOptions(opt);
     */
-
 }
 
 // *****************************************************************************
@@ -284,7 +281,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 SceneManager::~SceneManager()
 {
     std::cout << "Cleaning up SceneManager..." << std::endl;
-
 
     // Force a delete (and destructor call) for all nodes still in the scene:
     unsigned i = 0;
@@ -306,7 +302,6 @@ SceneManager::~SceneManager()
 
     // clear any states that are left over:
     clearStates();
-
 
     // stop sceneManager OSC threads:
     lo_server_thread_stop(rxServ);
@@ -373,7 +368,7 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
     lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
 
-    SCENE_MSG(this, "sss", "registerState", s->id->s_name, s->classType.c_str());
+    SCENE_MSG("sss", "registerState", s->id->s_name, s->classType.c_str());
 
     sendNodeList("*");
 }
@@ -387,7 +382,7 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
     itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );
     if ( itr != stateMap[s->classType].end() ) stateMap[s->classType].erase(itr);
 
-    SCENE_MSG(this, "ss", "unregisterState", s->id->s_name);
+    SCENE_MSG("ss", "unregisterState", s->id->s_name);
 
     sendNodeList("*");
 }
@@ -735,7 +730,7 @@ void SceneManager::debug()
     ev.apply(*(this->rootNode.get()));
 
     // send debug message to all clients:
-    SCENE_MSG(this,"s","debug");
+    SCENE_MSG("s", "debug");
 
 }
 
@@ -768,7 +763,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
     // Let's broadcast a createNode message BEFORE we actually do the creation.
     // Thus, if some messages are sent during instantiation, at least clients
     // will already have a placeholder for the node.
-    SCENE_MSG(this, "sss", "createNode", id, type);
+    SCENE_MSG("sss", "createNode", id, type);
 
 
     // check if a node with that name already exists:
@@ -891,7 +886,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         nodeMap[n->nodeType].push_back(n);
 
         // broadcast (only if this is the server):
-        SCENE_MSG(this, "sss", "createNode", id, type);
+        SCENE_MSG("sss", "createNode", id, type);
         /*
         if (this->isServer())
         {
@@ -1015,7 +1010,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
         std::cout << "created new state: " << id << " of type " << type << std::endl;
         registerStateSet(n.get());
         // broadcast (only if this is the server):
-        SCENE_MSG(this, "sss", "createStateSet", id, type);
+        SCENE_MSG("sss", "createStateSet", id, type);
         return n.get();
     }
     else
@@ -2244,7 +2239,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
         sceneManager->clearStates();
     else if (theMethod=="userRefresh")
     {
-        SCENE_MSG(sceneManager, "s", "userRefresh");
+        SCENE_MSG("s", "userRefresh");
         //lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID).c_str(), "s", "uesrRefresh");
         //sceneManager->sendSceneMessage("s", "userRefresh", LO_ARGS_END);
     }

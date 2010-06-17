@@ -137,4 +137,45 @@ class spinApp
 
         spinBaseContext *context;
 };
+
+
+/*
+#define BROADCAST(pNode, types, ...) \
+    if (sceneManager->isServer()) \
+    lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
+
+#define BROADCAST_MSG(pNode, msg) \
+    if (sceneManager->isServer()) \
+    lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
+*/
+
+
+// Internal server-side MACROS for sending messages. Clients should NEVER use
+// these macros, and should rather use spinContext::send* methods. But just in
+// case, the macros always check that the passed SceneManager (s) is a server.
+
+#define SCENE_MSG(types, ...) \
+    if (spinApp::Instance().getContext()->isServer()) \
+    lo_send(spinApp::Instance().getContext()->lo_txAddr, \
+            ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
+
+#define SCENE_LO_MSG(msg) \
+    if (spinApp::Instance().getContext()->isServer()) \
+    lo_send(spinApp::Instance().getContext()->lo_txAddr, ("/SPIN/"+spinApp::Instance().getSceneID()).c_str(), msg)
+
+#define NODE_MSG(pNode, types, ...) \
+    if (spinApp::Instance().getContext()->isServer()) \
+    lo_send(spinApp::Instance().getContext()->lo_txAddr, \
+            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + std::string(pNode->id->s_name)).c_str(), \
+            types, ##__VA_ARGS__, LO_ARGS_END)
+
+#define NODE_LO_MSG(s, pNode, msg) \
+    if (spinApp::Instance().getContext()->isServer()) \
+    lo_send_message(spinApp::Instance().getContext()->lo_txAddr, \
+            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + std::string(pNode->id->s_name)).c_str(), msg)
+
+
+// backwards compatibility (TODO: replace all BROADCAST messages with NODE_MSG)
+#define BROADCAST(pNode, types, ...) NODE_MSG(pNode, types, ##__VA_ARGS__)
+
 #endif
