@@ -65,7 +65,7 @@ spinServerContext::spinServerContext()
 
 	// override sender and receiver addresses in server mode:
     lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
-    lo_txAddr = lo_address_new("224.0.0.1", "54323");
+    lo_txAddr = lo_address_new("226.0.0.1", "54323");
 
     // add info channel callback (receives pings from client apps):
     lo_server_thread_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
@@ -147,10 +147,11 @@ void *spinServerContext::spinServerThread(void *arg)
     osg::Timer_t frameTick = lastTick;
 
     // convert ports to integers for sending:
-    int i_rxPort, i_txPort, i_syncPort;
+    int i_rxPort, i_txPort, i_syncPort, i_tcpPort;
     fromString<int>(i_rxPort, lo_address_get_port(spin.getContext()->lo_rxAddr));
     fromString<int>(i_txPort, lo_address_get_port(spin.getContext()->lo_txAddr));
     fromString<int>(i_syncPort, lo_address_get_port(spin.getContext()->lo_syncAddr));
+    fromString<int>(i_tcpPort, lo_address_get_port(spin.getContext()->lo_tcpAddr));
 
     UpdateSceneVisitor visitor;
 
@@ -167,10 +168,11 @@ void *spinServerContext::spinServerThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            spin.InfoMessage("/ping/SPIN", "ssisii", spin.getSceneID().c_str(),
+            spin.InfoMessage("/SPIN/__server__", "ssisiii", spin.getSceneID().c_str(),
                     myIP.c_str(), i_rxPort,
                     lo_address_get_hostname(spin.getContext()->lo_txAddr), i_txPort,
                     i_syncPort,
+                    i_tcpPort,
                     LO_ARGS_END);
             //lo_send_from(spin->lo_infoAddr, spin->lo_infoServ, LO_TT_IMMEDIATE, "/ping/SPIN", "ssisi", spin->id.c_str(), myIP.c_str(), i_rxPort, spin->txAddr.c_str(), i_txPort);
             lastTick = frameTick;
