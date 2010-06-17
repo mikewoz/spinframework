@@ -245,7 +245,7 @@ std::vector<GroupNode*> ViewerManipulator::getNodesFromIntersections(osgUtil::Li
 
 void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter& ea)
 {
-	int i,j;
+	unsigned int i,j;
 		    
 	osg::ref_ptr<GroupNode> hitNode, drawNode;
 	
@@ -267,6 +267,36 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	//std::cout << "aspect= " << (float)ea.getWindowWidth()/ea.getWindowHeight() << std::endl;
 	dX *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
+
+
+	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
+	{
+		switch(ea.getEventType())
+		{
+			case(osgGA::GUIEventAdapter::PUSH):
+				std::cout << "PUSH ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::RELEASE):
+				std::cout << "RELEASE ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::DOUBLECLICK):
+				std::cout << "DOUBLECLICK ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::DRAG):
+				std::cout << "DRAG ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::MOVE):
+				std::cout << "MOVE ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::SCROLL):
+				std::cout << "SCROLL ("<<ea.getEventType()<<")"; break;
+			default:
+				std::cout << "some other message?" << std::endl; break;
+		}
+		std::cout << " buttonMask=" << buttonMask << ", modkeyMask=" << modkeyMask << ", dXYclick: " << dXclick<<","<<dYclick << std::endl;
+		std::cout << " currently selected nodes:";
+		for (j=0; j<selectedNodes.size(); j++)
+		{
+			std::cout << " " << selectedNodes[j]->s_name;
+		}
+		std::cout << std::endl;
+	}
+
 
 
 	float scrollX, scrollY;
@@ -293,6 +323,9 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 					break;
 				case osgGA::GUIEventAdapter::SCROLL_DOWN:
 					scrollY = 1.0;
+					break;
+				default:
+					// nothing
 					break;
 			}
 		}

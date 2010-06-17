@@ -178,20 +178,35 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 
 void ConstraintsNode::translate (float x, float y, float z)
 {
-    if ( !sceneManager->isGraphical() && ((_mode==BOUNCE)||(_mode==COLLIDE)) )
-	{
-		osg::Vec3 newPos;
-		applyConstrainedTranslation(osg::Vec3(x,y,z));
-	}
+
+    if ( !sceneManager->isGraphical() )
+    {
+    	if ((_mode==BOUNCE)||(_mode==COLLIDE))
+    	{
+    		applyConstrainedTranslation(osg::Vec3(x,y,z));
+    	}
+    	else {
+    		osg::Vec3 newPos = mainTransform->getPosition() + osg::Vec3(x,y,z);
+    		setTranslation(newPos.x(),newPos.y(),newPos.z());
+    	}
+    }
 }
 
 
 void ConstraintsNode::move (float x, float y, float z)
 {
-    if ( !sceneManager->isGraphical() && ((_mode==BOUNCE)||(_mode==COLLIDE)) )
+    if ( !sceneManager->isGraphical() )
     {
-		osg::Vec3 newPos;
-		applyConstrainedTranslation(mainTransform->getAttitude() * osg::Vec3(x,y,z) );
+    	osg::Vec3 v = mainTransform->getAttitude() * osg::Vec3(x,y,z);
+
+    	if ((_mode==BOUNCE)||(_mode==COLLIDE))
+    	{
+    		applyConstrainedTranslation(v);
+    	}
+    	else {
+    		osg::Vec3 newPos = mainTransform->getPosition() + v;
+    		setTranslation(newPos.x(),newPos.y(),newPos.z());
+    	}
     }
 }
 

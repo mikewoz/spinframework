@@ -233,3 +233,4 @@ int spinServerContext::infoCallback(const char *path, const char *types, lo_arg 
 
     return 1;
 }
+

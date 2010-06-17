@@ -65,6 +65,7 @@ int main(int argc, char **argv)
 	osg::ArgumentParser arguments(&argc,argv);
 
 	std::string sceneID = spinApp::Instance().getSceneID();
+
 	std::string txHost = lo_address_get_hostname(server->lo_txAddr);
 	std::string txPort = lo_address_get_port(server->lo_txAddr);
 	std::string rxHost = lo_address_get_hostname(server->lo_rxAddr);
@@ -76,7 +77,7 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] <scene-to-load.xml>");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify a unique ID for this scene.");
+	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify a unique ID for this scene (Default: '" + sceneID + "')");
 	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <hostname> <port>", "Set the transmission address where the server sends updates (Default: " + txHost + " " + txPort + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("-syncPort <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
@@ -92,6 +93,7 @@ int main(int argc, char **argv)
 	}
 	osg::ArgumentParser::Parameter param_spinID(sceneID);
 	arguments.read("-sceneID", param_spinID);
+	spinApp::Instance().setSceneID(sceneID);
 
 	while (arguments.read("-txAddr", txHost, txPort)) {
 		server->lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
