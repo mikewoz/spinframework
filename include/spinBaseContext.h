@@ -102,6 +102,7 @@ class spinBaseContext
         lo_address lo_txAddr;
         lo_address lo_infoAddr;
         lo_address lo_syncAddr;
+        lo_address lo_tcpAddr;
 
         /**
          * All contexts would probably like to listen to infoPort broadcasts.
