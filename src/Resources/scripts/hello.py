@@ -20,12 +20,12 @@ class Script:
         y = self.radius * math.sin(self.angle);
         method = "setTranslation " + `x` + " " + `y` + " 0.0"
         #print "the method is: ", method
-        libSPINPyWrap.callback(self.nodeID, "sfff", method, 4)
+        libSPINPyWrap.callback(self.nodeID, "sfff", method)
         
         method = "setDamping 0.234"
-        libSPINPyWrap.callback(self.nodeID, "sf", method, 2)
+        libSPINPyWrap.callback(self.nodeID, "sf", method)
 
-        ret = libSPINPyWrap.callback(self.nodeID, "s", "getTranslation", 1)
+        ret = libSPINPyWrap.callback(self.nodeID, "s", "getTranslation")
         print "ret?? = ", ret.getVector()
 
 

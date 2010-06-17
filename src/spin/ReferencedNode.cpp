@@ -42,9 +42,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
-
-
 #include <exception>
+#include <osgDB/FileUtils>
 
 #include "spinApp.h"
 #include "ReferencedNode.h"
@@ -89,19 +88,9 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
 
     registerNode(sceneManager);
 
-
-    if (strcmp(initID, "potato") == 0 && !sceneManager->isSlave() ) {
-        printf("I am potato\n");
-        //setScript("orbit.py", "");
-        setScript("orbit.py");
-        addEventScript("setTranslation","hotspot.py", "");
-    }
-
-
     this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
 
     attach();
-    //printf("referencednode ctor done.\n");
 
 }
 
@@ -168,30 +157,8 @@ void squat() {
 
 void ReferencedNode::callbackUpdate()
 {
+    callCronScripts();
 
-    if ( _scriptFile != "" ) {
-
-        try {
-
-            _scriptRun();
-
-        } catch (boost::python::error_already_set & ) {
-            std::cout << currentException() << std::endl;
-            std::cout << "2: Python error: [";
-            PyErr_Print();
-            std::cout << "]" << std::endl;
-            abort();
-
-        } catch ( std::exception& e ) {
-            std::cout << "2:  what? "<< e.what() << std::endl;
-            abort();
-        } catch(...) {                        // catch all other exceptions
-            std::cout << "2: Caught... something??\n";
-            abort();
-        }
-
-
-    }
 
 }
 
@@ -515,55 +482,48 @@ void ReferencedNode::stateDump ()
 
 // *****************************************************************************
 
-//bool ReferencedNode::setScript( const std::string& scr, const std::string& params )
-bool ReferencedNode::setScript( const char *scriptPath )
+bool ReferencedNode::addCronScript( const std::string& scriptPath, double freq, const std::string& params )
 {
-	const std::string& scr = string(scriptPath);
-	const std::string& params = "";
+    spinApp &spin = spinApp::Instance();
+    osg::Timer* timer = osg::Timer::instance();
 
-	spinApp &spin = spinApp::Instance();
-    printf("moo?\n");
-    _scriptFile = sceneManager->resourcesPath + "/scripts/" + scr;
-    printf("moo! [%s]\n", _scriptFile.c_str());
+    std::string sf = osgDB::findDataFile( scriptPath );
+    cout << "script file path is: " << sf << endl;
 
-    boost::python::object s;
-    //char hexAddr[20];
-    //sprintf(hexAddr, "%p", this);
-    printf("ReferencedNode: address = %p\n", this);
-    printf("ReferencedNode: id = %s\n", id->s_name);
+    boost::python::object s, p;
+
     char cmd[100];
+    //osg::Timer_t utick = timer->tick();
+    unsigned long long utick =  (unsigned long long) timer->tick();
 
     try {
-        sprintf(cmd, "mod%p = spin.load_module('%s')", this, _scriptFile.c_str());
+        sprintf( cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str() );
         std::cout << "Python cmd: " << cmd << std::endl;
-        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+        exec( cmd, spin._pyNamespace, spin._pyNamespace );
+        sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
 
-        if (params != "") sprintf(cmd, "script%p = mod%p.Script('%s')", this, this, id->s_name);
-        else sprintf(cmd, "script%p = mod%p.Script('%s', %s)", this, this, id->s_name, params.c_str());
         std::cout << "Python cmd: " << cmd << std::endl;
-        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+        exec( cmd, spin._pyNamespace, spin._pyNamespace );
 
-        sprintf(cmd, "script%p", this);
+        sprintf( cmd, "script%llx", utick );
         s = spin._pyNamespace[cmd];
-        _scriptRun = s.attr("run"); // extract instead?
+        p = s.attr( "run" );
 
-    } catch (boost::python::error_already_set const & ) {
-        ///if (PyErr_ExceptionMatches(PyExc_ZeroDivisionError))
+        CronScript* cs = new CronScript;
+        cs->freq = freq;
+        cs->lastRun = timer->time_s() - 1.0/freq;
+        cs->run = p;
+        _cronScriptList.push_back( cs );
 
-        std::cout << "0: Python error: " << std::endl;
+    } catch ( boost::python::error_already_set const & ) {
+        std::cout << "Python error: " << std::endl;
         PyErr_Print();
-        //abort();
-        _scriptFile = "";
         return false;
     } catch ( std::exception& e ) {
-        std::cout << "0: what? " << e.what() << std::endl;
-        //abort();
-        _scriptFile = "";
+        std::cout << "Python error: " << e.what() << std::endl;
         return false;
     } catch(...) {                        // catch all other exceptions
-        std::cout << "0: Caught... something??\n";
-        //abort();
-        _scriptFile = "";
+        std::cout << "Python error... Caught... something??\n";
         return false;
     }
 
@@ -571,53 +531,85 @@ bool ReferencedNode::setScript( const char *scriptPath )
 
 }
 
+// *****************************************************************************
+
+bool ReferencedNode::callCronScripts() {
+
+    if (_cronScriptList.empty()) return false;
+
+    osg::Timer* timer = osg::Timer::instance();
+    double d;
+
+    try {
+
+        for ( size_t i = 0; i < _cronScriptList.size(); i++ ) {
+            if ( !_cronScriptList[i] ) continue;
+            d = 1.0 / _cronScriptList[i]->freq;
+            if ( timer->time_s() >= d + _cronScriptList[i]->lastRun ) {
+                _cronScriptList[i]->lastRun += d;
+                _cronScriptList[i]->run();
+            }
+        }
+
+    } catch (boost::python::error_already_set & ) {
+        std::cout << currentException() << std::endl;
+        std::cout << "Python error: [";
+        PyErr_Print();
+        std::cout << "]" << std::endl;
+        return false;
+    } catch ( std::exception& e ) {
+        std::cout << "Python error: "<< e.what() << std::endl;
+        return false;
+    } catch(...) {                        // catch all other exceptions
+        std::cout << "Python error: Caught... something??\n";
+        return false;
+    }
 
 
+
+
+    return true;
+}
 
 // *****************************************************************************
 
-bool ReferencedNode::addEventScript( const std::string& eventName, const std::string& scr, const std::string& params ) {
+bool ReferencedNode::addEventScript( const std::string& eventName,  const std::string& scriptPath,  const std::string& params ) {
 
-	spinApp &spin = spinApp::Instance();
-    printf("moo?\n");
+    spinApp &spin = spinApp::Instance();
+    osg::Timer* timer = osg::Timer::instance();
 
-
-    std::string sf = sceneManager->resourcesPath + "/scripts/" + scr;
-    printf("moo! [%s]\n", sf.c_str());
+    std::string sf = osgDB::findDataFile( scriptPath );
+    cout << "script file path is: " << sf << endl;
 
     boost::python::object s, p;
-    //char hexAddr[20];
-    //sprintf(hexAddr, "%p", this);
-    //printf("ReferencedNode: address = %p\n", this);
-    //printf("ReferencedNode: id = %s\n", id->s_name);
     char cmd[100];
+    unsigned long long utick =  (unsigned long long) timer->tick();
 
     try {
-        sprintf(cmd, "mod%p = spin.load_module('%s')", this, sf.c_str());
+        sprintf(cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str());
         std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
-        if (params != "") sprintf(cmd, "script%p = mod%p.Script('%s')", this, this, id->s_name);
-        else sprintf(cmd, "script%p = mod%p.Script('%s', %s)", this, this, id->s_name, params.c_str());
+        sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
         std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
-        sprintf(cmd, "script%p", this);
+        sprintf(cmd, "script%llx", utick);
         s = spin._pyNamespace[cmd];
         p = s.attr("run");
-        //_scriptRun = s.attr("run"); // extract instead?
-        _eventScriptList.insert( pair<const std::string, boost::python::object>(eventName, p) );
+
+        _eventScriptList.insert( pair<const std::string, boost::python::object>( std::string(eventName), p) );
 
     } catch (boost::python::error_already_set const & ) {
-        std::cout << "0: Python error: " << std::endl;
+        std::cout << "Python error: " << std::endl;
         PyErr_Print();
         return false;
     } catch ( std::exception& e ) {
-        std::cout << "0: what? " << e.what() << std::endl;
+        std::cout << "Python error: " << e.what() << std::endl;
 
         return false;
     } catch(...) {                        // catch all other exceptions
-        std::cout << "0: Caught... something??\n";
+        std::cout << "Python error: Caught... something??\n";
         return false;
     }
 
@@ -650,17 +642,15 @@ bool ReferencedNode::callEventScript( const std::string& eventName ) {
 
         }
 
-
-
     } catch (boost::python::error_already_set const & ) {
         std::cout << "0: Python error: " << std::endl;
         PyErr_Print();
         return false;
     } catch ( std::exception& e ) {
-        std::cout << "0: what? " << e.what() << std::endl;
+        std::cout << "Python error: " << e.what() << std::endl;
         return false;
     } catch(...) {
-        std::cout << "0: Caught... something??\n";
+        std::cout << "Python error: Caught... something??\n";
         return false;
     }
 

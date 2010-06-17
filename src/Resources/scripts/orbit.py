@@ -14,11 +14,11 @@ class Script:
     def run(self): 
         if self.angle % 10 == 0:
             print "running: nodeID = ", self.nodeID, "angle = " , self.angle
-        self.angle += 0.001
+        self.angle += 0.01
         x = self.radius * math.cos(self.angle);
         y = self.radius * math.sin(self.angle);
         method = "setTranslation " + `x` + " " + `y` + " 0.0"
         #print "the method is: ", method
-        libSPINPyWrap.callback(self.nodeID, "sfff", method, 4)
+        libSPINPyWrap.callback(self.nodeID, "sfff", method)
 
 print "orbit module loaded."

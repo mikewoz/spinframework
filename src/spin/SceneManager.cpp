@@ -63,7 +63,7 @@
 #include <osgDB/WriteFile>
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
-
+#include <osgDB/Registry>
 #include <osgUtil/Optimizer>
 
 #include <osgIntrospection/Reflection>
@@ -110,6 +110,17 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         resourcesPath = "/usr/local/share/spinFramework";
     }
     std::cout << "  Resources path:\t\t" << resourcesPath << std::endl;
+
+    // get user defined env variable OSG_FILE_PATH
+    osgDB::Registry::instance()->initDataFilePathList();
+
+    // add all default resources paths to osg's file path list
+    osgDB::FilePathList fpl = osgDB::getDataFilePathList();
+    fpl.push_back( resourcesPath );
+    fpl.push_back( resourcesPath + "/scripts/");
+    fpl.push_back( resourcesPath + "/fonts/");
+    fpl.push_back( resourcesPath + "/images/");
+    osgDB::setDataFilePathList( fpl );
 
     mediaManager = new MediaManager(resourcesPath);
 
@@ -1026,11 +1037,11 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
 
 ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 {
-	// check if stateset already exists:
-	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(gensym(fname)->s_thing);
+    // check if stateset already exists:
+    osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(gensym(fname)->s_thing);
     if (ss.valid())
     {
-    	return ss.get();
+        return ss.get();
     }
 
     // go through all existing statesets and see if any have fname as the
@@ -1047,61 +1058,61 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
                 ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
                 if (getAbsolutePath(s->getPath())==getAbsolutePath(fname))
                 {
-                	std::cout << "already exists: " << fname << std::endl;
-                	return s;
+                    std::cout << "already exists: " << fname << std::endl;
+                    return s;
                 }
             }
         }
     }
 
 
-	// otherwise, we assume this is a filename, and try to create a stateset of
+    // otherwise, we assume this is a filename, and try to create a stateset of
     // the appropriate type
 
-	std::cout << "Trying to create statestet from filename: " << fname << std::endl;
-	std::string fullPath = getAbsolutePath(fname);
+    std::cout << "Trying to create statestet from filename: " << fname << std::endl;
+    std::string fullPath = getAbsolutePath(fname);
 
 
-	//std::string newID = osgDB::getStrippedName(fullPath); // no path, or ext
-	std::string newID = osgDB::getSimpleFileName(fullPath); // no path, keep ext
+    //std::string newID = osgDB::getStrippedName(fullPath); // no path, or ext
+    std::string newID = osgDB::getSimpleFileName(fullPath); // no path, keep ext
 
-	size_t pos;
-	if ((pos=fullPath.find("shared_video_texture")) != std::string::npos)
-	{
-		// create the shared memory id from the filename:
-		std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
-		osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(createStateSet(shID.c_str(), "SharedVideoTexture"));
-		if (shvid.valid())
-		{
-			return shvid.get();
-		}
-	}
+    size_t pos;
+    if ((pos=fullPath.find("shared_video_texture")) != std::string::npos)
+    {
+        // create the shared memory id from the filename:
+        std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
+        osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(createStateSet(shID.c_str(), "SharedVideoTexture"));
+        if (shvid.valid())
+        {
+            return shvid.get();
+        }
+    }
 
-	// check if the path is a video, or a directory (potentially containing a
-	// sequence of images)
-	else if (isVideoPath(fullPath) || osgDB::getDirectoryContents(fullPath).size())
-	{
-		osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(createStateSet(newID.c_str(), "VideoTexture"));
-		if (vid.valid())
-		{
-			vid->setPath(getRelativePath(fname).c_str());
-			return vid.get();
-		}
-	}
+    // check if the path is a video, or a directory (potentially containing a
+    // sequence of images)
+    else if (isVideoPath(fullPath) || osgDB::getDirectoryContents(fullPath).size())
+    {
+        osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(createStateSet(newID.c_str(), "VideoTexture"));
+        if (vid.valid())
+        {
+            vid->setPath(getRelativePath(fname).c_str());
+            return vid.get();
+        }
+    }
 
-	// otherwise, assume a static image texture:
-	else
-	{
-		osg::ref_ptr<ImageTexture> img = dynamic_cast<ImageTexture*>(createStateSet(newID.c_str(), "ImageTexture"));
-		if (img.valid())
-		{
-			img->setPath(getRelativePath(fname).c_str());
-			return img.get();
-		}
-	}
+    // otherwise, assume a static image texture:
+    else
+    {
+        osg::ref_ptr<ImageTexture> img = dynamic_cast<ImageTexture*>(createStateSet(newID.c_str(), "ImageTexture"));
+        if (img.valid())
+        {
+            img->setPath(getRelativePath(fname).c_str());
+            return img.get();
+        }
+    }
 
-	std::cout << "ERROR creating ReferencedStateSet from file: " << fname << std::endl;
-	return NULL;
+    std::cout << "ERROR creating ReferencedStateSet from file: " << fname << std::endl;
+    return NULL;
 }
 
 
@@ -1649,7 +1660,7 @@ bool SceneManager::saveXML(const char *s, bool withUsers = false)
     // convert filename into valid path:
     std::string filename = getSpinPath(s);
     // and make sure that there is an .xml extension:
-    if (filename.substr(filename.length() - 4) != std::string(".xml")) 
+    if (filename.substr(filename.length() - 4) != std::string(".xml"))
         filename+=".xml";
 
     // start with XML Header:
@@ -1713,7 +1724,7 @@ bool SceneManager::saveUsers(const char *s)
     // convert filename into valid path:
     std::string filename = getSpinPath(s);
     // and make sure that there is an .xml extension:
-    if (filename.substr(filename.length() - 4) != std::string(".xml")) 
+    if (filename.substr(filename.length() - 4) != std::string(".xml"))
         filename += ".xml";
 
     // start with XML Header:
@@ -1791,8 +1802,8 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
                 {
                     method = child1->Value();
                     argVector = tokenize(child1->FirstChild()->Value());
-                } 
-                else 
+                }
+                else
                     continue;
 
                 // special case if method is setParent():
@@ -1956,7 +1967,7 @@ bool SceneManager::loadXML(const char *s)
     // convert filename into valid path:
     std::string filename = getSpinPath(s);
     // and make sure that there is an .xml extension:
-    if (filename.substr(filename.length() - 4) != std::string(".xml")) 
+    if (filename.substr(filename.length() - 4) != std::string(".xml"))
         filename+=".xml";
 
 
@@ -2083,7 +2094,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     {
         theMethod = std::string((char *)argv[0]);
     }
-    else 
+    else
         return 1;
 
     // get the instance of the node, which is the last token of the OSCpath:
@@ -2131,27 +2142,87 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
     // If we have found a valid Type, then let's build an argument list and see
     // if we can find a method that takes this list of argumets:
-    for (i=1; i<argc; i++)
-    {
-        if (lo_is_numerical_type((lo_type)types[i]))
-        {
-            theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
+
+    if (theMethod == "addCronScript") {
+
+        // Script path
+        if (!lo_is_numerical_type((lo_type)types[1])) {
+            theArgs.push_back( std::string( (const char*)argv[1] ) );
         } else {
-            theArgs.push_back( (const char*) argv[i] );
+            std::cout << "ERROR: script path for addCronScript is not a string" << std::endl;
+            return 1;
         }
+
+        // frequency
+        if (lo_is_numerical_type((lo_type)types[2])) {
+            theArgs.push_back( (double) lo_hires_val((lo_type)types[2], argv[2]) );
+        } else {
+            std::cout << "ERROR: frequency for addCronScript is not a number" << std::endl;
+            return 1;
+        }
+
+        // rest of args are comma separated and passed as a string
+         std::stringstream params("");
+        for (i = 3; i < argc; i++) {
+            if (lo_is_numerical_type((lo_type)types[i]))  {
+                params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
+            } else {
+                params << ", \"" << (const char*)argv[i] << "\"";
+            }
+        }
+        theArgs.push_back( params.str() );
+
+    } else if (theMethod == "addEventScript") {
+
+        // event method name
+        if (!lo_is_numerical_type((lo_type)types[1])) {
+            theArgs.push_back( std::string( (const char*)argv[1] ) );
+        } else {
+            std::cout << "ERROR: event method name for addEventScript is not a string" << std::endl;
+            return 1;
+        }
+
+        // Script path
+        if (!lo_is_numerical_type((lo_type)types[2])) {
+            theArgs.push_back(  std::string( (const char*)argv[2] ) );
+        } else {
+            std::cout << "ERROR: script path for addEventScript is not a string" << std::endl;
+            return 1;
+        }
+
+        // rest of args are comma separated and passed as a string
+        std::stringstream params("");
+        for (i = 3; i < argc; i++) {
+            if (lo_is_numerical_type((lo_type)types[i]))  {
+                params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
+            } else {
+                params << ", \"" << (const char*)argv[i] << "\"";
+            }
+        }
+
+        theArgs.push_back( params.str() );
+
+    } else {
+
+        for (i=1; i<argc; i++) {
+            if (lo_is_numerical_type((lo_type)types[i]))  {
+                theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
+            } else {
+                theArgs.push_back( (const char*) argv[i] );
+            }
+        }
+
     }
 
     // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
-
-
 
     if (!invokeMethod(classInstance, classType, theMethod, theArgs))
     {
         //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
 
         // HACK: TODO: fix this
-    	spinApp &spin = spinApp::Instance();
+        spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())
         {
 
@@ -2226,7 +2297,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
     {
         theMethod = std::string((char *)argv[0]);
     }
-    else 
+    else
         return 1;
 
     //pthread_mutex_lock(&pthreadLock);
@@ -2289,7 +2360,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 
     else {
 
-    	spinApp &spin = spinApp::Instance();
+        spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())
         {
             lo_message msg = lo_message_new();
