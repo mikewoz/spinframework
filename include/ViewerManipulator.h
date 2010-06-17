@@ -53,7 +53,7 @@ namespace osgViewer {
     class View;
 }
 
-#include "spinContext.h"
+#include "spinBaseContext.h"
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 

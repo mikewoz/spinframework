@@ -120,26 +120,18 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     //rxAddr = lo_address_new(addr.c_str(), port.c_str());
 
     if (isMulticastAddress(addr))
-    {
-        rxServ = lo_server_thread_new_multicast(addr.c_str(), port.c_str(), oscParser_error);
-    } else {
-        rxServ = lo_server_thread_new(port.c_str(), oscParser_error);
-    }
-
+        rxServ = lo_server_new_multicast(addr.c_str(), port.c_str(), oscParser_error);
+    else 
+        rxServ = lo_server_new(port.c_str(), oscParser_error);
+    
     // add OSC callback methods to match various incoming messages:
-
 #if 0
     // oscCallback_debug() will match any path and args:
     lo_server_thread_add_method(rxServ, NULL, NULL, SceneManagerCallback_debug, NULL);
 #endif
 
     // generic admin callback:
-    lo_server_thread_add_method(rxServ, std::string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);
-
-
-
-    // start the listener:
-    lo_server_thread_start(rxServ);
+    lo_server_add_method(rxServ, std::string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);
 
     std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
@@ -280,6 +272,8 @@ SceneManager::~SceneManager()
 {
     std::cout << "Cleaning up SceneManager..." << std::endl;
 
+    // FIXME: DOING THIS HERE IS REALLY BAD, should happen earlier
+#if 0
     // Force a delete (and destructor call) for all nodes still in the scene:
     unsigned i = 0;
     ReferencedNode *n;
@@ -288,6 +282,7 @@ SceneManager::~SceneManager()
         if ((n = dynamic_cast<ReferencedNode*>(worldNode->getChild(i))))
         {
             // delete the graph of any ReferencedNode:
+            std::cout << "Delete graph!\n";
             deleteGraph(n->id->s_name);
         }
         else
@@ -299,14 +294,19 @@ SceneManager::~SceneManager()
     }
 
     // clear any states that are left over:
+    std::cout << "clear states!\n";
     clearStates();
+#endif
 
     // stop sceneManager OSC threads:
-    lo_server_thread_stop(rxServ);
     usleep(100);
 
-    if (rxServ) lo_server_thread_free(rxServ);
-
+    // FIXME: is this necessary/a good idea?
+    if (rxServ) 
+    {
+        lo_server_free(rxServ);
+        rxServ = 0;
+    }
 }
 
 //void SceneManager::setLog(const char* filename)
@@ -314,7 +314,7 @@ void SceneManager::setLog(spinLog &log)
 {
     // remove existing callback:
 
-    lo_server_thread_add_method(rxServ, NULL, NULL, SceneManagerCallback_log, &log);
+    lo_server_add_method(rxServ, NULL, NULL, SceneManagerCallback_log, &log);
 }
 
 // *****************************************************************************
@@ -325,7 +325,7 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
     stateMap[s->classType].push_back(s->id);
 
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
+    lo_server_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
 
     SCENE_MSG("sss", "registerState", s->id->s_name, s->classType.c_str());
 
@@ -335,7 +335,7 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
 void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 {
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
+    lo_server_del_method(rxServ, oscPattern.c_str(), NULL);
 
     ReferencedStateSetList::iterator itr;
     itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );

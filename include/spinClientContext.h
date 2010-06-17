@@ -52,7 +52,6 @@
  */
 class spinClientContext : public spinBaseContext
 {
-
     public:
 
 		spinClientContext();
@@ -62,11 +61,7 @@ class spinClientContext : public spinBaseContext
 
         lo_server_thread lo_syncServ;
 
-    protected:
-
     private:
-
-
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
          * listens to incoming SPIN messages. It does NOT re-transmit those messages,

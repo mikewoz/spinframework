@@ -108,8 +108,6 @@ void *spinServerContext::spinServerThread(void *arg)
 	spinServerContext *thiss = (spinServerContext*)(arg);
 	spinApp &spin = spinApp::Instance();
 
-    spin.sceneManager = new SceneManager(spin.getSceneID(), lo_address_get_hostname(spin.getContext()->lo_rxAddr), lo_address_get_port(spin.getContext()->lo_rxAddr));
-
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
     std::string cmd = "sys.path.append('" + spin.sceneManager->resourcesPath + "/scripts')";
@@ -141,8 +139,6 @@ void *spinServerContext::spinServerThread(void *arg)
 
     UpdateSceneVisitor visitor;
 
-    //lo_server_thread_add_method(spin->sceneManager->rxServ, NULL, NULL, sceneCallback, spin);
-
     // start sync (timecode) thread:
     thiss->startSyncThread();
 
@@ -167,11 +163,9 @@ void *spinServerContext::spinServerThread(void *arg)
         pthread_mutex_unlock(&pthreadLock);
 
         lo_server_recv_noblock(spin.getContext()->lo_infoServ, TIMEOUT);
+        lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
     }
     thiss->running = false;
-
-    // clean up:
-    delete spin.sceneManager;
 
     pthread_exit(NULL);
 }

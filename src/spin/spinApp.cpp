@@ -136,11 +136,12 @@ spinApp::spinApp()
     setSyncStart(0);
 
     _pyInitialized = false;
+
 }
 
 spinApp::~spinApp()
 {
-
+    delete sceneManager;
 	//spinBaseContext::signalStop = true;
 }
 
@@ -159,6 +160,8 @@ spinApp& spinApp::Instance() {
 void spinApp::setContext(spinBaseContext *c)
 {
 	context = c;
+    // make scene manager
+    sceneManager = new SceneManager(getSceneID(), lo_address_get_hostname(getContext()->lo_rxAddr), lo_address_get_port(getContext()->lo_rxAddr));
 }
 
 // *****************************************************************************

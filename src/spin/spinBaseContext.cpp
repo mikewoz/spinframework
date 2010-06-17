@@ -116,9 +116,7 @@ spinBaseContext::~spinBaseContext()
     this->stop();
 
     if (lo_infoServ)
-    {
         lo_server_free(lo_infoServ);
-    }
 
     if (lo_rxAddr) lo_address_free(lo_rxAddr);
     if (lo_txAddr) lo_address_free(lo_txAddr);
@@ -130,11 +128,12 @@ void spinBaseContext::sigHandler(int signum)
 {
     std::cout << " Caught signal: " << signum << std::endl;
 
-    spinApp &spin = spinApp::Instance();
+//    spinApp &spin = spinApp::Instance();
 
     // unlock mutex so we can clean up:
     pthread_mutex_unlock(&pthreadLock);
 
+#if 0
     // TODO: we really shouldn't do anything like this here. Can we get rid of
     // this?:
     if (spin.userNode.valid())
@@ -145,9 +144,9 @@ void spinBaseContext::sigHandler(int signum)
         // now deleting the node in the sceneManager should release the last instance:
         spin.sceneManager->doDelete(heldPointer);
     }
+#endif
 
     spinBaseContext::signalStop = true;
-
 }
 
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )

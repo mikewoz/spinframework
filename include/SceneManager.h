@@ -95,7 +95,7 @@ class SceneManager
         void init();
         void debug();
 
-        lo_server_thread rxServ;
+        lo_server rxServ;
 
         void setGraphical(bool b) { graphicalMode = b; }
         bool isGraphical() { return (bool) graphicalMode; }

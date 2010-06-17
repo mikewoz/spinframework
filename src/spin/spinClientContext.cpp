@@ -61,7 +61,6 @@ spinClientContext::spinClientContext()
 
 spinClientContext::~spinClientContext()
 {
-
 }
 
 bool spinClientContext::start()
@@ -81,11 +80,8 @@ void *spinClientContext::spinClientThread(void *arg)
 	spinClientContext *thiss = (spinClientContext*)(arg);
     spinApp &spin = spinApp::Instance();
 
-    spin.sceneManager = new SceneManager(spin.getSceneID(), lo_address_get_hostname(spin.getContext()->lo_rxAddr), lo_address_get_port(spin.getContext()->lo_rxAddr));
-
     // register our special scene callback:
-    lo_server_thread_add_method(spin.sceneManager->rxServ, ("/SPIN/" + spin.getSceneID()).c_str(), NULL, sceneCallback, NULL);
-
+    lo_server_add_method(spin.sceneManager->rxServ, ("/SPIN/" + spin.getSceneID()).c_str(), NULL, sceneCallback, NULL);
 
     // sync (timecode) receiver:
     if (isMulticastAddress(lo_address_get_hostname(spin.getContext()->lo_syncAddr)))
@@ -111,22 +107,25 @@ void *spinClientContext::spinClientThread(void *arg)
     while (!spinBaseContext::signalStop)
     {
         lo_server_recv_noblock(spin.getContext()->lo_infoServ, TIMEOUT); // was 250 ms before
+        lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
         // do nothing (assume the app is doing updates - eg, in a draw loop)
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            if (spin.userNode.valid()) spin.InfoMessage("/ping/user", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
+            if (spin.userNode.valid()) 
+                spin.InfoMessage("/ping/user", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
             lastTick = frameTick;
         }
     }
+
+    std::cout << "Exitting spin client thread\n";
     thiss->running = false;
 
     // clean up:
     lo_server_thread_stop(thiss->lo_syncServ);
     lo_server_thread_free(thiss->lo_syncServ);
-    delete spin.sceneManager;
 
     pthread_exit(NULL);
 }
@@ -223,8 +222,6 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
 
         //std::cout << "start = " <<  startTick << " m=" <<  masterTick << " s=" << slaveTick << " o=" <<  off << std::endl;
         //std::cout << "got new sync time: " << timer->time_s() << std::endl;
-
-
     }
 
     return 1;

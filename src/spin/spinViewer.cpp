@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 {
 	std::cout <<"\nspinViewer launching..." << std::endl;
 
-	spinClientContext *spinListener = new spinClientContext();
+	spinClientContext spinListener;
 	spinApp &spin = spinApp::Instance();
 
 	std::string id = getHostname();
@@ -95,9 +95,9 @@ int main(int argc, char **argv)
 	std::string redirectAddr, redirectPort;
 
 	std::string sceneID = spin.getSceneID();
-	std::string rxHost = lo_address_get_hostname(spinListener->lo_rxAddr);
-	std::string rxPort = lo_address_get_port(spinListener->lo_rxAddr);
-	std::string syncPort = lo_address_get_port(spinListener->lo_rxAddr);
+	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddr);
+	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddr);
+	std::string syncPort = lo_address_get_port(spinListener.lo_rxAddr);
 
 
 	// *************************************************************************
@@ -146,10 +146,10 @@ int main(int argc, char **argv)
 	spin.setSceneID(sceneID);
 
 	while (arguments.read("-serverAddr", rxHost, rxPort)) {
-		spinListener->lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
+		spinListener.lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
 	while (arguments.read("-syncPort", syncPort)) {
-		spinListener->lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
+		spinListener.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
 	}
 
 	if (arguments.read("--fullscreen")) fullscreen=true;
@@ -181,10 +181,10 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// start the listener thread:
 
-	if (!spinListener->start())
+	if (!spinListener.start())
 	{
         std::cout << "ERROR: could not start SPIN listener" << std::endl;
-        exit(1);
+        exit(EXIT_FAILURE);
 	}
 
 	spin.sceneManager->setGraphical(true);
@@ -284,12 +284,12 @@ int main(int argc, char **argv)
 	{
 		//std::cout << "frame: " << view->getFrameStamp()->getSimulationTime() << std::endl;
 		
-		if (spinListener->isRunning())
+		if (spinListener.isRunning())
 		{
 			osg::Timer_t startFrameTick = osg::Timer::instance()->tick();
 			
 			pthread_mutex_lock(&pthreadLock);
-			spin.sceneManager->update();
+            spin.sceneManager->update();
 			pthread_mutex_unlock(&pthreadLock);
 	
 			pthread_mutex_lock(&pthreadLock);
@@ -315,7 +315,6 @@ int main(int argc, char **argv)
 			
 			viewer.setDone(true);
 		}
-		
 	}
 	
 	std::cout << "spinViewer done." << std::endl;
