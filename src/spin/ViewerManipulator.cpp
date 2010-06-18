@@ -67,9 +67,6 @@ ViewerManipulator::ViewerManipulator()
 	this->picker = false;
 	this->mover = true;	
 	
-	redirectAddr = NULL;
-	redirectServ = NULL;
-
 	// set up user node tracker:
 	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
@@ -80,46 +77,6 @@ ViewerManipulator::ViewerManipulator()
 
 ViewerManipulator::~ViewerManipulator()
 {
-	if (redirectServ)
-	{
-		lo_server_thread_stop(redirectServ);
-		usleep(100);
-	
-		lo_server_thread_free(redirectServ);
-	}
-}
-
-
-void ViewerManipulator::setRedirection(std::string addr, std::string port)
-{
-	//if (redirectServ) lo_server_free(redirectServ);
-	
-	redirectAddr = lo_address_new(addr.c_str(), port.c_str());
-	
-	if (isMulticastAddress(addr))
-	{
-		redirectServ = lo_server_thread_new_multicast(addr.c_str(), NULL, oscParser_error);
-	}
-
-	else if (isBroadcastAddress(addr))
-	{
-		redirectServ = lo_server_thread_new(NULL, oscParser_error);
-		int sock = lo_server_get_socket_fd(redirectServ);
-		int sockopt = 1;
-		setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
-	}
-
-	else {
-		redirectServ = lo_server_thread_new(NULL, oscParser_error);
-	}
-
-	if (!redirectServ) std::cout << "ERROR (ViewerManipulator) - Could not set redirection. Bad address?: " << addr << ":" << port << std::endl;
-	else
-	{
-		std::cout << "  ViewerManipulator is redirecting picking events to: " << lo_address_get_url(redirectAddr) << std::endl;
-	}
-	
-	lo_server_thread_start(redirectServ);
 }
 
 
@@ -715,14 +672,7 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 	int err = lo_message_add_varargs(msg, types, ap);
 
 	if (!err)
-	{
-		
-		// TODO: fix this:
-		//if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
-		if (redirectAddr) lo_send_message(redirectAddr, ("/" + std::string(nodeId)).c_str(), msg);
-		else spin.NodeMessage(nodeId, msg);
-		
-	} else {
+		spin.NodeMessage(nodeId, msg);
+	else 
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
-	}
 }

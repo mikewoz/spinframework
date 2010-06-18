@@ -92,8 +92,6 @@ int main(int argc, char **argv)
 	int height=480;
 	int screen=-1;
 	
-	std::string redirectAddr, redirectPort;
-
 	std::string sceneID = spin.getSceneID();
 	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddr);
 	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddr);
@@ -126,7 +124,6 @@ int main(int argc, char **argv)
 	
 	arguments.getApplicationUsage()->addCommandLineOption("--disabled", "Disable camera controls for this user");
 	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server");
-	arguments.getApplicationUsage()->addCommandLineOption("--redirection <host> <port>", "Redirect events to the specified address/port instead of the SPIN server");
 
 
 	// *************************************************************************
@@ -161,12 +158,9 @@ int main(int argc, char **argv)
 	
 	if (arguments.read("--disabled")) mover=false;
 	if (arguments.read("--picker")) picker=true;
-	while (arguments.read("--redirection",redirectAddr,redirectPort)) {}
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
 	osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
-
-
 
 	// *************************************************************************
 	// construct the viewer:
@@ -243,8 +237,6 @@ int main(int argc, char **argv)
 	osg::ref_ptr<ViewerManipulator> manipulator = new ViewerManipulator();
 	manipulator->setPicker(picker);
 	manipulator->setMover(mover);
-	if (!redirectAddr.empty() && !redirectPort.empty())
-		manipulator->setRedirection(redirectAddr, redirectPort);
 
 	view->setCameraManipulator(manipulator.get());
 	

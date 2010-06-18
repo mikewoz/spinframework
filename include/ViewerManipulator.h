@@ -82,8 +82,6 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		//ViewerManipulator(UserNode *u);
 		ViewerManipulator();
 		
-		void setRedirection(std::string addr, std::string port);
-		
 		void setPicker(bool b);
 		void setMover(bool b);
 		void setRaw(bool b);
@@ -109,9 +107,6 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		
 		//t_symbol *selectedNode;
 		std::vector<t_symbol*> selectedNodes;
-		
-		lo_address redirectAddr;
-		lo_server_thread  redirectServ;
 		
 		bool picker, mover, raw;
 		float lastX, lastY;
