@@ -1,6 +1,4 @@
 Server side tcp handlers
-0)replace server_threads with servers to avoid the overhead of having to synchronize everything. this means figuring out where to call lo_server_recv_noblock safely, with a timeout of 10 (as per what lo_server_thread does, just in a separate thread)
-1)pull liblo function calls out of SceneManager.cpp and out of the macros in SceneManager.h and use spinApp*Message calls instead
 2)clients can connect on a port (in TCP) which is broadcast by the server in multicast. The client tells the server its listening port/ip (again for TCP), which the server maintains in a list. the server then changes the port that it broadcasts.
 3)a new callback for that TCP port that responds to the dumpState message. the server then dumps the state to the client in the connection maintained in its list of connections.
 4)generic handler that dispatches calls to its callbacks (see bottom of SceneManager)

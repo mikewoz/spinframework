@@ -110,7 +110,7 @@ void spinServerContext::startSyncThread()
 
 void *spinServerContext::spinServerThread(void *arg)
 {
-	spinServerContext *thiss = (spinServerContext*)(arg);
+	spinServerContext *context = (spinServerContext*)(arg);
 	spinApp &spin = spinApp::Instance();
 
     if ( !spin.initPython() )
@@ -137,26 +137,27 @@ void *spinServerContext::spinServerThread(void *arg)
     osg::Timer_t frameTick = lastTick;
 
     // convert ports to integers for sending:
-    int i_rxPort, i_txPort, i_syncPort;
-    fromString<int>(i_rxPort, lo_address_get_port(spin.getContext()->lo_rxAddr));
-    fromString<int>(i_txPort, lo_address_get_port(spin.getContext()->lo_txAddr));
-    fromString<int>(i_syncPort, lo_address_get_port(spin.getContext()->lo_syncAddr));
+    int i_rxPort, i_txPort, i_syncPort, i_tcpPort;
+    fromString<int>(i_rxPort, lo_address_get_port(context->lo_rxAddr));
+    fromString<int>(i_txPort, lo_address_get_port(context->lo_txAddr));
+    fromString<int>(i_syncPort, lo_address_get_port(context->lo_syncAddr));
+    fromString<int>(i_tcpPort, lo_address_get_port(context->lo_tcpAddr));
 
     UpdateSceneVisitor visitor;
 
     // start sync (timecode) thread:
-    thiss->startSyncThread();
+    context->startSyncThread();
 
-    thiss->running = true;
+    context->running = true;
     static const int TIMEOUT = 10;
     while (!spinBaseContext::signalStop)
     {
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            spin.InfoMessage("/ping/SPIN", "ssisii", spin.getSceneID().c_str(),
-                    myIP.c_str(), i_rxPort,
-                    lo_address_get_hostname(spin.getContext()->lo_txAddr), i_txPort,
+            spin.InfoMessage("/SPIN/__server__", "ssiisii", spin.getSceneID().c_str(),
+                    myIP.c_str(), i_rxPort, i_tcpPort,
+                    lo_address_get_hostname(context->lo_txAddr), i_txPort,
                     i_syncPort,
                     LO_ARGS_END);
             
@@ -167,10 +168,10 @@ void *spinServerContext::spinServerThread(void *arg)
         visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
         pthread_mutex_unlock(&pthreadLock);
 
-        lo_server_recv_noblock(spin.getContext()->lo_infoServ, TIMEOUT);
+        lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
         lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
     }
-    thiss->running = false;
+    context->running = false;
 
     pthread_exit(NULL);
 }

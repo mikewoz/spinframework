@@ -62,6 +62,8 @@ class spinClientContext : public spinBaseContext
         lo_server lo_syncServ;
 
     private:
+        // address to which messages can be sent over TCP
+        lo_address lo_serverTCPAddr;
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
          * listens to incoming SPIN messages. It does NOT re-transmit those messages,
@@ -88,5 +90,7 @@ class spinClientContext : public spinBaseContext
          */
         static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
+        // register my ip and port for reliable communication with the server
+        void subscribe();
 };
 #endif

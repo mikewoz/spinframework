@@ -226,11 +226,25 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
     return 1;
 }
 
-int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*/, lo_arg ** /*argv*/, 
-        int /*argc*/, void * /*data*/, void * /*user_data*/)
+int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*/, 
+        lo_arg ** argv, int argc, void * /*data*/, void * user_data)
 {
-    //spinApp &spin = spinApp::Instance();
+    spinClientContext *context = static_cast<spinClientContext*>(user_data);
     // TODO: get server port upon which client can connect 
+    if (argc != 7)
+        return 1;
+    context->lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP, 
+            reinterpret_cast<const char*>(argv[1]), reinterpret_cast<const char*>(argv[3]));
+    context->subscribe();
 
     return 1;
+}
+
+void spinClientContext::subscribe()
+{
+    // TODO: subscribe with myip and port at which i can reached
+#if 0
+    lo_send(lo_serverTCPAddr, "/SPIN/__client__/subscribe", "ss", 
+            myIP.c_str(), listenPort_.c_str());
+#endif
 }
