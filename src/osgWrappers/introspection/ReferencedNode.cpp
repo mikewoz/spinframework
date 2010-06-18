@@ -142,9 +142,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __bool__addEventScript__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
 	          "",
 	          "");
-	I_Method1(bool, callEventScript, IN, const std::string &, eventName,
+	I_Method3(bool, callEventScript, IN, const std::string &, eventName, IN, const std::string &, types, IN, osgIntrospection::ValueList &, args,
 	          Properties::NON_VIRTUAL,
-	          __bool__callEventScript__C5_std_string_R1,
+	          __bool__callEventScript__C5_std_string_R1__C5_std_string_R1__osgIntrospection_ValueList_R1,
 	          "",
 	          "");
 	I_SimpleProperty(osg::Group *, AttachmentNode, 

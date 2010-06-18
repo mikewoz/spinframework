@@ -573,7 +573,7 @@ bool ReferencedNode::callCronScripts() {
 
 // *****************************************************************************
 
-bool ReferencedNode::addEventScript( const std::string& eventName,  const std::string& scriptPath,  const std::string& params ) {
+bool ReferencedNode::addEventScript( const std::string& eventName, const std::string& scriptPath, const std::string& params ) {
 
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -620,26 +620,50 @@ bool ReferencedNode::addEventScript( const std::string& eventName,  const std::s
 
 // *****************************************************************************
 
-bool ReferencedNode::callEventScript( const std::string& eventName ) {
+bool ReferencedNode::callEventScript( const std::string& eventName, const std::string& types, osgIntrospection::ValueList& args ) {
 
-    //printf("callEventScript( '%s' )...\n", eventName.c_str());
-    if (_eventScriptList.empty()) return false;
-    //printf("callEventScript... doing stuff\n");
+    if ( _eventScriptList.empty() ) return false;
+
     boost::python::object p;
     EventScriptList::iterator iter;
+    boost::python::list argList;
 
     try {
 
         iter = _eventScriptList.find( eventName );
         if( iter != _eventScriptList.end() ) {
-            //cout << "Value is: " << eventName << '\n';
+
+
+            try {
+                for ( size_t i = 0; i < args.size(); i++ ) {
+
+                    const std::type_info* argt = &args[i].getType().getStdTypeInfo();
+
+                    if ( *argt == typeid(int) ) {
+                        argList.append( osgIntrospection::variant_cast<int>(args[i]) );
+                    } else if ( *argt == typeid(float) ) {
+                        argList.append( osgIntrospection::variant_cast<float>(args[i]) );
+                    } else if ( *argt == typeid(double) ) {
+                        argList.append( osgIntrospection::variant_cast<double>(args[i]) );
+                    } else if ( *argt == typeid(std::string) ) {
+                        argList.append( osgIntrospection::variant_cast<std::string>(args[i]).c_str() );
+                    } else if ( *argt == typeid(const char*) ) {
+                        argList.append( osgIntrospection::variant_cast<const char*>(args[i]) );
+                    } else if ( *argt == typeid(char*) ) {
+                        argList.append( osgIntrospection::variant_cast<char*>(args[i]) );
+                    } else {
+                        std::cout << "callEventScript: unsupported argument type: " << argt->name() << std::endl;
+                        return false;
+                    }
+                }
+            } catch (...) {
+                std::cout << "callEventScript: something went wrong" << std::endl;
+                return false;
+            }
+
             p = iter->second;
-            p();
-
-        }
-        else {
-            //cout << "Key is not in myMap" << '\n';
-
+            p( eventName.c_str(), types.c_str(), argList );
+            return true;
         }
 
     } catch (boost::python::error_already_set const & ) {
@@ -655,6 +679,6 @@ bool ReferencedNode::callEventScript( const std::string& eventName ) {
     }
 
 
-    return true;
+    return false;
 
 }

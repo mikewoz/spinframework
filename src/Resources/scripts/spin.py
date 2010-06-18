@@ -3,6 +3,20 @@ import os.path
 import imp
 import traceback
 import sys
+import libSPINPyWrap
+
+##########################################################################################
+
+class ScriptBase:
+    _nodeID = ""
+    
+    def applyEvent(self, eventMethod, eventTypes, eventArgs, cascade):
+        method = eventMethod + " " + " ".join(map(str,eventArgs))
+        print( method )
+        libSPINPyWrap.callback( self._nodeID, eventTypes, method, cascade)
+
+
+##########################################################################################
 
 def load_module(code_path):
     try:

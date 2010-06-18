@@ -2214,36 +2214,37 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
     }
 
-    // invoke the method on the node, and if it doesn't work, then just forward
-    // the message:
+    bool eventScriptCalled = false;
+    if ( s->s_type == REFERENCED_NODE ) {
+        //printf("calling eventscript...\n");
+        eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, std::string(types), theArgs );
+    }
 
-    if (!invokeMethod(classInstance, classType, theMethod, theArgs))
-    {
-        //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
-
-        // HACK: TODO: fix this
-        spinApp &spin = spinApp::Instance();
-        if (spin.sceneManager->isServer())
+    if ( !eventScriptCalled ) { // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
+        // invoke the method on the node, and if it doesn't work, then just forward
+        // the message:
+        if (!invokeMethod(classInstance, classType, theMethod, theArgs))
         {
-
-            lo_message msg = lo_message_new();
-            for (i=0; i<argc; i++)
+            //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
+            // HACK: TODO: fix this
+            spinApp &spin = spinApp::Instance();
+            if (spin.sceneManager->isServer())
             {
-                if (lo_is_numerical_type((lo_type)types[i]))
+                lo_message msg = lo_message_new();
+                for (i=0; i<argc; i++)
                 {
-                    lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
-                } else {
-                    lo_message_add_string(msg, (const char*) argv[i] );
+                    if (lo_is_numerical_type((lo_type)types[i]))
+                    {
+                        lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+                    } else {
+                        lo_message_add_string(msg, (const char*) argv[i] );
+                    }
                 }
+                lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
             }
-
-            lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
         }
     }
-    if (s->s_type == REFERENCED_NODE) {
-        //printf("calling eventscript...\n");
-        dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod );
-    }
+
     //pthread_mutex_unlock(&pthreadLock);
 
     return 1;

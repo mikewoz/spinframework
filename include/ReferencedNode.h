@@ -249,8 +249,8 @@ public:
     bool addCronScript( const std::string& scriptPath, double freq, const std::string& params );
     bool callCronScripts();
 
-    bool addEventScript( const std::string& eventName,  const std::string& scriptPath,  const std::string& params );
-    bool callEventScript( const std::string& eventName );
+    bool addEventScript( const std::string& eventName, const std::string& scriptPath,  const std::string& params );
+    bool callEventScript( const std::string& eventName, const std::string& types, osgIntrospection::ValueList& args );
 
  protected:
 
