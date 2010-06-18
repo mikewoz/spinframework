@@ -86,13 +86,11 @@ void *spinClientContext::spinClientThread(void *arg)
     // sync (timecode) receiver:
     if (isMulticastAddress(lo_address_get_hostname(spin.getContext()->lo_syncAddr)))
     {
-    	thiss->lo_syncServ = lo_server_thread_new_multicast(lo_address_get_hostname(spin.getContext()->lo_syncAddr), lo_address_get_port(spin.getContext()->lo_syncAddr), oscParser_error);
+    	thiss->lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(spin.getContext()->lo_syncAddr), lo_address_get_port(spin.getContext()->lo_syncAddr), oscParser_error);
     } else {
-    	thiss->lo_syncServ = lo_server_thread_new(lo_address_get_port(spin.getContext()->lo_syncAddr), oscParser_error);
+    	thiss->lo_syncServ = lo_server_new(lo_address_get_port(spin.getContext()->lo_syncAddr), oscParser_error);
     }
-    lo_server_thread_add_method(thiss->lo_syncServ, std::string("/SPIN/"+spin.getSceneID()).c_str(), NULL, syncCallback, &spin);
-    lo_server_thread_start(thiss->lo_syncServ);
-
+    lo_server_add_method(thiss->lo_syncServ, std::string("/SPIN/"+spin.getSceneID()).c_str(), NULL, syncCallback, &spin);
 
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
@@ -106,6 +104,7 @@ void *spinClientContext::spinClientThread(void *arg)
     static const int TIMEOUT = 10;
     while (!spinBaseContext::signalStop)
     {
+        lo_server_recv_noblock(thiss->lo_syncServ, TIMEOUT); 
         lo_server_recv_noblock(spin.getContext()->lo_infoServ, TIMEOUT); // was 250 ms before
         lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
         // do nothing (assume the app is doing updates - eg, in a draw loop)
@@ -124,8 +123,7 @@ void *spinClientContext::spinClientThread(void *arg)
     thiss->running = false;
 
     // clean up:
-    lo_server_thread_stop(thiss->lo_syncServ);
-    lo_server_thread_free(thiss->lo_syncServ);
+    lo_server_free(thiss->lo_syncServ);
 
     pthread_exit(NULL);
 }

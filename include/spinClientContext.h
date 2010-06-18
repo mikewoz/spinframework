@@ -59,7 +59,7 @@ class spinClientContext : public spinBaseContext
 
 		bool start();
 
-        lo_server_thread lo_syncServ;
+        lo_server lo_syncServ;
 
     private:
         /**
