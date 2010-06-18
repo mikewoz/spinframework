@@ -370,7 +370,9 @@ void spinApp::SceneMessage(lo_message msg)
 
         // if, however, this process acts as a server, we can optimize and send
         // directly to the OSC callback function:
-        else SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
+        else 
+            SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), 
+                    lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
 
     } //else std::cout << "Error: tried to send SceneMssage but SPIN is not running" << std::endl;
 

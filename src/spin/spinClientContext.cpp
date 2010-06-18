@@ -164,7 +164,8 @@ int spinClientContext::sceneCallback(const char * /*path*/, const char *types, l
 
     if (theMethod=="userRefresh")
     {
-        if (spin.userNode.valid()) spin.SceneMessage("sss", "createNode", spin.userNode->id->s_name, "UserNode", LO_ARGS_END);
+        if (spin.userNode.valid()) 
+            spin.SceneMessage("sss", "createNode", spin.userNode->id->s_name, "UserNode", LO_ARGS_END);
     }
 
     return 1;

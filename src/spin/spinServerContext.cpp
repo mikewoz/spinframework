@@ -58,7 +58,6 @@ spinServerContext::spinServerContext()
 
 	// Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
-    spin.setContext(this);
 
 	// override sender and receiver addresses in server mode:
     lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
@@ -66,6 +65,9 @@ spinServerContext::spinServerContext()
 
     // add info channel callback (receives pings from client apps):
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+
+    // now that we've overridden addresses, we can call setContext
+    spin.setContext(this);
 }
 
 spinServerContext::~spinServerContext()
