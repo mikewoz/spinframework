@@ -1,0 +1,11 @@
+
+SPIN Framework
+
+for full documentation, visit http://spinframework.org
+
+Generic build method:
+
+./configure
+make
+sudo make install
+
