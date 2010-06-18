@@ -67,10 +67,6 @@ class spinServerContext : public spinBaseContext
          */
         void startSyncThread();
 
-
-    protected:
-
-
     private:
 
 
@@ -101,7 +97,7 @@ class spinServerContext : public spinBaseContext
         static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 
-
+        lo_address lo_tcpAddr;
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
 };

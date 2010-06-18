@@ -63,6 +63,9 @@ spinServerContext::spinServerContext()
     lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
     lo_txAddr = lo_address_new("226.0.0.1", "54323");
 
+    // add new tcp address for server only
+    lo_tcpAddr = lo_address_new(getMyIPaddress().c_str(), "54322");
+
     // add info channel callback (receives pings from client apps):
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
 
