@@ -51,6 +51,7 @@
 #include "spinApp.h"
 #include "spinServerContext.h"
 #include "spinLog.h"
+#include "config.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -76,6 +77,7 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] <scene-to-load.xml>");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
+	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify a unique ID for this scene (Default: '" + sceneID + "')");
 	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <hostname> <port>", "Set the transmission address where the server sends updates (Default: " + txHost + " " + txPort + ")");
@@ -89,8 +91,13 @@ int main(int argc, char **argv)
 	if (arguments.read("-h") || arguments.read("--help"))
 	{
 		arguments.getApplicationUsage()->write(std::cout);
-		return 1;
+		return 0;
 	}
+    if (arguments.read("--version"))
+    {
+        std::cout << VERSION << std::endl;
+        return 0;
+    }
 	osg::ArgumentParser::Parameter param_spinID(sceneID);
 	arguments.read("-sceneID", param_spinID);
 	spinApp::Instance().setSceneID(sceneID);

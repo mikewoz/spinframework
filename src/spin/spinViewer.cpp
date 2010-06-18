@@ -62,6 +62,7 @@
 #include "GroupNode.h"
 #include "SceneManager.h"
 #include "ShapeNode.h"
+#include "config.h"
 
 extern pthread_mutex_t pthreadLock;
 
@@ -71,7 +72,7 @@ extern pthread_mutex_t pthreadLock;
 // *****************************************************************************
 int main(int argc, char **argv)
 {
-	std::cout <<"\nspinViewer launching..." << std::endl;
+	//std::cout <<"\nspinViewer launching..." << std::endl;
 
 	spinClientContext *spinListener = new spinClientContext();
 	spinApp &spin = spinApp::Instance();
@@ -110,6 +111,7 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a 3D viewer for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options]");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
+	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify an ID for this viewer (Default is hostname: '" + id + "')");
 
@@ -136,9 +138,14 @@ int main(int argc, char **argv)
 	if (arguments.read("-h") || arguments.read("--help"))
 	{
 		arguments.getApplicationUsage()->write(std::cout);
-		return 1;
+		return 0;
 	}
 
+    if (arguments.read("--version"))
+    {
+        std::cout << VERSION << std::endl;
+        return 0;
+    }
 	osg::ArgumentParser::Parameter param_id(id);
 	arguments.read("-id", param_id);
 	osg::ArgumentParser::Parameter param_spinID(sceneID);
