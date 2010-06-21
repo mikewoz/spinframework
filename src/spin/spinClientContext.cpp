@@ -106,6 +106,7 @@ void *spinClientContext::spinClientThread(void *arg)
         lo_server_recv_noblock(context->lo_syncServ, TIMEOUT); 
         lo_server_recv_noblock(context->lo_infoServ, TIMEOUT); // was 250 ms before
         lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
+        lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT); 
         // do nothing (assume the app is doing updates - eg, in a draw loop)
 
         // just send a ping so the server knows we are still here
