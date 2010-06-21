@@ -92,6 +92,12 @@ class spinClientContext : public spinBaseContext
          */
         static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
+        /**
+         * The client uses tcpCallback to get tcp messages from
+         * a server. 
+         */
+        static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
         // register my ip and port for reliable communication with the server
         void subscribe();
 };

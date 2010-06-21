@@ -66,7 +66,7 @@ spinServerContext::spinServerContext()
     // add info channel callback (receives pings from client apps):
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
     // add tcp channel callback (receives subscribe messages from client apps):
-    lo_server_add_method(lo_tcpRxServer_, "/SPIN/__client__", "sss", subscribeCallback, this);
+    lo_server_add_method(lo_tcpRxServer_, "/SPIN/__client__", "ssss", tcpCallback, this);
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
@@ -207,7 +207,7 @@ void *spinServerContext::syncThread(void * /*arg*/)
     return 0;
 }
 
-int spinServerContext::subscribeCallback(const char * path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     spinServerContext *context = static_cast<spinServerContext*>(user_data);
     std::string method(reinterpret_cast<const char*> (argv[0]));
@@ -216,10 +216,19 @@ int spinServerContext::subscribeCallback(const char * path, const char *types, l
     // is some meaningful identifier
     if (method == "subscribe")
     {
-        context->tcpClientAddrs_.push_back(lo_address_new_with_proto(LO_TCP, 
-                    reinterpret_cast<const char*> (argv[1]), 
-                    reinterpret_cast<const char*> (argv[2]))); 
-        std::cout << "Got new subscriber " << lo_address_get_url(context->tcpClientAddrs_.back()) << std::endl;
+        std::string clientID(reinterpret_cast<const char*> (argv[1]));
+
+        // if client with this id already exists, free its address
+        if (context->tcpClientAddrs_.find(clientID) != context->tcpClientAddrs_.end())
+        {
+            std::cerr << "WARNING: new client has same ID as existing client, freeing old client\n";
+            lo_address_free(context->tcpClientAddrs_[clientID]);
+        }
+        context->tcpClientAddrs_[clientID] = lo_address_new_with_proto(LO_TCP, 
+                    reinterpret_cast<const char*> (argv[2]), 
+                    reinterpret_cast<const char*> (argv[3])); 
+        std::cout << "Got new subscriber " << clientID << "@" << 
+            lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
     return 1;
 }
@@ -229,7 +238,7 @@ int spinServerContext::infoCallback(const char * path, const char *types, lo_arg
     //spinApp &spin = spinApp::Instance();
 
     // TODO: monitor /ping/user messages, keep timeout handlers, and remove
-   	// users who are no longer pinging
+    // users who are no longer pinging
 
     return 1;
 }

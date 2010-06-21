@@ -57,6 +57,7 @@ spinClientContext::spinClientContext() : subscribed_(false)
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+    lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
 }
 
 spinClientContext::~spinClientContext()
@@ -231,9 +232,9 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
     spinClientContext *context = static_cast<spinClientContext*>(user_data);
     if (argc != 7)
         return 1;
-    std::string theirServerID(reinterpret_cast<const char*>(argv[0]));
+    std::string theirSceneID(reinterpret_cast<const char*>(argv[0]));
     // make sure my sceneID matches the sceneID whose info message this is
-    if (spinApp::Instance().getSceneID() == theirServerID and not context->subscribed_)
+    if (spinApp::Instance().getSceneID() == theirSceneID and not context->subscribed_)
     {
         std::ostringstream sstr;
         sstr << argv[3]->i;    // convert to string
@@ -246,14 +247,23 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
     return 1;
 }
 
+
+/// this handles tcp communication from the server
+int spinClientContext::tcpCallback(const char * /*path*/, const char * /*types*/, 
+        lo_arg ** argv, int argc, void * /*data*/, void * user_data)
+{
+    // TODO: add some methods!
+    return 1;
+}
+
 void spinClientContext::subscribe()
 {
     std::stringstream sstr;
     // convert to port number to string
     sstr << lo_server_get_port(lo_tcpRxServer_);
 
-    lo_send(lo_serverTCPAddr, "/SPIN/__client__", "sss",
-            "subscribe", getMyIPaddress().c_str(),
+    lo_send(lo_serverTCPAddr, "/SPIN/__client__", "ssss",
+            "subscribe", spinApp::Instance().userNode->getID().c_str(), getMyIPaddress().c_str(),
             sstr.str().c_str());
     subscribed_ = true;
 }

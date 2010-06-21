@@ -44,8 +44,9 @@
 
 #include <boost/python.hpp>
 #include <osg/Timer>
+#include <lo/lo_types.h>
+#include <osg/ref_ptr>
 
-#include "UserNode.h"
 #include "spinUtil.h"
 
 class spinBaseContext;
@@ -59,6 +60,9 @@ class MediaManager;
  * known as libSPIN, and create
  *
  */
+
+class UserNode;
+
 class spinApp
 {
     public:
@@ -116,9 +120,7 @@ class spinApp
         boost::python::object _pyNamespace;
         bool _pyInitialized;
 
-
         osg::ref_ptr<UserNode> userNode;
-
 
         SceneManager *sceneManager;
         MediaManager *mediaManager;
@@ -134,25 +136,12 @@ class spinApp
         spinApp& operator=(spinApp const&);
         ~spinApp();
 
-
         std::string sceneID;
 
         osg::Timer_t _syncStartTick;
 
         spinBaseContext *context;
 };
-
-
-/*
-#define BROADCAST(pNode, types, ...) \
-    if (sceneManager->isServer()) \
-    lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
-
-#define BROADCAST_MSG(pNode, msg) \
-    if (sceneManager->isServer()) \
-    lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
-*/
-
 
 // Internal server-side MACROS for sending messages. Clients should NEVER use
 // these macros, and should rather use spinContext::send* methods. But just in

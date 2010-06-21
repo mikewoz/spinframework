@@ -492,6 +492,11 @@ void ReferencedNode::stateDump ()
 }
 
 
+std::string ReferencedNode::getID() const
+{
+    return std::string(id->s_name);
+}
+
 // *****************************************************************************
 
 //bool ReferencedNode::setScript( const std::string& scr, const std::string& params )

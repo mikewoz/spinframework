@@ -58,7 +58,6 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
 
     setTranslation(0.0, -5.0, 0.5);
     setReportMode(GroupNode::GLOBAL_6DOF);
-
 }
 
 // destructor

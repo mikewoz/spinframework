@@ -239,6 +239,7 @@ public:
     bool setScript( const char *scriptPath );
     bool addEventScript( const std::string& eventName, const std::string& scr, const std::string& params );
     bool callEventScript( const std::string& eventName );
+    std::string getID() const;
 
  protected:
 
