@@ -227,7 +227,11 @@ void ShapeNode::drawShape()
 		shapeGeode = NULL;
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
+	// only draw shape if context matches host or context is empty
+
+	//bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
+	bool drawOnThisHost = (sceneManager->isSlave() && ( (this->getContext()=="") ||  (this->getContext()==getHostname()) ) );
+
 
 	//std::cout << "ShapeNode " << this->id->s_name << " ignore? " << (int)ignoreOnThisHost << std::endl;
 
@@ -237,7 +241,8 @@ void ShapeNode::drawShape()
 	// that do not need to use it!
 	// ACTUALLY, the server needs to know about the geometry to compute 
 	// intersections, determine bounding regions, radius, etc...
-	if (shape && !ignoreOnThisHost)
+	if (shape && drawOnThisHost)
+	//if (shape && !ignoreOnThisHost)
 	{
 
 		osg::TessellationHints* hints = new osg::TessellationHints;
