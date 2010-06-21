@@ -124,9 +124,11 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     else 
         rxServ = lo_server_new(port.c_str(), oscParser_error);
     
+#if 0
     // add OSC callback methods to match various incoming messages:
     // oscCallback_debug() will match any path and args:
     lo_server_add_method(rxServ, NULL, NULL, SceneManagerCallback_debug, NULL);
+#endif
 
     // generic admin callback:
     lo_server_add_method(rxServ, std::string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);

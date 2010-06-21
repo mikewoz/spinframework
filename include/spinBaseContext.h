@@ -102,7 +102,7 @@ class spinBaseContext
         lo_server lo_infoServ;
 
     protected:
-
+        lo_server lo_tcpRxServer_;
         bool running;
         spinContextMode mode;
         /**

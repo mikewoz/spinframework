@@ -82,7 +82,9 @@ spinBaseContext::spinBaseContext()
     lo_rxAddr = lo_address_new("226.0.0.1", "54323");
     lo_txAddr = lo_address_new("226.0.0.1", "54324");
     lo_syncAddr = lo_address_new("226.0.0.1", "54321");
-
+    
+    // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
+    lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
 
     // override infoPort based on environment variable:
     char *infoPortStr = getenv("AS_INFOPORT");
@@ -117,11 +119,16 @@ spinBaseContext::~spinBaseContext()
 
     if (lo_infoServ)
         lo_server_free(lo_infoServ);
-
-    if (lo_rxAddr) lo_address_free(lo_rxAddr);
-    if (lo_txAddr) lo_address_free(lo_txAddr);
-    if (lo_infoAddr) lo_address_free(lo_infoAddr);
-    if (lo_syncAddr) lo_address_free(lo_syncAddr);
+    if (lo_rxAddr) 
+        lo_address_free(lo_rxAddr);
+    if (lo_txAddr) 
+        lo_address_free(lo_txAddr);
+    if (lo_infoAddr) 
+        lo_address_free(lo_infoAddr);
+    if (lo_syncAddr) 
+        lo_address_free(lo_syncAddr);
+    if (lo_tcpRxServer_)
+        lo_server_free(lo_tcpRxServer_);
 }
 
 void spinBaseContext::sigHandler(int signum)
@@ -153,6 +160,8 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
     std::cout << "  INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
     std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
+    std::cout << "  TCP channel:\t\t\t" << lo_server_get_url(lo_tcpRxServer_) <<
+        std::endl;
 
     signalStop = false;
 
@@ -190,6 +199,3 @@ void spinBaseContext::stop()
         while (running) usleep(10);
     }
 }
-
-
-

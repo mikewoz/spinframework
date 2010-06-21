@@ -64,8 +64,8 @@ class spinClientContext : public spinBaseContext
     private:
         // address to which messages can be sent over TCP
         lo_address lo_serverTCPAddr;
-        // server to which messages can be sent over TCP from the server
-        lo_server lo_tcpRxServer_;
+        // true once we've subscribed to a server in TCP
+        bool subscribed_; 
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
          * listens to incoming SPIN messages. It does NOT re-transmit those messages,

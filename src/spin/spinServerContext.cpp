@@ -63,11 +63,10 @@ spinServerContext::spinServerContext()
     lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
     lo_txAddr = lo_address_new("226.0.0.1", "54323");
 
-    // add new tcp address for server only
-    lo_tcpAddr = lo_address_new(getMyIPaddress().c_str(), "54322");
-
     // add info channel callback (receives pings from client apps):
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+    // add tcp channel callback (receives subscribe messages from client apps):
+    lo_server_add_method(lo_tcpRxServer_, "/SPIN/__client__", "sss", subscribeCallback, this);
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
@@ -137,11 +136,10 @@ void *spinServerContext::spinServerThread(void *arg)
     osg::Timer_t frameTick = lastTick;
 
     // convert ports to integers for sending:
-    int i_rxPort, i_txPort, i_syncPort, i_tcpPort;
+    int i_rxPort, i_txPort, i_syncPort;
     fromString<int>(i_rxPort, lo_address_get_port(context->lo_rxAddr));
     fromString<int>(i_txPort, lo_address_get_port(context->lo_txAddr));
     fromString<int>(i_syncPort, lo_address_get_port(context->lo_syncAddr));
-    fromString<int>(i_tcpPort, lo_address_get_port(context->lo_tcpAddr));
 
     UpdateSceneVisitor visitor;
 
@@ -156,7 +154,8 @@ void *spinServerContext::spinServerThread(void *arg)
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
             spin.InfoMessage("/SPIN/__server__", "ssiisii", spin.getSceneID().c_str(),
-                    myIP.c_str(), i_rxPort, i_tcpPort,
+                    myIP.c_str(), i_rxPort, 
+                    lo_server_get_port(context->lo_tcpRxServer_),
                     lo_address_get_hostname(context->lo_txAddr), i_txPort,
                     i_syncPort,
                     LO_ARGS_END);
@@ -170,6 +169,7 @@ void *spinServerContext::spinServerThread(void *arg)
 
         lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
         lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
+        lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT); 
     }
     context->running = false;
 
@@ -192,7 +192,7 @@ void *spinServerContext::syncThread(void * /*arg*/)
     osg::Timer_t frameTick = startTick;
 
     //while (spin.isRunning())
-    while (1)
+    while (true)
     {
         //usleep(1000000 * 0.25); // 1/4 second sleep
         usleep(1000000 * 0.5); // 1/2 second sleep
@@ -207,14 +207,26 @@ void *spinServerContext::syncThread(void * /*arg*/)
     return 0;
 }
 
-int spinServerContext::infoCallback(const char * /*path*/, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int spinServerContext::subscribeCallback(const char * path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+{
+    spinServerContext *context = static_cast<spinServerContext*>(user_data);
+    std::string method(reinterpret_cast<const char*> (argv[0]));
+
+    // FIXME: probably want to replace this list with a map where the key
+    // is some meaningful identifier
+    if (method == "subscribe")
+        context->tcpClientAddrs_.push_back(lo_address_new_with_proto(LO_TCP, 
+                    reinterpret_cast<const char*> (argv[1]), 
+                    reinterpret_cast<const char*> (argv[2]))); 
+    return 1;
+}
+
+int spinServerContext::infoCallback(const char * path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     //spinApp &spin = spinApp::Instance();
 
-
     // TODO: monitor /ping/user messages, keep timeout handlers, and remove
    	// users who are no longer pinging
-
 
     return 1;
 }
