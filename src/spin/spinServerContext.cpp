@@ -215,9 +215,12 @@ int spinServerContext::subscribeCallback(const char * path, const char *types, l
     // FIXME: probably want to replace this list with a map where the key
     // is some meaningful identifier
     if (method == "subscribe")
+    {
         context->tcpClientAddrs_.push_back(lo_address_new_with_proto(LO_TCP, 
                     reinterpret_cast<const char*> (argv[1]), 
                     reinterpret_cast<const char*> (argv[2]))); 
+        std::cout << "Subscribed " << lo_address_get_url(context->tcpClientAddrs_.back()) << std::endl;
+    }
     return 1;
 }
 
