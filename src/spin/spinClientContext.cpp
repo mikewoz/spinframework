@@ -47,8 +47,7 @@
 #include "SceneManager.h"
 
 
-
-spinClientContext::spinClientContext()
+spinClientContext::spinClientContext() : lo_tcpRxServer_(0)
 {
 	// Important: fist thing to do is set the context mode (client vs server)
     mode = CLIENT_MODE;
@@ -57,10 +56,14 @@ spinClientContext::spinClientContext()
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+    // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
+    lo_tcpRxServer_ = lo_server_new(NULL, oscParser_error);
 }
 
 spinClientContext::~spinClientContext()
 {
+    if (lo_tcpRxServer_)
+        lo_server_free(lo_tcpRxServer_);
 }
 
 bool spinClientContext::start()
@@ -77,7 +80,7 @@ bool spinClientContext::start()
 
 void *spinClientContext::spinClientThread(void *arg)
 {
-	spinClientContext *thiss = (spinClientContext*)(arg);
+	spinClientContext *context = (spinClientContext*)(arg);
     spinApp &spin = spinApp::Instance();
 
     // register our special scene callback:
@@ -86,11 +89,11 @@ void *spinClientContext::spinClientThread(void *arg)
     // sync (timecode) receiver:
     if (isMulticastAddress(lo_address_get_hostname(spin.getContext()->lo_syncAddr)))
     {
-    	thiss->lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(spin.getContext()->lo_syncAddr), lo_address_get_port(spin.getContext()->lo_syncAddr), oscParser_error);
+    	context->lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(context->lo_syncAddr), lo_address_get_port(context->lo_syncAddr), oscParser_error);
     } else {
-    	thiss->lo_syncServ = lo_server_new(lo_address_get_port(spin.getContext()->lo_syncAddr), oscParser_error);
+    	context->lo_syncServ = lo_server_new(lo_address_get_port(context->lo_syncAddr), oscParser_error);
     }
-    lo_server_add_method(thiss->lo_syncServ, std::string("/SPIN/"+spin.getSceneID()).c_str(), NULL, syncCallback, &spin);
+    lo_server_add_method(context->lo_syncServ, std::string("/SPIN/" + spin.getSceneID()).c_str(), NULL, syncCallback, &spin);
 
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
@@ -100,13 +103,14 @@ void *spinClientContext::spinClientThread(void *arg)
     int i_rxPort;
     fromString<int>(i_rxPort, lo_address_get_port(spin.getContext()->lo_rxAddr));
 
-    thiss->running = true;
+    context->running = true;
     static const int TIMEOUT = 10;
     while (!spinBaseContext::signalStop)
     {
-        lo_server_recv_noblock(thiss->lo_syncServ, TIMEOUT); 
-        lo_server_recv_noblock(spin.getContext()->lo_infoServ, TIMEOUT); // was 250 ms before
+        lo_server_recv_noblock(context->lo_syncServ, TIMEOUT); 
+        lo_server_recv_noblock(context->lo_infoServ, TIMEOUT); // was 250 ms before
         lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
+        lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT); 
         // do nothing (assume the app is doing updates - eg, in a draw loop)
 
         // just send a ping so the server knows we are still here
@@ -120,14 +124,12 @@ void *spinClientContext::spinClientThread(void *arg)
     }
 
     std::cout << "Exitting spin client thread\n";
-    thiss->running = false;
+    context->running = false;
 
     // clean up:
-    lo_server_free(thiss->lo_syncServ);
-
+    lo_server_free(context->lo_syncServ);
     pthread_exit(NULL);
 }
-
 
 int spinClientContext::sceneCallback(const char * /*path*/, const char *types, lo_arg **argv, 
         int argc, lo_message /*msg*/, void * /*user_data*/)
@@ -234,8 +236,11 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
     if (argc != 7)
         return 1;
     context->lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP, 
-            reinterpret_cast<const char*>(argv[1]), reinterpret_cast<const char*>(argv[3]));
-    context->subscribe();
+            reinterpret_cast<const char*>(argv[1]), 
+            reinterpret_cast<const char*>(argv[3]));
+    std::string theirServerID(reinterpret_cast<const char*>(argv[0]));
+    if (spinApp::Instance().getSceneID() == theirServerID)
+        context->subscribe();
 
     return 1;
 }
@@ -243,8 +248,7 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
 void spinClientContext::subscribe()
 {
     // TODO: subscribe with myip and port at which i can reached
-#if 0
-    lo_send(lo_serverTCPAddr, "/SPIN/__client__/subscribe", "ss", 
-            myIP.c_str(), listenPort_.c_str());
-#endif
+    lo_send(lo_serverTCPAddr, "/SPIN/__client__", "ssi", 
+            "subscribe", getMyIPaddress().c_str(), lo_server_get_port(lo_tcpRxServer_));
 }
+
