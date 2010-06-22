@@ -73,6 +73,8 @@ class spinApp
         void setContext(spinBaseContext *c);
         spinBaseContext *getContext() { return context; }
 
+		void createScene();
+		
 
         /**
          * This method should be used to register a user for a listener-style

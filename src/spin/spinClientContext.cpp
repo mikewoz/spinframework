@@ -75,6 +75,7 @@ void *spinClientContext::spinClientThread(void *arg)
 {
 	spinClientContext *context = (spinClientContext*)(arg);
     spinApp &spin = spinApp::Instance();
+	spin.createScene();
     spin.registerUser();
 
     // register our special scene callback:

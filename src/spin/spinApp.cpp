@@ -160,7 +160,16 @@ void spinApp::setContext(spinBaseContext *c)
 {
 	context = c;
     // make scene manager
-    sceneManager = new SceneManager(getSceneID(), lo_address_get_hostname(getContext()->lo_rxAddr), lo_address_get_port(getContext()->lo_rxAddr));
+	//createScene(); // mikewoz moved this to the start of the client/server threads
+}
+
+void spinApp::createScene()
+{
+	if (context)
+		//if (!sceneManager)
+		sceneManager = new SceneManager(getSceneID(), lo_address_get_hostname(getContext()->lo_rxAddr), lo_address_get_port(getContext()->lo_rxAddr));
+	else
+		std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
 }
 
 // *****************************************************************************
