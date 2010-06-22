@@ -68,7 +68,7 @@
 extern pthread_mutex_t pthreadLock;
 
 
-spinApp::spinApp()
+spinApp::spinApp() : userID_(getHostname())
 {
 
 #ifdef __Darwin
@@ -136,7 +136,6 @@ spinApp::spinApp()
     setSyncStart(0);
 
     _pyInitialized = false;
-
 }
 
 spinApp::~spinApp()
@@ -227,9 +226,8 @@ bool spinApp::execPython( const std::string& cmd ) {
 
 // *****************************************************************************
 
-void spinApp::registerUser (const char *id)
+void spinApp::registerUser()
 {
-
     if (sceneManager)
     {
         // Here we force the creation of a (local) UserNode, so that we are sure
@@ -237,7 +235,7 @@ void spinApp::registerUser (const char *id)
         // our ViewerManipulator, and tracker node before receiver the official
         // createNode message from the server.
 
-        userNode = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(id, "UserNode"));
+        userNode = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(userID_.c_str(), "UserNode"));
 
         // We then send a message to the server to create the node. If the
         // server doesn't exist yet, it doesn't really matter, since we are
@@ -252,7 +250,7 @@ void spinApp::registerUser (const char *id)
 
     if (!userNode.valid())
     {
-        std::cout << "ERROR: Could not registerUser '" << id << "'. Perhaps SPIN is not running?" << std::endl;
+        std::cout << "ERROR: Could not registerUser '" << userID_ << "'. Perhaps SPIN is not running?" << std::endl;
     }
 }
 

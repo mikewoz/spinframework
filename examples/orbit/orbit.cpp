@@ -13,16 +13,14 @@
 
 int main(int argc, char **argv)
 {
-	spinClientContext *spinListener = new spinClientContext();
-
-	if (!spinListener->start())
-	{
-        std::cout << "ERROR: could not start SPIN client thread" << std::endl;
-        exit(1);
-	}
-
+	spinClientContext spinListener;
 	spinApp &spin = spinApp::Instance();
 
+	if (!spinListener.start())
+	{
+        std::cout << "ERROR: could not start SPIN client thread" << std::endl;
+        exit(EXIT_FAILURE);
+	}
 
 	spin.SceneMessage("sss",
 			"createNode",
@@ -41,10 +39,9 @@ int main(int argc, char **argv)
 
 	std::cout << "\nRunning example. Press CTRL-C to quit..." << std::endl;
 
-
-    while (spinListener->isRunning()) // send signal (eg, ctrl-c to stop)
+    while (spinListener.isRunning()) // send signal (eg, ctrl-c to stop)
     {
-		for (int i=0;i<numSamples;++i)
+		for (int i = 0; i < numSamples; ++i)
 		{
 			float angle = i * 2.0f*osg::PI/((float)numSamples-1.0f);
 
@@ -58,5 +55,5 @@ int main(int argc, char **argv)
 			usleep(1000000 * orbitDuration / numSamples);
 		}
     }
-
+    return 0;
 }

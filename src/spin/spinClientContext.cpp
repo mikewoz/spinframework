@@ -48,7 +48,7 @@
 #include "SceneManager.h"
 
 
-spinClientContext::spinClientContext() : subscribed_(false)
+spinClientContext::spinClientContext() : doSubscribe_(true)
 {
 	// Important: fist thing to do is set the context mode (client vs server)
     mode = CLIENT_MODE;
@@ -75,6 +75,7 @@ void *spinClientContext::spinClientThread(void *arg)
 {
 	spinClientContext *context = (spinClientContext*)(arg);
     spinApp &spin = spinApp::Instance();
+    spin.registerUser();
 
     // register our special scene callback:
     lo_server_add_method(spin.sceneManager->rxServ, ("/SPIN/" + spin.getSceneID()).c_str(), NULL, sceneCallback, NULL);
@@ -230,7 +231,7 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
         return 1;
     std::string theirSceneID(reinterpret_cast<const char*>(argv[0]));
     // make sure my sceneID matches the sceneID whose info message this is
-    if (spinApp::Instance().getSceneID() == theirSceneID and not context->subscribed_)
+    if (spinApp::Instance().getSceneID() == theirSceneID and context->doSubscribe_)
     {
         std::ostringstream sstr;
         sstr << argv[3]->i;    // convert to string
@@ -265,6 +266,6 @@ void spinClientContext::subscribe()
                 "subscribe", spinApp::Instance().userNode->getID().c_str(), getMyIPaddress().c_str(),
                 sstr.str().c_str());
     }
-    subscribed_ = true;
+    doSubscribe_ = false;
 }
 

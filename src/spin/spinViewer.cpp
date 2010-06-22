@@ -77,8 +77,7 @@ int main(int argc, char **argv)
 	spinClientContext spinListener;
 	spinApp &spin = spinApp::Instance();
 
-	std::string id = getHostname();
-	
+	std::string userID;
 	bool picker = false;
 	bool mover = true;
 	
@@ -111,7 +110,7 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify an ID for this viewer (Default is hostname: '" + id + "')");
+	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify a user ID for this viewer (Default is hostname: '" + userID + "')");
 
 	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
 	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <host> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
@@ -143,8 +142,11 @@ int main(int argc, char **argv)
         std::cout << VERSION << std::endl;
         return 0;
     }
-	osg::ArgumentParser::Parameter param_id(id);
-	arguments.read("-id", param_id);
+	osg::ArgumentParser::Parameter param_userID(userID);
+	arguments.read("-id", param_userID);
+    if (not userID.empty())
+        spin.setUserID(userID);
+
 	osg::ArgumentParser::Parameter param_spinID(sceneID);
 	arguments.read("-sceneID", param_spinID);
 	spin.setSceneID(sceneID);
@@ -189,9 +191,6 @@ int main(int argc, char **argv)
 	}
 
 	spin.sceneManager->setGraphical(true);
-
-	spin.registerUser(id.c_str());
-		
 
 	// *************************************************************************
 	// get details on keyboard and mouse bindings used by the viewer.

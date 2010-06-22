@@ -1,0 +1,4 @@
+GOAL:
+Get liblo stuff out of scene manager
+1) Move rxServ from scene manager to base context
+2) move relevant callbacks to base context

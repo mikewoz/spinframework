@@ -79,7 +79,7 @@ class spinApp
          * SPIN client. The user is definitively created and stored in the
          * current application context, even if a server is not running.
          */
-        void registerUser(const char *id);
+        void registerUser();
 
         /**
          * This sends a variable length message.
@@ -124,8 +124,11 @@ class spinApp
 
         SceneManager *sceneManager;
         MediaManager *mediaManager;
+        void setUserID(const std::string &id) { userID_ = id; }
 
     private:
+        // can be overridden in client apps
+        std::string userID_;
         void sendBundle(std::string OSCpath, std::vector<lo_message> msgs);
 
         // singleton constructors & desctructor (hidden):
