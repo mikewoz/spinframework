@@ -44,6 +44,8 @@
 #include "osgUtil.h"
 
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 
 //extern SceneManager *sceneManager;
 

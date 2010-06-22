@@ -136,11 +136,12 @@ spinApp::spinApp()
     setSyncStart(0);
 
     _pyInitialized = false;
+
 }
 
 spinApp::~spinApp()
 {
-
+    delete sceneManager;
 	//spinBaseContext::signalStop = true;
 }
 
@@ -159,6 +160,8 @@ spinApp& spinApp::Instance() {
 void spinApp::setContext(spinBaseContext *c)
 {
 	context = c;
+    // make scene manager
+    sceneManager = new SceneManager(getSceneID(), lo_address_get_hostname(getContext()->lo_rxAddr), lo_address_get_port(getContext()->lo_rxAddr));
 }
 
 // *****************************************************************************
@@ -280,7 +283,7 @@ void spinApp::InfoMessage(std::string OSCpath, lo_message msg)
 {
 	if (context)
 	{
-		lo_send_message_from(context->lo_infoAddr, lo_server_thread_get_server(context->lo_infoServ), OSCpath.c_str(), msg);
+		lo_send_message_from(context->lo_infoAddr, context->lo_infoServ, OSCpath.c_str(), msg);
 
 		// Let's free the message after (not sure if this is necessary):
 		lo_message_free(msg);
@@ -367,10 +370,42 @@ void spinApp::SceneMessage(lo_message msg)
 
         // if, however, this process acts as a server, we can optimize and send
         // directly to the OSC callback function:
-        else SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
+        else 
+            SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), 
+                    lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
 
     } //else std::cout << "Error: tried to send SceneMssage but SPIN is not running" << std::endl;
 
     // Let's free the message after (not sure if this is necessary):
     lo_message_free(msg);
 }
+
+
+void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
+{
+    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name); 
+    sendBundle(OSCpath,msgs);
+}
+
+void spinApp::SceneBundle(std::vector<lo_message> msgs)
+{
+    std::string OSCpath = "/SPIN/" + sceneID;
+    sendBundle(OSCpath, msgs);
+}
+
+void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
+{
+    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+
+    std::vector<lo_message>::iterator iter = msgs.begin();
+    while (iter != msgs.end())
+    {
+        //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
+        lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+        msgs.erase(iter); // iterator automatically advances after erase()
+    }
+
+    lo_send_bundle(context->lo_txAddr, b);
+    lo_bundle_free_messages(b);
+}
+

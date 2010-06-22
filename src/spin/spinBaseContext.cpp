@@ -70,8 +70,6 @@ pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
 
 bool spinBaseContext::signalStop = false;
 
-
-
 spinBaseContext::spinBaseContext()
 {
 	signalStop = true;
@@ -79,14 +77,14 @@ spinBaseContext::spinBaseContext()
 
     signal(SIGINT, sigHandler);
 
-
     // set default addresses (can be overridden):
     lo_infoAddr = lo_address_new("226.0.0.1", "54320");
     lo_rxAddr = lo_address_new("226.0.0.1", "54323");
     lo_txAddr = lo_address_new("226.0.0.1", "54324");
-    lo_tcpAddr = lo_address_new("226.0.0.1", "54322");
     lo_syncAddr = lo_address_new("226.0.0.1", "54321");
-
+    
+    // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
+    lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
 
     // override infoPort based on environment variable:
     char *infoPortStr = getenv("AS_INFOPORT");
@@ -101,20 +99,17 @@ spinBaseContext::spinBaseContext()
     // set up infoPort listener thread:
     if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
-        lo_infoServ = lo_server_thread_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
-
+        lo_infoServ = lo_server_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
     } else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
-        lo_infoServ = lo_server_thread_new(lo_address_get_port(lo_infoAddr), oscParser_error);
-        int sock = lo_server_get_socket_fd(lo_server_thread_get_server(lo_infoServ));
+        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+        int sock = lo_server_get_socket_fd(lo_infoServ);
         int sockopt = 1;
         setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
 
     } else {
-        lo_infoServ = lo_server_thread_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
     }
-    lo_server_thread_start(lo_infoServ);
-
 }
 
 spinBaseContext::~spinBaseContext()
@@ -122,28 +117,29 @@ spinBaseContext::~spinBaseContext()
     this->stop();
 
     if (lo_infoServ)
-    {
-        lo_server_thread_stop(lo_infoServ);
-        lo_server_thread_free(lo_infoServ);
-    }
-
-    if (lo_rxAddr) lo_address_free(lo_rxAddr);
-    if (lo_txAddr) lo_address_free(lo_txAddr);
-    if (lo_infoAddr) lo_address_free(lo_infoAddr);
-    if (lo_syncAddr) lo_address_free(lo_syncAddr);
+        lo_server_free(lo_infoServ);
+    if (lo_rxAddr) 
+        lo_address_free(lo_rxAddr);
+    if (lo_txAddr) 
+        lo_address_free(lo_txAddr);
+    if (lo_infoAddr) 
+        lo_address_free(lo_infoAddr);
+    if (lo_syncAddr) 
+        lo_address_free(lo_syncAddr);
+    if (lo_tcpRxServer_)
+        lo_server_free(lo_tcpRxServer_);
 }
-
-
 
 void spinBaseContext::sigHandler(int signum)
 {
     std::cout << " Caught signal: " << signum << std::endl;
 
-    spinApp &spin = spinApp::Instance();
+//    spinApp &spin = spinApp::Instance();
 
     // unlock mutex so we can clean up:
     pthread_mutex_unlock(&pthreadLock);
 
+#if 0
     // TODO: we really shouldn't do anything like this here. Can we get rid of
     // this?:
     if (spin.userNode.valid())
@@ -154,17 +150,17 @@ void spinBaseContext::sigHandler(int signum)
         // now deleting the node in the sceneManager should release the last instance:
         spin.sceneManager->doDelete(heldPointer);
     }
+#endif
 
     spinBaseContext::signalStop = true;
-
 }
-
-
 
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
     std::cout << "  INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
     std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
+    std::cout << "  TCP channel:\t\t\t" << lo_server_get_url(lo_tcpRxServer_) <<
+        std::endl;
 
     signalStop = false;
 
@@ -202,6 +198,3 @@ void spinBaseContext::stop()
         while (running) usleep(10);
     }
 }
-
-
-

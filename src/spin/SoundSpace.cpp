@@ -42,6 +42,8 @@
 
 #include "SoundSpace.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 
 using namespace std;
 

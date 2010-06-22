@@ -52,7 +52,6 @@
  */
 class spinClientContext : public spinBaseContext
 {
-
     public:
 
 		spinClientContext();
@@ -60,13 +59,13 @@ class spinClientContext : public spinBaseContext
 
 		bool start();
 
-        lo_server_thread lo_syncServ;
-
-    protected:
+        lo_server lo_syncServ;
 
     private:
-
-
+        // address to which messages can be sent over TCP
+        lo_address lo_serverTCPAddr;
+        // true once we've subscribed to a server in TCP
+        bool subscribed_; 
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
          * listens to incoming SPIN messages. It does NOT re-transmit those messages,
@@ -86,5 +85,20 @@ class spinClientContext : public spinBaseContext
          * the server, and adjust its internal clock to match the server
          */
         static int syncCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+        
+        /**
+         * The client uses infoCallback to find out which port it can connect to 
+         * on a server. 
+         */
+        static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+        /**
+         * The client uses tcpCallback to get tcp messages from
+         * a server. 
+         */
+        static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+        // register my ip and port for reliable communication with the server
+        void subscribe();
 };
 #endif

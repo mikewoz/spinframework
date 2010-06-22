@@ -46,6 +46,7 @@
 #include <osgDB/FileUtils>
 
 #include "spinApp.h"
+#include "spinBaseContext.h"
 #include "ReferencedNode.h"
 #include "SceneManager.h"
 
@@ -104,7 +105,7 @@ ReferencedNode::~ReferencedNode()
     {
         // unregister with OSC parser:
         string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-        lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
+        lo_server_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
     }
 
     id->s_thing = 0;
@@ -118,7 +119,7 @@ void ReferencedNode::registerNode(SceneManager *s)
 
     // register with OSC parser:
     string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-    lo_server_thread_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)id);
+    lo_server_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)id);
 #ifdef OSCDEBUG
     std::cout << "oscParser registered: " << oscPattern << std::endl;
 #endif
@@ -462,23 +463,14 @@ std::vector<lo_message> ReferencedNode::getState ()
 // *****************************************************************************
 void ReferencedNode::stateDump ()
 {
-
-    sceneManager->sendNodeBundle(this->id, this->getState());
-
-    /*
-    vector<lo_message> nodeState = this->getState();
-
-    vector<lo_message>::iterator iter = nodeState.begin();
-    while (iter != nodeState.end())
-    {
-        sceneManager->sendNodeMessage(this->id, (*iter));
-        //if (sceneManager->txServ) lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/node/"+string(this->id->s_name)).c_str(), (*iter));
-        //lo_message_free(*iter);
-        nodeState.erase(iter); //note: iterator automatically advances after erase()
-    }
-    */
+    spinApp::Instance().NodeBundle(this->id, this->getState());
 }
 
+
+std::string ReferencedNode::getID() const
+{
+    return std::string(id->s_name);
+}
 
 // *****************************************************************************
 

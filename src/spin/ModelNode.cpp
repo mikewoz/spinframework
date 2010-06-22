@@ -59,6 +59,8 @@
 #include "ModelNode.h"
 #include "osgUtil.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "MediaManager.h"
 #include "nodeVisitors.h"
 
@@ -150,7 +152,8 @@ void ModelNode::setKeyframe (int index, float keyframe)
 
 	if (switcher[index].valid())
 	{
-		for (int j=1; j<switcher[index]->getNumChildren(); j++) switcher[index]->setValue(j, false);
+		for (unsigned j = 1; j < switcher[index]->getNumChildren(); j++) 
+            switcher[index]->setValue(j, false);
 		switcher[index]->setValue((int)(switcher[index]->getNumChildren()*_keyframe[index]), true);
 	}
 
@@ -250,7 +253,7 @@ void ModelNode::drawModel()
 		}
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
+	bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() and (this->getContext()==getHostname()));
 	
 	if ((modelPath != string("NULL")) && !ignoreOnThisHost)
 	{

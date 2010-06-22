@@ -45,8 +45,11 @@
 
 #include "GroupNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 #include "UserNode.h"
+#include "spinApp.h"
 
 
 
@@ -116,7 +119,7 @@ void GroupNode::callbackUpdate()
     // Now we need to update translation/orientation based on our velocity/spin.
     // We find out how many seconds passed since the last time this was called,
     // and move by _velocity*dt (ie, m/s) and rotate by _spin*dt (ie, deg/sec)
-    if ( !sceneManager->isSlave() )
+    if ( spinApp::Instance().getContext()->isServer() )
     {
         osg::Timer_t tick = osg::Timer::instance()->tick();
         float dt = osg::Timer::instance()->delta_s(lastTick,tick);
@@ -193,7 +196,7 @@ void GroupNode::updateNodePath()
 
 // *****************************************************************************
 
-void GroupNode::mouseEvent (int event, int keyMask, int buttonMask, float x, float y)
+void GroupNode::mouseEvent (int /*event*/, int keyMask, int buttonMask, float x, float y)
 {
     // TODO
     BROADCAST(this, "siiiff", "mouseEvent", keyMask, buttonMask, x, y);

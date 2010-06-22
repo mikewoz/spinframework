@@ -76,7 +76,6 @@ class spinBaseContext
 		 */
 		static bool signalStop;
 
-
         enum spinContextMode { SERVER_MODE, CLIENT_MODE };
 
         bool isServer() { return (bool)(mode==SERVER_MODE); }
@@ -94,31 +93,25 @@ class spinBaseContext
          */
         void stop();
 
-
         bool isRunning() { return running; }
-
 
         lo_address lo_rxAddr;
         lo_address lo_txAddr;
         lo_address lo_infoAddr;
         lo_address lo_syncAddr;
-        lo_address lo_tcpAddr;
+        lo_server lo_infoServ;
 
+    protected:
+        lo_server lo_tcpRxServer_;
+        bool running;
+        spinContextMode mode;
         /**
          * All contexts would probably like to listen to infoPort broadcasts.
          * A client can listen for info about the server, such as the correct
          * ports to send messages. The server can listen to pings from clients
          * to determine if they are still alive and connected.
          */
-        lo_server_thread lo_infoServ;
 
-    protected:
-
-
-
-        bool running;
-
-        spinContextMode mode;
 
     private:
 
@@ -127,7 +120,5 @@ class spinBaseContext
         pthread_attr_t pthreadAttr;
 
 };
-
-
 
 #endif

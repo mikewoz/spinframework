@@ -48,6 +48,8 @@
 #include <iostream>
 
 #include "ImageTexture.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 
 
 

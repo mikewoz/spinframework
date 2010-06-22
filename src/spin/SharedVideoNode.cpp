@@ -294,7 +294,7 @@ void SharedVideoNode::drawShape()
 {
     // Then check if the new value is equivalent to this machine's hostname.
     // If so, prevent it from drawing anything (but only for client threads)
-    if (sceneManager->isSlave() && (host==getHostname()))
+    if (not spinApp::Instance().getContext->isServer() && (host==getHostname()))
     {
         this->setShape(ShapeNode::NONE);
     } else {

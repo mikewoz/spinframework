@@ -54,6 +54,8 @@
 #include "RayNode.h"
 #include "GroupNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 
 using namespace std;
@@ -468,21 +470,16 @@ void PointerNode::highlight (int b)
  */
 void PointerNode::manipulate (int b)
 {
-    if (sceneManager->isSlave() && !dragger.valid()) return;
+    if (not spinApp::Instance().getContext()->isServer() and not dragger.valid()) 
+        return;
 
     pthread_mutex_lock(&pthreadLock);
-
-
-
-
     // Start manipulation:
 
     // Note, the dragger should have been set by the highlight() method
 
-
     if (b && intersectList.size() && dragger.valid())
     {
-
         // reset selection:
         selection->setMatrix(osg::Matrix::identity());
 
@@ -558,20 +555,18 @@ void PointerNode::manipulate (int b)
 void PointerNode::grab (int b)
 {
     // return if this spinContext is a slave
-    if (sceneManager->isSlave()) return;
-
+    if (not spinApp::Instance().getContext()->isServer()) 
+        return;
 
     osg::Matrix srcMatrix, dstMatrix;
 
-
     // start grab:
-    if (b && intersectList.size())
+    if (b and intersectList.size())
     {
 
         // What do we do if a node is already grabbed? let go and grab again?
         // ... for now, let's do nothing.
         if (grabbedNode.valid()) return;
-
 
         grabbedNode = getNodeFromIntersections();
 

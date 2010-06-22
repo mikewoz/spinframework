@@ -44,7 +44,8 @@
 #include <osg/Geometry>
 #include <osg/Billboard>
 
-
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 #include "ShapeNode.h"
 #include "SceneManager.h"
@@ -228,23 +229,18 @@ void ShapeNode::drawShape()
 	}
 
 	// only draw shape if context matches host or context is empty
-
-	//bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
-	bool drawOnThisHost = (sceneManager->isSlave() && ( (this->getContext()=="") ||  (this->getContext()==getHostname()) ) );
-
-
-	//std::cout << "ShapeNode " << this->id->s_name << " ignore? " << (int)ignoreOnThisHost << std::endl;
-
+    // Have to use to a string "NULL" because OSC cannot do empty strings
+	bool drawOnThisHost = (not spinApp::Instance().getContext()->isServer()) 
+            and (this->getContextString() == getHostname() or this->getContextString() == "NULL");
 
 	// TODO: this should only be added if this application is a graphical renderer.
 	// There is no point to actually add the memory of the ShapeDrawable for apps
 	// that do not need to use it!
 	// ACTUALLY, the server needs to know about the geometry to compute 
 	// intersections, determine bounding regions, radius, etc...
-	if (shape && drawOnThisHost)
 	//if (shape && !ignoreOnThisHost)
+	if (shape and drawOnThisHost)
 	{
-
 		osg::TessellationHints* hints = new osg::TessellationHints;
 		hints->setDetailRatio(GENERIC_SHAPE_RESOLUTION);
 
@@ -261,6 +257,8 @@ void ShapeNode::drawShape()
 					b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
 					b->setNormal(osg::Vec3(0.0f,1.0f,0.0f));
 					break;
+                default:
+                    break;
 			}
 			shapeGeode = b;
 			
@@ -535,8 +533,6 @@ std::vector<lo_message> ShapeNode::getState ()
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setShape", getShape());
 	ret.push_back(msg);
-
-
 
 	return ret;
 }

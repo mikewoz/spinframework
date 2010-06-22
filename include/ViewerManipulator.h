@@ -46,6 +46,14 @@
 #include <osgViewer/View>
 #include <osgGA/NodeTrackerManipulator>
 
+// forward declarations
+class GroupNode;
+
+namespace osgViewer {
+    class View;
+}
+
+#include "spinBaseContext.h"
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
@@ -74,8 +82,6 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		//ViewerManipulator(UserNode *u);
 		ViewerManipulator();
 		
-		void setRedirection(std::string addr, std::string port);
-		
 		void setPicker(bool b);
 		void setMover(bool b);
 		void setRaw(bool b);
@@ -102,16 +108,12 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
 		//t_symbol *selectedNode;
 		std::vector<t_symbol*> selectedNodes;
 		
-		lo_address redirectAddr;
-		lo_server_thread  redirectServ;
-		
 		bool picker, mover, raw;
 		float lastX, lastY;
 		float clickX, clickY;
 		
 		osg::Vec3 lastHitPoint;
 };
-
 
 
 #endif

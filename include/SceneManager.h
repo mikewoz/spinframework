@@ -95,15 +95,7 @@ class SceneManager
         void init();
         void debug();
 
-        lo_address rxAddr;
-        lo_server_thread rxServ;
-
-        lo_address txAddr;
-        lo_server  txServ;
-        //lo_server_thread  txServ;
-
-        bool isServer() { return (bool) txServ; }
-        bool isSlave() { return (bool) !txServ; }
+        lo_server rxServ;
 
         void setGraphical(bool b) { graphicalMode = b; }
         bool isGraphical() { return (bool) graphicalMode; }
@@ -111,18 +103,11 @@ class SceneManager
         //void setLogFile(const char *logfile);
         void setLog(spinLog& log);
 
-        void setTXaddress (std::string addr, std::string port);
-
         void registerStateSet(ReferencedStateSet *s);
         void unregisterStateSet(ReferencedStateSet *s);
 
-
         void sendNodeList(std::string type);
         void sendConnectionList();
-        void sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
-        void sendSceneBundle(std::vector<lo_message> msgs);
-        void sendBundle(std::string OSCpath, std::vector<lo_message> msgs);
-
 
         ReferencedNode *createNode(std::string id, std::string type);
         ReferencedNode *createNode(const char *id, const char *type);
@@ -274,42 +259,5 @@ int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv
 
 
 void oscParser_error(int num, const char *msg, const char *path);
-
-/*
-#define BROADCAST(pNode, types, ...) \
-    if (sceneManager->isServer()) \
-    lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__)
-
-#define BROADCAST_MSG(pNode, msg) \
-    if (sceneManager->isServer()) \
-    lo_send_message_from(sceneManager->txAddr, sceneManager->txServ, ("/SPIN/"+sceneManager->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
-*/
-
-
-// Internal server-side MACROS for sending messages. Clients should NEVER use
-// these macros, and should rather use spinContext::send* methods. But just in
-// case, the macros always check that the passed SceneManager (s) is a server.
-
-#define SCENE_MSG(s, types, ...) \
-    if (s->isServer()) \
-    lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
-
-#define SCENE_LO_MSG(s, msg) \
-    if (s->isServer()) \
-    lo_send_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID).c_str(), msg)
-
-#define NODE_MSG(s, pNode, types, ...) \
-    if (s->isServer()) \
-    lo_send_from(s->txAddr, s->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
-
-#define NODE_LO_MSG(s, pNode, msg) \
-    if (s->isServer()) \
-    lo_send_message_from(s->txAddr, s->txServ, ("/SPIN/"+s->sceneID+"/"+std::string(pNode->id->s_name)).c_str(), msg)
-
-
-// backwards compatibility (TODO: replace all BROADCAST messages with NODE_MSG)
-#define BROADCAST(pNode, types, ...) NODE_MSG(pNode->sceneManager, pNode, types, ##__VA_ARGS__)
-
-
 
 #endif

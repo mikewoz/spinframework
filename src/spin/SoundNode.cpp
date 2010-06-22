@@ -41,12 +41,11 @@
 
 #include <osg/ShapeDrawable>
 #include <osg/PolygonMode>
-//#include <osgUtil/Optimizer>
-//#include <osgUtil/SmoothingVisitor>
-//#include <osg/TessellationHints>
 
 #include "SoundNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 
 using namespace std;

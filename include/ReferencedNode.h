@@ -161,7 +161,7 @@ public:
     /**
      * Returns the current parent as an osg::Group
      */
-    osg::Group *getParent(unsigned int i) { return osg::Group::getParent(i); }
+    osg::Group *getParent(int i) { return osg::Group::getParent(i); }
 
     /**
      * A node can 'belong' to a certain host machine, allowing it to be rendered
@@ -178,6 +178,7 @@ public:
      * Returns the current host
      */
     const char *getContext() { return contextString.c_str(); }
+    std::string getContextString() { return contextString; }
 
     void setParam (const char *paramName, const char *paramValue);
     void setParam (const char *paramName, float paramValue);
@@ -245,6 +246,7 @@ public:
 
     //bool setScript( const std::string& s, const std::string& params );
     //bool setScript( const char *scriptPath, double freq );  // freq is nb of calls per second
+    std::string getID() const;
 
     bool addCronScript( const std::string& scriptPath, double freq, const std::string& params );
     bool callCronScripts();

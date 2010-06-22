@@ -44,6 +44,8 @@
 
 #include <iostream>
 
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "SceneManager.h"
 #include "ReferencedStateSet.h"
 
@@ -181,7 +183,7 @@ void ReferencedStateSet::replace(osg::StateSet *ss)
 void ReferencedStateSet::debug()
 {
 	lo_arg **args;
-	int i, argc;
+	int argc;
 	char *argTypes;
 
 	std::cout << "****************************************" << std::endl;
@@ -191,10 +193,8 @@ void ReferencedStateSet::debug()
 
 	
 	std::cout << "   Shared by:";
-	for (i=0; i<getNumParents(); i++)
-	{
+	for (unsigned i = 0; i < getNumParents(); i++)
 		std::cout << " " << getParent(i)->getName();
-	}
 	std::cout << std::endl;
 
 	//osg::ref_ptr<ReferencedStateSet> test = this;
@@ -210,7 +210,7 @@ void ReferencedStateSet::debug()
 	    args = lo_message_get_argv(*nodeStateIterator);
 
 	    std::cout << "  ";
-	    for (i = 0; i<argc; i++) {
+	    for (int i = 0; i < argc; i++) {
 		    std::cout << " ";
 	    	if (lo_is_numerical_type((lo_type)argTypes[i]))
 	    	{
@@ -238,5 +238,5 @@ std::vector<lo_message> ReferencedStateSet::getState ()
 
 void ReferencedStateSet::stateDump()
 {
-	sceneManager->sendNodeBundle(this->id, this->getState());
+    spinApp::Instance().NodeBundle(this->id, this->getState());
 }

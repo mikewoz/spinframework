@@ -41,6 +41,8 @@
 
 #include "MeasurementNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "osgUtil.h"
 
 using namespace std;
@@ -155,7 +157,7 @@ void MeasurementNode::callbackUpdate()
         lo_message_add( msg, "sf", "targetIncidence", snkIncidence );
         msgs.push_back(msg);
 
-        sceneManager->sendNodeBundle(this->id, msgs);
+        spinApp::Instance().NodeBundle(this->id, msgs);
 
     }
 

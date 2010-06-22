@@ -41,6 +41,8 @@
 
 #include "UserNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 
 using namespace std;
 
@@ -49,28 +51,27 @@ using namespace std;
 // constructor:
 UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
 {
-	nodeType = "UserNode";
-	this->setName(string(id->s_name) + ".UserNode");
+    nodeType = "UserNode";
+    this->setName(string(id->s_name) + ".UserNode");
 
-	_description = string(initID);
-	
-	setTranslation(0.0, -5.0, 0.5);
-	setReportMode(GroupNode::GLOBAL_6DOF);
+    _description = string(initID);
 
+    setTranslation(0.0, -5.0, 0.5);
+    setReportMode(GroupNode::GLOBAL_6DOF);
 }
 
 // destructor
 UserNode::~UserNode()
 {
-	//std::cout << "Destroying UserNode: " << id->s_name << std::endl;
+    //std::cout << "Destroying UserNode: " << id->s_name << std::endl;
 }
 
 // *****************************************************************************
 
 void UserNode::updateNodePath()
 {
-	GroupNode::updateNodePath();
-	this->nodepathUpdate = true;
+    GroupNode::updateNodePath();
+    this->nodepathUpdate = true;
 }
 
 // *****************************************************************************
@@ -78,8 +79,8 @@ void UserNode::updateNodePath()
 
 void UserNode::setDescription (const char *newvalue)
 {
-	_description = string(newvalue);
-	BROADCAST(this, "ss", "setDescription", getDescription());
+    _description = string(newvalue);
+    BROADCAST(this, "ss", "setDescription", getDescription());
 }
 
 

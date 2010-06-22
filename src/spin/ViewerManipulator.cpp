@@ -67,9 +67,6 @@ ViewerManipulator::ViewerManipulator()
 	this->picker = false;
 	this->mover = true;	
 	
-	redirectAddr = NULL;
-	redirectServ = NULL;
-
 	// set up user node tracker:
 	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
 	setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
@@ -80,46 +77,6 @@ ViewerManipulator::ViewerManipulator()
 
 ViewerManipulator::~ViewerManipulator()
 {
-	if (redirectServ)
-	{
-		lo_server_thread_stop(redirectServ);
-		usleep(100);
-	
-		lo_server_thread_free(redirectServ);
-	}
-}
-
-
-void ViewerManipulator::setRedirection(std::string addr, std::string port)
-{
-	//if (redirectServ) lo_server_free(redirectServ);
-	
-	redirectAddr = lo_address_new(addr.c_str(), port.c_str());
-	
-	if (isMulticastAddress(addr))
-	{
-		redirectServ = lo_server_thread_new_multicast(addr.c_str(), NULL, oscParser_error);
-	}
-
-	else if (isBroadcastAddress(addr))
-	{
-		redirectServ = lo_server_thread_new(NULL, oscParser_error);
-		int sock = lo_server_get_socket_fd(redirectServ);
-		int sockopt = 1;
-		setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
-	}
-
-	else {
-		redirectServ = lo_server_thread_new(NULL, oscParser_error);
-	}
-
-	if (!redirectServ) std::cout << "ERROR (ViewerManipulator) - Could not set redirection. Bad address?: " << addr << ":" << port << std::endl;
-	else
-	{
-		std::cout << "  ViewerManipulator is redirecting picking events to: " << lo_address_get_url(redirectAddr) << std::endl;
-	}
-	
-	lo_server_thread_start(redirectServ);
 }
 
 
@@ -245,8 +202,6 @@ std::vector<GroupNode*> ViewerManipulator::getNodesFromIntersections(osgUtil::Li
 
 void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter& ea)
 {
-	unsigned int i,j;
-		    
 	osg::ref_ptr<GroupNode> hitNode, drawNode;
 	
 	float dX = lastX - ea.getXnormalized();
@@ -267,7 +222,6 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	//std::cout << "aspect= " << (float)ea.getWindowWidth()/ea.getWindowHeight() << std::endl;
 	dX *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
-
 
 	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
 	{
@@ -290,13 +244,12 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		}
 		std::cout << " buttonMask=" << buttonMask << ", modkeyMask=" << modkeyMask << ", dXYclick: " << dXclick<<","<<dYclick << std::endl;
 		std::cout << " currently selected nodes:";
-		for (j=0; j<selectedNodes.size(); j++)
+		for (unsigned j = 0; j < selectedNodes.size(); ++j)
 		{
 			std::cout << " " << selectedNodes[j]->s_name;
 		}
 		std::cout << std::endl;
 	}
-
 
 
 	float scrollX, scrollY;
@@ -308,7 +261,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		// some devices can't report the delta, so we check if both deltas are
 		// zero and in that case, we set the delta to a unit value (1.0) in the 
 		// appropriate direction
-		if (scrollX==0 && scrollY==0)
+		if (scrollX == 0 && scrollY == 0)
 		{
 			switch (ea.getScrollingMotion())
 			{
@@ -347,7 +300,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		// a RELEASE event for that node, so the id must be stored.
 
 		osgUtil::LineSegmentIntersector::Intersections intersections;
-		bool haveIntersections = view->computeIntersections(ea.getX(),ea.getY(),intersections);
+		view->computeIntersections(ea.getX(),ea.getY(),intersections);
 		//bool haveIntersections = view->computeIntersections(ea.getX(),ea.getY(),intersections, INTERACTIVE_NODE_MASK);
 
 		// first, we fill 2 vectors with data (the pointer to the node, and the
@@ -361,7 +314,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 		{
 			// look down the nodePath for the first SPIN node:
-			for (i=(*itr).nodePath.size()-1; i>=0; i--)
+			for (unsigned i = (*itr).nodePath.size() - 1; i >= 0; i--)
 			{
 				osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
 				if (testNode.valid())
@@ -409,7 +362,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 			{	
 				bool found = false;
 				GroupNode *n = dynamic_cast<GroupNode*>((*it)->s_thing);
-				for (i=0; i<hitNodes.size(); i++)
+				for (unsigned i = 0; i < hitNodes.size(); i++)
 				{
 					if (hitNodes[i] == n)
 					{
@@ -450,7 +403,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 			bool foundSelectable = false;
 			bool foundDrawable = false;
 			
-			for (i=0; i<hitNodes.size(); i++)
+			for (unsigned i = 0; i < hitNodes.size(); i++)
 			{
 				if ( hitNodes[i]->getInteractionMode()==GroupNode::DRAW )
 				{
@@ -747,14 +700,7 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 	int err = lo_message_add_varargs(msg, types, ap);
 
 	if (!err)
-	{
-		
-		// TODO: fix this:
-		//if (redirectServ) lo_send_message_from(redirectAddr, redirectServ, ("/"+string(nodeId)).c_str(), msg);
-		if (redirectAddr) lo_send_message(redirectAddr, ("/" + std::string(nodeId)).c_str(), msg);
-		else spin.NodeMessage(nodeId, msg);
-		
-	} else {
+		spin.NodeMessage(nodeId, msg);
+	else 
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
-	}
 }

@@ -42,6 +42,8 @@
 #include "SoundConnection.h"
 #include "DSPNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include <iostream>
 
 // *****************************************************************************
@@ -71,13 +73,13 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	
 	// register with OSC parser:
     std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
-	lo_server_thread_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_conn, (void*)this);
+	lo_server_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_conn, (void*)this);
 
 	// store pointer to sceneManager
 	sceneManager = s;
 	
 	// broadcast the creation of this connection
-	SCENE_MSG(sceneManager, "sss", "createNode", id->s_name, "SoundConnection");
+	SCENE_MSG("sss", "createNode", id->s_name, "SoundConnection");
 }
 
 
@@ -93,10 +95,10 @@ SoundConnection::~SoundConnection()
 	
 	
 	// broadcast the delete message of this connection
-	SCENE_MSG(sceneManager, "ss", "deleteNode", id->s_name);
+	SCENE_MSG("ss", "deleteNode", id->s_name);
 
     std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
-	lo_server_thread_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
+	lo_server_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
 	
 	//id->s_thing = 0;
 
@@ -477,7 +479,7 @@ std::vector<lo_message> SoundConnection::getState ()
 void SoundConnection::stateDump ()
 {
 
-	sceneManager->sendNodeBundle(this->id, this->getState());
+    spinApp::Instance().NodeBundle(this->id, this->getState());
 	
 	/*
 	vector<lo_message> nodeState = this->getState();

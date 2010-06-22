@@ -369,12 +369,12 @@ osg::Geode* createHollowSphere(float radius, osg::Vec4 color)
 
 osg::Geode* createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color)
 {
-	int samples = 30; // the number of times we sample the rolloff table
-	int resolution = 10; // level of detail
-	int i,j,currIndex;
+	//int samples = 30; // the number of times we sample the rolloff table
+	//int resolution = 10; // level of detail
+	//int j,currIndex;
 	
 	
-	float tableIndex, angle, tableValue, step;
+	//float tableIndex, angle, tableValue, step;
 	
 	osg::Geode* triGeode = new osg::Geode();
 
@@ -441,11 +441,9 @@ osg::Geode* createWireframeRolloff(int rolloff, float distortion, float scale, o
 	triGeode->addDrawable(triFan);
 	
 	osgUtil::Optimizer optimizer;
-	optimizer.optimize(triGeode);
+	optimizer.optimize(triGeode); */
 
 	return triGeode;
-*/
-
 }
 
 

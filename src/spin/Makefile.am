@@ -5,8 +5,6 @@ AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
 lib_LTLIBRARIES = libSPIN.la
 python_LTLIBRARIES = libSPINPyWrap.la
 
-#libSPIN_la_CPPFLAGS = $(SPIN_CPPFLAGS)
-
 libSPIN_la_LIBADD = \
 	$(top_srcdir)/src/osgWrappers/introspection/libSPINwrappers.la \
 	$(top_srcdir)/src/tinyxml/libtinyxml.la

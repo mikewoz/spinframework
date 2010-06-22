@@ -45,6 +45,8 @@
 #include "osgUtil.h"
 #include "TextNode.h"
 #include "SceneManager.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 #include "MediaManager.h"
 
 
@@ -163,8 +165,7 @@ void TextNode::drawText()
 		textGeode = NULL;
 	}
 
-	bool ignoreOnThisHost = (sceneManager->isSlave() && (this->getContext()==getHostname()));
-	
+	bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() && (this->getContext()==getHostname()));
 
 	if (!ignoreOnThisHost)
 	{
@@ -181,6 +182,8 @@ void TextNode::drawText()
 					b->setAxis(osg::Vec3(0.0f,0.0f,1.0f));
 					b->setNormal(osg::Vec3(0.0f,-1.0f,0.0f));
 					break;
+                default:
+                    break;
 			}
 			textGeode = b;
 			

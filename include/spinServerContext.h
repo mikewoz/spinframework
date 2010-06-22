@@ -43,6 +43,7 @@
 #define __spinServerContext_H
 
 #include "spinBaseContext.h"
+#include <map>
 
 
 /**
@@ -66,10 +67,6 @@ class spinServerContext : public spinBaseContext
          * Starts the thread that sends synchronization timecode (syncThread)
          */
         void startSyncThread();
-
-
-    protected:
-
 
     private:
 
@@ -100,8 +97,9 @@ class spinServerContext : public spinBaseContext
          */
         static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
+        static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-
+        std::map<std::string, lo_address> tcpClientAddrs_;
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
 };

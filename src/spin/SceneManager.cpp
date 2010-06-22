@@ -41,6 +41,7 @@
 
 
 #include "SceneManager.h"
+#include "spinBaseContext.h"
 #include "MediaManager.h"
 #include "ReferencedNode.h"
 #include "SoundConnection.h"
@@ -127,35 +128,25 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
 
     // set up OSC event listener:
 
-    rxAddr = lo_address_new(addr.c_str(), port.c_str());
+    //rxAddr = lo_address_new(addr.c_str(), port.c_str());
 
     if (isMulticastAddress(addr))
-    {
-        rxServ = lo_server_thread_new_multicast(addr.c_str(), port.c_str(), oscParser_error);
-    } else {
-        rxServ = lo_server_thread_new(port.c_str(), oscParser_error);
-    }
-
-    txServ = NULL;
-
-    // add OSC callback methods to match various incoming messages:
-
+        rxServ = lo_server_new_multicast(addr.c_str(), port.c_str(), oscParser_error);
+    else 
+        rxServ = lo_server_new(port.c_str(), oscParser_error);
+    
 #if 0
+    // add OSC callback methods to match various incoming messages:
     // oscCallback_debug() will match any path and args:
-    lo_server_thread_add_method(rxServ, NULL, NULL, SceneManagerCallback_debug, NULL);
+    lo_server_add_method(rxServ, NULL, NULL, SceneManagerCallback_debug, NULL);
 #endif
 
     // generic admin callback:
-    lo_server_thread_add_method(rxServ, std::string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);
-
-
-
-    // start the listener:
-    lo_server_thread_start(rxServ);
+    lo_server_add_method(rxServ, std::string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);
 
     std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
-    std::cout << "  SceneManager receiving on:\t" << lo_address_get_url(rxAddr) << std::endl;
+    std::cout << "  SceneManager receiving on:\t" << addr << std::endl;
 
 
     // discover all relevant nodeTypes by introspection, and fill the nodeMap
@@ -204,7 +195,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         }
         }
     }
-    catch (osgIntrospection::Exception & ex)
+    catch (const osgIntrospection::Exception & ex)
     {
         std::cerr << "SceneManager could not set up:\n" << ex.what() << std::endl;
         std::cout << "These nodes were defined:";
@@ -220,7 +211,7 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
         }
         std::cout << std::endl;
 
-        exit(1);
+        exit (EXIT_FAILURE);
     }
 
     // need to remove DSPNode???
@@ -256,9 +247,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     }
     rootNode->setStateSet(rootStateSet);
 
-
-
-
     // To prevent same external texture from being loaded multiple times,
     // we use the osgDB::SharedStateManager:
 
@@ -287,7 +275,6 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     opt->setObjectCacheHint(osgDB::Options::CACHE_ALL);
     osgDB::Registry::instance()->setOptions(opt);
     */
-
 }
 
 // *****************************************************************************
@@ -296,7 +283,8 @@ SceneManager::~SceneManager()
 {
     std::cout << "Cleaning up SceneManager..." << std::endl;
 
-
+    // FIXME: DOING THIS HERE IS REALLY BAD, should happen earlier
+#if 0
     // Force a delete (and destructor call) for all nodes still in the scene:
     unsigned i = 0;
     ReferencedNode *n;
@@ -305,6 +293,7 @@ SceneManager::~SceneManager()
         if ((n = dynamic_cast<ReferencedNode*>(worldNode->getChild(i))))
         {
             // delete the graph of any ReferencedNode:
+            std::cout << "Delete graph!\n";
             deleteGraph(n->id->s_name);
         }
         else
@@ -316,18 +305,19 @@ SceneManager::~SceneManager()
     }
 
     // clear any states that are left over:
+    std::cout << "clear states!\n";
     clearStates();
-
+#endif
 
     // stop sceneManager OSC threads:
-    lo_server_thread_stop(rxServ);
     usleep(100);
 
-    if (txServ) lo_server_free(txServ);
-    if (rxServ) lo_server_thread_free(rxServ);
-    //if (txAddr) lo_address_free(txAddr);
-    //if (rxAddr) lo_address_free(rxAddr);
-
+    // FIXME: is this necessary/a good idea?
+    if (rxServ) 
+    {
+        lo_server_free(rxServ);
+        rxServ = 0;
+    }
 }
 
 //void SceneManager::setLog(const char* filename)
@@ -335,41 +325,7 @@ void SceneManager::setLog(spinLog &log)
 {
     // remove existing callback:
 
-    lo_server_thread_add_method(rxServ, NULL, NULL, SceneManagerCallback_log, &log);
-}
-
-void SceneManager::setTXaddress (std::string addr, std::string port)
-{
-    // Note that only a spinServer will set the txAddr, so that events are
-    // re-broadcasted. Other apps, such as simple renderers/editors/etc will
-    // leave the txAddr null.
-
-    // events for this scene are broadcasted to the following address:
-    txAddr = lo_address_new(addr.c_str(), port.c_str());
-
-    if (isMulticastAddress(addr))
-    {
-        txServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-    }
-
-    else if (isBroadcastAddress(addr))
-    {
-        txServ = lo_server_new(NULL, oscParser_error);
-        int sock = lo_server_get_socket_fd(txServ);
-        int sockopt = 1;
-        setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
-    }
-
-    else {
-        txServ = lo_server_new(NULL, oscParser_error);
-    }
-
-    if (!txServ) std::cout << "ERROR: SceneManager::setTXaddress(). Bad address?: " << addr << ":" << port << std::endl;
-    else
-    {
-        std::cout << "  SceneManager sending to:\t" << lo_address_get_url(txAddr) << std::endl;
-        //std::cout << "  ... via liblo server: " << lo_server_get_url(txServ) << std::endl;
-    }
+    lo_server_add_method(rxServ, NULL, NULL, SceneManagerCallback_log, &log);
 }
 
 // *****************************************************************************
@@ -380,9 +336,9 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
     stateMap[s->classType].push_back(s->id);
 
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_thread_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
+    lo_server_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
 
-    SCENE_MSG(this, "sss", "registerState", s->id->s_name, s->classType.c_str());
+    SCENE_MSG("sss", "registerState", s->id->s_name, s->classType.c_str());
 
     sendNodeList("*");
 }
@@ -390,13 +346,13 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
 void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 {
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_thread_del_method(rxServ, oscPattern.c_str(), NULL);
+    lo_server_del_method(rxServ, oscPattern.c_str(), NULL);
 
     ReferencedStateSetList::iterator itr;
     itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );
     if ( itr != stateMap[s->classType].end() ) stateMap[s->classType].erase(itr);
 
-    SCENE_MSG(this, "ss", "unregisterState", s->id->s_name);
+    SCENE_MSG("ss", "unregisterState", s->id->s_name);
 
     sendNodeList("*");
 }
@@ -407,9 +363,6 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 void SceneManager::sendNodeList(std::string typeFilter)
 {
     // TODO: typeFilter not used yet
-
-    if (!txServ) return;
-
     std::string OSCpath = "/SPIN/" + sceneID;
     lo_message msg;
 
@@ -444,7 +397,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
                 }
 
                 msgs.push_back(msg);
-                //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
             }
         }
 
@@ -475,7 +427,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
                 }
 
                 msgs.push_back(msg);
-                //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
             }
         }
 
@@ -513,7 +464,6 @@ void SceneManager::sendNodeList(std::string typeFilter)
                     }
 
                     msgs.push_back(msg);
-                    //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
                 }
             }
             {
@@ -537,15 +487,13 @@ void SceneManager::sendNodeList(std::string typeFilter)
                     }
 
                     msgs.push_back(msg);
-                    //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
                 }
             }
 
         }
     }
 
-    sendSceneBundle(msgs);
-
+    spinApp::Instance().SceneBundle(msgs);
 }
 
 void SceneManager::sendConnectionList()
@@ -569,112 +517,8 @@ void SceneManager::sendConnectionList()
         lo_message_add_string(msg, "NULL" );
     }
 
-    std::string OSCpath = "/SPIN/" + sceneID;
-
-    lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
+    SCENE_LO_MSG(msg);
 }
-
-void SceneManager::sendNodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
-{
-    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
-    sendBundle(OSCpath,msgs);
-}
-
-void SceneManager::sendSceneBundle(std::vector<lo_message> msgs)
-{
-    std::string OSCpath = "/SPIN/" + sceneID;
-    sendBundle(OSCpath,msgs);
-}
-
-void SceneManager::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
-{
-    if (!txServ) return;
-
-    /*
-    lo_timetag now;
-    lo_timetag_now(&now);
-    now.sec += 1;
-    lo_bundle b = lo_bundle_new(now);
-     */
-
-    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
-
-    std::vector<lo_message>::iterator iter = msgs.begin();
-    while (iter != msgs.end())
-    {
-        //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
-        lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
-        msgs.erase(iter); // iterator automatically advances after erase()
-    }
-
-    lo_send_bundle_from(txAddr, txServ, b);
-    //lo_send_bundle(txAddr, b);
-
-    lo_bundle_free_messages(b);
-
-}
-
-/*
-
-
-void SceneManager::sendSceneMessage(const char *types, ...)
-{
-    if (!txServ) return;
-
-
-    lo_message msg = lo_message_new();
-
-    va_list ap;
-    va_start(ap, types);
-
-    int err = lo_message_add_varargs(msg, types, ap);
-
-    if (!err)
-    {
-        string OSCpath = "/SPIN/" + sceneID;
-        lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
-    } else {
-        std::cout << "ERROR (lo_message_add_varargs): " << err << std::endl;
-    }
-
-    //lo_message_free(msg);
-}
-
-
-void SceneManager::sendNodeMessage(t_symbol *nodeSym, lo_message msg)
-{
-    if (!txServ) return;
-
-    string OSCpath = "/SPIN/" + sceneID + "/" + string(nodeSym->s_name);
-    lo_send_message_from(txAddr, txServ, OSCpath.c_str(), msg);
-
-    //lo_message_pp(msg);
-    lo_message_free(msg);
-
-}
-
-void SceneManager::sendNodeMessage(t_symbol *nodeSym, const char *types, ...)
-{
-    if (!txServ) return;
-
-    int err;
-    lo_message msg = lo_message_new();
-
-    va_list ap;
-    va_start(ap, types);
-
-    err = lo_message_add_varargs(msg, types, ap);
-
-    if (!err)
-    {
-        sendNodeMessage(nodeSym, msg);
-    } else {
-        std::cout << "ERROR (lo_message_add_varargs): " << err << std::endl;
-    }
-
-}
-*/
-
 
 // *****************************************************************************
 void SceneManager::debug()
@@ -744,7 +588,7 @@ void SceneManager::debug()
     ev.apply(*(this->rootNode.get()));
 
     // send debug message to all clients:
-    SCENE_MSG(this,"s","debug");
+    SCENE_MSG("s", "debug");
 
 }
 
@@ -777,7 +621,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
     // Let's broadcast a createNode message BEFORE we actually do the creation.
     // Thus, if some messages are sent during instantiation, at least clients
     // will already have a placeholder for the node.
-    SCENE_MSG(this, "sss", "createNode", id, type);
+    SCENE_MSG("sss", "createNode", id, type);
 
 
     // check if a node with that name already exists:
@@ -791,7 +635,6 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
             return NULL;
         } else {
             //SCENE_MSG(this, "sss", "createNode", id, type);
-            //if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
             return n.get();
         }
     }
@@ -900,14 +743,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         nodeMap[n->nodeType].push_back(n);
 
         // broadcast (only if this is the server):
-        SCENE_MSG(this, "sss", "createNode", id, type);
-        /*
-        if (this->isServer())
-        {
-            lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "sss", "createNode", id, type);
-        }
-        */
-
+        SCENE_MSG("sss", "createNode", id, type);
         return n.get();
     }
     else
@@ -1024,7 +860,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
         std::cout << "created new state: " << id << " of type " << type << std::endl;
         registerStateSet(n.get());
         // broadcast (only if this is the server):
-        SCENE_MSG(this, "sss", "createStateSet", id, type);
+        SCENE_MSG("sss", "createStateSet", id, type);
         return n.get();
     }
     else
@@ -1115,13 +951,6 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
     return NULL;
 }
 
-
-
-
-
-
-
-
 // *****************************************************************************
 std::vector<SoundConnection*> SceneManager::getConnections()
 {
@@ -1180,13 +1009,13 @@ void SceneManager::deleteNode(const char *id)
         }
 
         doDelete(n);
-        if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
+        SCENE_MSG("ss", "deleteNode", id);
 
     } else if (ReferencedStateSet *s = getStateSet(id))
     {
         s->removeFromScene();
         sendNodeList("*");
-        if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
+        SCENE_MSG("ss", "deleteNode", id);
     }
     else std::cout << "ERROR: tried to delete " << id << ", but no node or state by that name exists." << std::endl;
 
@@ -1210,18 +1039,17 @@ void SceneManager::deleteGraph(const char *id)
         {
             char* childID = (*(n->children.begin()))->id->s_name;
             doDelete(*(n->children.begin()));
-            if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", childID);
+            SCENE_MSG("ss", "deleteNode", childID);
         }
 
         doDelete(n);
-        if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", id);
+        SCENE_MSG("ss", "deleteNode", id);
     }
     else std::cout << "ERROR: tried to deleteGraph " << id << ", but that node does not exist." << std::endl;
 
     // if delete was successful and removed all other references to the node,
     // then by this point, the node will be deleted, and it's destructor will
     // have been called.
-
 }
 
 // *****************************************************************************
@@ -1259,10 +1087,6 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     // time, the destructor for the node should be called
     //char *nodeID = n->id->s_name; // but remember the name for the broadcast
     n = NULL;
-
-    // finally, broadcast:
-    //if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "ss", "deleteNode", nodeID);
-
 }
 
 
@@ -1345,12 +1169,11 @@ void SceneManager::clear()
     */
 
 
-    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "clear");
+    SCENE_MSG("s", "clear");
 
     sendNodeList("*");
 
     std::cout << "Cleared scene." << std::endl;
-
 }
 
 void SceneManager::clearUsers()
@@ -1360,7 +1183,7 @@ void SceneManager::clearUsers()
         deleteGraph(nodeMap[std::string("UserNode")][0]->id->s_name);
     }
 
-    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "clearUsers");
+    SCENE_MSG("s", "clearUsers");
 
     sendNodeList("*");
 
@@ -1434,8 +1257,7 @@ void SceneManager::refresh()
         (*iter)->stateDump();
     }
 
-    if (txServ) lo_send_from(txAddr, txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneID).c_str(), "s", "refresh");
-
+    SCENE_MSG("s", "refresh");
 }
 
 // *****************************************************************************
@@ -2173,7 +1995,6 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
         theArgs.push_back( params.str() );
 
     } else if (theMethod == "addEventScript") {
-
         // event method name
         if (!lo_is_numerical_type((lo_type)types[1])) {
             theArgs.push_back( std::string( (const char*)argv[1] ) );
@@ -2228,7 +2049,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
             //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
             // HACK: TODO: fix this
             spinApp &spin = spinApp::Instance();
-            if (spin.sceneManager->isServer())
+            if (spin.getContext()->isServer())
             {
                 lo_message msg = lo_message_new();
                 for (i=0; i<argc; i++)
@@ -2240,7 +2061,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
                         lo_message_add_string(msg, (const char*) argv[i] );
                     }
                 }
-                lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+                lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
             }
         }
     }
@@ -2314,9 +2135,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
         sceneManager->clearStates();
     else if (theMethod=="userRefresh")
     {
-        SCENE_MSG(sceneManager, "s", "userRefresh");
-        //lo_send_from(sceneManager->txAddr, sceneManager->txServ, LO_TT_IMMEDIATE, ("/SPIN/"+sceneManager->sceneID).c_str(), "s", "uesrRefresh");
-        //sceneManager->sendSceneMessage("s", "userRefresh", LO_ARGS_END);
+        SCENE_MSG("s", "userRefresh");
     }
     else if (theMethod=="refresh")
         sceneManager->refresh();
@@ -2356,11 +2175,9 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
         sceneManager->deleteNode((char*)argv[1]);
     else if ((theMethod=="deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*)argv[1]);
-//  else if ((theMethod=="setGrid") && (argc==2))
-//      if (lo_is_numerical_type((lo_type)types[1])) sceneManager->setGrid((int) lo_hires_val((lo_type)types[1], argv[1]));
-
     else {
-
+            // FIXME: this used to rebroadcast messages that did not match command
+#if 0
         spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())
         {
@@ -2379,6 +2196,7 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
         } else {
             //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
         }
+#endif
     }
 
     //pthread_mutex_unlock(&pthreadLock);
@@ -2389,7 +2207,6 @@ int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **arg
 int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     std::string theMethod, idStr;
-
 
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;
@@ -2444,3 +2261,4 @@ void oscParser_error(int num, const char *msg, const char *path)
     printf("OSC (liblo) error %d in path %s: %s\n", num, path, msg);
     fflush(stdout);
 }
+
