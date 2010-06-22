@@ -76,6 +76,14 @@ class Tween(object):
         """
         return c * (t / d) + b
 
+    def line(self, target, duration):
+        """
+        Resets the interpolation line taking current value as it start value.
+        """
+        self.c = self.b #target - current_value # FIXME: we don't have current value right now...
+        self.b = self.c
+        self.d = duration
+
 if __name__ == '__main__':
     print "this test will tween from 0 to 100 in steps of 10"
     kind = LINEAR_TWEEN
