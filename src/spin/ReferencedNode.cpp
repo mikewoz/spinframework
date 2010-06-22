@@ -42,9 +42,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
-
-
 #include <exception>
+#include <osgDB/FileUtils>
 
 #include "spinApp.h"
 #include "spinBaseContext.h"
@@ -90,11 +89,9 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
 
     registerNode(sceneManager);
 
-
     this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
 
     attach();
-    //printf("referencednode ctor done.\n");
 
 }
 
@@ -161,30 +158,8 @@ void squat() {
 
 void ReferencedNode::callbackUpdate()
 {
+    callCronScripts();
 
-    if ( _scriptFile != "" ) {
-
-        try {
-
-            _scriptRun();
-
-        } catch (boost::python::error_already_set & ) {
-            std::cout << currentException() << std::endl;
-            std::cout << "2: Python error: [";
-            PyErr_Print();
-            std::cout << "]" << std::endl;
-            abort();
-
-        } catch ( std::exception& e ) {
-            std::cout << "2:  what? "<< e.what() << std::endl;
-            abort();
-        } catch(...) {                        // catch all other exceptions
-            std::cout << "2: Caught... something??\n";
-            abort();
-        }
-
-
-    }
 
 }
 
@@ -499,109 +474,134 @@ std::string ReferencedNode::getID() const
 
 // *****************************************************************************
 
-//bool ReferencedNode::setScript( const std::string& scr, const std::string& params )
-bool ReferencedNode::setScript( const char *scriptPath )
+bool ReferencedNode::addCronScript( const std::string& scriptPath, double freq, const std::string& params )
 {
-	const std::string& scr = string(scriptPath);
-	const std::string& params = "";
+    spinApp &spin = spinApp::Instance();
+    osg::Timer* timer = osg::Timer::instance();
 
-	spinApp &spin = spinApp::Instance();
-    printf("moo?\n");
-    _scriptFile = sceneManager->resourcesPath + "/scripts/" + scr;
-    printf("moo! [%s]\n", _scriptFile.c_str());
-
-    boost::python::object s;
-    //char hexAddr[20];
-    //sprintf(hexAddr, "%p", this);
-    printf("ReferencedNode: address = %p\n", this);
-    printf("ReferencedNode: id = %s\n", id->s_name);
-    char cmd[100];
-
-    try {
-        sprintf(cmd, "mod%p = spin.load_module('%s')", this, _scriptFile.c_str());
-        std::cout << "Python cmd: " << cmd << std::endl;
-        exec(cmd, spin._pyNamespace, spin._pyNamespace);
-
-        if (params != "") sprintf(cmd, "script%p = mod%p.Script('%s')", this, this, id->s_name);
-        else sprintf(cmd, "script%p = mod%p.Script('%s', %s)", this, this, id->s_name, params.c_str());
-        std::cout << "Python cmd: " << cmd << std::endl;
-        exec(cmd, spin._pyNamespace, spin._pyNamespace);
-
-        sprintf(cmd, "script%p", this);
-        s = spin._pyNamespace[cmd];
-        _scriptRun = s.attr("run"); // extract instead?
-
-    } catch (boost::python::error_already_set const & ) {
-        ///if (PyErr_ExceptionMatches(PyExc_ZeroDivisionError))
-
-        std::cout << "0: Python error: " << std::endl;
-        PyErr_Print();
-        //abort();
-        _scriptFile = "";
-        return false;
-    } catch ( std::exception& e ) {
-        std::cout << "0: what? " << e.what() << std::endl;
-        //abort();
-        _scriptFile = "";
-        return false;
-    } catch(...) {                        // catch all other exceptions
-        std::cout << "0: Caught... something??\n";
-        //abort();
-        _scriptFile = "";
-        return false;
-    }
-
-    return true;
-
-}
-
-
-
-
-// *****************************************************************************
-
-bool ReferencedNode::addEventScript( const std::string& eventName, const std::string& scr, const std::string& params ) {
-
-	spinApp &spin = spinApp::Instance();
-    printf("moo?\n");
-
-
-    std::string sf = sceneManager->resourcesPath + "/scripts/" + scr;
-    printf("moo! [%s]\n", sf.c_str());
+    std::string sf = osgDB::findDataFile( scriptPath );
+    cout << "script file path is: " << sf << endl;
 
     boost::python::object s, p;
-    //char hexAddr[20];
-    //sprintf(hexAddr, "%p", this);
-    //printf("ReferencedNode: address = %p\n", this);
-    //printf("ReferencedNode: id = %s\n", id->s_name);
+
     char cmd[100];
+    //osg::Timer_t utick = timer->tick();
+    unsigned long long utick =  (unsigned long long) timer->tick();
 
     try {
-        sprintf(cmd, "mod%p = spin.load_module('%s')", this, sf.c_str());
+        sprintf( cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str() );
         std::cout << "Python cmd: " << cmd << std::endl;
-        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+        exec( cmd, spin._pyNamespace, spin._pyNamespace );
+        sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
 
-        if (params != "") sprintf(cmd, "script%p = mod%p.Script('%s')", this, this, id->s_name);
-        else sprintf(cmd, "script%p = mod%p.Script('%s', %s)", this, this, id->s_name, params.c_str());
         std::cout << "Python cmd: " << cmd << std::endl;
-        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+        exec( cmd, spin._pyNamespace, spin._pyNamespace );
 
-        sprintf(cmd, "script%p", this);
+        sprintf( cmd, "script%llx", utick );
         s = spin._pyNamespace[cmd];
-        p = s.attr("run");
-        //_scriptRun = s.attr("run"); // extract instead?
-        _eventScriptList.insert( pair<const std::string, boost::python::object>(eventName, p) );
+        p = s.attr( "run" );
 
-    } catch (boost::python::error_already_set const & ) {
-        std::cout << "0: Python error: " << std::endl;
+        CronScript* cs = new CronScript;
+        cs->freq = freq;
+        cs->lastRun = timer->time_s() - 1.0/freq;
+        cs->run = p;
+        _cronScriptList.push_back( cs );
+
+    } catch ( boost::python::error_already_set const & ) {
+        std::cout << "Python error: " << std::endl;
         PyErr_Print();
         return false;
     } catch ( std::exception& e ) {
-        std::cout << "0: what? " << e.what() << std::endl;
+        std::cout << "Python error: " << e.what() << std::endl;
+        return false;
+    } catch(...) {                        // catch all other exceptions
+        std::cout << "Python error... Caught... something??\n";
+        return false;
+    }
+
+    return true;
+
+}
+
+// *****************************************************************************
+
+bool ReferencedNode::callCronScripts() {
+
+    if (_cronScriptList.empty()) return false;
+
+    osg::Timer* timer = osg::Timer::instance();
+    double d;
+
+    try {
+
+        for ( size_t i = 0; i < _cronScriptList.size(); i++ ) {
+            if ( !_cronScriptList[i] ) continue;
+            d = 1.0 / _cronScriptList[i]->freq;
+            if ( timer->time_s() >= d + _cronScriptList[i]->lastRun ) {
+                _cronScriptList[i]->lastRun += d;
+                _cronScriptList[i]->run();
+            }
+        }
+
+    } catch (boost::python::error_already_set & ) {
+        std::cout << currentException() << std::endl;
+        std::cout << "Python error: [";
+        PyErr_Print();
+        std::cout << "]" << std::endl;
+        return false;
+    } catch ( std::exception& e ) {
+        std::cout << "Python error: "<< e.what() << std::endl;
+        return false;
+    } catch(...) {                        // catch all other exceptions
+        std::cout << "Python error: Caught... something??\n";
+        return false;
+    }
+
+
+
+
+    return true;
+}
+
+// *****************************************************************************
+
+bool ReferencedNode::addEventScript( const std::string& eventName, const std::string& scriptPath, const std::string& params ) {
+
+    spinApp &spin = spinApp::Instance();
+    osg::Timer* timer = osg::Timer::instance();
+
+    std::string sf = osgDB::findDataFile( scriptPath );
+    cout << "script file path is: " << sf << endl;
+
+    boost::python::object s, p;
+    char cmd[100];
+    unsigned long long utick =  (unsigned long long) timer->tick();
+
+    try {
+        sprintf(cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str());
+        std::cout << "Python cmd: " << cmd << std::endl;
+        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+
+        sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
+        std::cout << "Python cmd: " << cmd << std::endl;
+        exec(cmd, spin._pyNamespace, spin._pyNamespace);
+
+        sprintf(cmd, "script%llx", utick);
+        s = spin._pyNamespace[cmd];
+        p = s.attr("run");
+
+        _eventScriptList.insert( pair<const std::string, boost::python::object>( std::string(eventName), p) );
+
+    } catch (boost::python::error_already_set const & ) {
+        std::cout << "Python error: " << std::endl;
+        PyErr_Print();
+        return false;
+    } catch ( std::exception& e ) {
+        std::cout << "Python error: " << e.what() << std::endl;
 
         return false;
     } catch(...) {                        // catch all other exceptions
-        std::cout << "0: Caught... something??\n";
+        std::cout << "Python error: Caught... something??\n";
         return false;
     }
 
@@ -612,43 +612,65 @@ bool ReferencedNode::addEventScript( const std::string& eventName, const std::st
 
 // *****************************************************************************
 
-bool ReferencedNode::callEventScript( const std::string& eventName ) {
+bool ReferencedNode::callEventScript( const std::string& eventName, const std::string& types, osgIntrospection::ValueList& args ) {
 
-    //printf("callEventScript( '%s' )...\n", eventName.c_str());
-    if (_eventScriptList.empty()) return false;
-    //printf("callEventScript... doing stuff\n");
+    if ( _eventScriptList.empty() ) return false;
+
     boost::python::object p;
     EventScriptList::iterator iter;
+    boost::python::list argList;
 
     try {
 
         iter = _eventScriptList.find( eventName );
         if( iter != _eventScriptList.end() ) {
-            //cout << "Value is: " << eventName << '\n';
+
+
+            try {
+                for ( size_t i = 0; i < args.size(); i++ ) {
+
+                    const std::type_info* argt = &args[i].getType().getStdTypeInfo();
+
+                    if ( *argt == typeid(int) ) {
+                        argList.append( osgIntrospection::variant_cast<int>(args[i]) );
+                    } else if ( *argt == typeid(float) ) {
+                        argList.append( osgIntrospection::variant_cast<float>(args[i]) );
+                    } else if ( *argt == typeid(double) ) {
+                        argList.append( osgIntrospection::variant_cast<double>(args[i]) );
+                    } else if ( *argt == typeid(std::string) ) {
+                        argList.append( osgIntrospection::variant_cast<std::string>(args[i]).c_str() );
+                    } else if ( *argt == typeid(const char*) ) {
+                        argList.append( osgIntrospection::variant_cast<const char*>(args[i]) );
+                    } else if ( *argt == typeid(char*) ) {
+                        argList.append( osgIntrospection::variant_cast<char*>(args[i]) );
+                    } else {
+                        std::cout << "callEventScript: unsupported argument type: " << argt->name() << std::endl;
+                        return false;
+                    }
+                }
+            } catch (...) {
+                std::cout << "callEventScript: something went wrong" << std::endl;
+                return false;
+            }
+
             p = iter->second;
-            p();
-
+            p( eventName.c_str(), types.c_str(), argList );
+            return true;
         }
-        else {
-            //cout << "Key is not in myMap" << '\n';
-
-        }
-
-
 
     } catch (boost::python::error_already_set const & ) {
         std::cout << "0: Python error: " << std::endl;
         PyErr_Print();
         return false;
     } catch ( std::exception& e ) {
-        std::cout << "0: what? " << e.what() << std::endl;
+        std::cout << "Python error: " << e.what() << std::endl;
         return false;
     } catch(...) {
-        std::cout << "0: Caught... something??\n";
+        std::cout << "Python error: Caught... something??\n";
         return false;
     }
 
 
-    return true;
+    return false;
 
 }

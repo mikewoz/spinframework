@@ -100,7 +100,6 @@ spinBaseContext::spinBaseContext()
     if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
         lo_infoServ = lo_server_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
-
     } else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
         lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);

@@ -21,6 +21,16 @@
 #undef OUT
 #endif
 
+BEGIN_VALUE_REFLECTOR(CronScript)
+	I_DeclaringFile("ReferencedNode.h");
+	I_Constructor0(____CronScript,
+	               "",
+	               "");
+	I_PublicMemberProperty(boost::python::object, run);
+	I_PublicMemberProperty(double, freq);
+	I_PublicMemberProperty(double, lastRun);
+END_REFLECTOR
+
 BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
@@ -117,19 +127,24 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __void__stateDump,
 	          "",
 	          "StateDump() is a request to broadcast the node state via SceneManager. ");
-	I_Method1(bool, setScript, IN, const char *, scriptPath,
+	I_Method3(bool, addCronScript, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
 	          Properties::NON_VIRTUAL,
-	          __bool__setScript__C5_char_P1,
+	          __bool__addCronScript__C5_std_string_R1__double__C5_std_string_R1,
 	          "",
 	          "");
-	I_Method3(bool, addEventScript, IN, const std::string &, eventName, IN, const std::string &, scr, IN, const std::string &, params,
+	I_Method0(bool, callCronScripts,
+	          Properties::NON_VIRTUAL,
+	          __bool__callCronScripts,
+	          "",
+	          "");
+	I_Method3(bool, addEventScript, IN, const std::string &, eventName, IN, const std::string &, scriptPath, IN, const std::string &, params,
 	          Properties::NON_VIRTUAL,
 	          __bool__addEventScript__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
 	          "",
 	          "");
-	I_Method1(bool, callEventScript, IN, const std::string &, eventName,
+	I_Method3(bool, callEventScript, IN, const std::string &, eventName, IN, const std::string &, types, IN, osgIntrospection::ValueList &, args,
 	          Properties::NON_VIRTUAL,
-	          __bool__callEventScript__C5_std_string_R1,
+	          __bool__callEventScript__C5_std_string_R1__C5_std_string_R1__osgIntrospection_ValueList_R1,
 	          "",
 	          "");
 	I_SimpleProperty(osg::Group *, AttachmentNode, 
@@ -141,9 +156,6 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	I_SimpleProperty(char *, Parent, 
 	                 __char_P1__getParent, 
 	                 0);
-	I_SimpleProperty(const char *, Script, 
-	                 0, 
-	                 __bool__setScript__C5_char_P1);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

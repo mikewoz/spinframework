@@ -165,11 +165,8 @@ std::string ValueWrapper::getString() {
 
 boost::python::tuple ValueWrapper::getVector() {
 
-    osg::Vec2 v2;
-    osg::Vec3 v3;
-    osg::Vec4 v4;
-
     try {
+        osg::Vec2 v2;
         v2 = osgIntrospection::variant_cast<osg::Vec2>(_value);
         return make_tuple( v2.x(), v2.y() );
     } catch (...) {
@@ -177,6 +174,7 @@ boost::python::tuple ValueWrapper::getVector() {
     }
 
     try {
+        osg::Vec3 v3;
         v3 = osgIntrospection::variant_cast<osg::Vec3>(_value);
         return make_tuple( v3.x(), v3.y(), v3.z() );
     } catch (...) {
@@ -184,6 +182,7 @@ boost::python::tuple ValueWrapper::getVector() {
     }
 
     try {
+        osg::Vec4 v4;
         v4 = osgIntrospection::variant_cast<osg::Vec4>(_value);
         return make_tuple( v4.x(), v4.y(), v4.z(), v4.w() );
     } catch (...) {
@@ -247,8 +246,8 @@ int invokeMethod(const osgIntrospection::Value classInstance,
 /******************************************************************************/
 /******************************************************************************/
 
-ValueWrapper SceneManagerCallback_script(const char* symName, const char *types,
-                                         std::string args, int argc)
+ValueWrapper SceneManagerCallback_script( const char* symName, const char *types,
+                                          std::string args, int cascadeEvents )
 {
 
     //int i;
@@ -306,26 +305,30 @@ ValueWrapper SceneManagerCallback_script(const char* symName, const char *types,
         argn++;
     }
 
-     // invoke the method on the node, and if it doesn't work, then just forward
+    // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
 
     osgIntrospection::Value v;
 
-    if (invokeMethod(classInstance, classType, theMethod, theArgs, v)) {
-
+    bool eventScriptCalled = false;
+    if (cascadeEvents) {
         if (s->s_type == REFERENCED_NODE) {
             //printf("calling eventscript...\n");
-            dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod );
+            eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, std::string(types), theArgs );
         }
-
-        return ValueWrapper(v);
-
-    } else {
-        std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name
-                  << "], but forwarding message anyway...NOT!" << std::endl;
     }
 
+    if (eventScriptCalled) { // cascaded event script called successful, do not invokeMethod, return nothing to the python script
+        return ValueWrapper(0);
+    } else { // no cascaded event assigned to theMethod or cascaded event script failed.  call invokeMethod and return result to python script
+        if (invokeMethod(classInstance, classType, theMethod, theArgs, v)) {
+            return ValueWrapper(v);
+        } else {
+            std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name
+                      << "], not forwarding the message" << std::endl;
+        }
 
+    }
     //pthread_mutex_unlock(&pthreadLock);
 
     return ValueWrapper(0);

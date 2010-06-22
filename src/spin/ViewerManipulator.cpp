@@ -223,9 +223,36 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	dX *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 
+	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
+	{
+		switch(ea.getEventType())
+		{
+			case(osgGA::GUIEventAdapter::PUSH):
+				std::cout << "PUSH ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::RELEASE):
+				std::cout << "RELEASE ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::DOUBLECLICK):
+				std::cout << "DOUBLECLICK ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::DRAG):
+				std::cout << "DRAG ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::MOVE):
+				std::cout << "MOVE ("<<ea.getEventType()<<")"; break;
+			case(osgGA::GUIEventAdapter::SCROLL):
+				std::cout << "SCROLL ("<<ea.getEventType()<<")"; break;
+			default:
+				std::cout << "some other message?" << std::endl; break;
+		}
+		std::cout << " buttonMask=" << buttonMask << ", modkeyMask=" << modkeyMask << ", dXYclick: " << dXclick<<","<<dYclick << std::endl;
+		std::cout << " currently selected nodes:";
+		for (unsigned j = 0; j < selectedNodes.size(); ++j)
+		{
+			std::cout << " " << selectedNodes[j]->s_name;
+		}
+		std::cout << std::endl;
+	}
 
-	float scrollX = 0.0;
-    float scrollY = 0.0;
+
+	float scrollX, scrollY;
 	if (ea.getEventType()==osgGA::GUIEventAdapter::SCROLL)
 	{
 		scrollX = ea.getScrollingDeltaX();
@@ -234,7 +261,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		// some devices can't report the delta, so we check if both deltas are
 		// zero and in that case, we set the delta to a unit value (1.0) in the 
 		// appropriate direction
-		if (scrollX==0 && scrollY==0)
+		if (scrollX == 0 && scrollY == 0)
 		{
 			switch (ea.getScrollingMotion())
 			{
@@ -250,8 +277,9 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 				case osgGA::GUIEventAdapter::SCROLL_DOWN:
 					scrollY = 1.0;
 					break;
-                default:
-                    break;
+				default:
+					// nothing
+					break;
 			}
 		}
 	}

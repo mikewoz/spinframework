@@ -1,0 +1,9 @@
+[SYNOPSIS]
+spinviewer [options]
+
+[REPORTING BUGS]
+https://sourceforge.net/apps/trac/spinframework/
+
+[SEE ALSO]
+spinserver (1)
+

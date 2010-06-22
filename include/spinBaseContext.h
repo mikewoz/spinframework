@@ -78,7 +78,7 @@ class spinBaseContext
 
         enum spinContextMode { SERVER_MODE, CLIENT_MODE };
 
-        bool isServer() { return (mode==SERVER_MODE); }
+        bool isServer() { return (bool)(mode==SERVER_MODE); }
 
 		virtual bool start() = 0;
 

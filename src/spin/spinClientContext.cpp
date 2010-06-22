@@ -58,6 +58,9 @@ spinClientContext::spinClientContext() : subscribed_(false)
     spin.setContext(this);
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
     lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
+
+    lo_rxAddr = lo_address_new("226.0.0.1", "54323");
+    lo_txAddr = lo_address_new("226.0.0.1", "54324");
 }
 
 spinClientContext::~spinClientContext()
@@ -67,13 +70,6 @@ bool spinClientContext::start()
 {
 	return startThread(&spinClientThread);
 }
-
-
-
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-
 
 void *spinClientContext::spinClientThread(void *arg)
 {
@@ -258,13 +254,17 @@ int spinClientContext::tcpCallback(const char * /*path*/, const char * /*types*/
 
 void spinClientContext::subscribe()
 {
-    std::stringstream sstr;
-    // convert to port number to string
-    sstr << lo_server_get_port(lo_tcpRxServer_);
+    // FIXME: can only subscribe with a valid user name
+    if (spinApp::Instance().userNode.valid()) 
+    {
+        std::stringstream sstr;
+        // convert to port number to string
+        sstr << lo_server_get_port(lo_tcpRxServer_);
 
-    lo_send(lo_serverTCPAddr, "/SPIN/__client__", "ssss",
-            "subscribe", spinApp::Instance().userNode->getID().c_str(), getMyIPaddress().c_str(),
-            sstr.str().c_str());
+        lo_send(lo_serverTCPAddr, "/SPIN/__client__", "ssss",
+                "subscribe", spinApp::Instance().userNode->getID().c_str(), getMyIPaddress().c_str(),
+                sstr.str().c_str());
+    }
     subscribed_ = true;
 }
 
