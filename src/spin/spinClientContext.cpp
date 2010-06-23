@@ -99,7 +99,7 @@ void *spinClientContext::spinClientThread(void *arg)
     fromString<int>(i_rxPort, lo_address_get_port(spin.getContext()->lo_rxAddr));
 
     context->running = true;
-    static const int TIMEOUT = 10;
+    static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
     {
         lo_server_recv_noblock(context->lo_syncServ, TIMEOUT); 

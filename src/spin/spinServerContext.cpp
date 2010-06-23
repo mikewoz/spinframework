@@ -148,7 +148,7 @@ void *spinServerContext::spinServerThread(void *arg)
     context->startSyncThread();
 
     context->running = true;
-    static const int TIMEOUT = 10;
+    static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
     {
         frameTick = osg::Timer::instance()->tick();
