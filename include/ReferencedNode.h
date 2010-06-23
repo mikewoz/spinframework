@@ -60,15 +60,24 @@ typedef struct {
     boost::python::object run;
     double freq;
     double lastRun;
-
+    int enabled;
+    std::string pyScript;
+    std::string pyModule;
 } CronScript;
 
+typedef struct {
+    boost::python::object run;
+    std::string eventName;
+    int enabled;
+    std::string pyScript;
+    std::string pyModule;
+} EventScript;
+
+typedef std::map< const std::string, CronScript* > CronScriptList;
+typedef std::map< const std::string, EventScript* > EventScriptList;
 
 typedef std::map< std::string, std::string > stringParamType;
 typedef std::map< std::string, float > floatParamType;
-typedef std::map< const std::string, boost::python::object > EventScriptList;
-//typedef std::map< double, boost::python::object > CronScriptList;
-typedef std::vector< CronScript* > CronScriptList;
 
 
 /**
@@ -248,11 +257,18 @@ public:
     //bool setScript( const char *scriptPath, double freq );  // freq is nb of calls per second
     std::string getID() const;
 
-    bool addCronScript( const std::string& scriptPath, double freq, const std::string& params );
+    bool addCronScript( const std::string& label, const std::string& scriptPath,
+                        double freq, const std::string& params );
     bool callCronScripts();
+    bool enableCronScript( const char* label, int enable );
+    bool removeCronScript( const char* label );
 
-    bool addEventScript( const std::string& eventName, const std::string& scriptPath,  const std::string& params );
-    bool callEventScript( const std::string& eventName, const std::string& types, osgIntrospection::ValueList& args );
+    bool addEventScript( const std::string& label, const std::string& eventName,
+                         const std::string& scriptPath,  const std::string& params );
+    bool callEventScript( const std::string& eventName,
+                          osgIntrospection::ValueList& args );
+    bool enableEventScript( const char* label, int enable );
+    bool removeEventScript( const char* label );
 
  protected:
 

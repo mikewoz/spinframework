@@ -2,6 +2,8 @@ import spin
 import libSPINPyWrap
 import math
 
+__spin_behavior_class__ = "Script"
+
 class Script( spin.ScriptBase ):
 
     c = 1
@@ -19,14 +21,9 @@ class Script( spin.ScriptBase ):
         self.angle += 0.001
         x = self.radius * math.cos(self.angle);
         y = self.radius * math.sin(self.angle);
-        method = "setTranslation " + `x` + " " + `y` + " 0.0"
-        #print "the method is: ", method
-        libSPINPyWrap.callback(self._nodeID, "sfff", method, 0)
+        libSPINPyWrap.callback(self._nodeID, "setTranslation", [x, y, 0.0], 0)
         
-        method = "setDamping 0.234"
-        libSPINPyWrap.callback(self._nodeID, "sf", method)
-
-        ret = libSPINPyWrap.callback(self._nodeID, "s", "getTranslation", 0)
+        ret = libSPINPyWrap.callback(self._nodeID, "getTranslation", [], 0)
         print "ret?? = ", ret.getVector()
 
 

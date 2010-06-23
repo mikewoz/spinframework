@@ -9,12 +9,18 @@ import libSPINPyWrap
 
 class ScriptBase:
     _nodeID = ""
-    
-    def applyEvent(self, eventMethod, eventTypes, eventArgs, cascade):
-        method = eventMethod + " " + " ".join(map(str,eventArgs))
-        print( method )
-        libSPINPyWrap.callback( self._nodeID, eventTypes, method, cascade)
 
+    def __init__(self, id):
+        print "ScriptBase init"
+        self._nodeID = id
+
+    def __del__(self):
+        print "Node ", self._nodeID, ": script destroyed"
+
+    def applyEvent(self, eventMethod, eventArgs, cascade):
+        libSPINPyWrap.callback( self._nodeID, eventMethod, eventArgs, cascade)
+
+  
 
 ##########################################################################################
 

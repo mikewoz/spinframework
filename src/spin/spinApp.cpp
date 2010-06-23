@@ -141,7 +141,7 @@ spinApp::spinApp() : userID_(getHostname())
 spinApp::~spinApp()
 {
     delete sceneManager;
-	//spinBaseContext::signalStop = true;
+    //spinBaseContext::signalStop = true;
 }
 
 // Meyers Singleton design pattern:
@@ -158,18 +158,18 @@ spinApp& spinApp::Instance() {
  */
 void spinApp::setContext(spinBaseContext *c)
 {
-	context = c;
+    context = c;
     // make scene manager
-	//createScene(); // mikewoz moved this to the start of the client/server threads
+    //createScene(); // mikewoz moved this to the start of the client/server threads
 }
 
 void spinApp::createScene()
 {
-	if (context)
-		//if (!sceneManager)
-		sceneManager = new SceneManager(getSceneID(), lo_address_get_hostname(getContext()->lo_rxAddr), lo_address_get_port(getContext()->lo_rxAddr));
-	else
-		std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
+    if (context)
+        //if (!sceneManager)
+        sceneManager = new SceneManager(getSceneID(), lo_address_get_hostname(getContext()->lo_rxAddr), lo_address_get_port(getContext()->lo_rxAddr));
+    else
+        std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
 }
 
 // *****************************************************************************
@@ -217,21 +217,46 @@ bool spinApp::execPython( const std::string& cmd ) {
         exec(cmd.c_str(), _pyNamespace, _pyNamespace);
 
     } catch (boost::python::error_already_set const & ) {
-        ///if (PyErr_ExceptionMatches(PyExc_ZeroDivisionError))
-
-        std::cout << "0: Python error: " << std::endl;
+        std::cout << getCurrentPyException() << std::endl;
+        std::cout << "Python error: " << std::endl;
         PyErr_Print();
+        PyErr_Clear();
         return false;
     } catch ( std::exception& e ) {
-        std::cout << "0: what? " << e.what() << std::endl;
+        std::cout << "Python error:" << e.what() << std::endl;
         return false;
     } catch(...) {                        // catch all other exceptions
-        std::cout << "0: Caught... something??\n";
+        std::cout << "0Python error: caught (...)\n";
         return false;
     }
 
     return true;
 }
+
+
+std::string spinApp::getCurrentPyException()
+{
+  using namespace boost::python;
+  namespace py = boost::python;
+  printf("currentException...\n");
+  PyObject *exc,*val,*tb;
+  PyErr_Fetch(&exc,&val,&tb);
+  handle<> hexc(exc),hval(val),htb(tb);
+  if(!htb || !hval)
+  {
+      //MYAPP_ASSERT_BUG(hexc);
+    return extract<std::string>(str(hexc));
+  }
+  else
+  {
+    object traceback(py::import("traceback"));
+    object format_exception(traceback.attr("format_exception"));
+    object formatted_list(format_exception(hexc,hval,htb));
+    object formatted(str("\n").join(formatted_list));
+    return extract<std::string>(formatted);
+  }
+}
+
 
 // *****************************************************************************
 
@@ -288,13 +313,13 @@ void spinApp::InfoMessage(std::string OSCpath, const char *types, va_list ap)
 
 void spinApp::InfoMessage(std::string OSCpath, lo_message msg)
 {
-	if (context)
-	{
-		lo_send_message_from(context->lo_infoAddr, context->lo_infoServ, OSCpath.c_str(), msg);
+    if (context)
+    {
+        lo_send_message_from(context->lo_infoAddr, context->lo_infoServ, OSCpath.c_str(), msg);
 
-		// Let's free the message after (not sure if this is necessary):
-		lo_message_free(msg);
-	}
+        // Let's free the message after (not sure if this is necessary):
+        lo_message_free(msg);
+    }
 }
 
 
@@ -364,7 +389,7 @@ void spinApp::SceneMessage(const char *types, va_list ap)
 
 void spinApp::SceneMessage(lo_message msg)
 {
-	if (context && context->isRunning())
+    if (context && context->isRunning())
     {
         std::string OSCpath = "/SPIN/" + sceneID;
 
@@ -377,8 +402,8 @@ void spinApp::SceneMessage(lo_message msg)
 
         // if, however, this process acts as a server, we can optimize and send
         // directly to the OSC callback function:
-        else 
-            SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg), 
+        else
+            SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg),
                     lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
 
     } //else std::cout << "Error: tried to send SceneMssage but SPIN is not running" << std::endl;
@@ -390,7 +415,7 @@ void spinApp::SceneMessage(lo_message msg)
 
 void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
 {
-    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name); 
+    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
     sendBundle(OSCpath,msgs);
 }
 

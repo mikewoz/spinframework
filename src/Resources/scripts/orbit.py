@@ -2,6 +2,8 @@ import spin
 import libSPINPyWrap
 import math
 
+__spin_behavior_class__ = "Script"
+
 class Script( spin.ScriptBase ):
 
     c = 1
@@ -18,8 +20,8 @@ class Script( spin.ScriptBase ):
         self.angle += 0.05
         x = self.radius * math.cos(self.angle);
         y = self.radius * math.sin(self.angle);
-        method = "setTranslation " + `x` + " " + `y` + " 0.0"
-        #print "the method is: ", method ... cascadeEvents = 1: setTranslation can trigger more event scripts! like hotspot.py
-        libSPINPyWrap.callback(self._nodeID, "sfff", method, 1)
+
+        #cascadeEvents = 1: setTranslation can trigger more event scripts! like hotspot.py
+        libSPINPyWrap.callback(self._nodeID, "setTranslation", [x, y, 0.0], 1)
 
 print "orbit module loaded."

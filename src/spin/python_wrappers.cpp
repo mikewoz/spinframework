@@ -244,14 +244,67 @@ int invokeMethod(const osgIntrospection::Value classInstance,
 
 /******************************************************************************/
 /******************************************************************************/
-/******************************************************************************/
 
-ValueWrapper SceneManagerCallback_script( const char* symName, const char *types,
-                                          std::string args, int cascadeEvents )
+bool pyextract( boost::python::object obj, double* d ) {
+
+    try {
+        *d = boost::python::extract<double>( obj );
+    } catch (...) {
+        PyErr_Clear();
+        return false;
+    }
+
+    return true;
+}
+
+
+bool pyextract( boost::python::object obj, float* d ) {
+
+    try {
+        *d = boost::python::extract<float>( obj );
+    } catch (...) {
+        PyErr_Clear();
+        return false;
+    }
+
+    return true;
+}
+
+bool pyextract( boost::python::object obj, int* d ) {
+
+    try {
+        *d = boost::python::extract<int>( obj );
+    } catch (...) {
+        PyErr_Clear();
+        return false;
+    }
+
+    return true;
+}
+
+bool pyextract( boost::python::object obj, char* d ) {
+
+    try {
+        d = boost::python::extract<char*>( obj );
+        printf("got string [%s]\n", d);
+    } catch (...) {
+        PyErr_Clear();
+        return false;
+    }
+
+    return true;
+}
+
+
+
+
+/******************************************************************************/
+ValueWrapper SceneManagerCallback_script( const char* symName, const char* method,
+                                          boost::python::list& argList, int cascadeEvents )
 {
 
     //int i;
-    std::string    theMethod;
+    std::string    theMethod( method );
     osgIntrospection::ValueList theArgs;
 
     //printf("SceneManagerCallback_script: hi! %s, %s, [%s]\n", symName, types, args.c_str());
@@ -285,24 +338,16 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char *types
         return ValueWrapper(0);
     }
 
-    int argn = 1;
-    std::string tok;
-    std::istringstream iss(args);
-    getline(iss, tok, ' ');
+    size_t nbArgs = boost::python::len( argList );
+    double da; float fa; int ia; char* sa;
 
-    theMethod = tok;
+    for ( size_t i = 0; i < nbArgs; i++ ) {
 
-    while ( getline(iss, tok, ' ') ) {
-
-        //std::cout << tok << std::endl;
-
-        if (lo_is_numerical_type((lo_type)types[argn])) {
-            //   theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-            theArgs.push_back( (float) atof(tok.c_str() ) );
-        } else {
-            theArgs.push_back( tok );
-        }
-        argn++;
+        if ( pyextract( argList[i], &da ) ) theArgs.push_back( (double) da );
+        else if ( pyextract( argList[i], &fa ) ) theArgs.push_back( (float) fa );
+        else if ( pyextract( argList[i], &ia ) ) theArgs.push_back( (int) ia );
+        else if ( pyextract( argList[i], sa ) ) theArgs.push_back( (const char*) sa );
+        else printf( "could not cast argList[%i]\n", i );
     }
 
     // invoke the method on the node, and if it doesn't work, then just forward
@@ -314,7 +359,7 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char *types
     if (cascadeEvents) {
         if (s->s_type == REFERENCED_NODE) {
             //printf("calling eventscript...\n");
-            eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, std::string(types), theArgs );
+            eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, theArgs );
         }
     }
 

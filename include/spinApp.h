@@ -73,8 +73,8 @@ class spinApp
         void setContext(spinBaseContext *c);
         spinBaseContext *getContext() { return context; }
 
-		void createScene();
-		
+        void createScene();
+
 
         /**
          * This method should be used to register a user for a listener-style
@@ -118,6 +118,7 @@ class spinApp
          */
         bool initPython();
         bool execPython( const std::string& cmd );
+        std::string getCurrentPyException();
         boost::python::object _pyMainModule;
         boost::python::object _pyNamespace;
         bool _pyInitialized;

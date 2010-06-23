@@ -473,8 +473,11 @@ std::string ReferencedNode::getID() const
 }
 
 // *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************
 
-bool ReferencedNode::addCronScript( const std::string& scriptPath, double freq, const std::string& params )
+bool ReferencedNode::addCronScript( const std::string& label, const std::string& scriptPath,
+                                    double freq, const std::string& params )
 {
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -487,29 +490,47 @@ bool ReferencedNode::addCronScript( const std::string& scriptPath, double freq, 
     char cmd[100];
     //osg::Timer_t utick = timer->tick();
     unsigned long long utick =  (unsigned long long) timer->tick();
+    std::string pyModule, pyScript, pyClassName;
 
     try {
-        sprintf( cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str() );
-        std::cout << "Python cmd: " << cmd << std::endl;
-        exec( cmd, spin._pyNamespace, spin._pyNamespace );
-        sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
-
-        std::cout << "Python cmd: " << cmd << std::endl;
-        exec( cmd, spin._pyNamespace, spin._pyNamespace );
-
+        sprintf( cmd, "mod%llx", utick );
+        pyModule = cmd;
         sprintf( cmd, "script%llx", utick );
-        s = spin._pyNamespace[cmd];
+        pyScript = cmd;
+
+        //sprintf( cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str() );
+        sprintf( cmd, "%s = spin.load_module('%s')", pyModule.c_str(), sf.c_str() );
+        // std::cout << "Python cmd: " << cmd << std::endl;
+        exec( cmd, spin._pyNamespace, spin._pyNamespace );
+
+        s = spin._pyNamespace[pyModule.c_str()];
+        char* cls = boost::python::extract<char*>(s.attr("__spin_behavior_class__") );
+        //printf("got class = %s\n", cls);
+
+        //sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
+        sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id->s_name, params.c_str() );
+
+        std::cout << "Python cmd: " << cmd << std::endl;
+        exec( cmd, spin._pyNamespace, spin._pyNamespace );
+
+        //sprintf( cmd, "script%llx", utick );
+        s = spin._pyNamespace[pyScript.c_str()];
         p = s.attr( "run" );
 
         CronScript* cs = new CronScript;
         cs->freq = freq;
         cs->lastRun = timer->time_s() - 1.0/freq;
         cs->run = p;
-        _cronScriptList.push_back( cs );
+        cs->enabled = 1;
+        cs->pyModule = pyModule;
+        cs->pyScript = pyScript;
+
+        _cronScriptList.insert( pair<const std::string, CronScript*>( std::string(label), cs ) );
 
     } catch ( boost::python::error_already_set const & ) {
         std::cout << "Python error: " << std::endl;
         PyErr_Print();
+        PyErr_Clear();
         return false;
     } catch ( std::exception& e ) {
         std::cout << "Python error: " << e.what() << std::endl;
@@ -534,19 +555,22 @@ bool ReferencedNode::callCronScripts() {
 
     try {
 
-        for ( size_t i = 0; i < _cronScriptList.size(); i++ ) {
-            if ( !_cronScriptList[i] ) continue;
-            d = 1.0 / _cronScriptList[i]->freq;
-            if ( timer->time_s() >= d + _cronScriptList[i]->lastRun ) {
-                _cronScriptList[i]->lastRun += d;
-                _cronScriptList[i]->run();
+        for ( CronScriptList::iterator it = _cronScriptList.begin();
+              it != _cronScriptList.end(); it++ ) {
+            if ( !it->second ) continue;
+            d = 1.0 / it->second->freq;
+            if ( timer->time_s() >= d + it->second->lastRun ) {
+                it->second->lastRun += d;
+                if ( it->second->enabled ) it->second->run();
             }
         }
 
-    } catch (boost::python::error_already_set & ) {
+
+    } catch ( boost::python::error_already_set & ) {
         std::cout << currentException() << std::endl;
         std::cout << "Python error: [";
         PyErr_Print();
+        PyErr_Clear();
         std::cout << "]" << std::endl;
         return false;
     } catch ( std::exception& e ) {
@@ -557,15 +581,54 @@ bool ReferencedNode::callCronScripts() {
         return false;
     }
 
-
-
-
     return true;
 }
 
 // *****************************************************************************
 
-bool ReferencedNode::addEventScript( const std::string& eventName, const std::string& scriptPath, const std::string& params ) {
+bool ReferencedNode::enableCronScript( const char* label, int enable ) {
+
+    CronScriptList::iterator it;
+    it = _cronScriptList.find( std::string(label) );
+
+    if ( it != _cronScriptList.end() ) {
+        it->second->enabled = enable;
+        return true;
+    }
+
+    return false;
+}
+
+// *****************************************************************************
+
+bool ReferencedNode::removeCronScript( const char* label ) {
+
+    spinApp &spin = spinApp::Instance();
+    char cmd[100];
+    CronScriptList::iterator it;
+    it = _cronScriptList.find( std::string(label) );
+
+    if ( it != _cronScriptList.end() ) {
+        sprintf( cmd, "del %s", it->second->pyScript.c_str() );
+        if ( !spin.execPython( cmd ) ) return false;
+
+        delete( it->second );
+        it->second = NULL;
+        _cronScriptList.erase( it );
+        return true;
+    }
+
+    return false;
+}
+
+
+
+// *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************
+
+bool ReferencedNode::addEventScript( const std::string& label, const std::string& eventName,
+                                     const std::string& scriptPath, const std::string& params ) {
 
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -576,25 +639,45 @@ bool ReferencedNode::addEventScript( const std::string& eventName, const std::st
     boost::python::object s, p;
     char cmd[100];
     unsigned long long utick =  (unsigned long long) timer->tick();
+    std::string pyModule, pyScript;
 
     try {
-        sprintf(cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str());
+        sprintf( cmd, "mod%llx", utick );
+        pyModule = cmd;
+        sprintf( cmd, "script%llx", utick );
+        pyScript = cmd;
+
+        //sprintf(cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str());
+        sprintf( cmd, "%s = spin.load_module('%s')", pyModule.c_str(), sf.c_str() );
         std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
-        sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
+        s = spin._pyNamespace[pyModule.c_str()];
+        char* cls = boost::python::extract<char*>(s.attr("__spin_behavior_class__") );
+
+        //sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
+        sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id->s_name, params.c_str() );
         std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
-        sprintf(cmd, "script%llx", utick);
-        s = spin._pyNamespace[cmd];
+        //sprintf(cmd, "script%llx", utick);
+        //s = spin._pyNamespace[cmd];
+        s = spin._pyNamespace[pyScript.c_str()];
         p = s.attr("run");
 
-        _eventScriptList.insert( pair<const std::string, boost::python::object>( std::string(eventName), p) );
+        EventScript* es = new EventScript;
+        es->eventName = std::string( eventName );
+        es->run = p;
+        es->enabled = 1;
+        es->pyModule = pyModule;
+        es->pyScript = pyScript;
+
+        _eventScriptList.insert( pair<const std::string, EventScript*>( std::string(label), es ) );
 
     } catch (boost::python::error_already_set const & ) {
         std::cout << "Python error: " << std::endl;
         PyErr_Print();
+        PyErr_Clear();
         return false;
     } catch ( std::exception& e ) {
         std::cout << "Python error: " << e.what() << std::endl;
@@ -612,23 +695,24 @@ bool ReferencedNode::addEventScript( const std::string& eventName, const std::st
 
 // *****************************************************************************
 
-bool ReferencedNode::callEventScript( const std::string& eventName, const std::string& types, osgIntrospection::ValueList& args ) {
+bool ReferencedNode::callEventScript( const std::string& eventName,
+                                      osgIntrospection::ValueList& args ) {
 
     if ( _eventScriptList.empty() ) return false;
 
-    boost::python::object p;
-    EventScriptList::iterator iter;
     boost::python::list argList;
+    bool argListBuilt = false;
+    bool eventScriptCalled = false;
 
-    try {
+    for( EventScriptList::iterator it = _eventScriptList.begin();
+         it != _eventScriptList.end(); it++ ) {
 
-        iter = _eventScriptList.find( eventName );
-        if( iter != _eventScriptList.end() ) {
+        if ( !it->second ) continue;
+        if ( it->second->eventName != eventName ) continue;
 
-
+        if ( !argListBuilt ) {
             try {
                 for ( size_t i = 0; i < args.size(); i++ ) {
-
                     const std::type_info* argt = &args[i].getType().getStdTypeInfo();
 
                     if ( *argt == typeid(int) ) {
@@ -652,25 +736,69 @@ bool ReferencedNode::callEventScript( const std::string& eventName, const std::s
                 std::cout << "callEventScript: something went wrong" << std::endl;
                 return false;
             }
-
-            p = iter->second;
-            p( eventName.c_str(), types.c_str(), argList );
-            return true;
         }
 
-    } catch (boost::python::error_already_set const & ) {
-        std::cout << "0: Python error: " << std::endl;
-        PyErr_Print();
-        return false;
-    } catch ( std::exception& e ) {
-        std::cout << "Python error: " << e.what() << std::endl;
-        return false;
-    } catch(...) {
-        std::cout << "Python error: Caught... something??\n";
-        return false;
+        try {
+            it->second->run( eventName.c_str(), argList );
+            eventScriptCalled = true;
+
+        } catch (boost::python::error_already_set const & ) {
+            std::cout << "0: Python error: " << std::endl;
+            PyErr_Print();
+            PyErr_Clear();
+            return false;
+        } catch ( std::exception& e ) {
+            std::cout << "Python error: " << e.what() << std::endl;
+            return false;
+        } catch(...) {
+            std::cout << "Python error: Caught... something??\n";
+            return false;
+        }
     }
 
-
-    return false;
+    return eventScriptCalled;
 
 }
+
+// *****************************************************************************
+
+bool ReferencedNode::enableEventScript( const char* label, int enable ) {
+
+    EventScriptList::iterator it;
+    it = _eventScriptList.find( std::string(label) );
+
+    if ( it != _eventScriptList.end() ) {
+        it->second->enabled = enable;
+        return true;
+    }
+
+    return false;
+}
+
+// *****************************************************************************
+
+bool ReferencedNode::removeEventScript( const char* label ) {
+
+    spinApp &spin = spinApp::Instance();
+    char cmd[100];
+    EventScriptList::iterator it;
+    it = _eventScriptList.find( std::string(label) );
+
+    if ( it != _eventScriptList.end() ) {
+        sprintf( cmd, "del %s", it->second->pyScript.c_str() );
+        if ( !spin.execPython( cmd ) ) return false;
+
+        delete( it->second );
+        it->second = NULL;
+        _eventScriptList.erase( it );
+        return true;
+    }
+
+    return false;
+}
+
+
+
+// *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************

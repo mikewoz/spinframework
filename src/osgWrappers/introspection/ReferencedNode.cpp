@@ -29,6 +29,21 @@ BEGIN_VALUE_REFLECTOR(CronScript)
 	I_PublicMemberProperty(boost::python::object, run);
 	I_PublicMemberProperty(double, freq);
 	I_PublicMemberProperty(double, lastRun);
+	I_PublicMemberProperty(int, enabled);
+	I_PublicMemberProperty(std::string, pyScript);
+	I_PublicMemberProperty(std::string, pyModule);
+END_REFLECTOR
+
+BEGIN_VALUE_REFLECTOR(EventScript)
+	I_DeclaringFile("ReferencedNode.h");
+	I_Constructor0(____EventScript,
+	               "",
+	               "");
+	I_PublicMemberProperty(boost::python::object, run);
+	I_PublicMemberProperty(std::string, eventName);
+	I_PublicMemberProperty(int, enabled);
+	I_PublicMemberProperty(std::string, pyScript);
+	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(ReferencedNode)
@@ -97,6 +112,11 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __C5_char_P1__getContext,
 	          "",
 	          "Returns the current host ");
+	I_Method0(std::string, getContextString,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getContextString,
+	          "",
+	          "");
 	I_Method2(void, setParam, IN, const char *, paramName, IN, const char *, paramValue,
 	          Properties::NON_VIRTUAL,
 	          __void__setParam__C5_char_P1__C5_char_P1,
@@ -127,9 +147,14 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __void__stateDump,
 	          "",
 	          "StateDump() is a request to broadcast the node state via SceneManager. ");
-	I_Method3(bool, addCronScript, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
+	I_Method0(std::string, getID,
 	          Properties::NON_VIRTUAL,
-	          __bool__addCronScript__C5_std_string_R1__double__C5_std_string_R1,
+	          __std_string__getID,
+	          "",
+	          "");
+	I_Method4(bool, addCronScript, IN, const std::string &, label, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
+	          Properties::NON_VIRTUAL,
+	          __bool__addCronScript__C5_std_string_R1__C5_std_string_R1__double__C5_std_string_R1,
 	          "",
 	          "");
 	I_Method0(bool, callCronScripts,
@@ -137,14 +162,34 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __bool__callCronScripts,
 	          "",
 	          "");
-	I_Method3(bool, addEventScript, IN, const std::string &, eventName, IN, const std::string &, scriptPath, IN, const std::string &, params,
+	I_Method2(bool, enableCronScript, IN, const char *, label, IN, int, enable,
 	          Properties::NON_VIRTUAL,
-	          __bool__addEventScript__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
+	          __bool__enableCronScript__C5_char_P1__int,
 	          "",
 	          "");
-	I_Method3(bool, callEventScript, IN, const std::string &, eventName, IN, const std::string &, types, IN, osgIntrospection::ValueList &, args,
+	I_Method1(bool, removeCronScript, IN, const char *, label,
 	          Properties::NON_VIRTUAL,
-	          __bool__callEventScript__C5_std_string_R1__C5_std_string_R1__osgIntrospection_ValueList_R1,
+	          __bool__removeCronScript__C5_char_P1,
+	          "",
+	          "");
+	I_Method4(bool, addEventScript, IN, const std::string &, label, IN, const std::string &, eventName, IN, const std::string &, scriptPath, IN, const std::string &, params,
+	          Properties::NON_VIRTUAL,
+	          __bool__addEventScript__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
+	          "",
+	          "");
+	I_Method2(bool, callEventScript, IN, const std::string &, eventName, IN, osgIntrospection::ValueList &, args,
+	          Properties::NON_VIRTUAL,
+	          __bool__callEventScript__C5_std_string_R1__osgIntrospection_ValueList_R1,
+	          "",
+	          "");
+	I_Method2(bool, enableEventScript, IN, const char *, label, IN, int, enable,
+	          Properties::NON_VIRTUAL,
+	          __bool__enableEventScript__C5_char_P1__int,
+	          "",
+	          "");
+	I_Method1(bool, removeEventScript, IN, const char *, label,
+	          Properties::NON_VIRTUAL,
+	          __bool__removeEventScript__C5_char_P1,
 	          "",
 	          "");
 	I_SimpleProperty(osg::Group *, AttachmentNode, 
@@ -153,6 +198,12 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	I_SimpleProperty(const char *, Context, 
 	                 __C5_char_P1__getContext, 
 	                 __void__setContext__C5_char_P1);
+	I_SimpleProperty(std::string, ContextString, 
+	                 __std_string__getContextString, 
+	                 0);
+	I_SimpleProperty(std::string, ID, 
+	                 __std_string__getID, 
+	                 0);
 	I_SimpleProperty(char *, Parent, 
 	                 __char_P1__getParent, 
 	                 0);

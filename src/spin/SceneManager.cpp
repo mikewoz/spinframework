@@ -1967,17 +1967,25 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
     if (theMethod == "addCronScript") {
 
-        // Script path
+        // label
         if (!lo_is_numerical_type((lo_type)types[1])) {
             theArgs.push_back( std::string( (const char*)argv[1] ) );
+        } else {
+            std::cout << "ERROR: label for addCronScript is not a string" << std::endl;
+            return 1;
+        }
+
+        // Script path
+        if (!lo_is_numerical_type((lo_type)types[2])) {
+            theArgs.push_back( std::string( (const char*)argv[2] ) );
         } else {
             std::cout << "ERROR: script path for addCronScript is not a string" << std::endl;
             return 1;
         }
 
         // frequency
-        if (lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back( (double) lo_hires_val((lo_type)types[2], argv[2]) );
+        if (lo_is_numerical_type((lo_type)types[3])) {
+            theArgs.push_back( (double) lo_hires_val((lo_type)types[3], argv[3]) );
         } else {
             std::cout << "ERROR: frequency for addCronScript is not a number" << std::endl;
             return 1;
@@ -1985,7 +1993,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
         // rest of args are comma separated and passed as a string
          std::stringstream params("");
-        for (i = 3; i < argc; i++) {
+        for (i = 4; i < argc; i++) {
             if (lo_is_numerical_type((lo_type)types[i]))  {
                 params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
             } else {
@@ -1995,17 +2003,25 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
         theArgs.push_back( params.str() );
 
     } else if (theMethod == "addEventScript") {
-        // event method name
+        // label
         if (!lo_is_numerical_type((lo_type)types[1])) {
             theArgs.push_back( std::string( (const char*)argv[1] ) );
+        } else {
+            std::cout << "ERROR: label for addEventScript is not a string" << std::endl;
+            return 1;
+        }
+
+        // event method name
+        if (!lo_is_numerical_type((lo_type)types[2])) {
+            theArgs.push_back( std::string( (const char*)argv[2] ) );
         } else {
             std::cout << "ERROR: event method name for addEventScript is not a string" << std::endl;
             return 1;
         }
 
         // Script path
-        if (!lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back(  std::string( (const char*)argv[2] ) );
+        if (!lo_is_numerical_type((lo_type)types[3])) {
+            theArgs.push_back(  std::string( (const char*)argv[3] ) );
         } else {
             std::cout << "ERROR: script path for addEventScript is not a string" << std::endl;
             return 1;
@@ -2013,7 +2029,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
 
         // rest of args are comma separated and passed as a string
         std::stringstream params("");
-        for (i = 3; i < argc; i++) {
+        for (i = 4; i < argc; i++) {
             if (lo_is_numerical_type((lo_type)types[i]))  {
                 params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
             } else {
@@ -2038,7 +2054,7 @@ int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv
     bool eventScriptCalled = false;
     if ( s->s_type == REFERENCED_NODE ) {
         //printf("calling eventscript...\n");
-        eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, std::string(types), theArgs );
+        eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, theArgs );
     }
 
     if ( !eventScriptCalled ) { // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script

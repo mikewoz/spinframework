@@ -2,10 +2,12 @@ import spin
 import libSPINPyWrap
 import math
 
+__spin_behavior_class__ = "ADSR"
+
 def interpolate( start, end, dur, t ):
     return (end-start) * (t / dur) + start
 
-class Script( spin.ScriptBase ):
+class ADSR( spin.ScriptBase ):
 
     def __init__( self, id, a, d, s, r, scale, duration ):
         print "adsr init!"
