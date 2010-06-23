@@ -156,7 +156,7 @@ void *spinServerContext::spinServerThread(void *arg)
         {
             spin.InfoMessage("/SPIN/__server__", "ssiisii", spin.getSceneID().c_str(),
                     myIP.c_str(), i_rxPort, 
-                    lo_servever_),
+                    lo_server_get_port(context->lo_tcpRxServer_),
                     lo_address_get_hostname(context->lo_txAddr), i_txPort,
                     i_syncPort, LO_ARGS_END);
             
