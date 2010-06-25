@@ -57,7 +57,8 @@ extern pthread_mutex_t pthreadLock;
 
 // ***********************************************************
 // constructor (one arg required: the node ID)
-ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
+ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) : 
+    contextString("NULL")
 {
 
     id = gensym(initID);
@@ -65,8 +66,6 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID)
     id->s_type = REFERENCED_NODE;
 
     nodeType = "ReferencedNode";
-
-    contextString = "NULL";
 
     this->setName(string(id->s_name) + ".ReferencedNode");
 
@@ -105,7 +104,7 @@ ReferencedNode::~ReferencedNode()
     {
         // unregister with OSC parser:
         string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-        lo_server_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
+        lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
     }
 
     id->s_thing = 0;
@@ -119,7 +118,8 @@ void ReferencedNode::registerNode(SceneManager *s)
 
     // register with OSC parser:
     string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-    lo_server_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)id);
+    lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), 
+            NULL, spinBaseContext::nodeCallback, (void*)id);
 #ifdef OSCDEBUG
     std::cout << "oscParser registered: " << oscPattern << std::endl;
 #endif

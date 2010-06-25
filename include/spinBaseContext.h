@@ -63,6 +63,10 @@
  * whether the process is to act as a server or a client.
  *
  */
+
+// Forward declarations
+class spinLog;
+
 class spinBaseContext
 {
     public:
@@ -100,11 +104,25 @@ class spinBaseContext
         lo_address lo_infoAddr;
         lo_address lo_syncAddr;
         lo_server lo_infoServ;
+        lo_server lo_rxServ_;
+        static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
+                int argc, void *data, void *user_data);
+        static int nodeCallback(const char *path, const char *types, lo_arg **argv, 
+                int argc, void *data, void *user_data);
+        static int sceneCallback(const char *path, const char *types, lo_arg **argv, 
+                int argc, void *data, void *user_data);
+        static int logCallback(const char *path, const char *types, lo_arg **argv, 
+                int argc, void *data, void *user_data);
+        static int debugCallback(const char *path, const char *types, lo_arg **argv, 
+                int argc, void *data, void *user_data);
+
+	static void oscParser_error(int num, const char *msg, const char *path);
 
     protected:
         lo_server lo_tcpRxServer_;
         bool running;
         spinContextMode mode;
+        void setLog(spinLog &log);
         /**
          * All contexts would probably like to listen to infoPort broadcasts.
          * A client can listen for info about the server, such as the correct

@@ -86,16 +86,12 @@ class spinLog;
 */
 class SceneManager
 {
-
     public:
-
-        SceneManager(std::string id, std::string addr, std::string port);
+        SceneManager(const std::string &id);
         ~SceneManager();
 
         void init();
         void debug();
-
-        lo_server rxServ;
 
         void setGraphical(bool b) { graphicalMode = b; }
         bool isGraphical() { return (bool) graphicalMode; }
@@ -212,7 +208,7 @@ class SceneManager
         std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
 
         std::string getConnectionsAsXML();
-        bool saveXML(const char *filename, bool withUsers);
+        bool saveXML(const char *filename, bool withUsers = false);
         bool saveUsers(const char *s);
 
         bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
@@ -240,24 +236,5 @@ class SceneManager
 
 
 int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
-
-int SceneManagerCallback_log(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-int SceneManagerCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
-//int SceneManagerCallback_script(const char* symName,  char *types, lo_arg *argv, int argc);
-
-
-/**
- * The SoundConnection node is an exception that does not extend ReferencedNode.
- * As a result, it cannot use the automated OSC interfacing system, or the WX
- * property generation stuff. TODO: fix this so that osgIntrospection can be
- * used (ie, subclass connections from ReferencedNode or some other an osg class)
- */
-int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
-
-void oscParser_error(int num, const char *msg, const char *path);
 
 #endif

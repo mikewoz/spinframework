@@ -73,7 +73,8 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	
 	// register with OSC parser:
     std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
-	lo_server_add_method(sceneManager->rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_conn, (void*)this);
+	lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), 
+            NULL, spinBaseContext::connectionCallback, (void*)this);
 
 	// store pointer to sceneManager
 	sceneManager = s;
@@ -98,7 +99,7 @@ SoundConnection::~SoundConnection()
 	SCENE_MSG("ss", "deleteNode", id->s_name);
 
     std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
-	lo_server_del_method(sceneManager->rxServ, oscPattern.c_str(), NULL);
+	lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
 	
 	//id->s_thing = 0;
 

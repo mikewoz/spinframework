@@ -68,8 +68,9 @@ class spinServerContext : public spinBaseContext
          */
         void startSyncThread();
 
-    private:
+        //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
+    private:
 
         /**
          * The spinServerThread is mainly differentiated from a client thread by
@@ -82,6 +83,9 @@ class spinServerContext : public spinBaseContext
          * for any nodes who need periodic (scheduled) processing.
          */
         static void *spinServerThread(void *arg);
+
+        /// creates all our osc servers, this has to happen later because we override addresses first
+        void createServers();
 
         /**
          * The syncThread sends timecode on an independent multicast UDP port

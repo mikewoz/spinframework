@@ -90,7 +90,7 @@ extern pthread_mutex_t pthreadLock;
 // *****************************************************************************
 // constructors:
 
-SceneManager::SceneManager (std::string id, std::string addr, std::string port)
+SceneManager::SceneManager(const std::string &id)
 {
     this->sceneID = id;
 
@@ -124,30 +124,9 @@ SceneManager::SceneManager (std::string id, std::string addr, std::string port)
     osgDB::setDataFilePathList( fpl );
 
     mediaManager = new MediaManager(resourcesPath);
-
-
-    // set up OSC event listener:
-
-    //rxAddr = lo_address_new(addr.c_str(), port.c_str());
-
-    if (isMulticastAddress(addr))
-        rxServ = lo_server_new_multicast(addr.c_str(), port.c_str(), oscParser_error);
-    else 
-        rxServ = lo_server_new(port.c_str(), oscParser_error);
     
-#if 0
-    // add OSC callback methods to match various incoming messages:
-    // oscCallback_debug() will match any path and args:
-    lo_server_add_method(rxServ, NULL, NULL, SceneManagerCallback_debug, NULL);
-#endif
-
-    // generic admin callback:
-    lo_server_add_method(rxServ, std::string("/SPIN/"+sceneID).c_str(), NULL, SceneManagerCallback_admin, this);
-
     std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
-    std::cout << "  SceneManager receiving on:\t" << addr << std::endl;
-
 
     // discover all relevant nodeTypes by introspection, and fill the nodeMap
     // with empty vectors:
@@ -311,24 +290,7 @@ SceneManager::~SceneManager()
 
     // stop sceneManager OSC threads:
     usleep(100);
-
-    // FIXME: is this necessary/a good idea?
-    if (rxServ) 
-    {
-        lo_server_free(rxServ);
-        rxServ = 0;
-    }
 }
-
-//void SceneManager::setLog(const char* filename)
-void SceneManager::setLog(spinLog &log)
-{
-    // remove existing callback:
-
-    lo_server_add_method(rxServ, NULL, NULL, SceneManagerCallback_log, &log);
-}
-
-// *****************************************************************************
 
 void SceneManager::registerStateSet(ReferencedStateSet *s)
 {
@@ -336,7 +298,8 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
     stateMap[s->classType].push_back(s->id);
 
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_add_method(rxServ, oscPattern.c_str(), NULL, SceneManagerCallback_node, (void*)s->id);
+    lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL, 
+            spinBaseContext::nodeCallback, (void*)s->id);
 
     SCENE_MSG("sss", "registerState", s->id->s_name, s->classType.c_str());
 
@@ -346,7 +309,7 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
 void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 {
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_del_method(rxServ, oscPattern.c_str(), NULL);
+    lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
 
     ReferencedStateSetList::iterator itr;
     itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );
@@ -1477,7 +1440,7 @@ std::string SceneManager::getConnectionsAsXML(ReferencedNode *n)
 
 
 // *****************************************************************************
-bool SceneManager::saveXML(const char *s, bool withUsers = false)
+bool SceneManager::saveXML(const char *s, bool withUsers)
 {
     // convert filename into valid path:
     std::string filename = getSpinPath(s);
@@ -1898,383 +1861,5 @@ int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospec
    // }
 
     return 0;
-}
-
-int SceneManagerCallback_node(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
-    // NOTE: user_data is a t_symbol pointer
-
-    int i;
-    std::string    theMethod, nodeStr;
-    ValueList theArgs;
-
-    // make sure there is at least one argument (ie, a method to call):
-    if (!argc) return 1;
-
-    // get the method (argv[0]):
-    if (lo_is_string_type((lo_type)types[0]))
-    {
-        theMethod = std::string((char *)argv[0]);
-    }
-    else
-        return 1;
-
-    // get the instance of the node, which is the last token of the OSCpath:
-    // TODO: use user_data instead!
-    /*
-    nodeStr = string(path);
-    nodeStr = nodeStr.substr(nodeStr.rfind("/")+1);
-    t_symbol *s = gensym(nodeStr.c_str());
-    */
-    t_symbol *s = (t_symbol*) user_data;
-
-    if (!s->s_thing)
-    {
-        std::cout << "oscParser: Could not find referenced object named: " << nodeStr << std::endl;
-        return 1;
-    }
-
-    // get osgInrospection::Value from passed UserData by casting as the proper
-    // referenced object pointer:
-
-    osgIntrospection::Value classInstance;
-    if (s->s_type == REFERENCED_STATESET)
-    {
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
-    }
-    else
-    {
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
-
-    }
-
-
-    // the getInstanceType() method however, gives us the real type being pointed at:
-    const osgIntrospection::Type &classType = classInstance.getInstanceType();
-
-
-
-    if (!classType.isDefined())
-    {
-        std::cout << "ERROR: oscParser cound not process message '" << path << ". osgIntrospection has no data for that node." << std::endl;
-        return 1;
-    }
-
-    //introspect_print_type(classType);
-
-    // If we have found a valid Type, then let's build an argument list and see
-    // if we can find a method that takes this list of argumets:
-
-    if (theMethod == "addCronScript") {
-
-        // label
-        if (!lo_is_numerical_type((lo_type)types[1])) {
-            theArgs.push_back( std::string( (const char*)argv[1] ) );
-        } else {
-            std::cout << "ERROR: label for addCronScript is not a string" << std::endl;
-            return 1;
-        }
-
-        // Script path
-        if (!lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back( std::string( (const char*)argv[2] ) );
-        } else {
-            std::cout << "ERROR: script path for addCronScript is not a string" << std::endl;
-            return 1;
-        }
-
-        // frequency
-        if (lo_is_numerical_type((lo_type)types[3])) {
-            theArgs.push_back( (double) lo_hires_val((lo_type)types[3], argv[3]) );
-        } else {
-            std::cout << "ERROR: frequency for addCronScript is not a number" << std::endl;
-            return 1;
-        }
-
-        // rest of args are comma separated and passed as a string
-         std::stringstream params("");
-        for (i = 4; i < argc; i++) {
-            if (lo_is_numerical_type((lo_type)types[i]))  {
-                params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
-            } else {
-                params << ", \"" << (const char*)argv[i] << "\"";
-            }
-        }
-        theArgs.push_back( params.str() );
-
-    } else if (theMethod == "addEventScript") {
-        // label
-        if (!lo_is_numerical_type((lo_type)types[1])) {
-            theArgs.push_back( std::string( (const char*)argv[1] ) );
-        } else {
-            std::cout << "ERROR: label for addEventScript is not a string" << std::endl;
-            return 1;
-        }
-
-        // event method name
-        if (!lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back( std::string( (const char*)argv[2] ) );
-        } else {
-            std::cout << "ERROR: event method name for addEventScript is not a string" << std::endl;
-            return 1;
-        }
-
-        // Script path
-        if (!lo_is_numerical_type((lo_type)types[3])) {
-            theArgs.push_back(  std::string( (const char*)argv[3] ) );
-        } else {
-            std::cout << "ERROR: script path for addEventScript is not a string" << std::endl;
-            return 1;
-        }
-
-        // rest of args are comma separated and passed as a string
-        std::stringstream params("");
-        for (i = 4; i < argc; i++) {
-            if (lo_is_numerical_type((lo_type)types[i]))  {
-                params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
-            } else {
-                params << ", \"" << (const char*)argv[i] << "\"";
-            }
-        }
-
-        theArgs.push_back( params.str() );
-
-    } else {
-
-        for (i=1; i<argc; i++) {
-            if (lo_is_numerical_type((lo_type)types[i]))  {
-                theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-            } else {
-                theArgs.push_back( (const char*) argv[i] );
-            }
-        }
-
-    }
-
-    bool eventScriptCalled = false;
-    if ( s->s_type == REFERENCED_NODE ) {
-        //printf("calling eventscript...\n");
-        eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, theArgs );
-    }
-
-    if ( !eventScriptCalled ) { // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
-        // invoke the method on the node, and if it doesn't work, then just forward
-        // the message:
-        if (!invokeMethod(classInstance, classType, theMethod, theArgs))
-        {
-            //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
-            // HACK: TODO: fix this
-            spinApp &spin = spinApp::Instance();
-            if (spin.getContext()->isServer())
-            {
-                lo_message msg = lo_message_new();
-                for (i=0; i<argc; i++)
-                {
-                    if (lo_is_numerical_type((lo_type)types[i]))
-                    {
-                        lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
-                    } else {
-                        lo_message_add_string(msg, (const char*) argv[i] );
-                    }
-                }
-                lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
-            }
-        }
-    }
-
-    //pthread_mutex_unlock(&pthreadLock);
-
-    return 1;
-}
-
-int SceneManagerCallback_log(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
-    spinLog *log = (spinLog*) user_data;
-
-    *log << path << ' ' << types << ' ';
-    for (int i=0; i<argc; i++)
-    {
-        if (lo_is_numerical_type((lo_type)types[i]))
-        {
-            *log << (float) lo_hires_val((lo_type)types[i], argv[i]);
-        } else {
-            *log << (const char*) argv[i];
-        }
-        *log << ' ';
-    }
-    *log << std::endl;
-
-    return 1;
-}
-
-int SceneManagerCallback_debug(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
-    printf("************ oscCallback_debug() got message: %s\n", (char*)path);
-    printf("user_data: %s\n", (char*) user_data);
-    for (int i=0; i<argc; i++) {
-        printf("arg %d '%c' ", i, types[i]);
-        lo_arg_pp((lo_type) types[i], argv[i]);
-        printf("\n");
-    }
-    printf("\n");
-    fflush(stdout);
-
-    return 1;
-}
-
-int SceneManagerCallback_admin(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
-    SceneManager *sceneManager = (SceneManager*) user_data;
-
-    // make sure there is at least one argument (ie, a method to call):
-    if (!argc) return 1;
-
-    // get the method (argv[0]):
-    std::string theMethod;
-    if (lo_is_string_type((lo_type)types[0]))
-    {
-        theMethod = std::string((char *)argv[0]);
-    }
-    else
-        return 1;
-
-    //pthread_mutex_lock(&pthreadLock);
-
-    // note that args start at argv[1] now:
-    if (theMethod=="debug")
-        sceneManager->debug();
-    else if (theMethod=="clear")
-        sceneManager->clear();
-    else if (theMethod=="clearUsers")
-        sceneManager->clearUsers();
-    else if (theMethod=="clearStates")
-        sceneManager->clearStates();
-    else if (theMethod=="userRefresh")
-    {
-        SCENE_MSG("s", "userRefresh");
-    }
-    else if (theMethod=="refresh")
-        sceneManager->refresh();
-    else if (theMethod=="getNodeList")
-        sceneManager->sendNodeList("*");
-    else if ((theMethod=="nodeList") && (argc>2))
-    {
-        for (int i=2; i<argc; i++)
-        {
-            if (strcmp((char*)argv[i],"NULL")!=0) sceneManager->createNode((char*)argv[i], (char*)argv[1]);
-        }
-    }
-    else if ((theMethod=="stateList") && (argc>2))
-    {
-        for (int i=2; i<argc; i++)
-        {
-            if (strcmp((char*)argv[i],"NULL")!=0) sceneManager->createStateSet((char*)argv[i], (char*)argv[1]);
-        }
-    }
-    else if ((theMethod=="exportScene") && (argc==3))
-        sceneManager->exportScene((char*)argv[1], (char*)argv[2]);
-    else if ((theMethod=="load") && (argc==2))
-        sceneManager->loadXML((char*)argv[1]);
-    else if ((theMethod=="save") && (argc==2))
-        sceneManager->saveXML((char*)argv[1]);
-    else if ((theMethod=="saveAll") && (argc==2))
-        sceneManager->saveXML((char*)argv[1], true);
-    else if ((theMethod=="saveUsers") && (argc==2))
-        sceneManager->saveUsers((char*)argv[1]);
-    else if ((theMethod=="createNode") && (argc==3))
-        sceneManager->createNode((char*)argv[1], (char*)argv[2]);
-    else if ((theMethod=="createStateSet") && (argc==3))
-        sceneManager->createStateSet((char*)argv[1], (char*)argv[2]);
-    else if ((theMethod=="createStateSet") && (argc==2))
-        sceneManager->createStateSet((char*)argv[1]);
-    else if ((theMethod=="deleteNode") && (argc==2))
-        sceneManager->deleteNode((char*)argv[1]);
-    else if ((theMethod=="deleteGraph") && (argc==2))
-        sceneManager->deleteGraph((char*)argv[1]);
-    else {
-            // FIXME: this used to rebroadcast messages that did not match command
-#if 0
-        spinApp &spin = spinApp::Instance();
-        if (spin.sceneManager->isServer())
-        {
-            lo_message msg = lo_message_new();
-            for (int i=0; i<argc; i++)
-            {
-                if (lo_is_numerical_type((lo_type)types[i]))
-                {
-                    lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
-                } else {
-                    lo_message_add_string(msg, (const char*) argv[i] );
-                }
-            }
-            lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
-            //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args), but forwarding the message anyway." << std::endl;
-        } else {
-            //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-        }
-#endif
-    }
-
-    //pthread_mutex_unlock(&pthreadLock);
-
-    return 1;
-}
-
-int SceneManagerCallback_conn(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
-{
-    std::string theMethod, idStr;
-
-    // make sure there is at least one argument (ie, a method to call):
-    if (!argc) return 1;
-
-    // get the method (argv[0]):
-    if (lo_is_string_type((lo_type)types[0]))
-    {
-        theMethod = std::string((char *)argv[0]);
-    }
-    else return 1;
-
-    // get the instance of the connection:
-    SoundConnection *conn = (SoundConnection*) user_data;
-    if (!conn)
-    {
-        std::cout << "oscParser: Could not find connection: " << idStr << std::endl;
-        return 1;
-    }
-
-    // TODO: replace method call with osg::Introspection
-
-    if (theMethod=="stateDump")
-        conn->stateDump();
-    else if (theMethod=="debug")
-        conn->debug();
-    else if ((argc==2) && (lo_is_numerical_type((lo_type)types[1])))
-    {
-        float value = lo_hires_val((lo_type)types[1], argv[1]);
-
-        if (theMethod=="setThru")
-            conn->setThru((bool) value);
-        else if (theMethod=="setDistanceEffect")
-            conn->setDistanceEffect(value);
-        else if (theMethod=="setRolloffEffect")
-            conn->setRolloffEffect(value);
-        else if (theMethod=="setDopplerEffect")
-            conn->setDopplerEffect(value);
-        else if (theMethod=="setDiffractionEffect")
-            conn->setDiffractionEffect(value);
-        else
-            std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-    }
-
-    else
-        std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-
-    return 1;
-}
-
-void oscParser_error(int num, const char *msg, const char *path)
-{
-    printf("OSC (liblo) error %d in path %s: %s\n", num, path, msg);
-    fflush(stdout);
 }
 

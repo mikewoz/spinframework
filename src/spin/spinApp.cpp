@@ -57,6 +57,7 @@
 
 #include "spinApp.h"
 #include "spinBaseContext.h"
+#include "spinServerContext.h"
 #include "SceneManager.h"
 #include "spinUtil.h"
 #include "spinLog.h"
@@ -165,11 +166,10 @@ void spinApp::setContext(spinBaseContext *c)
 
 void spinApp::createScene()
 {
-    if (context)
-        //if (!sceneManager)
-        sceneManager = new SceneManager(getSceneID(), lo_address_get_hostname(getContext()->lo_rxAddr), lo_address_get_port(getContext()->lo_rxAddr));
-    else
-        std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
+	if (context)
+		sceneManager = new SceneManager(getSceneID());
+	else
+		std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
 }
 
 // *****************************************************************************
@@ -359,7 +359,8 @@ void spinApp::NodeMessage(const char *nodeId, lo_message msg)
 
         // if, however, this process acts as a server, we can optimize and send
         // directly to the OSC callback function:
-        else SceneManagerCallback_node(OSCpath.c_str(), lo_message_get_types(msg), lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)gensym(nodeId));
+        else context->nodeCallback(OSCpath.c_str(), lo_message_get_types(msg), 
+                lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)gensym(nodeId));
 
     } //else std::cout << "Error: tried to send NodeMessage but SPIN is not running" << std::endl;
 
@@ -387,6 +388,8 @@ void spinApp::SceneMessage(const char *types, va_list ap)
     }
 }
 
+// FIXME: gross, this should probably just be a template method in spinBaseContext with client/server specifics
+// in their respective classes
 void spinApp::SceneMessage(lo_message msg)
 {
     if (context && context->isRunning())
@@ -399,12 +402,13 @@ void spinApp::SceneMessage(lo_message msg)
         {
             lo_send_message(context->lo_txAddr, OSCpath.c_str(), msg);
         }
-
-        // if, however, this process acts as a server, we can optimize and send
+        else 
+        {
+            // if, however, this process acts as a server, we can optimize and send
         // directly to the OSC callback function:
-        else
-            SceneManagerCallback_admin(OSCpath.c_str(), lo_message_get_types(msg),
-                    lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)sceneManager);
+            spinServerContext::sceneCallback(OSCpath.c_str(), lo_message_get_types(msg), 
+                    lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, NULL);
+        }
 
     } //else std::cout << "Error: tried to send SceneMssage but SPIN is not running" << std::endl;
 

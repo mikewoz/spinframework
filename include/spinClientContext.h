@@ -72,12 +72,14 @@ class spinClientContext : public spinBaseContext
          */
         static void *spinClientThread(void *arg);
 
+        /// creates all our osc servers, this has to happen later because we override addresses first
+        void createServers();
         /**
          * The sceneCallback is used for to listen to userRefresh messages.
          * If this client is running before the server comes up, the server will
          * send a userRefresh message, and this client can re-send his user info
 		 */
-        static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+        //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
         /**
          * The syncCallback allows a client to listen to timecode originating at

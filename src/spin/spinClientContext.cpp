@@ -56,9 +56,6 @@ spinClientContext::spinClientContext() : doSubscribe_(true)
 	// Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
-    lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
-    lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
-
     lo_rxAddr = lo_address_new("226.0.0.1", "54323");
     lo_txAddr = lo_address_new("226.0.0.1", "54324");
 }
@@ -71,18 +68,61 @@ bool spinClientContext::start()
 	return startThread(&spinClientThread);
 }
 
+// FIXME: Push this up to base context
+void spinClientContext::createServers()
+{
+    // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
+    lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
+    std::cout << "  TCP channel:\t\t\t" << lo_server_get_url(lo_tcpRxServer_) <<
+        std::endl;
+
+    // set up OSC event listener:
+
+    if (isMulticastAddress(lo_address_get_hostname(lo_rxAddr)))
+        lo_rxServ_ = lo_server_new_multicast(lo_address_get_hostname(lo_rxAddr), lo_address_get_port(lo_rxAddr), oscParser_error);
+    else 
+        lo_rxServ_ = lo_server_new(lo_address_get_port(lo_rxAddr), oscParser_error);
+
+#if 0
+    // add OSC callback methods to match various incoming messages:
+    // oscCallback_debug() will match any path and args:
+    lo_server_add_method(lo_rxServ_, NULL, NULL, debugCallback, NULL);
+#endif
+    
+    // set up infoPort listener thread:
+    if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
+    {
+        lo_infoServ = lo_server_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
+    } else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
+    {
+        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+        int sock = lo_server_get_socket_fd(lo_infoServ);
+        int sockopt = 1;
+        setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
+
+    } else {
+        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+    }
+    lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+    lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
+
+    lo_server_add_method(lo_rxServ_, 
+            std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
+            NULL, sceneCallback, NULL);
+    std::cout << "  SceneManager receiving on:\t" << 
+        lo_address_get_hostname(lo_rxAddr) << std::endl;
+}
+
 void *spinClientContext::spinClientThread(void *arg)
 {
 	spinClientContext *context = (spinClientContext*)(arg);
     spinApp &spin = spinApp::Instance();
+    context->createServers();
 	spin.createScene();
     spin.registerUser();
 
-    // register our special scene callback:
-    lo_server_add_method(spin.sceneManager->rxServ, ("/SPIN/" + spin.getSceneID()).c_str(), NULL, sceneCallback, NULL);
-
     // sync (timecode) receiver:
-    if (isMulticastAddress(lo_address_get_hostname(spin.getContext()->lo_syncAddr)))
+    if (isMulticastAddress(lo_address_get_hostname(context->lo_syncAddr)))
     {
     	context->lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(context->lo_syncAddr), lo_address_get_port(context->lo_syncAddr), oscParser_error);
     } else {
@@ -96,7 +136,7 @@ void *spinClientContext::spinClientThread(void *arg)
     // convert port to integers for sending:
     std::string myIP = getMyIPaddress();
     int i_rxPort;
-    fromString<int>(i_rxPort, lo_address_get_port(spin.getContext()->lo_rxAddr));
+    fromString<int>(i_rxPort, lo_address_get_port(context->lo_rxAddr));
 
     context->running = true;
     static const int TIMEOUT = 0;
@@ -104,7 +144,7 @@ void *spinClientContext::spinClientThread(void *arg)
     {
         lo_server_recv_noblock(context->lo_syncServ, TIMEOUT); 
         lo_server_recv_noblock(context->lo_infoServ, TIMEOUT); // was 250 ms before
-        lo_server_recv_noblock(spin.sceneManager->rxServ, TIMEOUT); 
+        lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT); 
         lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT); 
         // do nothing (assume the app is doing updates - eg, in a draw loop)
 
@@ -124,46 +164,6 @@ void *spinClientContext::spinClientThread(void *arg)
     // clean up:
     lo_server_free(context->lo_syncServ);
     pthread_exit(NULL);
-}
-
-int spinClientContext::sceneCallback(const char * /*path*/, const char *types, lo_arg **argv, 
-        int argc, lo_message /*msg*/, void * /*user_data*/)
-{
-    spinApp &spin = spinApp::Instance();
-
-    // make sure there is at least one argument (ie, a method to call):
-    if (!argc) return 1;
-
-    // get the method (argv[0]):
-    std::string theMethod;
-    if (lo_is_string_type((lo_type)types[0]))
-    {
-        theMethod = std::string((char *)argv[0]);
-    }
-    else return 1;
-
-    // bundle all other arguments
-    std::vector<float> floatArgs;
-    std::vector<const char*> stringArgs;
-    for (int i=1; i<argc; i++)
-    {
-        if (lo_is_numerical_type((lo_type)types[i]))
-        {
-            floatArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-        } else {
-            stringArgs.push_back( (const char*) argv[i] );
-        }
-    }
-
-    // now, here are some special messages that we need to look for:
-
-    if (theMethod=="userRefresh")
-    {
-        if (spin.userNode.valid()) 
-            spin.SceneMessage("sss", "createNode", spin.userNode->id->s_name, "UserNode", LO_ARGS_END);
-    }
-
-    return 1;
 }
 
 
