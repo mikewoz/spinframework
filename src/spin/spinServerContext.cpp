@@ -192,11 +192,15 @@ void *spinServerContext::spinServerThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            spin.InfoMessage("/SPIN/__server__", "ssiisii", spin.getSceneID().c_str(),
-                    myIP.c_str(), i_rxPort, 
-                    lo_server_get_port(context->lo_tcpRxServer_),
-                    lo_address_get_hostname(context->lo_txAddr), i_txPort,
-                    i_syncPort, LO_ARGS_END);
+            spin.InfoMessage("/SPIN/__server__", "ssiisii",
+                             spin.getSceneID().c_str(),
+                             myIP.c_str(), // server's IP address
+                             i_rxPort, // server's receiving port
+                             lo_server_get_port(context->lo_tcpRxServer_), // server's receiving TCP port
+                             lo_address_get_hostname(context->lo_txAddr), // server multicasting group
+                             i_txPort,	// server multicast port
+                             i_syncPort, // server multicast port for sync (timecode)
+                             LO_ARGS_END);
             
             lastTick = frameTick;
         }

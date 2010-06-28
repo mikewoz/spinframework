@@ -230,9 +230,13 @@ void ShapeNode::drawShape()
 
 	// only draw shape if context matches host or context is empty
     // Have to use to a string "NULL" because OSC cannot do empty strings
-	bool drawOnThisHost = (not spinApp::Instance().getContext()->isServer()) 
-            and (this->getContextString() == getHostname() or this->getContextString() == "NULL");
+	//bool drawOnThisHost = (not spinApp::Instance().getContext()->isServer()) 
+    //        and (this->getContextString() == getHostname() or this->getContextString() == "NULL");
 
+	bool drawOnThisHost = ((this->getContextString() == spinApp::Instance().getUserID()) or
+	                       (this->getContextString() == "NULL"));
+
+	
 	// TODO: this should only be added if this application is a graphical renderer.
 	// There is no point to actually add the memory of the ShapeDrawable for apps
 	// that do not need to use it!

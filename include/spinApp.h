@@ -128,6 +128,7 @@ class spinApp
         SceneManager *sceneManager;
         MediaManager *mediaManager;
         void setUserID(const std::string &id) { userID_ = id; }
+        std::string getUserID() { return userID_; }
 
     private:
         // can be overridden in client apps
