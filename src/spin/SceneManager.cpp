@@ -125,7 +125,7 @@ SceneManager::SceneManager(const std::string &id)
 
     mediaManager = new MediaManager(resourcesPath);
     
-    std::cout << "  SceneManager ID:\t\t" << id << std::endl;
+    //std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
 
     // discover all relevant nodeTypes by introspection, and fill the nodeMap
