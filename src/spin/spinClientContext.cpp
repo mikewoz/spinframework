@@ -153,7 +153,7 @@ void *spinClientContext::spinClientThread(void *arg)
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
             if (spin.userNode.valid()) 
-                spin.InfoMessage("/ping/user", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
+                spin.InfoMessage("/SPIN/__user__", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
             lastTick = frameTick;
         }
     }
@@ -263,7 +263,7 @@ void spinClientContext::subscribe()
         // convert to port number to string
         sstr << lo_server_get_port(lo_tcpRxServer_);
 
-        lo_send(lo_serverTCPAddr, "/SPIN/__client__", "ssss",
+        lo_send(lo_serverTCPAddr, "/SPIN/__user__", "ssss",
                 "subscribe", spinApp::Instance().userNode->getID().c_str(), getMyIPaddress().c_str(),
                 sstr.str().c_str());
     }
