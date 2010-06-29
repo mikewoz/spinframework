@@ -110,19 +110,20 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-id <uniqueID>", "Specify a user ID for this viewer (Default is hostname: '" + userID + "')");
+	arguments.getApplicationUsage()->addCommandLineOption("--user-id <uniqueID>", "Specify a user ID for this viewer (Default is the local host name)"); 
+    // FIXME: see note in spinServer.cpp
+    //: '" + userID + "')");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("-serverAddr <host> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-serverSync <port>", "Set the receiving port for timecode sync (Default: " + syncPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
+	arguments.getApplicationUsage()->addCommandLineOption("--server-addr <host> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the receiving port for timecode sync (Default: " + syncPort + ")");
 
 	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
-    arguments.getApplicationUsage()->addCommandLineOption("--hideCursor", "Hide the mouse cursor");
+    arguments.getApplicationUsage()->addCommandLineOption("--hide-cursor", "Hide the mouse cursor");
 	arguments.getApplicationUsage()->addCommandLineOption("--window <x y w h>", "Set the position (x,y) and size (w,h) of the viewer window (Default: 50 50 640 480)");
 	arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
 
-	
 	arguments.getApplicationUsage()->addCommandLineOption("--disabled", "Disable camera controls for this user");
 	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server");
 
@@ -130,7 +131,7 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// PARSE ARGS:
 
-	// if user request help write it out to cout.
+	// if user request help or version write it out to cout.
 	if (arguments.read("-h") || arguments.read("--help"))
 	{
 		arguments.getApplicationUsage()->write(std::cout);
@@ -142,24 +143,25 @@ int main(int argc, char **argv)
         std::cout << VERSION << std::endl;
         return 0;
     }
+    // otherwise, start the viewer:
 	osg::ArgumentParser::Parameter param_userID(userID);
-	arguments.read("-id", param_userID);
+	arguments.read("--user-id", param_userID);
     if (not userID.empty())
         spin.setUserID(userID);
 
 	osg::ArgumentParser::Parameter param_spinID(sceneID);
-	arguments.read("-sceneID", param_spinID);
+	arguments.read("--scene-id", param_spinID);
 	spin.setSceneID(sceneID);
 
-	while (arguments.read("-serverAddr", rxHost, rxPort)) {
+	while (arguments.read("--server-addr", rxHost, rxPort)) {
 		spinListener.lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
-	while (arguments.read("-syncPort", syncPort)) {
+	while (arguments.read("--sync-port", syncPort)) {
 		spinListener.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
 	}
 
 	if (arguments.read("--fullscreen")) fullscreen=true;
-    if (arguments.read("--hideCursor")) hideCursor=true;
+    if (arguments.read("--hide-cursor")) hideCursor=true;
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}

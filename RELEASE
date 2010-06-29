@@ -1,3 +1,28 @@
-spinframework 0.3.2
+2010-0?-?? : spinframework 0.3.2
 
+    New features:
+    * Added a TCP channel for important messages to the spinserver
+    * Renamed spinserver and spinviewer to lowercase
+    * Implemented the --version option in spinserver and spinviewer
+    * Created man pages for spinserver and spinviewer
+    * Introducing the server side Python scripting
+    * big refactoring of spinContext
+    * updated multicast group to 226.0.0.1
+    * created RELEASE, AUTHORS and NEWS files
+    * using POSIX/GNU-style options for spinserver and spinviewer
+    * Using /SPIN/__user__ for user subscription
+    * Using left-hand coordinates for both rotations and translations
+
+    Bug fixed:
+    * fixed sync signal to be double float in ms
+    * updates to autoconf for Lucid
+    * fixed `make dist`
+    * updated glut m4
+    * made spin context functions non global
+    * got rid of -Wstrict-prototypes in python cflags
+    * comment out fmod
+    * added -Wfatal-errors to flags
+    * don't use using namespace std
+    * moved python scripts into Resources folder
+    * fixed rm rule in osgwrappers
 
