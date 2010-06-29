@@ -79,15 +79,17 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
 
-	arguments.getApplicationUsage()->addCommandLineOption("-sceneID <uniqueID>", "Specify a unique ID for this scene (Default: '" + sceneID + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("-txAddr <hostname> <port>", "Set the transmission address where the server sends updates (Default: " + txHost + " " + txPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-rxAddr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("-syncPort <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify a unique ID for this scene (Default: the local host name)"); 
+    //FIXME: Printing current local host in help is no good for the man page generation
+    //'" + sceneID + "')");
+	arguments.getApplicationUsage()->addCommandLineOption("--tx-addr <hostname> <port>", "Set the transmission address where the server sends updates to (Default: " + txHost + " " + txPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--rx-addr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
 
 
 	// PARSE ARGS:
 
-	// if user request help write it out to cout.
+	// if user request help or version write it out to cout and quit.
 	if (arguments.read("-h") || arguments.read("--help"))
 	{
 		arguments.getApplicationUsage()->write(std::cout);
@@ -98,17 +100,18 @@ int main(int argc, char **argv)
         std::cout << VERSION << std::endl;
         return 0;
     }
+    // otherwise, try to start the server:
 	osg::ArgumentParser::Parameter param_spinID(sceneID);
-	arguments.read("-sceneID", param_spinID);
+	arguments.read("--scene-id", param_spinID);
 	spinApp::Instance().setSceneID(sceneID);
 
-	while (arguments.read("-txAddr", txHost, txPort)) {
+	while (arguments.read("--tx-addr", txHost, txPort)) {
 		server->lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
 	}
-	while (arguments.read("-rxAddr", rxHost, rxPort)) {
+	while (arguments.read("--rx-addr", rxHost, rxPort)) {
 		server->lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
-	while (arguments.read("-syncPort", syncPort)) {
+	while (arguments.read("--sync-port", syncPort)) {
 		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
 	}
 
