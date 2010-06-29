@@ -138,7 +138,7 @@ void spinServerContext::createServers()
     // add info channel callback (receives pings from client apps):
     lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
     // add tcp channel callback (receives subscribe messages from client apps):
-    lo_server_add_method(lo_tcpRxServer_, "/SPIN/__client__", "ssss", tcpCallback, this);
+    lo_server_add_method(lo_tcpRxServer_, "/SPIN/__user__", "ssss", tcpCallback, this);
     // add scene callback
     lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
             NULL, sceneCallback, NULL);
@@ -279,7 +279,7 @@ int spinServerContext::infoCallback(const char * path, const char *types, lo_arg
 {
     //spinApp &spin = spinApp::Instance();
 
-    // TODO: monitor /ping/user messages, keep timeout handlers, and remove
+    // TODO: monitor /SPIN/__user__ messages, keep timeout handlers, and remove
     // users who are no longer pinging
 
     return 1;
