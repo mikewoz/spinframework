@@ -79,6 +79,7 @@ bool spinServerContext::start()
     return startThread(&spinServerThread);
 }
 
+
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -136,12 +137,14 @@ void spinServerContext::createServers()
         lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
     }
     // add info channel callback (receives pings from client apps):
-    lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+    //lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+
     // add tcp channel callback (receives subscribe messages from client apps):
-    lo_server_add_method(lo_tcpRxServer_, "/SPIN/__user__", "ssss", tcpCallback, this);
+    lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "ssss", tcpCallback, this);
+
     // add scene callback
-    lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
-            NULL, sceneCallback, NULL);
+    lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, sceneCallback, NULL);
+
 }
 
 void *spinServerContext::spinServerThread(void *arg)
@@ -186,7 +189,7 @@ void *spinServerContext::spinServerThread(void *arg)
     context->startSyncThread();
 
     context->running = true;
-    static const int TIMEOUT = 5;
+    static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
     {
         frameTick = osg::Timer::instance()->tick();
@@ -212,6 +215,21 @@ void *spinServerContext::spinServerThread(void *arg)
         lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
         lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
         lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
+
+        // Need to sleep a little bit so that updates have time. 2 reasons:
+        //
+        // 1) the CPU used for this thread is huge, because it never rests
+        // 2) Without a sleep, the attach() method in ReferencedNode takes a
+        // long time. This is probably true for any functions that grab a mutex.
+        // Maybe we don't need a mutex anymore, since it's all done in one
+        // thread?
+        //
+        // NOTE: if the sleep is too long, messages will start to accumulate,
+        // and will be processed with delay.
+        //
+        //
+        usleep(10);
+
     }
     context->running = false;
 
@@ -272,18 +290,21 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
                     reinterpret_cast<const char*> (argv[2]),
                     reinterpret_cast<const char*> (argv[3]));
         std::cout << "Got new subscriber " << clientID << "@" <<
-            lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
+        lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
+
+
     return 1;
 }
 
-int spinServerContext::infoCallback(const char * path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+
+void spinServerContext::refreshSubscribed()
 {
-    //spinApp &spin = spinApp::Instance();
 
-    // TODO: monitor /SPIN/__user__ messages, keep timeout handlers, and remove
-    // users who are no longer pinging
+	// TODO: call getState on all nodes in sceneManager and send them over TCP
+	// to each of the subscribers (ie, everyone in tcpClientAddrs_)
+	// other option: use ReferencedNode::stateDump, and SceneManager::refresh
+	// to send messages...
 
-    return 1;
+	std::cout << "Got to spinServerContext::refreshSubsribed" << std::endl;
 }
-

@@ -62,6 +62,9 @@ class spinServerContext : public spinBaseContext
 
 		bool start();
 
+        void refreshSubscribed();
+
+
 
         /**
          * Starts the thread that sends synchronization timecode (syncThread)
@@ -69,6 +72,7 @@ class spinServerContext : public spinBaseContext
         void startSyncThread();
 
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
 
     private:
 
@@ -92,6 +96,8 @@ class spinServerContext : public spinBaseContext
          */
         static void *syncThread(void *arg);
 
+
+
         /**
          * The server uses infoCallback to monitor /ping/user messages coming
          * from SPIN clients on the network. A series of timers are used to
@@ -99,9 +105,11 @@ class spinServerContext : public spinBaseContext
          * not, the server will remove the user subgraph and broadcast this to
          * change to all other clients.
          */
-        static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+        //static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
+
+
 
         std::map<std::string, lo_address> tcpClientAddrs_;
         pthread_t syncThreadID; // id of sync thread

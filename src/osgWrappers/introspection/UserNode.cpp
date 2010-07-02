@@ -28,6 +28,11 @@ BEGIN_OBJECT_REFLECTOR(UserNode)
 	               ____UserNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_Method0(void, callbackUpdate,
+	          Properties::VIRTUAL,
+	          __void__callbackUpdate,
+	          "",
+	          "The UserNode needs an update callback to check if ping messages are still being received. If not, the node and it's subgraph should be removed. ");
 	I_Method0(void, updateNodePath,
 	          Properties::VIRTUAL,
 	          __void__updateNodePath,
@@ -41,6 +46,11 @@ BEGIN_OBJECT_REFLECTOR(UserNode)
 	I_Method0(const char *, getDescription,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getDescription,
+	          "",
+	          "");
+	I_Method0(void, ping,
+	          Properties::NON_VIRTUAL,
+	          __void__ping,
 	          "",
 	          "");
 	I_Method0(std::vector< lo_message >, getState,

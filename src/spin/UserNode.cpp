@@ -54,7 +54,7 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
     nodeType = "UserNode";
     this->setName(string(id->s_name) + ".UserNode");
 
-    _description = string(initID);
+    description_ = string(initID);
 
     setTranslation(0.0, -5.0, 0.5);
     setReportMode(GroupNode::GLOBAL_6DOF);
@@ -68,6 +68,22 @@ UserNode::~UserNode()
 
 // *****************************************************************************
 
+void UserNode::callbackUpdate()
+{
+	ConstraintsNode::callbackUpdate();
+
+	osg::Timer_t t = osg::Timer::instance()->tick();
+    if (osg::Timer::instance()->delta_s(lastPing_,t) > 60) // every 60 seconds
+    {
+    	// oops. the user stopped pinging, so we should remove him from the
+    	// subgraph.
+
+    	//uncomment when ready:
+    	//spinApp::Instance().sceneManager->deleteGraph(this->id->s_name);
+    }
+
+}
+
 void UserNode::updateNodePath()
 {
     GroupNode::updateNodePath();
@@ -75,14 +91,19 @@ void UserNode::updateNodePath()
 }
 
 // *****************************************************************************
-// *****************************************************************************
 
 void UserNode::setDescription (const char *newvalue)
 {
-    _description = string(newvalue);
+    description_ = string(newvalue);
     BROADCAST(this, "ss", "setDescription", getDescription());
 }
 
+void UserNode::ping()
+{
+	lastPing_ = osg::Timer::instance()->tick();
+}
+
+// *****************************************************************************
 
 std::vector<lo_message> UserNode::getState ()
 {

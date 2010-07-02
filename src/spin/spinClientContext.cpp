@@ -146,11 +146,14 @@ void *spinClientContext::spinClientThread(void *arg)
     fromString<int>(i_rxPort, lo_address_get_port(context->lo_rxAddr));
 
     context->running = true;
+
+    // TIMEOUT in liblo was 10 ; zero here assumes that there is some other
+    // processing or sleeping going on to manage CPU and mutex acquisition
     static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
     {
         lo_server_recv_noblock(context->lo_syncServ, TIMEOUT);
-        lo_server_recv_noblock(context->lo_infoServ, TIMEOUT); // was 250 ms before
+        lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
         lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
         lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
         // do nothing (assume the app is doing updates - eg, in a draw loop)
@@ -159,13 +162,18 @@ void *spinClientContext::spinClientThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            if (spin.userNode.valid())
-                spin.InfoMessage("/SPIN/__user__", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
+        	spin.NodeMessage(spin.getUserID().c_str(), "s", "ping", LO_ARGS_END);
+        	/*
+            if (spin.userNode.valid()) 
+            {
+            	spin.InfoMessage("/SPIN/__user__", "ssi", (char*) spin.userNode->id->s_name, myIP.c_str(), i_rxPort, LO_ARGS_END);
+            }
+            */
             lastTick = frameTick;
         }
     }
 
-    std::cout << "Exitting spin client thread\n";
+    std::cout << "Exiting spin client thread\n";
     context->running = false;
 
     // clean up:
@@ -254,10 +262,18 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
 
 
 /// this handles tcp communication from the server
-int spinClientContext::tcpCallback(const char * /*path*/, const char * /*types*/,
-        lo_arg ** argv, int argc, void * /*data*/, void * user_data)
+int spinClientContext::tcpCallback(const char *path, const char *types,
+        lo_arg **argv, int argc, void *data, void *user_data)
 {
-    // TODO: add some methods!
+
+	// For now, we just take anything received from TCP and forward it to the
+	// regular OSC callback methods.
+
+	if (std::string(path)==std::string("/SPIN/"+spinApp::Instance().getSceneID()))
+		spinBaseContext::sceneCallback(path, types, argv, argc, data, user_data);
+	else
+		spinBaseContext::nodeCallback(path, types, argv, argc, data, user_data);
+
     return 1;
 }
 

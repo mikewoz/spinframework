@@ -58,6 +58,7 @@
 
 #include "SceneManager.h"
 #include "spinBaseContext.h"
+#include "spinServerContext.h"
 #include "spinUtil.h"
 #include "spinApp.h"
 #include "spinLog.h"
@@ -153,9 +154,10 @@ void spinBaseContext::sigHandler(int signum)
 
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
+	std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
     std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
-    std::cout << "  TX :\t\t\t" << lo_address_get_url(lo_txAddr) << std::endl;
+    std::cout << "  TX channel:\t\t\t" << lo_address_get_url(lo_txAddr) << std::endl;
 
     signalStop = false;
 
@@ -550,6 +552,14 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     }
     else if (theMethod=="refresh")
         sceneManager->refresh();
+    else if (theMethod=="refreshSubscribed")
+    {
+    	if (spin.getContext()->isServer())
+    	{
+    		spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
+    		server->refreshSubscribed();
+    	}
+    }
     else if (theMethod=="getNodeList")
         sceneManager->sendNodeList("*");
     else if ((theMethod=="nodeList") && (argc>2))

@@ -46,6 +46,8 @@
 #include "GroupNode.h"
 #include "ConstraintsNode.h"
 
+#include <osg/Timer>
+
 
 
 /**
@@ -69,6 +71,14 @@ class UserNode : public ConstraintsNode
 		UserNode(SceneManager *sceneManager, char *initID);
 		virtual ~UserNode();
 
+
+		/**
+		 * The UserNode needs an update callback to check if ping messages are
+		 * still being received. If not, the node and it's subgraph should be
+		 * removed.
+		 */
+		virtual void callbackUpdate();
+
 	
 		/**
 		 * The UserNode is used by OSG's NodeTrackerManipulator to position a
@@ -85,7 +95,11 @@ class UserNode : public ConstraintsNode
 
 
 		// GET methods:
-		const char* getDescription() { return _description.c_str(); }
+		const char* getDescription() { return description_.c_str(); }
+
+
+		// ping message
+		void ping();
 
 
 		/**
@@ -99,7 +113,8 @@ class UserNode : public ConstraintsNode
 
 	private:
 
-		std::string _description;
+		osg::Timer_t lastPing_;
+		std::string description_;
 
 };
 

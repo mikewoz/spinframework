@@ -1223,6 +1223,7 @@ void SceneManager::refresh()
     SCENE_MSG("s", "refresh");
 }
 
+
 // *****************************************************************************
 // This function returns a pointer to an SoundConnection object
 /*

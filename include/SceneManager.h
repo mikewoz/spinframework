@@ -167,7 +167,6 @@ class SceneManager
          */
         void refresh();
 
-
         /**
          * The update method is where any thread-safe changes to the scene graph
          * should go. The method is guaranteed to be called only when there are
