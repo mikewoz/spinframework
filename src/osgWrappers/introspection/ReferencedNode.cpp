@@ -29,7 +29,10 @@ BEGIN_VALUE_REFLECTOR(CronScript)
 	I_PublicMemberProperty(boost::python::object, run);
 	I_PublicMemberProperty(double, freq);
 	I_PublicMemberProperty(double, lastRun);
-	I_PublicMemberProperty(int, enabled);
+	I_PublicMemberProperty(bool, enabled);
+	I_PublicMemberProperty(bool, serverSide);
+	I_PublicMemberProperty(std::string, path);
+	I_PublicMemberProperty(std::string, params);
 	I_PublicMemberProperty(std::string, pyScript);
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
@@ -41,7 +44,10 @@ BEGIN_VALUE_REFLECTOR(EventScript)
 	               "");
 	I_PublicMemberProperty(boost::python::object, run);
 	I_PublicMemberProperty(std::string, eventName);
-	I_PublicMemberProperty(int, enabled);
+	I_PublicMemberProperty(bool, enabled);
+	I_PublicMemberProperty(bool, serverSide);
+	I_PublicMemberProperty(std::string, path);
+	I_PublicMemberProperty(std::string, params);
 	I_PublicMemberProperty(std::string, pyScript);
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
@@ -152,9 +158,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __std_string__getID,
 	          "",
 	          "");
-	I_Method4(bool, addCronScript, IN, const std::string &, label, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
+	I_Method5(bool, addCronScript, IN, bool, serverSide, IN, const std::string &, label, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
 	          Properties::NON_VIRTUAL,
-	          __bool__addCronScript__C5_std_string_R1__C5_std_string_R1__double__C5_std_string_R1,
+	          __bool__addCronScript__bool__C5_std_string_R1__C5_std_string_R1__double__C5_std_string_R1,
 	          "",
 	          "");
 	I_Method0(bool, callCronScripts,
@@ -172,9 +178,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __bool__removeCronScript__C5_char_P1,
 	          "",
 	          "");
-	I_Method4(bool, addEventScript, IN, const std::string &, label, IN, const std::string &, eventName, IN, const std::string &, scriptPath, IN, const std::string &, params,
+	I_Method5(bool, addEventScript, IN, bool, serverSide, IN, const std::string &, label, IN, const std::string &, eventName, IN, const std::string &, scriptPath, IN, const std::string &, params,
 	          Properties::NON_VIRTUAL,
-	          __bool__addEventScript__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
+	          __bool__addEventScript__bool__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
 	          "",
 	          "");
 	I_Method2(bool, callEventScript, IN, const std::string &, eventName, IN, osgIntrospection::ValueList &, args,

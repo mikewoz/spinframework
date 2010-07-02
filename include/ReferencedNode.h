@@ -60,7 +60,10 @@ typedef struct {
     boost::python::object run;
     double freq;
     double lastRun;
-    int enabled;
+    bool enabled;
+    bool serverSide;
+    std::string path;
+    std::string params;
     std::string pyScript;
     std::string pyModule;
 } CronScript;
@@ -68,7 +71,10 @@ typedef struct {
 typedef struct {
     boost::python::object run;
     std::string eventName;
-    int enabled;
+    bool enabled;
+    bool serverSide;
+    std::string path;
+    std::string params;
     std::string pyScript;
     std::string pyModule;
 } EventScript;
@@ -257,13 +263,13 @@ public:
     //bool setScript( const char *scriptPath, double freq );  // freq is nb of calls per second
     std::string getID() const;
 
-    bool addCronScript( const std::string& label, const std::string& scriptPath,
+    bool addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
                         double freq, const std::string& params );
     bool callCronScripts();
     bool enableCronScript( const char* label, int enable );
     bool removeCronScript( const char* label );
 
-    bool addEventScript( const std::string& label, const std::string& eventName,
+    bool addEventScript( bool serverSide, const std::string& label, const std::string& eventName,
                          const std::string& scriptPath,  const std::string& params );
     bool callEventScript( const std::string& eventName,
                           osgIntrospection::ValueList& args );

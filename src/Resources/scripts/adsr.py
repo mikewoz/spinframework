@@ -31,25 +31,25 @@ class ADSR( spin.ScriptBase ):
         # start < NOW < start + attack        
         if ( self.start_time <= t and
              t < self.start_time + self.attack ):
-            print "ATTACK"
+            #print "ATTACK"
             val = interpolate( 0, self.scale, self.attack, t - self.start_time)
 
         # start + attack < NOW < start + attack + decay
         elif ( self.start_time + self.attack <= t and
                t < self.start_time + self.attack + self.decay ):
-            print "DECAY"
+            #print "DECAY"
             val = interpolate( self.scale, self.sustain*self.scale, self.decay, t - self.start_time - self.attack )
 
         # start + attack + decay < NOW < start + soundclip duration - decay
         elif ( self.start_time + self.attack + self.decay <= t and
                t < self.start_time + self.duration - self.release ):
-            print "SUSTAIN"
+            #print "SUSTAIN"
             val = self.sustain*self.scale
         
         # start + soundclip duration - release < NOW < start + soundclip duration
         elif ( self.start_time + self.duration - self.release <= t and
                t <self.start_time + self.duration ):
-            print "RELEASE"
+            #print "RELEASE"
             val = interpolate( self.sustain*self.scale, 0, self.release , t - (self.start_time + self.duration - self.release) )
 
         else:

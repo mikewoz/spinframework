@@ -57,7 +57,7 @@ extern pthread_mutex_t pthreadLock;
 
 // ***********************************************************
 // constructor (one arg required: the node ID)
-ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) : 
+ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
     contextString("NULL")
 {
 
@@ -118,7 +118,7 @@ void ReferencedNode::registerNode(SceneManager *s)
 
     // register with OSC parser:
     string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-    lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), 
+    lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(),
             NULL, spinBaseContext::nodeCallback, (void*)id);
 #ifdef OSCDEBUG
     std::cout << "oscParser registered: " << oscPattern << std::endl;
@@ -126,35 +126,6 @@ void ReferencedNode::registerNode(SceneManager *s)
 }
 
 // *****************************************************************************
-
-std::string currentException()
-{
-  using namespace boost::python;
-  namespace py = boost::python;
-  printf("currentException...\n");
-  PyObject *exc,*val,*tb;
-  PyErr_Fetch(&exc,&val,&tb);
-  handle<> hexc(exc),hval(val),htb(tb);
-  if(!htb || !hval)
-  {
-      //MYAPP_ASSERT_BUG(hexc);
-    return extract<std::string>(str(hexc));
-  }
-  else
-  {
-    object traceback(py::import("traceback"));
-    object format_exception(traceback.attr("format_exception"));
-    object formatted_list(format_exception(hexc,hval,htb));
-    object formatted(str("\n").join(formatted_list));
-    return extract<std::string>(formatted);
-  }
-}
-
-
-void squat() {
-    printf("doing squat.\n");
-}
-
 
 void ReferencedNode::callbackUpdate()
 {
@@ -457,6 +428,35 @@ std::vector<lo_message> ReferencedNode::getState ()
     }
 
 
+    for ( CronScriptList::iterator it = _cronScriptList.begin();
+          it != _cronScriptList.end(); it++ ) {
+
+        if ( !it->second ) continue;
+        msg = lo_message_new();
+        lo_message_add(msg, "ssssf", "addCronScript",
+                       it->second->serverSide ? "S" : "C",
+                       it->first.c_str(), // the label is the key of the pair!
+                       it->second->path.c_str(),
+                       it->second->freq);
+        if (it->second->params != "") lo_message_add_string(msg, it->second->params.c_str() );
+        ret.push_back(msg);
+    }
+
+    for( EventScriptList::iterator it = _eventScriptList.begin();
+         it != _eventScriptList.end(); it++ ) {
+
+        if ( !it->second ) continue;
+        msg = lo_message_new();
+        lo_message_add(msg, "sssss", "addEventScript",
+                       it->second->serverSide ? "S" : "C",
+                       it->first.c_str(), // the label!
+                       it->second->eventName.c_str(),
+                       it->second->path.c_str() );
+        if (it->second->params != "") lo_message_add_string(msg, it->second->params.c_str() );
+        ret.push_back(msg);
+
+    }
+
     return ret;
 }
 
@@ -476,9 +476,14 @@ std::string ReferencedNode::getID() const
 // *****************************************************************************
 // *****************************************************************************
 
-bool ReferencedNode::addCronScript( const std::string& label, const std::string& scriptPath,
+bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
                                     double freq, const std::string& params )
 {
+   // do we already have a script with the same label?
+    CronScriptList::iterator it;
+    it = _cronScriptList.find( std::string(label) );
+    if ( it != _cronScriptList.end() ) return false; // yes! don't reload it.
+
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
 
@@ -492,36 +497,46 @@ bool ReferencedNode::addCronScript( const std::string& label, const std::string&
     unsigned long long utick =  (unsigned long long) timer->tick();
     std::string pyModule, pyScript, pyClassName;
 
+    CronScript* cs = new CronScript;
+    cs->path = scriptPath;
+    cs->serverSide = serverSide;
+    cs->params = params;
+    cs->freq = freq;
+    cs->enabled = false;
+
+    if ( spin.getContext()->isServer() != serverSide ) {
+        cs->lastRun = 0;
+        cs->enabled = false;
+        cs->pyModule = "";
+        cs->pyScript = "";
+        _cronScriptList.insert( pair<const std::string, CronScript*>( std::string(label), cs ) );
+        return true;
+    }
+
     try {
         sprintf( cmd, "mod%llx", utick );
         pyModule = cmd;
         sprintf( cmd, "script%llx", utick );
         pyScript = cmd;
 
-        //sprintf( cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str() );
         sprintf( cmd, "%s = spin.load_module('%s')", pyModule.c_str(), sf.c_str() );
-        // std::cout << "Python cmd: " << cmd << std::endl;
         exec( cmd, spin._pyNamespace, spin._pyNamespace );
 
         s = spin._pyNamespace[pyModule.c_str()];
         char* cls = boost::python::extract<char*>(s.attr("__spin_behavior_class__") );
-        //printf("got class = %s\n", cls);
 
-        //sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
         sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id->s_name, params.c_str() );
 
         std::cout << "Python cmd: " << cmd << std::endl;
         exec( cmd, spin._pyNamespace, spin._pyNamespace );
 
-        //sprintf( cmd, "script%llx", utick );
         s = spin._pyNamespace[pyScript.c_str()];
         p = s.attr( "run" );
 
-        CronScript* cs = new CronScript;
         cs->freq = freq;
         cs->lastRun = timer->time_s() - 1.0/freq;
         cs->run = p;
-        cs->enabled = 1;
+        cs->enabled = true;
         cs->pyModule = pyModule;
         cs->pyScript = pyScript;
 
@@ -549,7 +564,7 @@ bool ReferencedNode::addCronScript( const std::string& label, const std::string&
 bool ReferencedNode::callCronScripts() {
 
     if (_cronScriptList.empty()) return false;
-
+    spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
     double d;
 
@@ -557,7 +572,10 @@ bool ReferencedNode::callCronScripts() {
 
         for ( CronScriptList::iterator it = _cronScriptList.begin();
               it != _cronScriptList.end(); it++ ) {
+
             if ( !it->second ) continue;
+            if ( it->second->serverSide != spin.getContext()->isServer() ) continue;
+
             d = 1.0 / it->second->freq;
             if ( timer->time_s() >= d + it->second->lastRun ) {
                 it->second->lastRun += d;
@@ -567,7 +585,7 @@ bool ReferencedNode::callCronScripts() {
 
 
     } catch ( boost::python::error_already_set & ) {
-        std::cout << currentException() << std::endl;
+        std::cout << spin.getCurrentPyException() << std::endl;
         std::cout << "Python error: [";
         PyErr_Print();
         PyErr_Clear();
@@ -592,7 +610,7 @@ bool ReferencedNode::enableCronScript( const char* label, int enable ) {
     it = _cronScriptList.find( std::string(label) );
 
     if ( it != _cronScriptList.end() ) {
-        it->second->enabled = enable;
+        it->second->enabled = (enable != 0);
         return true;
     }
 
@@ -609,9 +627,11 @@ bool ReferencedNode::removeCronScript( const char* label ) {
     it = _cronScriptList.find( std::string(label) );
 
     if ( it != _cronScriptList.end() ) {
-        sprintf( cmd, "del %s", it->second->pyScript.c_str() );
-        if ( !spin.execPython( cmd ) ) return false;
 
+        if ( spin.getContext()->isServer() == it->second->serverSide ) {
+            sprintf( cmd, "del %s", it->second->pyScript.c_str() );
+            if ( !spin.execPython( cmd ) ) return false;
+        }
         delete( it->second );
         it->second = NULL;
         _cronScriptList.erase( it );
@@ -627,8 +647,13 @@ bool ReferencedNode::removeCronScript( const char* label ) {
 // *****************************************************************************
 // *****************************************************************************
 
-bool ReferencedNode::addEventScript( const std::string& label, const std::string& eventName,
+bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, const std::string& eventName,
                                      const std::string& scriptPath, const std::string& params ) {
+
+    // do we already have a script with the same label?
+    EventScriptList::iterator it;
+    it = _eventScriptList.find( std::string(label) );
+    if ( it != _eventScriptList.end() ) return false; // yes! don't reload it.
 
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -640,6 +665,22 @@ bool ReferencedNode::addEventScript( const std::string& label, const std::string
     char cmd[100];
     unsigned long long utick =  (unsigned long long) timer->tick();
     std::string pyModule, pyScript;
+
+    EventScript* es = new EventScript;
+    es->path = scriptPath;
+    es->serverSide = serverSide;
+    es->params = params;
+    es->eventName = eventName;
+    es->enabled = false;
+
+    if ( spin.getContext()->isServer() != serverSide ) {
+        es->enabled = false;
+        es->pyModule = "";
+        es->pyScript = "";
+        _eventScriptList.insert( pair<const std::string, EventScript*>( std::string(label), es ) );
+        return true;
+    }
+
 
     try {
         sprintf( cmd, "mod%llx", utick );
@@ -665,10 +706,8 @@ bool ReferencedNode::addEventScript( const std::string& label, const std::string
         s = spin._pyNamespace[pyScript.c_str()];
         p = s.attr("run");
 
-        EventScript* es = new EventScript;
-        es->eventName = std::string( eventName );
         es->run = p;
-        es->enabled = 1;
+        es->enabled = true;
         es->pyModule = pyModule;
         es->pyScript = pyScript;
 
@@ -700,6 +739,7 @@ bool ReferencedNode::callEventScript( const std::string& eventName,
 
     if ( _eventScriptList.empty() ) return false;
 
+    spinApp &spin = spinApp::Instance();
     boost::python::list argList;
     bool argListBuilt = false;
     bool eventScriptCalled = false;
@@ -709,6 +749,8 @@ bool ReferencedNode::callEventScript( const std::string& eventName,
 
         if ( !it->second ) continue;
         if ( it->second->eventName != eventName ) continue;
+        if ( it->second->serverSide != spin.getContext()->isServer() ) continue;
+        if ( !it->second->enabled ) continue;
 
         if ( !argListBuilt ) {
             try {
@@ -768,7 +810,7 @@ bool ReferencedNode::enableEventScript( const char* label, int enable ) {
     it = _eventScriptList.find( std::string(label) );
 
     if ( it != _eventScriptList.end() ) {
-        it->second->enabled = enable;
+        it->second->enabled = (enable != 0);
         return true;
     }
 
@@ -785,9 +827,10 @@ bool ReferencedNode::removeEventScript( const char* label ) {
     it = _eventScriptList.find( std::string(label) );
 
     if ( it != _eventScriptList.end() ) {
-        sprintf( cmd, "del %s", it->second->pyScript.c_str() );
-        if ( !spin.execPython( cmd ) ) return false;
-
+        if ( spin.getContext()->isServer() == it->second->serverSide ) {
+            sprintf( cmd, "del %s", it->second->pyScript.c_str() );
+            if ( !spin.execPython( cmd ) ) return false;
+        }
         delete( it->second );
         it->second = NULL;
         _eventScriptList.erase( it );

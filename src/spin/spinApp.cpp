@@ -166,10 +166,10 @@ void spinApp::setContext(spinBaseContext *c)
 
 void spinApp::createScene()
 {
-	if (context)
-		sceneManager = new SceneManager(getSceneID());
-	else
-		std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
+    if (context)
+        sceneManager = new SceneManager(getSceneID());
+    else
+        std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
 }
 
 // *****************************************************************************
@@ -232,7 +232,6 @@ bool spinApp::execPython( const std::string& cmd ) {
 
     return true;
 }
-
 
 std::string spinApp::getCurrentPyException()
 {
@@ -359,7 +358,7 @@ void spinApp::NodeMessage(const char *nodeId, lo_message msg)
 
         // if, however, this process acts as a server, we can optimize and send
         // directly to the OSC callback function:
-        else context->nodeCallback(OSCpath.c_str(), lo_message_get_types(msg), 
+        else context->nodeCallback(OSCpath.c_str(), lo_message_get_types(msg),
                 lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, (void*)gensym(nodeId));
 
     } //else std::cout << "Error: tried to send NodeMessage but SPIN is not running" << std::endl;
@@ -402,11 +401,11 @@ void spinApp::SceneMessage(lo_message msg)
         {
             lo_send_message(context->lo_txAddr, OSCpath.c_str(), msg);
         }
-        else 
+        else
         {
             // if, however, this process acts as a server, we can optimize and send
         // directly to the OSC callback function:
-            spinServerContext::sceneCallback(OSCpath.c_str(), lo_message_get_types(msg), 
+            spinServerContext::sceneCallback(OSCpath.c_str(), lo_message_get_types(msg),
                     lo_message_get_argv(msg), lo_message_get_argc(msg), NULL, NULL);
         }
 

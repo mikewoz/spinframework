@@ -53,17 +53,17 @@ extern pthread_mutex_t pthreadLock;
 
 spinServerContext::spinServerContext()
 {
-	// Important: fist thing to do is set the context mode (client vs server)
+    // Important: fist thing to do is set the context mode (client vs server)
     mode = SERVER_MODE;
 
-	// Next, tell spinApp that this is the current context running:
+    // Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
 
-	// override sender and receiver addresses in server mode:
+    // override sender and receiver addresses in server mode:
     lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
     lo_txAddr = lo_address_new("226.0.0.1", "54323");
 
-    std::cout << "  SceneManager receiving on:\t" << 
+    std::cout << "  SceneManager receiving on:\t" <<
         lo_address_get_hostname(lo_rxAddr) << std::endl;
 
     // now that we've overridden addresses, we can call setContext
@@ -76,7 +76,7 @@ spinServerContext::~spinServerContext()
 
 bool spinServerContext::start()
 {
-	return startThread(&spinServerThread);
+    return startThread(&spinServerThread);
 }
 
 // *****************************************************************************
@@ -112,7 +112,7 @@ void spinServerContext::createServers()
 
     if (isMulticastAddress(lo_address_get_hostname(lo_rxAddr)))
         lo_rxServ_ = lo_server_new_multicast(lo_address_get_hostname(lo_rxAddr), lo_address_get_port(lo_rxAddr), oscParser_error);
-    else 
+    else
         lo_rxServ_ = lo_server_new(lo_address_get_port(lo_rxAddr), oscParser_error);
 
 #if 0
@@ -120,7 +120,7 @@ void spinServerContext::createServers()
     // oscCallback_debug() will match any path and args:
     lo_server_add_method(lo_rxServ_, NULL, NULL, debugCallback, NULL);
 #endif
-    
+
     // set up infoPort listener thread:
     if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
     {
@@ -140,16 +140,16 @@ void spinServerContext::createServers()
     // add tcp channel callback (receives subscribe messages from client apps):
     lo_server_add_method(lo_tcpRxServer_, "/SPIN/__user__", "ssss", tcpCallback, this);
     // add scene callback
-    lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
+    lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
             NULL, sceneCallback, NULL);
 }
 
 void *spinServerContext::spinServerThread(void *arg)
 {
-	spinServerContext *context = (spinServerContext*)(arg);
-	spinApp &spin = spinApp::Instance();
+    spinServerContext *context = (spinServerContext*)(arg);
+    spinApp &spin = spinApp::Instance();
     context->createServers();
-	spin.createScene();
+    spin.createScene();
 
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
@@ -186,7 +186,7 @@ void *spinServerContext::spinServerThread(void *arg)
     context->startSyncThread();
 
     context->running = true;
-    static const int TIMEOUT = 0;
+    static const int TIMEOUT = 5;
     while (!spinBaseContext::signalStop)
     {
         frameTick = osg::Timer::instance()->tick();
@@ -198,10 +198,10 @@ void *spinServerContext::spinServerThread(void *arg)
                              i_rxPort, // server's receiving port
                              lo_server_get_port(context->lo_tcpRxServer_), // server's receiving TCP port
                              lo_address_get_hostname(context->lo_txAddr), // server multicasting group
-                             i_txPort,	// server multicast port
+                             i_txPort,  // server multicast port
                              i_syncPort, // server multicast port for sync (timecode)
                              LO_ARGS_END);
-            
+
             lastTick = frameTick;
         }
 
@@ -210,8 +210,8 @@ void *spinServerContext::spinServerThread(void *arg)
         pthread_mutex_unlock(&pthreadLock);
 
         lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
-        lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT); 
-        lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT); 
+        lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
+        lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
     }
     context->running = false;
 
@@ -224,7 +224,7 @@ void *spinServerContext::spinServerThread(void *arg)
  */
 void *spinServerContext::syncThread(void * /*arg*/)
 {
-	spinApp &spin = spinApp::Instance();
+    spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
 
 
@@ -242,9 +242,11 @@ void *spinServerContext::syncThread(void * /*arg*/)
         frameTick = timer->tick();
 
         //std::cout << "sync time: " << timer->time_s() << "s = " << timer->time_m() << "ms ...  tick = " << (frameTick - startTick ) << std::endl;
-        //lo_send( spin.getContext()->lo_syncAddr, ("/SPIN/" + spin.getSceneID()).c_str(), "sh", "sync", (long long)(frameTick - startTick) );
+
+        // send the TICK!  not the time in ms.
+        lo_send( spin.getContext()->lo_syncAddr, ("/SPIN/" + spin.getSceneID()).c_str(), "sh", "sync", (long long)(frameTick - startTick) );
         //lo_send( spin.getContext()->lo_syncAddr, ("/SPIN/" + spin.getSceneID()).c_str(), "sh", "sync", (long long)(timer->time_m()) );
-        lo_send( spin.getContext()->lo_syncAddr, ("/SPIN/" + spin.getSceneID()).c_str(), "sd", "sync", (double)(timer->time_m()) );
+        //lo_send( spin.getContext()->lo_syncAddr, ("/SPIN/" + spin.getSceneID()).c_str(), "sd", "sync", (double)(timer->time_m()) );
     }
     return 0;
 }
@@ -266,10 +268,10 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
             std::cerr << "WARNING: new client has same ID as existing client, freeing old client\n";
             lo_address_free(context->tcpClientAddrs_[clientID]);
         }
-        context->tcpClientAddrs_[clientID] = lo_address_new_with_proto(LO_TCP, 
-                    reinterpret_cast<const char*> (argv[2]), 
-                    reinterpret_cast<const char*> (argv[3])); 
-        std::cout << "Got new subscriber " << clientID << "@" << 
+        context->tcpClientAddrs_[clientID] = lo_address_new_with_proto(LO_TCP,
+                    reinterpret_cast<const char*> (argv[2]),
+                    reinterpret_cast<const char*> (argv[3]));
+        std::cout << "Got new subscriber " << clientID << "@" <<
             lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
     return 1;

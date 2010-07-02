@@ -74,7 +74,7 @@ bool spinBaseContext::signalStop = false;
 
 spinBaseContext::spinBaseContext()
 {
-	signalStop = true;
+    signalStop = true;
     running = false;
 
     signal(SIGINT, sigHandler);
@@ -84,7 +84,7 @@ spinBaseContext::spinBaseContext()
     lo_rxAddr = lo_address_new("226.0.0.1", "54323");
     lo_txAddr = lo_address_new("226.0.0.1", "54324");
     lo_syncAddr = lo_address_new("226.0.0.1", "54321");
-    
+
     // override infoPort based on environment variable:
     char *infoPortStr = getenv("AS_INFOPORT");
     if (infoPortStr)
@@ -103,13 +103,13 @@ spinBaseContext::~spinBaseContext()
 
     if (lo_infoServ)
         lo_server_free(lo_infoServ);
-    if (lo_rxAddr) 
+    if (lo_rxAddr)
         lo_address_free(lo_rxAddr);
-    if (lo_txAddr) 
+    if (lo_txAddr)
         lo_address_free(lo_txAddr);
-    if (lo_infoAddr) 
+    if (lo_infoAddr)
         lo_address_free(lo_infoAddr);
-    if (lo_syncAddr) 
+    if (lo_syncAddr)
         lo_address_free(lo_syncAddr);
     if (lo_tcpRxServer_)
         lo_server_free(lo_tcpRxServer_);
@@ -117,7 +117,7 @@ spinBaseContext::~spinBaseContext()
     usleep(100);
 
     // FIXME: is this necessary/a good idea?
-    if (lo_rxServ_) 
+    if (lo_rxServ_)
         lo_server_free(lo_rxServ_);
 }
 
@@ -306,24 +306,63 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
         return 1;
     }
 
-    //introspect_print_type(classType);
-
-    // If we have found a valid Type, then let's build an argument list and see
-    // if we can find a method that takes this list of argumets:
+    spinApp &spin = spinApp::Instance();
 
     if (theMethod == "addCronScript") {
 
+        // client or server?
+        if ( !lo_is_numerical_type((lo_type)types[1]) ) {
+
+            std::string s( (const char*)argv[1] );
+            if ( s[0] == 'S' || s[0] == 's' ) {
+
+                if ( !spin.getContext()->isServer() ) return 0;
+                theArgs.push_back( true );
+
+            } else if ( s[0] == 'C' || s[0] == 'c' ) {
+
+                if ( spin.getContext()->isServer() ) {
+                    lo_message msg = lo_message_new();
+                    for (int i = 0; i < argc; i++) {
+                        if (lo_is_numerical_type((lo_type)types[i])) {
+                            lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+                        } else {
+                            lo_message_add_string(msg, (const char*) argv[i] );
+                        }
+                    }
+                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
+
+                }
+                theArgs.push_back( false ); // serverSide arg
+
+            } else {
+                std::cout << "wrong server / client specifier... must be C or S" << std::endl;
+            }
+
+        } else {
+            std::cout << "ERROR: client or server specifier for addCronScript is not a char" << std::endl;
+            return 1;
+        }
+
+        // label
+        if (!lo_is_numerical_type((lo_type)types[2])) {
+            theArgs.push_back( std::string( (const char*)argv[2] ) );
+        } else {
+            std::cout << "ERROR: label for addCronScript is not a string" << std::endl;
+            return 1;
+        }
+
         // Script path
-        if (!lo_is_numerical_type((lo_type)types[1])) {
-            theArgs.push_back( std::string( (const char*)argv[1] ) );
+        if (!lo_is_numerical_type((lo_type)types[3])) {
+            theArgs.push_back( std::string( (const char*)argv[3] ) );
         } else {
             std::cout << "ERROR: script path for addCronScript is not a string" << std::endl;
             return 1;
         }
 
         // frequency
-        if (lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back( (double) lo_hires_val((lo_type)types[2], argv[2]) );
+        if (lo_is_numerical_type((lo_type)types[4])) {
+            theArgs.push_back( (double) lo_hires_val((lo_type)types[4], argv[4]) );
         } else {
             std::cout << "ERROR: frequency for addCronScript is not a number" << std::endl;
             return 1;
@@ -331,7 +370,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
         // rest of args are comma separated and passed as a string
          std::stringstream params("");
-        for (i = 3; i < argc; i++) {
+        for (i = 5; i < argc; i++) {
             if (lo_is_numerical_type((lo_type)types[i]))  {
                 params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
             } else {
@@ -341,17 +380,55 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
         theArgs.push_back( params.str() );
 
     } else if (theMethod == "addEventScript") {
+
+        // client or server?
+        if ( !lo_is_numerical_type((lo_type)types[1]) ) { ///(lo_type)types[1] == LO_CHAR ) {
+            std::string s( (const char*)argv[1] );
+
+            if ( s[0] == 'S' || s[0] == 's' ) {
+
+                if ( !spin.getContext()->isServer() ) return 0;
+                theArgs.push_back( true );
+
+            } else if ( s[0] == 'C' || s[0] == 'c' ) {
+
+                if ( spin.getContext()->isServer() ) {
+                    lo_message msg = lo_message_new();
+                    for (int i = 0; i < argc; i++) {
+                        if (lo_is_numerical_type((lo_type)types[i])) {
+                            lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+                        } else {
+                            lo_message_add_string(msg, (const char*) argv[i] );
+                        }
+                    }
+                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
+                }
+                theArgs.push_back( false ); // serverSide arg
+            }
+        } else {
+            std::cout << "ERROR: client or server specifier for addCronScript is not a char" << std::endl;
+            return 1;
+        }
+
+        // label
+        if (!lo_is_numerical_type((lo_type)types[2])) {
+            theArgs.push_back( std::string( (const char*)argv[2] ) );
+        } else {
+            std::cout << "ERROR: label for addEventScript is not a string" << std::endl;
+            return 1;
+        }
+
         // event method name
-        if (!lo_is_numerical_type((lo_type)types[1])) {
-            theArgs.push_back( std::string( (const char*)argv[1] ) );
+        if (!lo_is_numerical_type((lo_type)types[3])) {
+            theArgs.push_back( std::string( (const char*)argv[3] ) );
         } else {
             std::cout << "ERROR: event method name for addEventScript is not a string" << std::endl;
             return 1;
         }
 
         // Script path
-        if (!lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back(  std::string( (const char*)argv[2] ) );
+        if (!lo_is_numerical_type((lo_type)types[4])) {
+            theArgs.push_back(  std::string( (const char*)argv[4] ) );
         } else {
             std::cout << "ERROR: script path for addEventScript is not a string" << std::endl;
             return 1;
@@ -359,7 +436,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
         // rest of args are comma separated and passed as a string
         std::stringstream params("");
-        for (i = 3; i < argc; i++) {
+        for (i = 5; i < argc; i++) {
             if (lo_is_numerical_type((lo_type)types[i]))  {
                 params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
             } else {
@@ -381,6 +458,23 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     }
 
+
+    if ( spin.getContext()->isServer() &&
+         (theMethod == "enableCronScript" || theMethod == "removeCronScript" ||
+          theMethod == "enableEventScript" || theMethod == "removeEventScript") ) {
+
+        lo_message msg = lo_message_new();
+        for (int i = 0; i < argc; i++) {
+            if (lo_is_numerical_type((lo_type)types[i])) {
+                lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+            } else {
+                lo_message_add_string(msg, (const char*) argv[i] );
+            }
+        }
+        lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
+
+    }
+
     bool eventScriptCalled = false;
     if ( s->s_type == REFERENCED_NODE ) {
         //printf("calling eventscript...\n");
@@ -394,7 +488,6 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
         {
             //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
             // HACK: TODO: fix this
-            spinApp &spin = spinApp::Instance();
             if (spin.getContext()->isServer())
             {
                 lo_message msg = lo_message_new();
@@ -418,10 +511,10 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 }
 
 
-int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, 
+int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg **argv, int argc,
         void * /*data*/, void * /*user_data*/)
 {
-	spinApp &spin = spinApp::Instance();
+    spinApp &spin = spinApp::Instance();
     SceneManager *sceneManager = spin.sceneManager;
 
     // make sure there is at least one argument (ie, a method to call):
@@ -447,13 +540,13 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->clearStates();
     else if (theMethod=="userRefresh")
     {
-	if (spin.getContext()->isServer())
-	{
-    	    SCENE_MSG("s", "userRefresh");
-	}
-	else {
-		if (spin.userNode.valid()) spin.SceneMessage("sss", "createNode", spin.userNode->id->s_name, "UserNode", LO_ARGS_END);
-	}
+    if (spin.getContext()->isServer())
+    {
+            SCENE_MSG("s", "userRefresh");
+    }
+    else {
+        if (spin.userNode.valid()) spin.SceneMessage("sss", "createNode", spin.userNode->id->s_name, "UserNode", LO_ARGS_END);
+    }
     }
     else if (theMethod=="refresh")
         sceneManager->refresh();
