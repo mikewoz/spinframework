@@ -44,7 +44,7 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 if ENABLE_EDITOR
-  bin_PROGRAMS += spinEditor
+bin_PROGRAMS += spineditor
 endif
 
 spinserver_SOURCES = spinServer.cpp
@@ -57,11 +57,13 @@ spindocgenerator_SOURCES = docGenerator.cpp
 spindocgenerator_LDFLAGS = $(SPIN_LDFLAGS)
 spindocgenerator_LDADD = libSPIN.la
 
+if ENABLE_EDITOR
 spineditor_SOURCES =  spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
 		wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \
 		wxSpinTreeCtrl.cpp
 spineditor_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 spineditor_LDADD = libSPIN.la
+endif
 
 # tell automake that the Resources folder is required
 EXTRA_DIST = ../Resources
