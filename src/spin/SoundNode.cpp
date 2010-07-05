@@ -52,7 +52,7 @@ using namespace std;
 
 //extern SceneManager *sceneManager;
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 // ===================================================================
 // constructor:
@@ -211,7 +211,7 @@ void SoundNode::updateLaser()
 
 void SoundNode::drawVUmeter()
 {
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
 		
 	if (this->getAttachmentNode()->containsNode(VUmeterTransform.get()) )
@@ -255,7 +255,7 @@ void SoundNode::drawVUmeter()
 		this->getAttachmentNode()->addChild(VUmeterTransform.get());
    }
 
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 }
 
 
@@ -265,7 +265,7 @@ t_float cardioid_to_cone_map[] = {180.0, 155.047, 147.605, 140.163, 116.907, 113
 // ===================================================================
 void SoundNode::drawDirectivity()
 {
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
 	
 	if (this->getAttachmentNode()->containsNode(directivityGeode.get()))
@@ -319,8 +319,7 @@ void SoundNode::drawDirectivity()
 
 	}
 	
-    pthread_mutex_unlock(&pthreadLock);
-
+    pthread_mutex_unlock(&sceneMutex);
 }
 
 // ===================================================================

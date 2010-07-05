@@ -59,7 +59,7 @@
 using namespace std;
 
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 
 // ===================================================================
@@ -219,7 +219,7 @@ void ShapeNode::setLighting (int i)
 // ===================================================================
 void ShapeNode::drawShape()
 {
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
 	// remove the old shape:
 	if (this->getAttachmentNode()->containsNode(shapeGeode.get()))
@@ -358,7 +358,7 @@ void ShapeNode::drawShape()
 		optimizer.optimize(shapeGeode.get()); // ?
 	}
 
-	pthread_mutex_unlock(&pthreadLock);
+	pthread_mutex_unlock(&sceneMutex);
 
 	
 	//drawTexture();
@@ -384,7 +384,7 @@ void ShapeNode::drawTexture()
 
 	else if (shapeGeode.valid())
 	{
-		pthread_mutex_lock(&pthreadLock);
+		pthread_mutex_lock(&sceneMutex);
 		
 		std::string fullPath = getAbsolutePath(texturePath);
 		
@@ -433,7 +433,7 @@ void ShapeNode::drawTexture()
 
 		}
 
-		pthread_mutex_unlock(&pthreadLock);
+		pthread_mutex_unlock(&sceneMutex);
 	}
 }
 			

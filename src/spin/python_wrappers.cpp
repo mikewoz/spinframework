@@ -374,7 +374,7 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
         }
 
     }
-    //pthread_mutex_unlock(&pthreadLock);
+    //pthread_mutex_unlock(&sceneMutex);
 
     return ValueWrapper(0);
 }

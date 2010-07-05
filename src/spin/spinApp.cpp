@@ -66,7 +66,7 @@
 
 #define UNUSED(x) ( (void)(x) )
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 
 spinApp::spinApp() : userID_(getHostname())

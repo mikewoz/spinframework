@@ -67,7 +67,7 @@
 #define UNUSED(x) ( (void)(x) )
 
 // TODO: make mutex a static member (perhaps of spinApp)?
-pthread_mutex_t pthreadLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 bool spinBaseContext::signalStop = false;
@@ -133,7 +133,7 @@ void spinBaseContext::sigHandler(int signum)
 //    spinApp &spin = spinApp::Instance();
 
     // unlock mutex so we can clean up:
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 
 #if 0
     // TODO: we really shouldn't do anything like this here. Can we get rid of
@@ -297,14 +297,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     else
     {
         classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
-
     }
 
 
     // the getInstanceType() method however, gives us the real type being pointed at:
     const osgIntrospection::Type &classType = classInstance.getInstanceType();
-
-
 
     if (!classType.isDefined())
     {
@@ -388,7 +385,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     } else if (theMethod == "addEventScript") {
 
         // client or server?
-        if ( !lo_is_numerical_type((lo_type)types[1]) ) { ///(lo_type)types[1] == LO_CHAR ) {
+        if ( !lo_is_numerical_type((lo_type)types[1]) ) { /// (lo_type)types[1] == LO_CHAR )
             std::string s( (const char*)argv[1] );
 
             if ( s[0] == 'S' || s[0] == 's' ) {
@@ -461,9 +458,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                 theArgs.push_back( (const char*) argv[i] );
             }
         }
-
     }
-
 
     if ( spin.getContext()->isServer() &&
          (theMethod == "enableCronScript" || theMethod == "removeCronScript" ||
@@ -511,7 +506,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
         }
     }
 
-    //pthread_mutex_unlock(&pthreadLock);
+    //pthread_mutex_unlock(&sceneMutex);
 
     return 1;
 }
@@ -533,7 +528,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     else
         return 1;
 
-    //pthread_mutex_lock(&pthreadLock);
+    //pthread_mutex_lock(&sceneMutex);
 
     // note that args start at argv[1] now:
     if (theMethod=="debug")
@@ -624,7 +619,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
 #endif
     }
 
-    //pthread_mutex_unlock(&pthreadLock);
+    //pthread_mutex_unlock(&sceneMutex);
 
     return 1;
 }

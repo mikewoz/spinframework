@@ -52,10 +52,6 @@
 
 using namespace std;
 
-
-extern pthread_mutex_t pthreadLock;
-
-
 // *****************************************************************************
 // constructor:
 AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)

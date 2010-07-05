@@ -64,7 +64,7 @@
 #include "ShapeNode.h"
 #include "config.h"
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 
 // *****************************************************************************
@@ -287,13 +287,15 @@ int main(int argc, char **argv)
 		{
 			osg::Timer_t startFrameTick = osg::Timer::instance()->tick();
 			
-			pthread_mutex_lock(&pthreadLock);
+#if 0
+			pthread_mutex_lock(&sceneMutex);
             spin.sceneManager->update();
-			pthread_mutex_unlock(&pthreadLock);
+			pthread_mutex_unlock(&sceneMutex);
+#endif
 	
-			pthread_mutex_lock(&pthreadLock);
+			pthread_mutex_lock(&sceneMutex);
 			viewer.frame();
-			pthread_mutex_unlock(&pthreadLock);
+			pthread_mutex_unlock(&sceneMutex);
 
 			if (maxFrameRate>0)
 			{

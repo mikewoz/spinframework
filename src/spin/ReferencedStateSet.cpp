@@ -54,7 +54,7 @@
 using namespace std;
 
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 // *****************************************************************************
 // constructor:
@@ -108,7 +108,7 @@ void ReferencedStateSet::updateCallback()
 
 void ReferencedStateSet::removeFromScene()
 {
-	//pthread_mutex_lock(&pthreadLock);
+	//pthread_mutex_lock(&sceneMutex);
 	
 	osg::StateSet::ParentList::iterator itr;
 	osg::StateSet::ParentList parents = this->getParents();	
@@ -128,7 +128,7 @@ void ReferencedStateSet::removeFromScene()
 	
 	this->setUserData( NULL );
 	
-	//pthread_mutex_unlock(&pthreadLock);
+	//pthread_mutex_unlock(&sceneMutex);
 }
 
 

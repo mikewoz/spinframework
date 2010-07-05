@@ -85,7 +85,7 @@
 
 using namespace osgIntrospection;
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 // *****************************************************************************
 // constructors:
@@ -1042,9 +1042,9 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     */
 
     // have to unregister the callback function to remove the last ref_ptr:
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
     n->setUserData( NULL );
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 
     // now force the actual delete by nulling this referenced pointer. At that
     // time, the destructor for the node should be called

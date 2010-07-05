@@ -53,7 +53,7 @@
 
 using namespace std;
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 // ***********************************************************
 // constructor (one arg required: the node ID)
@@ -141,7 +141,7 @@ void ReferencedNode::attach()
 {
     if (this->newParent==NULL_SYMBOL) return;
 
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
     osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent->s_thing);
 
@@ -163,7 +163,7 @@ void ReferencedNode::attach()
         }
     }
 
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 
     // remove node from current parent (make sure to release the mutex first!)
     if (this->parent != this->newParent)
@@ -187,7 +187,7 @@ void ReferencedNode::attach()
 // remove this node from the scenegraph:
 void ReferencedNode::detach()
 {
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
     if (parent == WORLD_SYMBOL)
     {
@@ -206,7 +206,7 @@ void ReferencedNode::detach()
         }
     }
 
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 }
 
 

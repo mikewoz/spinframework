@@ -72,7 +72,7 @@
 
 using namespace std;
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 
 // ===================================================================
@@ -227,7 +227,7 @@ void ModelNode::drawModel()
 {
 	int i,j;
 	
-	pthread_mutex_lock(&pthreadLock);
+	pthread_mutex_lock(&sceneMutex);
 
 	if (model.valid())
 	{
@@ -510,8 +510,7 @@ void ModelNode::drawModel()
 		}
 	}
 	
-	pthread_mutex_unlock(&pthreadLock);
-
+	pthread_mutex_unlock(&sceneMutex);
 }
 
 std::vector<lo_message> ModelNode::getState ()

@@ -61,10 +61,6 @@ static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
 
 using namespace std;
 
-
-extern pthread_mutex_t pthreadLock;
-
-
 // ===================================================================
 // constructor:
 SharedVideoNode::SharedVideoNode (SceneManager *sceneManager, char *initID) : ShapeNode(sceneManager, initID)

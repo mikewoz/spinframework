@@ -49,7 +49,7 @@
 #include "spinLog.h"
 #include "nodeVisitors.h"
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 spinServerContext::spinServerContext()
 {
@@ -208,9 +208,9 @@ void *spinServerContext::spinServerThread(void *arg)
             lastTick = frameTick;
         }
 
-        pthread_mutex_lock(&pthreadLock);
+        pthread_mutex_lock(&sceneMutex);
         visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
-        pthread_mutex_unlock(&pthreadLock);
+        pthread_mutex_unlock(&sceneMutex);
 
         lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
         lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);

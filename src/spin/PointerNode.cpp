@@ -60,7 +60,7 @@
 
 using namespace std;
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 // *****************************************************************************
 // constructor:
@@ -349,7 +349,7 @@ void PointerNode::enableDragger()
         return;
     }
 
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
     dragger->setName("asManipulator.dragger");
     dragger->setNodeMask(GEOMETRIC_NODE_MASK); // make sure intersector sees it
@@ -362,13 +362,13 @@ void PointerNode::enableDragger()
 
     cmdMgr->connect(*dragger.get(), *selection.get());
 
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 
 }
 
 void PointerNode::disableDragger()
 {
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
     if (dragger.valid() && targetNode.valid())
     {
@@ -377,7 +377,7 @@ void PointerNode::disableDragger()
         dragger = NULL;
     }
 
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 }
 
 
@@ -473,7 +473,7 @@ void PointerNode::manipulate (int b)
     if (not spinApp::Instance().getContext()->isServer() and not dragger.valid()) 
         return;
 
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
     // Start manipulation:
 
     // Note, the dragger should have been set by the highlight() method
@@ -538,7 +538,7 @@ void PointerNode::manipulate (int b)
     }
 
 
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 
 
     BROADCAST(this, "si", "manipulate", this->getManipulate());
@@ -621,12 +621,12 @@ void PointerNode::grab (int b)
 
         // attach node to this pointer:
 
-        pthread_mutex_lock(&pthreadLock);
+        pthread_mutex_lock(&sceneMutex);
 
             grabbedNode->newParent = this->id;
             grabbedNode->attach();
 
-        pthread_mutex_unlock(&pthreadLock);
+        pthread_mutex_unlock(&sceneMutex);
 
 
         // now apply the offset:
@@ -664,12 +664,12 @@ void PointerNode::grab (int b)
 
         // re-attach node to it's old parent:
 
-        pthread_mutex_lock(&pthreadLock);
+        pthread_mutex_lock(&sceneMutex);
 
-            grabbedNode->newParent = previousParent;
-            grabbedNode->attach();
+        grabbedNode->newParent = previousParent;
+        grabbedNode->attach();
 
-        pthread_mutex_unlock(&pthreadLock);
+        pthread_mutex_unlock(&sceneMutex);
 
         //std::cout << "Re-attaching node [" << targetNode->id->s_name << "] to old parent [" << oldTargetParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
 
@@ -714,14 +714,14 @@ std::vector<lo_message> PointerNode::getState ()
     ret.push_back(msg);
 
     /*
-    msg = lo_message_new();
-    lo_message_add(msg, "si", "highlight", this->getHighlight());
-    ret.push_back(msg);
+       msg = lo_message_new();
+       lo_message_add(msg, "si", "highlight", this->getHighlight());
+       ret.push_back(msg);
 
-    msg = lo_message_new();
-    lo_message_add(msg, "si", "manipulate", this->getManipulate());
-    ret.push_back(msg);
-    */
+       msg = lo_message_new();
+       lo_message_add(msg, "si", "manipulate", this->getManipulate());
+       ret.push_back(msg);
+     */
 
     return ret;
 }

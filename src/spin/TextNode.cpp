@@ -54,7 +54,7 @@
 using namespace std;
 
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 
 // ===================================================================
@@ -106,9 +106,9 @@ void TextNode::setTextValue (const char *s)
 		//getText().createUTF8EncodedString();
 		
 		//this->_text = string(s);
-		pthread_mutex_lock(&pthreadLock);
+		pthread_mutex_lock(&sceneMutex);
 		textLabel->setText(s);
-		pthread_mutex_unlock(&pthreadLock);
+		pthread_mutex_unlock(&sceneMutex);
 		//drawText();
 
 		std::cout << "debug: setting text label to: " << s << ", getTextValue() reports: " << getTextValue() << std::endl;
@@ -122,9 +122,9 @@ void TextNode::setFont (const char *s)
 	if (this->_font != string(s))
 	{
 		this->_font = string(s);
-		pthread_mutex_lock(&pthreadLock);
+		pthread_mutex_lock(&sceneMutex);
 		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
-		pthread_mutex_unlock(&pthreadLock);
+		pthread_mutex_unlock(&sceneMutex);
 		//drawText();
 
 		BROADCAST(this, "ss", "setFont", getFont());
@@ -156,7 +156,7 @@ void TextNode::setColor (float r, float g, float b, float a)
 void TextNode::drawText()
 {
 
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
 	// first remove existing text:
 	if (this->getAttachmentNode()->containsNode(textGeode.get()))
@@ -229,7 +229,7 @@ void TextNode::drawText()
 		textLabel->setStateSet( labelStateSet );
 	}
 
-	pthread_mutex_unlock(&pthreadLock);
+	pthread_mutex_unlock(&sceneMutex);
 
 }
 

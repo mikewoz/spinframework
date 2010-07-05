@@ -220,9 +220,6 @@ class SceneManager
 
         osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
-        //pthread_mutex_t pthreadLock;// = PTHREAD_MUTEX_INITIALIZER;
-
-
     private:
         static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;

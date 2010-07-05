@@ -53,7 +53,7 @@
 using namespace std;
 
 
-extern pthread_mutex_t pthreadLock;
+extern pthread_mutex_t sceneMutex;
 
 
 // *****************************************************************************
@@ -106,7 +106,7 @@ void GridNode::drawGrid()
 {
 	if (!sceneManager->isGraphical()) return;
 	
-    pthread_mutex_lock(&pthreadLock);
+    pthread_mutex_lock(&sceneMutex);
 
 	// remove the old ray:
 	if (this->getAttachmentNode()->containsNode(gridGeode.get()))
@@ -185,7 +185,7 @@ void GridNode::drawGrid()
 
 	}
 		
-    pthread_mutex_unlock(&pthreadLock);
+    pthread_mutex_unlock(&sceneMutex);
 
 }
 
