@@ -95,8 +95,7 @@ int main(int argc, char **argv)
 	std::string sceneID = spin.getSceneID();
 	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddr);
 	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddr);
-	std::string syncPort = lo_address_get_port(spinListener.lo_rxAddr);
-
+	std::string syncPort = lo_address_get_port(spinListener.lo_syncAddr);
 
 	// *************************************************************************
 

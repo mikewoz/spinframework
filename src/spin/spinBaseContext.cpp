@@ -44,7 +44,6 @@
 #include <pthread.h>
 #include <signal.h>
 
-
 #include <osgDB/Registry>
 #include <osgIntrospection/Type>
 #include <osgIntrospection/Value>
@@ -196,7 +195,12 @@ void spinBaseContext::stop()
     }
 }
 
-int spinBaseContext::connectionCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int spinBaseContext::connectionCallback(const char *path, 
+        const char *types, 
+        lo_arg **argv, 
+        int argc, 
+        void * /*data*/, 
+        void *user_data)
 {
     std::string theMethod, idStr;
 
@@ -248,7 +252,7 @@ int spinBaseContext::connectionCallback(const char *path, const char *types, lo_
     return 1;
 }
 
-int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
+int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **argv, int argc, void * /*data*/, void *user_data)
 {
     // NOTE: user_data is a t_symbol pointer
 

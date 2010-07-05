@@ -272,13 +272,11 @@ void *spinServerContext::syncThread(void * /*arg*/)
 int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     spinServerContext *context = static_cast<spinServerContext*>(user_data);
-    std::string method(reinterpret_cast<const char*> (argv[0]));
+    std::string method(reinterpret_cast<const char*>(argv[0]));
 
-    // FIXME: probably want to replace this list with a map where the key
-    // is some meaningful identifier
     if (method == "subscribe")
     {
-        std::string clientID(reinterpret_cast<const char*> (argv[1]));
+        std::string clientID(reinterpret_cast<const char*>(argv[1]));
 
         // if client with this id already exists, free its address
         if (context->tcpClientAddrs_.find(clientID) != context->tcpClientAddrs_.end())
@@ -287,12 +285,11 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
             lo_address_free(context->tcpClientAddrs_[clientID]);
         }
         context->tcpClientAddrs_[clientID] = lo_address_new_with_proto(LO_TCP,
-                    reinterpret_cast<const char*> (argv[2]),
-                    reinterpret_cast<const char*> (argv[3]));
+                    reinterpret_cast<const char*>(argv[2]),
+                    reinterpret_cast<const char*>(argv[3]));
         std::cout << "Got new subscriber " << clientID << "@" <<
         lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
-
 
     return 1;
 }
