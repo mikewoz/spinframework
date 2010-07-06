@@ -240,3 +240,9 @@ void ReferencedStateSet::stateDump()
 {
     spinApp::Instance().NodeBundle(this->id, this->getState());
 }
+
+
+void ReferencedStateSet::stateDump(lo_address addr)
+{
+    spinApp::Instance().NodeBundle(this->id, this->getState(), addr);
+}

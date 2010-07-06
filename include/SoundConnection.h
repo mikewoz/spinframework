@@ -85,6 +85,7 @@ class SoundConnection : virtual public osg::Node
 		void debug();
 		virtual std::vector<lo_message> getState();
 		virtual void stateDump();
+		virtual void stateDump(lo_address addr);
 		
 		// ************
 	

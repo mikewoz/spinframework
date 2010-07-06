@@ -222,6 +222,11 @@ public:
      * StateDump() is a request to broadcast the node state via SceneManager.
      */
     virtual void stateDump();
+    
+    /**
+     * StateDump() is a request to send the node state to one address
+     */
+    virtual void stateDump(lo_address addr);
 
 
     // ***********************************************************

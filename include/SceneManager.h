@@ -102,8 +102,8 @@ class SceneManager
         void registerStateSet(ReferencedStateSet *s);
         void unregisterStateSet(ReferencedStateSet *s);
 
-        void sendNodeList(std::string type);
-        void sendConnectionList();
+        void sendNodeList(std::string type, lo_address txAddr = 0);
+        void sendConnectionList(lo_address txAddr = 0);
 
         ReferencedNode *createNode(std::string id, std::string type);
         ReferencedNode *createNode(const char *id, const char *type);
@@ -161,13 +161,6 @@ class SceneManager
         void clearStates();
 
         /**
-         * The refresh method results in a broadcast of all nodelists so that
-         * clients can create any missing nodes. Then, the full node state is
-         * broadcasted, for ALL nodes.
-         */
-        void refresh();
-
-        /**
          * The update method is where any thread-safe changes to the scene graph
          * should go. The method is guaranteed to be called only when there are
          * no traversals being performed.
@@ -220,7 +213,22 @@ class SceneManager
 
         osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
+        /**
+         * The refreshAll method results in a broadcast of all nodelists so that
+         * clients can create any missing nodes. Then, the full node state is
+         * broadcasted, for ALL nodes.
+         */
+        void refreshAll();
+        
+        /**
+         * The refreshSubscribers method results in a publication of all nodelists to the given TCP 
+         * subscribers. Then, the full node state is
+         * published to the subscribers, for ALL nodes.
+         */
+        void refreshSubscribers(const std::map<std::string, lo_address> &clients);
+
     private:
+
         static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
         nodeMapType nodeMap; // the nodeList arranged by type

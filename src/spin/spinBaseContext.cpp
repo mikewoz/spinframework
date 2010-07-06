@@ -550,13 +550,13 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     }
     }
     else if (theMethod=="refresh")
-        sceneManager->refresh();
-    else if (theMethod=="refreshSubscribed")
+        sceneManager->refreshAll();
+    else if (theMethod=="refreshSubscribers")
     {
     	if (spin.getContext()->isServer())
     	{
     		spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
-    		server->refreshSubscribed();
+    		server->refreshSubscribers();
     	}
     }
     else if (theMethod=="getNodeList")

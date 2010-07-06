@@ -1,5 +1,2 @@
 GOAL:
-Get liblo stuff out of scene manager
-1) Move rxServ from scene manager to base context
-2) move relevant callbacks to base context
-3) don't create servers and bind methods until spinServerThread and spinClientThread methods, create scene manager first
+refreshSubscribers in SceneManager should be like refresh all but only for a server's tcp subscribers.

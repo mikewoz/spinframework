@@ -295,13 +295,14 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 }
 
 
-void spinServerContext::refreshSubscribed()
+void spinServerContext::refreshSubscribers()
 {
-
 	// TODO: call getState on all nodes in sceneManager and send them over TCP
 	// to each of the subscribers (ie, everyone in tcpClientAddrs_)
 	// other option: use ReferencedNode::stateDump, and SceneManager::refresh
 	// to send messages...
 
-	std::cout << "Got to spinServerContext::refreshSubsribed" << std::endl;
+	std::cout << "Got spinServerContext::refreshSubsribers" << std::endl;
+    spinApp::Instance().sceneManager->refreshSubscribers(tcpClientAddrs_);
 }
+

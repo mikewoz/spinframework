@@ -265,12 +265,11 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
 int spinClientContext::tcpCallback(const char *path, const char *types,
         lo_arg **argv, int argc, void *data, void *user_data)
 {
-
 	// For now, we just take anything received from TCP and forward it to the
 	// regular OSC callback methods.
-
-	if (std::string(path)==std::string("/SPIN/"+spinApp::Instance().getSceneID()))
-		spinBaseContext::sceneCallback(path, types, argv, argc, data, user_data);
+    if (std::string(path) == std::string("/SPIN/" +
+                spinApp::Instance().getSceneID()))
+        spinBaseContext::sceneCallback(path, types, argv, argc, data, user_data);
 	else
 		spinBaseContext::nodeCallback(path, types, argv, argc, data, user_data);
 
@@ -287,7 +286,8 @@ void spinClientContext::subscribe()
         sstr << lo_server_get_port(lo_tcpRxServer_);
 
         lo_send(lo_serverTCPAddr, "/SPIN/__user__", "ssss",
-                "subscribe", spinApp::Instance().userNode->getID().c_str(), getMyIPaddress().c_str(),
+                "subscribe", spinApp::Instance().userNode->getID().c_str(), 
+                getMyIPaddress().c_str(),
                 sstr.str().c_str());
     }
     doSubscribe_ = false;

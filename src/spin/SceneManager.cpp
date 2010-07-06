@@ -322,8 +322,7 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 
 // *****************************************************************************
 
-
-void SceneManager::sendNodeList(std::string typeFilter)
+void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
 {
     // TODO: typeFilter not used yet
     std::string OSCpath = "/SPIN/" + sceneID;
@@ -331,14 +330,13 @@ void SceneManager::sendNodeList(std::string typeFilter)
 
     std::vector<lo_message> msgs;
 
-
-    if ((typeFilter.empty()) || (typeFilter=="*"))
+    if ((typeFilter.empty()) or (typeFilter=="*"))
     {
         {
             // for each type, send an OSC message:
             nodeMapType::iterator it;
             nodeListType::iterator iter;
-            for ( it=nodeMap.begin(); it!=nodeMap.end(); it++ )
+            for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
             {
                 //std::cout << "Nodes of type '" << (*it).first << "':";
                 //for (i=0; i<(*it).second.size(); i++) std::cout << " " << (*it).second[i];
@@ -368,7 +366,7 @@ void SceneManager::sendNodeList(std::string typeFilter)
             ReferencedStateSetMap::iterator it;
             ReferencedStateSetList::iterator iter;
 
-            for ( it=stateMap.begin(); it!=stateMap.end(); it++ )
+            for (it = stateMap.begin(); it != stateMap.end(); ++it)
             {
                 //std::cout << "Nodes of type '" << (*it).first << "':";
                 //for (i=0; i<(*it).second.size(); i++) std::cout << " " << (*it).second[i]->s_name;
@@ -394,16 +392,13 @@ void SceneManager::sendNodeList(std::string typeFilter)
         }
 
         // remember to send connections as well
-        sendConnectionList();
+        sendConnectionList(txAddr);
     }
-
     // just send a list for the desired type:
-    else {
-
+    else 
+    {
         if (typeFilter=="SoundConnection")
-        {
-            sendConnectionList();
-        }
+            sendConnectionList(txAddr);
         else
         {
             {
@@ -422,9 +417,8 @@ void SceneManager::sendNodeList(std::string typeFilter)
                         {
                             lo_message_add_string(msg, (char*) (*iter)->id->s_name );
                         }
-                    } else {
+                    } else 
                         lo_message_add_string(msg, "NULL");
-                    }
 
                     msgs.push_back(msg);
                 }
@@ -442,27 +436,22 @@ void SceneManager::sendNodeList(std::string typeFilter)
                     if ( (*it).second.size() )
                     {
                         for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                        {
                             lo_message_add_string(msg, (char*) (*iter)->s_name );
-                        }
-                    } else {
+                    } else 
                         lo_message_add_string(msg, "NULL");
-                    }
 
                     msgs.push_back(msg);
                 }
             }
-
         }
     }
 
     spinApp::Instance().SceneBundle(msgs);
 }
 
-void SceneManager::sendConnectionList()
+void SceneManager::sendConnectionList(lo_address txAddr)
 {
     // need to manually send soundConnections, since they are not in the nodeMap
-
     lo_message msg = lo_message_new();
     lo_message_add_string(msg, "nodeList" );
     lo_message_add_string(msg, "SoundConnection" );
@@ -472,15 +461,18 @@ void SceneManager::sendConnectionList()
     if (connections.size())
     {
         for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
-        {
             lo_message_add_string(msg, (*iter)->id->s_name );
-        }
-
-    } else {
+    } else 
         lo_message_add_string(msg, "NULL" );
-    }
 
-    SCENE_LO_MSG(msg);
+    if (txAddr == 0)
+    {
+        SCENE_LO_MSG(msg);
+    }
+    else
+    {
+        SCENE_LO_MSG_TCP(msg, txAddr);
+    }
 }
 
 // *****************************************************************************
@@ -526,24 +518,24 @@ void SceneManager::debug()
     }
 
     /*
-    std::cout << "\n Nodes with textures: " << std::endl;
-    StateSetList statesets;
-    TextureStateSetFinder f(statesets);
-    rootNode->accept(f);
-    for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
-    {
-        osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
-        if (attr)
-        {
-            if (attr->asTexture()->getImage(0))
-            {
-                // ARGH... can't do this, because image doesn't store filename after load!
-                std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
-                std::cout << (*itr)->getParent(0)->getName() << ": " << imageFile << std::endl;
-            }
-        }
+       std::cout << "\n Nodes with textures: " << std::endl;
+       StateSetList statesets;
+       TextureStateSetFinder f(statesets);
+       rootNode->accept(f);
+       for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
+       {
+       osg::StateAttribute *attr = (*itr)->getTextureAttribute(0,osg::StateAttribute::TEXTURE);
+       if (attr)
+       {
+       if (attr->asTexture()->getImage(0))
+       {
+    // ARGH... can't do this, because image doesn't store filename after load!
+    std::string imageFile = attr->asTexture()->getImage(0)->getFileName();
+    std::cout << (*itr)->getParent(0)->getName() << ": " << imageFile << std::endl;
     }
-    */
+    }
+    }
+     */
 
 
     std::cout << "\nSCENE GRAPH:" << std::endl;
@@ -605,26 +597,26 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
     osgIntrospection::Value sceneManagerPtr = osgIntrospection::Value(this);
 
     /*
-    std::cout << "[DEBUG] These are all possible types:" << std::endl;
-    const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-    for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
-    {
-        std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
-    }
-    */
+       std::cout << "[DEBUG] These are all possible types:" << std::endl;
+       const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
+       for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
+       {
+       std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
+       }
+     */
 
     /*
-    std::cout << "sceneManagerPtr::" << std::endl;
-    std::cout << "is value a typed pointer? " << sceneManagerPtr.isTypedPointer() << std::endl;
-    std::cout << "is value null? " << sceneManagerPtr.isNullPointer() << std::endl;
-    std::cout << "is value empty? " << sceneManagerPtr.isEmpty() << std::endl;
+       std::cout << "sceneManagerPtr::" << std::endl;
+       std::cout << "is value a typed pointer? " << sceneManagerPtr.isTypedPointer() << std::endl;
+       std::cout << "is value null? " << sceneManagerPtr.isNullPointer() << std::endl;
+       std::cout << "is value empty? " << sceneManagerPtr.isEmpty() << std::endl;
 
-    const osgIntrospection::Type &tt = sceneManagerPtr.getType();
-    std::cout << "the type is:" << std::endl;
+       const osgIntrospection::Type &tt = sceneManagerPtr.getType();
+       std::cout << "the type is:" << std::endl;
     //introspect_print_type(tt);
     std::cout << "name():" << tt.getStdTypeInfo().name() << std::endl;
     std::cout << "is type defined? " << tt.isDefined() << std::endl;
-    */
+     */
 
     try {
         // Let's use osgIntrospection to create a node of the proper type:
@@ -642,28 +634,28 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
 
         /*
-        std::cout << "is value a typed pointer? " << v.isTypedPointer() << std::endl;
-        std::cout << "is value null? " << v.isNullPointer() << std::endl;
-        std::cout << "is value empty? " << v.isEmpty() << std::endl;
+           std::cout << "is value a typed pointer? " << v.isTypedPointer() << std::endl;
+           std::cout << "is value null? " << v.isNullPointer() << std::endl;
+           std::cout << "is value empty? " << v.isEmpty() << std::endl;
 
-        const osgIntrospection::Type &tt = v.getType();
-        std::cout << "the reg type is:" << std::endl;
-        introspect_print_type(tt);
+           const osgIntrospection::Type &tt = v.getType();
+           std::cout << "the reg type is:" << std::endl;
+           introspect_print_type(tt);
 
-        const osgIntrospection::Type &ttt = v.getInstanceType();
-        std::cout << "the instantiated type is:" << std::endl;
-        introspect_print_type(ttt);
+           const osgIntrospection::Type &ttt = v.getInstanceType();
+           std::cout << "the instantiated type is:" << std::endl;
+           introspect_print_type(ttt);
 
 
 
-        std::cout << "type of ReferencedNode = " << typeid(ReferencedNode).name() << std::endl;
-        std::cout << "type of ReferencedNode* = " << typeid(ReferencedNode*).name() << std::endl;
-        std::cout << "type of getInstance = " << typeid(osgIntrospection::getInstance<ReferencedNode>(v)).name() << std::endl;
-        std::cout << "type returned from variant_cast = " << typeid(osgIntrospection::variant_cast<ReferencedNode>(v)).name() << std::endl;
-        std::cout << "type returned from variant_cast* = " << typeid(osgIntrospection::variant_cast<ReferencedNode*>(v)).name() << std::endl;
-        std::cout << "type returned from extract_raw_data = " << typeid(osgIntrospection::extract_raw_data<ReferencedNode>(v)).name() << std::endl;
-        std::cout << "type returned from extract_raw_data (with reinterpret_cast)= " << typeid(reinterpret_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
-        std::cout << "type returned from extract_raw_data (with dynamic_cast)= " << typeid(dynamic_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
+           std::cout << "type of ReferencedNode = " << typeid(ReferencedNode).name() << std::endl;
+           std::cout << "type of ReferencedNode* = " << typeid(ReferencedNode*).name() << std::endl;
+           std::cout << "type of getInstance = " << typeid(osgIntrospection::getInstance<ReferencedNode>(v)).name() << std::endl;
+           std::cout << "type returned from variant_cast = " << typeid(osgIntrospection::variant_cast<ReferencedNode>(v)).name() << std::endl;
+           std::cout << "type returned from variant_cast* = " << typeid(osgIntrospection::variant_cast<ReferencedNode*>(v)).name() << std::endl;
+           std::cout << "type returned from extract_raw_data = " << typeid(osgIntrospection::extract_raw_data<ReferencedNode>(v)).name() << std::endl;
+           std::cout << "type returned from extract_raw_data (with reinterpret_cast)= " << typeid(reinterpret_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
+           std::cout << "type returned from extract_raw_data (with dynamic_cast)= " << typeid(dynamic_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
 
 
         //ReferencedNode test = (osgIntrospection::getInstance<ReferencedNode>(v));
@@ -679,7 +671,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
 
         n = test;
-        */
+         */
         n = osgIntrospection::variant_cast<ReferencedNode*>(v);
 
     }
@@ -1036,10 +1028,10 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 
     // TODO: more efficient way (since we know the nodetype):
     /*
-    nodeListType::iterator iter;
-    iter = std::find( nodeMap[n->nodeType].second.begin(), nodeMap[n->nodeType].second.end(), n );
-    if ( iter != nodeMap[n->nodeType].second.end() ) nodeMap[n->nodeType].second.erase(iter);
-    */
+       nodeListType::iterator iter;
+       iter = std::find( nodeMap[n->nodeType].second.begin(), nodeMap[n->nodeType].second.end(), n );
+       if ( iter != nodeMap[n->nodeType].second.end() ) nodeMap[n->nodeType].second.erase(iter);
+     */
 
     // have to unregister the callback function to remove the last ref_ptr:
     pthread_mutex_lock(&sceneMutex);
@@ -1070,17 +1062,17 @@ void SceneManager::clear()
     // ERROR: only does odd ones
     for (int i=0; i<worldNode->getNumChildren(); i++)
     {
-        ReferencedNode *n = dynamic_cast<ReferencedNode*>(worldNode->getChild(i));
-        if (n)
-        {
-            // as long as this isn't a UserNode, delete
-            if (!dynamic_cast<UserNode*>(n))
-            {
-                deleteGraph(n->id->s_name);
-            }
-        }
+    ReferencedNode *n = dynamic_cast<ReferencedNode*>(worldNode->getChild(i));
+    if (n)
+    {
+    // as long as this isn't a UserNode, delete
+    if (!dynamic_cast<UserNode*>(n))
+    {
+    deleteGraph(n->id->s_name);
     }
-    */
+    }
+    }
+     */
 
     unsigned i = 0;
     ReferencedNode *n;
@@ -1111,25 +1103,25 @@ void SceneManager::clear()
     nodeMapType::iterator it;
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
-        if ((*it).first != "UserNode")
-        {
+    if ((*it).first != "UserNode")
+    {
 
-            nodeListType::iterator iter;
-            for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-            {
-                if (strcmp((*iter)->getParent(),"world")==0)
-                {
-                    deleteGraph((*iter)->id->s_name);
-                }
-            }
-        }
+    nodeListType::iterator iter;
+    for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+    {
+    if (strcmp((*iter)->getParent(),"world")==0)
+    {
+    deleteGraph((*iter)->id->s_name);
     }
-    */
+    }
+    }
+    }
+     */
 
     /*
-    ClearSceneVisitor visitor;
-    worldNode->accept(visitor);
-    */
+       ClearSceneVisitor visitor;
+       worldNode->accept(visitor);
+     */
 
 
     SCENE_MSG("s", "clear");
@@ -1186,9 +1178,7 @@ void SceneManager::clearStates()
     std::cout << "Cleared all states." << std::endl;
 }
 
-
-// *****************************************************************************
-void SceneManager::refresh()
+void SceneManager::refreshAll()
 {
     sendNodeList("*");
 
@@ -1220,32 +1210,69 @@ void SceneManager::refresh()
         (*iter)->stateDump();
     }
 
+    // Announce that a refresh has been completed
     SCENE_MSG("s", "refresh");
+}
+
+
+void SceneManager::refreshSubscribers(const std::map<std::string, lo_address> &clients)
+{
+    for (std::map<std::string, lo_address>::const_iterator client = clients.begin(); 
+            client != clients.end(); 
+            ++client)
+    {
+        // TODO: just send to subscribers
+        sendNodeList("*", client->second);
+
+        nodeMapType::iterator it;
+        for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
+        {
+            nodeListType::iterator iter;
+            for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+                (*iter)->stateDump(client->second);
+        }
+
+        ReferencedStateSetMap::iterator sIt;
+        for (sIt = stateMap.begin(); sIt != stateMap.end(); ++sIt)
+        {
+            ReferencedStateSetList::iterator sIter;
+            for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
+            {
+                osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
+                if (s.valid()) s->stateDump(client->second);
+            }
+        }
+
+        // must do connections manually:
+        std::vector<SoundConnection*> connections = getConnections();
+        for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
+            (*iter)->stateDump(client->second);
+    }
 }
 
 
 // *****************************************************************************
 // This function returns a pointer to an SoundConnection object
 /*
-SoundConnection* SceneManager::getConnection(char *from, char *to)
-{
-    vector<SoundConnection*>::iterator iter;
+   SoundConnection* SceneManager::getConnection(char *from, char *to)
+   {
+   vector<SoundConnection*>::iterator iter;
 
-    osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( getNode(from) );
-    osg::ref_ptr<DSPNode> snkNode = dynamic_cast<DSPNode*>( getNode(to) );
+   osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( getNode(from) );
+   osg::ref_ptr<DSPNode> snkNode = dynamic_cast<DSPNode*>( getNode(to) );
 
-    if ( srcNode.valid() && snkNode.valid() ) {
-        for (iter = srcNode->connectTO.begin(); iter != srcNode->connectTO.end(); iter++)
-        {
-            if ((*iter)->sink->id == snkNode->id) return (*iter);
-        }
-    }
+   if ( srcNode.valid() && snkNode.valid() ) {
+   for (iter = srcNode->connectTO.begin(); iter != srcNode->connectTO.end(); iter++)
+   {
+   if ((*iter)->sink->id == snkNode->id) return (*iter);
+   }
+   }
 
-    // SoundConnection not found:
-    return NULL;
+// SoundConnection not found:
+return NULL;
 
 }
-*/
+ */
 
 // *****************************************************************************
 // Here is where we change the graph (ie, attach nodes to their new parents,
@@ -1425,19 +1452,19 @@ std::string SceneManager::getConnectionsAsXML()
 }
 
 /*
-std::string SceneManager::getConnectionsAsXML(ReferencedNode *n)
-{
-    // just give connections for the node in question (and all children
+   std::string SceneManager::getConnectionsAsXML(ReferencedNode *n)
+   {
+// just give connections for the node in question (and all children
 
-    ostringstream output("");
-    output << "<connection>\n";
+ostringstream output("");
+output << "<connection>\n";
 
 
 
-    output << "</connection>\n";
-    return output.str();
+output << "</connection>\n";
+return output.str();
 }
-*/
+ */
 
 
 // *****************************************************************************
@@ -1452,20 +1479,20 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
     // start with XML Header:
     std::ostringstream output("");
     output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
-            << "<!DOCTYPE SPIN SYSTEM>\n"
-            << "<spinScene>\n";
+        << "<!DOCTYPE SPIN SYSTEM>\n"
+        << "<spinScene>\n";
 
 
     /*
-    vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
-    for (iter = nodeList.begin(); iter != nodeList.end() ; iter++)
-    {
-        // Add the state for this node only if it is a top-level node. Children
-        // will be added recursively:
-        if ((*iter)->parent == WORLD_SYMBOL)
-            output << getNodeStateAsXML( (*iter).get() );
+       vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
+       for (iter = nodeList.begin(); iter != nodeList.end() ; iter++)
+       {
+    // Add the state for this node only if it is a top-level node. Children
+    // will be added recursively:
+    if ((*iter)->parent == WORLD_SYMBOL)
+    output << getNodeStateAsXML( (*iter).get() );
     }
-    */
+     */
 
     nodeMapType::iterator it;
     nodeListType::iterator iter;
@@ -1516,8 +1543,8 @@ bool SceneManager::saveUsers(const char *s)
     // start with XML Header:
     std::ostringstream output("");
     output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
-            << "<!DOCTYPE SPIN SYSTEM>\n"
-            << "<spinScene>\n";
+        << "<!DOCTYPE SPIN SYSTEM>\n"
+        << "<spinScene>\n";
 
     for (nodeListType::iterator iter = nodeMap["UserNode"].begin(); iter != nodeMap["UserNode"].end(); iter++)
     {
@@ -1707,44 +1734,44 @@ bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
 }
 
 /*
-bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
+   bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
+   {
+
+// NOTE: this assumes all nodes have already been created
+
+TiXmlElement *child1, *child2;
+
+for ( child1 = XMLnode->FirstChildElement(); child1; child1 = child1->NextSiblingElement() )
 {
-
-    // NOTE: this assumes all nodes have already been created
-
-    TiXmlElement *child1, *child2;
-
-    for ( child1 = XMLnode->FirstChildElement(); child1; child1 = child1->NextSiblingElement() )
-    {
-        // first check children:
-        if (child1->Value() == string("subgraph"))
-        {
-            for (child2 = child1->FirstChildElement(); child2; child2 = child2->NextSiblingElement() )
-            {
-                createConnectionsFromXML(child2);
-            }
-        }
-
-        // now if this node has a "connect" message,
-        else if (child1->Value() == string("connect"))
-        {
-            // don't care about nodeType (should be SoundNode or SoundSpace)
-            //char *nodeType = (char*) XMLnode->Value();
-
-            if (XMLnode->Attribute("id"))
-            {
-                osg::ref_ptr<ReferencedNode> n = getNode((char*) XMLnode->Attribute("id"));
-                if (n.valid())
-                {
-                    osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>(n.get());
-                    if (srcNode.valid()) srcNode->connect((char*)child1->FirstChild()->Value());
-                }
-            }
-        }
-
-    } // for ( child1
+// first check children:
+if (child1->Value() == string("subgraph"))
+{
+for (child2 = child1->FirstChildElement(); child2; child2 = child2->NextSiblingElement() )
+{
+createConnectionsFromXML(child2);
 }
-*/
+}
+
+// now if this node has a "connect" message,
+else if (child1->Value() == string("connect"))
+{
+// don't care about nodeType (should be SoundNode or SoundSpace)
+//char *nodeType = (char*) XMLnode->Value();
+
+if (XMLnode->Attribute("id"))
+{
+osg::ref_ptr<ReferencedNode> n = getNode((char*) XMLnode->Attribute("id"));
+if (n.valid())
+{
+osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>(n.get());
+if (srcNode.valid()) srcNode->connect((char*)child1->FirstChild()->Value());
+}
+}
+}
+
+} // for ( child1
+}
+ */
 
 
 // *****************************************************************************
@@ -1836,30 +1863,30 @@ int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospec
     // a lookup every time there is a message:
 
     /*
-    const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+       const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
 
 
-    if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
+       if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
+       {
+     */
+    try {
+        classType.invokeMethod(method, classInstance, theArgs, true);
+        // if we get this far, then the method invocation succeeded and
+        // we can return:
+        return 1;
+    }
+    catch (osgIntrospection::Exception & ex)
     {
-    */
-        try {
-            classType.invokeMethod(method, classInstance, theArgs, true);
-            // if we get this far, then the method invocation succeeded and
-            // we can return:
-            return 1;
-        }
-        catch (osgIntrospection::Exception & ex)
-        {
-            //std::cerr << "catch exception: " << ex.what() << std::endl;
-        }
+        //std::cerr << "catch exception: " << ex.what() << std::endl;
+    }
 
-        // If the method wasn't found in the classInstance, then we need to go
-        // through all base classes to see if method is contained in a parent class:
-        for (int i=0; i<classType.getNumBaseTypes(); i++)
-        {
-            if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs)) return 1;
-        }
-   // }
+    // If the method wasn't found in the classInstance, then we need to go
+    // through all base classes to see if method is contained in a parent class:
+    for (int i=0; i<classType.getNumBaseTypes(); i++)
+    {
+        if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs)) return 1;
+    }
+    // }
 
     return 0;
 }

@@ -419,8 +419,16 @@ void spinApp::SceneMessage(lo_message msg)
 void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
 {
     std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
-    sendBundle(OSCpath,msgs);
+    sendBundle(OSCpath, msgs);
 }
+
+
+void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_address addr)
+{
+    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
+    sendBundle(OSCpath, msgs, addr);
+}
+
 
 void spinApp::SceneBundle(std::vector<lo_message> msgs)
 {
@@ -428,7 +436,14 @@ void spinApp::SceneBundle(std::vector<lo_message> msgs)
     sendBundle(OSCpath, msgs);
 }
 
-void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
+void spinApp::SceneBundle(std::vector<lo_message> msgs, lo_address addr)
+{
+    std::string OSCpath = "/SPIN/" + sceneID;
+    sendBundle(OSCpath, msgs, addr);
+}
+
+
+void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs, lo_address txAddr)
 {
     lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
 
@@ -440,7 +455,10 @@ void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs)
         msgs.erase(iter); // iterator automatically advances after erase()
     }
 
-    lo_send_bundle(context->lo_txAddr, b);
+    if (txAddr == 0)
+        lo_send_bundle(context->lo_txAddr, b);
+    else
+        lo_send_bundle(txAddr, b);
     lo_bundle_free_messages(b);
 }
 

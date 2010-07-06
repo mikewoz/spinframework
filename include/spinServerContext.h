@@ -45,7 +45,6 @@
 #include "spinBaseContext.h"
 #include <map>
 
-
 /**
  * \brief A server-side spinContext for maintaining an instance of SPIN and
  * updating all clients
@@ -54,17 +53,13 @@
  */
 class spinServerContext : public spinBaseContext
 {
-
     public:
-
 		spinServerContext();
 		~spinServerContext();
 
 		bool start();
 
-        void refreshSubscribed();
-
-
+        void refreshSubscribers();
 
         /**
          * Starts the thread that sends synchronization timecode (syncThread)
@@ -72,7 +67,6 @@ class spinServerContext : public spinBaseContext
         void startSyncThread();
 
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
 
     private:
 
@@ -96,8 +90,6 @@ class spinServerContext : public spinBaseContext
          */
         static void *syncThread(void *arg);
 
-
-
         /**
          * The server uses infoCallback to monitor /ping/user messages coming
          * from SPIN clients on the network. A series of timers are used to
@@ -108,8 +100,6 @@ class spinServerContext : public spinBaseContext
         //static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
-
 
         std::map<std::string, lo_address> tcpClientAddrs_;
         pthread_t syncThreadID; // id of sync thread

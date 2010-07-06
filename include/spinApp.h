@@ -103,7 +103,9 @@ class spinApp
         void NodeMessage(const char *nodeId, lo_message msg);
 
         void NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
+        void NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_address addr);
         void SceneBundle(std::vector<lo_message> msgs);
+        void SceneBundle(std::vector<lo_message> msgs, lo_address addr);
 
         void setSceneID(std::string s) { sceneID = s; }
         std::string getSceneID() { return sceneID; }
@@ -133,7 +135,7 @@ class spinApp
     private:
         // can be overridden in client apps
         std::string userID_;
-        void sendBundle(std::string OSCpath, std::vector<lo_message> msgs);
+        void sendBundle(std::string OSCpath, std::vector<lo_message> msgs, lo_address txAddr = 0);
 
         // singleton constructors & desctructor (hidden):
         spinApp();
@@ -162,6 +164,10 @@ class spinApp
 #define SCENE_LO_MSG(msg) \
     if (spinApp::Instance().getContext()->isServer()) \
     lo_send_message(spinApp::Instance().getContext()->lo_txAddr, ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), msg)
+
+#define SCENE_LO_MSG_TCP(msg, addr) \
+    if (spinApp::Instance().getContext()->isServer()) \
+        lo_send_message((addr), ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), msg)
 
 #define NODE_MSG(pNode, types, ...) \
     if (spinApp::Instance().getContext()->isServer()) \

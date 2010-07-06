@@ -466,6 +466,11 @@ void ReferencedNode::stateDump ()
     spinApp::Instance().NodeBundle(this->id, this->getState());
 }
 
+// *****************************************************************************
+void ReferencedNode::stateDump(lo_address txAddr)
+{
+    spinApp::Instance().NodeBundle(this->id, this->getState(), txAddr);
+}
 
 std::string ReferencedNode::getID() const
 {
