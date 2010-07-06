@@ -324,7 +324,8 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 
 void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
 {
-    // TODO: typeFilter not used yet
+	if (!spinApp::Instance().getContext()->isServer()) return;
+
     std::string OSCpath = "/SPIN/" + sceneID;
     lo_message msg;
 
@@ -699,6 +700,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
         // broadcast (only if this is the server):
         SCENE_MSG("sss", "createNode", id, type);
+        sendNodeList(type);
         return n.get();
     }
     else
@@ -816,6 +818,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
         registerStateSet(n.get());
         // broadcast (only if this is the server):
         SCENE_MSG("sss", "createStateSet", id, type);
+        sendNodeList("type");
         return n.get();
     }
     else
