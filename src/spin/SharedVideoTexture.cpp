@@ -39,12 +39,13 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "config.h"
+
 #include <iostream>
 #include "SharedVideoTexture.h"
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-
 
 static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
 

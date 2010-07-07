@@ -54,10 +54,6 @@
 
 #include "UserNode.h"
 
-#ifdef WITH_SHARED_VIDEO
-#include "SharedVideoTexture.h"
-#endif
-
 #include "lo/lo.h"
 #include "tinyxml.h"
 

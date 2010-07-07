@@ -42,6 +42,7 @@
 #ifndef __SharedVideoTexture_H
 #define __SharedVideoTexture_H
 
+#include "config.h"
 #include <osg/Image>
 #include <osg/Texture2D>
 #include <osg/Timer>
@@ -49,7 +50,7 @@
 #include "ReferencedStateSet.h"
 
 #ifdef WITH_SHARED_VIDEO		
-#include "sharedVideoBuffer.h"
+#include <scenic/sharedVideoBuffer.h>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
@@ -76,6 +77,10 @@
  *
  * ie, this node still has reduced funtionality on non-supported platforms.
  */
+
+// forward declaration
+class SharedVideoBuffer;
+
 class SharedVideoTexture : public ReferencedStateSet
 {
 

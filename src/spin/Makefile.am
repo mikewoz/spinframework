@@ -17,7 +17,8 @@ libSPIN_la_LDFLAGS = \
 	-lOpenThreads -losg \
 	-losgGA -losgSim -losgDB -losgManipulator -losgText -losgUtil \
 	-losgFX -losgParticle -losgViewer \
-	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS)
+	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS) $(BOOST_THREAD_LIB) $(SHARED_VIDEO_LIB)
+
 
 libSPIN_la_SOURCES = \
 	spinApp.cpp spinBaseContext.cpp spinClientContext.cpp spinServerContext.cpp \
@@ -48,7 +49,7 @@ bin_PROGRAMS += spineditor
 endif
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libSPIN.la # $(SPIN_LDFLAGS)
+spinserver_LDADD = libSPIN.la #$(SPIN_LDFLAGS)
 
 spinviewer_SOURCES = spinViewer.cpp
 spinviewer_LDADD = libSPIN.la # $(SPIN_LDFLAGS)D

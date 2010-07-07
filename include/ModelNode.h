@@ -52,13 +52,7 @@
 #include "SceneManager.h"
 #include "ReferencedStateSet.h"
 
-#ifdef WITH_SHARED_VIDEO
-#include "SharedVideoTexture.h"
-#endif
-
 #define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
-
-
 
 /**
  * \brief Node for including 3D models of popular formats in the scene.
@@ -151,12 +145,6 @@ private:
 
 	std::vector<osg::Drawable*> _ssDrawableList;
 	std::vector<osg::Node*> _ssNodeList;
-
-#ifdef WITH_SHARED_VIDEO
-	//std::vector< osg::ref_ptr<SharedVideoTexture> > sharedVideoTextures;
-	//std::vector<SharedVideoTexture*> sharedVideoTextures;
-	//osg::ref_ptr<SharedVideoTexture> shTex;
-#endif
 
 	osg::ref_ptr<osg::Group> model;
 

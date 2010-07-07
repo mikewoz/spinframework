@@ -45,12 +45,12 @@ int main(int argc, char **argv)
 			(int)ShapeNode::BOX,
 			LO_ARGS_END);
 
-	spin.NodeMessage("vid", "si",
-			"setPath",
+	spin.NodeMessage("vid", "ss",
+			"setTextureID",
 			argv[1],
 			LO_ARGS_END);
 
-	spin.NodeMessage("box", "si",
+	spin.NodeMessage("box", "ss",
 			"setStateSet",
 			"vid",
 			LO_ARGS_END);
