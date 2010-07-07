@@ -208,6 +208,8 @@ void *spinServerContext::spinServerThread(void *arg)
             lastTick = frameTick;
         }
 
+        spin.sceneManager->update();
+
         pthread_mutex_lock(&sceneMutex);
         visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
         pthread_mutex_unlock(&sceneMutex);

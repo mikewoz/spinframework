@@ -74,6 +74,8 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
     newParent = WORLD_SYMBOL;
 
     textFlag = false;
+    scheduleForDeletion = false;
+
 
     // When children are attached to this, they get added to the attachmentNode:
     attachmentNode = this;

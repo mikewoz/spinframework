@@ -277,9 +277,9 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
 	// regular OSC callback methods.
     if (std::string(path) == std::string("/SPIN/" +
                 spinApp::Instance().getSceneID()))
-        spinBaseContext::sceneCallback(path, types, argv, argc, data, user_data);
+        spinBaseContext::sceneCallback(path, types, argv, argc, (void*) data, (void*) user_data);
 	else
-		spinBaseContext::nodeCallback(path, types, argv, argc, data, user_data);
+		spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) user_data);
 
     return 1;
 }

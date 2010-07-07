@@ -286,12 +286,7 @@ int main(int argc, char **argv)
 		if (spinListener.isRunning())
 		{
 			osg::Timer_t startFrameTick = osg::Timer::instance()->tick();
-			
-#if 0
-			pthread_mutex_lock(&sceneMutex);
-            spin.sceneManager->update();
-			pthread_mutex_unlock(&sceneMutex);
-#endif
+
 	
 			pthread_mutex_lock(&sceneMutex);
 			viewer.frame();

@@ -100,7 +100,7 @@ class UserNode : public ConstraintsNode
 
 		// ping message
 		void ping();
-
+		osg::Timer_t getLastPing() { return lastPing_; }
 
 		/**
 		 * For each subclass of ReferencedNode, we override the getState() method to

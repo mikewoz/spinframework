@@ -243,6 +243,9 @@ public:
 
     t_symbol *parent, *newParent;
 
+    bool scheduleForDeletion;
+
+
     // debug
 
     bool textFlag;

@@ -1292,6 +1292,28 @@ void SceneManager::update()
     //if (shTex.valid()) shTex->updateCallback();
 #endif
 
+
+	if (spinApp::Instance().getContext()->isServer())
+	{
+
+		// check if any UserNodes have stopped pinging, and remove them (and their
+		// subgraph) if necessary:
+
+		nodeListType::iterator iter;
+	    for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
+	    {
+			if ((*iter)->scheduleForDeletion)
+			{
+				// this user stopped pinging, so we should remove him from the
+				// subgraph.
+
+				//uncomment when ready:
+				spinApp::Instance().sceneManager->deleteGraph((*iter)->id->s_name);
+			} else iter++;
+	    }
+
+	}
+
 }
 
 // save scene as .osg
