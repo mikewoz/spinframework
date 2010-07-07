@@ -118,8 +118,9 @@ void *spinClientContext::spinClientThread(void *arg)
     spinClientContext *context = (spinClientContext*)(arg);
     spinApp &spin = spinApp::Instance();
     context->createServers();
+
+
     spin.createScene();
-    spin.registerUser();
 
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
@@ -147,6 +148,9 @@ void *spinClientContext::spinClientThread(void *arg)
 
     context->running = true;
 
+    // registerUser needs the context to be running (since it sends messages)
+    spin.registerUser();
+
     // TIMEOUT in liblo was 10 ; zero here assumes that there is some other
     // processing or sleeping going on to manage CPU and mutex acquisition
     static const int TIMEOUT = 0;
@@ -157,6 +161,9 @@ void *spinClientContext::spinClientThread(void *arg)
         lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
         lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
         // do nothing (assume the app is doing updates - eg, in a draw loop)
+
+        // TODO: this should sleep?
+        usleep(10);
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();
@@ -246,6 +253,7 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
     if (argc != 7)
         return 1;
     std::string theirSceneID(reinterpret_cast<const char*>(argv[0]));
+
     // make sure my sceneID matches the sceneID whose info message this is
     if (spinApp::Instance().getSceneID() == theirSceneID and context->doSubscribe_)
     {
@@ -278,18 +286,22 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
 
 void spinClientContext::subscribe()
 {
-    // FIXME: can only subscribe with a valid user name
-    if (spinApp::Instance().userNode.valid())
-    {
-        std::stringstream sstr;
-        // convert to port number to string
-        sstr << lo_server_get_port(lo_tcpRxServer_);
+	// TODO: this should also be called whenever client gets a UserRefresh...
+	// the idea is that if the server crashed and came back online, it sends a
+	// userRefresh message and the client can re-subscribe.
+	//
+	// ie, UserRefresh should set doSubscribe_ to true.
 
-        lo_send(lo_serverTCPAddr, "/SPIN/__user__", "ssss",
-                "subscribe", spinApp::Instance().userNode->getID().c_str(), 
-                getMyIPaddress().c_str(),
-                sstr.str().c_str());
-    }
+
+	std::stringstream sstr;
+	// convert to port number to string
+	sstr << lo_server_get_port(lo_tcpRxServer_);
+
+	lo_send(lo_serverTCPAddr, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "ssss",
+			"subscribe", spinApp::Instance().getUserID().c_str(),
+			getMyIPaddress().c_str(),
+			sstr.str().c_str());
+
     doSubscribe_ = false;
 }
 

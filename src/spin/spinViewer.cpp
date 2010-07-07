@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 	bool fullscreen = false;
 	bool hideCursor=false;
 
-	double maxFrameRate = -1;
+	double maxFrameRate = 60;
 	
 	int x=50;
 	int y=50;

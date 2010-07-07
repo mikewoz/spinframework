@@ -140,7 +140,7 @@ void spinServerContext::createServers()
     //lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
 
     // add tcp channel callback (receives subscribe messages from client apps):
-    lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "ssss", tcpCallback, this);
+    lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, tcpCallback, this);
 
     // add scene callback
     lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, sceneCallback, NULL);

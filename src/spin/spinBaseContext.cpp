@@ -541,13 +541,13 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->clearStates();
     else if (theMethod=="userRefresh")
     {
-    if (spin.getContext()->isServer())
-    {
-            SCENE_MSG("s", "userRefresh");
-    }
-    else {
-        if (spin.userNode.valid()) spin.SceneMessage("sss", "createNode", spin.userNode->id->s_name, "UserNode", LO_ARGS_END);
-    }
+		if (spin.getContext()->isServer())
+		{
+			SCENE_MSG("s", "userRefresh");
+		}
+		else {
+			spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
+		}
     }
     else if (theMethod=="refresh")
         sceneManager->refreshAll();
