@@ -63,8 +63,8 @@ spinServerContext::spinServerContext()
     lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
     lo_txAddr = lo_address_new("226.0.0.1", "54323");
 
-    std::cout << "  SceneManager receiving on:\t" <<
-        lo_address_get_hostname(lo_rxAddr) << std::endl;
+    std::cout << "RX SceneManager receiving on:\t" <<
+        lo_address_get_url(lo_rxAddr) << std::endl;
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
