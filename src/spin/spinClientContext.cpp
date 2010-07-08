@@ -180,14 +180,13 @@ void *spinClientContext::spinClientThread(void *arg)
         }
     }
 
-    std::cout << "Exiting spin client thread\n";
+    std::cout << "Exitting spin client thread\n";
     context->running = false;
 
     // clean up:
     lo_server_free(context->lo_syncServ);
     pthread_exit(NULL);
 }
-
 
 int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo_arg **argv, int argc,
         lo_message /*msg*/, void * /*user_data*/)

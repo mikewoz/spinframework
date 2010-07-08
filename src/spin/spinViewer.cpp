@@ -279,7 +279,7 @@ int main(int argc, char **argv)
 	double minFrameTime = 1.0 / maxFrameRate;
 	
 	// program loop:
-	while( !viewer.done() )
+	while(not viewer.done())
 	{
 		//std::cout << "frame: " << view->getFrameStamp()->getSimulationTime() << std::endl;
 		

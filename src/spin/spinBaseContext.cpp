@@ -130,11 +130,6 @@ void spinBaseContext::sigHandler(int signum)
 {
     std::cout << " Caught signal: " << signum << std::endl;
 
-//    spinApp &spin = spinApp::Instance();
-
-    // unlock mutex so we can clean up:
-    pthread_mutex_unlock(&sceneMutex);
-
 #if 0
     // TODO: we really shouldn't do anything like this here. Can we get rid of
     // this?:
@@ -192,6 +187,7 @@ void spinBaseContext::stop()
         std::cout << "Stopping spinBaseContext..." << std::endl;
         signalStop = true;
         while (running) usleep(10);
+        std::cout << "Stopped spinBaseContext..." << std::endl;
     }
 }
 
