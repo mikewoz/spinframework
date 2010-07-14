@@ -110,7 +110,7 @@ void spinClientContext::createServers()
             std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
             NULL, sceneCallback, NULL);
     std::cout << "  SceneManager receiving on:\t" <<
-        lo_address_get_hostname(lo_rxAddr) << std::endl;
+        lo_address_get_url(lo_rxAddr) << std::endl;
 }
 
 void *spinClientContext::spinClientThread(void *arg)

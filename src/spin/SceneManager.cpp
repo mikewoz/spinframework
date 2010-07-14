@@ -590,7 +590,6 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
             std::cout << "ERROR: Tried to create " << type << " with id '" << id << "', but that id already exists as an " << n->nodeType << "." << std::endl;
             return NULL;
         } else {
-            //SCENE_MSG(this, "sss", "createNode", id, type);
             return n.get();
         }
     }
