@@ -6,10 +6,49 @@
 #include <cstdlib>
 #include <cmath>
 
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+
+
 /**
  * This example shows how to send commands to a spin server. The result is an
  * orbiting sphere.
  */
+
+
+
+int kbhit(void)
+{
+  struct termios oldt, newt;
+  int ch;
+  int oldf;
+
+  tcgetattr(STDIN_FILENO, &oldt);
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+  fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+  ch = getchar();
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+  if(ch != EOF)
+  {
+    ungetc(ch, stdin);
+    return 1;
+  }
+
+  return 0;
+}
+
+
+
 
 int main(int argc, char **argv)
 {
@@ -70,35 +109,41 @@ int main(int argc, char **argv)
             "vid1",
             LO_ARGS_END);
 
-    bool done = false;
 
-    std::cout << "\nRunning example. Press CTRL-C to quit or q to quit." << std::endl;
-    while (!done and spinListener.isRunning())
+    usleep(1000);
+
+    std::cout << "\nRunning example." << std::endl;
+    std::cout << "  Press 1 or 2 to switch textures." << std::endl;
+    std::cout << "  Press q or CTRL-C to quit.\n" << std::endl;
+
+    while (spinListener.isRunning())
     {
-        char c;
-        std::cin >> c;
-        switch (c) {
-            case '1':
-                spin.NodeMessage("box", "ss",
-                        "setStateSet",
-                        "vid1",
-                        LO_ARGS_END);
-                break;
-            case '2':
-                spin.NodeMessage("box", "ss",
-                        "setStateSet",
-                        "vid2",
-                        LO_ARGS_END);
-                break;
-            case 'q':
-            case 'Q':
-                done = true;
-                break;
-            default:
-                break;
+        if (kbhit())
+        {
+            switch (getchar()) {
+                case '1':
+                    std::cout << "texture1" << std::endl;
+                    spin.NodeMessage("box", "ss",
+                            "setStateSet",
+                            "vid1",
+                            LO_ARGS_END);
+                    break;
+                case '2':
+                    std::cout << "texture2" << std::endl;
+                    spin.NodeMessage("box", "ss",
+                            "setStateSet",
+                            "vid2",
+                            LO_ARGS_END);
+                    break;
+                case 'q':
+                case 'Q':
+                    spinListener.stop();
+                    break;
+                default:
+                    break;
+            }
         }
     }
-
     return 0;
 }
 
