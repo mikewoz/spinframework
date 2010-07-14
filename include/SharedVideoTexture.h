@@ -128,8 +128,8 @@ private:
 	boost::condition_variable textureUploadedCondition_;
 	SharedVideoBuffer *sharedBuffer;
 		
-	boost::interprocess::shared_memory_object *shm;
-	boost::interprocess::mapped_region *region;
+	boost::interprocess::shared_memory_object *shm_;
+	boost::interprocess::mapped_region *region_;
 #endif
 		
 };

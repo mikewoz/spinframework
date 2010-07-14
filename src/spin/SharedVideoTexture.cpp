@@ -56,7 +56,10 @@ using namespace std;
 // ===================================================================
 // constructor:
 //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
-SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
+SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
+    ReferencedStateSet(s, initID),
+    shm_(0),
+    region_(0)
 {
 	classType = "SharedVideoTexture";
 	
@@ -110,6 +113,10 @@ SharedVideoTexture::~SharedVideoTexture()
 	std::cout << "SharedVideoTexture destructor for id:" << this->id->s_name << std::endl;
 #ifdef WITH_SHARED_VIDEO
 	stop();
+    delete region_;
+    delete shm_;
+#else
+        std::cerr << "WARNING: SHARED_VIDEO not enabled\n";
 #endif
 }
 
@@ -127,7 +134,19 @@ void SharedVideoTexture::setTextureID (const char* newID)
 	if (sceneManager->isGraphical())
 	{
 #ifdef WITH_SHARED_VIDEO
+        if (region_)
+        {
+            delete region_;
+            region_ = 0;
+        }
+        if (shm_)
+        {
+            delete shm_;
+            shm_ = 0;
+        }
 		start();
+#else
+        std::cerr << "WARNING: SHARED_VIDEO not enabled\n";
 #endif
 	}
 	
@@ -292,13 +311,15 @@ void SharedVideoTexture::start()
 	try
 	{
 		// open the already created shared memory object
-		shm = new shared_memory_object(open_only, textureID.c_str(), read_write);
+        assert(shm_ == 0);
+		shm_ = new shared_memory_object(open_only, textureID.c_str(), read_write);
 
 		// map the whole shared memory in this process
-		region = new mapped_region(*shm, read_write);
+        assert(region_ == 0);
+		region_ = new mapped_region(*shm_, read_write);
 		
 		// get the address of the region
-		void *addr = region->get_address();
+		void *addr = region_->get_address();
 		
 		
 		// cast to pointer of type of our shared structure
