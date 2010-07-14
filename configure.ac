@@ -162,10 +162,11 @@ AC_ARG_ENABLE([scenic],
 	[with_scenic=no])
 
 # FIXME: scenic should use pkg-config to say where shared video is
-AS_IF([test "x$with_scenic" = "xyes"],
+AS_IF([test "x$with_scenic" = "xyes"],[
     LDFLAGS="$LDFLAGS -L/usr/local/lib/scenic -L/usr/lib/scenic" 
-	AC_CHECK_LIB([shared_video], [shared_video_is_present], SHARED_VIDEO_LIB="-lshared_video"; AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]), AC_MSG_ERROR([missing Scenic shared_video library]),[-pthread])
-	[with_scenic=no])
+	AC_CHECK_LIB([shared_video], [shared_video_is_present], SHARED_VIDEO_LIB="-lshared_video"; 
+        AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]), 
+        AC_MSG_ERROR([missing Scenic shared_video library]),[-pthread])], [with_scenic=no])
 
 AC_SUBST([SHARED_VIDEO_LIB])
 
@@ -203,6 +204,7 @@ AM_CONDITIONAL(ENABLE_EDITOR, [test "x$with_gui" = xyes])
 #AC_MSG_RESULT($with_scenic)
 
 AC_MSG_NOTICE([============================================])
+AS_IF([test "x$with_scenic" = "xyes"], AC_MSG_NOTICE([Using scenic]), AC_MSG_NOTICE([Not using scenic]))
 AC_MSG_NOTICE([PYTHON_LIB:          ${PYTHON_LIB}])
 AC_MSG_NOTICE([PYTHON_INCLUDE_DIR:  ${PYTHON_INCLUDE_DIR}])
 AC_MSG_NOTICE([PYTHON_CPPFLAGS:     ${PYTHON_CPPFLAGS}])
