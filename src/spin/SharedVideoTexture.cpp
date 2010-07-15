@@ -57,9 +57,12 @@ using namespace std;
 // constructor:
 //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
 SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
-    ReferencedStateSet(s, initID),
+    ReferencedStateSet(s, initID)
+#ifdef WITH_SHARED_VIDEO
+    ,
     shm_(0),
     region_(0)
+#endif
 {
 	classType = "SharedVideoTexture";
 	
