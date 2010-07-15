@@ -40,3 +40,18 @@ A number of audio/video/image formats are supported by means of the OpenSceneGra
 
 Ultimately, the SPIN Framework allows for the creation of collaborative environments where several distributed users can share and interact with immersive 3D content.
 
+
+Compiling
+---------
+
+./autogen.sh (Only if from the SVN, not the tarball)
+
+./configure --enable-scenic
+
+make 
+
+
+Installing 
+----------
+
+sudo make install
