@@ -113,6 +113,7 @@ class UserNode : public ConstraintsNode
 
 	private:
 
+		bool ping_;
 		osg::Timer_t lastPing_;
 		std::string description_;
 

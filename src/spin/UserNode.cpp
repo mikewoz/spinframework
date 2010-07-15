@@ -59,7 +59,7 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
     setTranslation(0.0, -5.0, 0.5);
     setReportMode(GroupNode::GLOBAL_6DOF);
 
-    ping();
+    ping_ = false;
 }
 
 // destructor
@@ -74,17 +74,18 @@ void UserNode::callbackUpdate()
 {
 	ConstraintsNode::callbackUpdate();
 
-
-	osg::Timer_t t = osg::Timer::instance()->tick();
-	if (osg::Timer::instance()->delta_s(lastPing_,t) > 30) // every 30 seconds
+	if (ping_)
 	{
-		// this user stopped pinging, so we should remove him from the
-		// subgraph.
+		osg::Timer_t t = osg::Timer::instance()->tick();
+		if (osg::Timer::instance()->delta_s(lastPing_,t) > 30) // every 30 seconds
+		{
+			// this user stopped pinging, so we should remove him from the
+			// subgraph.
 
-		//uncomment when ready:
-		this->scheduleForDeletion = true;
+			//uncomment when ready:
+			this->scheduleForDeletion = true;
+		}
 	}
-
 
 }
 
@@ -105,6 +106,7 @@ void UserNode::setDescription (const char *newvalue)
 void UserNode::ping()
 {
 	lastPing_ = osg::Timer::instance()->tick();
+	ping_ = true;
 }
 
 // *****************************************************************************
