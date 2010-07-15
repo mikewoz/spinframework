@@ -245,43 +245,47 @@ void SharedVideoTexture::consumeFrame()
 
     do
     {
+        // Lock the mutex
+        scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
+
+        // wait for new buffer to be pushed if it's empty
+        if (not sharedBuffer->waitOnProducer(lock))
         {
-            // Lock the mutex
-            scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
-
-            // wait for new buffer to be pushed if it's empty
-            sharedBuffer->waitOnProducer(lock);
-			
-
-            if (!sharedBuffer->isPushing())
-                end_loop = true;
-            else
-            {
-                // got a new buffer, wait until we upload it in gl thread before notifying producer
-                {
-                    boost::mutex::scoped_lock displayLock(displayMutex_);
-
-                    if (killed_)
-                    {
-                        sharedBuffer->stopPushing();   // tell appsink not to give us any more buffers
-                        end_loop = true;
-                    }
-                    else
-                        textureUploadedCondition_.wait(displayLock);
-                }
-
-                // Notify the other process that the buffer status has changed
-                sharedBuffer->notifyProducer();
-            }
-            // mutex is released (goes out of scope) here
+            end_loop = true;
+            break;
         }
+
+        if (!sharedBuffer->isPushing())
+        {
+            end_loop = true;
+            break;
+        }
+        else
+        {
+            // got a new buffer, wait until we upload it in gl thread before notifying producer
+            {
+                boost::mutex::scoped_lock displayLock(displayMutex_);
+
+                if (killed_)
+                {
+                    sharedBuffer->stopPushing();   // tell appsink not to give us any more buffers
+                    end_loop = true;
+                }
+                else
+                    textureUploadedCondition_.wait(displayLock);
+            }
+
+            // Notify the other process that the buffer status has changed
+            sharedBuffer->notifyProducer();
+        }
+        // mutex is released (goes out of scope) here
     }
     while (!end_loop);
 
-	
+
     // erase shared memory
-	// No! we never do this... only the other process is allowed to
-	// destroy the memory
+    // No! we never do this... only the other process is allowed to
+    // destroy the memory
     //shared_memory_object::remove(textureID.c_str());
     // shouldn't we also destroy our shm and region objects?
 }
@@ -297,13 +301,13 @@ void SharedVideoTexture::signalKilled ()
 // ===================================================================
 void SharedVideoTexture::start()
 {
-	// first kill any existing thread:
-	stop();
-	
-	using namespace boost::interprocess;
-	try
-	{
-		// open the already created shared memory object
+    // first kill any existing thread:
+    stop();
+
+    using namespace boost::interprocess;
+    try
+    {
+        // open the already created shared memory object
         if (region_)
         {
             delete region_;
@@ -314,55 +318,55 @@ void SharedVideoTexture::start()
             delete shm_;
             shm_ = 0;
         }
-		shm_ = new shared_memory_object(open_only, textureID.c_str(), read_write);
-		// map the whole shared memory in this process
-		region_ = new mapped_region(*shm_, read_write);
-		
-		// get the address of the region
-		void *addr = region_->get_address();
-		
-		
-		// cast to pointer of type of our shared structure
-		sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
-			
-		width = sharedBuffer->getWidth();
-		height = sharedBuffer->getHeight();
-		
-		// reset the killed_ conditional
-		killed_ = false;
-		
-		std::cout << "SharedVideoTexture '" << textureID << "' starting thread" << std::endl;
-		
-		// start our consumer thread, which is a member function of this class
-		// and takes sharedBuffer as an argument
-		worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoTexture::consumeFrame), boost::ref(*this)));
-	}
-	catch(interprocess_exception &ex)
-	{
-		static const char *MISSING_ERROR = "No such file or directory";
-		if (strncmp(ex.what(), MISSING_ERROR, strlen(MISSING_ERROR)) != 0)
-		{
-			shared_memory_object::remove(textureID.c_str());
-			std::cout << "Unexpected exception: " << ex.what() << std::endl;
-		}
-		else
-		{
-			std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet\n";
-			//boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
-		}
-		killed_ = true;
-	}
+        shm_ = new shared_memory_object(open_only, textureID.c_str(), read_write);
+        // map the whole shared memory in this process
+        region_ = new mapped_region(*shm_, read_write);
+
+        // get the address of the region
+        void *addr = region_->get_address();
+
+
+        // cast to pointer of type of our shared structure
+        sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
+
+        width = sharedBuffer->getWidth();
+        height = sharedBuffer->getHeight();
+
+        // reset the killed_ conditional
+        killed_ = false;
+
+        std::cout << "SharedVideoTexture '" << textureID << "' starting thread" << std::endl;
+
+        // start our consumer thread, which is a member function of this class
+        // and takes sharedBuffer as an argument
+        worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoTexture::consumeFrame), boost::ref(*this)));
+    }
+    catch(interprocess_exception &ex)
+    {
+        static const char *MISSING_ERROR = "No such file or directory";
+        if (strncmp(ex.what(), MISSING_ERROR, strlen(MISSING_ERROR)) != 0)
+        {
+            shared_memory_object::remove(textureID.c_str());
+            std::cout << "Unexpected exception: " << ex.what() << std::endl;
+        }
+        else
+        {
+            std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet\n";
+            //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
+        }
+        killed_ = true;
+    }
 
 }
 
 void SharedVideoTexture::stop()
 {
-	if (!killed_)
-	{
-		this->signalKilled();
-		worker.join(); // wait here until thread exits
-		std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
-	}
+    if (!killed_)
+    {
+        this->signalKilled();
+        worker.join(); // wait here until thread exits
+        std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
+    }
 }
 
 #endif
