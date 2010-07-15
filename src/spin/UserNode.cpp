@@ -76,7 +76,7 @@ void UserNode::callbackUpdate()
 
 
 	osg::Timer_t t = osg::Timer::instance()->tick();
-	if (osg::Timer::instance()->delta_s(lastPing_,t) > 10) // every 60 seconds
+	if (osg::Timer::instance()->delta_s(lastPing_,t) > 30) // every 30 seconds
 	{
 		// this user stopped pinging, so we should remove him from the
 		// subgraph.
