@@ -137,16 +137,6 @@ void SharedVideoTexture::setTextureID (const char* newID)
 	if (sceneManager->isGraphical())
 	{
 #ifdef WITH_SHARED_VIDEO
-        if (region_)
-        {
-            delete region_;
-            region_ = 0;
-        }
-        if (shm_)
-        {
-            delete shm_;
-            shm_ = 0;
-        }
 		start();
 #else
         std::cerr << "WARNING: SHARED_VIDEO not enabled\n";
@@ -314,11 +304,18 @@ void SharedVideoTexture::start()
 	try
 	{
 		// open the already created shared memory object
-        assert(shm_ == 0);
+        if (region_)
+        {
+            delete region_;
+            region_ = 0;
+        }
+        if (shm_)
+        {
+            delete shm_;
+            shm_ = 0;
+        }
 		shm_ = new shared_memory_object(open_only, textureID.c_str(), read_write);
-
 		// map the whole shared memory in this process
-        assert(region_ == 0);
 		region_ = new mapped_region(*shm_, read_write);
 		
 		// get the address of the region
