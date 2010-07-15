@@ -100,7 +100,7 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 	this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 	// keep a timer for reload attempts:
-	lastTick = osg::Timer::instance()->tick();
+	lastTick = 0;
 	
 	std::cout << "created SharedVideoTexture with id: " << this->id->s_name << std::endl;
 
@@ -134,16 +134,7 @@ void SharedVideoTexture::setTextureID (const char* newID)
 	textureID = std::string(newID);
 	this->setName("SharedVideoTexture("+textureID+")");
 	
-	if (sceneManager->isGraphical())
-	{
-#ifdef WITH_SHARED_VIDEO
-		start();
-#else
-        std::cerr << "WARNING: SHARED_VIDEO not enabled\n";
-#endif
-	}
-	
-	else
+	if (!sceneManager->isGraphical())
 	{
 		BROADCAST(this, "ss", "setTextureID", getTextureID());
 	}
@@ -254,6 +245,7 @@ void SharedVideoTexture::consumeFrame()
             end_loop = true;
             break;
         }
+        
 
         if (!sharedBuffer->isPushing())
         {
@@ -262,6 +254,7 @@ void SharedVideoTexture::consumeFrame()
         }
         else
         {
+            
             // got a new buffer, wait until we upload it in gl thread before notifying producer
             {
                 boost::mutex::scoped_lock displayLock(displayMutex_);
@@ -272,7 +265,11 @@ void SharedVideoTexture::consumeFrame()
                     end_loop = true;
                 }
                 else
-                    textureUploadedCondition_.wait(displayLock);
+                {
+                    const boost::system_time timeout = boost::get_system_time() +
+                        boost::posix_time::milliseconds(100);
+                    textureUploadedCondition_.timed_wait(displayLock, timeout);
+                }
             }
 
             // Notify the other process that the buffer status has changed
@@ -288,6 +285,10 @@ void SharedVideoTexture::consumeFrame()
     // destroy the memory
     //shared_memory_object::remove(textureID.c_str());
     // shouldn't we also destroy our shm and region objects?
+
+    
+    signalKilled();
+
 }
 
 // ===================================================================
