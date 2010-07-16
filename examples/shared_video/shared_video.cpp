@@ -52,14 +52,15 @@ int kbhit(void)
 
 int main(int argc, char **argv)
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        std::cerr << "Usage: shared_video <shared_video1_path> <shared_video2_path>\n";
+        std::cerr << "Usage: shared_video <server_name> <shared_video1_path> <shared_video2_path>\n";
         return 1;
     }
 
     spinClientContext spinListener;
     spinApp &spin = spinApp::Instance();
+    spin.setSceneID(argv[1]);
 
     if (!spinListener.start())
     {
@@ -95,12 +96,12 @@ int main(int argc, char **argv)
     // set textureID on stateset
     spin.NodeMessage("vid1", "ss",
             "setTextureID",
-            argv[1],
+            argv[2],
             LO_ARGS_END);
 
     spin.NodeMessage("vid2", "ss",
             "setTextureID",
-            argv[2],
+            argv[3],
             LO_ARGS_END);
 
     // apply the stateset to the box
