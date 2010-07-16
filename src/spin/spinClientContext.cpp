@@ -48,7 +48,10 @@
 #include "SceneManager.h"
 
 
-spinClientContext::spinClientContext() : doSubscribe_(true)
+spinClientContext::spinClientContext() : 
+    doSubscribe_(true),
+    lo_syncServ(NULL),
+    lo_serverTCPAddr(NULL)
 {
     // Important: fist thing to do is set the context mode (client vs server)
     mode = CLIENT_MODE;
@@ -61,7 +64,10 @@ spinClientContext::spinClientContext() : doSubscribe_(true)
 }
 
 spinClientContext::~spinClientContext()
-{}
+{
+    lo_address_free(lo_serverTCPAddr);
+    lo_server_free(lo_syncServ);
+}
 
 bool spinClientContext::start()
 {
@@ -111,6 +117,16 @@ void spinClientContext::createServers()
             NULL, sceneCallback, NULL);
     std::cout << "  SceneManager receiving on:\t" <<
         lo_address_get_url(lo_rxAddr) << std::endl;
+
+    // sync (timecode) receiver:
+    if (isMulticastAddress(lo_address_get_hostname(lo_syncAddr)))
+    {
+        lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(lo_syncAddr), lo_address_get_port(lo_syncAddr), oscParser_error);
+    } else {
+        lo_syncServ = lo_server_new(lo_address_get_port(lo_syncAddr), oscParser_error);
+    }
+    lo_server_add_method(lo_syncServ, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
+            NULL, syncCallback, NULL);
 }
 
 void *spinClientContext::spinClientThread(void *arg)
@@ -118,8 +134,6 @@ void *spinClientContext::spinClientThread(void *arg)
     spinClientContext *context = (spinClientContext*)(arg);
     spinApp &spin = spinApp::Instance();
     context->createServers();
-
-
     spin.createScene();
 
     if ( !spin.initPython() )
@@ -128,15 +142,6 @@ void *spinClientContext::spinClientThread(void *arg)
 
     spin.execPython(cmd);
     spin.execPython("import spin");
-
-    // sync (timecode) receiver:
-    if (isMulticastAddress(lo_address_get_hostname(context->lo_syncAddr)))
-    {
-        context->lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(context->lo_syncAddr), lo_address_get_port(context->lo_syncAddr), oscParser_error);
-    } else {
-        context->lo_syncServ = lo_server_new(lo_address_get_port(context->lo_syncAddr), oscParser_error);
-    }
-    lo_server_add_method(context->lo_syncServ, std::string("/SPIN/" + spin.getSceneID()).c_str(), NULL, syncCallback, &spin);
 
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
@@ -186,7 +191,6 @@ void *spinClientContext::spinClientThread(void *arg)
 	spin.destroyScene();
 	
     // clean up:
-    lo_server_free(context->lo_syncServ);
     pthread_exit(NULL);
 }
 

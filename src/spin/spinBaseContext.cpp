@@ -72,7 +72,13 @@ pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
 
 bool spinBaseContext::signalStop = false;
 
-spinBaseContext::spinBaseContext()
+spinBaseContext::spinBaseContext() :
+    lo_rxAddr(NULL),
+    lo_txAddr(NULL),
+    lo_infoAddr(NULL),
+    lo_syncAddr(NULL),
+    lo_infoServ(NULL),
+    lo_rxServ_(NULL)
 {
     signalStop = true;
     running = false;
@@ -132,7 +138,7 @@ void spinBaseContext::sigHandler(int signum)
 
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
-	std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
+    std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
     std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
     std::cout << "  TX channel:\t\t\t" << lo_address_get_url(lo_txAddr) << std::endl;
@@ -254,10 +260,10 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     // get the instance of the node, which is the last token of the OSCpath:
     // TODO: use user_data instead!
     /*
-    nodeStr = string(path);
-    nodeStr = nodeStr.substr(nodeStr.rfind("/")+1);
-    t_symbol *s = gensym(nodeStr.c_str());
-    */
+       nodeStr = string(path);
+       nodeStr = nodeStr.substr(nodeStr.rfind("/")+1);
+       t_symbol *s = gensym(nodeStr.c_str());
+     */
     t_symbol *s = (t_symbol*) user_data;
 
     if (!s->s_thing)
@@ -352,7 +358,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
         }
 
         // rest of args are comma separated and passed as a string
-         std::stringstream params("");
+        std::stringstream params("");
         for (i = 5; i < argc; i++) {
             if (lo_is_numerical_type((lo_type)types[i]))  {
                 params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
@@ -441,8 +447,8 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     }
 
     if ( spin.getContext()->isServer() &&
-         (theMethod == "enableCronScript" || theMethod == "removeCronScript" ||
-          theMethod == "enableEventScript" || theMethod == "removeEventScript") ) {
+            (theMethod == "enableCronScript" || theMethod == "removeCronScript" ||
+             theMethod == "enableEventScript" || theMethod == "removeEventScript") ) {
 
         lo_message msg = lo_message_new();
         for (int i = 0; i < argc; i++) {
@@ -521,23 +527,23 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->clearStates();
     else if (theMethod=="userRefresh")
     {
-		if (spin.getContext()->isServer())
-		{
-			SCENE_MSG("s", "userRefresh");
-		}
-		else {
-			spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
-		}
+        if (spin.getContext()->isServer())
+        {
+            SCENE_MSG("s", "userRefresh");
+        }
+        else {
+            spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
+        }
     }
     else if (theMethod=="refresh")
         sceneManager->refreshAll();
     else if (theMethod=="refreshSubscribers")
     {
-    	if (spin.getContext()->isServer())
-    	{
-    		spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
-    		server->refreshSubscribers();
-    	}
+        if (spin.getContext()->isServer())
+        {
+            spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
+            server->refreshSubscribers();
+        }
     }
     else if (theMethod=="getNodeList")
         sceneManager->sendNodeList("*");
@@ -576,7 +582,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     else if ((theMethod=="deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*)argv[1]);
     else {
-            // FIXME: this used to rebroadcast messages that did not match command
+        // FIXME: this used to rebroadcast messages that did not match command
 #if 0
         spinApp &spin = spinApp::Instance();
         if (spin.sceneManager->isServer())

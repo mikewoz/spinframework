@@ -70,6 +70,12 @@ spinServerContext::spinServerContext()
 
 spinServerContext::~spinServerContext()
 {
+    using std::map;
+    using std::string;
+    for (map<string, lo_address>::iterator iter = tcpClientAddrs_.begin();
+            iter != tcpClientAddrs_.end();
+            ++iter)
+        lo_address_free(iter->second);
 }
 
 bool spinServerContext::start()
