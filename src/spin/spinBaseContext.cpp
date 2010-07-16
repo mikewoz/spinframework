@@ -79,6 +79,10 @@ spinBaseContext::spinBaseContext()
 
     signal(SIGINT, sigHandler);
 
+	lo_infoServ = NULL;
+	lo_rxServ_ = NULL;
+	lo_tcpRxServer_ = NULL;
+	
     // set default addresses (can be overridden):
     lo_infoAddr = lo_address_new("226.0.0.1", "54320");
     lo_rxAddr = lo_address_new("226.0.0.1", "54323");
