@@ -128,20 +128,7 @@ void spinBaseContext::setLog(spinLog &log)
 
 void spinBaseContext::sigHandler(int signum)
 {
-    std::cout << " Caught signal: " << signum << std::endl;
-
-#if 0
-    // TODO: we really shouldn't do anything like this here. Can we get rid of
-    // this?:
-    if (spin.userNode.valid())
-    {
-        ReferencedNode *heldPointer = spin.userNode.get();
-        //spin.userNode.release();
-        spin.userNode = NULL;
-        // now deleting the node in the sceneManager should release the last instance:
-        spin.sceneManager->doDelete(heldPointer);
-    }
-#endif
+    std::cout << "SPIN thread caught signal: " << signum << std::endl;
 
     spinBaseContext::signalStop = true;
 }

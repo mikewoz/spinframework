@@ -100,12 +100,11 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
 // destructor
 ReferencedNode::~ReferencedNode()
 {
-    //std::cout << "In ReferencedNode destructor... node: " << this->id->s_name << std::endl;
 
-    if (sceneManager)
+    if (!spinBaseContext::signalStop)
     {
         // unregister with OSC parser:
-        string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
+        string oscPattern = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + string(id->s_name);
         lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
     }
 

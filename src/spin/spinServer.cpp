@@ -162,9 +162,9 @@ int main(int argc, char **argv)
 		sleep(1);
 		// loop until a quit message is received (TODO)
 	}
+
+	usleep(100);
+	std::cout << "spinserver exited normally." << std::endl;
 	
-	std::cout << "spinServer done." << std::endl;
-
-
 	return 0;
 }

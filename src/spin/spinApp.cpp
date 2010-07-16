@@ -69,9 +69,10 @@
 extern pthread_mutex_t sceneMutex;
 
 
+
 spinApp::spinApp() : userID_(getHostname())
 {
-
+	
 #ifdef __Darwin
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
     //#define OSG_LIBRARY_PATH @executable_path/../PlugIns
@@ -171,6 +172,33 @@ void spinApp::createScene()
     else
         std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
 }
+
+void spinApp::destroyScene()
+{
+	std::cout << "Cleaning up SceneManager..." << std::endl;
+	
+	// Force a delete (and destructor call) for all nodes still in the scene:
+    unsigned int i = 0;
+    ReferencedNode *n;
+    while (i < sceneManager->worldNode->getNumChildren())
+    {
+        if ((n = dynamic_cast<ReferencedNode*>(sceneManager->worldNode->getChild(i))))
+        {
+            // delete the graph of any ReferencedNode:
+            sceneManager->deleteGraph(n->id->s_name);
+        }
+        else
+        {
+            // it's possible that there are other nodes attached to worldNode,
+            // so just skip them:
+            i++;
+        }
+    }
+
+    // clear any states that are left over:
+    sceneManager->clearStates();
+}
+
 
 // *****************************************************************************
 // PYTHON STUFF:

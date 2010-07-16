@@ -180,9 +180,11 @@ void *spinClientContext::spinClientThread(void *arg)
         }
     }
 
-    std::cout << "Exitting spin client thread\n";
+    std::cout << "Exiting spin client thread\n";
     context->running = false;
 
+	spin.destroyScene();
+	
     // clean up:
     lo_server_free(context->lo_syncServ);
     pthread_exit(NULL);

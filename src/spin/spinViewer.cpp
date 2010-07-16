@@ -312,8 +312,9 @@ int main(int argc, char **argv)
 			viewer.setDone(true);
 		}
 	}
-	
-	std::cout << "spinViewer done." << std::endl;
+
+	usleep(100);
+	std::cout << "spinviewer exited normally." << std::endl;
 
 	return 0;
 }

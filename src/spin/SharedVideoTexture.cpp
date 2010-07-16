@@ -75,8 +75,8 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 
 	// placeholder image:
 	img = new osg::Image;
-	//img->setOrigin(osg::Image::TOP_LEFT); 
-	img->setOrigin(osg::Image::BOTTOM_LEFT); 
+	img->setOrigin(osg::Image::TOP_LEFT); 
+	//img->setOrigin(osg::Image::BOTTOM_LEFT); 
    
 	// setup texture:
 	tex = new osg::Texture2D; //(img.get());
@@ -113,13 +113,10 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 // destructor
 SharedVideoTexture::~SharedVideoTexture()
 {
-	std::cout << "SharedVideoTexture destructor for id:" << this->id->s_name << std::endl;
 #ifdef WITH_SHARED_VIDEO
 	stop();
     delete region_;
     delete shm_;
-#else
-        std::cerr << "WARNING: SHARED_VIDEO not enabled\n";
 #endif
 }
 
@@ -184,14 +181,14 @@ void SharedVideoTexture::updateCallback()
 	            sharedBuffer->pixelsAddress(), 
 	            osg::Image::NO_DELETE, 
 	            1);
-	    		
-	    // set texture:
-	    tex->setImage(img.get());
-
+	    
 		// flip image from camera space:
 		//img->flipHorizontal();
 		//img->flipVertical();
-	
+			
+	    // set texture:
+	    tex->setImage(img.get());
+
 	    //img->setOrigin(osg::Image::TOP_LEFT); 
 
 	    

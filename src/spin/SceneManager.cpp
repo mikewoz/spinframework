@@ -260,36 +260,7 @@ SceneManager::SceneManager(const std::string &id)
 // destructor
 SceneManager::~SceneManager()
 {
-    std::cout << "Cleaning up SceneManager..." << std::endl;
-
-    // FIXME: DOING THIS HERE IS REALLY BAD, should happen earlier
-#if 0
-    // Force a delete (and destructor call) for all nodes still in the scene:
-    unsigned i = 0;
-    ReferencedNode *n;
-    while (i < worldNode->getNumChildren())
-    {
-        if ((n = dynamic_cast<ReferencedNode*>(worldNode->getChild(i))))
-        {
-            // delete the graph of any ReferencedNode:
-            std::cout << "Delete graph!\n";
-            deleteGraph(n->id->s_name);
-        }
-        else
-        {
-            // it's possible that there are other nodes attached to worldNode,
-            // so just skip them:
-            i++;
-        }
-    }
-
-    // clear any states that are left over:
-    std::cout << "clear states!\n";
-    clearStates();
-#endif
-
-    // stop sceneManager OSC threads:
-    usleep(100);
+	// TODO
 }
 
 void SceneManager::registerStateSet(ReferencedStateSet *s)
