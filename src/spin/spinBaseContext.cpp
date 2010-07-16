@@ -105,24 +105,17 @@ spinBaseContext::~spinBaseContext()
 {
     this->stop();
 
-    if (lo_infoServ)
-        lo_server_free(lo_infoServ);
-    if (lo_rxAddr)
-        lo_address_free(lo_rxAddr);
-    if (lo_txAddr)
-        lo_address_free(lo_txAddr);
-    if (lo_infoAddr)
-        lo_address_free(lo_infoAddr);
-    if (lo_syncAddr)
-        lo_address_free(lo_syncAddr);
-    if (lo_tcpRxServer_)
-        lo_server_free(lo_tcpRxServer_);
-    // stop sceneManager OSC threads:
-    usleep(100);
+    lo_address_free(lo_rxAddr);
+    lo_address_free(lo_txAddr);
+	lo_address_free(lo_infoAddr);
+    lo_address_free(lo_syncAddr);
 
-    // FIXME: is this necessary/a good idea?
-    if (lo_rxServ_)
-        lo_server_free(lo_rxServ_);
+	// stop sceneManager OSC threads:
+    //usleep(100);
+	
+    lo_server_free(lo_infoServ);
+    lo_server_free(lo_tcpRxServer_);
+	lo_server_free(lo_rxServ_);
 }
 
 void spinBaseContext::setLog(spinLog &log)
