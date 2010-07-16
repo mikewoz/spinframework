@@ -134,6 +134,11 @@ void spinBaseContext::sigHandler(int signum)
     std::cout << "SPIN thread caught signal: " << signum << std::endl;
 
     spinBaseContext::signalStop = true;
+    static int interruptCount = 0;
+    const static int MAX_INTERRUPTS = 2;
+    ++interruptCount;
+    if (interruptCount >= MAX_INTERRUPTS)
+        throw std::runtime_error("Got multiple interrupts, exitting rudely");
 }
 
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
