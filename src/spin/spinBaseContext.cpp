@@ -176,7 +176,8 @@ void spinBaseContext::stop()
     {
         std::cout << "Stopping spinBaseContext..." << std::endl;
         signalStop = true;
-        while (running) usleep(10);
+        //while (running) usleep(10);
+		pthread_join(pthreadID, NULL);
         std::cout << "Stopped spinBaseContext..." << std::endl;
     }
 }
