@@ -177,9 +177,11 @@ void spinBaseContext::stop()
         std::cout << "Stopping spinBaseContext..." << std::endl;
         signalStop = true;
         //while (running) usleep(10);
-		pthread_join(pthreadID, NULL);
         std::cout << "Stopped spinBaseContext..." << std::endl;
     }
+    if (pthread_join(pthreadID, NULL) == ESRCH)
+        std::cerr << "WARNING: No thread could be found corresponding " << 
+            "to that specified by the given thread ID to join" << std::endl; 
 }
 
 int spinBaseContext::connectionCallback(const char *path, 

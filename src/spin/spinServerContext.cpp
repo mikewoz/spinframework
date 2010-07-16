@@ -242,8 +242,6 @@ void *spinServerContext::spinServerThread(void *arg)
     context->running = false;
 
 	spin.destroyScene();
-
-    pthread_exit(NULL);
 }
 
 /**

@@ -123,7 +123,7 @@ private:
 	
 
 #ifdef WITH_SHARED_VIDEO		
-	boost::thread worker;
+	boost::thread worker_;
 	boost::mutex displayMutex_;
 	boost::condition_variable textureUploadedCondition_;
 	SharedVideoBuffer *sharedBuffer;

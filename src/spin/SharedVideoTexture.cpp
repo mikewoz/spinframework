@@ -337,7 +337,7 @@ void SharedVideoTexture::start()
 
         // start our consumer thread, which is a member function of this class
         // and takes sharedBuffer as an argument
-        worker = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoTexture::consumeFrame), boost::ref(*this)));
+        worker_ = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoTexture::consumeFrame), boost::ref(*this)));
     }
     catch(interprocess_exception &ex)
     {
@@ -360,11 +360,9 @@ void SharedVideoTexture::start()
 void SharedVideoTexture::stop()
 {
     if (!killed_)
-    {
         this->signalKilled();
-        worker.join(); // wait here until thread exits
-        std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
-    }
+    worker_.join(); // wait here until thread exits
+    std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
 }
 
 #endif

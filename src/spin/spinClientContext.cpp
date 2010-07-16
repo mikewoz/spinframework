@@ -189,9 +189,6 @@ void *spinClientContext::spinClientThread(void *arg)
     context->running = false;
 
 	spin.destroyScene();
-	
-    // clean up:
-    pthread_exit(NULL);
 }
 
 int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo_arg **argv, int argc,
