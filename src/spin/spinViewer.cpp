@@ -312,6 +312,8 @@ int main(int argc, char **argv)
 			viewer.setDone(true);
 		}
 	}
+    // make sure we're done in case we didn't quit via interrupt
+	spinListener.stop();
 
 	usleep(100);
 	std::cout << "spinviewer exited normally." << std::endl;
