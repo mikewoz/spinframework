@@ -99,9 +99,13 @@ class spinBaseContext
 
         bool isRunning() { return running; }
 
+        /** Multicast group and port number on which the server listens for messages that alters the scene graph. */
         lo_address lo_rxAddr;
+        /** Multicast group and port number to which the server sends the messages that clients sent to it to alter the scene graph. */
         lo_address lo_txAddr;
+        /** Multicast group and port number to which the server sends the addresses and port numbers on which it sends and receives. */
         lo_address lo_infoAddr;
+        /** Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters. */
         lo_address lo_syncAddr;
         lo_server lo_infoServ;
         lo_server lo_rxServ_;

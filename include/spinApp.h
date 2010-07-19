@@ -119,7 +119,14 @@ class spinApp
          * initializes the embedded python interpreter
          */
         bool initPython();
+        
+        /**
+         * Runs some Python code and returns its success or not.
+         */
         bool execPython( const std::string& cmd );
+        /** 
+         * Returns a string containing the most recent Python exception, if any.
+         */
         std::string getCurrentPyException();
         boost::python::object _pyMainModule;
         boost::python::object _pyNamespace;

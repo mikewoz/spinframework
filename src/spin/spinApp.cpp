@@ -254,7 +254,7 @@ bool spinApp::execPython( const std::string& cmd ) {
         std::cout << "Python error:" << e.what() << std::endl;
         return false;
     } catch(...) {                        // catch all other exceptions
-        std::cout << "0Python error: caught (...)\n";
+        std::cout << "Python error: caught (...)\n";
         return false;
     }
 

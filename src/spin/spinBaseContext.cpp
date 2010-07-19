@@ -72,6 +72,11 @@ pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
 
 bool spinBaseContext::signalStop = false;
 
+/**
+ * Constructor. 
+ * 
+ * This is where the actual default port numbers and multicast groups are defined.
+ */
 spinBaseContext::spinBaseContext() :
     lo_rxAddr(NULL),
     lo_txAddr(NULL),
@@ -107,7 +112,11 @@ spinBaseContext::spinBaseContext() :
     }
 
 }
-
+/**
+ * Destructor 
+ * 
+ * Frees the senders and receivers. 
+ */
 spinBaseContext::~spinBaseContext()
 {
     this->stop();
@@ -129,7 +138,11 @@ void spinBaseContext::setLog(spinLog &log)
 {
     lo_server_add_method(lo_rxServ_, NULL, NULL, logCallback, &log);
 }
-
+/**
+ * Signal handler. 
+ * 
+ * Called, for example, when the user presses Control-C
+ */
 void spinBaseContext::sigHandler(int signum)
 {
     std::cout << "SPIN thread caught signal: " << signum << std::endl;
@@ -141,7 +154,9 @@ void spinBaseContext::sigHandler(int signum)
     if (interruptCount >= MAX_INTERRUPTS)
         throw std::runtime_error("Got multiple interrupts, exitting rudely");
 }
-
+/**
+ * Startup point of the server's thread.
+ */
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
@@ -246,7 +261,22 @@ int spinBaseContext::connectionCallback(const char *path,
 
     return 1;
 }
-
+/**
+ * Callback for messages sent to a node in the scene graph.
+ * 
+ * Messages to node should have an OSC address in the form /SPIN/<scene ID>/<node ID>
+ * Their first argument is the name of the method to call. 
+ * 
+ * Methods to manage Python scripts for a node:
+ * - addCronScript <label> <path> <frequency>
+ * - addEventScript <label> <event> <path> [*args...]
+ * - enableCronScript <label>
+ * - removeCronScript <label>
+ * - enableEventScript <label>
+ * - removeEventScript <label>
+ * 
+ * We use C++ introspection to figure out the other methods that can be called for a given node.
+ */
 int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **argv, int argc, void * /*data*/, void *user_data)
 {
     // NOTE: user_data is a t_symbol pointer
@@ -506,7 +536,33 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     return 1;
 }
 
-
+/**
+ * Callback for the OSC message to the whole scene. 
+ * 
+ * The address of the OSC messages sent to the scene are in the form /SPIN/<scene ID> <method name> [args...]
+ * 
+ * They are used mostly to delete all nodes from a scene, or to ask the server to refresh the information about all nodes. It's also possible to save the current scene graph to an XML file, and to load a previously saved XML file. 
+ * 
+ * Some valid method include:
+ * - clear
+ * - clearUsers
+ * - clearStates
+ * - userRefresh
+ * - refresh
+ * - refreshSubscribers
+ * - getNodeList
+ * - nodeList [node names...] : Creates many nodes
+ * - stateList [] : Creates many state sets
+ * - exportScene [] []
+ * - load [XML file]
+ * - save [XML file] 
+ * - saveAll [XML file]
+ * - saveUsers [XML file]
+ * - createNode [node name] [node type]
+ * - createStateSet [name] [type]
+ * - deleteNode [name]
+ * - deleteGraph [name]
+ */
 int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg **argv, int argc,
         void * /*data*/, void * /*user_data*/)
 {
