@@ -84,19 +84,7 @@ ReferencedStateSet::ReferencedStateSet(SceneManager *s, const char *initID)
 // destructor
 ReferencedStateSet::~ReferencedStateSet()
 {
-	// This will only be called when all references to the state are released,
-	// AND the UserData is set to null. ie, the removeFromScene() method needs
-	// to be called.
-	
-	// clear the stateset
-	this->clear();
-	
-	// unregister from sceneManager:
-	sceneManager->unregisterStateSet(this);
-	
-	// finally, by nulling the ref_ptr in s_thing, we should have removed all
-	// references to this object, so OSG can clean up
-	id->s_thing = 0;
+
 }
 
 // *****************************************************************************

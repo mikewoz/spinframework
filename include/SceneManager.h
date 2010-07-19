@@ -61,7 +61,7 @@ typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
 typedef std::map< std::string, nodeListType > nodeMapType;
 typedef std::pair< std::string, nodeListType > nodeMapPair;
 
-typedef std::vector<t_symbol*> ReferencedStateSetList;
+typedef std::vector< osg::ref_ptr<ReferencedStateSet> > ReferencedStateSetList;
 typedef std::map< std::string, ReferencedStateSetList > ReferencedStateSetMap;
 typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
 
@@ -139,6 +139,14 @@ class SceneManager
          */
         void doDelete(ReferencedNode *n);
 
+		/**
+         * The doDelete method performs all of the necessary steps to delete a
+         * stateset. It is similar to the doDelete method for a note: it calls
+		 * the node's removeFromScene() method, releases resources (eg, videos),
+		 * removes it from the stateMap list, etc.
+         */
+		void doDelete(ReferencedStateSet *n);
+		
         /**
          * Clears scene elements that are not part of any user's subgraphs
          */

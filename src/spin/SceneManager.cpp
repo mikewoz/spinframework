@@ -266,7 +266,7 @@ SceneManager::~SceneManager()
 void SceneManager::registerStateSet(ReferencedStateSet *s)
 {
     //stateList.push_back(s->id);
-    stateMap[s->classType].push_back(s->id);
+    stateMap[s->classType].push_back(s);
 
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
     lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL, 
@@ -283,7 +283,7 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
     lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
 
     ReferencedStateSetList::iterator itr;
-    itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s->id );
+    itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s );
     if ( itr != stateMap[s->classType].end() ) stateMap[s->classType].erase(itr);
 
     SCENE_MSG("ss", "unregisterState", s->id->s_name);
@@ -353,7 +353,7 @@ void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
                 {
                     for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
                     {
-                        lo_message_add_string(msg, (char*) (*iter)->s_name );
+                        lo_message_add_string(msg, (char*) (*iter)->id->s_name );
                     }
                 } else {
                     lo_message_add_string(msg, "NULL");
@@ -408,7 +408,7 @@ void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
                     if ( (*it).second.size() )
                     {
                         for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                            lo_message_add_string(msg, (char*) (*iter)->s_name );
+                            lo_message_add_string(msg, (char*) (*iter)->id->s_name );
                     } else 
                         lo_message_add_string(msg, "NULL");
 
@@ -476,13 +476,13 @@ void SceneManager::debug()
         ReferencedStateSetList::iterator sIter;
         for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
         {
-            if ((*sIter)->s_thing)
+            if ((*sIter).valid())
             {
-                ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
-                std::cout << "    " << (*sIter)->s_name << " (parents=";
-                for (unsigned i = 0; i < s->getNumParents(); i++)
+                //ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
+                std::cout << "    " << (*sIter)->id->s_name << " (parents=";
+                for (unsigned i = 0; i < (*sIter)->getNumParents(); i++)
                 {
-                    std::cout << " " << s->getParent(i)->getName();
+                    std::cout << " " << (*sIter)->getParent(i)->getName();
                 }
                 std::cout << ")" << std::endl;
             }
@@ -817,13 +817,13 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
     {
         for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
         {
-            if ((*sIter)->s_thing)
+            if ((*sIter).valid())
             {
-                ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
-                if (getAbsolutePath(s->getPath())==getAbsolutePath(fname))
+                //ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
+                if (getAbsolutePath((*sIter)->getPath())==getAbsolutePath(fname))
                 {
                     std::cout << "already exists: " << fname << std::endl;
-                    return s;
+                    return (*sIter).get();
                 }
             }
         }
@@ -941,7 +941,7 @@ void SceneManager::deleteNode(const char *id)
 
     } else if (ReferencedStateSet *s = getStateSet(id))
     {
-        s->removeFromScene();
+		doDelete(s);
         sendNodeList("*");
         SCENE_MSG("ss", "deleteNode", id);
     }
@@ -1017,6 +1017,27 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     n = NULL;
 }
 
+void SceneManager::doDelete(ReferencedStateSet *s)
+{
+	// hold on to a referenced pointer, while we remove all others
+    osg::ref_ptr<ReferencedStateSet> ss = s;
+
+	// remove from the scene
+	s->removeFromScene();
+	
+	// clear the stateset
+	s->clear();
+	
+	// unregister from sceneManager (this removes it from the stateMap storage):
+	unregisterStateSet(s);
+
+	// by nulling the ref_ptr in s_thing, we will remove the last reference to
+	// the stateset (other than the one in local scope)
+	s->id->s_thing = 0;
+
+	// now force the actual delete by nulling this referenced pointer.
+	ss = NULL; // destructor is called
+}
 
 // *****************************************************************************
 void SceneManager::clear()
@@ -1128,18 +1149,16 @@ void SceneManager::clearStates()
     {
         while ((iter=(*it).second.begin()) != (*it).second.end())
         {
-			osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*iter)->s_thing);
-			if (s.valid()) s->removeFromScene();
-			
-			(*it).second.erase(iter);
-        }
-    }
+			doDelete((*iter).get());
+			/*
+			//osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*iter)->s_thing);
+			// removeFromScene will remove all of OSG's references, leavind the
+			// referenced count at just one (ie, the one in our stateMap)
+			if ((*iter).valid()) (*iter)->removeFromScene();
 
-    for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
-    {
-        for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
-        {
-            std::cout << "why is " << (*iter)->s_type << " '" << (*iter)->s_name << "' still here?!" << std::endl;
+			// as soon as we erase it, OSG will call the stateset destructor
+			(*it).second.erase(iter);
+			*/
         }
     }
 
@@ -1169,8 +1188,8 @@ void SceneManager::refreshAll()
         ReferencedStateSetList::iterator sIter;
         for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
         {
-            osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
-            if (s.valid()) s->stateDump();
+            //osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
+            if ((*sIter).valid()) (*sIter)->stateDump();
         }
     }
 
@@ -1209,8 +1228,8 @@ void SceneManager::refreshSubscribers(const std::map<std::string, lo_address> &c
             ReferencedStateSetList::iterator sIter;
             for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
             {
-                osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
-                if (s.valid()) s->stateDump(client->second);
+                //osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*sIter)->s_thing);
+                if ((*sIter).valid()) (*sIter)->stateDump(client->second);
             }
         }
 
