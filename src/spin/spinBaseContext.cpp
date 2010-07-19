@@ -78,7 +78,8 @@ spinBaseContext::spinBaseContext() :
     lo_infoAddr(NULL),
     lo_syncAddr(NULL),
     lo_infoServ(NULL),
-    lo_rxServ_(NULL)
+    lo_rxServ_(NULL),
+    pthreadID(0)
 {
     signalStop = true;
     running = false;
@@ -184,7 +185,7 @@ void spinBaseContext::stop()
         //while (running) usleep(10);
         std::cout << "Stopped spinBaseContext..." << std::endl;
     }
-    if (pthread_join(pthreadID, NULL) == ESRCH)
+    if (pthreadID != 0 and pthread_join(pthreadID, NULL) == ESRCH)
         std::cerr << "WARNING: No thread could be found corresponding " << 
             "to that specified by the given thread ID to join" << std::endl; 
 }
