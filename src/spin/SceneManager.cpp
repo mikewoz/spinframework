@@ -1126,14 +1126,12 @@ void SceneManager::clearStates()
 
     for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
     {
-        //for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
         while ((iter=(*it).second.begin()) != (*it).second.end())
         {
-            if ((*iter)->s_thing)
-            {
-                ReferencedStateSet *s = dynamic_cast<ReferencedStateSet*>((*iter)->s_thing);
-                s->removeFromScene();
-            } else (*it).second.erase(iter);
+			osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*iter)->s_thing);
+			if (s.valid()) s->removeFromScene();
+			
+			(*it).second.erase(iter);
         }
     }
 
