@@ -122,6 +122,11 @@ public:
 	virtual void setOrientation (float pitch, float roll, float yaw);
 
 	/**
+	 * Set the orientation offset as a quaternion
+	 */
+	virtual void setOrientationQuat (float x, float y, float z, float w);
+
+	/**
 	 * A grouped scale operation
 	 */
 	virtual void setScale (float x, float y, float z);

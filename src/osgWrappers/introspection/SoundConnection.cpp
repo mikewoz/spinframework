@@ -93,6 +93,11 @@ BEGIN_VALUE_REFLECTOR(SoundConnection)
 	          __void__stateDump,
 	          "",
 	          "");
+	I_Method1(void, stateDump, IN, lo_address, addr,
+	          Properties::VIRTUAL,
+	          __void__stateDump__lo_address,
+	          "",
+	          "");
 	I_SimpleProperty(float, DiffractionEffect, 
 	                 __float__getDiffractionEffect, 
 	                 __void__setDiffractionEffect__float);

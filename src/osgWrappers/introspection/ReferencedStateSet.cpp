@@ -62,6 +62,11 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(ReferencedStateSet)
 	          __void__stateDump,
 	          "",
 	          "StateDump() is a request to broadcast the node state via SceneManager. ");
+	I_Method1(void, stateDump, IN, lo_address, txAddr,
+	          Properties::VIRTUAL,
+	          __void__stateDump__lo_address,
+	          "",
+	          "");
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 0);

@@ -100,6 +100,11 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	          __void__setOrientation__float__float__float,
 	          "",
 	          "The local orientation offset for this node with respect to it's parent ");
+	I_Method4(void, setOrientationQuat, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
+	          Properties::VIRTUAL,
+	          __void__setOrientationQuat__float__float__float__float,
+	          "",
+	          "Set the orientation offset as a quaternion ");
 	I_Method3(void, setScale, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,

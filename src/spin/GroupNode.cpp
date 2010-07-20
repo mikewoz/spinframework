@@ -445,6 +445,19 @@ void GroupNode::setTranslation (float x, float y, float z)
     }
 }
 
+void GroupNode::setOrientationQuat (float x, float y, float z, float w)
+{
+	osg::Quat newQuat = osg::Quat(x,y,z,w);
+
+    if (newQuat != mainTransform->getAttitude())
+    {
+        mainTransform->setAttitude(newQuat);
+        _orientation = Vec3inDegrees(QuatToEuler(newQuat));
+
+        BROADCAST(this, "sffff", "setOrientationQuat", x, y, z, w);
+    }
+
+}
 
 void GroupNode::setOrientation (float p, float r, float y)
 {

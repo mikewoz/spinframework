@@ -53,6 +53,11 @@ BEGIN_OBJECT_REFLECTOR(UserNode)
 	          __void__ping,
 	          "",
 	          "");
+	I_Method0(osg::Timer_t, getLastPing,
+	          Properties::NON_VIRTUAL,
+	          __osg_Timer_t__getLastPing,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -61,6 +66,9 @@ BEGIN_OBJECT_REFLECTOR(UserNode)
 	I_SimpleProperty(const char *, Description, 
 	                 __C5_char_P1__getDescription, 
 	                 __void__setDescription__C5_char_P1);
+	I_SimpleProperty(osg::Timer_t, LastPing, 
+	                 __osg_Timer_t__getLastPing, 
+	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

@@ -153,6 +153,11 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __void__stateDump,
 	          "",
 	          "StateDump() is a request to broadcast the node state via SceneManager. ");
+	I_Method1(void, stateDump, IN, lo_address, addr,
+	          Properties::VIRTUAL,
+	          __void__stateDump__lo_address,
+	          "",
+	          "StateDump() is a request to send the node state to one address ");
 	I_Method0(std::string, getID,
 	          Properties::NON_VIRTUAL,
 	          __std_string__getID,
@@ -223,6 +228,7 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	I_PublicMemberProperty(lo_method, oscHandler);
 	I_PublicMemberProperty(t_symbol *, parent);
 	I_PublicMemberProperty(t_symbol *, newParent);
+	I_PublicMemberProperty(bool, scheduleForDeletion);
 	I_PublicMemberProperty(bool, textFlag);
 	I_PublicMemberProperty(stringParamType, stringParams);
 	I_PublicMemberProperty(floatParamType, floatParams);
