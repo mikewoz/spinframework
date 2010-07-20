@@ -13,8 +13,8 @@ AC_CANONICAL_HOST # fills $host variable
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
   if test -d /opt/local ; then
-    CPPFLAGS="$CPPFLAGS -I/opt/local/include"
-    LDFLAGS="$LDFLAGS -L/opt/local/lib"
+    CPPFLAGS="$CPPFLAGS -I/usr/local/include -I/opt/local/include"
+    LDFLAGS="$LDFLAGS -L/usr/local/lib -L/opt/local/lib"
   elif test -d /sw ; then
     CPPFLAGS="$CPPFLAGS -I/sw/include"
     LDFLAGS="$LDFLAGS -L/sw/lib"
