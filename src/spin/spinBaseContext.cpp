@@ -296,13 +296,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     else
         return 1;
 
-    // get the instance of the node, which is the last token of the OSCpath:
-    // TODO: use user_data instead!
-    /*
-       nodeStr = string(path);
-       nodeStr = nodeStr.substr(nodeStr.rfind("/")+1);
-       t_symbol *s = gensym(nodeStr.c_str());
-     */
+
     t_symbol *s = (t_symbol*) user_data;
 
     if (!s->s_thing)

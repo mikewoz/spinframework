@@ -275,13 +275,41 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
 int spinClientContext::tcpCallback(const char *path, const char *types,
         lo_arg **argv, int argc, void *data, void *user_data)
 {
-	// For now, we just take anything received from TCP and forward it to the
-	// regular OSC callback methods.
-    if (std::string(path) == std::string("/SPIN/" +
-                spinApp::Instance().getSceneID()))
+    // WARNING: tcpCallback is registered to match ANY path, so we must manually
+    // check if it is within the /SPIN namespace, and if it matches the sceneID:
+
+    std::string spinToken, sceneID, nodeID;
+    std::istringstream pathstream(path);
+    pathstream.get(); // ignore leading slash
+    getline(pathstream, spinToken, '/');
+    getline(pathstream, sceneID, '/');
+    getline(pathstream, nodeID, '/');
+
+    if ((spinToken!="SPIN") || (sceneID!=spinApp::Instance().getSceneID()))
+    {
+    	std::cout << "Warning: server is ignoring TCP message: " << path << std::endl;
+    	return 1;
+    }
+
+	// It's a valid message, so we just forward it to the regular OSC callback
+    // methods:
+
+    if (nodeID.empty())
+    {
+    	// scene message:
         spinBaseContext::sceneCallback(path, types, argv, argc, (void*) data, (void*) user_data);
-	else
-		spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) user_data);
+    }
+    else
+    {
+    	// node message:
+	    ReferencedNode* n = spinApp::Instance().sceneManager->getNode(nodeID);
+	    if (n)
+	    {
+	    	spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
+	    }
+	}
+
+
 
     return 1;
 }

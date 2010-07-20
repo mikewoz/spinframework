@@ -144,7 +144,7 @@ void spinServerContext::createServers()
     //lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
 
     // add tcp channel callback (receives subscribe messages from client apps):
-    lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, tcpCallback, this);
+    lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
 
     // add scene callback
     lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, sceneCallback, NULL);
@@ -220,9 +220,10 @@ void *spinServerContext::spinServerThread(void *arg)
         visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
         pthread_mutex_unlock(&sceneMutex);
 
-        lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
-        lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
-        lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
+        int recv = 0; // bytes received (note: might not be accurate for TCP)
+        recv += lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
+        recv += lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
+        recv += lo_server_recv_noblock(context->lo_tcpRxServer_, 10);
 
         // Need to sleep a little bit so that updates have time. 2 reasons:
         //
@@ -236,7 +237,10 @@ void *spinServerContext::spinServerThread(void *arg)
         // and will be processed with delay.
         //
         //
-        usleep(10);
+
+        if (recv<=0) {
+        	usleep(10);
+        }
 
     }
     context->running = false;
@@ -282,6 +286,31 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     spinServerContext *context = static_cast<spinServerContext*>(user_data);
     std::string method(reinterpret_cast<const char*>(argv[0]));
 
+#if 0
+    printf("server got TCP message: %s", path);
+    for (int i=0; i<argc; i++) {
+    	printf(" ");
+		lo_arg_pp((lo_type) types[i], argv[i]);
+	}
+    printf("\n");
+#endif
+
+    // WARNING: tcpCallback is registered to match ANY path, so we must manually
+    // check if it is within the /SPIN namespace, and if it matches the sceneID:
+
+    std::string spinToken, sceneID, nodeID;
+    std::istringstream pathstream(path);
+    pathstream.get(); // ignore leading slash
+    getline(pathstream, spinToken, '/');
+    getline(pathstream, sceneID, '/');
+    getline(pathstream, nodeID, '/');
+
+    if ((spinToken!="SPIN") || (sceneID!=spinApp::Instance().getSceneID()))
+    {
+    	std::cout << "Warning: server is ignoring TCP message: " << path << std::endl;
+    	return 1;
+    }
+
     if (method == "subscribe")
     {
         std::string clientID(reinterpret_cast<const char*>(argv[1]));
@@ -299,6 +328,27 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
         lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
 
+    // any other scene message just gets forwarded to the generic (UDP)
+    // sceneCallback
+    else if (nodeID.empty()) // (std::string(path) == std::string("/SPIN/" + spinApp::Instance().getSceneID()))
+    {
+    	//std::cout << "... forwarding scene message " << std::endl;
+        spinBaseContext::sceneCallback(path, types, argv, argc, (void*) data, (void*) user_data);
+    }
+
+
+    else
+    {
+	    ReferencedNode* n = spinApp::Instance().sceneManager->getNode(nodeID);
+
+	    if (n)
+	    {
+	    	//std::cout << "... forwarding to node: " << n->getID() << " (" << path << ")" << std::endl;
+	    	spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
+	    }
+	}
+
+
     return 1;
 }
 
@@ -310,7 +360,6 @@ void spinServerContext::refreshSubscribers()
 	// other option: use ReferencedNode::stateDump, and SceneManager::refresh
 	// to send messages...
 
-	std::cout << "Got spinServerContext::refreshSubsribers" << std::endl;
     spinApp::Instance().sceneManager->refreshSubscribers(tcpClientAddrs_);
 }
 

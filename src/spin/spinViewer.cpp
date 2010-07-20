@@ -219,7 +219,7 @@ int main(int argc, char **argv)
     viewer.getWindows(windows);
     for (wIter=windows.begin(); wIter!=windows.end(); wIter++)
     {
-    	(*wIter)->setWindowName("spinViewer " + userID + "@" + sceneID);
+    	(*wIter)->setWindowName("spinViewer " + spin.getUserID() + "@" + spin.getSceneID());
 		if (hideCursor) (*wIter)->useCursor(false);
     }
 
