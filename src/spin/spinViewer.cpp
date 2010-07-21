@@ -318,9 +318,9 @@ int run(int argc, char **argv)
 // *****************************************************************************
 int main(int argc, char **argv)
 {
-    run(argc, argv);
+    int result = run(argc, argv);
 	usleep(100);
 	std::cout << "spinviewer exited normally." << std::endl;
 
-	return 0;
+	return result;
 }
