@@ -66,11 +66,7 @@
 
 extern pthread_mutex_t sceneMutex;
 
-
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-int main(int argc, char **argv)
+int run(int argc, char **argv)
 {
 	//std::cout <<"\nspinViewer launching..." << std::endl;
 
@@ -315,6 +311,14 @@ int main(int argc, char **argv)
     // make sure we're done in case we didn't quit via interrupt
 	spinListener.stop();
 
+}
+
+// *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************
+int main(int argc, char **argv)
+{
+    run(argc, argv);
 	usleep(100);
 	std::cout << "spinviewer exited normally." << std::endl;
 
