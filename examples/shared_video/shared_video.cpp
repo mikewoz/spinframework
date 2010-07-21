@@ -52,7 +52,7 @@ int kbhit(void)
 
 int main(int argc, char **argv)
 {
-    if (argc < 4)
+    if (argc != 4)
     {
         std::cerr << "Usage: shared_video <server_name> <shared_video1_path> <shared_video2_path>\n";
         return 1;
