@@ -224,12 +224,14 @@ void SharedVideoTexture::consumeFrame()
 	// get frames until the other process marks the end
 	bool end_loop = false;
 
+#if 0
     // make sure there's no sentinel
     {
         // Lock the mutex
         scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
         sharedBuffer->startPushing();   // tell appsink to give us buffers
     }
+#endif
 
     do
     {
@@ -242,36 +244,26 @@ void SharedVideoTexture::consumeFrame()
             end_loop = true;
             break;
         }
-        
 
-        if (!sharedBuffer->isPushing())
+        // got a new buffer, wait until we upload it in gl thread before notifying producer
         {
-            end_loop = true;
-            break;
-        }
-        else
-        {
-            
-            // got a new buffer, wait until we upload it in gl thread before notifying producer
+            boost::mutex::scoped_lock displayLock(displayMutex_);
+
+            if (killed_)
             {
-                boost::mutex::scoped_lock displayLock(displayMutex_);
-
-                if (killed_)
-                {
-                    sharedBuffer->stopPushing();   // tell appsink not to give us any more buffers
-                    end_loop = true;
-                }
-                else
-                {
-                    const boost::system_time timeout = boost::get_system_time() +
-                        boost::posix_time::milliseconds(100);
-                    textureUploadedCondition_.timed_wait(displayLock, timeout);
-                }
+                //sharedBuffer->stopPushing();   // tell appsink not to give us any more buffers
+                end_loop = true;
             }
-
-            // Notify the other process that the buffer status has changed
-            sharedBuffer->notifyProducer();
+            else
+            {
+                const boost::system_time timeout = boost::get_system_time() +
+                    boost::posix_time::milliseconds(100);
+                textureUploadedCondition_.timed_wait(displayLock, timeout);
+            }
         }
+
+        // Notify the other process that the buffer status has changed
+        sharedBuffer->notifyProducer();
         // mutex is released (goes out of scope) here
     }
     while (!end_loop);
@@ -283,9 +275,7 @@ void SharedVideoTexture::consumeFrame()
     //shared_memory_object::remove(textureID.c_str());
     // shouldn't we also destroy our shm and region objects?
 
-    
     signalKilled();
-
 }
 
 // ===================================================================
