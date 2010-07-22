@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(SPINFramework, [0.3.2], [https://sourceforge.net/apps/trac/spinframework/])
+AC_INIT(SPINFramework, [0.3.3], [https://sourceforge.net/apps/trac/spinframework/])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
