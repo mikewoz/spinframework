@@ -164,28 +164,44 @@ class spinApp
 // case, the macros always check that the passed SceneManager (s) is a server.
 
 #define SCENE_MSG(types, ...) \
-    if (spinApp::Instance().getContext()->isServer()) \
-    lo_send(spinApp::Instance().getContext()->lo_txAddr, \
-            ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), types, ##__VA_ARGS__, LO_ARGS_END)
+    if (spinApp::Instance().getContext() && \
+	    (spinApp::Instance().getContext()->isRunning()) && \
+		(spinApp::Instance().getContext()->isServer()) ) \
+        lo_send(spinApp::Instance().getContext()->lo_txAddr, \
+			("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
+			types, ##__VA_ARGS__, LO_ARGS_END)
 
 #define SCENE_LO_MSG(msg) \
-    if (spinApp::Instance().getContext()->isServer()) \
-    lo_send_message(spinApp::Instance().getContext()->lo_txAddr, ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), msg)
+    if (spinApp::Instance().getContext() && \
+	    (spinApp::Instance().getContext()->isRunning()) && \
+		(spinApp::Instance().getContext()->isServer()) ) \
+        lo_send_message(spinApp::Instance().getContext()->lo_txAddr, \
+			("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), msg)
 
 #define SCENE_LO_MSG_TCP(msg, addr) \
-    if (spinApp::Instance().getContext()->isServer()) \
-        lo_send_message((addr), ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), msg)
+    if (spinApp::Instance().getContext() && \
+	    (spinApp::Instance().getContext()->isRunning()) && \
+		(spinApp::Instance().getContext()->isServer()) ) \
+        lo_send_message((addr), \
+			("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
+			msg)
 
 #define NODE_MSG(pNode, types, ...) \
-    if (spinApp::Instance().getContext()->isServer()) \
-    lo_send(spinApp::Instance().getContext()->lo_txAddr, \
-            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + std::string(pNode->id->s_name)).c_str(), \
+    if (spinApp::Instance().getContext() && \
+	    (spinApp::Instance().getContext()->isRunning()) && \
+		(spinApp::Instance().getContext()->isServer()) ) \
+    	lo_send(spinApp::Instance().getContext()->lo_txAddr, \
+            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
+			std::string(pNode->id->s_name)).c_str(), \
             types, ##__VA_ARGS__, LO_ARGS_END)
 
 #define NODE_LO_MSG(s, pNode, msg) \
-    if (spinApp::Instance().getContext()->isServer()) \
-    lo_send_message(spinApp::Instance().getContext()->lo_txAddr, \
-            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + std::string(pNode->id->s_name)).c_str(), msg)
+    if (spinApp::Instance().getContext() && \
+	    (spinApp::Instance().getContext()->isRunning()) && \
+		(spinApp::Instance().getContext()->isServer()) ) \
+        lo_send_message(spinApp::Instance().getContext()->lo_txAddr, \
+            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
+			std::string(pNode->id->s_name)).c_str(), msg)
 
 
 // backwards compatibility (TODO: replace all BROADCAST messages with NODE_MSG)

@@ -151,7 +151,6 @@ int main(int argc, char **argv)
 
 	
 	// send a userRefresh message:
-	//spinApp::Instance().SceneMessage("s", "userRefresh", LO_ARGS_END);
     SCENE_MSG("s", "userRefresh");
 	
 	// *************************************************************************

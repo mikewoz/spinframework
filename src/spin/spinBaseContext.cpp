@@ -120,7 +120,7 @@ spinBaseContext::spinBaseContext() :
 spinBaseContext::~spinBaseContext()
 {
     this->stop();
-
+	
     lo_address_free(lo_rxAddr);
     lo_address_free(lo_txAddr);
 	lo_address_free(lo_infoAddr);
@@ -132,6 +132,7 @@ spinBaseContext::~spinBaseContext()
     lo_server_free(lo_infoServ);
     lo_server_free(lo_tcpRxServer_);
 	lo_server_free(lo_rxServ_);
+
 }
 
 void spinBaseContext::setLog(spinLog &log)
@@ -172,11 +173,13 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
         std::cout << "spinBaseContext: could not prepare child thread" << std::endl;
         return false;
     }
+	/*
     if (pthread_attr_setdetachstate(&pthreadAttr, PTHREAD_CREATE_DETACHED) < 0)
     {
         std::cout << "spinBaseContext: could not prepare child thread" << std::endl;
         return false;
     }
+	*/
     if (pthread_create( &pthreadID, &pthreadAttr, threadFunction, this) < 0)
     {
         std::cout << "spinBaseContext: could not create new thread" << std::endl;
@@ -193,16 +196,12 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 
 void spinBaseContext::stop()
 {
-    if (isRunning())
-    {
-        std::cout << "Stopping spinBaseContext..." << std::endl;
-        signalStop = true;
-        //while (running) usleep(10);
-        std::cout << "Stopped spinBaseContext..." << std::endl;
-    }
-    if (pthreadID != 0 and pthread_join(pthreadID, NULL) == ESRCH)
-        std::cerr << "WARNING: No thread could be found corresponding " << 
-            "to that specified by the given thread ID to join" << std::endl; 
+    if (isRunning()) signalStop = true;
+
+    if (pthreadID != 0) 
+	{
+		int ret = pthread_join(pthreadID, NULL);
+	}
 }
 
 int spinBaseContext::connectionCallback(const char *path, 
