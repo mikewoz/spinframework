@@ -127,9 +127,6 @@ private:
 	boost::mutex displayMutex_;
 	boost::condition_variable textureUploadedCondition_;
 	SharedVideoBuffer *sharedBuffer;
-		
-	boost::interprocess::shared_memory_object *shm_;
-	boost::interprocess::mapped_region *region_;
 #endif
 		
 };
