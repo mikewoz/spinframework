@@ -240,7 +240,7 @@ void *spinServerContext::spinServerThread(void *arg)
         //
 
         if (recv<=0) {
-        	usleep(10);
+        	usleep(1000);
         }
 
     }

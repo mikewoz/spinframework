@@ -158,19 +158,22 @@ void *spinClientContext::spinClientThread(void *arg)
     // registerUser needs the context to be running (since it sends messages)
     spin.registerUser();
 
-    // TIMEOUT in liblo was 10 ; zero here assumes that there is some other
-    // processing or sleeping going on to manage CPU and mutex acquisition
+    // TIMEOUT in liblo was 10; We set it to zero, and sleep only if there are
+    // no received messages. ie, if there are messages, we eat them as fast as
+    // possible; otherwise, we let the CPU relax a bit
     static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
     {
-        lo_server_recv_noblock(context->lo_syncServ, TIMEOUT);
-        lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
-        lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
-        lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
-        // do nothing (assume the app is doing updates - eg, in a draw loop)
+    	int recv = 0; // bytes received (note: might not be accurate for TCP)
+    	recv += lo_server_recv_noblock(context->lo_syncServ, TIMEOUT);
+    	recv += lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
+    	recv += lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
+    	recv += lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
 
-        // TODO: this should sleep?
-        usleep(10);
+        if (recv<=0) {
+        	usleep(1000);
+        }
+
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();
