@@ -48,11 +48,13 @@
 #include "SceneManager.h"
 #include "spinLog.h"
 #include "nodeVisitors.h"
+#include "spinDefaults.h"
 
 extern pthread_mutex_t sceneMutex;
 
 spinServerContext::spinServerContext()
 {
+    using namespace spin_defaults;
     // Important: fist thing to do is set the context mode (client vs server)
     mode = SERVER_MODE;
 
@@ -60,9 +62,8 @@ spinServerContext::spinServerContext()
     spinApp &spin = spinApp::Instance();
 
     // override sender and receiver addresses in server mode:
-    lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), "54324");
-    lo_txAddr = lo_address_new("226.0.0.1", "54323");
-
+    lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT);
+    lo_txAddr = lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT);
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
@@ -246,6 +247,7 @@ void *spinServerContext::spinServerThread(void *arg)
     context->running = false;
 
 	spin.destroyScene();
+    return arg;
 }
 
 /**

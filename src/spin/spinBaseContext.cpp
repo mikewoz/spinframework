@@ -63,6 +63,7 @@
 #include "spinLog.h"
 #include "nodeVisitors.h"
 #include "SoundConnection.h"
+#include "spinDefaults.h"
 
 #define UNUSED(x) ( (void)(x) )
 
@@ -86,6 +87,7 @@ spinBaseContext::spinBaseContext() :
     lo_rxServ_(NULL),
     pthreadID(0)
 {
+    using namespace spin_defaults;
     signalStop = true;
     running = false;
 
@@ -96,10 +98,10 @@ spinBaseContext::spinBaseContext() :
 	lo_tcpRxServer_ = NULL;
 	
     // set default addresses (can be overridden):
-    lo_infoAddr = lo_address_new("226.0.0.1", "54320");
-    lo_rxAddr = lo_address_new("226.0.0.1", "54323");
-    lo_txAddr = lo_address_new("226.0.0.1", "54324");
-    lo_syncAddr = lo_address_new("226.0.0.1", "54321");
+    lo_infoAddr = lo_address_new(MULTICAST_GROUP, INFO_UDP_PORT);
+    lo_rxAddr = lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT);
+    lo_txAddr = lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT);
+    lo_syncAddr = lo_address_new(MULTICAST_GROUP, SYNC_UDP_PORT);
 
     // override infoPort based on environment variable:
     char *infoPortStr = getenv("AS_INFOPORT");
@@ -200,7 +202,7 @@ void spinBaseContext::stop()
 
     if (pthreadID != 0) 
 	{
-		int ret = pthread_join(pthreadID, NULL);
+		pthread_join(pthreadID, NULL);
 	}
 }
 

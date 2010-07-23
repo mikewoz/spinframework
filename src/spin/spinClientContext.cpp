@@ -46,21 +46,23 @@
 #include "spinClientContext.h"
 #include "spinApp.h"
 #include "SceneManager.h"
+#include "spinDefaults.h"
 
 
 spinClientContext::spinClientContext() : 
-    doSubscribe_(true),
     lo_syncServ(NULL),
+    doSubscribe_(true),
     lo_serverTCPAddr(NULL)
 {
-    // Important: fist thing to do is set the context mode (client vs server)
+    using namespace spin_defaults;
+    // Important: first thing to do is set the context mode (client vs server)
     mode = CLIENT_MODE;
 
     // Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
-    lo_rxAddr = lo_address_new("226.0.0.1", "54323");
-    lo_txAddr = lo_address_new("226.0.0.1", "54324");
+    lo_rxAddr = lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT);
+    lo_txAddr = lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT);
 }
 
 spinClientContext::~spinClientContext()
@@ -189,6 +191,7 @@ void *spinClientContext::spinClientThread(void *arg)
     context->running = false;
 
 	spin.destroyScene();
+    return arg;
 }
 
 int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo_arg **argv, int argc,
