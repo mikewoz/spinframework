@@ -224,7 +224,7 @@ void *spinServerContext::spinServerThread(void *arg)
         int recv = 0; // bytes received (note: might not be accurate for TCP)
         recv += lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
         recv += lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
-        recv += lo_server_recv_noblock(context->lo_tcpRxServer_, 10);
+        recv += lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
 
         // Need to sleep a little bit so that updates have time. 2 reasons:
         //
