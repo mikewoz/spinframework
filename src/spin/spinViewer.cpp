@@ -312,6 +312,7 @@ int run(int argc, char **argv)
     // make sure we're done in case we didn't quit via interrupt
 	spinListener.stop();
 
+    return 0;
 }
 
 // *****************************************************************************
