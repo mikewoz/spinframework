@@ -45,12 +45,12 @@
 #include "ReferencedNode.h"
 
 /**
- * \brief A node that can be used to measure relations to another node.
+ * \brief Reports geometric measurements in relation to another node
  * 
  * 
  * A targetNode must be specified, and then measurements (such as distance,
- * incidence of orientation, etc.) are computed in the callback and can be
- * reported with different levels of detail.
+ * relative orientation, etc.) are computed and can be reported with varying
+ * levels of detail.
  */
 class MeasurementNode : public ReferencedNode
 {
@@ -60,13 +60,44 @@ public:
 	MeasurementNode(SceneManager *sceneManager, char *initID);
 	virtual ~MeasurementNode();
 	
+	/**
+	 * Level of reporting that is sent (see setReportingLevel for more details)
+	 */
+	enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES, REPORT_ALL_ANGLES };
+
+	/**
+	 * The update callback for MeasurementNode checks to see if the target's or
+	 * the MeasurementNode's global matrix has changed (ie, whether it has been
+	 * moved or not). If so, it updates the internal matrices, and calls
+	 * sendMeasurements()
+	 */
 	virtual void callbackUpdate();
 
+	/**
+	 * sendMeasurements is where the actual computation takes place, and,
+	 * depending on the reportMode, the measurements are sent out on the network
+	 */
+	void sendMeasurements();
+
+	/**
+	 * MeasurementNode requires a targetNode to be set, which defines which node
+	 * in the scene is being measured.
+	 */
 	void setTarget (const char *targetID);
-	void setReportingLevel (int level);
+
+	/**
+	 * There are several levels of reporting:
+	 *
+	 * REPORT_NONE			sends no measurements
+	 * REPORT_BASIC			sends distance and absolute direction (independent) of and orientations
+	 * REPORT_ANGLES		sends above info, plus relative angle of target with respect to the MeasurementNode's current position and orientation
+	 * REPORT_ALL_ANGLES	sends above info, plus angles from the target's perspective
+	 */
+	void setReportingLevel (reportMode level);
 	
-	const char* getTarget() { return this->targetName->s_name; }
-	int getReportingLevel() { return this->reportingLevel; }
+
+	const char* getTarget() { return this->targetName_->s_name; }
+	int getReportingLevel() { return (int) this->reportingLevel_; }
 	
 	
 	/**
@@ -75,23 +106,12 @@ public:
 	 */
 	virtual std::vector<lo_message> getState();
 	
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
-	
-	
 private:
 	
-	//osg::ref_ptr<ReferencedNode> targetNode;
-	t_symbol *targetName;
-	int reportingLevel;
+	t_symbol *targetName_;
+	reportMode reportingLevel_;
 	
-	
-	osg::Matrix thisMatrix, targetMatrix;
-	
+	osg::Matrix thisMatrix_, targetMatrix_;
 };
 
 

@@ -47,9 +47,6 @@
 
 using namespace std;
 
-//extern SceneManager *sceneManager;
-
-
 
 // *****************************************************************************
 // constructor:
@@ -58,17 +55,13 @@ MeasurementNode::MeasurementNode (SceneManager *sceneManager, char *initID) : Re
     this->setName(string(id->s_name) + ".MeasurementNode");
     nodeType = "MeasurementNode";
 
-    targetName = gensym("NULL");
-    reportingLevel = 2;
+    targetName_ = gensym("NULL");
+    reportingLevel_ = MeasurementNode::REPORT_ANGLES;
 
-    thisMatrix.makeIdentity();
-    targetMatrix.makeIdentity();
+    thisMatrix_.makeIdentity();
+    targetMatrix_.makeIdentity();
 
     this->setNodeMask(STATSDATA_NODE_MASK); // nodemask info in spinUtil.h
-
-
-    //thisMatrix = new osg::Matrixd();
-    //targetMatrix = new osg::Matrixd();
 }
 
 // *****************************************************************************
@@ -80,30 +73,40 @@ MeasurementNode::~MeasurementNode()
 
 void MeasurementNode::callbackUpdate()
 {
-
     ReferencedNode::callbackUpdate();
 
-    osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(targetName->s_thing);
+    osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(targetName_->s_thing);
     if (!targetNode.valid()) return;
 
-    osg::Matrix mthis = osg::computeLocalToWorld(this->currentNodePath);
-    osg::Matrix mtarget = osg::computeLocalToWorld(targetNode->currentNodePath);
+    osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath);
+    osg::Matrixd mtarget = osg::computeLocalToWorld(targetNode->currentNodePath);
 
     // check if there is a change in the matrices:
-    if ((thisMatrix==mthis) && (targetMatrix==mtarget))
+    if ((thisMatrix_==mthis) && (targetMatrix_==mtarget))
     {
         return;
     } else
     {
-        thisMatrix = mthis;
-        targetMatrix = mtarget;
+        thisMatrix_ = mthis;
+        targetMatrix_ = mtarget;
     }
 
-    osg::Vec3 connection_vector = targetMatrix.getTrans() - thisMatrix.getTrans();
+    if ((int)reportingLevel_ > 0) sendMeasurements();
+}
 
-    osg::Quat srcQuat, snkQuat;
-    thisMatrix.get(srcQuat);
-    targetMatrix.get(snkQuat);
+void MeasurementNode::sendMeasurements()
+{
+    std::vector<lo_message> msgs;
+    lo_message msg;
+
+    osg::Vec3 srcTrans, snkTrans, srcScale, snkScale;
+    osg::Quat srcQuat, snkQuat, srcScaleQuat, snkScaleQuat;
+
+    thisMatrix_.decompose(srcTrans, srcQuat, srcScale, srcScaleQuat);
+    targetMatrix_.decompose(snkTrans, snkQuat, snkScale, snkScaleQuat);
+
+    osg::Vec3 connection_vector = snkTrans - srcTrans;
+
 
     // let's also compute the orientations projected on the (local) horizontal
     // and vertical planes (ie, azimuth and elevation respectively)
@@ -116,30 +119,12 @@ void MeasurementNode::callbackUpdate()
     osg::Vec3 snk_right = snkQuat * osg::X_AXIS;
     osg::Vec3 snk_up    = snkQuat * osg::Z_AXIS;
 
-    // NOTE: all output angles are in RADIANS::
+    // NOTE: all output angles are in RADIANS!
 
-    if (reportingLevel > 0)
+    if (reportingLevel_ > 0)
     {
         // direction: angle of connection_vector (projected on XY plane):
         float direction = AngleBetweenVectors(connection_vector, osg::Y_AXIS, 3);
-
-        // relative incidence between source and the connection_vector:
-        float srcIncidence = AngleBetweenVectors(src_dir, connection_vector, 3);
-
-        // relative incidence between sink and the connection_vector:
-        float snkIncidence = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 3);
-
-        /*
-        BROADCAST(this, "sf", "distance", connection_vector.length());
-        BROADCAST(this, "sf", "direction", direction);
-        //BROADCAST(this, "sf", "incidence", (srcIncidence / osg::PI) * (snkIncidence / osg::PI) );
-        //BROADCAST(this, "sf", "incidence", srcIncidence * (osg::PI-snkIncidence) );
-        BROADCAST(this, "sf", "incidence", srcIncidence );
-        BROADCAST(this, "sf", "targetIncidence", snkIncidence );
-        */
-
-        std::vector<lo_message> msgs;
-        lo_message msg;
 
         msg = lo_message_new();
         lo_message_add( msg, "sf", "distance", connection_vector.length() );
@@ -148,60 +133,68 @@ void MeasurementNode::callbackUpdate()
         msg = lo_message_new();
         lo_message_add( msg, "sf", "direction", direction );
         msgs.push_back(msg);
-
-        msg = lo_message_new();
-        lo_message_add( msg, "sf", "incidence", srcIncidence );
-        msgs.push_back(msg);
-
-        msg = lo_message_new();
-        lo_message_add( msg, "sf", "targetIncidence", snkIncidence );
-        msgs.push_back(msg);
-
-        spinApp::Instance().NodeBundle(this->id, msgs);
-
     }
 
-    if (reportingLevel>1)
+    if (reportingLevel_ > 1)
     {
+        // Azimuth: source incidence projected on XY plane (Z is ignored)
+        float srcIncidenceAzim = AngleBetweenVectors(src_dir, connection_vector, 3);
 
-        // Azimuth: incidence projected on XY plane (Z is ignored)
-        float srcIncidenceAzim = AngleBetweenVectors(connection_vector, src_dir, 3);
+        // Elevation: source incidence projected on XZ plane (Y is ignored)
+        float srcIncidenceElev = AngleBetweenVectors(src_up, connection_vector, 2);
 
-        // Elevation: incidence projected on XZ plane (Y is ignored)
-        float srcIncidenceElev = AngleBetweenVectors(connection_vector, src_up, 2);
+        // Roll: source incidence projected on YZ plane (X is ignored)
+        float srcIncidenceRoll = AngleBetweenVectors(src_right, connection_vector, 1);
 
-        // Roll: incidence projected on YZ plane (X is ignored)
-        float srcIncidenceRoll = AngleBetweenVectors(connection_vector, src_right, 1);
+        msg = lo_message_new();
+        lo_message_add( msg, "sf", "azimuth", srcIncidenceAzim);
+        msgs.push_back(msg);
 
-        BROADCAST(this, "sf", "azimuth", srcIncidenceAzim);
-        BROADCAST(this, "sf", "elevation", srcIncidenceElev);
-        BROADCAST(this, "sf", "roll", srcIncidenceRoll);
+        msg = lo_message_new();
+        lo_message_add( msg, "sf", "elevation", srcIncidenceElev);
+        msgs.push_back(msg);
 
-
-        /*
-        osg::Quat rot = RotationBetweenVectors(src_dir, connection_vector);
-        osg::Vec3 eulers = QuatToEuler(rot);
-        BROADCAST(this, "sf", "azimuth", eulers.z());
-        BROADCAST(this, "sf", "elevation", eulers.x());
-        BROADCAST(this, "sf", "roll", eulers.y());
-        */
+        msg = lo_message_new();
+        lo_message_add( msg, "sf", "roll", srcIncidenceRoll);
+        msgs.push_back(msg);
     }
 
+    if (reportingLevel_ > 2)
+    {
+		// incidence between sink (TARGET) and the connection_vector:
+		float snkIncidenceAzim = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 3);
+		float snkIncidenceElev = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_up, connection_vector, 2);
+		float snkIncidenceRoll = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_right, connection_vector, 1);
+
+        msg = lo_message_new();
+        lo_message_add( msg, "sf", "targetAzimuth", snkIncidenceAzim );
+        msgs.push_back(msg);
+
+        msg = lo_message_new();
+        lo_message_add( msg, "sf", "targetElevation", snkIncidenceElev);
+        msgs.push_back(msg);
+
+        msg = lo_message_new();
+        lo_message_add( msg, "sf", "targetRoll", snkIncidenceRoll);
+        msgs.push_back(msg);
+    }
+
+    spinApp::Instance().NodeBundle(this->id, msgs);
 }
 
 // *****************************************************************************
 void MeasurementNode::setTarget (const char *targetID)
 {
-    if (targetName != gensym(targetID))
+    if (targetName_ != gensym(targetID))
     {
-        targetName = gensym(targetID);
+        targetName_ = gensym(targetID);
         BROADCAST(this, "ss", "setTarget", getTarget());
     }
 }
 
-void MeasurementNode::setReportingLevel (int level)
+void MeasurementNode::setReportingLevel (reportMode level)
 {
-    this->reportingLevel = level;
+    this->reportingLevel_ = level;
     BROADCAST(this, "si", "setReportingLevel", getReportingLevel());
 }
 
