@@ -107,7 +107,7 @@ class spinBaseContext
         lo_address lo_infoAddr;
         /** Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters. */
         lo_address lo_syncAddr;
-        lo_server lo_infoServ;
+        lo_server lo_infoServ_;
         lo_server lo_rxServ_;
         static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
@@ -127,6 +127,7 @@ class spinBaseContext
         bool running;
         spinContextMode mode;
         void setLog(spinLog &log);
+        virtual void createServers() = 0;
         /**
          * All contexts would probably like to listen to infoPort broadcasts.
          * A client can listen for info about the server, such as the correct

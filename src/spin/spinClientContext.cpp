@@ -42,6 +42,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 #include "spinClientContext.h"
 #include "spinApp.h"
@@ -79,17 +80,14 @@ bool spinClientContext::start()
 // FIXME: Push this up to base context
 void spinClientContext::createServers()
 {
+    using boost::lexical_cast;
+    using std::string;
     // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
     lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
     std::cout << "  TCP channel:\t\t\t" << lo_server_get_url(lo_tcpRxServer_) <<
         std::endl;
 
-    // set up OSC event listener:
-
-    if (isMulticastAddress(lo_address_get_hostname(lo_rxAddr)))
-        lo_rxServ_ = lo_server_new_multicast(lo_address_get_hostname(lo_rxAddr), lo_address_get_port(lo_rxAddr), oscParser_error);
-    else
-        lo_rxServ_ = lo_server_new(lo_address_get_port(lo_rxAddr), oscParser_error);
+    spinBaseContext::createServers();
 
 #if 0
     // add OSC callback methods to match various incoming messages:
@@ -97,21 +95,7 @@ void spinClientContext::createServers()
     lo_server_add_method(lo_rxServ_, NULL, NULL, debugCallback, NULL);
 #endif
 
-    // set up infoPort listener thread:
-    if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
-    {
-        lo_infoServ = lo_server_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
-    } else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
-    {
-        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
-        int sock = lo_server_get_socket_fd(lo_infoServ);
-        int sockopt = 1;
-        setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
-
-    } else {
-        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
-    }
-    lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
+    lo_server_add_method(lo_infoServ_, NULL, NULL, infoCallback, this);
     lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
 
     lo_server_add_method(lo_rxServ_,
@@ -124,8 +108,26 @@ void spinClientContext::createServers()
     if (isMulticastAddress(lo_address_get_hostname(lo_syncAddr)))
     {
         lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(lo_syncAddr), lo_address_get_port(lo_syncAddr), oscParser_error);
+        if (lo_syncServ == 0)
+        {
+            std::cerr << "Sync server creation on port " << lo_address_get_port(lo_syncAddr) << 
+                " failed, trying a random port" << std::endl;
+            std::string addr(lo_address_get_hostname(lo_syncAddr));
+            lo_address_free(lo_syncAddr);
+            lo_syncServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
+            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+        }
     } else {
         lo_syncServ = lo_server_new(lo_address_get_port(lo_syncAddr), oscParser_error);
+        if (lo_syncServ == 0)
+        {
+            std::cerr << "Sync server creation on port " << lo_address_get_port(lo_syncAddr) << 
+                " failed, trying a random port" << std::endl;
+            std::string addr(lo_address_get_hostname(lo_syncAddr));
+            lo_address_free(lo_syncAddr);
+            lo_syncServ = lo_server_new(NULL, oscParser_error);
+            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+        }
     }
     lo_server_add_method(lo_syncServ, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
             NULL, syncCallback, NULL);
@@ -166,7 +168,7 @@ void *spinClientContext::spinClientThread(void *arg)
     {
     	int recv = 0; // bytes received (note: might not be accurate for TCP)
     	recv += lo_server_recv_noblock(context->lo_syncServ, TIMEOUT);
-    	recv += lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
+    	recv += lo_server_recv_noblock(context->lo_infoServ_, TIMEOUT);
     	recv += lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
     	recv += lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
 

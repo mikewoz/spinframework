@@ -45,6 +45,7 @@
 namespace spin_defaults {
     static const char *INFO_UDP_PORT = "54320";
     static const char *SYNC_UDP_PORT = "54321";
+    static const char *SERVER_TCP_PORT = "54322";
     static const char *CLIENT_RX_UDP_PORT = "54323";
     static const char *CLIENT_TX_UDP_PORT = "54324";
     static const char *SERVER_RX_UDP_PORT = CLIENT_TX_UDP_PORT; // "54324"

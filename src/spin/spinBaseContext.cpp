@@ -43,6 +43,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <signal.h>
+#include <boost/lexical_cast.hpp>
 
 #include <osgDB/Registry>
 #include <osgIntrospection/Type>
@@ -83,7 +84,7 @@ spinBaseContext::spinBaseContext() :
     lo_txAddr(NULL),
     lo_infoAddr(NULL),
     lo_syncAddr(NULL),
-    lo_infoServ(NULL),
+    lo_infoServ_(NULL),
     lo_rxServ_(NULL),
     pthreadID(0)
 {
@@ -93,7 +94,7 @@ spinBaseContext::spinBaseContext() :
 
     signal(SIGINT, sigHandler);
 
-	lo_infoServ = NULL;
+	lo_infoServ_ = NULL;
 	lo_rxServ_ = NULL;
 	lo_tcpRxServer_ = NULL;
 	
@@ -131,7 +132,7 @@ spinBaseContext::~spinBaseContext()
 	// stop sceneManager OSC threads:
     //usleep(100);
 	
-    lo_server_free(lo_infoServ);
+    lo_server_free(lo_infoServ_);
     lo_server_free(lo_tcpRxServer_);
 	lo_server_free(lo_rxServ_);
 
@@ -353,7 +354,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                             lo_message_add_string(msg, (const char*) argv[i] );
                         }
                     }
-                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
+                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
 
                 }
                 theArgs.push_back( false ); // serverSide arg
@@ -424,7 +425,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                             lo_message_add_string(msg, (const char*) argv[i] );
                         }
                     }
-                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
+                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
                 }
                 theArgs.push_back( false ); // serverSide arg
             }
@@ -492,7 +493,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                 lo_message_add_string(msg, (const char*) argv[i] );
             }
         }
-        lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
+        lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
 
     }
 
@@ -521,7 +522,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                         lo_message_add_string(msg, (const char*) argv[i] );
                     }
                 }
-                lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ, path, msg);
+                lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
             }
         }
     }
@@ -712,4 +713,83 @@ void spinBaseContext::oscParser_error(int num, const char *msg, const char *path
 {
     printf("OSC (liblo) error %d in path %s: %s\n", num, path, msg);
     fflush(stdout);
+}
+
+/// this method is used by both spinClientContext and spinServerContext
+void spinBaseContext::createServers()
+{
+    using boost::lexical_cast;
+    using std::string;
+    // set up OSC event listener:
+
+    if (isMulticastAddress(lo_address_get_hostname(lo_rxAddr)))
+    {
+        lo_rxServ_ = lo_server_new_multicast(lo_address_get_hostname(lo_rxAddr), lo_address_get_port(lo_rxAddr), oscParser_error);
+        if (lo_rxServ_ == 0)
+        {
+            std::cerr << "Multicast server creation on port " << lo_address_get_port(lo_rxAddr) << 
+                " failed, trying a random port" << std::endl;
+            std::string addr(lo_address_get_hostname(lo_rxAddr));
+            lo_rxServ_ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
+            lo_address_free(lo_rxAddr);
+            lo_rxAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_rxServ_)).c_str());
+        }
+    }
+    else
+    {
+        lo_rxServ_ = lo_server_new(lo_address_get_port(lo_rxAddr), oscParser_error);
+        if (lo_rxServ_ == 0)
+        {
+            std::cerr << "UDP listener creation on port " << lo_address_get_port(lo_rxAddr) << 
+                " failed, trying a random port" << std::endl;
+            lo_rxServ_ = lo_server_new(NULL, oscParser_error);
+            std::string addr(lo_address_get_hostname(lo_rxAddr));
+            lo_address_free(lo_rxAddr);
+            lo_rxAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_rxServ_)).c_str());
+        }
+    }
+
+    // set up infoPort listener thread:
+    if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
+    {
+        lo_infoServ_ = lo_server_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
+        if (lo_infoServ_ == 0)
+        {
+            std::cerr << "Multicast info server creation on port " << lo_address_get_port(lo_infoAddr) << 
+                " failed, trying a random port" << std::endl;
+            std::string addr(lo_address_get_hostname(lo_infoAddr));
+            lo_address_free(lo_infoAddr);
+            lo_infoServ_ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
+            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+        }
+    } 
+    else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
+    {
+        lo_infoServ_ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+        if (lo_infoServ_ == 0)
+        {
+            std::cerr << "Info server creation on port " << lo_address_get_port(lo_infoAddr) << 
+                " failed, trying a random port" << std::endl;
+            std::string addr(lo_address_get_hostname(lo_infoAddr));
+            lo_address_free(lo_infoAddr);
+            lo_infoServ_ = lo_server_new(NULL, oscParser_error);
+            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+        }
+        int sock = lo_server_get_socket_fd(lo_infoServ_);
+        int sockopt = 1;
+        setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
+    } 
+    else 
+    {
+        lo_infoServ_ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
+        if (lo_infoServ_ == 0)
+        {
+            std::cerr << "Info server creation on port " << lo_address_get_port(lo_infoAddr) << 
+                " failed, trying a random port" << std::endl;
+            std::string addr(lo_address_get_hostname(lo_infoAddr));
+            lo_address_free(lo_infoAddr);
+            lo_infoServ_ = lo_server_new(NULL, oscParser_error);
+            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+        }
+    }
 }

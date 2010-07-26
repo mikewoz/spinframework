@@ -52,7 +52,7 @@
 
 extern pthread_mutex_t sceneMutex;
 
-spinServerContext::spinServerContext()
+spinServerContext::spinServerContext() : syncThreadID(0)
 {
     using namespace spin_defaults;
     // Important: fist thing to do is set the context mode (client vs server)
@@ -96,7 +96,7 @@ void spinServerContext::startSyncThread()
     {
         std::cout << "spinServerContext: could not prepare sync thread" << std::endl;
     }
-    if (pthread_attr_setdetachstate(&syncthreadAttr, PTHREAD_CREATE_DETACHED) < 0)
+    if (pthread_attr_setdetachstate(&syncthreadAttr, PTHREAD_CREATE_JOINABLE) < 0)
     {
         std::cout << "spinServerContext: could not prepare sync thread" << std::endl;
     }
@@ -110,37 +110,25 @@ void spinServerContext::startSyncThread()
 void spinServerContext::createServers()
 {
     // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
-    lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
+    lo_tcpRxServer_ = lo_server_new_with_proto(spin_defaults::SERVER_TCP_PORT, LO_TCP, oscParser_error);
+    // liblo will try a random free port if the default failed
+    if (lo_tcpRxServer_ == 0)
+    {
+        std::cerr << "TCP server creation on port " << spin_defaults::SERVER_TCP_PORT << 
+            " failed, trying a random port" << std::endl;
+        lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
+    }
+
     std::cout << "  TCP channel:\t\t\t" << lo_server_get_url(lo_tcpRxServer_) <<
         std::endl;
 
-    // set up OSC event listener:
-
-    if (isMulticastAddress(lo_address_get_hostname(lo_rxAddr)))
-        lo_rxServ_ = lo_server_new_multicast(lo_address_get_hostname(lo_rxAddr), lo_address_get_port(lo_rxAddr), oscParser_error);
-    else
-        lo_rxServ_ = lo_server_new(lo_address_get_port(lo_rxAddr), oscParser_error);
-
+    spinBaseContext::createServers();
 #if 0
     // add OSC callback methods to match various incoming messages:
     // oscCallback_debug() will match any path and args:
     lo_server_add_method(lo_rxServ_, NULL, NULL, debugCallback, NULL);
 #endif
 
-    // set up infoPort listener thread:
-    if (isMulticastAddress(lo_address_get_hostname(lo_infoAddr)))
-    {
-        lo_infoServ = lo_server_new_multicast(lo_address_get_hostname(lo_infoAddr), lo_address_get_port(lo_infoAddr), oscParser_error);
-    } else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
-    {
-        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
-        int sock = lo_server_get_socket_fd(lo_infoServ);
-        int sockopt = 1;
-        setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &sockopt, sizeof(sockopt));
-
-    } else {
-        lo_infoServ = lo_server_new(lo_address_get_port(lo_infoAddr), oscParser_error);
-    }
     // add info channel callback (receives pings from client apps):
     //lo_server_add_method(lo_infoServ, NULL, NULL, infoCallback, this);
 
@@ -148,7 +136,8 @@ void spinServerContext::createServers()
     lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
 
     // add scene callback
-    lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, sceneCallback, NULL);
+    lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
+            NULL, sceneCallback, NULL);
 
 	std::cout << "  SceneManager receiving on:\t" <<
         lo_address_get_url(lo_rxAddr) << std::endl;
@@ -222,7 +211,7 @@ void *spinServerContext::spinServerThread(void *arg)
         pthread_mutex_unlock(&sceneMutex);
 
         int recv = 0; // bytes received (note: might not be accurate for TCP)
-        recv += lo_server_recv_noblock(context->lo_infoServ, TIMEOUT);
+        recv += lo_server_recv_noblock(context->lo_infoServ_, TIMEOUT);
         recv += lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
         recv += lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
 
@@ -239,12 +228,12 @@ void *spinServerContext::spinServerThread(void *arg)
         //
         //
 
-        if (recv<=0) {
+        if (recv == 0)
         	usleep(1000);
-        }
-
     }
     context->running = false;
+    if (context->syncThreadID != 0)
+       pthread_join(context->syncThreadID, NULL);
 
 	spin.destroyScene();
     return arg;
@@ -265,8 +254,7 @@ void *spinServerContext::syncThread(void * /*arg*/)
     spin.setSyncStart(startTick);
     osg::Timer_t frameTick = startTick;
 
-    //while (spin.isRunning())
-    while (true)
+    while (spin.getContext()->isRunning())
     {
         //usleep(1000000 * 0.25); // 1/4 second sleep
         usleep(1000000 * 0.5); // 1/2 second sleep
