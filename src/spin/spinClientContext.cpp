@@ -170,10 +170,8 @@ void *spinClientContext::spinClientThread(void *arg)
     	recv += lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
     	recv += lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
 
-        if (recv<=0) {
+        if (recv ==0)
         	usleep(1000);
-        }
-
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();
