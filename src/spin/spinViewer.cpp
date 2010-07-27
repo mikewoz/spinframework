@@ -320,8 +320,14 @@ int run(int argc, char **argv)
 // *****************************************************************************
 int main(int argc, char **argv)
 {
-    int result = run(argc, argv);
-	std::cout << "\nspinviewer exited normally." << std::endl;
-
-	return result;
+    try {
+        int result = run(argc, argv);
+        std::cout << "\nspinviewer exited normally." << std::endl;
+        return result;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Got exception " << e.what() << std::endl;
+        return 1;
+    }
 }

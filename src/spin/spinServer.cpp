@@ -155,15 +155,21 @@ int main(int argc, char **argv)
 	
 	// *************************************************************************
 	// loop:
-	
-	while (server->isRunning())
-	{
-		sleep(1);
-		// loop until a quit message is received (TODO)
-	}
+    try {	
+        while (server->isRunning())
+        {
+            sleep(1);
+            // loop until a quit message is received (TODO)
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Got exception " << e.what() << std::endl;
+        return 1;
+    }
 
-	usleep(100);
-	std::cout << "spinserver exited normally." << std::endl;
-	
-	return 0;
+    usleep(100);
+    std::cout << "spinserver exited normally." << std::endl;
+
+    return 0;
 }
