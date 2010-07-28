@@ -209,7 +209,8 @@ int run(int argc, char **argv)
     	else view->setUpViewInWindow(x,y,width,height,screen);
     }
 
-
+    //TODO:2010-07-28:aalex:Load an image for a window icon
+    //HANDLE icon = osg::LoadImage(0, "MyIcon.ico", osg::IMAGE_ICON, 0, 0, osg::LR_LOADFROMFILE);
     osgViewer::ViewerBase::Windows windows;
     osgViewer::ViewerBase::Windows::iterator wIter;
     viewer.getWindows(windows);
@@ -217,6 +218,12 @@ int run(int argc, char **argv)
     {
     	(*wIter)->setWindowName("spinViewer " + spin.getUserID() + "@" + spin.getSceneID());
 		if (hideCursor) (*wIter)->useCursor(false);
+
+        //TODO:2010-07-28:aalex:Set a window icon
+        //if( hIcon && hWnd )
+        //{
+        //    osg::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        //} 
     }
 
     view->setSceneData(spin.sceneManager->rootNode.get());
