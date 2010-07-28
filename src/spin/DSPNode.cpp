@@ -75,9 +75,6 @@ DSPNode::DSPNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneMan
 // destructor
 DSPNode::~DSPNode()
 {
-	//std::cout << "In DSPNode destructor... node: " << this->id->s_name << std::endl;
-	
-	
 	// we should check if there are any connections on this node, and delete
 	// them before this object is gone.
 
@@ -87,7 +84,8 @@ DSPNode::~DSPNode()
 	}
 	
 	while (connectFROM.size())
-	{
+    {
+        if (connectFROM[0]->source)
 		connectFROM[0]->source->disconnect(this->id->s_name);
 	}
 	
@@ -130,9 +128,7 @@ SoundConnection *DSPNode::getConnection(DSPNode *snk)
 
 SoundConnection *DSPNode::getConnection(const char *snk)
 {
-	osg::ref_ptr<DSPNode> sinkNode = dynamic_cast<DSPNode*>( sceneManager->getNode(snk) );
-	if (sinkNode.valid()) return getConnection(sinkNode.get());
-	else return NULL;
+	return getConnection( dynamic_cast<DSPNode*>( sceneManager->getNode(snk) ) );
 }
 
 
@@ -168,14 +164,11 @@ void DSPNode::connectSource(const char *src)
 
 void DSPNode::disconnect(const char *snk)
 {
-	
 	// check if this connection already exists:
-	SoundConnection *conn = this->getConnection(dynamic_cast<DSPNode*>( sceneManager->getNode(snk) ));
+	SoundConnection *conn = this->getConnection(snk);
 
 	if (conn)
 	{
-		//std::cout << "Disconnecting " << conn->id->s_name << std::endl;
-		
 		/*
 		// if this is the last connection for this node, then disactivate it:
 		if (this->connectTO.empty() && this->connectFROM.empty())
@@ -212,7 +205,9 @@ void DSPNode::disconnect(const char *snk)
 		delete conn;
 
 		BROADCAST(this, "ss", "disconnect", snk);
-	}
+	} else { 
+        std::cout << "oops. couldn't find connection: " << this->id->s_name << " -> " << snk << std::endl;
+    }
 }
 
 

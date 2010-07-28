@@ -685,21 +685,25 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 // returns a pointer to a node given an id:
 ReferencedNode* SceneManager::getNode(std::string id)
 {
-    char *charID = (char*) id.c_str();
-    return getNode(charID);
+    return getNode(id.c_str());
 }
 ReferencedNode* SceneManager::getNode(const char *id)
 {
+/*
     osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(gensym(id)->s_thing);
 
     if (n.valid()) return n.get();
     else return NULL;
+*/
+    return dynamic_cast<ReferencedNode*>(gensym(id)->s_thing);
+
 }
 
 // *****************************************************************************
 // returns a pointer to an node given an id and type:
 ReferencedNode* SceneManager::getNode(const char *id, const char *type)
 {
+/*
     osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(gensym(id)->s_thing);
 
     if (n.valid())
@@ -707,6 +711,19 @@ ReferencedNode* SceneManager::getNode(const char *id, const char *type)
         if (n->nodeType == std::string(type))
         {
             return n.get();
+        }
+    }
+
+    return NULL;
+*/
+
+    ReferencedNode *n = dynamic_cast<ReferencedNode*>(gensym(id)->s_thing);
+    
+    if (n)
+    {
+        if (n->nodeType == std::string(type))
+        {
+            return n;
         }
     }
 
@@ -985,6 +1002,7 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 {
     // hold on to a referenced pointer, while we remove all others
     osg::ref_ptr<ReferencedNode> n = nodeToDelete;
+
 
     // remove the node from the scenegraph:
     n->detach();
