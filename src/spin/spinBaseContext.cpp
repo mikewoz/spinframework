@@ -94,10 +94,6 @@ spinBaseContext::spinBaseContext() :
 
     signal(SIGINT, sigHandler);
 
-	lo_infoServ_ = NULL;
-	lo_rxServ_ = NULL;
-	lo_tcpRxServer_ = NULL;
-	
     // set default addresses (can be overridden):
     lo_infoAddr = lo_address_new(MULTICAST_GROUP, INFO_UDP_PORT);
     lo_rxAddr = lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT);
@@ -113,7 +109,6 @@ spinBaseContext::spinBaseContext() :
         std::string infoPort = tmpStr.substr(tmpStr.find(":")+1);
         lo_infoAddr = lo_address_new(infoAddr.c_str(), infoPort.c_str());
     }
-
 }
 /**
  * Destructor 
@@ -164,9 +159,9 @@ void spinBaseContext::sigHandler(int signum)
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
+    std::cout << "  Receiving on INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
     std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
-    std::cout << "  TX channel:\t\t\t" << lo_address_get_url(lo_txAddr) << std::endl;
+    std::cout << "  Sending on TX channel:\t\t\t" << lo_address_get_url(lo_txAddr) << std::endl;
 
     signalStop = false;
 
