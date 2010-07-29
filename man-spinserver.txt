@@ -1,0 +1,9 @@
+[SYNOPSIS]
+spinserver [options] <scene-to-load.xml>
+
+[REPORTING BUGS]
+https://sourceforge.net/apps/trac/spinframework/
+
+[SEE ALSO]
+spinviewer (1)
+
