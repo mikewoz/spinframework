@@ -122,12 +122,6 @@ int main(int argc, char **argv)
 
 	
 	// *************************************************************************
-	// start spin:
-
-	server->start();
-
-	
-	// *************************************************************************
 	// remaining arguments are assumed to be scene elements to be loaded (.xml)
 	
 	std::vector<std::string>::iterator arg;
@@ -149,7 +143,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	
+	// *************************************************************************
+	// start spin:
+	server->start();
+
+	// *************************************************************************
 	// send a userRefresh message:
     SCENE_MSG("s", "userRefresh");
 	
