@@ -102,6 +102,7 @@ double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2, int nullAxis)
 
 	// angle will be from -90 to 270 for some reason, so convert to -PI,PI
 	if (angle>osg::PI) angle -= 2 * osg::PI;
+	if (angle<-osg::PI) angle += 2 * osg::PI;
 	
 	return(angle);
 }
