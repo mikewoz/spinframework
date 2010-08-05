@@ -56,7 +56,7 @@ MeasurementNode::MeasurementNode (SceneManager *sceneManager, char *initID) : Re
     nodeType = "MeasurementNode";
 
     targetName_ = gensym("NULL");
-    reportingLevel_ = MeasurementNode::REPORT_ANGLES;
+    reportingLevel_ = MeasurementNode::REPORT_BASIC;
 
     thisMatrix_.makeIdentity();
     targetMatrix_.makeIdentity();
@@ -133,13 +133,16 @@ void MeasurementNode::sendMeasurements()
         msg = lo_message_new();
         lo_message_add( msg, "sf", "direction", direction );
         msgs.push_back(msg);
+
+        double incidence = AngleBetweenVectors(src_dir, connection_vector);
+
+        msg = lo_message_new();
+        lo_message_add( msg, "sf", "incidence", incidence );
+        msgs.push_back(msg);
     }
 
     if (reportingLevel_ > 1)
     {
-        // Azimuth: source incidence projected on XY plane (Z is ignored)
-        float srcIncidenceAzim = AngleBetweenVectors(src_dir, connection_vector, 3);
-
         // Elevation: source incidence projected on XZ plane (Y is ignored)
         //float srcIncidenceElev = AngleBetweenVectors(src_up, connection_vector, 2);
         float srcIncidenceElev = AngleBetweenVectors(src_dir, connection_vector, 2);
@@ -148,39 +151,27 @@ void MeasurementNode::sendMeasurements()
         //float srcIncidenceRoll = AngleBetweenVectors(src_right, connection_vector, 1);
         float srcIncidenceRoll = AngleBetweenVectors(src_dir, connection_vector, 1);
 
-        msg = lo_message_new();
-        lo_message_add( msg, "sf", "azimuth", srcIncidenceAzim);
-        msgs.push_back(msg);
+        // Azimuth: source incidence projected on XY plane (Z is ignored)
+        float srcIncidenceAzim = AngleBetweenVectors(src_dir, connection_vector, 3);
 
         msg = lo_message_new();
-        lo_message_add( msg, "sf", "elevation", srcIncidenceElev);
+        lo_message_add( msg, "sfff", "eulers", srcIncidenceElev, srcIncidenceRoll, srcIncidenceAzim);
         msgs.push_back(msg);
+
+        osg::Quat rot;
+        rot.makeRotate(connection_vector, src_dir);
 
         msg = lo_message_new();
-        lo_message_add( msg, "sf", "roll", srcIncidenceRoll);
+        lo_message_add(msg, "sffff", "quaternion", rot.x(), rot.y(), rot.z(), rot.w());
         msgs.push_back(msg);
-    }
 
-    if (reportingLevel_ > 2)
-    {
-		// incidence between sink (TARGET) and the connection_vector:
-		float snkIncidenceAzim = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 3);
-		//float snkIncidenceElev = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_up, connection_vector, 2);
-		float snkIncidenceElev = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 2);
-		//float snkIncidenceRoll = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_right, connection_vector, 1);
-		float snkIncidenceRoll = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 1);
+        osg::Vec3 rotEulers = QuatToEuler(rot);
 
         msg = lo_message_new();
-        lo_message_add( msg, "sf", "targetAzimuth", snkIncidenceAzim );
+        lo_message_add( msg, "sfff", "test", rotEulers.x(), rotEulers.y(), rotEulers.z());
         msgs.push_back(msg);
 
-        msg = lo_message_new();
-        lo_message_add( msg, "sf", "targetElevation", snkIncidenceElev);
-        msgs.push_back(msg);
 
-        msg = lo_message_new();
-        lo_message_add( msg, "sf", "targetRoll", snkIncidenceRoll);
-        msgs.push_back(msg);
     }
 
     spinApp::Instance().NodeBundle(this->id, msgs);

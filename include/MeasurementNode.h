@@ -49,8 +49,21 @@
  * 
  * 
  * A targetNode must be specified, and then measurements (such as distance,
- * relative orientation, etc.) are computed and can be reported with varying
- * levels of detail.
+ * relative orientation, etc.) are computed and broadcasted.
+ *
+ * The following items are measured:
+ *
+ * distance		the distance to the target
+ * direction	the absolute direction (angle) on the XY plane
+ * incidence	the angle difference between the measurement node's current orientation to that which would point at the target
+ * eulers		the angle difference separated into pitch, roll, and yaw components (NOTE: possible inaccuracies due to gimbal lock)
+ * quaternion	the rotation required to point at the target
+ *
+ * Other notes:
+ *
+ * - all angles are reported in radians
+ * - the reportMode must be set to enable some measurements
+ *
  */
 class MeasurementNode : public ReferencedNode
 {
@@ -63,15 +76,14 @@ public:
 	/**
 	 * Level of reporting that is sent (see setReportingLevel for more details)
 	 *
-	 * REPORT_NONE			sends no measurements
+	 * REPORT_NONE		sends no measurements
 	 *
-	 * REPORT_BASIC			sends distance and absolute direction (independent) of and orientations
+	 * REPORT_BASIC		sends distance, absolute direction, and incidence of orientation
 	 *
-	 * REPORT_ANGLES		sends above info, plus relative angle of target with respect to the MeasurementNode's current position and orientation
+	 * REPORT_ANGLES	sends above info, plus rotation information to target with respect to the MeasurementNode's current position and orientation (available as either euler angles or quaternion)
 	 *
-	 * REPORT_ALL_ANGLES	sends above info, plus angles from the target's perspective
 	 */
-	enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES, REPORT_ALL_ANGLES };
+	enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES };
 
 	/**
 	 * The update callback for MeasurementNode checks to see if the target's or

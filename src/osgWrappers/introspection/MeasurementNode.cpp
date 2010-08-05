@@ -26,7 +26,6 @@ BEGIN_ENUM_REFLECTOR(MeasurementNode::reportMode)
 	I_EnumLabel(MeasurementNode::REPORT_NONE);
 	I_EnumLabel(MeasurementNode::REPORT_BASIC);
 	I_EnumLabel(MeasurementNode::REPORT_ANGLES);
-	I_EnumLabel(MeasurementNode::REPORT_ALL_ANGLES);
 END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(MeasurementNode)
