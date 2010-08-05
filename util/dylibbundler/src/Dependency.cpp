@@ -52,9 +52,25 @@ Dependency::Dependency(std::string path)
         // if no prefix is specified
         if(prefix.size()<1)
         {
-            std::cout << "\n/!\\ WARNING : Library " << filename << " has an incomplete name (location unknown)" << std::endl;
             missing_prefixes = true;
+
+            // mikewoz edit:
+            // check standard path (/usr/local/lib), and paths in LD_LIBRARY_PATH (TODO):
+            std::vector<std::string> extraPaths;
+            extraPaths.push_back("/usr/local/lib");
+
+            for (int j=0; j<extraPaths.size(); j++)
+            {
+                prefix = extraPaths[i];
+                if ( prefix[ prefix.size()-1 ] != '/' ) prefix += "/";
+                if (fileExists(prefix+filename))
+                {
+                    break;
+                }
+            }
+            // end mikewoz
             
+            std::cout << "\n/!\\ WARNING : Library " << filename << " has an incomplete name (location unknown)" << std::endl;
             while(true)
             {
                 std::cout << "Please specify now where this library can be found (or write 'quit' to abort): ";  fflush(stdout);

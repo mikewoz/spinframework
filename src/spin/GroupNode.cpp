@@ -466,9 +466,9 @@ void GroupNode::setOrientation (float p, float r, float y)
     if (newOrientation != getOrientation())
     {
         _orientation = newOrientation;
-        osg::Quat q = osg::Quat( -osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-                                 -osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-                                 -osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
+        osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
+                                 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
+                                 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
         mainTransform->setAttitude(q);
         BROADCAST(this, "sfff", "setOrientation", p, r, y);
     }

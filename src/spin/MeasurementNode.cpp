@@ -141,10 +141,12 @@ void MeasurementNode::sendMeasurements()
         float srcIncidenceAzim = AngleBetweenVectors(src_dir, connection_vector, 3);
 
         // Elevation: source incidence projected on XZ plane (Y is ignored)
-        float srcIncidenceElev = AngleBetweenVectors(src_up, connection_vector, 2);
+        //float srcIncidenceElev = AngleBetweenVectors(src_up, connection_vector, 2);
+        float srcIncidenceElev = AngleBetweenVectors(src_dir, connection_vector, 2);
 
         // Roll: source incidence projected on YZ plane (X is ignored)
-        float srcIncidenceRoll = AngleBetweenVectors(src_right, connection_vector, 1);
+        //float srcIncidenceRoll = AngleBetweenVectors(src_right, connection_vector, 1);
+        float srcIncidenceRoll = AngleBetweenVectors(src_dir, connection_vector, 1);
 
         msg = lo_message_new();
         lo_message_add( msg, "sf", "azimuth", srcIncidenceAzim);
@@ -163,8 +165,10 @@ void MeasurementNode::sendMeasurements()
     {
 		// incidence between sink (TARGET) and the connection_vector:
 		float snkIncidenceAzim = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 3);
-		float snkIncidenceElev = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_up, connection_vector, 2);
-		float snkIncidenceRoll = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_right, connection_vector, 1);
+		//float snkIncidenceElev = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_up, connection_vector, 2);
+		float snkIncidenceElev = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 2);
+		//float snkIncidenceRoll = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_right, connection_vector, 1);
+		float snkIncidenceRoll = AngleBetweenVectors(osg::Vec3(0,0,0)-snk_dir, connection_vector, 1);
 
         msg = lo_message_new();
         lo_message_add( msg, "sf", "targetAzimuth", snkIncidenceAzim );

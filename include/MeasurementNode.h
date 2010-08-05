@@ -62,6 +62,14 @@ public:
 	
 	/**
 	 * Level of reporting that is sent (see setReportingLevel for more details)
+	 *
+	 * REPORT_NONE			sends no measurements
+	 *
+	 * REPORT_BASIC			sends distance and absolute direction (independent) of and orientations
+	 *
+	 * REPORT_ANGLES		sends above info, plus relative angle of target with respect to the MeasurementNode's current position and orientation
+	 *
+	 * REPORT_ALL_ANGLES	sends above info, plus angles from the target's perspective
 	 */
 	enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES, REPORT_ALL_ANGLES };
 
@@ -86,12 +94,7 @@ public:
 	void setTarget (const char *targetID);
 
 	/**
-	 * There are several levels of reporting:
-	 *
-	 * REPORT_NONE			sends no measurements
-	 * REPORT_BASIC			sends distance and absolute direction (independent) of and orientations
-	 * REPORT_ANGLES		sends above info, plus relative angle of target with respect to the MeasurementNode's current position and orientation
-	 * REPORT_ALL_ANGLES	sends above info, plus angles from the target's perspective
+	 * This sets the level of reporting (choose a reportMode)
 	 */
 	void setReportingLevel (reportMode level);
 	

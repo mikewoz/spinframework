@@ -85,6 +85,11 @@ scripts_DATA = ../Resources/scripts/*
 # CUSTOM targets:
 
 
+OSG_VER = $(shell osgversion --so-number)
+OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
+
+OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
+
 spinviewer.app: spinviewer$(EXEEXT)
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
@@ -100,13 +105,30 @@ spinviewer.app: spinviewer$(EXEEXT)
 	spinviewer.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp .libs/spinviewer $@/Contents/MacOS
-	-cp -R /usr/local/lib/osgPlugins-2.8.2 $@/Contents
+#	cp /usr/local/lib/libOpenThreads.12.dylib $@/Contents/libs
 	cp ../Resources/images/spinviewer.icns $@/Contents/Resources
+#install_name_tool -add-rpath /usr/local/lib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libOpenThreads.12.dylib /usr/local/lib/libOpenThreads.2.5.0.dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosg.$(OSG_VER).dylib @executable_path/../libs/libosg.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgGA.$(OSG_VER).dylib @executable_path/../libs/libosgGA.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgSim.$(OSG_VER).dylib @executable_path/../libs/libosgSim.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgDB.$(OSG_VER).dylib @executable_path/../libs/libosgDB.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgManipulator.$(OSG_VER).dylib @executable_path/../libs/libosgManipulator.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgText.$(OSG_VER).dylib @executable_path/../libs/libosgText.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgUtil.$(OSG_VER).dylib @executable_path/../libs/libosgUtil.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgFX.$(OSG_VER).dylib @executable_path/../libs/libosgFX.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgParticle.$(OSG_VER).dylib @executable_path/../libs/libosgParticle.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgViewer.$(OSG_VER).dylib @executable_path/../libs/libosgViewer.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libosgIntrospection.$(OSG_VER).dylib @executable_path/../libs/libosgIntrospection.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
 	./dylibbundler -of -b -x $@/Contents/MacOS/spinviewer -d $@/Contents/libs
 
 
 
-#install_name_tool -change libOpenThreads.11.dylib /usr/local/lib/libOpenThreads.11.dylib $@/Contents/MacOS/spinviewer
+#	install_name_tool -change libOpenThreads.$(OPENTHREADS_VER).dylib /usr/local/lib/libOpenThreads.$(OPENTHREADS_VER).dylib $@/Contents/MacOS/spinviewer
+#-cp -R /usr/local/lib/osgPlugins-* $@/Contents/libs
+#-cp /usr/local/lib/libosg*.dylib $@/Contents/libs
+#-cp /usr/local/lib/libOpenThreads.*.dylib $@/Contents/libs
+
 #install_name_tool -change libosg.55.dylib @executable_path/../libs/libosg.55.dylib $@/Contents/MacOS/spinviewer
 #install_name_tool -change libosgGA.55.dylib @executable_path/../libs/libosgGA.55.dylib $@/Contents/MacOS/spinviewer
 #install_name_tool -change libosgSim.55.dylib @executable_path/../libs/libosgSim.55.dylib $@/Contents/MacOS/spinviewer
@@ -128,3 +150,4 @@ spinviewer.app: spinviewer$(EXEEXT)
 doc:
 	./spindocgenerator
 	-cp *.html ../../doxygen/html
+

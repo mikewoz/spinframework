@@ -55,7 +55,7 @@ BEGIN_OBJECT_REFLECTOR(MeasurementNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setReportingLevel__reportMode,
 	          "",
-	          "There are several levels of reporting:REPORT_NONE sends no measurements REPORT_BASIC sends distance and absolute direction (independent) of and orientations REPORT_ANGLES sends above info, plus relative angle of target with respect to the MeasurementNode's current position and orientation REPORT_ALL_ANGLES sends above info, plus angles from the target's perspective ");
+	          "This sets the level of reporting (choose a reportMode) ");
 	I_Method0(const char *, getTarget,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getTarget,
