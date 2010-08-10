@@ -105,22 +105,8 @@ spinviewer.app: spinviewer$(EXEEXT)
 	spinviewer.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
 	cp .libs/spinviewer $@/Contents/MacOS
-#	cp /usr/local/lib/libOpenThreads.12.dylib $@/Contents/libs
-	cp ../Resources/images/spinviewer.icns $@/Contents/Resources
-#install_name_tool -add-rpath /usr/local/lib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libOpenThreads.12.dylib /usr/local/lib/libOpenThreads.2.5.0.dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosg.$(OSG_VER).dylib @executable_path/../libs/libosg.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgGA.$(OSG_VER).dylib @executable_path/../libs/libosgGA.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgSim.$(OSG_VER).dylib @executable_path/../libs/libosgSim.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgDB.$(OSG_VER).dylib @executable_path/../libs/libosgDB.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgManipulator.$(OSG_VER).dylib @executable_path/../libs/libosgManipulator.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgText.$(OSG_VER).dylib @executable_path/../libs/libosgText.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgUtil.$(OSG_VER).dylib @executable_path/../libs/libosgUtil.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgFX.$(OSG_VER).dylib @executable_path/../libs/libosgFX.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgParticle.$(OSG_VER).dylib @executable_path/../libs/libosgParticle.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgViewer.$(OSG_VER).dylib @executable_path/../libs/libosgViewer.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-#	install_name_tool -change libosgIntrospection.$(OSG_VER).dylib @executable_path/../libs/libosgIntrospection.$(OSG_VER).dylib $@/Contents/MacOS/spinviewer
-	./dylibbundler -of -b -x $@/Contents/MacOS/spinviewer -d $@/Contents/libs
+	cp ../Resources/images/spinViewer.icns $@/Contents/Resources
+	../../util/dylibbundler/dylibbundler -of -b -x $@/Contents/MacOS/spinviewer -d $@/Contents/libs
 
 
 

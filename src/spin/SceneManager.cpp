@@ -90,17 +90,16 @@ extern pthread_mutex_t sceneMutex;
 // *****************************************************************************
 // constructors:
 
-SceneManager::SceneManager(const std::string &id)
+//SceneManager::SceneManager(const std::string &id)
+SceneManager::SceneManager(std::string id)
 {
     this->sceneID = id;
 
     graphicalMode = false;
 
     // initialize storage vectors:
-    //nodeTypes.clear();
     nodeMap.clear();
     stateMap.clear();
-    //nodeList.clear();
 
     // Set resourcesPath:
     std::string currentDir = getenv("PWD");

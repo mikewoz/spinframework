@@ -34,5 +34,10 @@ doc:
 	doxygen ./doxygen_config        
 	$(MAKE) -C src/spin doc
 
+apps:
+	@echo ""; \
+	echo ">>>>>>>>>>>>>>>>>>>>> Generating OSX App Bundles <<<<<<<<<<<<<<<<<<<<<"; \
+	$(MAKE) -C src/spin spinviewer.app
+
 INCLUDES = src/tinyxml
 

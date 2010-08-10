@@ -83,8 +83,9 @@ class spinLog;
 class SceneManager
 {
     public:
-        SceneManager(const std::string &id);
-        ~SceneManager();
+		//SceneManager(const std::string &id);
+		SceneManager(std::string id);
+	    ~SceneManager();
 
         void init();
         void debug();

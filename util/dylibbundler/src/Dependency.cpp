@@ -55,47 +55,55 @@ Dependency::Dependency(std::string path)
             missing_prefixes = true;
 
             // mikewoz edit:
-            // check standard path (/usr/local/lib), and paths in LD_LIBRARY_PATH (TODO):
+            // check standard paths (eg, /usr/local/lib):
             std::vector<std::string> extraPaths;
             extraPaths.push_back("/usr/local/lib");
+            extraPaths.push_back("/opt/local/lib");
+            extraPaths.push_back("/usr/lib");
+            // TODO: add paths from DYLD_LIBRARY_PATH
 
-            for (int j=0; j<extraPaths.size(); j++)
+            bool foundInPath = false;
+            unsigned int i;
+            for (int i=0; i<extraPaths.size(); i++)
             {
                 prefix = extraPaths[i];
                 if ( prefix[ prefix.size()-1 ] != '/' ) prefix += "/";
                 if (fileExists(prefix+filename))
                 {
+                    foundInPath = true;
                     break;
                 }
             }
             // end mikewoz
             
-            std::cout << "\n/!\\ WARNING : Library " << filename << " has an incomplete name (location unknown)" << std::endl;
-            while(true)
+            if (not foundInPath)
             {
-                std::cout << "Please specify now where this library can be found (or write 'quit' to abort): ";  fflush(stdout);
-                
-                char buffer[128];
-                std::cin >> buffer;
-                prefix = buffer;
-                std::cout << std::endl;
-                
-                if(prefix.compare("quit")==0) exit(1);
-                
-                if( prefix[ prefix.size()-1 ] != '/' ) prefix += "/";
-                
-                if( !fileExists( prefix+filename ) )
+                std::cout << "\n/!\\ WARNING : Library " << filename << " has an incomplete name (location unknown)" << std::endl;
+                while(true)
                 {
-                    std::cerr << (prefix+filename) << " does not exist. Try again" << std::endl;
-                    continue;
-                }
-                else
-                {
-                    std::cerr << (prefix+filename) << " was found. /!\\MANUALLY CHECK THE EXECUTABLE WITH 'otool -L', DYLIBBUNDLDER MAY NOT HANDLE CORRECTLY THIS UNSTANDARD/ILL-FORMED DEPENDENCY" << std::endl;
-                    break;
+                    std::cout << "Please specify now where this library can be found (or write 'quit' to abort): ";  fflush(stdout);
+                
+                    char buffer[128];
+                    std::cin >> buffer;
+                    prefix = buffer;
+                    std::cout << std::endl;
+                
+                    if(prefix.compare("quit")==0) exit(1);
+                
+                    if( prefix[ prefix.size()-1 ] != '/' ) prefix += "/";
+                
+                    if( !fileExists( prefix+filename ) )
+                    {
+                        std::cerr << (prefix+filename) << " does not exist. Try again" << std::endl;
+                        continue;
+                    }
+                    else
+                    {
+                        std::cerr << (prefix+filename) << " was found. /!\\MANUALLY CHECK THE EXECUTABLE WITH 'otool -L', DYLIBBUNDLDER MAY NOT HANDLE CORRECTLY THIS UNSTANDARD/ILL-FORMED DEPENDENCY" << std::endl;
+                        break;
+                    }
                 }
             }
-            
         }
         
         //new_name  = filename.substr(0, filename.find(".")) + ".dylib";

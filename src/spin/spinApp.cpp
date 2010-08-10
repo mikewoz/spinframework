@@ -72,11 +72,12 @@ extern pthread_mutex_t sceneMutex;
 
 spinApp::spinApp() : userID_(getHostname())
 {
-	
+
 #ifdef __Darwin
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
-    //#define OSG_LIBRARY_PATH @executable_path/../PlugIns
+    setenv("DYLD_LIBRARY_PATH", "@executable_path/../libs", 1);
 #endif
+
 
     // Load the SPIN library:
     /*
@@ -84,7 +85,10 @@ spinApp::spinApp() : userID_(getHostname())
     if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN")))
     {
         std::cout << "Error: Could not load libSPIN" << std::endl;
+    } else {
+    	std::cout << "Successfully loaded libSPIN" << std::endl;
     }
+
     if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPINwrappers")))
     {
         std::cout << "Error: Could not load libSPINwrappers" << std::endl;
@@ -92,21 +96,32 @@ spinApp::spinApp() : userID_(getHostname())
     */
 
 
-    // Make sure that our OSG nodekit    is loaded (by checking for existance of
+    // Make sure that our OSG nodekit is loaded (by checking for existence of
     // the ReferencedNode node type):
     try
     {
-        /*
+    	/*
         std::cout << "[DEBUG] These are all possible types:" << std::endl;
         const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
         for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
         {
             if ( ((*it).second)->isDefined() )
-            std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
+            {
+            	std::cout << ((*it).second)->getName() << " isAtomic?  " << ((*it).second)->isAtomic() << std::endl;
+            	//std::cout << ((*it).second)->getName() << " isDefined? " << ((*it).second)->isDefined() << std::endl;
+            }
         }
-        */
+		*/
         const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-        UNUSED(ReferencedNodeType);
+        //UNUSED(ReferencedNodeType);
+        if (!ReferencedNodeType.isDefined())
+        {
+            std::cout << "Introspection ERROR: Make sure that libSPIN exists and can be found." << std::endl;
+        	exit(1);
+        }
+        else {
+        	//std::cout << "Successfully loaded SPIN library" << std::endl;
+        }
     }
     catch (osgIntrospection::Exception & ex)
     {
@@ -168,11 +183,15 @@ void spinApp::setContext(spinBaseContext *c)
 void spinApp::createScene()
 {
     if (context)
+    {
         sceneManager = new SceneManager(getSceneID());
+    }
     else
+    {
         std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
+        exit(1);
+    }
 }
-
 void spinApp::destroyScene()
 {
 	std::cout << "Cleaning up SceneManager..." << std::endl;
