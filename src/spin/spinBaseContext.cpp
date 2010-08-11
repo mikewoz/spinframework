@@ -80,12 +80,10 @@ bool spinBaseContext::signalStop = false;
  * This is where the actual default port numbers and multicast groups are defined.
  */
 spinBaseContext::spinBaseContext() :
-    lo_rxAddr(NULL),
     lo_txAddr(NULL),
     lo_infoAddr(NULL),
     lo_syncAddr(NULL),
     lo_infoServ_(NULL),
-    lo_rxServ_(NULL),
     pthreadID(0)
 {
     using namespace spin_defaults;
@@ -96,7 +94,7 @@ spinBaseContext::spinBaseContext() :
 
     // set default addresses (can be overridden):
     lo_infoAddr = lo_address_new(MULTICAST_GROUP, INFO_UDP_PORT);
-    lo_rxAddr = lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT);
+    //lo_rxAddrs.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT));
     lo_txAddr = lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT);
     lo_syncAddr = lo_address_new(MULTICAST_GROUP, SYNC_UDP_PORT);
 
@@ -119,7 +117,20 @@ spinBaseContext::~spinBaseContext()
 {
     this->stop();
 	
-    lo_address_free(lo_rxAddr);
+    std::vector<lo_address>::iterator addrIter;
+    while ((addrIter=lo_rxAddrs_.begin()) != lo_rxAddrs_.end())
+    {
+    	lo_address_free(*addrIter);
+    	lo_rxAddrs_.erase(addrIter);
+    }
+
+    std::vector<lo_server>::iterator servIter;
+    while ((servIter=lo_rxServs_.begin()) != lo_rxServs_.end())
+    {
+    	lo_server_free(*servIter);
+    	lo_rxServs_.erase(servIter);
+    }
+
     lo_address_free(lo_txAddr);
 	lo_address_free(lo_infoAddr);
     lo_address_free(lo_syncAddr);
@@ -129,13 +140,17 @@ spinBaseContext::~spinBaseContext()
 	
     lo_server_free(lo_infoServ_);
     lo_server_free(lo_tcpRxServer_);
-	lo_server_free(lo_rxServ_);
+
 
 }
 
 void spinBaseContext::setLog(spinLog &log)
 {
-    lo_server_add_method(lo_rxServ_, NULL, NULL, logCallback, &log);
+	std::vector<lo_server>::iterator it;
+    for (it = lo_rxServs_.begin(); it != lo_rxServs_.end(); ++it)
+    {
+    	lo_server_add_method((*it), NULL, NULL, logCallback, &log);
+    }
 }
 /**
  * Signal handler. 
@@ -717,31 +732,35 @@ void spinBaseContext::createServers()
     using std::string;
     // set up OSC event listener:
 
-    if (isMulticastAddress(lo_address_get_hostname(lo_rxAddr)))
+	std::vector<lo_address>::iterator it;
+    for (it = lo_rxAddrs_.begin(); it != lo_rxAddrs_.end(); ++it)
     {
-        lo_rxServ_ = lo_server_new_multicast(lo_address_get_hostname(lo_rxAddr), lo_address_get_port(lo_rxAddr), oscParser_error);
-        if (lo_rxServ_ == 0)
-        {
-            std::cerr << "Multicast server creation on port " << lo_address_get_port(lo_rxAddr) << 
-                " failed, trying a random port" << std::endl;
-            std::string addr(lo_address_get_hostname(lo_rxAddr));
-            lo_rxServ_ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-            lo_address_free(lo_rxAddr);
-            lo_rxAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_rxServ_)).c_str());
-        }
-    }
-    else
-    {
-        lo_rxServ_ = lo_server_new(lo_address_get_port(lo_rxAddr), oscParser_error);
-        if (lo_rxServ_ == 0)
-        {
-            std::cerr << "UDP listener creation on port " << lo_address_get_port(lo_rxAddr) << 
-                " failed, trying a random port" << std::endl;
-            lo_rxServ_ = lo_server_new(NULL, oscParser_error);
-            std::string addr(lo_address_get_hostname(lo_rxAddr));
-            lo_address_free(lo_rxAddr);
-            lo_rxAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_rxServ_)).c_str());
-        }
+    	lo_server tmpServ;
+		if (isMulticastAddress(lo_address_get_hostname(*it)))
+		{
+			tmpServ = lo_server_new_multicast(lo_address_get_hostname(*it), lo_address_get_port(*it), oscParser_error);
+			if (tmpServ == 0)
+			{
+				std::cerr << "Multicast server creation on port " << lo_address_get_port(*it) << " failed, trying a random port" << std::endl;
+				std::string addr(lo_address_get_hostname(*it));
+				tmpServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
+				lo_address_free(*it);
+				(*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+			}
+		}
+		else
+		{
+			tmpServ = lo_server_new(lo_address_get_port(*it), oscParser_error);
+			if (tmpServ == 0)
+			{
+				std::cerr << "UDP listener creation on port " << lo_address_get_port(*it) << " failed, trying a random port" << std::endl;
+				tmpServ = lo_server_new(NULL, oscParser_error);
+				std::string addr(lo_address_get_hostname(*it));
+				lo_address_free(*it);
+				(*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+			}
+		}
+		lo_rxServs_.push_back(tmpServ);
     }
 
     // set up infoPort listener thread:

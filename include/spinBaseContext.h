@@ -99,8 +99,11 @@ class spinBaseContext
 
         bool isRunning() { return running; }
 
-        /** Multicast group and port number on which the server listens for messages that alters the scene graph. */
-        lo_address lo_rxAddr;
+        /** list of address/port combinations on which the server listens for messages that alters the scene graph. */
+        std::vector<lo_address> lo_rxAddrs_;
+        std::vector<lo_server> lo_rxServs_;
+
+
         /** Multicast group and port number to which the server sends the messages that clients sent to it to alter the scene graph. */
         lo_address lo_txAddr;
         /** Multicast group and port number to which the server sends the addresses and port numbers on which it sends and receives. */
@@ -108,7 +111,8 @@ class spinBaseContext
         /** Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters. */
         lo_address lo_syncAddr;
         lo_server lo_infoServ_;
-        lo_server lo_rxServ_;
+
+
         static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
         static int nodeCallback(const char *path, const char *types, lo_arg **argv, 

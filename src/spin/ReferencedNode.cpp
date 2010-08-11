@@ -105,7 +105,11 @@ ReferencedNode::~ReferencedNode()
     {
         // unregister with OSC parser:
         string oscPattern = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + string(id->s_name);
-        lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
+        std::vector<lo_server>::iterator it;
+        for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
+        {
+        	lo_server_del_method((*it), oscPattern.c_str(), NULL);
+        }
     }
 
     id->s_thing = 0;
@@ -119,11 +123,12 @@ void ReferencedNode::registerNode(SceneManager *s)
 
     // register with OSC parser:
     string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
-    lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(),
+    std::vector<lo_server>::iterator it;
+    for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
+    {
+    	lo_server_add_method((*it), oscPattern.c_str(),
             NULL, spinBaseContext::nodeCallback, (void*)id);
-#ifdef OSCDEBUG
-    std::cout << "oscParser registered: " << oscPattern << std::endl;
-#endif
+    }
 }
 
 // *****************************************************************************

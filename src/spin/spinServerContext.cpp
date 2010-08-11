@@ -62,7 +62,7 @@ spinServerContext::spinServerContext() : syncThreadID(0)
     spinApp &spin = spinApp::Instance();
 
     // override sender and receiver addresses in server mode:
-    lo_rxAddr = lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT);
+    lo_rxAddrs_.push_back(lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT));
     lo_txAddr = lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT);
 
     // now that we've overridden addresses, we can call setContext
@@ -109,6 +109,8 @@ void spinServerContext::startSyncThread()
 // FIXME: Push this up to base context
 void spinServerContext::createServers()
 {
+	std::vector<lo_server>::iterator servIter;
+
     // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
     lo_tcpRxServer_ = lo_server_new_with_proto(spin_defaults::SERVER_TCP_PORT, LO_TCP, oscParser_error);
     // liblo will try a random free port if the default failed
@@ -119,14 +121,17 @@ void spinServerContext::createServers()
         lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
     }
 
-    std::cout << "  Receiving on TCP channel:\t\t\t" << lo_server_get_url(lo_tcpRxServer_) <<
-        std::endl;
+    std::cout << "  Receiving on TCP channel:\t\t\t" <<
+    		lo_server_get_url(lo_tcpRxServer_) << std::endl;
 
     spinBaseContext::createServers();
 #if 0
     // add OSC callback methods to match various incoming messages:
     // oscCallback_debug() will match any path and args:
-    lo_server_add_method(lo_rxServ_, NULL, NULL, debugCallback, NULL);
+    for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++it)
+    {
+    	lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
+    }
 #endif
 
     // add info channel callback (receives pings from client apps):
@@ -136,11 +141,13 @@ void spinServerContext::createServers()
     lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
 
     // add scene callback
-    lo_server_add_method(lo_rxServ_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
-            NULL, sceneCallback, NULL);
+    for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
+    {
+    	lo_server_add_method((*servIter), std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
+    			NULL, sceneCallback, NULL);
 
-	std::cout << "  SceneManager receiving on:\t" <<
-        lo_address_get_url(lo_rxAddr) << std::endl;
+    	std::cout << "  SceneManager receiving on:\t" << lo_server_get_url(*servIter) << std::endl;
+    }
 }
 
 void *spinServerContext::spinServerThread(void *arg)
@@ -175,7 +182,7 @@ void *spinServerContext::spinServerThread(void *arg)
 
     // convert ports to integers for sending:
     int i_rxPort, i_txPort, i_syncPort;
-    fromString<int>(i_rxPort, lo_address_get_port(context->lo_rxAddr));
+    fromString<int>(i_rxPort, lo_address_get_port(context->lo_rxAddrs_[0]));
     fromString<int>(i_txPort, lo_address_get_port(context->lo_txAddr));
     fromString<int>(i_syncPort, lo_address_get_port(context->lo_syncAddr));
 
@@ -211,8 +218,9 @@ void *spinServerContext::spinServerThread(void *arg)
         pthread_mutex_unlock(&sceneMutex);
 
         int recv = 0; // bytes received (note: might not be accurate for TCP)
+        for (std::vector<lo_server>::iterator it = context->lo_rxServs_.begin(); it != context->lo_rxServs_.end(); ++it)
+        	recv += lo_server_recv_noblock((*it), TIMEOUT);
         recv += lo_server_recv_noblock(context->lo_infoServ_, TIMEOUT);
-        recv += lo_server_recv_noblock(context->lo_rxServ_, TIMEOUT);
         recv += lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
 
         // Need to sleep a little bit so that updates have time. 2 reasons:

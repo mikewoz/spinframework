@@ -69,9 +69,9 @@ int main(int argc, char **argv)
 
 	std::string txHost = lo_address_get_hostname(server->lo_txAddr);
 	std::string txPort = lo_address_get_port(server->lo_txAddr);
-	std::string rxHost = lo_address_get_hostname(server->lo_rxAddr);
-	std::string rxPort = lo_address_get_port(server->lo_rxAddr);
-	std::string syncPort = lo_address_get_port(server->lo_rxAddr);
+	std::string rxHost = lo_address_get_hostname(server->lo_rxAddrs_[0]);
+	std::string rxPort = lo_address_get_port(server->lo_rxAddrs_[0]);
+	std::string syncPort = lo_address_get_port(server->lo_syncAddr);
 
 	// set up the usage document, which a user can acess with -h or --help
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 		server->lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
 	}
 	while (arguments.read("--rx-addr", rxHost, rxPort)) {
-		server->lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
+		server->lo_rxAddrs_[0] = lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
 	while (arguments.read("--sync-port", syncPort)) {
 		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());

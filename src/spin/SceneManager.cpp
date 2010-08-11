@@ -268,8 +268,12 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
     stateMap[s->classType].push_back(s);
 
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL, 
+    std::vector<lo_server>::iterator it;
+    for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
+    {
+    	lo_server_add_method((*it), oscPattern.c_str(), NULL,
             spinBaseContext::nodeCallback, (void*)s->id);
+    }
 
     SCENE_MSG("sss", "registerState", s->id->s_name, s->classType.c_str());
 
@@ -279,7 +283,11 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
 void SceneManager::unregisterStateSet(ReferencedStateSet *s)
 {
     std::string oscPattern = "/SPIN/" + sceneID + "/" + std::string(s->id->s_name);
-    lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
+    std::vector<lo_server>::iterator it;
+    for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
+    {
+    	lo_server_del_method((*it), oscPattern.c_str(), NULL);
+    }
 
     ReferencedStateSetList::iterator itr;
     itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s );

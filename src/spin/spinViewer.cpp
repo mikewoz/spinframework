@@ -89,8 +89,8 @@ int run(int argc, char **argv)
 	int screen=-1;
 	
 	std::string sceneID = spin.getSceneID();
-	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddr);
-	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddr);
+	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddrs_[0]);
+	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddrs_[0]);
 	std::string syncPort = lo_address_get_port(spinListener.lo_syncAddr);
 
 	// *************************************************************************
@@ -149,7 +149,7 @@ int run(int argc, char **argv)
 	spin.setSceneID(sceneID);
 
 	while (arguments.read("--server-addr", rxHost, rxPort)) {
-		spinListener.lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
+		spinListener.lo_rxAddrs_[0] = lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
 	while (arguments.read("--sync-port", syncPort)) {
 		spinListener.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
