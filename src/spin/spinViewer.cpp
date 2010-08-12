@@ -66,6 +66,17 @@
 
 extern pthread_mutex_t sceneMutex;
 
+struct frustum
+{
+	bool valid;
+	double left;
+	double right;
+	double bottom;
+	double top;
+	double near;
+	double far;
+};
+
 int run(int argc, char **argv)
 {
 	//std::cout <<"\nspinViewer launching..." << std::endl;
@@ -155,6 +166,14 @@ int run(int argc, char **argv)
 		spinListener.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
 	}
 
+	frustum frust;
+	frust.valid = false;
+	while (arguments.read("--frustum", frust.left, frust.right, frust.bottom, frust.top)) {
+		frust.near = 1.0;
+		frust.far = 10000.0;
+		frust.valid = true;
+	}
+
 	if (arguments.read("--fullscreen")) fullscreen=true;
     if (arguments.read("--hide-cursor")) hideCursor=true;
 	while (arguments.read("--window",x,y,width,height)) {}
@@ -207,6 +226,13 @@ int run(int argc, char **argv)
     } else {
     	if (screen<0) view->setUpViewInWindow(x,y,width,height);
     	else view->setUpViewInWindow(x,y,width,height,screen);
+    }
+
+    if (frust.valid)
+    {
+    	//view->getCamera()->getProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
+    	std::cout << "  Custom frustum:\t\t" << frust.left<<" "<<frust.right<<" "<<frust.bottom<<" "<<frust.top<<" "<<frust.near<<" "<<frust.far << std::endl;
+    	view->getCamera()->setProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
     }
 
     //TODO:2010-07-28:aalex:Load an image for a window icon
