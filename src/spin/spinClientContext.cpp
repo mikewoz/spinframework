@@ -183,17 +183,8 @@ void *spinClientContext::spinClientThread(void *arg)
     static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
     {
-		
-    	int recv = 0; // bytes received (note: might not be accurate for TCP)
-
-		/*
-        for (std::vector<lo_server>::iterator it = context->lo_rxServs_.begin(); it != context->lo_rxServs_.end(); ++it)
-        	recv += lo_server_recv_noblock((*it), TIMEOUT);
-    	recv += lo_server_recv_noblock(context->lo_syncServ, TIMEOUT);
-    	recv += lo_server_recv_noblock(context->lo_infoServ_, TIMEOUT);
-    	recv += lo_server_recv_noblock(context->lo_tcpRxServer_, TIMEOUT);
-		*/
-		
+        int recv = context->pollUpdates();
+        
         if (recv == 0)
         	usleep(1000);
 
