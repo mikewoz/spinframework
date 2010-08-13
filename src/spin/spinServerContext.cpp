@@ -339,14 +339,14 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     else
     {
 	    ReferencedNode* n = spinApp::Instance().sceneManager->getNode(nodeID);
+	    if (n) spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
 
-	    if (n)
+	    else
 	    {
-	    	//std::cout << "... forwarding to node: " << n->getID() << " (" << path << ")" << std::endl;
-	    	spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
+	    	ReferencedStateSet* s = spinApp::Instance().sceneManager->getStateSet(nodeID.c_str());
+	    	if (s) spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) s->id);
 	    }
 	}
-
 
     return 1;
 }
