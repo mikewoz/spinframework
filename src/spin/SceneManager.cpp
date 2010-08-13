@@ -1325,7 +1325,7 @@ void SceneManager::update()
 	    }
 
 	}
-
+	
 }
 
 // save scene as .osg

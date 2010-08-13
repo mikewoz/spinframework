@@ -147,8 +147,10 @@ void ReferencedNode::attach()
 {
     if (this->newParent==NULL_SYMBOL) return;
 
+	std::cout << "about to lock sceneMutex in ReferencedNode::attach" << std::endl;
     pthread_mutex_lock(&sceneMutex);
-
+	std::cout << "....yep" << std::endl;
+	
     osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent->s_thing);
 
     // if the parent is invalid (which will be the case, for example, if the user
@@ -170,6 +172,7 @@ void ReferencedNode::attach()
     }
 
     pthread_mutex_unlock(&sceneMutex);
+	std::cout << "... yep unlocked" << std::endl;
 
     // remove node from current parent (make sure to release the mutex first!)
     if (this->parent != this->newParent)
@@ -193,7 +196,7 @@ void ReferencedNode::attach()
 // remove this node from the scenegraph:
 void ReferencedNode::detach()
 {
-    pthread_mutex_lock(&sceneMutex);
+    //pthread_mutex_lock(&sceneMutex);
 
     if (parent == WORLD_SYMBOL)
     {
@@ -212,7 +215,7 @@ void ReferencedNode::detach()
         }
     }
 
-    pthread_mutex_unlock(&sceneMutex);
+    //pthread_mutex_unlock(&sceneMutex);
 }
 
 
@@ -330,8 +333,8 @@ void ReferencedNode::setParent (const char *newvalue)
     if (parent != s)
     {
         newParent = s;
-        attach();
-    }
+		attach();
+	}
 }
 
 void ReferencedNode::setContext (const char *newvalue)

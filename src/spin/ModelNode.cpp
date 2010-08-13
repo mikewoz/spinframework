@@ -226,9 +226,13 @@ void ModelNode::setStateSet (int i, const char *replacement)
 void ModelNode::drawModel()
 {
 	int i,j;
+
+	std::cout << "about to lock sceneMutex in ModelNode::drawModel (" << modelPath << ")" << std::endl;
 	
 	pthread_mutex_lock(&sceneMutex);
 
+	std::cout << "..... locked!" << std::endl;
+	
 	if (model.valid())
 	{
 
@@ -511,6 +515,7 @@ void ModelNode::drawModel()
 	}
 	
 	pthread_mutex_unlock(&sceneMutex);
+	std::cout << "unlocked sceneMutex in ModelNode::drawModel" << std::endl;
 }
 
 std::vector<lo_message> ModelNode::getState ()

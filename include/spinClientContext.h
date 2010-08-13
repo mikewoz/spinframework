@@ -60,11 +60,15 @@ class spinClientContext : public spinBaseContext
 		bool start();
         lo_server lo_syncServ;
 
+		int pollUpdates();
+
+		
     private:
         // false once we've subscribed to a server in TCP
         bool doSubscribe_; 
         // address to which messages can be sent over TCP
         lo_address lo_serverTCPAddr;
+
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
          * listens to incoming SPIN messages. It does NOT re-transmit those messages,

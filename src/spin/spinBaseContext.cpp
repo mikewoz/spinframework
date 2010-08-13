@@ -174,9 +174,9 @@ void spinBaseContext::sigHandler(int signum)
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Receiving on INFO channel:\t\t\t" << lo_address_get_url(lo_infoAddr) << std::endl;
+    std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << std::endl;
     std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
-    std::cout << "  Sending on TX channel:\t\t\t" << lo_address_get_url(lo_txAddr) << std::endl;
+    std::cout << "  Sending on TX channel:\t" << lo_address_get_url(lo_txAddr) << std::endl;
 
     signalStop = false;
 

@@ -121,8 +121,9 @@ void spinServerContext::createServers()
         lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
     }
 
-    std::cout << "  Receiving on TCP channel:\t\t\t" <<
-    		lo_server_get_url(lo_tcpRxServer_) << std::endl;
+    std::cout << "  Receiving on TCP channel:\t" << lo_server_get_url(lo_tcpRxServer_) <<
+        std::endl;
+
 
     spinBaseContext::createServers();
 #if 0

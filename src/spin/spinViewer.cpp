@@ -242,7 +242,7 @@ int run(int argc, char **argv)
     viewer.getWindows(windows);
     for (wIter=windows.begin(); wIter!=windows.end(); wIter++)
     {
-    	(*wIter)->setWindowName("spinViewer " + spin.getUserID() + "@" + spin.getSceneID());
+    	(*wIter)->setWindowName("spinviewer " + spin.getUserID() + "@" + spin.getSceneID());
 		if (hideCursor) (*wIter)->useCursor(false);
 
         //TODO:2010-07-28:aalex:Set a window icon
@@ -304,9 +304,10 @@ int run(int argc, char **argv)
 	// ask for refresh:
 	spin.SceneMessage("s", "refresh", LO_ARGS_END);
 
-	
+	osg::Timer_t lastFrameTick = osg::Timer::instance()->tick();
+
 	double minFrameTime = 1.0 / maxFrameRate;
-	
+
 	// program loop:
 	while(not viewer.done())
 	{
@@ -314,9 +315,12 @@ int run(int argc, char **argv)
 		
 		if (spinListener.isRunning())
 		{
+			// ***** ORIGINAL (pollUpdates is done in clientContext thread):
+			/*
 			osg::Timer_t startFrameTick = osg::Timer::instance()->tick();
 
-	
+			spinListener.pollUpdates();
+			
 			pthread_mutex_lock(&sceneMutex);
 			viewer.frame();
 			pthread_mutex_unlock(&sceneMutex);
@@ -328,7 +332,34 @@ int run(int argc, char **argv)
 				double frameTime = osg::Timer::instance()->delta_s(startFrameTick, endFrameTick);
 				if (frameTime < minFrameTime) OpenThreads::Thread::microSleep(static_cast<unsigned int>(1000000.0*(minFrameTime-frameTime)));
 			}
+			*/
 
+			// ***** NEW (pollUpdates are done in same thread as viewer)
+
+			
+			int recv = spinListener.pollUpdates();
+			
+			double dt = osg::Timer::instance()->delta_s(lastFrameTick, osg::Timer::instance()->tick());
+
+			if (dt >= minFrameTime)
+			{
+				pthread_mutex_lock(&sceneMutex);
+				viewer.frame();
+				pthread_mutex_unlock(&sceneMutex);
+
+				// save time when the last time a frame was rendered:
+				lastFrameTick = osg::Timer::instance()->tick();
+				dt = 0;
+			}
+
+			unsigned int sleepTime;
+			if (!recv) sleepTime = static_cast<unsigned int>(1000000.0*(minFrameTime-dt));
+			else sleepTime = 0;
+			if (sleepTime > 100) sleepTime = 100;
+
+			if (!recv) OpenThreads::Thread::microSleep(sleepTime);
+
+			// ***** END
 		
 		} else {
 			
