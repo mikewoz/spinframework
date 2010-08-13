@@ -147,9 +147,7 @@ void ReferencedNode::attach()
 {
     if (this->newParent==NULL_SYMBOL) return;
 
-	std::cout << "about to lock sceneMutex in ReferencedNode::attach" << std::endl;
     pthread_mutex_lock(&sceneMutex);
-	std::cout << "....yep" << std::endl;
 	
     osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent->s_thing);
 
@@ -172,7 +170,6 @@ void ReferencedNode::attach()
     }
 
     pthread_mutex_unlock(&sceneMutex);
-	std::cout << "... yep unlocked" << std::endl;
 
     // remove node from current parent (make sure to release the mutex first!)
     if (this->parent != this->newParent)
