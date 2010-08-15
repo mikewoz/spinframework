@@ -47,6 +47,7 @@
 
 #include "spinApp.h"
 #include "spinBaseContext.h"
+#include "spinServerContext.h"
 #include "ReferencedNode.h"
 #include "SceneManager.h"
 
@@ -100,16 +101,18 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
 // destructor
 ReferencedNode::~ReferencedNode()
 {
+    string oscPattern = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + string(id->s_name);
 
     if (!spinBaseContext::signalStop)
     {
         // unregister with OSC parser:
-        string oscPattern = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + string(id->s_name);
         std::vector<lo_server>::iterator it;
         for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
         {
         	lo_server_del_method((*it), oscPattern.c_str(), NULL);
         }
+		lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
+		
     }
 
     id->s_thing = 0;
@@ -126,9 +129,21 @@ void ReferencedNode::registerNode(SceneManager *s)
     std::vector<lo_server>::iterator it;
     for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
     {
-    	lo_server_add_method((*it), oscPattern.c_str(),
-            NULL, spinBaseContext::nodeCallback, (void*)id);
+    	lo_server_add_method((*it),
+	                         oscPattern.c_str(),
+	                         NULL,
+	                         spinBaseContext::nodeCallback,
+	                         (void*)id);
+		
     }
+
+	// and with the TCP receiver in the server case:
+	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+	                     oscPattern.c_str(),
+	                     NULL,
+	                     spinBaseContext::nodeCallback,
+	                     (void*)id);
+
 }
 
 // *****************************************************************************

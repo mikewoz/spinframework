@@ -42,13 +42,15 @@
 #include <string>
 #include <iostream>
 
-
 #include "spinApp.h"
 #include "spinServerContext.h"
 #include "SceneManager.h"
 #include "spinLog.h"
 #include "nodeVisitors.h"
 #include "spinDefaults.h"
+
+#include "SoundConnection.h" // for TCP wildcard check
+
 
 extern pthread_mutex_t sceneMutex;
 
@@ -149,6 +151,9 @@ void spinServerContext::createServers()
 
     	std::cout << "  SceneManager receiving on:\t" << lo_server_get_url(*servIter) << std::endl;
     }
+
+	lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
+    			NULL, sceneCallback, NULL);
 }
 
 void *spinServerContext::spinServerThread(void *arg)
@@ -297,14 +302,15 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     // WARNING: tcpCallback is registered to match ANY path, so we must manually
     // check if it is within the /SPIN namespace, and if it matches the sceneID:
 
-    std::string spinToken, sceneID, nodeID;
+    std::string spinToken, sceneString, nodeString;
     std::istringstream pathstream(path);
     pathstream.get(); // ignore leading slash
     getline(pathstream, spinToken, '/');
-    getline(pathstream, sceneID, '/');
-    getline(pathstream, nodeID, '/');
+    getline(pathstream, sceneString, '/');
+    getline(pathstream, nodeString, '/');
 
-    if ((spinToken!="SPIN") || (sceneID!=spinApp::Instance().getSceneID()))
+
+    if ((spinToken!="SPIN") || !wildcardMatch(sceneString.c_str(),spinApp::Instance().getSceneID().c_str()) )
     {
     	std::cout << "Warning: server is ignoring TCP message: " << path << std::endl;
     	return 1;
@@ -327,17 +333,22 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
         lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
 
+	// WE DON'T NEED TO DO ANYHING MORE. WE REGISTER WITH THE TCP SERVER NOW...
+	// FOR THE SCENE, AND EACH NODE, STATESET, AND SOUNDCONNECTION
+	
+	
     // any other scene message just gets forwarded to the generic (UDP)
     // sceneCallback
-    else if (nodeID.empty()) // (std::string(path) == std::string("/SPIN/" + spinApp::Instance().getSceneID()))
+    else if (nodeString.empty())
     {
-    	//std::cout << "... forwarding scene message " << std::endl;
-        spinBaseContext::sceneCallback(path, types, argv, argc, (void*) data, (void*) user_data);
+        //spinBaseContext::sceneCallback(path, types, argv, argc, (void*) data, (void*) user_data);
     }
 
 
     else
     {
+		// OLD WAY (wildcards don't work)
+		/*
 	    ReferencedNode* n = spinApp::Instance().sceneManager->getNode(nodeID);
 	    if (n) spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
 
@@ -346,6 +357,38 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 	    	ReferencedStateSet* s = spinApp::Instance().sceneManager->getStateSet(nodeID.c_str());
 	    	if (s) spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) s->id);
 	    }
+		*/
+
+		
+		// WE DON'T NEED TO DO THIS ANYMORE. WE REGISTER THE TCP CALLBACK WITH
+		// EACH NODE, STATESET, AND SOUNDCONNECTION
+		
+		// The nodeString might have a wildcard, so here we call the method on
+		// any nodes (or statesets) that match:
+		/*
+		std::vector<t_symbol*> matched = spinApp::Instance().sceneManager->findNodes(nodeString.c_str());
+
+		std::vector<t_symbol*>::iterator iter;
+		for (iter = matched.begin(); iter != matched.end(); ++iter)
+		{
+			spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) (*iter));
+		}
+
+
+		// connections are different:
+		std::vector<SoundConnection*> conns = spinApp::Instance().sceneManager->getConnections();
+		
+		std::vector<SoundConnection*>::iterator cIter;
+		for ( cIter=conns.begin(); cIter!=conns.end(); ++cIter )
+		{
+			if (wildcardMatch(nodeString.c_str(), (*cIter)->id->s_name))
+			{
+				std::cout << " ... matched connection: " << (*cIter)->id->s_name << std::endl;
+				spinBaseContext::connectionCallback(path, types, argv, argc, (void*) data, (void*) (*iter));
+			}
+		}
+		*/
+
 	}
 
     return 1;

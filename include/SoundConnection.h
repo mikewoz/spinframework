@@ -45,6 +45,7 @@
 
 #include "DSPNode.h"
 #include "SceneManager.h"
+#include "spinServerContext.h"
 
 enum connectionType { NORMAL, NODE_TO_SPACE, SPACE_TO_NODE };
 

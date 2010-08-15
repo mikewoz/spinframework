@@ -111,7 +111,8 @@ class spinBaseContext
         /** Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters. */
         lo_address lo_syncAddr;
         lo_server lo_infoServ_;
-
+		
+        lo_server lo_tcpRxServer_;
 
         static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
@@ -127,7 +128,7 @@ class spinBaseContext
 	static void oscParser_error(int num, const char *msg, const char *path);
 
     protected:
-        lo_server lo_tcpRxServer_;
+
         bool running;
         spinContextMode mode;
         void setLog(spinLog &log);

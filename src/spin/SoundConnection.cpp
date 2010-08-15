@@ -80,6 +80,12 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
             NULL, spinBaseContext::connectionCallback, (void*)this);
     }
 
+	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+	                     oscPattern.c_str(),
+	                     NULL,
+	                     spinBaseContext::connectionCallback,
+	                     (void*)this);
+	
 	// store pointer to sceneManager
 	sceneManager = s;
 	
@@ -108,6 +114,9 @@ SoundConnection::~SoundConnection()
     {
     	lo_server_del_method((*it), oscPattern.c_str(), NULL);
     }
+
+	lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
+	
 	//id->s_thing = 0;
 
 }

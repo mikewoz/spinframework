@@ -113,6 +113,10 @@ class SceneManager
         ReferencedStateSet* createStateSet(const char *id, const char *type);
         ReferencedStateSet* createStateSet(const char *fname);
 
+		std::vector<t_symbol*> findNodes(const char *pattern);
+		//nodeListType findNodes(const char *pattern);
+		//ReferencedStateSetList findStateSet(const char *pattern);
+			
         std::vector<SoundConnection*> getConnections();
 
         /**

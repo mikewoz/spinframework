@@ -127,6 +127,9 @@ std::string leadingSpaces(int n);
 std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters = " ");
 std::vector<float> floatsFromString (std::string theString);
 
+bool wildcardMatch(const char *pat, const char *str);
+
+
 // *****************************************************************************
 // file helpers
 

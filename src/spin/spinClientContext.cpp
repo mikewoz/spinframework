@@ -306,7 +306,7 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
 
 	// It's a valid message, so we just forward it to the regular OSC callback
     // methods:
-
+/*
     if (nodeID.empty())
     {
     	// scene message:
@@ -321,7 +321,7 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
 	    	spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
 	    }
 	}
-
+*/
 
 
     return 1;

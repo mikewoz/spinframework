@@ -42,6 +42,7 @@
 
 #include "SceneManager.h"
 #include "spinBaseContext.h"
+#include "spinServerContext.h"
 #include "MediaManager.h"
 #include "ReferencedNode.h"
 #include "SoundConnection.h"
@@ -275,6 +276,10 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
             spinBaseContext::nodeCallback, (void*)s->id);
     }
 
+	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+	                     oscPattern.c_str(), NULL,
+	                     spinBaseContext::nodeCallback, (void*)s->id);
+	
     SCENE_MSG("sss", "registerState", s->id->s_name, s->classType.c_str());
 
     sendNodeList("*");
@@ -288,6 +293,8 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
     {
     	lo_server_del_method((*it), oscPattern.c_str(), NULL);
     }
+	lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+	                     oscPattern.c_str(), NULL);
 
     ReferencedStateSetList::iterator itr;
     itr = std::find( stateMap[s->classType].begin(), stateMap[s->classType].end(), s );
@@ -744,7 +751,7 @@ ReferencedNode* SceneManager::getOrCreateNode(const char *id, const char *type)
     if (n.valid()) return n.get();
     else return createNode(id, type);
 }
-
+	
 // *****************************************************************************
 
 ReferencedStateSet* SceneManager::getStateSet(const char *id)
@@ -902,6 +909,124 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
     std::cout << "ERROR creating ReferencedStateSet from file: " << fname << std::endl;
     return NULL;
 }
+
+
+
+// *****************************************************************************
+
+std::vector<t_symbol*> SceneManager::findNodes(const char *pattern)
+{
+	std::vector<t_symbol*> matches;
+
+	// first, check if the patterns does in fact have a wildcard. If not, we can
+	// just return a gensym of the pattern:
+	std::string patternStr = std::string(pattern);
+	if (patternStr.find_first_of("*?") != std::string::npos)
+	{
+		matches.push_back(gensym(pattern));
+	}
+
+	// otherwise, we have to go through the entire list of nodes and statesets
+	// and match with the id:
+	else
+	{
+		std::cout << "testing pattern" << pattern << std::endl;
+		
+		// nodes:
+		nodeMapType::iterator nIt;
+		nodeListType::iterator nIter;
+		for (nIt = nodeMap.begin(); nIt != nodeMap.end(); ++nIt)
+		{
+		    for (nIter = (*nIt).second.begin(); nIter != (*nIt).second.end(); ++nIter)
+		    {
+				if (wildcardMatch(pattern, (*nIter)->id->s_name))
+				{
+					matches.push_back((*nIter)->id);
+					std::cout << " ... matched node: " << (*nIter)->id->s_name << std::endl;
+				}
+		    }
+		}
+
+		// statesets:
+		ReferencedStateSetMap::iterator sIt;
+		ReferencedStateSetList::iterator sIter;
+		for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
+		{
+		    for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
+		    {
+				if (wildcardMatch(pattern, (*sIter)->id->s_name))
+				{
+					matches.push_back((*sIter)->id);		
+					std::cout << " ... matched stateset: " << (*nIter)->id->s_name << std::endl;
+			    }
+			}
+		}
+
+
+	}
+	return matches;
+}
+
+/*
+nodeListType SceneManager::findNodes(const char *pattern)
+{
+	nodeListType matches;
+    nodeMapType::iterator it;
+	nodeListType::iterator iter;
+	
+	patternStr = std::string(pattern);
+	if (patternStr.find_first_of("*?") != std::string::npos)
+	{
+		matches.push_back(getNode(patternStr));	
+	}
+
+	else
+	{
+		for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
+		{
+		    for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+		    {
+				if (wildcardMatch(pattern, (*iter)->id->s_name)
+					matches.push_back(*iter);		
+		    }
+		}
+	}
+	
+	return matches;
+}
+
+ReferencedStateSetList SceneManager::findStateSets(const char *pattern)
+{
+	ReferencedStateSetList matches;
+    ReferencedStateSetMap::iterator it;
+    ReferencedStateSetList::iterator iter;
+
+	patternStr = std::string(pattern);
+	if (patternStr.find_first_of("*?") != std::string::npos)
+	{
+		// no wildcards, just return getNode(pattern)
+		matches.push_back(getStateSet(patternStr));
+	}
+
+	else
+	{
+	
+		for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
+		{
+		    for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+		    {
+				if (wildcardMatch(pattern, (*iter)->id->s_name)
+					matches.push_back(*iter);		
+		    }
+		}
+	}
+
+	return matches;
+}
+*/
+
+
+
 
 // *****************************************************************************
 std::vector<SoundConnection*> SceneManager::getConnections()
