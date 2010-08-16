@@ -130,6 +130,7 @@ int run(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
 
+    //TODO:2010-08-16:aalex:rename --disabled to --disable-camera-controls
 	arguments.getApplicationUsage()->addCommandLineOption("--disabled", "Disable camera controls for this user");
 	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server");
 
@@ -180,7 +181,6 @@ int run(int argc, char **argv)
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}
-
 	
 	if (arguments.read("--disabled")) mover=false;
 	if (arguments.read("--picker")) picker=true;
@@ -218,7 +218,7 @@ int run(int argc, char **argv)
     osg::ref_ptr<osgViewer::View> view = new osgViewer::View;
     viewer.addView(view.get());
 
-    view->getCamera()->setClearColor(osg::Vec4(0.0,0.0,0.0,0.0));
+    view->getCamera()->setClearColor(osg::Vec4(0.0, 0.0, 0.0, 0.0));
 
     if (fullscreen)
     {
@@ -259,14 +259,12 @@ int run(int argc, char **argv)
 	view->addEventHandler(new osgViewer::ThreadingHandler);
 	view->addEventHandler(new osgViewer::WindowSizeHandler);
 
-
 	view->addEventHandler(new osgViewer::HelpHandler(arguments.getApplicationUsage()));
 	view->addEventHandler( new osgGA::StateSetManipulator(view->getCamera()->getOrCreateStateSet()) );
 
 	//view->setLightingMode(osg::View::NO_LIGHT);
 	view->setLightingMode(osg::View::HEADLIGHT);
 	//view->setLightingMode(osg::View::SKY_LIGHT);
-
 
 	// *************************************************************************
 	// create a camera manipulator
@@ -277,7 +275,6 @@ int run(int argc, char **argv)
 
 	view->setCameraManipulator(manipulator.get());
 	
-
 	// *************************************************************************
 	// any option left unread are converted into errors to write out later.
 	arguments.reportRemainingOptionsAsUnrecognized();
@@ -288,7 +285,6 @@ int run(int argc, char **argv)
 		arguments.writeErrorMessages(std::cout);
 		return 1;
 	}
-	
 
 	// *************************************************************************
 	// set up any initial scene elements:
