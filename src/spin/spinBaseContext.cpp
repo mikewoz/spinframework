@@ -118,18 +118,18 @@ spinBaseContext::~spinBaseContext()
     this->stop();
 	
     std::vector<lo_address>::iterator addrIter;
-    while ((addrIter=lo_rxAddrs_.begin()) != lo_rxAddrs_.end())
+    for (addrIter=lo_rxAddrs_.begin(); addrIter != lo_rxAddrs_.end(); ++addrIter)
     {
     	lo_address_free(*addrIter);
-    	lo_rxAddrs_.erase(addrIter);
     }
+    lo_rxAddrs_.clear();
 
     std::vector<lo_server>::iterator servIter;
-    while ((servIter=lo_rxServs_.begin()) != lo_rxServs_.end())
+    for (servIter=lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
     	lo_server_free(*servIter);
-    	lo_rxServs_.erase(servIter);
     }
+    lo_rxServs_.clear();
 
     lo_address_free(lo_txAddr);
 	lo_address_free(lo_infoAddr);

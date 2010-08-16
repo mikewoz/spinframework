@@ -109,9 +109,14 @@ int main(int argc, char **argv)
 	while (arguments.read("--tx-addr", txHost, txPort)) {
 		server->lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
 	}
+
+	bool passed_rxAddrs = false;
 	while (arguments.read("--rx-addr", rxHost, rxPort)) {
-		server->lo_rxAddrs_[0] = lo_address_new(rxHost.c_str(), rxPort.c_str());
+		if (!passed_rxAddrs) server->lo_rxAddrs_.clear();
+		server->lo_rxAddrs_.push_back(lo_address_new(rxHost.c_str(), rxPort.c_str()));
+		passed_rxAddrs = true;
 	}
+
 	while (arguments.read("--sync-port", syncPort)) {
 		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
 	}

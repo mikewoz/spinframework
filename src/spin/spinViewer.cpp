@@ -160,8 +160,9 @@ int run(int argc, char **argv)
 	spin.setSceneID(sceneID);
 
 	while (arguments.read("--server-addr", rxHost, rxPort)) {
-		spinListener.lo_rxAddrs_[0] = lo_address_new(rxHost.c_str(), rxPort.c_str());
+		spinListener.lo_txAddr= lo_address_new(rxHost.c_str(), rxPort.c_str());
 	}
+
 	while (arguments.read("--sync-port", syncPort)) {
 		spinListener.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
 	}
@@ -336,9 +337,6 @@ int run(int argc, char **argv)
 
 			// ***** NEW (pollUpdates are done in same thread as viewer)
 
-			
-			int recv = spinListener.pollUpdates();
-			
 			double dt = osg::Timer::instance()->delta_s(lastFrameTick, osg::Timer::instance()->tick());
 
 			if (dt >= minFrameTime)
