@@ -49,6 +49,8 @@
 #include <osgIntrospection/Type>
 #include <osgIntrospection/Value>
 
+#include <osgUtil/Optimizer>
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/python.hpp>
@@ -652,6 +654,18 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteNode((char*)argv[1]);
     else if ((theMethod=="deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*)argv[1]);
+    else if ((theMethod=="optimize") && (argc==2))
+    {
+    	osgUtil::Optimizer optimizer;
+    	switch ((char*)argv[1])
+    	{
+    	case("all"):
+    			optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
+				break;
+    	default:
+    		optimizer.optimize(sceneManager->worldNode.get());
+    	}
+    }
     else {
         // FIXME: this used to rebroadcast messages that did not match command
 #if 0
