@@ -659,10 +659,14 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     	osgUtil::Optimizer optimizer;
     	if (std::string((char*)argv[1])=="all")
     	{
+            std::cout << "Optimizing scene (all)" << std::endl;
+            
     		optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
         } else {
+            std::cout << "Optimizing scene" << std::endl;
     		optimizer.optimize(sceneManager->worldNode.get());
     	}
+        SCENE_MSG("ss", "optimize", (char*)argv[1]);
     }
     else {
         // FIXME: this used to rebroadcast messages that did not match command

@@ -322,8 +322,32 @@ void ModelNode::drawModel()
 			// *****************************************************************
 			// search for special "billboard" nodes
 
+			//optimizer.optimize(model.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
+			//optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
 			optimizer.optimize(model.get());
-			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
+			/*
+            optimizer.optimize(model.get(),
+                osgUtil::Optimizer::FLATTEN_STATIC_TRANSFORMS |
+                osgUtil::Optimizer::REMOVE_REDUNDANT_NODES |
+                osgUtil::Optimizer::REMOVE_LOADED_PROXY_NODES |
+                osgUtil::Optimizer::COMBINE_ADJACENT_LODS |
+                osgUtil::Optimizer::SHARE_DUPLICATE_STATE |
+                osgUtil::Optimizer::MERGE_GEOMETRY |
+                osgUtil::Optimizer::CHECK_GEOMETRY |
+                osgUtil::Optimizer::SPATIALIZE_GROUPS | 
+                osgUtil::Optimizer::COPY_SHARED_NODES | 
+                osgUtil::Optimizer::TRISTRIP_GEOMETRY |
+                osgUtil::Optimizer::TESSELLATE_GEOMETRY |
+                osgUtil::Optimizer::OPTIMIZE_TEXTURE_SETTINGS |
+                osgUtil::Optimizer::MERGE_GEODES |
+                osgUtil::Optimizer::FLATTEN_BILLBOARDS |
+                //osgUtil::Optimizer::TEXTURE_ATLAS_BUILDER |
+                osgUtil::Optimizer::STATIC_OBJECT_DETECTION |
+                osgUtil::Optimizer::FLATTEN_STATIC_TRANSFORMS_DUPLICATING_SHARED_SUBGRAPHS 
+			);
+            */
+
+            model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 			StateSetList statesets;
 			TextureStateSetFinder f(statesets);
