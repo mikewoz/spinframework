@@ -657,12 +657,10 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     else if ((theMethod=="optimize") && (argc==2))
     {
     	osgUtil::Optimizer optimizer;
-    	switch ((char*)argv[1])
+    	if (std::string((char*)argv[1])=="all")
     	{
-    	case("all"):
-    			optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
-				break;
-    	default:
+    		optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
+        } else {
     		optimizer.optimize(sceneManager->worldNode.get());
     	}
     }
