@@ -335,7 +335,8 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 
     if (method == "optimize")
     {
-    	std::cout << "got TCP optimize.." << std::endl;
+    	// TODO: we should really have a SCENE_MSG in spinApp that takes a
+    	// txaddr as an argument. For now, we are just using the bundle message
     	std::map<std::string, lo_address>::const_iterator client;
         for (client = context->tcpClientAddrs_.begin();
              client != context->tcpClientAddrs_.end();
@@ -346,7 +347,6 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
         	lo_message_add(msg, "ss", "optimize", reinterpret_cast<const char*>(argv[1]));
         	msgs.push_back(msg);
 			spinApp::Instance().SceneBundle(msgs, client->second);
-			std::cout << "sending to" << client->first << std::endl;
         }
 
     }

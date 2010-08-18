@@ -101,17 +101,18 @@ void TextNode::setContext (const char *newvalue)
 
 void TextNode::setTextValue (const char *s)
 {
-	if (textLabel->getText().createUTF8EncodedString() != string(s))
+	//if (textLabel->getText().createUTF8EncodedString() != string(s))
+	if (_text != string(s))
 	{
 		//getText().createUTF8EncodedString();
 		
-		//this->_text = string(s);
+		this->_text = string(s);
 		pthread_mutex_lock(&sceneMutex);
 		textLabel->setText(s);
 		pthread_mutex_unlock(&sceneMutex);
 		//drawText();
 
-		std::cout << "debug: setting text label to: " << s << ", getTextValue() reports: " << getTextValue() << std::endl;
+		//std::cout << "debug: setting text label to: " << s << ", getTextValue() reports: " << getTextValue() << std::endl;
 
 		BROADCAST(this, "ss", "setTextValue", getTextValue());
 	}

@@ -75,7 +75,8 @@ public:
 	void setColor			(float red, float green, float blue, float alpha);
 
 
-	const char *getTextValue() { return textLabel->getText().createUTF8EncodedString().c_str(); }
+	//const char *getTextValue() { return textLabel->getText().createUTF8EncodedString().c_str(); }
+	const char *getTextValue() { return _text.c_str(); }
 	const char *getFont() { return _font.c_str(); }
 	int getBillboard() { return (int)_billboard; }
 	osg::Vec4 getColor() { return _color; };
@@ -93,6 +94,8 @@ private:
 	std::string _font;
 	billboardType _billboard;
 	osg::Vec4 _color;
+
+	std::string _text; // we store this redundantly
 
 	osg::ref_ptr<osg::Geode> textGeode;
 	osg::ref_ptr<osgText::Text> textLabel;
