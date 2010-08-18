@@ -165,9 +165,12 @@ void TextNode::drawText()
 		textGeode = NULL;
 	}
 
-	bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() && (this->getContext()==getHostname()));
+	//bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() && (this->getContext()==getHostname()));
 
-	if (!ignoreOnThisHost)
+	bool drawOnThisHost = ((this->getContextString() == spinApp::Instance().getUserID()) or
+	                       (this->getContextString() == "NULL"));
+	
+	if (drawOnThisHost)
 	{
 		if (_billboard)
 		{
