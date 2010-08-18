@@ -333,6 +333,24 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
         lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
 
+    if (method == "optimize")
+    {
+    	std::cout << "got TCP optimize.." << std::endl;
+    	std::map<std::string, lo_address>::const_iterator client;
+        for (client = context->tcpClientAddrs_.begin();
+             client != context->tcpClientAddrs_.end();
+             ++client)
+        {
+        	std::vector<lo_message> msgs;
+        	lo_message msg = lo_message_new();
+        	lo_message_add(msg, "ss", "optimize", reinterpret_cast<const char*>(argv[1]));
+        	msgs.push_back(msg);
+			spinApp::Instance().SceneBundle(msgs, client->second);
+			std::cout << "sending to" << client->first << std::endl;
+        }
+
+    }
+
 	// WE DON'T NEED TO DO ANYHING MORE. WE REGISTER WITH THE TCP SERVER NOW...
 	// FOR THE SCENE, AND EACH NODE, STATESET, AND SOUNDCONNECTION
 	
