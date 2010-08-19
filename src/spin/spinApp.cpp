@@ -157,7 +157,12 @@ spinApp::spinApp() : userID_(getHostname())
 
 spinApp::~spinApp()
 {
-    delete sceneManager;
+	if (userNode.valid())
+	{
+		sceneManager->doDelete(userNode.get());
+		userNode = 0;
+	}
+	delete sceneManager;
     //spinBaseContext::signalStop = true;
 }
 
