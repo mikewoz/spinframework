@@ -660,11 +660,15 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     	if (std::string((char*)argv[1])=="all")
     	{
             std::cout << "Optimizing scene (all)" << std::endl;
-            
+            pthread_mutex_lock(&sceneMutex); 
     		optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
+            pthread_mutex_unlock(&sceneMutex); 
+            
         } else {
             std::cout << "Optimizing scene" << std::endl;
+            pthread_mutex_lock(&sceneMutex); 
     		optimizer.optimize(sceneManager->worldNode.get());
+            pthread_mutex_unlock(&sceneMutex); 
     	}
         SCENE_MSG("ss", "optimize", (char*)argv[1]);
     }
