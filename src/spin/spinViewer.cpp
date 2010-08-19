@@ -193,6 +193,8 @@ int run(int argc, char **argv)
 	// (note, this constructor gets rid of some additional args)
 
 	osgViewer::CompositeViewer viewer = osgViewer::CompositeViewer(arguments);
+    // Aug 19 2010:tmatth: Tried this for multithreading
+	// viewer.setThreadingModel(osgViewer::CompositeViewer::AutomaticSelection);
 	viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
 
 	viewer.getUsage(*arguments.getApplicationUsage());
@@ -253,6 +255,7 @@ int run(int argc, char **argv)
         //} 
     }
 
+    /// Thu Aug 19 2010:tmatth:FIXME: this segfaults in multithreaded mode
     view->setSceneData(spin.sceneManager->rootNode.get());
 
 	view->addEventHandler(new osgViewer::StatsHandler);
@@ -379,6 +382,8 @@ int run(int argc, char **argv)
 int main(int argc, char **argv)
 {
     try {
+        // Aug 19 2010:tmatth: Tried this to make multithreading work, didn't help
+        // osg::Referenced::setThreadSafeReferenceCounting(true);
         int result = run(argc, argv);
         std::cout << "\nspinviewer exited normally." << std::endl;
         return result;

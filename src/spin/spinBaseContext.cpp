@@ -86,6 +86,7 @@ spinBaseContext::spinBaseContext() :
     lo_infoAddr(NULL),
     lo_syncAddr(NULL),
     lo_infoServ_(NULL),
+    lo_tcpRxServer_(NULL),
     pthreadID(0)
 {
     using namespace spin_defaults;
@@ -128,9 +129,7 @@ spinBaseContext::~spinBaseContext()
 
     std::vector<lo_server>::iterator servIter;
     for (servIter=lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
-    {
-    	lo_server_free(*servIter);
-    }
+        lo_server_free(*servIter);
     lo_rxServs_.clear();
 
     lo_address_free(lo_txAddr);
@@ -142,16 +141,14 @@ spinBaseContext::~spinBaseContext()
 	
     lo_server_free(lo_infoServ_);
     lo_server_free(lo_tcpRxServer_);
-
-
 }
 
 void spinBaseContext::setLog(spinLog &log)
 {
-	std::vector<lo_server>::iterator it;
+    std::vector<lo_server>::iterator it;
     for (it = lo_rxServs_.begin(); it != lo_rxServs_.end(); ++it)
     {
-    	lo_server_add_method((*it), NULL, NULL, logCallback, &log);
+        lo_server_add_method((*it), NULL, NULL, logCallback, &log);
     }
 }
 /**
@@ -188,13 +185,13 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
         std::cout << "spinBaseContext: could not prepare child thread" << std::endl;
         return false;
     }
-	/*
-    if (pthread_attr_setdetachstate(&pthreadAttr, PTHREAD_CREATE_DETACHED) < 0)
-    {
-        std::cout << "spinBaseContext: could not prepare child thread" << std::endl;
-        return false;
-    }
-	*/
+    /*
+       if (pthread_attr_setdetachstate(&pthreadAttr, PTHREAD_CREATE_DETACHED) < 0)
+       {
+       std::cout << "spinBaseContext: could not prepare child thread" << std::endl;
+       return false;
+       }
+     */
     if (pthread_create( &pthreadID, &pthreadAttr, threadFunction, this) < 0)
     {
         std::cout << "spinBaseContext: could not create new thread" << std::endl;
@@ -214,9 +211,9 @@ void spinBaseContext::stop()
     if (isRunning()) signalStop = true;
 
     if (pthreadID != 0) 
-	{
-		pthread_join(pthreadID, NULL);
-	}
+    {
+        pthread_join(pthreadID, NULL);
+    }
 }
 
 int spinBaseContext::connectionCallback(const char *path, 
@@ -656,20 +653,20 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteGraph((char*)argv[1]);
     else if ((theMethod=="optimize") && (argc==2))
     {
-    	osgUtil::Optimizer optimizer;
-    	if (std::string((char*)argv[1])=="all")
-    	{
+        osgUtil::Optimizer optimizer;
+        if (std::string((char*)argv[1])=="all")
+        {
             std::cout << "Optimizing scene (all)" << std::endl;
             pthread_mutex_lock(&sceneMutex); 
-    		optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
+            optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
             pthread_mutex_unlock(&sceneMutex); 
-            
+
         } else {
             std::cout << "Optimizing scene" << std::endl;
             pthread_mutex_lock(&sceneMutex); 
-    		optimizer.optimize(sceneManager->worldNode.get());
+            optimizer.optimize(sceneManager->worldNode.get());
             pthread_mutex_unlock(&sceneMutex); 
-    	}
+        }
         SCENE_MSG("ss", "optimize", (char*)argv[1]);
     }
     else {
@@ -752,35 +749,35 @@ void spinBaseContext::createServers()
     using std::string;
     // set up OSC event listener:
 
-	std::vector<lo_address>::iterator it;
+    std::vector<lo_address>::iterator it;
     for (it = lo_rxAddrs_.begin(); it != lo_rxAddrs_.end(); ++it)
     {
-    	lo_server tmpServ;
-		if (isMulticastAddress(lo_address_get_hostname(*it)))
-		{
-			tmpServ = lo_server_new_multicast(lo_address_get_hostname(*it), lo_address_get_port(*it), oscParser_error);
-			if (tmpServ == 0)
-			{
-				std::cerr << "Multicast server creation on port " << lo_address_get_port(*it) << " failed, trying a random port" << std::endl;
-				std::string addr(lo_address_get_hostname(*it));
-				tmpServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-				lo_address_free(*it);
-				(*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
-			}
-		}
-		else
-		{
-			tmpServ = lo_server_new(lo_address_get_port(*it), oscParser_error);
-			if (tmpServ == 0)
-			{
-				std::cerr << "UDP listener creation on port " << lo_address_get_port(*it) << " failed, trying a random port" << std::endl;
-				tmpServ = lo_server_new(NULL, oscParser_error);
-				std::string addr(lo_address_get_hostname(*it));
-				lo_address_free(*it);
-				(*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
-			}
-		}
-		lo_rxServs_.push_back(tmpServ);
+        lo_server tmpServ;
+        if (isMulticastAddress(lo_address_get_hostname(*it)))
+        {
+            tmpServ = lo_server_new_multicast(lo_address_get_hostname(*it), lo_address_get_port(*it), oscParser_error);
+            if (tmpServ == 0)
+            {
+                std::cerr << "Multicast server creation on port " << lo_address_get_port(*it) << " failed, trying a random port" << std::endl;
+                std::string addr(lo_address_get_hostname(*it));
+                tmpServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
+                lo_address_free(*it);
+                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+            }
+        }
+        else
+        {
+            tmpServ = lo_server_new(lo_address_get_port(*it), oscParser_error);
+            if (tmpServ == 0)
+            {
+                std::cerr << "UDP listener creation on port " << lo_address_get_port(*it) << " failed, trying a random port" << std::endl;
+                tmpServ = lo_server_new(NULL, oscParser_error);
+                std::string addr(lo_address_get_hostname(*it));
+                lo_address_free(*it);
+                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+            }
+        }
+        lo_rxServs_.push_back(tmpServ);
     }
 
     // set up infoPort listener thread:
