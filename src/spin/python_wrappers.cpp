@@ -81,6 +81,7 @@
 
 
 #include "spinApp.h"
+#include "spinBaseContext.h"
 #include "SceneManager.h"
 
 using namespace boost::python;
@@ -282,17 +283,15 @@ bool pyextract( boost::python::object obj, int* d ) {
     return true;
 }
 
-bool pyextract( boost::python::object obj, char* d ) {
-
+std::string pyextract( boost::python::object obj ) {
+	std::string s;
     try {
-        d = boost::python::extract<char*>( obj );
-        printf("got string [%s]\n", d);
+        s = boost::python::extract<std::string>( obj );
     } catch (...) {
         PyErr_Clear();
-        return false;
     }
 
-    return true;
+    return s;
 }
 
 
@@ -313,7 +312,7 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
 
     if (!s->s_thing)
     {
-        std::cout << "oscParser: Could not find referenced object named: " << symName << std::endl;
+        //std::cout << "oscParser: Could not find referenced object named: " << symName << std::endl;
         return ValueWrapper(0);
     }
 
@@ -339,16 +338,21 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
     }
 
     size_t nbArgs = boost::python::len( argList );
-    double da; float fa; int ia; char* sa;
+    double da; float fa; int ia; std::string sa;
 
     for ( size_t i = 0; i < nbArgs; i++ ) {
 
         if ( pyextract( argList[i], &da ) ) theArgs.push_back( (double) da );
         else if ( pyextract( argList[i], &fa ) ) theArgs.push_back( (float) fa );
         else if ( pyextract( argList[i], &ia ) ) theArgs.push_back( (int) ia );
-        else if ( pyextract( argList[i], sa ) ) theArgs.push_back( (const char*) sa );
-        else printf( "could not cast argList[%i]\n", i );
+        else
+        {
+        	sa = pyextract( argList[i] );
+        	if (sa != "" ) theArgs.push_back( (const char*) sa.c_str() );
+        }
     }
+
+
 
     // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
@@ -369,8 +373,25 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
         if (invokeMethod(classInstance, classType, theMethod, theArgs, v)) {
             return ValueWrapper(v);
         } else {
-            std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name
-                      << "], not forwarding the message" << std::endl;
+            if (spinApp::Instance().getContext()->isServer())
+			{
+				lo_message msg = lo_message_new();
+				lo_message_add_string(msg, theMethod.c_str());
+			    for ( size_t i = 0; i < nbArgs; i++ )
+			    {
+			        if ( pyextract( argList[i], &da ) ) lo_message_add_float(msg, (float) da );
+			        else if ( pyextract( argList[i], &fa ) ) lo_message_add_float(msg, (float) fa );
+			        else if ( pyextract( argList[i], &ia ) ) lo_message_add_float(msg, (float) ia );
+			        else
+			        {
+			        	sa = pyextract( argList[i] );
+			        	if (sa != "" ) lo_message_add_string(msg, (const char*) sa.c_str() );
+			        }
+			    }
+
+				std::string path = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + s->s_name;
+				lo_send_message_from(spinApp::Instance().getContext()->lo_txAddr, spinApp::Instance().getContext()->lo_infoServ_, path.c_str(), msg);
+			}
         }
 
     }

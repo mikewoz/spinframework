@@ -58,15 +58,15 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-RayNode::RayNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+RayNode::RayNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".RayNode");
 	nodeType = "RayNode";
 
 	visible = true;
 	length = 100;
-	thickness = 0.25;
-	color = osg::Vec4(1,1,1,1);
+	thickness = 0.01;
+	color = osg::Vec4(1.0,1.0,0.0,1.0);
 
 
 	this->setNodeMask(DEBUGVIEW_NODE_MASK); // nodemask info in spinUtil.h
@@ -129,9 +129,9 @@ void RayNode::drawRay()
 {
 
 	// remove the old ray:
-	if (this->containsNode(rayGeode.get()))
+	if (getAttachmentNode()->containsNode(rayGeode.get()))
 	{
-		this->removeChild(rayGeode.get());
+		getAttachmentNode()->removeChild(rayGeode.get());
 		rayGeode = NULL;
 	}
 
@@ -139,28 +139,43 @@ void RayNode::drawRay()
 	{
         rayGeode = new osg::Geode();
 
-        // just draw a line
-        osg::Geometry* rayGeom = new osg::Geometry();
+        if (thickness <= 0.01)
+        {
+			// just draw a line
+			osg::Geometry* rayGeom = new osg::Geometry();
 
-        osg::Vec3Array* vertices = new osg::Vec3Array;
-        vertices->push_back(osg::Vec3(0,0,0));
-        vertices->push_back(osg::Vec3(0,this->length,0));
+			osg::Vec3Array* vertices = new osg::Vec3Array;
+			vertices->push_back(osg::Vec3(0,0,0));
+			vertices->push_back(osg::Vec3(0,this->length,0));
 
-        osg::Vec4Array* vertColors = new osg::Vec4Array;
-        vertColors->push_back(this->color);
-        rayGeom->setColorArray(vertColors);
-        rayGeom->setColorBinding(osg::Geometry::BIND_OVERALL);
+			osg::Vec4Array* vertColors = new osg::Vec4Array;
+			vertColors->push_back(this->color);
+			rayGeom->setColorArray(vertColors);
+			rayGeom->setColorBinding(osg::Geometry::BIND_OVERALL);
 
-        rayGeom->setVertexArray(vertices);
-        rayGeom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, vertices->size()));
+			rayGeom->setVertexArray(vertices);
+			rayGeom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, vertices->size()));
 
-        osgUtil::SmoothingVisitor::smooth(*rayGeom);
+			osgUtil::SmoothingVisitor::smooth(*rayGeom);
 
-        rayGeode->addDrawable(rayGeom);
+			rayGeode->addDrawable(rayGeom);
+        }
+        else
+        {
+        	// draw a cylinder
+        	osg::Cylinder *cyl;
+        	osg::ShapeDrawable* cylDrawable;
+        	cyl = new osg::Cylinder(osg::Vec3(0,length/2,0), thickness, length);
+        	cyl->setRotation(osg::Quat(-osg::PI/2, osg::X_AXIS));
+
+        	cylDrawable = new osg::ShapeDrawable(cyl);
+        	cylDrawable->setColor(color);
+        	rayGeode->addDrawable(cylDrawable);
+        }
 
         if (rayGeode.valid())
         {
-            this->addChild(rayGeode.get());
+        	getAttachmentNode()->addChild(rayGeode.get());
             rayGeode->setName(string(id->s_name) + ".rayGeode");
             osgUtil::Optimizer optimizer;
             optimizer.optimize(rayGeode.get());
@@ -175,7 +190,7 @@ void RayNode::drawRay()
 std::vector<lo_message> RayNode::getState ()
 {
     // inherit state from base class
-    std::vector<lo_message> ret = ReferencedNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 
     lo_message msg;
 

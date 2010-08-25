@@ -514,7 +514,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
     osg::Timer* timer = osg::Timer::instance();
 
     std::string sf = osgDB::findDataFile( scriptPath );
-    cout << "script file path is: " << sf << endl;
+    cout << "Loading script: " << sf << endl;
 
     boost::python::object s, p;
 
@@ -553,7 +553,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
 
         sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id->s_name, params.c_str() );
 
-        std::cout << "Python cmd: " << cmd << std::endl;
+        //std::cout << "Python cmd: " << cmd << std::endl;
         exec( cmd, spin._pyNamespace, spin._pyNamespace );
 
         s = spin._pyNamespace[pyScript.c_str()];
@@ -685,7 +685,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     osg::Timer* timer = osg::Timer::instance();
 
     std::string sf = osgDB::findDataFile( scriptPath );
-    cout << "script file path is: " << sf << endl;
+    cout << "Loading script: " << sf << endl;
 
     boost::python::object s, p;
     char cmd[100];
@@ -716,7 +716,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
 
         //sprintf(cmd, "mod%llx = spin.load_module('%s')", utick, sf.c_str());
         sprintf( cmd, "%s = spin.load_module('%s')", pyModule.c_str(), sf.c_str() );
-        std::cout << "Python cmd: " << cmd << std::endl;
+        //std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
         s = spin._pyNamespace[pyModule.c_str()];
@@ -724,7 +724,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
 
         //sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
         sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id->s_name, params.c_str() );
-        std::cout << "Python cmd: " << cmd << std::endl;
+        //std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
         //sprintf(cmd, "script%llx", utick);

@@ -45,17 +45,17 @@
 #include <osg/Geode>
 
 
-#include "ReferencedNode.h"
+#include "GroupNode.h"
 
 /**
  * \brief Describes a ray (actually a line segment) in space.
  *
- * When attached to an GroupNode, the RayNode essentially points in the
- * direction of specified by it's parent, and is visible up to a certain length.
+ * The RayNode "points" in the direction specified by it's current orientation,
+ * and is visible up to a certain length.
  *
  * RayNode is used by PointerNode to report which nodes are being pointed at.
  */
-class RayNode : public ReferencedNode
+class RayNode : public GroupNode
 {
 
 public:

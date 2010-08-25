@@ -23,7 +23,7 @@
 
 BEGIN_OBJECT_REFLECTOR(RayNode)
 	I_DeclaringFile("RayNode.h");
-	I_BaseType(ReferencedNode);
+	I_BaseType(GroupNode);
 	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
 	               ____RayNode__SceneManager_P1__char_P1,
 	               "",
