@@ -66,24 +66,8 @@ spineditor_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 spineditor_LDADD = libSPIN.la
 endif
 
-# tell automake that the Resources folder is required
-EXTRA_DIST = ../Resources
-
-# install data to $(datadir) ie, /usr/local/share/spinFramework
-
-imagesdir = $(datadir)/spinFramework/images
-images_DATA = ../Resources/images/*
-
-fontsdir = $(datadir)/spinFramework/fonts
-fonts_DATA = ../Resources/fonts/*
-
-scriptsdir = $(datadir)/spinFramework/scripts
-#scripts_DATA = scripts/hello.py scripts/spin.py scripts/orbit.py scripts/hotspot.py 
-scripts_DATA = ../Resources/scripts/*
-
 ###############################################################################
 # CUSTOM targets:
-
 
 OSG_VER = $(shell osgversion --so-number)
 OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
