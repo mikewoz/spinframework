@@ -10,5 +10,5 @@ Exec=spinviewer
 Comment[en_CA]=
 Name=spinviewer
 Comment=
-Categories=AudioVideo;Video;
+Categories=Network;
 Icon=spinviewer

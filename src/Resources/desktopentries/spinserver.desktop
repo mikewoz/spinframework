@@ -10,5 +10,5 @@ Exec=xterm -e spinserver
 Comment[en_CA]=In a terminal
 Name=spinserver
 Comment=In a terminal
-Categories=AudioVideo;Video;
+Categories=Network;
 Icon=spinserver
