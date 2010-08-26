@@ -1,1 +1,1 @@
-SUBDIRS = fonts images scripts
+SUBDIRS = fonts images scripts desktopentries

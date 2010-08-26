@@ -1,0 +1,14 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[en_CA]=spinserver
+Name[en_CA]=spinserver
+Exec=xterm -e spinserver
+Comment[en_CA]=In a terminal
+Name=spinserver
+Comment=In a terminal
+Categories=AudioVideo;Video;
+Icon=spinserver
