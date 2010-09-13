@@ -193,11 +193,12 @@ void *spinServerContext::spinServerThread(void *arg)
     fromString<int>(i_syncPort, lo_address_get_port(context->lo_syncAddr));
 
     UpdateSceneVisitor visitor;
+    
+    context->running = true;
 
     // start sync (timecode) thread:
     context->startSyncThread();
 
-    context->running = true;
     static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
     {
