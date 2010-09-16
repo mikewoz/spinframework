@@ -1,4 +1,5 @@
 AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
+#AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
 #lib_LTLIBRARIES = libSPIN.la libSPINPyWrap.la
@@ -15,7 +16,7 @@ libSPIN_la_LDFLAGS = \
 	$(BOOST_FILESYSTEM_LIB) \
 	-l$(BOOST_PYTHON_LIB) \
 	-lOpenThreads -losg \
-	-losgGA -losgSim -losgDB -losgManipulator -losgText -losgUtil \
+	-losgGA -losgDB -losgManipulator -losgText -losgUtil \
 	-losgFX -losgParticle -losgViewer \
 	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS) $(BOOST_THREAD_LIB) $(SHARED_VIDEO_LIB)
 
@@ -74,6 +75,10 @@ OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
 
 OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
 
+
+# WARNING: the .app generation script pulls some libs (eg, libSPIN) from /usr/local
+# so you must do a 'make install' before this will work (TODO: fix this)
+
 spinviewer.app: spinviewer$(EXEEXT)
 	@echo "\n--------------- Building $@: ---------------" 
 	-mkdir $@    
@@ -82,17 +87,24 @@ spinviewer.app: spinviewer$(EXEEXT)
 	-mkdir $@/Contents/libs
 	-mkdir $@/Contents/MacOS
 	-mkdir $@/Contents/Resources
+	-mkdir $@/Contents/Resources/fonts
+	-mkdir $@/Contents/Resources/images
+	-mkdir $@/Contents/Resources/scripts
 	-mkdir $@/Contents/Resources/English.lproj
 	sed -e "s/IDENTIFIER/`echo ./ | sed -e 's,\.\./,,g' | sed -e 's,/,.,g'`/" \
 	-e "s/EXECUTABLE/$</" \
 	-e "s/VERSION/$(VERSION)/" \
 	spinviewer.plist.in >$@/Contents/Info.plist
 	echo -n 'APPL????' > $@/Contents/PkgInfo
-	cp .libs/spinviewer $@/Contents/MacOS
-	cp ../Resources/images/spinViewer.icns $@/Contents/Resources
+	cp /usr/local/bin/spinviewer $@/Contents/MacOS
 	../../util/dylibbundler/dylibbundler -of -b -x $@/Contents/MacOS/spinviewer -d $@/Contents/libs
 
 
+#	cp ../Resources/fonts/*.ttf $@/Contents/Resources/fonts
+#	cp ../Resources/images/*.icns ../Resources/images/*.xpm ../Resources/images/*.gif ../Resources/images/*.png $@/Contents/Resources/images
+#	cp ../Resources/scripts/*.py $@/Contents/Resources/scripts
+
+#cp .libs/spinviewer $@/Contents/MacOS
 
 #	install_name_tool -change libOpenThreads.$(OPENTHREADS_VER).dylib /usr/local/lib/libOpenThreads.$(OPENTHREADS_VER).dylib $@/Contents/MacOS/spinviewer
 #-cp -R /usr/local/lib/osgPlugins-* $@/Contents/libs

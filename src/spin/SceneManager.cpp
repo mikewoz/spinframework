@@ -52,6 +52,8 @@
 
 #include "ImageTexture.h"
 #include "VideoTexture.h"
+#include "ShapeNode.h"
+#include "ModelNode.h"
 #include "SharedVideoTexture.h"
 
 #include "nodeVisitors.h"
@@ -94,7 +96,9 @@ extern pthread_mutex_t sceneMutex;
 //SceneManager::SceneManager(const std::string &id)
 SceneManager::SceneManager(std::string id)
 {
-    this->sceneID = id;
+	resourcesPath = "../Resources";
+
+	this->sceneID = id;
 
     graphicalMode = false;
 
@@ -103,6 +107,7 @@ SceneManager::SceneManager(std::string id)
     stateMap.clear();
 
     // Set resourcesPath:
+    /*
     std::string currentDir = getenv("PWD");
     if ((currentDir.length()>8) && (currentDir.substr(currentDir.length()-9))==std::string("/src/spin"))
     {
@@ -110,6 +115,8 @@ SceneManager::SceneManager(std::string id)
     } else {
         resourcesPath = "/usr/local/share/spinFramework";
     }
+    */
+    resourcesPath = "../Resources";
     std::cout << "  Resources path:\t\t" << resourcesPath << std::endl;
 
     // get user defined env variable OSG_FILE_PATH
@@ -124,7 +131,7 @@ SceneManager::SceneManager(std::string id)
     osgDB::setDataFilePathList( fpl );
 
     mediaManager = new MediaManager(resourcesPath);
-    
+
     //std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
 
@@ -192,6 +199,7 @@ SceneManager::SceneManager(std::string id)
 
         exit (EXIT_FAILURE);
     }
+
 
     // need to remove DSPNode???
 
@@ -1628,10 +1636,75 @@ return output.str();
 }
  */
 
+std::vector<t_symbol*> SceneManager::getSavableStateSets(ReferencedNode *n, bool withUsers)
+{
+	std::vector<t_symbol*> statesetsToSave;
+
+	// we ignore UserNodes, and their entire subgraphs:
+	if (!withUsers && (n->nodeType=="UserNode"))
+		return statesetsToSave;
+
+	// check for children:
+	std::vector<ReferencedNode*>::iterator childIter;
+	for (childIter = n->children.begin(); childIter != n->children.end(); ++childIter)
+	{
+		statesetsToSave = getSavableStateSets(*childIter, withUsers);
+	}
+
+	// the only subgraphs which can have statesets are:
+
+
+	// oops this doesn't work on the server (isGraphical==false) because it
+	// doesn't actually add the statesets to the nodes
+	/*
+	if ((n->nodeType=="ShapeNode") || (n->nodeType=="ModelNode"))
+	{
+		std::cout << "getting statesets for shape/model: " << n->id->s_name <<  std::endl;
+
+
+		// to actually find the stateset, we use the TextureStateSetFinder
+		// node visitor
+		StateSetList statesets;
+		TextureStateSetFinder f(statesets);
+		n->accept(f);
+
+		// these statesets could be regular osg statesets, but we keep only
+		// those which can be cast as ReferencedStateSet
+		for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
+		{
+			std::cout << "found one ... testing if referenced stateset" <<  std::endl;
+
+			ReferencedStateSet *refStateSet = dynamic_cast<ReferencedStateSet*>((*itr).get());
+			if (refStateSet) statesetsToSave.push_back(refStateSet);
+		}
+	}
+	*/
+
+	if (n->nodeType=="ShapeNode")
+	{
+		ShapeNode *shp = dynamic_cast<ShapeNode*>(n);
+		if (shp) statesetsToSave.push_back(shp->stateset);
+	}
+	else if (n->nodeType=="ModelNode")
+	{
+		ModelNode *mdl = dynamic_cast<ModelNode*>(n);
+		if (mdl)
+		{
+			statesetsToSave.insert( statesetsToSave.begin(), mdl->_statesetList.begin(), mdl->_statesetList.end());
+		}
+	}
+
+	return statesetsToSave;
+}
 
 // *****************************************************************************
 bool SceneManager::saveXML(const char *s, bool withUsers)
 {
+    nodeMapType::iterator it;
+    nodeListType::iterator iter;
+    std::vector<t_symbol*> statesetsToSave;
+    std::vector<t_symbol*>::iterator sIt;
+
     // convert filename into valid path:
     std::string filename = getSpinPath(s);
     // and make sure that there is an .xml extension:
@@ -1641,27 +1714,52 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
     // start with XML Header:
     std::ostringstream output("");
     output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
-        << "<!DOCTYPE SPIN SYSTEM>\n"
-        << "<spinScene>\n";
+        << "<!DOCTYPE SPIN SYSTEM>\n";
 
 
-    /*
-       vector< osg::ref_ptr<ReferencedNode> >::iterator iter;
-       for (iter = nodeList.begin(); iter != nodeList.end() ; iter++)
-       {
-    // Add the state for this node only if it is a top-level node. Children
-    // will be added recursively:
-    if ((*iter)->parent == WORLD_SYMBOL)
-    output << getNodeStateAsXML( (*iter).get() );
-    }
-     */
-
-    nodeMapType::iterator it;
-    nodeListType::iterator iter;
-
+    // Statesets need to be first, so we make a first pass over the scene graph
+    // to write all statesets. Note that we must do a full traversal rather than
+    // just checking ShapeNodes and ModelNodes, because those nodes may be
+    // attached under a user subgraph, and we need to be able to ignore those.
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
-        for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+        for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+        {
+            if ((*iter)->parent == WORLD_SYMBOL)
+            {
+             	statesetsToSave = getSavableStateSets((*iter).get(), withUsers);
+            }
+        }
+    }
+
+
+
+    // Note: several nodes may use the same stateset, so we need remove
+    // duplicates from the stateset list we just collected:
+    sIt = std::unique( statesetsToSave.begin(), statesetsToSave.end() );
+
+
+
+    // now write the statesets:
+    output << "<statesets>\n";
+    for (sIt = statesetsToSave.begin(); sIt != statesetsToSave.end(); ++sIt)
+    {
+    	ReferencedStateSet *ss = dynamic_cast<ReferencedStateSet*>((*sIt)->s_thing);
+    	if (ss)
+    	{
+    		output << "<" << ss->classType << " id=" << ss->id->s_name << ">\n";
+			output << getStateAsXML( ss->getState() );
+			output << "</" << ss->classType << ">\n";
+    	}
+    }
+    output << "</statesets>\n";
+
+
+    // now save nodes:
+    output << "<spinScene>\n";
+    for (it = nodeMap.begin(); it != nodeMap.end(); it++)
+    {
+        for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
         {
             if ((*iter)->parent == WORLD_SYMBOL)
             {
@@ -1669,8 +1767,6 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
             }
         }
     }
-
-
     output << "</spinScene>\n";
 
 
@@ -1731,6 +1827,9 @@ bool SceneManager::saveUsers(const char *s)
     }
 
 }
+
+
+
 
 bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode= "")
 {
@@ -1824,6 +1923,81 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
 
     } else {
         std::cout << "ERROR: Found XML node of type " << nodeType << ", but no such type is registered." << std::endl;
+    }
+
+    return true;
+}
+
+
+bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
+{
+    TiXmlElement *child;
+    char *types;
+    std::string method;
+    std::vector<std::string> argVector;
+    osgIntrospection::ValueList args;
+    float f;
+
+    char *classType = (char*) XMLnode->Value();
+
+    if (osgIntrospection::Reflection::getType(classType).isDefined())
+    {
+        if (XMLnode->Attribute("id"))
+        {
+            char *statesetID = (char*) XMLnode->Attribute("id");
+            osg::ref_ptr<ReferencedStateSet> ss = createStateSet(statesetID, classType);
+
+            // get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
+            const osgIntrospection::Value introspectValue = osgIntrospection::Value(ss.get());
+
+            // the getInstanceType() method however, gives us the real type being pointed at:
+            const osgIntrospection::Type &introspectType = introspectValue.getInstanceType();
+
+            for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
+            {
+                // look for child nodes with a 'types' attribute
+                if ((types = (char*) child->Attribute("types")))
+                {
+                    method = child->Value();
+                    argVector = tokenize(child->FirstChild()->Value());
+                }
+                else
+                    continue;
+
+                if (argVector.size() != strlen(types))
+                {
+                    std::cout << "ERROR: could not call '" << method << "' for stateset " << statesetID << ". Type mismatch." << std::endl;
+                    continue;
+                }
+
+                args.clear();
+                for (unsigned i=0; i<strlen(types); i++)
+                {
+                    if (lo_is_numerical_type((lo_type)types[i]))
+                    {
+                        if (fromString<float>(f, argVector[i])) args.push_back(f);
+                    } else {
+                        args.push_back( (const char*) argVector[i].c_str() );
+                    }
+                }
+
+                // now we can finally call the method:
+                try {
+                    introspectType.invokeMethod(method, introspectValue, args, true); // the true means that it will try base classes as well
+                }
+
+                catch (const osgIntrospection::Exception & ex)
+                {
+                    std::cerr << "catch exception in loadXML: " << ex.what() << std::endl;
+                }
+            }
+
+        } else {
+            std::cout << "ERROR: Found XML stateset of type " << classType << " with no id attribute. Could not create." << std::endl;
+        }
+
+    } else {
+        std::cout << "ERROR: Found XML stateset of type " << classType << ", but no such type is registered." << std::endl;
     }
 
     return true;
@@ -1959,6 +2133,15 @@ bool SceneManager::loadXML(const char *s)
         return false;
     }
 
+    // Now see if there is a <connections> tag:
+    if (root = doc.FirstChild( "statesets" ))
+    {
+        for( child = root->FirstChildElement(); child; child = child->NextSiblingElement() )
+        {
+            createStateSetFromXML(child);
+        }
+    }
+
     // get the <spinScene> tag and verify:
     if (!(root = doc.FirstChild( "spinScene" )))
     {
@@ -1966,15 +2149,13 @@ bool SceneManager::loadXML(const char *s)
         return false;
     }
 
-    // okay.. we have a valid xml file.
-
     for( child = root->FirstChildElement(); child; child = child->NextSiblingElement() )
     {
         createNodeFromXML(child);
     }
 
     // Now see if there is a <connections> tag:
-    if ((root = doc.FirstChild( "connections" )))
+    if (root = doc.FirstChild( "connections" ))
     {
         // go through the file again, making sure that connections get created:
         for( child = root->FirstChildElement(); child; child = child->NextSiblingElement() )

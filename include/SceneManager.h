@@ -209,10 +209,13 @@ class SceneManager
         std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
 
         std::string getConnectionsAsXML();
+        std::vector<t_symbol*> getSavableStateSets(ReferencedNode *n, bool withUsers);
+
         bool saveXML(const char *filename, bool withUsers = false);
         bool saveUsers(const char *s);
 
         bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
+        bool createStateSetFromXML(TiXmlElement *XMLnode);
         bool createConnectionsFromXML(TiXmlElement *XMLnode);
         bool loadXML(const char *filename);
 

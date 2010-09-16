@@ -133,6 +133,8 @@ public:
 	 */
 	virtual std::vector<lo_message> getState();
 
+	std::vector<t_symbol*> _statesetList;
+
 private:
 
 	void drawModel();
@@ -141,8 +143,6 @@ private:
 	//std::string modelName;
 	std::string modelPath;
 	
-	std::vector<t_symbol*> _statesetList;
-
 	std::vector<osg::Drawable*> _ssDrawableList;
 	std::vector<osg::Node*> _ssNodeList;
 

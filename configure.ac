@@ -13,6 +13,7 @@ AC_CANONICAL_HOST # fills $host variable
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
   CPPFLAGS="$CPPFLAGS -D__Darwin"
+  LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
   if test -d /opt/local ; then
     CPPFLAGS="$CPPFLAGS -I/usr/local/include -I/opt/local/include"
     LDFLAGS="$LDFLAGS -L/usr/local/lib -L/opt/local/lib"
@@ -28,6 +29,7 @@ esac
 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
+#CXXFLAGS+=" -g3 -ggdb -Wall -Wextra -Wfatal-errors"
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
 LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 

@@ -56,6 +56,7 @@
 #include <lo/lo_lowlevel.h>
 
 #include "spinApp.h"
+#include "spinDefaults.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
 #include "SceneManager.h"
@@ -70,7 +71,7 @@ extern pthread_mutex_t sceneMutex;
 
 
 
-spinApp::spinApp() : userID_(getHostname())
+spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
 {
 
 #ifdef __Darwin
@@ -130,7 +131,7 @@ spinApp::spinApp() : userID_(getHostname())
     }
 
 
-    sceneID = "default";
+    //sceneID = "default";
 
     // check if local user directory exists, otherwise make it:
     try
