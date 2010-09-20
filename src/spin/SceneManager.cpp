@@ -1640,6 +1640,7 @@ std::vector<t_symbol*> SceneManager::getSavableStateSets(ReferencedNode *n, bool
 {
 	std::vector<t_symbol*> statesetsToSave;
 
+
 	// we ignore UserNodes, and their entire subgraphs:
 	if (!withUsers && (n->nodeType=="UserNode"))
 		return statesetsToSave;
@@ -1683,7 +1684,10 @@ std::vector<t_symbol*> SceneManager::getSavableStateSets(ReferencedNode *n, bool
 	if (n->nodeType=="ShapeNode")
 	{
 		ShapeNode *shp = dynamic_cast<ShapeNode*>(n);
-		if (shp) statesetsToSave.push_back(shp->stateset);
+		if (shp)
+		{
+			statesetsToSave.push_back(shp->stateset);
+		}
 	}
 	else if (n->nodeType=="ModelNode")
 	{
@@ -1727,7 +1731,8 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
         {
             if ((*iter)->parent == WORLD_SYMBOL)
             {
-             	statesetsToSave = getSavableStateSets((*iter).get(), withUsers);
+            	std::vector<t_symbol*> tmp = getSavableStateSets((*iter).get(), withUsers);
+    			statesetsToSave.insert( statesetsToSave.begin(), tmp.begin(), tmp.end());
             }
         }
     }
@@ -1741,6 +1746,7 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
 
 
     // now write the statesets:
+    //std::cout << "saving " << statesetsToSave.size() << " statesets" << std::endl;
     output << "<statesets>\n";
     for (sIt = statesetsToSave.begin(); sIt != statesetsToSave.end(); ++sIt)
     {
