@@ -206,6 +206,10 @@ osg::Vec3 QuatToEuler(osg::Quat q)
 	yaw = atan2( 2* (q.x()*q.y() + q.z()*q.w()) , 1 - (2* (q.y()*q.y() + q.z()*q.z())) );
 	pitch =  atan2( 2* (q.x()*q.w() + q.y()*q.z()) , 1 - (2* (q.z()*q.z() + q.w()*q.w())) );
 	
+	if (isnan(roll)) roll = 0.0;
+	if (isnan(roll)) yaw = 0.0;
+	if (isnan(roll)) pitch = 0.0;
+
 	return osg::Vec3(osg::PI-pitch,-roll,yaw);
 }
 

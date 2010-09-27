@@ -293,6 +293,9 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 						osg::Vec3 collisionPoint = localHitPoint + (localHitNormal * 0.01);
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
+
+						BROADCAST(this, "sfff", "collide", osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+
 						return;
 					}
 
@@ -334,6 +337,8 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);
+
+						BROADCAST(this, "sfff", "bounce", osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 						return;
 
