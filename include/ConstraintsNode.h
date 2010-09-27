@@ -152,6 +152,9 @@ private:
 
 	osg::Vec3 _cubeSize;
 	osg::Vec3 _cubeOffset;
+
+	osg::ref_ptr< osg::Drawable > lastDrawable;
+	int lastPrimitiveIndex;
 };
 
 

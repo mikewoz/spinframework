@@ -185,6 +185,9 @@ void ConstraintsNode::translate (float x, float y, float z)
     {
     	if ((_mode==BOUNCE)||(_mode==COLLIDE))
     	{
+    		// reset the lastDrawable
+    		lastDrawable = 0;
+    		lastPrimitiveIndex = -1;
     		applyConstrainedTranslation(osg::Vec3(x,y,z));
     	}
     	else {
@@ -203,6 +206,8 @@ void ConstraintsNode::move (float x, float y, float z)
 
     	if ((_mode==BOUNCE)||(_mode==COLLIDE))
     	{
+    		lastDrawable = 0;
+    		lastPrimitiveIndex = -1;
     		applyConstrainedTranslation(v);
     	}
     	else {
@@ -251,15 +256,31 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 				ReferencedNode *testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[0]);
 				if (testNode==targetNode)
 				{
+
+					//std::cout << id->s_name << " collision!!! with " << (*itr).drawable->getName() << "[" << (*itr).primitiveIndex << "] @ " << std::endl;
+					//std::cout << "localHitPoint:\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
+					//std::cout << "localHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
+
+
+					// Check if we've intersected with the same primitive again
+					// (may be possible due to numerical imprecision). If so,
+					// we'll skip this intersection
+
+					if ((lastDrawable.get()==(*itr).drawable.get()) && (lastPrimitiveIndex==(*itr).primitiveIndex))
+					{
+						continue;
+					}
+					else
+					{
+						lastDrawable=(*itr).drawable;
+						lastPrimitiveIndex=(*itr).primitiveIndex;
+					}
+
+
 					osg::Vec3 localHitPoint = (*itr).getWorldIntersectPoint();
 					osg::Vec3 localHitNormal = (*itr).getWorldIntersectNormal();
 					localHitNormal.normalize();
 
-					/*
-					std::cout << id->s_name << " collision!!! @ " << std::endl;
-					std::cout << "localHitPoint:\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
-					std::cout << "localHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
-					*/
 
 					// current direction vector:
 					osg::Vec3 dirVec = v;
@@ -332,8 +353,8 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// the new position will be just at the hitpoint (plus
 						// a little bit, so that it doesn't intersect with the
 						// same surface again)
-						osg::Vec3 hitPoint_adj = localHitPoint + (newDir*0.0001*dist);
-						setTranslation(hitPoint_adj.x(), hitPoint_adj.y(), hitPoint_adj.z());
+						//osg::Vec3 hitPoint_adj = localHitPoint + (newDir*0.00000001*dist);
+						setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
 
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);
