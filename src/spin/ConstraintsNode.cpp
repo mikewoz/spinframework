@@ -221,6 +221,8 @@ void ConstraintsNode::move (float x, float y, float z)
 void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 {
 	osg::Vec3 localPos = this->getTranslation();
+	osg::ref_ptr<ReferencedNode> hitNode;
+	ReferencedNode *testNode;
 
 	/*
 	std::cout << std::endl << "checking for collisions" << std::endl;
@@ -229,6 +231,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	*/
 
 	osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(_target->s_thing);
+
 	if (targetNode.valid())
 	{
 		// get current position (including offset from previous bounces)
@@ -253,8 +256,25 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 			{
 				//std::cout << "testing intersection with " << (*itr).nodePath[0]->getName() << std::endl;
 
-				ReferencedNode *testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[0]);
-				if (testNode==targetNode)
+				// first check if the hit is with our target (should be first in
+				// the nodepath):
+
+				testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[0]);
+				if (testNode!=targetNode) continue;
+
+				// The intersection has a nodepath that we have to walk down to
+				// see which exact node has been hit. It's possible that there
+				// are other SPIN nodes in the targetNode's subgraph that are
+				// the real source of intersection:
+
+				hitNode = 0; testNode = 0;
+				for (unsigned int i=0; i<(*itr).nodePath.size(); i++)
+				{
+					testNode = dynamic_cast<ReferencedNode*>((*itr).nodePath[i]);
+					if (testNode) hitNode = testNode;
+				}
+
+				if (hitNode.valid())
 				{
 
 					//std::cout << id->s_name << " collision!!! with " << (*itr).drawable->getName() << "[" << (*itr).primitiveIndex << "] @ " << std::endl;
@@ -315,7 +335,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						osg::Vec3 collisionPoint = localHitPoint + (localHitNormal * 0.01);
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
 
-						BROADCAST(this, "sfff", "collide", osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 						return;
 					}
@@ -359,7 +379,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);
 
-						BROADCAST(this, "sfff", "bounce", osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+						BROADCAST(this, "ssfff", "bounce", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 						return;
 
