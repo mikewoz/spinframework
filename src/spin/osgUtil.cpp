@@ -71,7 +71,7 @@ double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
 	// Here we make sure that the angle is not a -1.#IND0000000 number, which means indefinite
 	if (isnan(angle))  //__isnand(x)
 		return 0;
-		
+
 	// Return the angle in radians
 	return( angle );
 }
@@ -206,11 +206,24 @@ osg::Vec3 QuatToEuler(osg::Quat q)
 	yaw = atan2( 2* (q.x()*q.y() + q.z()*q.w()) , 1 - (2* (q.y()*q.y() + q.z()*q.z())) );
 	pitch =  atan2( 2* (q.x()*q.w() + q.y()*q.z()) , 1 - (2* (q.z()*q.z() + q.w()*q.w())) );
 	
+	// ignore isnan:
 	if (isnan(roll)) roll = 0.0;
-	if (isnan(roll)) yaw = 0.0;
-	if (isnan(roll)) pitch = 0.0;
+	if (isnan(yaw)) yaw = 0.0;
+	if (isnan(pitch)) pitch = 0.0;
 
-	return osg::Vec3(osg::PI-pitch,-roll,yaw);
+	// correct to OSG's coordinate system:
+	pitch = osg::PI-pitch;
+	roll = -roll;
+
+	// ensure in range of [-PI,PI]
+	if (roll>osg::PI) roll -= 2 * osg::PI;
+	else if (roll<-osg::PI) roll += 2 * osg::PI;
+	if (yaw>osg::PI) yaw -= 2 * osg::PI;
+	else if (yaw<-osg::PI) yaw += 2 * osg::PI;
+	if (pitch>osg::PI) pitch -= 2 * osg::PI;
+	else if (pitch<-osg::PI) pitch += 2 * osg::PI;
+
+	return osg::Vec3(pitch,roll,yaw);
 }
 
 osg::Vec3 QuatToEuler_old(osg::Quat q)
