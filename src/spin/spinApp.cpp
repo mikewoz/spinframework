@@ -242,7 +242,14 @@ bool spinApp::initPython()
         exec("import sys", _pyNamespace, _pyNamespace);
         //////////exec("sys.path.append('/home/lwi')", _pyNamespace, _pyNamespace);
         ///exec("sys.path.append('/usr/local/share/spinFramework/scripts')", _pyNamespace, _pyNamespace);
-        exec("sys.path.append('/usr/local/lib')", _pyNamespace, _pyNamespace);
+
+        //exec("sys.path.append('/usr/local/lib')", _pyNamespace, _pyNamespace);
+
+
+        exec(std::string("sys.path.append('" + sceneManager->resourcesPath+  "')").c_str(), _pyNamespace, _pyNamespace);
+
+        //exec("print sys.path", _pyNamespace, _pyNamespace);
+
         //exec("import spin", _pyNamespace, _pyNamespace);
         exec("import libSPINPyWrap", _pyNamespace, _pyNamespace);
 
