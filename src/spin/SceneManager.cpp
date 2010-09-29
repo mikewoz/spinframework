@@ -107,7 +107,6 @@ SceneManager::SceneManager(std::string id)
     stateMap.clear();
 
     // Set resourcesPath:
-    /*
     std::string currentDir = getenv("PWD");
     if ((currentDir.length()>8) && (currentDir.substr(currentDir.length()-9))==std::string("/src/spin"))
     {
@@ -115,8 +114,7 @@ SceneManager::SceneManager(std::string id)
     } else {
         resourcesPath = "/usr/local/share/spinFramework";
     }
-    */
-    resourcesPath = "../Resources";
+    //resourcesPath = "../Resources";
     std::cout << "  Resources path:\t\t" << resourcesPath << std::endl;
 
     // get user defined env variable OSG_FILE_PATH
