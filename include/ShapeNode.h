@@ -126,6 +126,8 @@ public:
 	std::string texturePath;
 
 	int renderBin;
+
+
 	bool lightingEnabled;
 
 	//osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback

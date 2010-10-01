@@ -205,7 +205,7 @@ void ShapeNode::setLighting (int i)
 
 	lightingEnabled = (bool)i;
 
-	if (shapeGeode.valid())
+	if (shapeGeode.valid() && !stateset->s_thing)
 	{
 		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
 		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
@@ -350,8 +350,13 @@ void ShapeNode::drawShape()
 		ss->setMode( GL_BLEND, osg::StateAttribute::ON );
 		ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
-		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+		// if this shape has a stateset, then lighting is defined there.
+		// Otherwise, we have an internal lighting parameter for the shape:
+		if (!stateset->s_thing)
+		{
+			if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+			else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+		}
 		
 		this->getAttachmentNode()->addChild(shapeGeode.get());
 		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
