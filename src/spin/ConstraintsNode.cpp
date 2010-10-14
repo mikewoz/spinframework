@@ -361,14 +361,27 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 
 
-						// in BOUNCE mode, we want to update the orientation of
-						// the node, rotated in 'bounced' direction // TODO
-						osg::Quat newQuat;
-						newQuat.makeRotate(osg::Vec3(0,1,0),  newDir);
-						osg::Vec3 newRot = Vec3inDegrees(QuatToEuler(newQuat));
-						//std::cout << "newrot = " << newRot.x()<<","<<newRot.y()<<","<<newRot.z() << std::endl;
-						setOrientation(newRot.x(), newRot.y(), newRot.z());
+						// in node is translating (ie, changing position
+						// independently from it's orientatino), then we need to
+						// flip the velocity vector.
+						if (_velocityMode == GroupNode::TRANSLATE)
+						{
+							osg::Vec3 newVel = newDir * _velocity.length();
+							setVelocity(newVel.x(), newVel.y(), newVel.z());
+						}
 
+						// if the node is moving along it's orientation vector,
+						// we need to update the orientation of so that it
+						// points in 'bounced' direction
+						else if (_velocityMode == GroupNode::MOVE)
+						{
+							osg::Quat newQuat;
+							newQuat.makeRotate(osg::Vec3(0,1,0),  newDir);
+							osg::Vec3 newRot = Vec3inDegrees(QuatToEuler(newQuat));
+							//std::cout << "newrot = " << newRot.x()<<","<<newRot.y()<<","<<newRot.z() << std::endl;
+							setOrientation(newRot.x(), newRot.y(), newRot.z());
+
+						}
 
 						// the new position will be just at the hitpoint (plus
 						// a little bit, so that it doesn't intersect with the

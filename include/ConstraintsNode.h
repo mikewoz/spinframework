@@ -97,7 +97,7 @@ public:
 	 * "translate" command.
 	 *
 	 * BOUNCE:
-	 * A form of collision detection, where the node bounces off of the parent's
+	 * A form of collision detection, where the node reflects off the parent's
 	 * surface, and travels in the reflected direction (ie, the orientation of
 	 * the node is changed). Note: this only works when node is moved using the
 	 * "translate" command.
