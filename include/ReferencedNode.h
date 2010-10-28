@@ -49,8 +49,10 @@
 #include "libloUtil.h"
 #include "MediaManager.h"
 
+#include <osg/Referenced>
 #include <osg/Group>
 #include <osg/Node>
+#include <osg/observer_ptr>
 #include <boost/python.hpp>
 
 // forward declaration of SceneManager
@@ -107,6 +109,7 @@ public:
     ~ReferencedNode();
 
     void registerNode(SceneManager *s);
+    //void registerNode(std::string sceneID);
 
     /**
      * For nodes that require regular programmatic control, there is a callback
@@ -328,22 +331,25 @@ public:
 
 };
 
+class ReferencedNode_data : public osg::Referenced
+{
+	public:
+		ReferencedNode_data(ReferencedNode *n) { node_ = n; }
+		//~ReferencedNode_data();
+		void update() { if (node_.valid()) node_->callbackUpdate(); }
+
+	private:
+		osg::observer_ptr<ReferencedNode> node_;
+};
 
 
 class ReferencedNode_callback : public osg::NodeCallback
 {
-
     public:
-
         virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
         {
-            osg::ref_ptr<ReferencedNode> thisNode = dynamic_cast<ReferencedNode*> (node->getUserData());
-
-            if (thisNode != NULL)
-            {
-                //std::cout << "in ReferencedNode_callback for node: " << thisNode->id->s_name << std::endl;
-                thisNode->callbackUpdate();
-            }
+            osg::ref_ptr<ReferencedNode_data> data = dynamic_cast<ReferencedNode_data*> (node->getUserData());
+            if (data != NULL) data->update();
 
             traverse(node, nv);
         }

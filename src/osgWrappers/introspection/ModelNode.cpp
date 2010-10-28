@@ -109,5 +109,6 @@ BEGIN_OBJECT_REFLECTOR(ModelNode)
 	I_SimpleProperty(int, StateRegistration, 
 	                 __int__getStateRegistration, 
 	                 __void__setStateRegistration__int);
+	I_PublicMemberProperty(std::vector< t_symbol * >, _statesetList);
 END_REFLECTOR
 

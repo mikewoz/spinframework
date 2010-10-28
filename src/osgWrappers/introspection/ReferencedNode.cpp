@@ -245,3 +245,17 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode_callback)
 	               "");
 END_REFLECTOR
 
+BEGIN_VALUE_REFLECTOR(ReferencedNode_data)
+	I_DeclaringFile("ReferencedNode.h");
+	I_Constructor1(IN, ReferencedNode *, n,
+	               Properties::NON_EXPLICIT,
+	               ____ReferencedNode_data__ReferencedNode_P1,
+	               "",
+	               "");
+	I_Method0(void, update,
+	          Properties::NON_VIRTUAL,
+	          __void__update,
+	          "",
+	          "");
+END_REFLECTOR
+

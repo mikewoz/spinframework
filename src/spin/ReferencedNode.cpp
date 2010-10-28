@@ -48,8 +48,8 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
-#include "ReferencedNode.h"
 #include "SceneManager.h"
+#include "ReferencedNode.h"
 
 
 using namespace std;
@@ -83,7 +83,8 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
 
     // We need to set up a callback. This should be on the topmost node, so that during node
     // traversal, we update our parameters before anything is drawn.
-    this->setUserData( dynamic_cast<osg::Referenced*>(this) );
+    //this->setUserData( dynamic_cast<osg::Referenced*>(this) );
+    this->setUserData( new ReferencedNode_data(this) );
     this->setUpdateCallback(new ReferencedNode_callback);
 
     // set initial nodepath:

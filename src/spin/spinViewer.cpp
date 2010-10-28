@@ -194,8 +194,9 @@ int run(int argc, char **argv)
 
 	osgViewer::CompositeViewer viewer = osgViewer::CompositeViewer(arguments);
     // Aug 19 2010:tmatth: Tried this for multithreading
-	// viewer.setThreadingModel(osgViewer::CompositeViewer::AutomaticSelection);
-	viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
+	//viewer.setThreadingModel(osgViewer::CompositeViewer::AutomaticSelection);
+	//viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
+	viewer.setThreadingModel(osgViewer::CompositeViewer::CullDrawThreadPerContext);
 
 	viewer.getUsage(*arguments.getApplicationUsage());
 
@@ -307,6 +308,9 @@ int run(int argc, char **argv)
 	osg::Timer_t lastFrameTick = osg::Timer::instance()->tick();
 
 	double minFrameTime = 1.0 / maxFrameRate;
+
+
+	std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
 
 	// program loop:
 	while(not viewer.done())

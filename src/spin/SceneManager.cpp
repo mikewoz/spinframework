@@ -438,7 +438,7 @@ void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
         }
     }
 
-    spinApp::Instance().SceneBundle(msgs);
+    spinApp::Instance().SceneBundle(msgs, txAddr);
 }
 
 void SceneManager::sendConnectionList(lo_address txAddr)

@@ -475,12 +475,13 @@ void spinApp::SceneMessage(lo_message msg)
     lo_message_free(msg);
 }
 
-
+/*
 void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
 {
     std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
     sendBundle(OSCpath, msgs);
 }
+*/
 
 
 void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_address addr)
@@ -489,12 +490,13 @@ void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_add
     sendBundle(OSCpath, msgs, addr);
 }
 
-
+/*
 void spinApp::SceneBundle(std::vector<lo_message> msgs)
 {
     std::string OSCpath = "/SPIN/" + sceneID;
     sendBundle(OSCpath, msgs);
 }
+*/
 
 void spinApp::SceneBundle(std::vector<lo_message> msgs, lo_address addr)
 {
@@ -505,20 +507,37 @@ void spinApp::SceneBundle(std::vector<lo_message> msgs, lo_address addr)
 
 void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs, lo_address txAddr)
 {
-    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+	lo_address sendingAddress;
+	if (txAddr == 0) sendingAddress = context->lo_txAddr;
+	else sendingAddress = txAddr;
 
-    std::vector<lo_message>::iterator iter = msgs.begin();
-    while (iter != msgs.end())
-    {
-        //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
-        lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
-        msgs.erase(iter); // iterator automatically advances after erase()
-    }
+	std::vector<lo_message>::iterator iter;
 
-    if (txAddr == 0)
-        lo_send_bundle(context->lo_txAddr, b);
-    else
-        lo_send_bundle(txAddr, b);
-    lo_bundle_free_messages(b);
+	// TCP in liblo can't handle bundles
+	if (lo_address_get_protocol(sendingAddress) == LO_TCP)
+	{
+		iter = msgs.begin();
+		while (iter != msgs.end())
+		{
+			lo_send_message(sendingAddress, OSCpath.c_str(), (*iter));
+			msgs.erase(iter); // iterator automatically advances after erase()
+		}
+	}
+
+	// if it's any UDP socket, then bundle the messages:
+	else
+	{
+		lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+
+		iter = msgs.begin();
+		while (iter != msgs.end())
+		{
+			lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+			msgs.erase(iter); // iterator automatically advances after erase()
+		}
+
+        lo_send_bundle(sendingAddress, b);
+        lo_bundle_free_messages(b);
+
+	}
 }
-

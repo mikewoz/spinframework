@@ -327,14 +327,26 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
             std::cerr << "WARNING: new client has same ID as existing client, freeing old client\n";
             lo_address_free(context->tcpClientAddrs_[clientID]);
         }
+
+        // port needs to be a string, and the user might send it as either, so
+        // we need to check:
+
+        std::string portString;
+
+        if (lo_is_numerical_type((lo_type)types[3]))
+        {
+        	portString = stringify( (int) lo_hires_val( (lo_type)types[3], argv[3] ) );
+        }
+        else portString = reinterpret_cast<const char*>(argv[3]);
+
         context->tcpClientAddrs_[clientID] = lo_address_new_with_proto(LO_TCP,
                     reinterpret_cast<const char*>(argv[2]),
-                    reinterpret_cast<const char*>(argv[3]));
+                    portString.c_str());
         std::cout << "Got new subscriber " << clientID << "@" <<
         lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
     }
 
-    if (method == "optimize")
+    else if (method == "optimize")
     {
     	// TODO: we should really have a SCENE_MSG in spinApp that takes a
     	// txaddr as an argument. For now, we are just using the bundle message
@@ -349,6 +361,22 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
         	msgs.push_back(msg);
 			spinApp::Instance().SceneBundle(msgs, client->second);
         }
+
+    }
+
+    else if (method == "getState")
+    {
+    	osg::ref_ptr<ReferencedNode> n = spinApp::Instance().sceneManager->getNode(reinterpret_cast<const char*>(argv[1]));
+
+    	if (n.valid())
+    	{
+    		std::vector<lo_message> state = n->getState();
+
+			std::cout << "WARNING: UNIMPLEMENTED: TCP request 'getState' for node " << reinterpret_cast<const char*>(argv[1]) << std::endl;
+
+			// TODO: send node bundle back to sender
+
+    	}
 
     }
 

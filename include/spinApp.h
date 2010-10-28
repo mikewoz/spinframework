@@ -102,10 +102,10 @@ class spinApp
         void NodeMessage(const char *nodeId, const char *types, va_list ap);
         void NodeMessage(const char *nodeId, lo_message msg);
 
-        void NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
-        void NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_address addr);
-        void SceneBundle(std::vector<lo_message> msgs);
-        void SceneBundle(std::vector<lo_message> msgs, lo_address addr);
+        //void NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs);
+        void NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_address addr = 0);
+        //void SceneBundle(std::vector<lo_message> msgs);
+        void SceneBundle(std::vector<lo_message> msgs, lo_address addr = 0);
 
         void setSceneID(std::string s) { sceneID = s; }
         std::string getSceneID() { return sceneID; }
