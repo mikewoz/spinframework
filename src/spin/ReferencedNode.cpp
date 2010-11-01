@@ -45,7 +45,7 @@
 #include <exception>
 #include <osgDB/FileUtils>
 #include <osg/BlendFunc>
-#include <osg/Blendcolor>
+#include <osg/BlendColor>
 #include <osg/BlendEquation>
 
 #include "spinApp.h"
