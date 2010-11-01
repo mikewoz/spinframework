@@ -44,6 +44,9 @@
 #include <iostream>
 #include <exception>
 #include <osgDB/FileUtils>
+#include <osg/BlendFunc>
+#include <osg/Blendcolor>
+#include <osg/BlendEquation>
 
 #include "spinApp.h"
 #include "spinBaseContext.h"
@@ -70,12 +73,14 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
 
     this->setName(string(id->s_name) + ".ReferencedNode");
 
+
     // set some initial symbols:
     parent = WORLD_SYMBOL;
     newParent = WORLD_SYMBOL;
 
     textFlag = false;
     scheduleForDeletion = false;
+    subgraphAlpha_ = 1.0;
 
 
     // When children are attached to this, they get added to the attachmentNode:
@@ -86,6 +91,10 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
     //this->setUserData( dynamic_cast<osg::Referenced*>(this) );
     this->setUserData( new ReferencedNode_data(this) );
     this->setUpdateCallback(new ReferencedNode_callback);
+
+    // tell OSG that this object will be updated dynamically
+    this->setDataVariance(osg::Object::DYNAMIC);
+
 
     // set initial nodepath:
     currentNodePath.clear();
@@ -356,6 +365,60 @@ void ReferencedNode::setContext (const char *newvalue)
     BROADCAST(this, "ss", "setContext", getContext());
 }
 
+void ReferencedNode::setAlpha (float alpha)
+{
+	if (subgraphAlpha_ == alpha) return;
+
+	subgraphAlpha_ = alpha;
+	if (subgraphAlpha_ < 0.0) subgraphAlpha_ = 0.0;
+	else if (subgraphAlpha_ > 1.0) subgraphAlpha_ = 1.0;
+
+	osg::StateSet *ss = this->getOrCreateStateSet();
+	ss->setDataVariance(osg::Object::DYNAMIC);
+
+    // turn on blending and tell OSG to sort meshes before displaying them
+    ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+    ss->setMode(GL_BLEND, osg::StateAttribute::ON);
+
+	osg::BlendFunc *blendFunc = new osg::BlendFunc();
+	osg::BlendColor *blendColor= new osg::BlendColor(osg::Vec4(1, 1, 1, subgraphAlpha_));
+
+	blendFunc->setDataVariance(osg::Object::DYNAMIC);
+	blendColor->setDataVariance(osg::Object::DYNAMIC);
+
+	blendFunc->setSource(osg::BlendFunc::CONSTANT_ALPHA);
+	blendFunc->setDestination(osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA);
+	ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+	ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+
+	//this->setStateSet(ss);
+
+
+
+
+    /*
+    osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
+    blendEquation->setDataVariance(osg::Object::DYNAMIC);
+
+	//blendEquation->setEquation(osg::BlendEquation::FUNC_ADD);
+	//blendEquation->setEquation(osg::BlendEquation::FUNC_SUBTRACT);
+	//blendEquation->setEquation(osg::BlendEquation::FUNC_REVERSE_SUBTRACT);
+	//blendEquation->setEquation(osg::BlendEquation::RGBA_MIN);
+	//blendEquation->setEquation(osg::BlendEquation::RGBA_MAX);
+	blendEquation->setEquation(osg::BlendEquation::ALPHA_MIN);
+	//blendEquation->setEquation(osg::BlendEquation::ALPHA_MAX);
+	//blendEquation->setEquation(osg::BlendEquation::LOGIC_OP);
+
+    ss->setAttributeAndModes(blendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+    */
+
+
+
+
+	std::cout << "set alpha for " << this->id->s_name << " to " << subgraphAlpha_ << std::endl;
+
+}
+
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)
 {
     //std::cout << id->s_name << " got setParam: " << paramValue << std::endl;
@@ -431,6 +494,10 @@ std::vector<lo_message> ReferencedNode::getState ()
 
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setContext", this->getContext());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setAlpha", this->getAlpha());
     ret.push_back(msg);
 
     stringParamType::iterator stringIter;

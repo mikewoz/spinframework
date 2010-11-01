@@ -113,6 +113,16 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __void__setContext__C5_char_P1,
 	          "",
 	          "A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
+	I_Method1(void, setAlpha, IN, float, alpha,
+	          Properties::NON_VIRTUAL,
+	          __void__setAlpha__float,
+	          "",
+	          "");
+	I_Method0(float, getAlpha,
+	          Properties::NON_VIRTUAL,
+	          __float__getAlpha,
+	          "",
+	          "");
 	I_Method0(const char *, getContext,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getContext,
@@ -203,6 +213,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __bool__removeEventScript__C5_char_P1,
 	          "",
 	          "");
+	I_SimpleProperty(float, Alpha, 
+	                 __float__getAlpha, 
+	                 __void__setAlpha__float);
 	I_SimpleProperty(osg::Group *, AttachmentNode, 
 	                 __osg_Group_P1__getAttachmentNode, 
 	                 __int__setAttachmentNode__osg_Group_P1);
@@ -232,6 +245,7 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	I_PublicMemberProperty(bool, textFlag);
 	I_PublicMemberProperty(stringParamType, stringParams);
 	I_PublicMemberProperty(floatParamType, floatParams);
+	I_PublicMemberProperty(float, subgraphAlpha_);
 	I_PublicMemberProperty(osg::NodePath, currentNodePath);
 	I_PublicMemberProperty(std::vector< ReferencedNode * >, children);
 	I_PublicMemberProperty(SceneManager *, sceneManager);

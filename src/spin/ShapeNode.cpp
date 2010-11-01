@@ -93,6 +93,7 @@ ShapeNode::~ShapeNode()
 
 void ShapeNode::setContext (const char *newvalue)
 {
+	if (this->contextString == string(newvalue)) return;
 	// need to redraw after setContext() is called:
 	ReferencedNode::setContext(newvalue);
 	drawShape();
@@ -185,10 +186,9 @@ void ShapeNode::updateStateSet()
 // ===================================================================
 void ShapeNode::setRenderBin (int i)
 {
+	if (renderBin == i) return;
+
 	renderBin = i;
-
-	//std::cout << "TODO: fix renderbin.  " << renderBin << std::endl;
-
 
 	if (shapeGeode.valid())
 	{
@@ -202,7 +202,7 @@ void ShapeNode::setRenderBin (int i)
 
 void ShapeNode::setLighting (int i)
 {
-
+	if (lightingEnabled==(bool)i) return;
 	lightingEnabled = (bool)i;
 
 	if (shapeGeode.valid() && !stateset->s_thing)

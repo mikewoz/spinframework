@@ -192,6 +192,9 @@ public:
      */
     virtual void setContext (const char *newvalue);
 
+    void setAlpha (float alpha);
+    float getAlpha() { return subgraphAlpha_; }
+
     /**
      * Returns the current host
      */
@@ -256,8 +259,7 @@ public:
     stringParamType stringParams;
     floatParamType floatParams;
 
-
-
+    float subgraphAlpha_;
 
     osg::NodePath currentNodePath;
 

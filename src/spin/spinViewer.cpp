@@ -310,7 +310,7 @@ int run(int argc, char **argv)
 	double minFrameTime = 1.0 / maxFrameRate;
 
 
-	std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
+	//std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
 
 	// program loop:
 	while(not viewer.done())
