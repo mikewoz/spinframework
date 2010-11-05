@@ -23,7 +23,7 @@ libSPINwrappers_la_SOURCES = \
 	ReferencedNode.cpp ReferencedStateSet.cpp \
     UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
     GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
-    ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
+    ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp ReporterNode.cpp \
     AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
     DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
     ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 

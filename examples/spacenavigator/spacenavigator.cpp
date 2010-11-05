@@ -21,7 +21,7 @@ pthread_mutex_t spacenavMutex;
 
 // scalars when using setVelocity and setSpin:
 #define VELOCITY_SCALAR 0.05
-#define SPIN_SCALAR 0.05
+#define SPIN_SCALAR 0.01
 
 // scalars when using move and rotate:
 //#define VELOCITY_SCALAR 0.0005
@@ -56,7 +56,7 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
 			state = (ConnexionDeviceState*)messageArgument;
 			if (state->client == fConnexionClientID)
 			{
-               	std::cout << "SPACENAVIGATOR INFO:";
+               	//std::cout << "SPACENAVIGATOR INFO:";
 
                	// decipher what command/event is being reported by the driver
                 switch (state->command)
@@ -75,7 +75,7 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
                     			"sfff", "setSpin",
                     			(float)  SPIN_SCALAR*state->axis[3],
                     			(float)  SPIN_SCALAR*state->axis[5],
-                    			(float) -SPIN_SCALAR*state->axis[4]*5.0, // yaw should be faster
+                    			(float) -SPIN_SCALAR*state->axis[4]*10.0, // yaw should be faster
                     			LO_ARGS_END);
 
                     	break;
@@ -92,7 +92,7 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
 
                         break;
                 }
-               	std::cout << std::endl;
+               	//std::cout << std::endl;
 
 				memcpy(state, &lastState, (long)sizeof(ConnexionDeviceState));
 			}
