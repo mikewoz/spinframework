@@ -230,11 +230,13 @@ void ReporterNode::sendReports(reporterTarget *target)
         }
         */
 
-
-        msg = lo_message_new();
-        lo_message_add(msg, "ssi", "containedBy", target->node->id->s_name, (int)!intersector->containsIntersections());
-        msgs.push_back(msg);
-
+        if (target->contained != (!intersector->containsIntersections()))
+        {
+        	target->contained = !intersector->containsIntersections();
+			msg = lo_message_new();
+			lo_message_add(msg, "ssi", "containedBy", target->node->id->s_name, (int)target->contained);
+			msgs.push_back(msg);
+        }
     }
 
     if (reporting_["OCCLUSION"])
@@ -242,7 +244,8 @@ void ReporterNode::sendReports(reporterTarget *target)
     	// TODO
     }
 
-    spinApp::Instance().NodeBundle(this->id, msgs);
+    if (msgs.size())
+    	spinApp::Instance().NodeBundle(this->id, msgs);
 }
 
 // *****************************************************************************
@@ -263,7 +266,7 @@ void ReporterNode::addTarget (const char *targetID)
     {
     	if (n.get()==(*t).node.get())
     	{
-    		std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
+    		//std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
     		return;
     	}
     }

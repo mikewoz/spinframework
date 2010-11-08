@@ -47,6 +47,7 @@
 typedef struct _reporterTarget {
 	osg::observer_ptr<ReferencedNode> node;
 	osg::Matrix matrix;
+	bool contained;
 } reporterTarget;
 
 typedef std::map< std::string, bool > reportingType;
