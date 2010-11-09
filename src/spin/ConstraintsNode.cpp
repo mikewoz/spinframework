@@ -282,11 +282,14 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					//std::cout << "localHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
 
-					// Check if we've intersected with the same primitive again
-					// (may be possible due to numerical imprecision). If so,
-					// we'll skip this intersection
-
-					if ((lastDrawable.get()==(*itr).drawable.get()) && (lastPrimitiveIndex==(*itr).primitiveIndex))
+					// For BOUNCE mode, we need to check if we've intersected
+					// with the same primitive again. This may occur since we
+					// do recursive translations after repositioning the node at
+					// the bounce point (and there may be numerical imprecision)
+					// If so, we skip this intersection:
+					if ((_mode==BOUNCE) &&
+					    (lastDrawable.get()==(*itr).drawable.get()) &&
+						    (lastPrimitiveIndex==(*itr).primitiveIndex))
 					{
 						continue;
 					}
@@ -332,7 +335,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// just set translation to the hitpoint, but back
 						// along the normal by a bit
 
-						osg::Vec3 collisionPoint = localHitPoint + (localHitNormal * 0.01);
+						osg::Vec3 collisionPoint = localHitPoint - (localHitNormal * 0.01);
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
 
 						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
