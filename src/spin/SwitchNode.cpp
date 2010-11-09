@@ -58,7 +58,7 @@ using namespace std;
 
 // *****************************************************************************
 // constructor:
-SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".SwitchNode");
 	nodeType = "SwitchNode";
@@ -136,7 +136,7 @@ void SwitchNode::setAll(int enabled)
 std::vector<lo_message> SwitchNode::getState ()
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
 	for (int i=0; i<switcher->getNumChildren(); i++)

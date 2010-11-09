@@ -51,7 +51,7 @@
  * \brief Allows for selectively enabling/disabling child nodes
  *
  */
-class SwitchNode : public ReferencedNode
+class SwitchNode : public GroupNode
 {
 
 public:
