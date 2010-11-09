@@ -45,7 +45,7 @@
 #include <osg/Switch>
 
 
-#include "ReferencedNode.h"
+#include "GroupNode.h"
 
 /**
  * \brief Allows for selectively enabling/disabling child nodes

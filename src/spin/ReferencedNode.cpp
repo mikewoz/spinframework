@@ -347,17 +347,24 @@ bool ReferencedNode::legalParent (t_symbol *newParent)
     return true;
 }
 
-// *****************************************************************************
-
 void ReferencedNode::setParent (const char *newvalue)
 {
     t_symbol *s = gensym(newvalue);
     if (parent != s)
     {
-        newParent = s;
-		attach();
+		if (legalParent(s))
+		{
+			newParent = s;
+			attach();
+		}
+		else
+		{
+			std::cout << "ERROR: Tried to setParent for node " << this->id->s_name << " to " << newvalue << ", but that parent is illegal (probably contained in the subgraph of this node)." << std::endl;
+		}
 	}
 }
+
+// *****************************************************************************
 
 void ReferencedNode::setContext (const char *newvalue)
 {

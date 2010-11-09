@@ -344,10 +344,21 @@ int run(int argc, char **argv)
 
 			if (dt >= minFrameTime)
 			{
+				// we used to just call viewer.frame() within a mutex, but we
+				// only really need to apply the mutex to the update traversal
+				/*
 				pthread_mutex_lock(&sceneMutex);
 				viewer.frame();
 				pthread_mutex_unlock(&sceneMutex);
+				*/
 
+				viewer.advance();
+				viewer.eventTraversal();
+				pthread_mutex_lock(&sceneMutex);
+				viewer.updateTraversal();
+				pthread_mutex_unlock(&sceneMutex);
+				viewer.renderingTraversals();
+				
 				// save time when the last time a frame was rendered:
 				lastFrameTick = osg::Timer::instance()->tick();
 				dt = 0;

@@ -527,7 +527,7 @@ void ModelNode::drawModel()
 
 			if (sceneManager->sharedStateManager.valid())
 				sceneManager->sharedStateManager->share(model.get());
-		
+			
 			
 		} else {
 			std::cout << "ERROR [ModelNode::drawModel]: Could not find \"" << modelPath << "\". Make sure file exists, and that it is a valid 3D model." << std::endl;

@@ -186,7 +186,7 @@ void *spinClientContext::spinClientThread(void *arg)
         int recv = context->pollUpdates();
         
         if (recv == 0)
-        	usleep(1000);
+        	usleep(10);
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();
