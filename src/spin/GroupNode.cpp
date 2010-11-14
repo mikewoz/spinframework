@@ -327,6 +327,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                     this->owner = user.get();
                     //std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
                     BROADCAST(this, "ss", "owner", owner->id->s_name);
+                    BROADCAST(this, "ssi", "select", userString, 1);
                 }
                 break;
 
@@ -339,7 +340,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                     //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
                     this->owner = NULL;
                     BROADCAST(this, "ss", "owner", "NULL");
-                }
+                    BROADCAST(this, "ssi", "select", userString, 0);
+               }
                 break;
             case(osgGA::GUIEventAdapter::DOUBLECLICK):
                 BROADCAST(this, "ss", "doubleclick", userString);

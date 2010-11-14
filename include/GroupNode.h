@@ -255,6 +255,8 @@ protected:
 	osg::Vec3 _spin;
 	float _damping;
 	
+private:
+
 	osg::Timer_t lastTick;
 
 };

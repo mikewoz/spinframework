@@ -67,7 +67,11 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	//_text = "";
 	_font = "arial.ttf";
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);
+	_bgColor = osg::Vec4(1.0,0.0,0.0,0.5);
+	_margin = 0.1;
 	_billboard = RELATIVE; // ie, no billboard
+	_decoration = DROP_SHADOW_BOTTOM_RIGHT;
+	_background = NO_BACKGROUND;
 
 	textLabel = new osgText::Text();
 	
@@ -132,25 +136,49 @@ void TextNode::setFont (const char *s)
 	}
 }
 
+void TextNode::setColor (float r, float g, float b, float a)
+{
+	_color = osg::Vec4(r,g,b,a);
+	textLabel->setColor( _color );
+	BROADCAST(this, "sffff", "setColor", r, g, b, a);
+}
+
+void TextNode::setBgColor (float r, float g, float b, float a)
+{
+	_bgColor = osg::Vec4(r,g,b,a);
+	textLabel->setBoundingBoxColor(_bgColor);
+	BROADCAST(this, "sffff", "setBgColor", r, g, b, a);
+}
+
+void TextNode::setMargin (float margin)
+{
+	_margin = margin;
+	textLabel->setBoundingBoxMargin(_margin);
+	BROADCAST(this, "sf", "setMargin", getMargin());
+}
+
 void TextNode::setBillboard (billboardType t)
 {
 	if (t == _billboard) return;
 	else _billboard = t;
-
 	drawText();
-
 	BROADCAST(this, "si", "setBillboard", (int) _billboard);
-
 }
 
-void TextNode::setColor (float r, float g, float b, float a)
+void TextNode::setDecoration (decorationType t)
 {
-	_color = osg::Vec4(r,g,b,a);
+	_decoration = t;
+	//textLabel->setBackdropType((osgText::Text::BackdropType)_decoration);
+	drawText();
+	BROADCAST(this, "si", "setDecoration", getBackround());
+}
 
-	textLabel->setColor( _color );
-	//drawText();
+void TextNode::setBackground (backgroundType t)
+{
+	_background = t;
+	drawText();
+	BROADCAST(this, "si", "setBackground", getBackround());
 
-	BROADCAST(this, "sffff", "setColor", r, g, b, a);
 }
 
 // =============================================================================
@@ -208,10 +236,20 @@ void TextNode::drawText()
 		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
 		textLabel->setFontResolution(40,40);
 		textLabel->setColor( _color );
+		textLabel->setBoundingBoxColor(_bgColor);
+		textLabel->setBoundingBoxMargin(_margin);
+		textLabel->setBackdropType((osgText::Text::BackdropType)_decoration);
 
-		// setDrawMode
-		// TEXT = 1, BOUNDINGBOX = 2, ALIGNMENT = 4
-		//textLabel->setDrawMode(osgText::Text::TEXT); 
+		// setDrawMode (background):
+		if (_background == NO_BACKGROUND)
+			textLabel->setDrawMode(osgText::Text::TEXT);
+		else if (_background == FILLED)
+			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::FILLEDBOUNDINGBOX);
+		else if (_background == WIREFRAME)
+			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+		else if (_background == ALL)
+			textLabel->setDrawMode(osgText::Text::TEXT| osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::BOUNDINGBOX);
+
 
 		// setAlignment
 		// LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM, CENTER_TOP,
@@ -244,6 +282,7 @@ std::vector<lo_message> TextNode::getState ()
 	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
+	osg::Vec4 v4;
 
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setTextValue", getTextValue());
@@ -254,13 +293,29 @@ std::vector<lo_message> TextNode::getState ()
 	ret.push_back(msg);
 
 	msg = lo_message_new();
+	v4 = this->getColor();
+	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	v4 = this->getBgColor();
+	lo_message_add(msg, "sffff", "setBgColor", v4.x(), v4.y(), v4.z(), v4.w());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setMargin", getMargin());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
 	lo_message_add(msg, "si", "setBillboard", getBillboard());
 	ret.push_back(msg);
 	
 	msg = lo_message_new();
-	osg::Vec4 v4 = this->getColor();
-	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());
+	lo_message_add(msg, "si", "setDecoration", getDecoration());
 	ret.push_back(msg);
 
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setBackground", getBackround());
+	ret.push_back(msg);
 	return ret;
 }

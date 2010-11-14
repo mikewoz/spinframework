@@ -155,6 +155,7 @@ private:
 
 	osg::ref_ptr< osg::Drawable > lastDrawable;
 	int lastPrimitiveIndex;
+	int recursionCounter;
 };
 
 

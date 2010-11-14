@@ -101,7 +101,7 @@ void SwitchNode::updateNodePath()
 // *****************************************************************************
 void SwitchNode::setEnabled (const char* id, int enabled)
 {
-	for (int i=0; i<switcher->getNumChildren(); i++)
+	for (unsigned int i=0; i<switcher->getNumChildren(); i++)
 	{
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
 		if (n.valid() && (n->id==gensym(id)))
@@ -121,7 +121,7 @@ void SwitchNode::setAll(int enabled)
 	else
 		switcher->setAllChildrenOff();
 	
-	for (int i=0; i<switcher->getNumChildren(); i++)
+	for (unsigned int i=0; i<switcher->getNumChildren(); i++)
 	{
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
 		if (n.valid())
@@ -139,7 +139,7 @@ std::vector<lo_message> SwitchNode::getState ()
 	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
-	for (int i=0; i<switcher->getNumChildren(); i++)
+	for (unsigned int i=0; i<switcher->getNumChildren(); i++)
 	{
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
 		if (n.valid())

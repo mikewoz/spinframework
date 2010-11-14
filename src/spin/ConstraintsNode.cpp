@@ -188,6 +188,7 @@ void ConstraintsNode::translate (float x, float y, float z)
     		// reset the lastDrawable
     		lastDrawable = 0;
     		lastPrimitiveIndex = -1;
+    		recursionCounter = 0;
     		applyConstrainedTranslation(osg::Vec3(x,y,z));
     	}
     	else {
@@ -208,6 +209,7 @@ void ConstraintsNode::move (float x, float y, float z)
     	{
     		lastDrawable = 0;
     		lastPrimitiveIndex = -1;
+    		recursionCounter = 0;
     		applyConstrainedTranslation(v);
     	}
     	else {
@@ -223,6 +225,11 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	osg::Vec3 localPos = this->getTranslation();
 	osg::ref_ptr<ReferencedNode> hitNode;
 	ReferencedNode *testNode;
+
+	// with really big velocities (or small enclosures), and if the surface
+	// doesn't damp the velocity, it's possible to get see an infinite recursion
+	// occur. So, we keep a recursionCounter, and stop prevent this occurrence:
+	if (++recursionCounter > 10) return;
 
 	/*
 	std::cout << std::endl << "checking for collisions" << std::endl;

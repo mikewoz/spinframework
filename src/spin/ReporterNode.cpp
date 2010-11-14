@@ -275,6 +275,7 @@ void ReporterNode::addTarget (const char *targetID)
     reporterTarget newTarget;
     newTarget.node = n.get();
     newTarget.matrix.makeIdentity();
+    newTarget.contained = false;
     targets_.push_back(newTarget);
 
     BROADCAST(this, "ss", "addTarget", targetID);

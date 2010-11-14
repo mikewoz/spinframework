@@ -28,6 +28,7 @@ BEGIN_VALUE_REFLECTOR(_reporterTarget)
 	               "");
 	I_PublicMemberProperty(osg::observer_ptr< ReferencedNode >, node);
 	I_PublicMemberProperty(osg::Matrix, matrix);
+	I_PublicMemberProperty(bool, contained);
 END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(ReporterNode)

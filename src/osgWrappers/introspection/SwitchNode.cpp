@@ -23,7 +23,7 @@
 
 BEGIN_OBJECT_REFLECTOR(SwitchNode)
 	I_DeclaringFile("SwitchNode.h");
-	I_BaseType(ReferencedNode);
+	I_BaseType(GroupNode);
 	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
 	               ____SwitchNode__SceneManager_P1__char_P1,
 	               "",
