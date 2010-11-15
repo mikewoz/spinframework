@@ -42,7 +42,7 @@
 #include "AttractorNode.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-#include "sceneManager.h"
+#include "SceneManager.h"
 #include "osgUtil.h"
 
 using namespace std;
@@ -164,7 +164,7 @@ void AttractorNode::setAttractorMode (attractorMode m)
 void AttractorNode::addTarget (const char *targetID)
 {
 	// target must inherit from GroupNode:
-	osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(sceneManager->getNode(targetID));
+	osg::observer_ptr<GroupNode> n = dynamic_cast<GroupNode*>(sceneManager->getNode(targetID));
 
 	if (!n.valid())
 	{

@@ -43,7 +43,7 @@
 #include "spinApp.h"
 #include "osgUtil.h"
 #include "spinBaseContext.h"
-#include "sceneManager.h"
+#include "SceneManager.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -102,7 +102,7 @@ void Menu3D::addItem (const char *itemText)
     	std::cout << "adding item: " << itemID << std::endl;
 
 		// get ReferencedNode for the ID:
-		osg::ref_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getOrCreateNode(itemID, "TextNode"));
+		osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getOrCreateNode(itemID, "TextNode"));
 		if (!n.valid())
 		{
 			std::cout << "WARNING: Menu3D '" << this->id->s_name << "' could not create TextNode: '" << itemID << "'" << std::endl;
@@ -181,7 +181,7 @@ void Menu3D::setHighlighted(int itemIndex)
 
 void Menu3D::setHighlighted(const char *itemID)
 {
-	osg::ref_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getNode(itemID));
+	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getNode(itemID));
 	doHighlight(n);
 }
 
