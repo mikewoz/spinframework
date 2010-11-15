@@ -116,6 +116,7 @@ void Menu3D::addItem (const char *itemText)
 		n->setBillboard(billboardType_);
 		n->setInteractionMode(GroupNode::SELECT);
 		n->setTextValue(itemText);
+        n->setParent(this->id->s_name);
 
 		// add it to the list:
 		items_.push_back(n);

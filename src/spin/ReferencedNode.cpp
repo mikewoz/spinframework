@@ -763,7 +763,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     cout << "Loading script: " << sf << endl;
 
     boost::python::object s, p;
-    char cmd[100];
+    char cmd[512];
     unsigned long long utick =  (unsigned long long) timer->tick();
     std::string pyModule, pyScript;
 
