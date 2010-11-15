@@ -41,6 +41,7 @@
 
 #include <osgText/Text>
 #include <osg/Billboard>
+#include <osg/Version>
 
 #include "osgUtil.h"
 #include "TextNode.h"
@@ -146,14 +147,18 @@ void TextNode::setColor (float r, float g, float b, float a)
 void TextNode::setBgColor (float r, float g, float b, float a)
 {
 	_bgColor = osg::Vec4(r,g,b,a);
+#if OSG_MIN_VERSION_REQUIRED(2,9,7)
 	textLabel->setBoundingBoxColor(_bgColor);
+#endif
 	BROADCAST(this, "sffff", "setBgColor", r, g, b, a);
 }
 
 void TextNode::setMargin (float margin)
 {
 	_margin = margin;
+#if OSG_MIN_VERSION_REQUIRED(2,9,7)
 	textLabel->setBoundingBoxMargin(_margin);
+#endif
 	BROADCAST(this, "sf", "setMargin", getMargin());
 }
 
@@ -236,19 +241,33 @@ void TextNode::drawText()
 		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
 		textLabel->setFontResolution(40,40);
 		textLabel->setColor( _color );
+#if OSG_MIN_VERSION_REQUIRED(2,9,7)
 		textLabel->setBoundingBoxColor(_bgColor);
 		textLabel->setBoundingBoxMargin(_margin);
+#endif
 		textLabel->setBackdropType((osgText::Text::BackdropType)_decoration);
 
 		// setDrawMode (background):
 		if (_background == NO_BACKGROUND)
 			textLabel->setDrawMode(osgText::Text::TEXT);
 		else if (_background == FILLED)
+        {
+#if OSG_MIN_VERSION_REQUIRED(2,9,7)
 			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::FILLEDBOUNDINGBOX);
+#else
+			textLabel->setDrawMode(osgText::Text::TEXT);
+#endif
+        }
 		else if (_background == WIREFRAME)
 			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
 		else if (_background == ALL)
-			textLabel->setDrawMode(osgText::Text::TEXT| osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::BOUNDINGBOX);
+        {
+#if OSG_MIN_VERSION_REQUIRED(2,9,7)
+			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::BOUNDINGBOX);
+#else
+			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
+#endif
+        }
 
 
 		// setAlignment
