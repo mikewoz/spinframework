@@ -330,11 +330,9 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						rot.makeRotate(dirVec, localHitNormal);
 					}
 
+
+					osg::Vec3 rotEulers = QuatToEuler(rot);
 					//std::cout << "newHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
-
-					osg::Vec3 rotEulers = QuatToEuler(rot*2);
-					//std::cout << "rot_eu = " << osg::RadiansToDegrees(rotEulers.x())<<","<<osg::RadiansToDegrees(rotEulers.y())<<","<<osg::RadiansToDegrees(rotEulers.z()) << std::endl;
-
 
 
 					if (_mode==COLLIDE)
@@ -402,6 +400,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);
 
+						//std::cout << "rotEulers = " << osg::RadiansToDegrees(rotEulers.x())<<","<<osg::RadiansToDegrees(rotEulers.y())<<","<<osg::RadiansToDegrees(rotEulers.z()) << std::endl;
 						BROADCAST(this, "ssfff", "bounce", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 						return;
