@@ -72,6 +72,8 @@ public:
 	void removeItem (const char *itemID);
 	int doRemoveItem (osg::observer_ptr<TextNode> n);
 
+	void clearItems();
+
 	/**
 	 * Highlight an item from the list
 	 */

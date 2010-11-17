@@ -161,8 +161,10 @@ void GroupNode::callbackUpdate()
 }
 
 
-void GroupNode::updateNodePath()
+void GroupNode::updateNodePath(bool updateChildren)
 {
+	ReferencedNode::updateNodePath(false);
+	/*
     currentNodePath.clear();
     if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
     {
@@ -176,11 +178,12 @@ void GroupNode::updateNodePath()
     // here, the nodePath includes the base osg::group, PLUS the mainTransform
     // and clipNode
     currentNodePath.push_back(this);
+    */
     currentNodePath.push_back(mainTransform.get());
     currentNodePath.push_back(clipNode.get());
 
     // now update NodePaths for all children:
-    updateChildNodePaths();
+    if (updateChildren) updateChildNodePaths();
 
     /*
     osg::NodePath::iterator iter;

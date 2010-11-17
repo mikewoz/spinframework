@@ -93,7 +93,7 @@ public:
 	 * function MUST be overridden, and extra nodes must be manually pushed onto
 	 * currentNodePath.
 	 */
-	virtual void updateNodePath();
+	virtual void updateNodePath(bool updateChildren = true);
 
 	void mouseEvent (int event, int keyMask, int buttonMask, float x, float y);
 	void event (int event, const char* userString, float eData1, float eData2, float x, float y, float z);

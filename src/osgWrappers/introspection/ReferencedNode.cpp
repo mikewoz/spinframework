@@ -78,11 +78,11 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __void__detach,
 	          "",
 	          "The detach() method is removes a node from the scene graph, depending on it's attachment position (specified by attachmentNode). ");
-	I_Method0(void, updateNodePath,
-	          Properties::VIRTUAL,
-	          __void__updateNodePath,
-	          "",
-	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
+	                      Properties::VIRTUAL,
+	                      __void__updateNodePath__bool,
+	                      "",
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
 	I_Method1(int, setAttachmentNode, IN, osg::Group *, n,
 	          Properties::NON_VIRTUAL,
 	          __int__setAttachmentNode__osg_Group_P1,

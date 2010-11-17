@@ -70,13 +70,7 @@ Menu3D::Menu3D (SceneManager *sceneManager, char *initID) : GroupNode(sceneManag
 // destructor
 Menu3D::~Menu3D()
 {
-	// remove text nodes:
-	MenuVector::iterator i;
-    for (i = items_.begin(); i != items_.end(); i++)
-    {
-    	if ((*i).valid()) sceneManager->deleteNode((*i)->id->s_name);
-	}
-    items_.clear();
+	this->clearItems();
 }
 
 
@@ -169,6 +163,21 @@ int Menu3D::doRemoveItem (osg::observer_ptr<TextNode> n)
 	}
 
 	return found;
+}
+
+void Menu3D::clearItems()
+{
+	MenuVector::iterator i;
+    while ((i=items_.begin()) != items_.end())
+    {
+    	// Call doRemoveItem(), which should erase the item from the list,
+    	// although sometimes (server quits), the remove method may not be
+   		// successful, so erase the item manually:
+   		if ((*i).valid())
+   			if (!doRemoveItem(*i)) items_.erase(i);
+   		else
+   			items_.erase(i);
+	}
 }
 // -----------------------------------------------------------------------------
 

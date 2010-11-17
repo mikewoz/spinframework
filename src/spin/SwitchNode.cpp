@@ -65,8 +65,14 @@ SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : GroupNode(sc
 
 	switcher = new osg::Switch();
 	switcher->setName(string(id->s_name) + ".switcher");
-	this->addChild(switcher.get());
+
+	std::cout << "creating switch node. attaching to " << this->getAttachmentNode()->getName() << std::endl;
+
+	// We inherit from GroupNode, so we must make sure to attach our osg Switch
+	// to the attachmentNode of GroupNode
+	this->getAttachmentNode()->addChild(switcher.get());
 	
+	// ... and then update the attachmentNode:
 	setAttachmentNode(switcher.get());
 }
 
@@ -79,18 +85,9 @@ SwitchNode::~SwitchNode()
 
 void SwitchNode::updateNodePath()
 {
-	currentNodePath.clear();
-	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
-	{
-		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
-		if (parentNode.valid())
-		{
-			currentNodePath = parentNode->currentNodePath;
-		}
-	}
-
-	// here, the nodePath includes the base osg::group, PLUS the textTransform
-	currentNodePath.push_back(this);
+	// call GroupNode's method, which will update all the way from the root, and
+	// we just need to add the Switch node:
+	GroupNode::updateNodePath(false);
 	currentNodePath.push_back(switcher.get());
 
 	// now update NodePaths for all children:

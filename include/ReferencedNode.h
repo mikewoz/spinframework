@@ -147,7 +147,7 @@ public:
      * function MUST be overridden, and extra nodes must be manually pushed onto
      * currentNodePath.
      */
-    virtual void updateNodePath();
+    virtual void updateNodePath(bool updateChildren = true);
 
     int setAttachmentNode(osg::Group *n);
 

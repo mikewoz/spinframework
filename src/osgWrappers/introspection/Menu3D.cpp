@@ -49,6 +49,11 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	          __int__doRemoveItem__osg_observer_ptrT1_TextNode_,
 	          "",
 	          "");
+	I_Method0(void, clearItems,
+	          Properties::NON_VIRTUAL,
+	          __void__clearItems,
+	          "",
+	          "");
 	I_Method1(void, setHighlighted, IN, int, itemIndex,
 	          Properties::NON_VIRTUAL,
 	          __void__setHighlighted__int,

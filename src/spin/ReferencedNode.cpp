@@ -248,7 +248,7 @@ void ReferencedNode::detach()
 // in this subgraph. If that is the case, the updateNodePath() function MUST be
 // overridden, and extra nodes must be manually pushed onto the currentNodePath.
 
-void ReferencedNode::updateNodePath()
+void ReferencedNode::updateNodePath(bool updateChildren)
 {
     currentNodePath.clear();
     if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
@@ -264,7 +264,7 @@ void ReferencedNode::updateNodePath()
     currentNodePath.push_back(this);
 
     // now update NodePaths for all children:
-    updateChildNodePaths();
+    if (updateChildren) updateChildNodePaths();
 
 }
 
@@ -593,7 +593,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
 
     boost::python::object s, p;
 
-    char cmd[100];
+    char cmd[512];
     //osg::Timer_t utick = timer->tick();
     unsigned long long utick =  (unsigned long long) timer->tick();
     std::string pyModule, pyScript, pyClassName;

@@ -55,11 +55,11 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	          __void__callbackUpdate,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
-	I_Method0(void, updateNodePath,
-	          Properties::VIRTUAL,
-	          __void__updateNodePath,
-	          "",
-	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
+	                      Properties::VIRTUAL,
+	                      __void__updateNodePath__bool,
+	                      "",
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
 	I_Method5(void, mouseEvent, IN, int, event, IN, int, keyMask, IN, int, buttonMask, IN, float, x, IN, float, y,
 	          Properties::NON_VIRTUAL,
 	          __void__mouseEvent__int__int__int__float__float,

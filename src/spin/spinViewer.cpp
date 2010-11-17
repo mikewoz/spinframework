@@ -356,8 +356,8 @@ int run(int argc, char **argv)
 				viewer.eventTraversal();
 				pthread_mutex_lock(&sceneMutex);
 				viewer.updateTraversal();
-				pthread_mutex_unlock(&sceneMutex);
 				viewer.renderingTraversals();
+				pthread_mutex_unlock(&sceneMutex);
 				
 				// save time when the last time a frame was rendered:
 				lastFrameTick = osg::Timer::instance()->tick();
