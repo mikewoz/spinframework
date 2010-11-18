@@ -48,7 +48,7 @@
 extern pthread_mutex_t sceneMutex;
 
 static unsigned int COUNTER = 0;
-static float Z_OFFSET = 0.2;
+static float Z_OFFSET = -0.2;
 
 // -----------------------------------------------------------------------------
 // constructor:
@@ -79,51 +79,53 @@ void Menu3D::addItem (const char *itemText)
 {
 	// We only add and remove items on the server side, because the actions will
 	// result in messages to create the appropriate nodes on the client anyway:
-    if (1) // ( spinApp::Instance().getContext()->isServer() )
-    {
+    if ( !spinApp::Instance().getContext()->isServer() ) return;
 
-    	// check if a menu item for that text already exists:
-    	MenuVector::iterator i;
-    	for (i = items_.begin(); i != items_.end(); i++)
-    	{
-    		if ((*i)->getTextString()==std::string(itemText)) return;
-    	}
+	// check if a menu item for that text already exists:
+	MenuVector::iterator i;
+	for (i = items_.begin(); i != items_.end(); i++)
+	{
+		if ((*i)->getTextString()==std::string(itemText)) return;
+	}
 
-    	// create a new id for the item:
-    	char itemID[256];
-    	sprintf(itemID, "%s_item_%06d", this->id->s_name, ++COUNTER);
+	// create a new id for the item:
+	char itemID[256];
+	unsigned long long utick =  (unsigned long long) osg::Timer::instance()->tick();
+	//sprintf(itemID, "%s_item_%06d", this->id->s_name, ++COUNTER);
+	sprintf(itemID, "%s_item_%llx", this->id->s_name, utick);
 
-    	std::cout << "adding item: " << itemID << std::endl;
+	std::cout << "adding item: " << itemID << ": '" << itemText << "'" << std::endl;
 
-		// get ReferencedNode for the ID:
-		osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getOrCreateNode(itemID, "TextNode"));
-		if (!n.valid())
-		{
-			std::cout << "WARNING: Menu3D '" << this->id->s_name << "' could not create TextNode: '" << itemID << "'" << std::endl;
-			return;
-		}
+	// get ReferencedNode for the ID:
+	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getOrCreateNode(itemID, "TextNode"));
+	if (!n.valid())
+	{
+		std::cout << "WARNING: Menu3D '" << this->id->s_name << "' could not create TextNode: '" << itemID << "'" << std::endl;
+		return;
+	}
 
-		// initial properties:
-		n->setTranslation(0.0, 0.0, items_.size() * -Z_OFFSET);
-		n->setFont(font_.c_str());
-		n->setColor(color_.x(),color_.y(),color_.z(),color_.w());
-		n->setBillboard(billboardType_);
-		n->setInteractionMode(GroupNode::SELECT);
-		n->setTextValue(itemText);
-        n->setParent(this->id->s_name);
+	// initial properties:
+	n->setTranslation(0.0, 0.0, items_.size() * Z_OFFSET);
+	n->setFont(font_.c_str());
+	n->setColor(color_.x(),color_.y(),color_.z(),color_.w());
+	n->setBillboard(billboardType_);
+	n->setInteractionMode(GroupNode::SELECT);
+	n->setTextValue(itemText);
+	n->setParent(this->id->s_name);
 
-		// add it to the list:
-		items_.push_back(n);
+	// add it to the list:
+	items_.push_back(n);
 
-		// if this is the first item, highlight it:
-		if (items_.size() == 1) setHighlighted(0);
+	// if this is the first item, highlight it:
+	if (items_.size() == 1) setHighlighted(0);
 
-		BROADCAST(this, "ss", "addItem", itemText);
-    }
+	BROADCAST(this, "ss", "addItem", itemText);
 }
 
 void Menu3D::removeItem (int itemIndex)
 {
+	if ( !spinApp::Instance().getContext()->isServer() ) return;
+	
 	if ((itemIndex>=0) && (itemIndex<(int)items_.size()))
 	{
 		if (!doRemoveItem(items_[itemIndex]))
@@ -132,6 +134,8 @@ void Menu3D::removeItem (int itemIndex)
 }
 void Menu3D::removeItem (const char *itemID)
 {
+	if ( !spinApp::Instance().getContext()->isServer() ) return;
+	
 	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getNode(itemID));
 	if (!doRemoveItem(n))
 		std::cout << "WARNING: Menu3D '" << this->id->s_name << "' failed to remove item '" << itemID << "'" << std::endl;
@@ -145,7 +149,6 @@ int Menu3D::doRemoveItem (osg::observer_ptr<TextNode> n)
 	if (n.get() == highlighted_.get()) highlighted_ = 0;
 
 	// on the server, find it in the list, and remove it:
-	int found = 0;
 	MenuVector::iterator i;
 	for (i = items_.begin(); i != items_.end(); i++)
 	{
@@ -153,16 +156,13 @@ int Menu3D::doRemoveItem (osg::observer_ptr<TextNode> n)
 		{
 			BROADCAST(this, "ss", "removeItem", (*i)->id->s_name);
 			sceneManager->deleteNode((*i)->id->s_name);
-			items_.erase(i);
-			found = 1;
+			items_.erase(i); // iterator increments
+			redraw(); // will remedy the whole left by the missing item
+			return 1;
 		}
-
-		// Notice that we don't stop iterating once we've found and removed the
-		// item. This is because we have to shift all the rest of the items up:
-		if (found) (*i)->translate(0,0,Z_OFFSET);
 	}
 
-	return found;
+	return 0;
 }
 
 void Menu3D::clearItems()
@@ -174,11 +174,32 @@ void Menu3D::clearItems()
     	// although sometimes (server quits), the remove method may not be
    		// successful, so erase the item manually:
    		if ((*i).valid())
+		{
    			if (!doRemoveItem(*i)) items_.erase(i);
-   		else
-   			items_.erase(i);
+		}
+		else items_.erase(i);
 	}
 }
+
+
+void Menu3D::redraw()
+{
+	int count = 0;
+	MenuVector::iterator i;
+	for (i = items_.begin(); i != items_.end();)
+	{
+		if ((*i).valid())
+		{
+			(*i)->setTranslation(0, 0, (count++) * Z_OFFSET);
+			i++;
+		}
+		else {
+			items_.erase(i);
+		}
+	}	
+}
+
+
 // -----------------------------------------------------------------------------
 
 void Menu3D::setHighlighted(int itemIndex)

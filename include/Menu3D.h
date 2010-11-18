@@ -73,7 +73,8 @@ public:
 	int doRemoveItem (osg::observer_ptr<TextNode> n);
 
 	void clearItems();
-
+	void redraw();
+	
 	/**
 	 * Highlight an item from the list
 	 */

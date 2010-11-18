@@ -67,6 +67,7 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 
 	//_text = "";
 	_font = "arial.ttf";
+	_size = 0.1f;
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);
 	_bgColor = osg::Vec4(1.0,0.0,0.0,0.5);
 	_margin = 0.1;
@@ -137,6 +138,13 @@ void TextNode::setFont (const char *s)
 	}
 }
 
+void TextNode::setSize (float s)
+{
+	_size = s;
+	textLabel->setCharacterSize( _size );
+	BROADCAST(this, "sf", "setSize", getSize());
+}
+
 void TextNode::setColor (float r, float g, float b, float a)
 {
 	_color = osg::Vec4(r,g,b,a);
@@ -189,9 +197,11 @@ void TextNode::setBackground (backgroundType t)
 // =============================================================================
 void TextNode::drawText()
 {
-
+	osg::Billboard *b;
+	
     pthread_mutex_lock(&sceneMutex);
-
+	
+	
 	// first remove existing text:
 	if (this->getAttachmentNode()->containsNode(textGeode.get()))
 	{
@@ -208,7 +218,7 @@ void TextNode::drawText()
 	{
 		if (_billboard)
 		{
-			osg::Billboard *b = new osg::Billboard();
+			b = new osg::Billboard();
 			switch (_billboard)
 			{
 				case POINT_EYE:
@@ -236,7 +246,7 @@ void TextNode::drawText()
 
 
 		// set some parameters for the text:
-		textLabel->setCharacterSize(0.1f);
+		textLabel->setCharacterSize(_size);
 		//textLabel->setFont(0); // inbuilt font (small)
 		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
 		textLabel->setFontResolution(40,40);
@@ -309,6 +319,10 @@ std::vector<lo_message> TextNode::getState ()
 
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setFont", getFont());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setSize", getSize());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

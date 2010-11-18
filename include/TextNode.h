@@ -105,6 +105,7 @@ public:
 	
 	void setTextValue		(const char* s);
 	void setFont			(const char* s);
+	void setSize			(float s);
 	void setColor			(float red, float green, float blue, float alpha);
 	void setBgColor			(float red, float green, float blue, float alpha);
 	void setMargin			(float margin);
@@ -118,6 +119,7 @@ public:
 	const char	*getTextValue()		{ return _text.c_str(); }
 	std::string	 getTextString()	{ return _text; }
 	const char	*getFont()			{ return _font.c_str(); }
+	float		 getSize()			{ return _size; }
 	osg::Vec4	 getColor()			{ return _color; };
 	osg::Vec4	 getBgColor()		{ return _bgColor; }
 	float		 getMargin()		{ return _margin; }
@@ -138,6 +140,7 @@ public:
 private:
 
 	std::string _font;
+	float _size;
 	osg::Vec4 _color, _bgColor;
 	float _margin;
 
