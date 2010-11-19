@@ -31,7 +31,7 @@ libSPIN_la_SOURCES = \
 	ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp ReporterNode.cpp \
 	AttractorNode.cpp AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
 	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-	ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
+	Fog.cpp ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
 
 libSPIN_la_includedir = $(includedir)/spinFramework
 libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h

@@ -29,6 +29,21 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	               ____Menu3D__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_Method0(void, updateNodePath,
+	          Properties::VIRTUAL,
+	          __void__updateNodePath,
+	          "",
+	          "");
+	I_Method1(void, setEnabled, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setEnabled__int,
+	          "",
+	          "");
+	I_Method0(int, getEnabled,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabled,
+	          "",
+	          "");
 	I_Method1(void, addItem, IN, const char *, itemText,
 	          Properties::NON_VIRTUAL,
 	          __void__addItem__C5_char_P1,
@@ -52,6 +67,11 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	I_Method0(void, clearItems,
 	          Properties::NON_VIRTUAL,
 	          __void__clearItems,
+	          "",
+	          "");
+	I_Method0(void, redraw,
+	          Properties::NON_VIRTUAL,
+	          __void__redraw,
 	          "",
 	          "");
 	I_Method1(void, setHighlighted, IN, int, itemIndex,
@@ -84,6 +104,21 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	          __osg_Vec4__getHighlightColor,
 	          "",
 	          "");
+	I_Method0(void, highlightNext,
+	          Properties::NON_VIRTUAL,
+	          __void__highlightNext,
+	          "",
+	          "");
+	I_Method0(void, highlightPrev,
+	          Properties::NON_VIRTUAL,
+	          __void__highlightPrev,
+	          "",
+	          "");
+	I_Method0(void, select,
+	          Properties::NON_VIRTUAL,
+	          __void__select,
+	          "",
+	          "");
 	I_Method1(void, setFont, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setFont__C5_char_P1,
@@ -107,6 +142,9 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	I_SimpleProperty(TextNode::billboardType, Billboard, 
 	                 0, 
 	                 __void__setBillboard__TextNode_billboardType);
+	I_SimpleProperty(int, Enabled, 
+	                 __int__getEnabled, 
+	                 __void__setEnabled__int);
 	I_SimpleProperty(const char *, Font, 
 	                 0, 
 	                 __void__setFont__C5_char_P1);

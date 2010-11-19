@@ -39,105 +39,48 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __Menu3D_H
-#define __Menu3D_H
+#ifndef __Fog_H
+#define __Fog_H
 
-#include <osg/Switch>
-#include "GroupNode.h"
-#include "TextNode.h"
-
-typedef std::vector< osg::observer_ptr<TextNode> > MenuVector;
-
+#include "SceneManager.h"
+#include <osg/Fog>
+#include <osg/Vec4>
 
 /**
- * \brief Provides a positionable 3D menu composed of TextNodes
+ * \brief Basic GL Fog
  *
  */
-class Menu3D : public GroupNode
+class Fog : public ReferencedStateSet
 {
 
 public:
 
-	Menu3D(SceneManager *sceneManager, char *initID);
-	virtual ~Menu3D();
+	Fog(SceneManager *sceneManager, const char *initID);
+	~Fog();
 
-	virtual void updateNodePath();
-
-	void setEnabled(int i);
-	int getEnabled() { return enabled_; }
+	// need to implement abstract method... ?!
+	const char *getPath() { return ""; }
 	
 	/**
-	 * Add an item (TextNode) to the list
+	 * Set fog density (good values are around 0.001 - 0.1)
 	 */
-	void addItem (const char *itemText);
+	void setFogDensity (float density);
+	float getFogDensity() { return fog_->getDensity(); }
 
 	/**
-	 * Remove an item from the list
+	 * Set fog color
 	 */
-	void removeItem (int itemIndex);
-	void removeItem (const char *itemID);
-	int doRemoveItem (osg::observer_ptr<TextNode> n);
+	void setFogColor (float r, float g, float b, float a);
+	osg::Vec4 getFogColor() { return fog_->getColor(); }
 
-	void clearItems();
-	void redraw();
-	
-	/**
-	 * Highlight an item from the list
-	 */
-	void setHighlighted(int itemIndex);
-	void setHighlighted(const char *itemID);
-	int doHighlight(osg::observer_ptr<TextNode> n);
-	const char *getHighlighted() { if (highlighted_.valid()) return highlighted_->id->s_name; else return "NULL"; }
-
-
-
-	/**
-	 * Set the color of the font when highlighted
-	 */
-	void setHighlightColor(float r, float g, float b, float a);
-	osg::Vec4 getHighlightColor() { return highlightColor_; }
-
-	void highlightNext();
-	void highlightPrev();
-
-	void select();
-	
-	
-	/**
-	 * wrapped from TextNode:
-	 */
-	void setFont			(const char* s);
-	/**
-	 * wrapped from TextNode:
-	 */
-	void setBillboard		(TextNode::billboardType t);
-	/**
-	 * wrapped from TextNode:
-	 */
-	void setColor			(float red, float green, float blue, float alpha);
-
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
+	// must reimplement
 	virtual std::vector<lo_message> getState();
 
-
+	
 private:
+	
+	osg::ref_ptr<osg::Fog> fog_;
 
-
-	osg::observer_ptr<TextNode> highlighted_;
-
-	MenuVector items_;
-
-	int enabled_;
-	std::string font_;
-	TextNode::billboardType billboardType_;
-	osg::Vec4 color_;
-	osg::Vec4 highlightColor_;
-
-	osg::ref_ptr<osg::Switch> switcher;
 };
-
 
 #endif

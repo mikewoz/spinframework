@@ -44,6 +44,7 @@
 
 #include <osg/Node>
 #include <osg/Group>
+#include <osg/ClearNode>
 #include <osg/Geode>
 
 #include <osgDB/SharedStateManager>
@@ -187,7 +188,7 @@ class SceneManager
         std::string sceneID;
 
         osg::ref_ptr<osg::Group> rootNode;
-        osg::ref_ptr<osg::Group> worldNode;
+        osg::ref_ptr<osg::ClearNode> worldNode;
         osg::ref_ptr<osg::Geode> gridGeode;
 
 

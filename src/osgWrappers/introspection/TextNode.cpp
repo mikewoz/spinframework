@@ -72,6 +72,11 @@ BEGIN_OBJECT_REFLECTOR(TextNode)
 	          __void__setFont__C5_char_P1,
 	          "",
 	          "");
+	I_Method1(void, setSize, IN, float, s,
+	          Properties::NON_VIRTUAL,
+	          __void__setSize__float,
+	          "",
+	          "");
 	I_Method4(void, setColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
@@ -115,6 +120,11 @@ BEGIN_OBJECT_REFLECTOR(TextNode)
 	I_Method0(const char *, getFont,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getFont,
+	          "",
+	          "");
+	I_Method0(float, getSize,
+	          Properties::NON_VIRTUAL,
+	          __float__getSize,
 	          "",
 	          "");
 	I_Method0(osg::Vec4, getColor,
@@ -179,6 +189,9 @@ BEGIN_OBJECT_REFLECTOR(TextNode)
 	I_SimpleProperty(float, Margin, 
 	                 __float__getMargin, 
 	                 __void__setMargin__float);
+	I_SimpleProperty(float, Size, 
+	                 __float__getSize, 
+	                 __void__setSize__float);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

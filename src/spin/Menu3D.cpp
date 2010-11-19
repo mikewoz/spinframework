@@ -58,12 +58,23 @@ Menu3D::Menu3D (SceneManager *sceneManager, char *initID) : GroupNode(sceneManag
 	nodeType = "Menu3D";
 
 	highlighted_ = 0;
+	enabled_ = 1;
 
 	font_ = "GillSans.ttf";
 	billboardType_ = TextNode::STAY_UP;
 	color_ = osg::Vec4(0.8,0.8,0.8,1.0);
 	highlightColor_ = osg::Vec4(1.0,1.0,1.0,1.0);
 
+	// create a switch node so we can easily enable/disable the menu:
+	switcher = new osg::Switch();
+	switcher->setName(std::string(id->s_name) + ".switcher");
+
+	// We inherit from GroupNode, so we must make sure to attach our osg Switch
+	// to the attachmentNode of GroupNode
+	this->getAttachmentNode()->addChild(switcher.get());
+	
+	// ... and then update the attachmentNode:
+	setAttachmentNode(switcher.get());
 }
 
 // -----------------------------------------------------------------------------
@@ -71,6 +82,14 @@ Menu3D::Menu3D (SceneManager *sceneManager, char *initID) : GroupNode(sceneManag
 Menu3D::~Menu3D()
 {
 	this->clearItems();
+}
+
+// -----------------------------------------------------------------------------
+void Menu3D::updateNodePath()
+{
+	GroupNode::updateNodePath(false);
+	currentNodePath.push_back(switcher.get());
+	updateChildNodePaths();
 }
 
 
@@ -164,9 +183,12 @@ int Menu3D::doRemoveItem (osg::observer_ptr<TextNode> n)
 
 	return 0;
 }
+// -----------------------------------------------------------------------------
 
 void Menu3D::clearItems()
 {
+	highlighted_ = 0;
+	
 	MenuVector::iterator i;
     while ((i=items_.begin()) != items_.end())
     {
@@ -175,12 +197,28 @@ void Menu3D::clearItems()
    		// successful, so erase the item manually:
    		if ((*i).valid())
 		{
-   			if (!doRemoveItem(*i)) items_.erase(i);
+   			sceneManager->deleteNode((*i)->id->s_name);
 		}
-		else items_.erase(i);
+		items_.erase(i);
 	}
 }
+// -----------------------------------------------------------------------------
 
+void Menu3D::setEnabled(int i)
+{
+	if (enabled_ == i) return;
+	
+	enabled_ = i;
+
+	//pthread_mutex_lock(&sceneMutex);
+	if (enabled_) switcher->setAllChildrenOn();
+	else switcher->setAllChildrenOff();
+	//pthread_mutex_unlock(&sceneMutex);
+	
+	BROADCAST(this, "si", "setEnabled", getEnabled());
+}
+
+// -----------------------------------------------------------------------------
 
 void Menu3D::redraw()
 {
@@ -202,10 +240,38 @@ void Menu3D::redraw()
 
 // -----------------------------------------------------------------------------
 
+void Menu3D::highlightPrev()
+{
+	for (int i=0; i<items_.size(); i++)
+	{
+		if (items_[i].get() == highlighted_.get())
+		{
+			setHighlighted(i-1);
+			return;
+		}
+	}
+}
+
+void Menu3D::highlightNext()
+{
+	for (int i=0; i<items_.size(); i++)
+	{
+		if (items_[i].get() == highlighted_.get())
+		{
+			setHighlighted(i+1);
+			return;
+		}
+	}
+}
+
 void Menu3D::setHighlighted(int itemIndex)
 {
-	if ((itemIndex>=0) && (itemIndex<(int)items_.size()))
+	if (items_.size())
 	{
+		// loop the highlight index if out of range:
+		if (itemIndex >= (int)items_.size()) itemIndex = 0;
+		if (itemIndex < 0) itemIndex = items_.size() - 1;
+		
 		doHighlight(items_[itemIndex]);
 	}
 }
@@ -244,6 +310,19 @@ void Menu3D::setHighlightColor(float r, float g, float b, float a)
 		highlighted_->setColor(highlightColor_.x(), highlightColor_.y(), highlightColor_.z(), highlightColor_.w());
 	}
 }
+
+void Menu3D::select()
+{
+	for (int i=0; i<items_.size(); i++)
+	{
+		if (items_[i].get() == highlighted_.get())
+		{
+			BROADCAST(this, "si", "selected", i);
+			return;
+		}
+	}
+}
+
 
 // -----------------------------------------------------------------------------
 
@@ -292,6 +371,11 @@ std::vector<lo_message> Menu3D::getState ()
 	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setEnabled", getEnabled());
+	ret.push_back(msg);
+	
 	MenuVector::iterator i;
     for (i = items_.begin(); i != items_.end(); i++)
     {

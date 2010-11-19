@@ -218,7 +218,7 @@ void ReferencedNode::attach()
 // remove this node from the scenegraph:
 void ReferencedNode::detach()
 {
-    //pthread_mutex_lock(&sceneMutex);
+    pthread_mutex_lock(&sceneMutex);
 
     if (parent == WORLD_SYMBOL)
     {
@@ -237,7 +237,7 @@ void ReferencedNode::detach()
         }
     }
 
-    //pthread_mutex_unlock(&sceneMutex);
+    pthread_mutex_unlock(&sceneMutex);
 }
 
 
@@ -398,7 +398,7 @@ void ReferencedNode::setAlpha (float alpha)
 	ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 	ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-	//this->setStateSet(ss);
+	this->setStateSet(ss);
 
 
 

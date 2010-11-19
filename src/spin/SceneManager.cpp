@@ -214,7 +214,7 @@ SceneManager::SceneManager(std::string id)
     // create some initial nodeS:
     rootNode = new osg::Group();
     rootNode->setName("root");
-    worldNode = new osg::Group();
+    worldNode = new osg::ClearNode();
     worldNode->setName("world");
     rootNode->addChild(worldNode.get());
 
@@ -594,7 +594,8 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
        const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
        for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
        {
-       std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
+		   if ((*it).second->isDefined())
+       			std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
        }
      */
 

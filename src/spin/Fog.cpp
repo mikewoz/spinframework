@@ -39,105 +39,73 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __Menu3D_H
-#define __Menu3D_H
+#include <iostream>
 
-#include <osg/Switch>
-#include "GroupNode.h"
-#include "TextNode.h"
-
-typedef std::vector< osg::observer_ptr<TextNode> > MenuVector;
+#include "Fog.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
 
 
-/**
- * \brief Provides a positionable 3D menu composed of TextNodes
- *
- */
-class Menu3D : public GroupNode
+// *****************************************************************************
+// constructor:
+Fog::Fog (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 {
+	classType = "Fog";
+ 	this->setName(std::string(id->s_name) + ".Fog");
 
-public:
+	fog_ = new osg::Fog();
 
-	Menu3D(SceneManager *sceneManager, char *initID);
-	virtual ~Menu3D();
+	fog_->setMode(osg::Fog::EXP);
+    fog_->setStart(-100.f);
+    fog_->setDensity(0.005);
 
-	virtual void updateNodePath();
-
-	void setEnabled(int i);
-	int getEnabled() { return enabled_; }
-	
-	/**
-	 * Add an item (TextNode) to the list
-	 */
-	void addItem (const char *itemText);
-
-	/**
-	 * Remove an item from the list
-	 */
-	void removeItem (int itemIndex);
-	void removeItem (const char *itemID);
-	int doRemoveItem (osg::observer_ptr<TextNode> n);
-
-	void clearItems();
-	void redraw();
-	
-	/**
-	 * Highlight an item from the list
-	 */
-	void setHighlighted(int itemIndex);
-	void setHighlighted(const char *itemID);
-	int doHighlight(osg::observer_ptr<TextNode> n);
-	const char *getHighlighted() { if (highlighted_.valid()) return highlighted_->id->s_name; else return "NULL"; }
-
-
-
-	/**
-	 * Set the color of the font when highlighted
-	 */
-	void setHighlightColor(float r, float g, float b, float a);
-	osg::Vec4 getHighlightColor() { return highlightColor_; }
-
-	void highlightNext();
-	void highlightPrev();
-
-	void select();
+	setFogColor(1.0, 1.0, 1.0, 0.0);
 	
 	
-	/**
-	 * wrapped from TextNode:
-	 */
-	void setFont			(const char* s);
-	/**
-	 * wrapped from TextNode:
-	 */
-	void setBillboard		(TextNode::billboardType t);
-	/**
-	 * wrapped from TextNode:
-	 */
-	void setColor			(float red, float green, float blue, float alpha);
+	osg::StateSet *worldStateSet = sceneManager->worldNode->getOrCreateStateSet();
+    worldStateSet->setMode(GL_FOG, osg::StateAttribute::ON);
+    worldStateSet->setAttribute(fog_, osg::StateAttribute::ON);
+}
 
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState();
+// destructor
+Fog::~Fog()
+{
+	osg::StateSet *worldStateSet = sceneManager->worldNode->getOrCreateStateSet();
+    worldStateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
+}
 
+// *****************************************************************************
+void Fog::setFogDensity (float density)
+{
+	fog_->setDensity(density);
+	BROADCAST(this, "sf", "setFogDensity", getFogDensity());
+}
 
-private:
+void Fog::setFogColor (float r, float g, float b, float a)
+{
+	osg::Vec4 newColor = osg::Vec4(r, g, b, a);
+	fog_->setColor(newColor);
+	sceneManager->worldNode->setClearColor(newColor);
+	BROADCAST(this, "sffff", "setFogColor", r, g, b, a);
+}
 
+// *****************************************************************************
+std::vector<lo_message> Fog::getState ()
+{
+	// inherit state from base class
+	std::vector<lo_message> ret = ReferencedStateSet::getState();
+		
+	lo_message msg;
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setFogDensity", getFogDensity());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	osg::Vec4 v4 = this->getFogColor();
+	lo_message_add(msg, "sffff", "setFogColor", v4.x(), v4.y(), v4.z(), v4.w());
+	ret.push_back(msg);
+	
+	return ret;
+}
 
-	osg::observer_ptr<TextNode> highlighted_;
-
-	MenuVector items_;
-
-	int enabled_;
-	std::string font_;
-	TextNode::billboardType billboardType_;
-	osg::Vec4 color_;
-	osg::Vec4 highlightColor_;
-
-	osg::ref_ptr<osg::Switch> switcher;
-};
-
-
-#endif
