@@ -43,6 +43,7 @@
 #define ReporterNode_H_
 
 #include "ReferencedNode.h"
+#include <osg/Timer>
 
 typedef struct _reporterTarget {
 	osg::observer_ptr<ReferencedNode> node;
@@ -129,6 +130,8 @@ private:
 
 	std::vector<reporterTarget> targets_;
 	osg::Matrix matrix_;
+
+	osg::Timer_t lastTick;
 };
 
 

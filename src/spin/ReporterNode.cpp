@@ -68,6 +68,8 @@ ReporterNode::ReporterNode (SceneManager *sceneManager, char *initID) : Referenc
     matrix_.makeIdentity();
 
     this->setNodeMask(STATSDATA_NODE_MASK); // nodemask info in spinUtil.h
+
+    lastTick = osg::Timer::instance()->tick();
 }
 
 // *****************************************************************************
@@ -82,44 +84,56 @@ void ReporterNode::callbackUpdate()
 {
     ReferencedNode::callbackUpdate();
 
-    bool needReport = false;
+    // only report from the server
+    if (spinApp::Instance().getContext()->isServer()) return;
 
-    osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath);
-    if (matrix_!=mthis)
+    // limit rate of updates:
+    osg::Timer_t tick = osg::Timer::instance()->tick();
+    float dt = osg::Timer::instance()->delta_s(lastTick,tick);
+    if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
     {
-    	needReport = true;
-    	matrix_ = mthis;
-    }
+        bool needReport = false;
 
-    std::vector<reporterTarget>::iterator t;
-    for (t = targets_.begin(); t != targets_.end();)
-    {
-    	if ((*t).node.valid())
-    	{
-    		osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath);
+		osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath);
+		if (matrix_!=mthis)
+		{
+			needReport = true;
+			matrix_ = mthis;
+		}
 
-    		// if there is a change in this node's matrix or the target, we need
-    		// to send an updated report:
-    		if (needReport || ((*t).matrix!=mtarget))
-    		{
-    			(*t).matrix = mtarget;
-    			sendReports(&(*t));
-    		}
+		std::vector<reporterTarget>::iterator t;
+		for (t = targets_.begin(); t != targets_.end();)
+		{
+			if ((*t).node.valid())
+			{
+				osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath);
 
-    		t++;
-    	}
+				// if there is a change in this node's matrix or the target, we need
+				// to send an updated report:
+				if (needReport || ((*t).matrix!=mtarget))
+				{
+					(*t).matrix = mtarget;
+					sendReports(&(*t));
+				}
+				t++;
+			}
 
-    	else
-    	{
-    		// the node has been deleted, so we need to remove this target from
-    		// the list
-    		targets_.erase(t); // t++ is implicit
-    	}
-    }
+			else
+			{
+				// the node has been deleted, so we need to remove this target from
+				// the list
+				targets_.erase(t); // t++ is implicit
+			}
+		}
+
+		lastTick = tick;
+	}
 }
 
 void ReporterNode::sendReports(reporterTarget *target)
 {
+	if (spinApp::Instance().getContext()->isServer()) return;
+
 	// check that at least one report is required:
 	bool allDisabled = true;
     for (reportingType::iterator i=reporting_.begin(); i!=reporting_.end(); i++)
@@ -274,11 +288,15 @@ void ReporterNode::addTarget (const char *targetID)
     // add it to the list:
     reporterTarget newTarget;
     newTarget.node = n.get();
-    newTarget.matrix.makeIdentity();
+    newTarget.matrix = osg::computeLocalToWorld(n->currentNodePath);
     newTarget.contained = false;
     targets_.push_back(newTarget);
 
+
     BROADCAST(this, "ss", "addTarget", targetID);
+
+    // force initial report:
+    this->sendReports(&newTarget);
 }
 
 void ReporterNode::removeTarget (const char *targetID)
@@ -315,16 +333,23 @@ void ReporterNode::setReporting (const char *type, bool enabled)
 
 		BROADCAST(this, "ssi", "setReporting", type, getReporting(type));
 
-		// if we've just turned on a report mode, we need to force one computation
-		// for all  targets:
+		// if we've just turned on a report mode, we need to force one
+		// computation for all  targets:
+		//if (enabled) callbackUpdate();
+
 		if (enabled)
 		{
 			std::vector<reporterTarget>::iterator t;
 			for (t = targets_.begin(); t != targets_.end(); t++)
 			{
-				this->sendReports(&(*t));
+				if ((*t).node.valid())
+				{
+					(*t).matrix = osg::computeLocalToWorld((*t).node->currentNodePath);
+					this->sendReports(&(*t));
+				}
 			}
 		}
+
 	}
 }
 
