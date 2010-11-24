@@ -84,40 +84,74 @@ void AttractorNode::callbackUpdate()
     	// only update when dt is at least 0.05s (ie 20hz):
         osg::Timer_t tick = osg::Timer::instance()->tick();
         float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
-        if (dt > 0.05)
+        if (dt > 0.05) //(dt > 0.05)
         {
-        	// get the magnitude of movement resulting from the force over the
-        	// time passed:
-        	float mag = pow (force_*dt, distanceDecay_);
+        	if (force_ != 0)
+        	{
+        		osg::Matrixd thisMat = osg::computeLocalToWorld(this->currentNodePath);
 
-        	// get direction of force by converting the AttractorNode's
-        	// orientation to world coords:
-            osg::Quat thisQuat = osg::computeLocalToWorld(this->currentNodePath).getRotate();
-            osg::Vec3 thisDir = thisQuat * osg::Y_AXIS;
+				// get direction of force by converting the AttractorNode's
+				// orientation to world coords:
+				osg::Quat thisQuat = thisMat.getRotate();
+				osg::Vec3 thisDir = thisQuat * osg::Y_AXIS;
 
-            // now cycle through each target and apply the force:
-        	targetVector::iterator t;
-            for (t = targets_.begin(); t != targets_.end(); t++)
-            {
-            	// find the target direction of the force in the local coord system of
-            	// the target
-            	osg::Matrix m = osg::computeWorldToLocal((*t)->currentNodePath);
-            	osg::Vec3 delta = (thisDir * m);
-            	delta *= mag;
-
-				if (delta.length() > EPSILON) // != osg::Vec3(0,0,0))
+				// now cycle through each target and apply the force:
+				targetVector::iterator t;
+				for (t = targets_.begin(); t != targets_.end(); t++)
 				{
-					if (mode_ == AttractorNode::EXTRINSIC)
+					osg::Matrixd targetMat = osg::computeLocalToWorld((*t)->currentNodePath);
+
+					osg::Vec3 connection_vector = targetMat.getTrans() - thisMat.getTrans();
+					float incidence = AngleBetweenVectors(thisDir, connection_vector);
+
+					float distanceScalar = 1 / (1.0 + pow(connection_vector.length(), distanceDecay_));
+					double angularScalar = 1 / (1.0 + pow(incidence, angularDecay_));
+
+					// the magnitude of movement resulting from the force over the
+					// time passed, with distance and angular scaling applied:
+					float mag = abs(force_) * dt * distanceScalar * angularScalar;
+
+					// find the target direction of the force in the local coord system of
+					// the target
+					osg::Quat q = targetMat.getRotate();
+
+					// If force is negative, we assume it's a repulsive force
+					// that should be applied in the opposite direction of our
+					// current orientation:
+					osg::Vec3 delta;
+					if (force_ > 0) delta = q * thisDir;
+					else delta = q * -thisDir;
+
+					delta *= mag;
+
+					if (incidence > osg::PI_4) delta = -delta;
+
+					// if the force is an attraction (negative) and this update
+					// will bypass our location, then scale delta so the target
+					// doesn't pass by:
+					if (( connection_vector.length() - delta.length() < 0 ) && (force_ < 0))
 					{
-						(*t)->translate( delta.x(), delta.y(), delta.z() );
+						delta *=  connection_vector.length() / delta.length();
 					}
-					else
-						(*t)->setVelocity( delta.x(), delta.y(), delta.z() );
+
+					//std::cout << "mag="<<mag<<" incidence=" << incidence << " delta: " << delta.x()<<","<<delta.y()<<","<<delta.z() << std::endl;
+
+					if (delta.length() > EPSILON) // != osg::Vec3(0,0,0))
+					{
+						if (mode_ == AttractorNode::EXTRINSIC)
+						{
+							(*t)->translate( delta.x(), delta.y(), delta.z() );
+						}
+						else
+						{
+							osg::Vec3 v = (*t)->getVelocity();
+							(*t)->setVelocity( v.x()+delta.x(), v.y()+delta.y(), v.z()+delta.z() );
+						}
+
+					}
 
 				}
-
-            }
-
+        	}
             lastTick_ = tick;
         }
     }
