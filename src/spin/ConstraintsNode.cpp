@@ -340,34 +340,32 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					if (_mode==COLLIDE)
 					{
 						// Let the collisionPoint be just a bit before the real
-						// hitpoint (to avoid numerical imprecision placing us
-						// behind the plane):
+						// hitpoint (to avoid numerical imprecision placing the
+						// node behind the plane):
 						osg::Vec3 collisionPoint = localHitPoint - (localHitNormal * 0.01);
 
-
-						// METHOD A:
-						// just place the node at the collision point
+						// place the node at the collision point
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
 
-/*
-						// METHOD B:
+
 						// SLIDE along the hit plane with the left over energy:
+						// ie, project the remaining vector onto the surface we
+						// just intersected with.
 						//
-						// using Cos(theta) = Adjacent / Hypotenuse:
-						//   Hypotenuse = (collisionPoint-localPos)
-						//   Adjacent = (projectedPos - localPos)
-						double cosTheta = (dirVec * -localHitNormal) - osg::PI_2; // dot product
-						//osg::Vec3 projectedPos = localPos - (-localHitNormal * (collisionPoint-localPos).length() * cosTheta);
+						// using:
+						//   cos(theta) = distToSurface / remainderVector length
+						//
+						double cosTheta = (dirVec * -localHitNormal) ; // dot product
+						osg::Vec3 remainderVector = (localPos + v) - localHitPoint;
+						double distToSurface = cosTheta * remainderVector.length();
+						osg::Vec3 slideVector = remainderVector + (localHitNormal * distToSurface);
 
-						osg::Vec3 projectedPos = (v - (collisionPoint - localPos)) * cosTheta;
-
-						setTranslation(projectedPos.x(), projectedPos.y(), projectedPos.z());
 
 						// pseudo-recursively apply remainder of bounce:
-						//applyConstrainedTranslation( - (-localHitNormal * (collisionPoint-localPos).length() * cosTheta) );
-*/
+						applyConstrainedTranslation( slideVector );
 
 						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+
 
 						return;
 					}
@@ -416,13 +414,14 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 						}
 
-						// the new position will be just at the hitpoint (just a
-						// hair before the collision, so that it doesn't
-						// intersect with the same surface again)
-						//osg::Vec3 hitPoint_adj = localHitPoint + (newDir*0.00000001*dist);
-						//double HAIR = 0.0000001;
-						//setTranslation(localHitPoint.x()-dirVec.x()*HAIR, localHitPoint.y()-dirVec.y()*HAIR, localHitPoint.z()-dirVec.z()*HAIR);
-						setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
+						// the new position will be just a hair before hitpoint
+						// (because numerical imprecision may place the hitpoint
+						// slightly beyond the surface, and when we bounce the
+						// node, we don't want to  intersect with the same
+						// surface again)
+						double HAIR = 0.0000001;
+						setTranslation(localHitPoint.x()-dirVec.x()*HAIR, localHitPoint.y()-dirVec.y()*HAIR, localHitPoint.z()-dirVec.z()*HAIR);
+						//setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
 
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);
