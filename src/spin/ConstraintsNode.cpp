@@ -296,8 +296,9 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					// If so, we skip this intersection:
 					if ((_mode==BOUNCE) &&
 					    (lastDrawable.get()==(*itr).drawable.get()) &&
-						    (lastPrimitiveIndex==(*itr).primitiveIndex))
+						    (lastPrimitiveIndex==(int)(*itr).primitiveIndex))
 					{
+						//std::cout << "... skipping" << std::endl;
 						continue;
 					}
 					else
@@ -320,7 +321,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					// surface normal at the hit point:
 					osg::Quat rot;
 					rot.makeRotate(dirVec, localHitNormal);
-					//std::cout << "rot =    " << rot.x()<<","<<rot.y()<<","<<rot.z()<<","<<rot.w() << " ... angle=" << acos(rot.w())*2 << ", indegrees=" << osg::RadiansToDegrees(acos(rot.w()))*2 << std::endl;
+					//std::cout << "rot =     " << rot.x()<<","<<rot.y()<<","<<rot.z()<<","<<rot.w() << " ... angle=" << acos(rot.w())*2 << ", indegrees=" << osg::RadiansToDegrees(acos(rot.w()))*2 << std::endl;
 
 					// the surface normal may be in the opposite direction
 					// from us. If so, we need to flip it:
@@ -328,6 +329,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					{
 						localHitNormal *= -1;
 						rot.makeRotate(dirVec, localHitNormal);
+						//std::cout << "flipped = " << rot.x()<<","<<rot.y()<<","<<rot.z()<<","<<rot.w() << " ... angle=" << acos(rot.w())*2 << ", indegrees=" << osg::RadiansToDegrees(acos(rot.w()))*2 << std::endl;
 					}
 
 
@@ -337,11 +339,33 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 					if (_mode==COLLIDE)
 					{
-						// just set translation to the hitpoint, but back
-						// along the normal by a bit
-
+						// Let the collisionPoint be just a bit before the real
+						// hitpoint (to avoid numerical imprecision placing us
+						// behind the plane):
 						osg::Vec3 collisionPoint = localHitPoint - (localHitNormal * 0.01);
+
+
+						// METHOD A:
+						// just place the node at the collision point
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
+
+/*
+						// METHOD B:
+						// SLIDE along the hit plane with the left over energy:
+						//
+						// using Cos(theta) = Adjacent / Hypotenuse:
+						//   Hypotenuse = (collisionPoint-localPos)
+						//   Adjacent = (projectedPos - localPos)
+						double cosTheta = (dirVec * -localHitNormal) - osg::PI_2; // dot product
+						//osg::Vec3 projectedPos = localPos - (-localHitNormal * (collisionPoint-localPos).length() * cosTheta);
+
+						osg::Vec3 projectedPos = (v - (collisionPoint - localPos)) * cosTheta;
+
+						setTranslation(projectedPos.x(), projectedPos.y(), projectedPos.z());
+
+						// pseudo-recursively apply remainder of bounce:
+						//applyConstrainedTranslation( - (-localHitNormal * (collisionPoint-localPos).length() * cosTheta) );
+*/
 
 						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
@@ -358,7 +382,8 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 						// the new direction vector is a rotated version
 						// of the original, about the localHitNormal:
-						osg::Vec3 newDir = (rot * 2.0) * -dirVec;
+						//osg::Vec3 newDir = (rot * 2.0) * -dirVec;
+						osg::Vec3 newDir = (rot * (rot * -dirVec));
 						newDir.normalize();
 						//std::cout << "newDir = " << newDir.x()<<","<<newDir.y()<<","<<newDir.z() << std::endl;
 
@@ -391,10 +416,12 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 						}
 
-						// the new position will be just at the hitpoint (plus
-						// a little bit, so that it doesn't intersect with the
-						// same surface again)
+						// the new position will be just at the hitpoint (just a
+						// hair before the collision, so that it doesn't
+						// intersect with the same surface again)
 						//osg::Vec3 hitPoint_adj = localHitPoint + (newDir*0.00000001*dist);
+						//double HAIR = 0.0000001;
+						//setTranslation(localHitPoint.x()-dirVec.x()*HAIR, localHitPoint.y()-dirVec.y()*HAIR, localHitPoint.z()-dirVec.z()*HAIR);
 						setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
 
 						// pseudo-recursively apply remainder of bounce:
