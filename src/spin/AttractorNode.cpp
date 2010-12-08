@@ -108,24 +108,38 @@ void AttractorNode::callbackUpdate()
 
 					osg::Vec3 connection_vector = targetMat.getTrans() - thisMat.getTrans();
 
-					// If the target and attractor are at the same location, the
-					// forceDirection is undefined. So, in that case, we choose
-					// the orientation of the attractor as the direction
-					if (connection_vector.length() == 0)
-					{
-						forceOrientation = thisQuat;
-					}
-					else {
-						forceOrientation.makeRotate(targetMat.getRotate()*osg::Y_AXIS, connection_vector);
-					}
 
 					float incidence = AngleBetweenVectors(thisDir, connection_vector);
 					float distanceScalar = 1 / (1.0 + pow(connection_vector.length(), distanceDecay_));
 					double angularScalar = 1 / (1.0 + pow(incidence, angularDecay_));
 
+
+
+
+					// If the target and attractor are at the same location, the
+					// force direction is undefined. So, in that case, we choose
+					// the orientation of the attractor as the direction
+
 					osg::Vec3 delta;
+
+					if (connection_vector.length() == 0)
+					{
+						//forceOrientation = thisQuat;
+						if (force_ > 0) delta = thisQuat * osg::Y_AXIS;
+						else delta = thisQuat * -osg::Y_AXIS;
+					}
+					else {
+						//forceOrientation.makeRotate(targetMat.getRotate()*osg::Y_AXIS, connection_vector);
+						if (force_ > 0) delta = connection_vector;
+						else delta = -connection_vector;
+					}
+
+					delta.normalize();
+
+					/*
 					if (force_ > 0) delta = forceOrientation * osg::Y_AXIS;
 					else delta = forceOrientation * -osg::Y_AXIS;
+					*/
 
 					// We now apply the force, scaling by amount of time,
 					// and distance/angular decay factors:
