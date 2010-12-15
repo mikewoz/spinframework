@@ -102,6 +102,11 @@ public:
 
 	void select();
 	
+	/**
+	 * Each successive menu item will appear at an offset from the previous
+	 */
+	void setItemOffset(float x, float y, float z);
+	osg::Vec3 getItemOffset() { return itemOffset_; }
 	
 	/**
 	 * wrapped from TextNode:
@@ -129,13 +134,14 @@ private:
 	osg::observer_ptr<TextNode> highlighted_;
 
 	MenuVector items_;
-
+	osg::Vec3 itemOffset_;
+	
 	int enabled_;
 	std::string font_;
 	TextNode::billboardType billboardType_;
 	osg::Vec4 color_;
 	osg::Vec4 highlightColor_;
-
+	
 	osg::ref_ptr<osg::Switch> switcher;
 };
 

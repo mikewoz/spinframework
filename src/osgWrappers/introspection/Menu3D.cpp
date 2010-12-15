@@ -119,6 +119,16 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	          __void__select,
 	          "",
 	          "");
+	I_Method3(void, setItemOffset, IN, float, x, IN, float, y, IN, float, z,
+	          Properties::NON_VIRTUAL,
+	          __void__setItemOffset__float__float__float,
+	          "",
+	          "Each successive menu item will appear at an offset from the previous ");
+	I_Method0(osg::Vec3, getItemOffset,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec3__getItemOffset,
+	          "",
+	          "");
 	I_Method1(void, setFont, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setFont__C5_char_P1,
@@ -154,6 +164,9 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	I_SimpleProperty(const char *, Highlighted, 
 	                 __C5_char_P1__getHighlighted, 
 	                 __void__setHighlighted__C5_char_P1);
+	I_SimpleProperty(osg::Vec3, ItemOffset, 
+	                 __osg_Vec3__getItemOffset, 
+	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

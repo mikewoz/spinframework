@@ -48,7 +48,6 @@
 extern pthread_mutex_t sceneMutex;
 
 static unsigned int COUNTER = 0;
-static float Z_OFFSET = -0.2;
 
 // -----------------------------------------------------------------------------
 // constructor:
@@ -60,6 +59,8 @@ Menu3D::Menu3D (SceneManager *sceneManager, char *initID) : GroupNode(sceneManag
 	highlighted_ = 0;
 	enabled_ = 1;
 
+	itemOffset_ = osg::Vec3(0.0,0.0,-0.1);
+	
 	font_ = "GillSans.ttf";
 	billboardType_ = TextNode::STAY_UP;
 	color_ = osg::Vec4(0.8,0.8,0.8,1.0);
@@ -124,7 +125,7 @@ void Menu3D::addItem (const char *itemText)
 	}
 
 	// initial properties:
-	n->setTranslation(0.0, 0.0, items_.size() * Z_OFFSET);
+	n->setTranslation(items_.size()*itemOffset_.x(), items_.size()*itemOffset_.y(), items_.size()*itemOffset_.z());
 	n->setFont(font_.c_str());
 	n->setColor(color_.x(),color_.y(),color_.z(),color_.w());
 	n->setBillboard(billboardType_);
@@ -228,7 +229,8 @@ void Menu3D::redraw()
 	{
 		if ((*i).valid())
 		{
-			(*i)->setTranslation(0, 0, (count++) * Z_OFFSET);
+			(*i)->setTranslation(count*itemOffset_.x(), count*itemOffset_.y(), count*itemOffset_.z());
+			count++;
 			i++;
 		}
 		else {
@@ -242,11 +244,11 @@ void Menu3D::redraw()
 
 void Menu3D::highlightPrev()
 {
-	for (int i=0; i<items_.size(); i++)
+	for (unsigned int i=0; i<items_.size(); i++)
 	{
 		if (items_[i].get() == highlighted_.get())
 		{
-			setHighlighted(i-1);
+			setHighlighted((int)i-1);
 			return;
 		}
 	}
@@ -254,7 +256,7 @@ void Menu3D::highlightPrev()
 
 void Menu3D::highlightNext()
 {
-	for (int i=0; i<items_.size(); i++)
+	for (unsigned int i=0; i<items_.size(); i++)
 	{
 		if (items_[i].get() == highlighted_.get())
 		{
@@ -313,7 +315,7 @@ void Menu3D::setHighlightColor(float r, float g, float b, float a)
 
 void Menu3D::select()
 {
-	for (int i=0; i<items_.size(); i++)
+	for (unsigned int i=0; i<items_.size(); i++)
 	{
 		if (items_[i].get() == highlighted_.get())
 		{
@@ -323,6 +325,14 @@ void Menu3D::select()
 	}
 }
 
+
+void Menu3D::setItemOffset(float x, float y, float z)
+{
+	itemOffset_ = osg::Vec3(x,y,z);
+	redraw();
+	
+	BROADCAST(this, "sfff", "setItemOffset", x,y,z);
+}
 
 // -----------------------------------------------------------------------------
 
@@ -374,6 +384,11 @@ std::vector<lo_message> Menu3D::getState ()
 	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setEnabled", getEnabled());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	osg::Vec3 v3 = this->getItemOffset();
+	lo_message_add(msg, "sfff", "getItemOffset", v3.x(), v3.y(), v3.z());
 	ret.push_back(msg);
 	
 	MenuVector::iterator i;
