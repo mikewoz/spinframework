@@ -48,6 +48,11 @@ BEGIN_OBJECT_REFLECTOR(UserNode)
 	          __C5_char_P1__getDescription,
 	          "",
 	          "");
+	I_Method0(osg::Group *, getCameraAttachmentNode,
+	          Properties::NON_VIRTUAL,
+	          __osg_Group_P1__getCameraAttachmentNode,
+	          "",
+	          "This is where you attach cameras for the user.The standard ViewerManipulator for SPIN derives from OSG's NodeTrackerManipulator, which tracks (points to) the center of a subgraph's bounding sphere. We want to keep that bound empty so that we may effectively place the camera right at the UserNode's location. If we attach geometry under this, the camera will point at the center of that geometry instead. ");
 	I_Method0(void, ping,
 	          Properties::NON_VIRTUAL,
 	          __void__ping,
@@ -63,6 +68,9 @@ BEGIN_OBJECT_REFLECTOR(UserNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(osg::Group *, CameraAttachmentNode, 
+	                 __osg_Group_P1__getCameraAttachmentNode, 
+	                 0);
 	I_SimpleProperty(const char *, Description, 
 	                 __C5_char_P1__getDescription, 
 	                 __void__setDescription__C5_char_P1);

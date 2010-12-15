@@ -119,6 +119,13 @@ public:
 	int getReporting(const char *type) { return (int)this->reporting_[type]; }
 
 	/**
+	 * Set the maximum reporting rate (hz). Note: updates are only sent when
+	 * necessary, so there is no constant reporting mode.
+	 */
+	void setMaxRate(float hz);
+	float getMaxRate() { return maxRate_; }
+	
+	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
@@ -130,6 +137,8 @@ private:
 
 	std::vector<reporterTarget> targets_;
 	osg::Matrix matrix_;
+
+	float maxRate_;
 
 	osg::Timer_t lastTick;
 };

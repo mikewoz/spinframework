@@ -58,6 +58,7 @@ ReporterNode::ReporterNode (SceneManager *sceneManager, char *initID) : Referenc
     this->setName(string(id->s_name) + ".ReporterNode");
     nodeType = "ReporterNode";
 
+	maxRate_ = 20.0;
 
     reporting_["DISTANCE"] = false;
     reporting_["INCIDENCE"] = false;
@@ -90,7 +91,7 @@ void ReporterNode::callbackUpdate()
     // limit rate of updates:
     osg::Timer_t tick = osg::Timer::instance()->tick();
     float dt = osg::Timer::instance()->delta_s(lastTick,tick);
-    if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
+    if (dt > 1/maxRate_) // only update when dt is at least 0.05s (ie 20hz):
     {
         bool needReport = false;
 
@@ -353,6 +354,12 @@ void ReporterNode::setReporting (const char *type, bool enabled)
 	}
 }
 
+void ReporterNode::setMaxRate(float hz)
+{
+	maxRate_ = hz;
+	BROADCAST(this, "sf", "setMaxRate", maxRate_);
+}
+
 
 // *****************************************************************************
 
@@ -380,6 +387,10 @@ std::vector<lo_message> ReporterNode::getState ()
     		ret.push_back(msg);
 		}
     }
+
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setMaxRate", getMaxRate());
+    ret.push_back(msg);
 
 
     return ret;

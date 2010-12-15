@@ -84,7 +84,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 // destructor
 ShapeNode::~ShapeNode()
 {
-	if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+	//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 }
 
 // ===================================================================
@@ -384,7 +384,7 @@ void ShapeNode::drawTexture()
 	{
 		// remove current texture
 		//shapeGeode->setStateSet( new osg::StateSet() );
-		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+		//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 	}
 
 	else if (shapeGeode.valid())
@@ -492,9 +492,10 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 
 		//n->setStateSet( shapeStateSet );
 
+		/*
 		if (sceneManager->sharedStateManager.valid())
 				sceneManager->sharedStateManager->share(n);
-
+		*/
 	} else {
 		std::cout << "ERROR (setTexture): The file " << path << " is not a valid texture." << std::endl;
 	}

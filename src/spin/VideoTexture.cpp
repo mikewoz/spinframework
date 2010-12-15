@@ -65,7 +65,7 @@ VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedSta
 	
 	_index = 0.0;
 	_loop = true;
-	_play = true;
+	_play = false;
 	_framerate = 24;
 
 	/*
@@ -254,6 +254,7 @@ void VideoTexture::setPath (const char* newPath)
 		
 			// apply current play/loop state, overriding OSG defaults:
 			if (_play) _imageStream->play();
+			else _imageStream->pause();
 			if (!_loop) _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
 		}
 
@@ -284,8 +285,9 @@ void VideoTexture::setIndex (float f)
 	
 	if (_imageStream.valid())
 	{
-		//std::cout << "seeking to " << (double) (f * _imageStream->getLength()) << std::endl;
-		_imageStream->seek((double) (f * _imageStream->getLength()));
+		double seekIndex = (double) (f * _imageStream->getLength());
+		std::cout << "seeking to " << seekIndex << std::endl;
+		_imageStream->seek(seekIndex);
 	}
 	
 	BROADCAST(this, "sf", "setIndex", getIndex());
@@ -305,7 +307,7 @@ void VideoTexture::setPlay (int i)
 {
 	if (_play != (int)i)
 	{
-		_play = i;
+		_play = (bool)i;
 		
 		if (_imageStream.valid())
 		{

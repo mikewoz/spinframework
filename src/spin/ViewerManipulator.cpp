@@ -58,7 +58,7 @@ ViewerManipulator::ViewerManipulator()
 	if (spin.userNode.valid())
 	{
 		this->user = spin.userNode->id;
-		setTrackNode(spin.userNode->getAttachmentNode());
+		setTrackNode(spin.userNode->getCameraAttachmentNode());
 	} else {
 		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
 	}
@@ -69,9 +69,12 @@ ViewerManipulator::ViewerManipulator()
 	
 	// set up user node tracker:
 	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
+	//setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER );
 	setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
-	setMinimumDistance( 0.0001 );
-	setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+	//setMinimumDistance( 0.0001 );
+	setMinimumDistance( 0.0 );
+	setHomePosition( osg::Vec3(0,-0.001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+	//setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,0.0001,0), osg::Vec3(0,0,1), false );
 
 }
 

@@ -225,16 +225,15 @@ public:
 	virtual void stateDump();
 
 
-	// ***********************************************************
-	// data:
 
-	osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
-
-	osg::ref_ptr<UserNode> owner;
 
 
 protected:
-	
+
+	osg::ref_ptr<UserNode> owner;
+
+	osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
+
 	
 	interactionMode _interactionMode;
 	std::vector<osg::Vec4> _trajectory;

@@ -98,6 +98,18 @@ class UserNode : public ConstraintsNode
 		const char* getDescription() { return description_.c_str(); }
 
 
+		/**
+		* This is where you attach cameras for the user.
+		*
+		* The standard ViewerManipulator for SPIN derives from OSG's
+		* NodeTrackerManipulator, which tracks (points to) the center of a
+		* subgraph's bounding sphere. We want to keep that bound empty so that
+		* we may effectively place the camera right at the UserNode's location.
+		* If we attach geometry under this, the camera will point at the center
+		* of that geometry instead.
+		*/
+		osg::Group *getCameraAttachmentNode() { return cameraAttachmentNode; }
+		
 		// ping message
 		void ping();
 		osg::Timer_t getLastPing() { return lastPing_; }
@@ -116,6 +128,8 @@ class UserNode : public ConstraintsNode
 		bool ping_;
 		osg::Timer_t lastPing_;
 		std::string description_;
+
+		osg::ref_ptr<osg::Group> cameraAttachmentNode;
 
 };
 

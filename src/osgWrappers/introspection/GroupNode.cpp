@@ -251,7 +251,5 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	I_SimpleProperty(GroupNode::velocityMode, VelocityMode, 
 	                 0, 
 	                 __void__setVelocityMode__velocityMode);
-	I_PublicMemberProperty(osg::ref_ptr< osg::PositionAttitudeTransform >, mainTransform);
-	I_PublicMemberProperty(osg::ref_ptr< UserNode >, owner);
 END_REFLECTOR
 

@@ -249,7 +249,8 @@ void TextNode::drawText()
 		textLabel->setCharacterSize(_size);
 		//textLabel->setFont(0); // inbuilt font (small)
 		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
-		textLabel->setFontResolution(40,40);
+		//textLabel->setFontResolution(40,40);
+		textLabel->setFontResolution(80,80);
 		textLabel->setColor( _color );
 #if OSG_MIN_VERSION_REQUIRED(2,9,7)
 		textLabel->setBoundingBoxColor(_bgColor);

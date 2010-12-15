@@ -59,6 +59,10 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
     setTranslation(0.0, -5.0, 0.5);
     setReportMode(GroupNode::GLOBAL_6DOF);
 
+	cameraAttachmentNode = new osg::Group();
+	cameraAttachmentNode->setName(string(id->s_name) + ".cameraAttachmentNode");
+	mainTransform->addChild(cameraAttachmentNode.get());
+
     ping_ = false;
 }
 

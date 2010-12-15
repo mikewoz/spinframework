@@ -240,7 +240,7 @@ void ModelNode::drawModel()
 		_ssDrawableList.clear();
 		_ssNodeList.clear();
 
-		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+		//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 		
 		
 		for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
@@ -525,9 +525,10 @@ void ModelNode::drawModel()
             // or shoudld we apply our currently stored _renderBin to the model?
 			ss->setRenderBinDetails( (int)_renderBin, "RenderBin");
 
+			/*
 			if (sceneManager->sharedStateManager.valid())
 				sceneManager->sharedStateManager->share(model.get());
-			
+			*/
 			
 		} else {
 			std::cout << "ERROR [ModelNode::drawModel]: Could not find \"" << modelPath << "\". Make sure file exists, and that it is a valid 3D model." << std::endl;

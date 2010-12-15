@@ -68,11 +68,24 @@ BEGIN_OBJECT_REFLECTOR(ReporterNode)
 	          __int__getReporting__C5_char_P1,
 	          "",
 	          "");
+	I_Method1(void, setMaxRate, IN, float, hz,
+	          Properties::NON_VIRTUAL,
+	          __void__setMaxRate__float,
+	          "",
+	          "Set the maximum reporting rate (hz). Note: updates are only sent when necessary, so there is no constant reporting mode. ");
+	I_Method0(float, getMaxRate,
+	          Properties::NON_VIRTUAL,
+	          __float__getMaxRate,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(float, MaxRate, 
+	                 __float__getMaxRate, 
+	                 __void__setMaxRate__float);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
