@@ -207,7 +207,7 @@ void Menu3D::clearItems()
 
 void Menu3D::setEnabled(int i)
 {
-	if (enabled_ == i) return;
+	//if (enabled_ == i) return;
 	
 	enabled_ = i;
 
