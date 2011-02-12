@@ -41,6 +41,7 @@
 
 #include <osg/ShapeDrawable>
 #include <osg/PolygonMode>
+#include <osg/Material>
 
 #include "SoundNode.h"
 #include "SceneManager.h"
@@ -67,10 +68,12 @@ SoundNode::SoundNode (SceneManager *sceneManager, char *initID) : DSPNode(sceneM
 	
 	directivityFlag = 0;
 	laserFlag = 0;
-	VUmeterFlag = 0;	
+	VUmeterFlag = 0;
 	
 	currentSoundIntensity = 0.0;
 	currentSoundColor = osg::Vec3(0.0,1.0,0.0); //green
+
+	directivityColor = osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0);
 
 	// OSG Stuff:
 	laserGeode = NULL;
@@ -139,6 +142,14 @@ void SoundNode::setVUmeterFlag (float newFlag)
 	BROADCAST(this, "sf", "setVUmeterFlag", VUmeterFlag);
 }
 
+
+void SoundNode::setDirectivityColor(float r, float g, float b, float a)
+{
+	directivityColor = osg::Vec4(r,g,b,a);
+	drawDirectivity();
+	BROADCAST(this, "sffff", "setDirectivityColor", r,g,b,a);
+}
+
 void SoundNode::setIntensity (float newvalue)
 {
 	currentSoundIntensity = newvalue;
@@ -201,9 +212,6 @@ void SoundNode::updateLaser()
 		}
 	}
 }
-
-
-
 
 
 // -----------------------------------------------------------------------------
@@ -292,13 +300,13 @@ void SoundNode::drawDirectivity()
 		if (val < 90)
 		{
 			// Place a cone pointing along the +Y axis
-			directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0) );
+			directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), directivityColor );
 		} else if (val > 90 && val < 180) {
 			// Place a cone pointing along the -Y axis
-			directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0) );
+			directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), directivityColor );
 		} else {
 			// Sphere
-			directivityGeode= createHollowSphere(_length*AS_DEBUG_SCALE, osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0) );
+			directivityGeode= createHollowSphere(_length*AS_DEBUG_SCALE, directivityColor );
 		}
 		
 		// ***
@@ -311,12 +319,11 @@ void SoundNode::drawDirectivity()
 		wireframeStateSet->setAttributeAndModes(polymode,osg::StateAttribute::ON);
 		wireframeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
 		wireframeStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-		
+
 		directivityGeode->setStateSet(wireframeStateSet);
 		
 		directivityGeode->setName(string(id->s_name) + ".directivityGeode");
 		this->getAttachmentNode()->addChild(directivityGeode.get());
-
 	}
 	
     pthread_mutex_unlock(&sceneMutex);
@@ -387,6 +394,10 @@ std::vector<lo_message> SoundNode::getState ()
 
 	msg = lo_message_new();
 	lo_message_add(msg, "sf", "setDirectivityFlag", directivityFlag);
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "sffff", "setDirectivityColor", directivityColor.x(), directivityColor.y(), directivityColor.z(), directivityColor.w());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

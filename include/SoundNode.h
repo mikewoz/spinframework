@@ -70,6 +70,8 @@ class SoundNode : public DSPNode
 		void setSpread (float newvalue);
 		void setLength (float newvalue);
 		
+		void setDirectivityColor(float r, float g, float b, float a);
+
 		void setVUmeterFlag (float newFlag);
 		void setDirectivityFlag (float newFlag);
 		void setLaserFlag (float newFlag);
@@ -81,6 +83,8 @@ class SoundNode : public DSPNode
 		const char* getRolloff() { return _rolloff.c_str(); }
 		float getSpread() { return _spread; }
 		float getLength() { return _length; }
+
+		osg::Vec4 getDirectivityColor() { return directivityColor; }
 		
 		float getVUmeterFlag() { return VUmeterFlag; }
 		float getDirectivityFlag() { return directivityFlag; }
@@ -140,6 +144,7 @@ class SoundNode : public DSPNode
 
 		// directivity patterns:
 		osg::ref_ptr<osg::Geode> directivityGeode;
+		osg::Vec4 directivityColor;
 
 		// laser beams:
 		osg::ref_ptr<osg::Geode> laserGeode;

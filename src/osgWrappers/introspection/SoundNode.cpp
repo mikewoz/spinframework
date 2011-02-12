@@ -43,6 +43,11 @@ BEGIN_OBJECT_REFLECTOR(SoundNode)
 	          __void__setLength__float,
 	          "",
 	          "");
+	I_Method4(void, setDirectivityColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
+	          Properties::NON_VIRTUAL,
+	          __void__setDirectivityColor__float__float__float__float,
+	          "",
+	          "");
 	I_Method1(void, setVUmeterFlag, IN, float, newFlag,
 	          Properties::NON_VIRTUAL,
 	          __void__setVUmeterFlag__float,
@@ -76,6 +81,11 @@ BEGIN_OBJECT_REFLECTOR(SoundNode)
 	I_Method0(float, getLength,
 	          Properties::NON_VIRTUAL,
 	          __float__getLength,
+	          "",
+	          "");
+	I_Method0(osg::Vec4, getDirectivityColor,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec4__getDirectivityColor,
 	          "",
 	          "");
 	I_Method0(float, getVUmeterFlag,
@@ -123,6 +133,9 @@ BEGIN_OBJECT_REFLECTOR(SoundNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(osg::Vec4, DirectivityColor, 
+	                 __osg_Vec4__getDirectivityColor, 
+	                 0);
 	I_SimpleProperty(float, DirectivityFlag, 
 	                 __float__getDirectivityFlag, 
 	                 __void__setDirectivityFlag__float);
