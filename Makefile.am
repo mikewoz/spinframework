@@ -7,7 +7,12 @@ SUBDIRS = src
 
 man_MANS = spinserver.1 spinviewer.1 
 MAN_TEXT_FILES=man-spinserver.txt man-spinviewer.txt
-EXTRA_DIST = README LICENSE $(man_MANS) $(MAN_TEXT_FILES)
+EXTRA_DIST = \
+    LICENSE \
+    README \
+    NEWS \
+    $(man_MANS) \
+    $(MAN_TEXT_FILES)
 
 MAINTAINERCLEANFILES = $(man_MANS)
 

@@ -19,14 +19,36 @@
 noinst_LTLIBRARIES = libSPINwrappers.la
 
 #libSPINwrappers_la_SOURCES = #$(BUILT_SOURCES)
+
 libSPINwrappers_la_SOURCES = \
-	ReferencedNode.cpp ReferencedStateSet.cpp \
-    UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
-    GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp Menu3D.cpp \
-    ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp ReporterNode.cpp \
-    AttractorNode.cpp AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
-    DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-    Fog.cpp ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
+	ReferencedNode.cpp \
+    AnimationNode.cpp \
+    AttractorNode.cpp \
+    ConstraintsNode.cpp \
+    Contour.cpp \
+    DSPNode.cpp \
+    Fog.cpp \
+    GridNode.cpp \
+    GroupNode.cpp \
+    ImageTexture.cpp \
+    LightSource.cpp \
+    Listener.cpp \
+    MeasurementNode.cpp \
+    Menu3D.cpp \
+    ModelNode.cpp \
+    PointerNode.cpp \
+    RayNode.cpp \
+    ReferencedStateSet.cpp \
+    ReporterNode.cpp \
+    ShapeNode.cpp \
+    SharedVideoTexture.cpp \
+    SoundConnection.cpp \
+    SoundNode.cpp \
+    SoundSpace.cpp \
+    SwitchNode.cpp \
+    TextNode.cpp \
+    UserNode.cpp \
+    VideoTexture.cpp
 
 
 libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
