@@ -1,4 +1,4 @@
-AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include $(PYTHON_CPPFLAGS)
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
@@ -20,18 +20,47 @@ libSPIN_la_LDFLAGS = \
 	-losgFX -losgParticle -losgViewer \
 	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS) $(BOOST_THREAD_LIB) $(SHARED_VIDEO_LIB)
 
-
+# please keep those in alphabetical order:
 libSPIN_la_SOURCES = \
-	spinApp.cpp spinBaseContext.cpp spinClientContext.cpp spinServerContext.cpp \
-	osgUtil.cpp spinUtil.cpp libloUtil.cpp \
-	SceneManager.cpp MediaManager.cpp ViewerManipulator.cpp \
-	ReferencedNode.cpp ReferencedStateSet.cpp \
-	UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
-	GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp Menu3D.cpp \
-	ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp ReporterNode.cpp \
-	AttractorNode.cpp AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
-	DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-	Fog.cpp ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp nodeVisitors.cpp
+	AttractorNode.cpp \
+	ConstraintsNode.cpp \
+	DSPNode.cpp \
+	Fog.cpp \
+	GridNode.cpp \
+	ReferencedNode.cpp \
+	SceneManager.cpp \
+	UserNode.cpp \
+	osgUtil.cpp \
+	spinApp.cpp \
+    AnimationNode.cpp \
+    Contour.cpp \
+    GroupNode.cpp \
+    ImageTexture.cpp \
+    LightSource.cpp \
+    Listener.cpp \
+    MeasurementNode.cpp \
+    MediaManager.cpp \
+    Menu3D.cpp \
+    ModelNode.cpp \
+    PointerNode.cpp \
+    RayNode.cpp \
+    ReferencedStateSet.cpp \
+    ReporterNode.cpp \
+    ShapeNode.cpp \
+    SharedVideoTexture.cpp \
+    SoundConnection.cpp \
+    SoundNode.cpp \
+    SoundSpace.cpp \
+    SwitchNode.cpp \
+    TextNode.cpp \
+    VideoTexture.cpp \
+    ViewerManipulator.cpp \
+    libloUtil.cpp \
+    nodeVisitors.cpp \
+    spinBaseContext.cpp \
+    spinClientContext.cpp \
+    spinServerContext.cpp \
+    spinUtil.cpp
 
 libSPIN_la_includedir = $(includedir)/spinFramework
 libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h

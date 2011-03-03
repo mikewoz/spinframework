@@ -20,6 +20,7 @@ noinst_LTLIBRARIES = libSPINwrappers.la
 
 #libSPINwrappers_la_SOURCES = #$(BUILT_SOURCES)
 
+# please keep those in alphabetical order:
 libSPINwrappers_la_SOURCES = \
 	ReferencedNode.cpp \
     AnimationNode.cpp \
@@ -50,6 +51,9 @@ libSPINwrappers_la_SOURCES = \
     UserNode.cpp \
     VideoTexture.cpp
 
+#    $(top_srcdir)/include/*.h \
+#    $(top_srcdir)/src/spin/*.h \
+#    $(top_srcdir)/src/tinyxml/*.h
 
-libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
+libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include -I$(top_srcdir)/src/spin $(PYTHON_CPPFLAGS)
 
