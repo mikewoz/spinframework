@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+#include <time.h>
 
 
 //#include <3DconnexionClient/ConnexionClient.h>
@@ -20,8 +21,14 @@ UInt16 fConnexionClientID;
 pthread_mutex_t spacenavMutex;
 
 // scalars when using setVelocity and setSpin:
-#define VELOCITY_SCALAR 0.05
+#define VELOCITY_SCALAR 0.005
 #define SPIN_SCALAR 0.01
+
+
+lo_address txAddr;
+time_t lastTime;
+float speedScaleValue;
+
 
 // scalars when using move and rotate:
 //#define VELOCITY_SCALAR 0.0005
@@ -49,6 +56,7 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
 {
 	static ConnexionDeviceState	lastState;
 	ConnexionDeviceState		*state;
+	time_t currentTime;
 
 	switch(messageType)
 	{
@@ -56,7 +64,56 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
 			state = (ConnexionDeviceState*)messageArgument;
 			if (state->client == fConnexionClientID)
 			{
-               	//std::cout << "SPACENAVIGATOR INFO:";
+
+				// reset speedScale if user let go of the puck:
+				time(&currentTime);
+				double dt = difftime( currentTime, lastTime );
+				if (dt > 1.0) speedScaleValue = 1.0;
+				lastTime = currentTime;
+
+
+
+				//std::cout << "SPACENAVIGATOR INFO: " << state->axis[0] << "," << state->axis[1] << "," << state->axis[2] << " - " << state->axis[3] << "," << state->axis[4] << "," << state->axis[5] << std::endl;
+
+
+				float x,y,z;
+				if (0) // if using puck rotations
+				{
+					x = state->axis[0];
+					y = state->axis[2];
+					z = -state->axis[1];
+				}
+				else {
+					// otherwise take average of rotation and push in an axis
+					// direction:
+					x = (state->axis[0] + (state->axis[5]/2.0));
+					y = (state->axis[2] + -(state->axis[3]/2.0));
+					z = -state->axis[1];
+				}
+
+				float xyMagnitude = sqrt((x*x) + (y*y));
+
+
+           		// we are pushing hard in some direction, so increment the speed over time:
+               	// NOTE, pulling up on the puck is harder to get to the max than
+               	// pushing down, so we handle the up/down axis separately
+               	if ((xyMagnitude>190) || (z<-200) ||  (z>150)) speedScaleValue += 0.02;
+               	else speedScaleValue -= 0.04;
+
+               	// max out at 10x of speed scaling:
+               	if (speedScaleValue < 1) speedScaleValue = 1.0;
+               	else if (speedScaleValue > 10) speedScaleValue = 10.0;
+
+             	//std::cout << "dt=" << dt << ", translated INFO: " << x << "," << y << "," << z << ", xyMagnitudes="<<xyMagnitude <<", speedScaleValue=" << speedScaleValue << std::endl;
+
+
+				float dX = pow(x * VELOCITY_SCALAR, 3) * 0.8;
+				float dY = pow(y * VELOCITY_SCALAR, 3) * 0.8;
+				float dZ = pow(z * VELOCITY_SCALAR, 3);
+
+
+               	//std::cout << "velocity=" << dX << "," << dY << "," << dZ << " * "<< speedScaleValue << std::endl;
+
 
                	// decipher what command/event is being reported by the driver
                 switch (state->command)
@@ -65,31 +122,52 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
                      	//std::cout << " dir=("<<(int)state->axis[0]<<","<<(int)state->axis[1]<<","<<(int)state->axis[2]<<")";
                     	//std::cout << " rot=("<<(int)state->axis[3]<<","<<(int)state->axis[4]<<","<<(int)state->axis[5]<<")";
 
-                    	spinApp::Instance().NodeMessage(spinApp::Instance().getUserID().c_str(),
+                    	lo_send(txAddr, "/SPIN/default/posture??",
                     			"sfff", "setVelocity",
+                    			dX*speedScaleValue, dY*speedScaleValue, dZ*speedScaleValue,
+                    			/*
                     			(float)  VELOCITY_SCALAR*state->axis[0],
                     			(float)  VELOCITY_SCALAR*state->axis[2],
                     			(float) -VELOCITY_SCALAR*state->axis[1],
+                    			*/
                     			LO_ARGS_END);
-                    	spinApp::Instance().NodeMessage(spinApp::Instance().getUserID().c_str(),
+                    	/*
+                    	lo_send(txAddr, "/SPIN/default/posture??",
                     			"sfff", "setSpin",
                     			(float)  SPIN_SCALAR*state->axis[3],
                     			(float)  SPIN_SCALAR*state->axis[5],
                     			(float) -SPIN_SCALAR*state->axis[4]*10.0, // yaw should be faster
                     			LO_ARGS_END);
+                    	*/
+
 
                     	break;
 
                     case kConnexionCmdHandleButtons:
-                    	//std::cout << " buttons=" << (int)state->buttons;
+                    	//std::cout << " buttons=" << (int)state->buttons << std::endl;
 
+                    	if ((int)state->buttons == 2)
+                    	{
+                    		lo_send(txAddr, "/SPIN/default/menu", "s", "highlightNext", LO_ARGS_END);
+                    	}
+                    	else if ((int)state->buttons == 1)
+                    	{
+                    		lo_send(txAddr, "/SPIN/default/menu", "s", "select", LO_ARGS_END);
+                    	}
+
+                    	//if (state->buttons != lastState.buttons) std::cout << "buttonState=" << (int)state->buttons << std::endl;
+
+
+
+
+                    	/*
                     	spinApp::Instance().NodeMessage(spinApp::Instance().getUserID().c_str(),
                     			"sfff", "setTranslation", 0.0, -10.0, 5.0,
                     			LO_ARGS_END);
                     	spinApp::Instance().NodeMessage(spinApp::Instance().getUserID().c_str(),
                     			"sfff", "setOrientation", 0.0, 0.0, 0.0,
                     			LO_ARGS_END);
-
+*/
                         break;
                 }
                	//std::cout << std::endl;
@@ -107,9 +185,17 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
 
 }
 
-
-void *spacenavThread(void *arg)
+int main(int argc, char **argv)
 {
+
+	std::cout << "\nRunning example. Press CTRL-C to quit..." << std::endl;
+
+	txAddr = lo_address_new("10.20.10.104", "54324");
+
+	time( &lastTime );
+	speedScaleValue = 1.0;
+
+
 	// Check if 3DConnexion famework/lib is installed:
 	if (InstallConnexionHandlers != NULL)
 	{
@@ -118,10 +204,6 @@ void *spacenavThread(void *arg)
 
 		if (error==0)
 		{
-			// make sure user has proper velocitymode:
-        	spinApp::Instance().NodeMessage(spinApp::Instance().getUserID().c_str(),
-        			"si", "setVelocityMode", (int)GroupNode::MOVE, LO_ARGS_END);
-
 			// This takes over in our application only:
 			//fConnexionClientID = RegisterConnexionClient('spinviewer', (UInt8*)"\pspinviewer with spacenavigator", kConnexionClientModeTakeOver, kConnexionMaskAll);
 
@@ -137,47 +219,6 @@ void *spacenavThread(void *arg)
 	}
 	else std::cout << "ERROR: could not find 3DConnexion library/framework" << std::endl;
 
-	return NULL;
-}
-
-int main(int argc, char **argv)
-{
-	spinClientContext spinListener;
-	spinApp &spin = spinApp::Instance();
-
-
-	if (!spinListener.start())
-	{
-        std::cout << "ERROR: could not start SPIN client thread" << std::endl;
-        exit(EXIT_FAILURE);
-	}
-
-
-	// start a pthread for the spacenavigator:
-    pthread_t pthreadID;
-    pthread_attr_t pthreadAttr;
-    if (pthread_attr_init(&pthreadAttr) < 0)
-    {
-        std::cout << "Could not prepare spacenavigator thread" << std::endl;
-        return false;
-    }
-    //if (pthread_create( &pthreadID, &pthreadAttr, spacenavThread, this) < 0)
-    if (pthread_create( &pthreadID, &pthreadAttr, spacenavThread, &spinListener) < 0)
-    {
-        std::cout << "Could not create spacenavigator thread" << std::endl;
-        return false;
-    }
-
-    // create a big grid to help orient ourselves
-	spin.SceneMessage("sss", "createNode", "grid", "GridNode", LO_ARGS_END);
-	spin.NodeMessage("grid", "sf", "setSize", 100.0, LO_ARGS_END);
-
-	std::cout << "\nRunning example. Press CTRL-C to quit..." << std::endl;
-
-    while (spinListener.isRunning()) // send signal (eg, ctrl-c to stop)
-    {
-		usleep(1000);
-    }
 
     // Clean up 3DConnextion stuff:
     if (InstallConnexionHandlers != NULL)
