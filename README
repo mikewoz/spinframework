@@ -6,7 +6,7 @@
 |                                                                           |
 |---------------------------------------------------------------------------|
 
-http://spinframework.sourceforge.net
+http://spinframework.org
 Copyright (C) 2009 Mike Wozniewski, Zack Settel
 
 Developed/Maintained by:
@@ -14,8 +14,9 @@ Developed/Maintained by:
    Zack Settel (http://www.sheefa.net/zack)
 
 Principle Partners:
+   La Société des Arts Technologiques (http://www.sat.qc.ca)
+   Institut Arts Cultures et Technologies, Université de Montréal (http://www.iact.umontreal.ca)    
    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
-   La Societe des Arts Technologiques (http://www.sat.qc.ca)
 
 Funding by:
    NSERC/Canada Council for the Arts - New Media Initiative
@@ -44,10 +45,8 @@ Ultimately, the SPIN Framework allows for the creation of collaborative environm
 Compiling
 ---------
 
-./autogen.sh (Only if from the SVN, not the tarball)
-
-./configure --enable-scenic
-
+./autogen.sh (if from svn/git, not the tarball)
+./configure
 make 
 
 
