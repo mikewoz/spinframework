@@ -3,5 +3,6 @@
 cd "`dirname $BASH_SOURCE`"
 ./autogen.sh
 ./configure
-make -j
+make
 
+# alias make="make -j2" in your ~/.bashrc for more speed
