@@ -7,8 +7,8 @@ lib_LTLIBRARIES = libSPIN.la
 python_LTLIBRARIES = libSPINPyWrap.la
 
 libSPIN_la_LIBADD = \
-	$(top_srcdir)/src/osgWrappers/introspection/libSPINwrappers.la \
-	$(top_srcdir)/src/tinyxml/libtinyxml.la
+	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
+	$(top_builddir)/src/tinyxml/libtinyxml.la
 
 libSPIN_la_LDFLAGS = \
 	$(PYTHON_LDFLAGS) \

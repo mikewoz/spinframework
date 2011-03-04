@@ -45,4 +45,3 @@ apps:
 	$(MAKE) -C src/spin spinviewer.app
 
 INCLUDES = src/tinyxml
-
