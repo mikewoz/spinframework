@@ -178,17 +178,6 @@ AC_CHECK_LIB([shared_video], [shared_video_is_present],
 
 AC_SUBST([SHARED_VIDEO_LIB])
 
-AC_ARG_ENABLE([fmod],
-	AS_HELP_STRING([--enable-fmod], [Enables audio rendering via FMOD]),
-	[with_fmod=$enableval],
-	[with_fmod=no])
-
-#AC_PUSH_LANG(C++)
-#AS_IF([test "x$with_fmod" = "xyes"],
-#	AC_CHECK_LIB([fmodex], [], FMOD_LDFLAGS="-lfmodex"; CPPFLAGS="$CPPFLAGS -I/Developer/FMOD\ Programmers\ API\ Mac/api/inc/"; AC_DEFINE([USE_FMOD],[],[A flag that enables audio rendering features using the FMOD engine]), AC_MSG_ERROR([missing FMOD libraries]),)
-#	[with_fmod=no])
-#AC_POP_LANG(C++)
-
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
     [with_editor=$enableval],
