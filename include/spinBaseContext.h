@@ -42,12 +42,8 @@
 #ifndef __spinBaseContext_H
 #define __spinBaseContext_H
 
-#include <boost/python.hpp>
-#include <osg/Timer>
-
-#include "UserNode.h"
-#include "spinUtil.h"
-
+#include <vector>
+#include <lo/lo_types.h>
 
 /**
  * \brief A class to facilitate communication with SPIN from any application.
@@ -80,9 +76,9 @@ class spinBaseContext
          */
         static bool signalStop;
 
-        enum spinContextMode { SERVER_MODE, CLIENT_MODE };
+        enum SpinContextMode { SERVER_MODE, CLIENT_MODE };
 
-        bool isServer() { return (bool)(mode==SERVER_MODE); }
+        bool isServer() { return mode==SERVER_MODE; }
 
         virtual bool start() = 0;
 
@@ -130,7 +126,7 @@ class spinBaseContext
     protected:
 
         bool running;
-        spinContextMode mode;
+        SpinContextMode mode;
         void setLog(spinLog &log);
         virtual void createServers() = 0;
         /**

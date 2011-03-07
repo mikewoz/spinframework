@@ -42,10 +42,11 @@
 #ifndef SwitchNode_H_
 #define SwitchNode_H_
 
-#include <osg/Switch>
-
-
 #include "GroupNode.h"
+
+namespace osg {
+    class Switch;
+}
 
 /**
  * \brief Allows for selectively enabling/disabling child nodes

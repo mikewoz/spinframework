@@ -41,6 +41,7 @@
 
 
 #include "SceneManager.h"
+#include "DSPNode.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
 #include "MediaManager.h"

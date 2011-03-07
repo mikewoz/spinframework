@@ -39,13 +39,14 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "SwitchNode.h"
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
 #include <osg/Geometry>
 #include <osgUtil/SmoothingVisitor>
+#include <osg/Switch>
 #include <lo/lo_types.h>
 
-#include "SwitchNode.h"
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
