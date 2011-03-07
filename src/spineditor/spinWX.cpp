@@ -50,6 +50,7 @@
 #include <wx/stdpaths.h>
 
 #include "spinBaseContext.h"
+#include "spinClientContext.h"
 
 //(*AppHeaders
 #include "wxSpinMain.h"
@@ -59,7 +60,7 @@
 IMPLEMENT_APP(spinWX);
 
 
-spinContext *spin; // global
+spinClientContext *spin; // global
 wxString resourcesPath; // global
 
 bool spinWX::OnInit()
@@ -68,7 +69,7 @@ bool spinWX::OnInit()
     if (!wxApp::OnInit())
         return false;
 
-	spin = new spinContext();
+	spin = new spinClientContext();
 
 	// override infoPort based on environment variable:
 	/*

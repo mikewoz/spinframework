@@ -57,9 +57,10 @@
 #include <osgGA/NodeTrackerManipulator>
 #include <osgGA/TrackballManipulator>
 #include <osgViewer/ViewerEventHandlers>
+#include <iostream>
 
-#include "spinContext.h"
-extern spinContext *spin;
+#include "spinClientContext.h"
+extern spinClientContext *spin;
 extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
@@ -138,8 +139,9 @@ wxSpinRenderer::wxSpinRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
     view->getCamera()->setGraphicsContext(gw);
     view->getCamera()->setViewport(0,0,200,200);//size.GetWidth(),size.GetHeight());
     view->getCamera()->setClearColor(osg::Vec4(0,0,0,0));
+#if 0
     view->setSceneData(spin->sceneManager->rootNode.get());
-
+#endif
 
     // add the view:
     viewer->addView(view);
@@ -157,7 +159,9 @@ wxSpinRenderer::wxSpinRenderer(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
 	//manipulator->setRotationMode( osgGA::NodeTrackerManipulator::TRACKBALL );
 
+#if 0
 	manipulator->setTrackNode(spin->sceneManager->rootNode.get());
+#endif
 
 
 	view->setCameraManipulator(manipulator);
@@ -436,6 +440,7 @@ void GraphicsWindowWX::swapBuffersImplementation()
 
 void wxSpinRenderer::OnGridToggle(wxCommandEvent& event)
 {
+#if 0
     if (event.IsChecked())
     {
         std::cout << "enabled grid" << std::endl;
@@ -444,4 +449,5 @@ void wxSpinRenderer::OnGridToggle(wxCommandEvent& event)
         std::cout << "disabled grid" << std::endl;
         spin->sceneManager->setGrid(0);
     }
+#endif
 }

@@ -46,7 +46,7 @@
 
 #include "spinWX.h"
 #include "wxSpinMain.h"
-#include "spinContext.h"
+#include "spinClientContext.h"
 #include "wxSpinEditor.h"
 #include "wxSpinRenderer.h"
 
@@ -56,7 +56,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 
-extern spinContext *spin;
+extern spinClientContext *spin;
 extern wxString resourcesPath;
 
 //(*InternalHeaders(wxSpinFrame)
@@ -249,11 +249,13 @@ wxSpinMain::wxSpinMain(wxWindow* parent,wxWindowID id)
     mainSplitter->SetSashPosition(40);
 
     spinSettingsFrame = new wxSpinSettings(0);
+#if 0
     spinSettingsFrame->spinID->SetValue( wxString( spin->id.c_str(), wxConvUTF8 ));
     spinSettingsFrame->rxAddr->SetValue( wxString( spin->rxAddr.c_str(), wxConvUTF8 ));
     spinSettingsFrame->rxPort->SetValue( wxString( spin->rxPort.c_str(), wxConvUTF8 ));
     spinSettingsFrame->txAddr->SetValue( wxString( spin->txAddr.c_str(), wxConvUTF8 ));
     spinSettingsFrame->txPort->SetValue( wxString( spin->txPort.c_str(), wxConvUTF8 ));
+#endif
 
 
     //wxFFile logFile(wxT("spinWX.log"),wxT("w+"));
@@ -327,6 +329,7 @@ void wxSpinMain::OnAbout(wxCommandEvent& event)
 
 void wxSpinMain::OnLoadScene(wxCommandEvent& event)
 {
+#if 0
     if (spin->isRunning())
     {
 		wxFileDialog* d = new wxFileDialog( this, wxT("Load Scene"), wxT(""), wxT(""), wxT("*.xml"), wxOPEN, wxDefaultPosition);
@@ -343,6 +346,7 @@ void wxSpinMain::OnLoadScene(wxCommandEvent& event)
 	    wxMessageDialog *dlg = new wxMessageDialog(this, wxT("The server needs to be started before you can load scenes."), wxT("SPIN not running"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
 	    dlg->ShowModal();
 	}
+#endif
 
 }
 
@@ -354,7 +358,7 @@ void wxSpinMain::OnSaveScene(wxCommandEvent& event)
 
 		if ( d->ShowModal() == wxID_OK )
 		{
-			spin->sendSceneMessage("ss", "save", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
+			//spin->sendSceneMessage("ss", "save", (const char*) d->GetPath().mb_str(), LO_ARGS_END);
 			/*
 		   	if (spin->sceneManager->saveXML( d->GetPath().mb_str() ))
 		   	{
@@ -403,6 +407,7 @@ void wxSpinMain::OnShowRenderer(wxCommandEvent& event)
 
 void wxSpinMain::OnStartStopToggle(wxCommandEvent& event)
 {
+#if 0
     if (event.IsChecked())
     {
         spin->id = std::string(spinSettingsFrame->spinID->GetValue().mb_str());
@@ -428,6 +433,7 @@ void wxSpinMain::OnStartStopToggle(wxCommandEvent& event)
         spin->stop();
         StartStop->SetLabel(wxT("Start"));
     }
+#endif
 }
 
 

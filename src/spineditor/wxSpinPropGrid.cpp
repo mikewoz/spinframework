@@ -73,8 +73,8 @@
 
 //#include <osgField/Manager>
 
-#include "spinContext.h"
-extern spinContext *spin;
+#include "spinClientContext.h"
+extern spinClientContext *spin;
 extern wxString resourcesPath;
 
 using namespace osgIntrospection;
@@ -176,7 +176,7 @@ void wxSpinPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
         if (listeningServer)
         {
             std::string oscPattern;
-
+#if 0
             // first remove the previously registered method:
             if (currentNode.valid())
             {
@@ -187,6 +187,7 @@ void wxSpinPropGrid::SetNode(ReferencedNode* newNode, bool forceUpdate)
             // add the new method:
             oscPattern = "/SPIN/" + spin->id + "/" + std::string(newNode->id->s_name);
             lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxSpinPropGrid_liblo_callback, (void*)this);
+#endif
         }
 
     }
@@ -262,6 +263,7 @@ void wxSpinPropGrid::UpdateFromSpin()
  */
 void wxSpinPropGrid::GenerateProperties(const osgIntrospection::Type& classType, ReferencedNode* pObject)
 {
+#if 0
 	// TODO: we should try to store this globally somewhere, so that we don't do
 	// a lookup every time there is a message:
 	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
@@ -399,7 +401,6 @@ void wxSpinPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
                             */
                         }
                     }
-
                     // Make a description.
                     if (propId)
                     {
@@ -477,7 +478,7 @@ void wxSpinPropGrid::GenerateProperties(const osgIntrospection::Type& classType,
 	{
 		GenerateProperties(classType.getBaseType(i), pObject);
 	}
-
+#endif
 }
 
 

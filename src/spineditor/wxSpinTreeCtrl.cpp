@@ -49,9 +49,9 @@
 #include "wxSpinTreeCtrl.h"
 #include "wxSpinTreeVisitor.h"
 #include "wxSpinEditor.h"
-#include "spinContext.h"
+#include "spinClientContext.h"
 
-extern spinContext *spin;
+extern spinClientContext *spin;
 extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
@@ -112,8 +112,10 @@ void wxSpinTreeCtrl::setListeningServer(lo_server_thread t)
     // we can dynamically update the tree based on OSC messages:
     if (listeningServer)
     {
+#if 0
         std::string oscPattern = "/SPIN/" + spin->id;
         lo_server_thread_add_method(listeningServer, oscPattern.c_str(), NULL, wxSpinTreeCtrl_liblo_callback, (void*)this);
+#endif
     }
 }
 
@@ -145,7 +147,7 @@ void wxSpinTreeCtrl::Refresh()
 	// graph, and adds or removes nodes accordingly while keeping the existing
 	// ones
 
-    BuildTree(spin->sceneManager->worldNode.get());
+//    BuildTree(spin->sceneManager->worldNode.get());
 }
 
 void wxSpinTreeCtrl::addToTree(ReferencedNode *n, wxTreeItemId parentID)
@@ -167,6 +169,7 @@ void wxSpinTreeCtrl::addNode(const char *id, const char *type)
     // note that a createNode message was broadcast from SPIN AFTER the node was
     // instantiated, so we should now be able to find it in the sceneManager,
     // and so we'll create a tree item (if it doesn't already exist).
+#if 0
     ReferencedNode *n = spin->sceneManager->getNode(id, type);
     if (!n) return;
 
@@ -178,12 +181,13 @@ void wxSpinTreeCtrl::addNode(const char *id, const char *type)
         if (parentInTree) addToTree(n,parentInTree);
         else addToTree(n,GetRootItem());
     }
-
+#endif
 }
 
 
 void wxSpinTreeCtrl::removeNode(const char *id)
 {
+#if 0
 	// if the node to be removed is currently selected, then select NULL (root)
 	if (strcmp(GetSelectedNode()->id->s_name,id)==0)
 	{
@@ -198,10 +202,12 @@ void wxSpinTreeCtrl::removeNode(const char *id)
 		Delete(nodeInTree);
 		Thaw();
 	}
+#endif
 }
 
 bool wxSpinTreeCtrl::SelectNode(ReferencedNode* pNode)
 {
+#if 0
     // there should always be at least one node (the scene root). If not, return
     // because this is a problem.
     if (GetCount() == 0) return false;
@@ -223,7 +229,7 @@ bool wxSpinTreeCtrl::SelectNode(ReferencedNode* pNode)
         UpdatePropGrid();
         return true;
     }
-
+#endif
     // couldn't find the node, so return false
     return false;
 }
@@ -389,7 +395,9 @@ void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
             lo_message_add(msg, "ss", "setParent", parentString.c_str());
             spin->nodeMessage(child->id, msg);
             */
+#if 0
             spin->sendNodeMessage(child->id->s_name, "ss", "setParent", parentString.c_str(), LO_ARGS_END);
+#endif
 
         }
     }

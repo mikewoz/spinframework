@@ -41,10 +41,10 @@
 
 #include "wxSpinEditor.h"
 
-#include "spinContext.h"
+#include "spinClientContext.h"
 #include <wx/choicdlg.h>
 
-extern spinContext *spin;
+extern spinClientContext *spin;
 extern pthread_mutex_t pthreadLock;
 extern wxString resourcesPath;
 
@@ -144,7 +144,8 @@ wxSpinEditor::wxSpinEditor(wxWindow* parent,wxWindowID id)
     pFont.SetPointSize(9.0f);
     spinTree->SetFont(pFont);
 
-	spinTree->BuildTree(spin->sceneManager->worldNode.get());
+	//TODO : uncomment this
+    // spinTree->BuildTree(spin->sceneManager->worldNode.get());
 
 	// provide SpinTree with a pointer to SpinPropGrid so that it can fill it:
 	spinTree->SetPropGrid(SpinPropGrid);
@@ -155,6 +156,8 @@ wxSpinEditor::wxSpinEditor(wxWindow* parent,wxWindowID id)
     // channel and not to spinChannel directly. This is because SPIN might
     // broadcast different messages than it receives (eg, it receives a 'move'
     // message, but will transmit a 'setTranslation' message).
+// TODO: uncomment this
+#if 0
     if (spin->sceneManager->isSlave())
     {
         // if this sceneManager is already a listener, then we can just hijack
@@ -174,7 +177,7 @@ wxSpinEditor::wxSpinEditor(wxWindow* parent,wxWindowID id)
 
     spinTree->setListeningServer(this->listeningServer);
     SpinPropGrid->setListeningServer(this->listeningServer);
-
+#endif
 }
 
 wxSpinEditor::~wxSpinEditor()
@@ -192,12 +195,13 @@ void wxSpinEditor::OnNewNode(wxCommandEvent& event)
     osg::ref_ptr<ReferencedNode> n;
 
 
-
+#if 0
     std::vector<std::string>::iterator it;
     for ( it=spin->sceneManager->nodeTypes.begin(); it!=spin->sceneManager->nodeTypes.end(); it++)
 	{
         allTypes.Add(wxString( (*it).c_str(), wxConvUTF8 ));
 	}
+#endif
 
     nodeType = wxGetSingleChoice( wxT("Select node type:"), wxT("New Node"), allTypes);
     if (nodeType.IsEmpty()) return;
@@ -209,6 +213,7 @@ void wxSpinEditor::OnNewNode(wxCommandEvent& event)
 
         if (nodeID.IsEmpty()) return;
 
+#if 0
         if ( spin->sceneManager->getNode(std::string(nodeID.mb_str())) )
         {
             wxMessageBox(wxT("That node ID already exists. Please try another."), wxT("Oops"), wxOK|wxICON_ERROR);
@@ -226,6 +231,7 @@ void wxSpinEditor::OnNewNode(wxCommandEvent& event)
             done = true;
 
         }
+#endif
 
     }
 
@@ -238,7 +244,7 @@ void wxSpinEditor::OnRefresh(wxCommandEvent& event)
     lo_message_add_string(msg, "refresh");
     spin->sceneMessage(msg);
     */
-	spin->sendSceneMessage("s", "refresh", LO_ARGS_END);
+//	spin->sendSceneMessage("s", "refresh", LO_ARGS_END);
 }
 
 void wxSpinEditor::OnDebugPrint(wxCommandEvent& event)
@@ -250,10 +256,10 @@ void wxSpinEditor::OnDebugPrint(wxCommandEvent& event)
     */
 
     // local print:
-    spin->sceneManager->debug();
+//    spin->sceneManager->debug();
 
     // remote print:
-    spin->sendSceneMessage("s", "debug", LO_ARGS_END);
+//    spin->sendSceneMessage("s", "debug", LO_ARGS_END);
 }
 
 void wxSpinEditor::OnClear(wxCommandEvent& event)
@@ -267,7 +273,7 @@ void wxSpinEditor::OnClear(wxCommandEvent& event)
         lo_message_add_string(msg, "clear");
         spin->sceneMessage(msg);
         */
-        spin->sendSceneMessage("s", "clear", LO_ARGS_END);
+ //       spin->sendSceneMessage("s", "clear", LO_ARGS_END);
 
     }
 }
@@ -285,7 +291,7 @@ void wxSpinEditor::OnDeleteNode(wxCommandEvent& event)
             lo_message_add(msg, "ss", "deleteNode", (const char*)n->id->s_name);
             spin->sceneMessage(msg);
             */
-            spin->sendSceneMessage("ss", "deleteNode", (const char*)n->id->s_name, LO_ARGS_END);
+//            spin->sendSceneMessage("ss", "deleteNode", (const char*)n->id->s_name, LO_ARGS_END);
         }
     } else {
         wxMessageDialog *dlg = new wxMessageDialog(this, wxT("You must select a node from the tree first"), wxT("Delete Node?"), wxOK|wxICON_ERROR|wxSTAY_ON_TOP);
