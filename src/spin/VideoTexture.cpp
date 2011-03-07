@@ -40,6 +40,10 @@
 // -----------------------------------------------------------------------------
 
 #include <osg/StateSet>
+#include <osg/ImageStream>
+#include <osg/ImageSequence>
+#include <osg/TextureRectangle>
+#include <osg/Texture2D>
 #include <osg/StateAttribute>
 #include <osgDB/ReadFile>
 #include <osgDB/FileUtils>
@@ -47,6 +51,7 @@
 
 #include <iostream>
 #include "spinApp.h"
+#include "SceneManager.h"
 #include "spinBaseContext.h"
 #include "VideoTexture.h"
 

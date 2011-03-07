@@ -42,14 +42,13 @@
 #ifndef __VideoTexture_H
 #define __VideoTexture_H
 
-#include "SceneManager.h"
+#include "ReferencedStateSet.h"
 
-#include <osg/ImageStream>
-#include <osg/ImageSequence>
-#include <osg/TextureRectangle>
-#include <osg/Texture2D>
-#include <osg/Timer>
+class SceneManager;
 
+namespace osg {
+    class ImageStream;
+}
 
 /**
  * \brief A video texture node that allows dynamic textures to be applied
