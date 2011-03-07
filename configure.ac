@@ -191,8 +191,20 @@ AC_ARG_ENABLE([fmod],
 
 AC_ARG_ENABLE([editor],
 	AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
-	[with_gui=$enableval],
-	[with_gui=no])
+	[with_editor=$enableval],
+	[with_editor=no])
+AM_CONDITIONAL(ENABLE_EDITOR, test "x$with_editor" = xyes)
+
+#AM_CONDITIONAL(ENABLE_EDITOR, [test "x$with_editor" = xyes])
+if test "x$with_editor" = xyes; then
+    AC_MSG_NOTICE([Enabling SPIN Editor])
+    AM_OPTIONS_WXCONFIG
+    reqwx=2.4.0
+    AM_PATH_WXCONFIG($reqwx, wxWin=1)
+    if test "$wxWin" != 1; then
+        AC_MSG_ERROR([wxWidgets must be installed on your system. Please check that wx-config is in path, the directory where wxWidgets libraries are installed (returned by 'wx-config --libs' or 'wx-config --static --libs' command) is in LD_LIBRARY_PATH or equivalent variable and wxWidgets version is $reqwx or above.])
+    fi
+fi
 
 # GNU help2man creates man pages from --help output; in many cases, this
 # is sufficient, and obviates the need to maintain man pages separately.
@@ -204,9 +216,6 @@ if test $cross_compiling = no; then
 else
     HELP2MAN=:
 fi
-
-AM_CONDITIONAL(ENABLE_EDITOR, [test "x$with_gui" = xyes])
-
 
 #AC_MSG_CHECKING([for Scenic shared_video support])
 #AC_MSG_RESULT($with_scenic)

@@ -88,6 +88,7 @@ osg::Vec3f myshape::getTranslation()
 void myshape::setNote(const std::string &s)
 {
 	note_ = s;
+	std::cout << "Got note: " << note_ << std::endl;
 }
 
 const std::string& myshape::getNote() const
