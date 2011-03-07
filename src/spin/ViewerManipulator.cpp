@@ -42,6 +42,7 @@
 #include "ViewerManipulator.h"
 #include <string>
 #include <vector>
+#include <osgViewer/View>
 #include "osgUtil.h"
 #include "spinUtil.h"
 #include "spinApp.h"
@@ -226,6 +227,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	dX *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 
+#if 0
 	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
 	{
 		switch(ea.getEventType())
@@ -253,9 +255,11 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		}
 		std::cout << std::endl;
 	}
+#endif
 
 
-	float scrollX, scrollY;
+	float scrollX = 0.0;
+    float scrollY = 0.0;
 	if (ea.getEventType()==osgGA::GUIEventAdapter::SCROLL)
 	{
 		scrollX = ea.getScrollingDeltaX();
@@ -313,11 +317,11 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 
 		// intersections are ordered from nearest to furthest, so we iterate and
 		// a return list of all nodes that can be cast as interactive SPIN nodes
-		osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+		osgUtil::LineSegmentIntersector::Intersections::const_iterator itr;
 		for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 		{
 			// look down the nodePath for the first SPIN node:
-			for (unsigned i = (*itr).nodePath.size() - 1; i >= 0; i--)
+			for (int i = (*itr).nodePath.size() - 1; i >= 0; i--)
 			{
 				osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
 				if (testNode.valid())

@@ -43,8 +43,9 @@
 #define __ViewerManipulator_H
 
 #include <osg/ref_ptr>
-#include <osgViewer/View>
 #include <osgGA/NodeTrackerManipulator>
+#include <cstdarg>
+#include "spinUtil.h" // for t_symbol
 
 // forward declarations
 class GroupNode;
@@ -52,14 +53,6 @@ class GroupNode;
 namespace osgViewer {
     class View;
 }
-
-#include "spinBaseContext.h"
-#include <lo/lo.h>
-#include <lo/lo_lowlevel.h>
-
-#include "spinUtil.h"
-
-class GroupNode;
 
 /**
  * \brief This class provides camera control and picking for viewers that render
