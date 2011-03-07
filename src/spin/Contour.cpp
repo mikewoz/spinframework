@@ -158,7 +158,7 @@ void Contour::updateTransforms()
 // This function gets the orientation of a given index into the soundLine. Note
 // that the orientation along a line has only 2 degrees of freedom (roll is not
 // defined). So we specify the Y_AXIS.
-osg::Quat Contour::getOrientation(int index)
+osg::Quat Contour::getOrientation(int index) const
 {
 	if (_vArray->size() < 2)
 	{
@@ -187,7 +187,7 @@ osg::Quat Contour::getOrientation(int index)
 
 // We allow the index to be a float, so position can be interpolated between
 // two indices:
-osg::Vec3 Contour::getTranslation(float index)
+osg::Vec3 Contour::getTranslation(float index) const
 {
 	
 	if (!_vArray->size())
@@ -474,7 +474,7 @@ void Contour::draw()
 
 
 // *****************************************************************************
-std::vector<lo_message> Contour::getState ()
+std::vector<lo_message> Contour::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedNode::getState();

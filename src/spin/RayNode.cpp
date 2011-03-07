@@ -187,7 +187,7 @@ void RayNode::drawRay()
 
 // *****************************************************************************
 
-std::vector<lo_message> RayNode::getState ()
+std::vector<lo_message> RayNode::getState () const
 {
     // inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();

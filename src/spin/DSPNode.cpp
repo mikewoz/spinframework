@@ -39,17 +39,15 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <iostream>
 #include "DSPNode.h"
-#include "ReferencedNode.h"
-#include "osgUtil.h"
+#include "SoundConnection.h"
 
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
 //extern SceneManager *sceneManager;
-
-using namespace std;
 
 // *****************************************************************************
 // constructor:
@@ -86,7 +84,7 @@ DSPNode::~DSPNode()
 	while (connectFROM.size())
     {
         if (connectFROM[0]->source)
-		connectFROM[0]->source->disconnect(this->id->s_name);
+            connectFROM[0]->source->disconnect(this->id->s_name);
 	}
 	
 }
@@ -116,7 +114,7 @@ SoundConnection *DSPNode::getConnection(DSPNode *snk)
 {
 	if (snk)
 	{	
-		vector<SoundConnection*>::iterator iter;
+        std::vector<SoundConnection*>::iterator iter;
 		for (iter = this->connectTO.begin(); iter != this->connectTO.end(); iter++)
 		{
 			if ((*iter)->sink == snk) return (*iter);
@@ -180,7 +178,7 @@ void DSPNode::disconnect(const char *snk)
 		 */
 		
 		// remove it from the connectTO list:		
-		vector<SoundConnection*>::iterator iter;
+        std::vector<SoundConnection*>::iterator iter;
 		for (iter = connectTO.begin(); iter != connectTO.end(); iter++)
 		{
 			if ((*iter) == conn)
@@ -266,7 +264,7 @@ void DSPNode::connectionMsg (char *snkName, char *method, float value)
 
 // *****************************************************************************
 
-std::vector<lo_message> DSPNode::getState ()
+std::vector<lo_message> DSPNode::getState() const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();

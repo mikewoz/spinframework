@@ -46,15 +46,7 @@
 
 #include "GroupNode.h"
 
-#include <osg/Group>
-#include <osg/PositionAttitudeTransform> 
-#include <osg/NodeVisitor>
-
-#include <string>
 #include <vector>
-#include <map>
-
-
 
 /**
  * \brief A node with constrained motion
@@ -113,16 +105,16 @@ public:
 	virtual void callbackUpdate();
 	
 	void setTarget(const char *id);
-	const char *getTarget() { return _target->s_name; }
+	const char *getTarget() const { return _target->s_name; }
 	
 	void setConstraintMode(constraintMode m);
-	int getConstraintMode() { return (int)_mode; };
+	int getConstraintMode() const { return (int)_mode; };
 	
 	void setCubeSize(float xScale, float yScale, float zScale);
 	void setCubeOffset(float x, float y, float z);
 
-	osg::Vec3 getCubeSize() { return _cubeSize; }
-	osg::Vec3 getCubeOffset() { return _cubeOffset; }
+	osg::Vec3 getCubeSize() const { return _cubeSize; }
+	osg::Vec3 getCubeOffset() const { return _cubeOffset; }
 
 	virtual void setTranslation (float x, float y, float z);
 	virtual void translate (float x, float y, float z);
@@ -141,7 +133,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	
 private:

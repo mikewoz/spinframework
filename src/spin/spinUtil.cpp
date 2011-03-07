@@ -67,34 +67,29 @@
 
 std::string getHostname()
 {
-	using namespace std;
-	
 	struct utsname ugnm;
-	string hostname;
+    std::string hostname;
 
 	if (uname(&ugnm) < 0) return "";
 	hostname = std::string(ugnm.nodename);
 	
 	// for OSX, remove .local
 	size_t pos = hostname.rfind(".local");
-	if (pos!=string::npos) hostname = hostname.substr(0,pos);
+	if (pos!=std::string::npos) hostname = hostname.substr(0,pos);
 	
 	return hostname;
 }
 
 std::string getMyIPaddress()
 {
-	using namespace std;
-	
 	struct ifaddrs *interfaceArray = NULL, *tempIfAddr = NULL;
 	void *tempAddrPtr = NULL;
 	int rc = 0;
 	char addressOutputBuffer[INET6_ADDRSTRLEN];
 
 	//char *IPaddress;
-	string IPaddress;
+    std::string IPaddress;
 
-	
 	rc = getifaddrs(&interfaceArray);  /* retrieve the current interfaces */
 	if (rc == 0)
 	{    
@@ -104,7 +99,7 @@ std::string getMyIPaddress()
 			{
 				tempAddrPtr = &((struct sockaddr_in *)tempIfAddr->ifa_addr)->sin_addr;
 				
-				if (string(tempIfAddr->ifa_name).find("lo")==string::npos) // skip loopback
+				if (std::string(tempIfAddr->ifa_name).find("lo")==std::string::npos) // skip loopback
 				{
 					IPaddress = inet_ntop(tempIfAddr->ifa_addr->sa_family, tempAddrPtr, addressOutputBuffer, sizeof(addressOutputBuffer));
 					
@@ -121,16 +116,12 @@ std::string getMyIPaddress()
 
 std::string getMyBroadcastAddress()
 {
-	using namespace std;
-	
-	string myIP = getMyIPaddress();
+    std::string myIP = getMyIPaddress();
 	return myIP.substr(0,myIP.rfind(".")) + ".255";
 }
 
 bool isMulticastAddress(std::string s)
 {
-	using namespace std;
-	
 	bool b = false;
 	try {
 		int i = atoi(s.substr(0,s.find(".")).c_str());
@@ -175,8 +166,8 @@ std::string leadingSpaces(int n)
 
 std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
 {
-	using namespace std;
-	
+    using std::vector;
+    using std::string;
 	vector<string> tokens;
 	
 	// skip delimiters at beginning:
@@ -213,8 +204,8 @@ std::vector<std::string> tokenize(const std::string& str, const std::string& del
 
 std::vector<float> floatsFromString (std::string theString)
 {
-	using namespace std;
-	
+    using std::string;
+    using std::vector;
 	// This function takes an std::string and uses spaces to
 	// tokenize the string into a vector of floats. If the
 	// tokens are symbolic instead of numeric, they are ignored.

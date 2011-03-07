@@ -80,15 +80,15 @@ class SoundNode : public DSPNode
 		void setIntensity(float newvalue);
 		
 		// GET methods:
-		const char* getRolloff() { return _rolloff.c_str(); }
-		float getSpread() { return _spread; }
-		float getLength() { return _length; }
+		const char* getRolloff() const { return _rolloff.c_str(); }
+		float getSpread() const { return _spread; }
+		float getLength() const { return _length; }
 
-		osg::Vec4 getDirectivityColor() { return directivityColor; }
+		osg::Vec4 getDirectivityColor() const { return directivityColor; }
 		
-		float getVUmeterFlag() { return VUmeterFlag; }
-		float getDirectivityFlag() { return directivityFlag; }
-		float getLaserFlag() { return laserFlag; }
+		float getVUmeterFlag() const { return VUmeterFlag; }
+		float getDirectivityFlag() const { return directivityFlag; }
+		float getLaserFlag() const { return laserFlag; }
 		
 		void updateVUmeter();
 		void updateLaser();
@@ -103,7 +103,7 @@ class SoundNode : public DSPNode
 		 * For each subclass of ReferencedNode, we override the getState() method to
 		 * fill the vector with the correct set of methods for this particular node
 		 */
-		virtual std::vector<lo_message> getState();
+		virtual std::vector<lo_message> getState() const;
 		
 		/**
 		 * We must include a stateDump() method that simply invokes the base class

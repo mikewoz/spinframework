@@ -40,6 +40,7 @@
 // -----------------------------------------------------------------------------
 
 #include "LightSource.h"
+#include <osg/LightSource>
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
@@ -80,7 +81,7 @@ LightSource::~LightSource()
 	
 	osg::Light *light;
 	osg::StateSet* thisStateSet = sceneManager->rootNode->getOrCreateStateSet();
-	if ( this->containsNode( lightSource.get() )) // kill light
+	if ( containsNode( lightSource.get() )) // kill light
 	{
 		light = lightSource->getLight();
 		sceneManager->activeLights[light->getLightNum()] = false;
@@ -260,7 +261,7 @@ void LightSource::drawLight()
 
 // *****************************************************************************
 
-std::vector<lo_message> LightSource::getState ()
+std::vector<lo_message> LightSource::getState() const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();
@@ -302,3 +303,11 @@ std::vector<lo_message> LightSource::getState ()
 	
 	return ret;
 }
+	
+int LightSource::getVisible() const	{ return (int) this->_visible; }
+float LightSource::getCutoff() const { return this->_cutoff; }
+float LightSource::getExponent() const { return this->_exponent; }
+float LightSource::getAttenuation()	const { return this->_attenuation; }
+osg::Vec4 LightSource::getAmbient() const { return this->_ambient; }
+osg::Vec4 LightSource::getDiffuse() const { return this->_diffuse; }
+osg::Vec4 LightSource::getSpecular() const { return this->_specular; }

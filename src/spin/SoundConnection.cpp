@@ -456,7 +456,7 @@ void SoundConnection::debug()
  * are always send with respect to the source node of the connection.
  * 
  */
-std::vector<lo_message> SoundConnection::getState ()
+std::vector<lo_message> SoundConnection::getState () const
 {
 	std::vector<lo_message> ret;
 	lo_message msg;

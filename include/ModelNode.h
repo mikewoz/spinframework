@@ -90,7 +90,7 @@ public:
 	 * over any textures or shaders withing the model
 	 */
 	void setModelFromFile		(const char *filename);
-	const char* getModelFromFile() { return modelPath.c_str(); }
+	const char* getModelFromFile() const { return modelPath.c_str(); }
 	
 	/**
 	 * The StateRegistration flag should be set if you want any textures or
@@ -100,7 +100,7 @@ public:
 	 * shader parameters, etc.
 	 */
 	void setStateRegistration	(int i);
-	int getStateRegistration() { return (int)_registerStates; }
+	int getStateRegistration() const { return (int)_registerStates; }
 
 	/**
 	 * Render bins allow you to control drawing order, and manage Z-fighting.
@@ -108,7 +108,7 @@ public:
 	 * Default renderBin = 11
 	 */
 	void setRenderBin			(int i);
-	int getRenderBin() { return _renderBin; }
+	int getRenderBin() const { return _renderBin; }
 
 	/**
 	 * Render bins allow you to control drawing order, and manage Z-fighting.
@@ -116,7 +116,7 @@ public:
 	 * Default renderBin = 11
 	 */
 	void setKeyframe (int index, float keyframe);
-	float getKeyframe(int index) { return _keyframe[index]; }
+	float getKeyframe(int index) const { return _keyframe[index]; }
 
 	/**
 	 * For statesets embedded in the model, it is possible to swap with some
@@ -131,7 +131,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	std::vector<t_symbol*> _statesetList;
 

@@ -196,7 +196,7 @@ void MeasurementNode::setReportingLevel (reportMode level)
 
 // *****************************************************************************
 
-std::vector<lo_message> MeasurementNode::getState ()
+std::vector<lo_message> MeasurementNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedNode::getState();

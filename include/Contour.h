@@ -42,8 +42,10 @@
 #ifndef Contour_H_
 #define Contour_H_
 
-#include <osg/Geode>
-#include <osg/PositionAttitudeTransform>
+namespace osg {
+    class Geode;
+    class PositionAttitudeTransform;
+}
 
 #include "ReferencedNode.h"
 
@@ -80,8 +82,8 @@ public:
 	virtual void callbackUpdate();
 	
 	void updateTransforms();
-	osg::Quat getOrientation(int index);
-	osg::Vec3 getTranslation(float index);
+	osg::Quat getOrientation(int index) const;
+	osg::Vec3 getTranslation(float index) const;
 	
 	void setCurrentIndex (float newValue);
 	void prev();
@@ -100,15 +102,15 @@ public:
 	void setColor (float newR, float newG, float newB, float newA);
 		
 	
-	float getCurrentIndex() { return _currentIndex; }
-	int getMaxVertices() { return _maxVertices; }
+	float getCurrentIndex() const { return _currentIndex; }
+	int getMaxVertices() const { return _maxVertices; }
 	
-	int getTrackingMode() { return (int) _trackingMode; }
+	int getTrackingMode() const { return (int) _trackingMode; }
 	
-	int getVisible() { return (int) _visible; }
-	float getThickness() { return _thickness; }
-	float getLineType() { return (int) _lineType; }
-	osg::Vec4 getColor() { return _color;  }
+	int getVisible() const { return (int) _visible; }
+	float getThickness() const { return _thickness; }
+	float getLineType() const { return (int) _lineType; }
+	osg::Vec4 getColor() const { return _color;  }
 	
 	
 	
@@ -119,7 +121,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 	
 	/**
 	 * We must include a stateDump() method that simply invokes the base class

@@ -42,12 +42,11 @@
 #ifndef LightSource_H_
 #define LightSource_H_
 
-
-#include "ReferencedNode.h"
 #include "GroupNode.h"
 
-#include <osg/Light>
-#include <osg/LightSource>
+namespace osg {
+    class LightSource;
+}
 
 /**
  * \brief A light source, with controllable intensity, color, etc.
@@ -71,20 +70,19 @@ public:
 	void setDiffuse		(float red, float green, float blue, float alpha);
 	void setSpecular	(float red, float green, float blue, float alpha);
 
-	int getVisible() 		{ return (int) this->_visible; }
-	float getCutoff()		{ return this->_cutoff; };
-	float getExponent()		{ return this->_exponent; };
-	float getAttenuation()	{ return this->_attenuation; };
-	osg::Vec4 getAmbient()	{ return this->_ambient; };
-	osg::Vec4 getDiffuse()	{ return this->_diffuse; };
-	osg::Vec4 getSpecular()	{ return this->_specular; };
-
+	int getVisible() const;
+	float getCutoff() const;
+	float getExponent() const;
+	float getAttenuation() const;
+	osg::Vec4 getAmbient() const;
+	osg::Vec4 getDiffuse() const;
+	osg::Vec4 getSpecular() const;
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	/**
 	 * We must include a stateDump() method that simply invokes the base class

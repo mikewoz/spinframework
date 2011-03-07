@@ -503,7 +503,7 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 
 }
 
-std::vector<lo_message> ShapeNode::getState ()
+std::vector<lo_message> ShapeNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();

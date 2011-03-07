@@ -192,7 +192,7 @@ void GridNode::drawGrid()
 
 // *****************************************************************************
 
-std::vector<lo_message> GridNode::getState ()
+std::vector<lo_message> GridNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedNode::getState();

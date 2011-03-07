@@ -384,7 +384,7 @@ void SharedVideoNode::drawTexture()
 
 }
 
-std::vector<lo_message> SharedVideoNode::getState ()
+std::vector<lo_message> SharedVideoNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ShapeNode::getState();

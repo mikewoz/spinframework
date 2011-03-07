@@ -46,6 +46,9 @@
 
 #include <osg/AnimationPath>
 
+// forward declarations
+class SceneManager;
+
 /**
  * \brief Node for encapsulating 3D animation
  */
@@ -84,12 +87,12 @@ public:
      * interpolated in between control points.
      */
 	void setUpdateRate (float hz);
-	float getUpdateRate() { return _updateRate; }
+	float getUpdateRate() const { return _updateRate; }
 	
 	
 	
 	void setPlay (int p);
-	int getPlay() { return (int) _play; }
+	int getPlay() const { return (int) _play; }
 		
     /**
      * Turns on/off automatic recording. This implies that whenever the node
@@ -98,13 +101,13 @@ public:
      * of the recording.
      */
 	void setRecord (int r);
-	int getRecord() { return (int) _record; }
+	int getRecord() const { return (int) _record; }
 	
 	/**
 	 * Sets the loop mode for the animation. eg, SWING, LOOP, NO_LOOPING.
 	 */
 	void setLoopMode (LoopMode mode);
-	int getLoopMode() { return (int) _animationPath->getLoopMode(); }
+	int getLoopMode() const { return (int) _animationPath->getLoopMode(); }
 	
 	/**
 	 * Override setTranslation so we can store updates in record mode
@@ -145,17 +148,12 @@ public:
 	 */
 	void clear() { _animationPath->clear(); }
 
-	
-	
-
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
-	
-	
 protected:
 	
 	bool _play, _record;

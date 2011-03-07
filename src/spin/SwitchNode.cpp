@@ -43,6 +43,7 @@
 #include <osgUtil/Optimizer>
 #include <osg/Geometry>
 #include <osgUtil/SmoothingVisitor>
+#include <lo/lo_types.h>
 
 #include "SwitchNode.h"
 #include "SceneManager.h"
@@ -50,16 +51,13 @@
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-using namespace std;
-
 //extern SceneManager *sceneManager;
-
-
 
 // *****************************************************************************
 // constructor:
 SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
+    using std::string;
 	this->setName(string(id->s_name) + ".SwitchNode");
 	nodeType = "SwitchNode";
 
@@ -130,7 +128,7 @@ void SwitchNode::setAll(int enabled)
 
 // *****************************************************************************
 
-std::vector<lo_message> SwitchNode::getState ()
+std::vector<lo_message> SwitchNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();

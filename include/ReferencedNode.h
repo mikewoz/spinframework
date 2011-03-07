@@ -174,7 +174,7 @@ public:
     /**
      * Returns the current parent name (string)
      */
-    char *getParent() { return parent->s_name; }
+    char *getParent() const { return parent->s_name; }
 
     /**
      * Returns the current parent as an osg::Group
@@ -193,13 +193,13 @@ public:
     virtual void setContext (const char *newvalue);
 
     void setAlpha (float alpha);
-    float getAlpha() { return subgraphAlpha_; }
+    float getAlpha() const { return subgraphAlpha_; }
 
     /**
      * Returns the current host
      */
-    const char *getContext() { return contextString.c_str(); }
-    std::string getContextString() { return contextString; }
+    const char *getContext() const { return contextString.c_str(); }
+    std::string getContextString() const { return contextString; }
 
     void setParam (const char *paramName, const char *paramValue);
     void setParam (const char *paramName, float paramValue);
@@ -211,7 +211,7 @@ public:
      * local coordinate system of this node (according to the subgraph). This
      * function returns a pointer to this node.
      */
-    osg::Group *getAttachmentNode() { return attachmentNode; }
+    osg::Group *getAttachmentNode() const { return attachmentNode; }
 
     /**
      * Debug print (to log/console)
@@ -222,7 +222,7 @@ public:
      * For each subclass of ReferencedNode, we override the getState() method to
      * fill the vector with the correct set of methods for this particular node.
      */
-    virtual std::vector<lo_message> getState();
+    virtual std::vector<lo_message> getState() const;
 
     /**
      * StateDump() is a request to broadcast the node state via SceneManager.

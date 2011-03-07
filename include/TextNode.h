@@ -116,25 +116,23 @@ public:
 
 
 	//const char *getTextValue() { return textLabel->getText().createUTF8EncodedString().c_str(); }
-	const char	*getTextValue()		{ return _text.c_str(); }
-	std::string	 getTextString()	{ return _text; }
-	const char	*getFont()			{ return _font.c_str(); }
-	float		 getSize()			{ return _size; }
-	osg::Vec4	 getColor()			{ return _color; };
-	osg::Vec4	 getBgColor()		{ return _bgColor; }
-	float		 getMargin()		{ return _margin; }
+	const char	*getTextValue() const   { return _text.c_str(); }
+	std::string	 getTextString() const  { return _text; }
+	const char	*getFont() const        { return _font.c_str(); }
+	float		 getSize() const		{ return _size; }
+	osg::Vec4	 getColor() const		{ return _color; };
+	osg::Vec4	 getBgColor() const	    { return _bgColor; }
+	float		 getMargin() const		{ return _margin; }
 
-	int			 getBillboard()		{ return (int)_billboard; }
-	int			 getDecoration()	{ return (int)_decoration; }
-	int			 getBackround()		{ return (int)_background; }
-
-
+	int			 getBillboard()  const { return (int)_billboard; }
+	int			 getDecoration() const { return (int)_decoration; }
+	int			 getBackround() const   { return (int)_background; }
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 
 private:

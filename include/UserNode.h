@@ -95,7 +95,7 @@ class UserNode : public ConstraintsNode
 
 
 		// GET methods:
-		const char* getDescription() { return description_.c_str(); }
+		const char* getDescription() const { return description_.c_str(); }
 
 
 		/**
@@ -108,17 +108,17 @@ class UserNode : public ConstraintsNode
 		* If we attach geometry under this, the camera will point at the center
 		* of that geometry instead.
 		*/
-		osg::Group *getCameraAttachmentNode() { return cameraAttachmentNode; }
+		osg::Group *getCameraAttachmentNode() const { return cameraAttachmentNode; }
 		
 		// ping message
 		void ping();
-		osg::Timer_t getLastPing() { return lastPing_; }
+		osg::Timer_t getLastPing() const { return lastPing_; }
 
 		/**
 		 * For each subclass of ReferencedNode, we override the getState() method to
 		 * fill the vector with the correct set of methods for this particular node
 		 */
-		virtual std::vector<lo_message> getState();
+		virtual std::vector<lo_message> getState() const;
 
 
 

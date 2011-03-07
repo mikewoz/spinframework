@@ -75,31 +75,31 @@ public:
 	 * contains a sequence of images to stitch into a video.
 	 */
 	void setPath (const char* newPath);
-	const char *getPath() { return _path.c_str(); }
+	const char *getPath() const { return _path.c_str(); }
 
 	/**
 	 * Enable (1) or disable (0) looping of the video
 	 */
 	void setLoop (int i);
-	int getLoop() { return (int)_loop; }
+	int getLoop() const { return (int)_loop; }
 
 	/**
 	 * Normalized seek to a part of the video. ie, index in range [0,1]
 	 */
 	void setIndex (float f);
-	float getIndex() { return _index; }
+	float getIndex() const { return _index; }
 
 	/**
 	 * Only for image sequences; tells OSG how fast to play the sequence
 	 */
 	void setFrameRate (float f);
-	float getFrameRate() { return _framerate; }
+	float getFrameRate() const { return _framerate; }
 	
 	/**
 	 * Play (1) or Pause (0) the video
 	 */
 	void setPlay (int i);
-	int getPlay() { return (int)_play; }
+	int getPlay() const { return (int)_play; }
 
 	
 	/**
@@ -119,7 +119,7 @@ public:
 	//bool isValid() { return (_imageStream.valid() || _imageSequence.valid()); }
 
 	// must reimplement
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	
 private:

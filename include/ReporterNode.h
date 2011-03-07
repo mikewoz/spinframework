@@ -51,9 +51,6 @@ typedef struct _reporterTarget {
 	bool contained;
 } reporterTarget;
 
-typedef std::map< std::string, bool > reportingType;
-
-
 /**
  * \brief Reports geometric relations to other nodes in the scene
  * 
@@ -116,24 +113,25 @@ public:
 	 * This enables or disables a particular reporting type
 	 */
 	void setReporting(const char *type, bool enabled);
-	int getReporting(const char *type) { return (int)this->reporting_[type]; }
+	int getReporting(const char *type) const;
 
 	/**
 	 * Set the maximum reporting rate (hz). Note: updates are only sent when
 	 * necessary, so there is no constant reporting mode.
 	 */
 	void setMaxRate(float hz);
-	float getMaxRate() { return maxRate_; }
+	float getMaxRate() const { return maxRate_; }
 	
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 	
 private:
 	
-	reportingType reporting_;
+    typedef std::map< std::string, bool > ReportingType;
+	ReportingType reporting_;
 
 	std::vector<reporterTarget> targets_;
 	osg::Matrix matrix_;

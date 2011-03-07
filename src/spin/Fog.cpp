@@ -40,10 +40,12 @@
 // -----------------------------------------------------------------------------
 
 #include <iostream>
+#include <osg/Fog>
 
 #include "Fog.h"
-#include "spinApp.h"
+#include "spinApp.h" // for BROADCAST
 #include "spinBaseContext.h"
+#include "SceneManager.h"
 
 
 // *****************************************************************************
@@ -81,6 +83,8 @@ void Fog::setFogDensity (float density)
 	BROADCAST(this, "sf", "setFogDensity", getFogDensity());
 }
 
+float Fog::getFogDensity() const { return fog_->getDensity(); }
+
 void Fog::setFogColor (float r, float g, float b, float a)
 {
 	osg::Vec4 newColor = osg::Vec4(r, g, b, a);
@@ -89,8 +93,10 @@ void Fog::setFogColor (float r, float g, float b, float a)
 	BROADCAST(this, "sffff", "setFogColor", r, g, b, a);
 }
 
+osg::Vec4 Fog::getFogColor() const { return fog_->getColor(); }
+
 // *****************************************************************************
-std::vector<lo_message> Fog::getState ()
+std::vector<lo_message> Fog::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedStateSet::getState();

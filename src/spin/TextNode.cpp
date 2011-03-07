@@ -42,6 +42,7 @@
 #include <osgText/Text>
 #include <osg/Billboard>
 #include <osg/Version>
+#include <lo/lo_types.h>
 
 #include "osgUtil.h"
 #include "TextNode.h"
@@ -50,18 +51,14 @@
 #include "spinBaseContext.h"
 #include "MediaManager.h"
 
-
-
-using namespace std;
-
-
 extern pthread_mutex_t sceneMutex;
-
 
 // ===================================================================
 // constructor:
 TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
+    using std::string;
+
 	this->setName(string(id->s_name) + ".TextNode");
 	nodeType = "TextNode";
 
@@ -107,6 +104,7 @@ void TextNode::setContext (const char *newvalue)
 
 void TextNode::setTextValue (const char *s)
 {
+    using std::string;
 	//if (textLabel->getText().createUTF8EncodedString() != string(s))
 	if (_text != string(s))
 	{
@@ -126,6 +124,7 @@ void TextNode::setTextValue (const char *s)
 
 void TextNode::setFont (const char *s)
 {
+    using std::string;
 	if (this->_font != string(s))
 	{
 		this->_font = string(s);
@@ -197,6 +196,7 @@ void TextNode::setBackground (backgroundType t)
 // =============================================================================
 void TextNode::drawText()
 {
+    using std::string;
 	osg::Billboard *b;
 	
     pthread_mutex_lock(&sceneMutex);
@@ -306,7 +306,7 @@ void TextNode::drawText()
 }
 
 // =============================================================================
-std::vector<lo_message> TextNode::getState ()
+std::vector<lo_message> TextNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();

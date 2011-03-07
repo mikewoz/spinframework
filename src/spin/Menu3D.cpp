@@ -375,7 +375,7 @@ void Menu3D::setColor (float r, float g, float b, float a)
 }
 
 // -----------------------------------------------------------------------------
-std::vector<lo_message> Menu3D::getState ()
+std::vector<lo_message> Menu3D::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();
@@ -391,7 +391,7 @@ std::vector<lo_message> Menu3D::getState ()
 	lo_message_add(msg, "sfff", "getItemOffset", v3.x(), v3.y(), v3.z());
 	ret.push_back(msg);
 	
-	MenuVector::iterator i;
+	MenuVector::const_iterator i;
     for (i = items_.begin(); i != items_.end(); i++)
     {
     	if ((*i).valid())

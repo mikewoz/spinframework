@@ -269,8 +269,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                     // if this node is owned by the event's user, then we apply the
                     // motion relative to the user's current position/orientation:
 
-                    osg::Matrix targMatrix = this->getGlobalMatrix();
-                    osg::Matrix userMatrix = user->getGlobalMatrix();
+                    const osg::Matrix targMatrix = this->getGlobalMatrix();
+                    const osg::Matrix userMatrix = user->getGlobalMatrix();
 
                     float distance = (targMatrix.getTrans() - userMatrix.getTrans()).length();
 
@@ -578,7 +578,7 @@ osg::Matrix GroupNode::getGlobalMatrix()
     return _globalMatrix;
 }
 
-osg::Vec3 GroupNode::getCenter()
+osg::Vec3 GroupNode::getCenter() const
 {
     const osg::BoundingSphere& bs = this->getBound();
     //osg::BoundingSphere& bs = this->computeBound();
@@ -647,7 +647,7 @@ void GroupNode::stateDump ()
 // *****************************************************************************
 
 
-std::vector<lo_message> GroupNode::getState ()
+std::vector<lo_message> GroupNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedNode::getState();

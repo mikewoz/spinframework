@@ -44,13 +44,11 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
-using namespace std;
-
-
 // *****************************************************************************
 // constructor:
 UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
 {
+    using std::string;
     nodeType = "UserNode";
     this->setName(string(id->s_name) + ".UserNode");
 
@@ -103,6 +101,7 @@ void UserNode::updateNodePath()
 
 void UserNode::setDescription (const char *newvalue)
 {
+    using std::string;
     description_ = string(newvalue);
     BROADCAST(this, "ss", "setDescription", getDescription());
 }
@@ -115,7 +114,7 @@ void UserNode::ping()
 
 // *****************************************************************************
 
-std::vector<lo_message> UserNode::getState ()
+std::vector<lo_message> UserNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ConstraintsNode::getState();

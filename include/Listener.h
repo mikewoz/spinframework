@@ -63,11 +63,11 @@ class Listener : public SoundNode
 		 * For each subclass of ReferencedNode, we override the getState() method to
 		 * fill the vector with the correct set of methods for this particular node
 		 */
-		virtual std::vector<lo_message> getState();
+		virtual std::vector<lo_message> getState() const;
 		
 		
 		void setType	(const char* t);
-		const char* getType() { return type.c_str(); }
+		const char* getType() const { return type.c_str(); }
 		
 		std::string type;
 		

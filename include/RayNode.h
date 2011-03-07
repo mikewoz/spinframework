@@ -68,17 +68,17 @@ public:
 	void setThickness	(float thickness);
 	void setColor		(float red, float green, float blue, float alpha);
 
-	int getVisible() { return (int) this->visible; }
-	float getLength() { return this->length; };
-	float getThickness() { return this->thickness; };
-	osg::Vec4 getColor() { return this->color;  };
+	int getVisible() const { return (int) this->visible; }
+	float getLength() const { return this->length; };
+	float getThickness() const { return this->thickness; };
+	osg::Vec4 getColor() const { return this->color;  };
 
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	/**
 	 * We must include a stateDump() method that simply invokes the base class

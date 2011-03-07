@@ -182,20 +182,20 @@ public:
 	virtual void rotate (float pitch, float roll, float yaw);
 
 
-	int getReportMode() { return (int) _reportMode; };
-	int getInteractionMode() { return (int) _interactionMode; };
-	osg::Vec3 getClipping() { return _clipping; };
-	osg::Vec3 getTranslation() { return mainTransform->getPosition(); };
-	osg::Vec3 getOrientation() { return _orientation; };
-	osg::Vec3 getScale() { return mainTransform->getScale(); };
-	osg::Vec3 getVelocity() { return _velocity; };
-	int getVelocityMode() { return (int) _velocityMode; };
-	float getDamping() { return _damping; };
+	int getReportMode() const { return (int) _reportMode; };
+	int getInteractionMode() const { return (int) _interactionMode; };
+	osg::Vec3 getClipping() const { return _clipping; };
+	osg::Vec3 getTranslation() const { return mainTransform->getPosition(); };
+	osg::Vec3 getOrientation() const { return _orientation; };
+	osg::Vec3 getScale() const { return mainTransform->getScale(); };
+	osg::Vec3 getVelocity() const { return _velocity; };
+	int getVelocityMode() const { return (int) _velocityMode; };
+	float getDamping() const { return _damping; };
 	//osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
 
 
 	osg::Matrix getGlobalMatrix();
-	osg::Vec3 getCenter();
+	osg::Vec3 getCenter() const;
 
 	
 	/**
@@ -216,7 +216,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	/**
 	 * We override stateDump so that we can additionally force a dumpGlobals()

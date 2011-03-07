@@ -76,15 +76,15 @@ class SoundConnection : virtual public osg::Node
 		void setDopplerEffect (float newvalue);
 		void setDiffractionEffect (float newvalue);
 		
-		int   getThru() { return (int) thru; };
-		float getDistanceEffect() { return distanceEffect; };
-		float getRolloffEffect() { return rolloffEffect; };
-		float getDopplerEffect() { return dopplerEffect; };
-		float getDiffractionEffect() { return diffractionEffect; };
+		int   getThru() const { return (int) thru; };
+		float getDistanceEffect() const { return distanceEffect; };
+		float getRolloffEffect() const { return rolloffEffect; };
+		float getDopplerEffect() const { return dopplerEffect; };
+		float getDiffractionEffect() const { return diffractionEffect; };
 
 		
 		void debug();
-		virtual std::vector<lo_message> getState();
+		virtual std::vector<lo_message> getState() const;
 		virtual void stateDump();
 		virtual void stateDump(lo_address addr);
 		

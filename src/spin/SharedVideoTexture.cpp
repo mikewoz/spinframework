@@ -127,7 +127,7 @@ void SharedVideoTexture::setTextureID (const char* newID)
 }
 
 // *****************************************************************************
-std::vector<lo_message> SharedVideoTexture::getState ()
+std::vector<lo_message> SharedVideoTexture::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedStateSet::getState();

@@ -2141,7 +2141,7 @@ bool SceneManager::loadXML(const char *s)
     }
 
     // Now see if there is a <connections> tag:
-    if (root = doc.FirstChild( "statesets" ))
+    if ((root = doc.FirstChild( "statesets" )))
     {
         for( child = root->FirstChildElement(); child; child = child->NextSiblingElement() )
         {

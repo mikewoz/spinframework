@@ -51,10 +51,6 @@
 #include "VideoTexture.h"
 
 
-
-using namespace std;
-
-
 // *****************************************************************************
 // constructor:
 VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
@@ -351,7 +347,7 @@ void VideoTexture::flipVertical()
 
 
 // *****************************************************************************
-std::vector<lo_message> VideoTexture::getState ()
+std::vector<lo_message> VideoTexture::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedStateSet::getState();

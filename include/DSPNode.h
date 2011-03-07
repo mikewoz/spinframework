@@ -42,13 +42,12 @@
 #ifndef __DSPNode_H
 #define __DSPNode_H
 
-#include <osg/Referenced>
-
-#include "ReferencedNode.h"
+#include <vector>
+#include <lo/lo_types.h>
 #include "GroupNode.h"
-#include "SoundConnection.h"
 
 class SoundConnection;
+class SceneManager;
 
 /**
  * \brief The base class for 3D audio nodes
@@ -88,8 +87,8 @@ public:
 		//virtual void connectionMsg (char *snkName, char *method, float value);
 
 		
-		int getActive() { return (int)active; }
-		const char* getPlugin() { return plugin.c_str(); }
+		int getActive() const { return (int)active; }
+		const char* getPlugin() const { return plugin.c_str(); }
 		
 		/**
 		 * We maintian 2 lists of all SoundConnection for this node (it is
@@ -108,7 +107,7 @@ public:
 		 * For each subclass of ReferencedNode, we override the getState() method to
 		 * fill the vector with the correct set of methods for this particular node
 		 */
-		virtual std::vector<lo_message> getState();
+		virtual std::vector<lo_message> getState() const;
 		
 		/**
 		 * We must include a stateDump() method that simply invokes the base class

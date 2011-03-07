@@ -702,7 +702,7 @@ void PointerNode::pull (float f)
 
 // *****************************************************************************
 
-std::vector<lo_message> PointerNode::getState ()
+std::vector<lo_message> PointerNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedNode::getState();

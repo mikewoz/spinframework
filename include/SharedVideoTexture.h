@@ -90,12 +90,12 @@ public:
 	~SharedVideoTexture();
 
 	void setTextureID(const char *id);
-	const char* getTextureID() { return textureID.c_str(); }
+	const char* getTextureID() const { return textureID.c_str(); }
 
 	// hack to get SceneManager::createStateSet to work:
-	const char* getPath() { return textureID.c_str(); }
+	const char* getPath() const { return textureID.c_str(); }
 		
-	std::vector<lo_message> getState ();
+	std::vector<lo_message> getState () const;
 	
 #ifdef WITH_SHARED_VIDEO
 	void updateCallback();

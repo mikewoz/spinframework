@@ -373,7 +373,7 @@ void SoundNode::drawLaser()
 	}
 }
 
-std::vector<lo_message> SoundNode::getState ()
+std::vector<lo_message> SoundNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = DSPNode::getState();

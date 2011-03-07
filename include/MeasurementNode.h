@@ -111,15 +111,15 @@ public:
 	void setReportingLevel (reportMode level);
 	
 
-	const char* getTarget() { return this->targetName_->s_name; }
-	int getReportingLevel() { return (int) this->reportingLevel_; }
+	const char* getTarget() const { return this->targetName_->s_name; }
+	int getReportingLevel() const { return (int) this->reportingLevel_; }
 	
 	
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 	
 private:
 	

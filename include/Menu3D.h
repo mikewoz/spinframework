@@ -64,7 +64,7 @@ public:
 	virtual void updateNodePath();
 
 	void setEnabled(int i);
-	int getEnabled() { return enabled_; }
+	int getEnabled() const { return enabled_; }
 	
 	/**
 	 * Add an item (TextNode) to the list
@@ -87,7 +87,7 @@ public:
 	void setHighlighted(int itemIndex);
 	void setHighlighted(const char *itemID);
 	int doHighlight(osg::observer_ptr<TextNode> n);
-	const char *getHighlighted() { if (highlighted_.valid()) return highlighted_->id->s_name; else return "NULL"; }
+	const char *getHighlighted() const { if (highlighted_.valid()) return highlighted_->id->s_name; else return "NULL"; }
 
 
 
@@ -95,7 +95,7 @@ public:
 	 * Set the color of the font when highlighted
 	 */
 	void setHighlightColor(float r, float g, float b, float a);
-	osg::Vec4 getHighlightColor() { return highlightColor_; }
+	osg::Vec4 getHighlightColor() const { return highlightColor_; }
 
 	void highlightNext();
 	void highlightPrev();
@@ -106,7 +106,7 @@ public:
 	 * Each successive menu item will appear at an offset from the previous
 	 */
 	void setItemOffset(float x, float y, float z);
-	osg::Vec3 getItemOffset() { return itemOffset_; }
+	osg::Vec3 getItemOffset() const { return itemOffset_; }
 	
 	/**
 	 * wrapped from TextNode:
@@ -125,7 +125,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 
 private:

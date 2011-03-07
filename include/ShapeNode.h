@@ -89,14 +89,14 @@ public:
 
 	void setStateSetFromFile(const char* filename);
 	void setStateSet		(const char* s);
-	const char *getStateSet () { return stateset->s_name; }
+	const char *getStateSet () const { return stateset->s_name; }
 	void updateStateSet		();
 
-	int getShape() { return (int)shape; }
-	int getBillboard() { return (int)billboard; }
-	osg::Vec4 getColor() { return _color; };
-	int getRenderBin() { return renderBin; }
-	int getLighting() { return (int)lightingEnabled; }
+	int getShape() const { return (int)shape; }
+	int getBillboard() const { return (int)billboard; }
+	osg::Vec4 getColor() const { return _color; };
+	int getRenderBin() const { return renderBin; }
+	int getLighting() const { return (int)lightingEnabled; }
 
 	
 	//void addSharedVideoTexture(osg::Node *n, std::string shID);
@@ -110,7 +110,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 
 

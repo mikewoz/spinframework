@@ -73,7 +73,7 @@ void Listener::setType (const char* t)
     BROADCAST(this, "ss", "setType", getType());
 }
 
-std::vector<lo_message> Listener::getState ()
+std::vector<lo_message> Listener::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = SoundNode::getState();

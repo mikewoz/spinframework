@@ -42,10 +42,12 @@
 #ifndef GridNode_H_
 #define GridNode_H_
 
-#include <osg/Geode>
-
-
+#include <osg/Vec4>
 #include "ReferencedNode.h"
+
+namespace osg {
+    class Geode;
+}
 
 /**
  * \brief Draws a tiled grid, which is useful for debugging and measurements
@@ -69,15 +71,15 @@ public:
 	 */
 	void setColor		(float red, float green, float blue, float alpha);
 
-	int getSize() { return (int) this->_size; }
-	osg::Vec4 getColor() { return this->_color;  };
+	int getSize() const { return (int) this->_size; }
+	osg::Vec4 getColor() const { return this->_color;  };
 
 
 	/**
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 
 private:

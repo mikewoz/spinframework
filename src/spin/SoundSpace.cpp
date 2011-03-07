@@ -95,7 +95,7 @@ void SoundSpace::setTransition (t_floatarg newval)
 	BROADCAST(this, "sf", "setTransition", transition);
 }
 
-std::vector<lo_message> SoundSpace::getState ()
+std::vector<lo_message> SoundSpace::getState () const
 {
 	std::vector<lo_message> ret;
 	return ret;

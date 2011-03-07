@@ -75,7 +75,7 @@ class SoundSpace : public DSPNode
 		 * For each subclass of ReferencedNode, we override the getState() method to
 		 * fill the vector with the correct set of methods for this particular node
 		 */
-		virtual std::vector<lo_message> getState();
+		virtual std::vector<lo_message> getState() const;
 		
 		/**
 		 * We must include a stateDump() method that simply invokes the base class

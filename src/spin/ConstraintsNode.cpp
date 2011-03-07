@@ -446,7 +446,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 
 
 // *****************************************************************************
-std::vector<lo_message> ConstraintsNode::getState ()
+std::vector<lo_message> ConstraintsNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = GroupNode::getState();

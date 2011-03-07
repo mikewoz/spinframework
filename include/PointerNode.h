@@ -89,14 +89,14 @@ public:
 	void highlight (int b);
 	void manipulate (int b);
 	
-	const char* getType() { return draggerType.c_str(); }
-	int getHighlight() { return (int) dragger.valid(); }
-	int getManipulate() { return (int) doManipulation; }
+	const char* getType() const { return draggerType.c_str(); }
+	int getHighlight() const { return (int) dragger.valid(); }
+	int getManipulate() const { return (int) doManipulation; }
 	
 	// grab stuff:
 	void grab (int b);
 	void pull (float f);
-	int getGrab() { return (int) grabbedNode.valid(); }
+	int getGrab() const { return (int) grabbedNode.valid(); }
 		
 
 	
@@ -104,7 +104,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 	
 	/**
 	 * We must include a stateDump() method that simply invokes the base class

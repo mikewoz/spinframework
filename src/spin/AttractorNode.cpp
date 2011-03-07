@@ -269,7 +269,7 @@ void AttractorNode::removeTarget (const char *targetID)
 // *****************************************************************************
 
 
-std::vector<lo_message> AttractorNode::getState ()
+std::vector<lo_message> AttractorNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = GroupNode::getState();
@@ -277,7 +277,7 @@ std::vector<lo_message> AttractorNode::getState ()
     lo_message msg;
     osg::Vec3 v;
 
-    targetVector::iterator t;
+    targetVector::const_iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
     	if ((*t).valid())

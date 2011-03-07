@@ -216,7 +216,7 @@ void ReferencedStateSet::debug()
 }
 
 // *****************************************************************************
-std::vector<lo_message> ReferencedStateSet::getState ()
+std::vector<lo_message> ReferencedStateSet::getState () const
 {
 	std::vector<lo_message> ret;
 

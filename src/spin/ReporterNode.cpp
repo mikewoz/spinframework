@@ -137,7 +137,7 @@ void ReporterNode::sendReports(reporterTarget *target)
 
 	// check that at least one report is required:
 	bool allDisabled = true;
-    for (reportingType::iterator i=reporting_.begin(); i!=reporting_.end(); i++)
+    for (ReportingType::iterator i=reporting_.begin(); i!=reporting_.end(); i++)
     {
 	    if (i->second) allDisabled = false;
     }
@@ -327,7 +327,7 @@ void ReporterNode::removeTarget (const char *targetID)
 void ReporterNode::setReporting (const char *type, bool enabled)
 {
 	// make sure type exists:
-	reportingType::iterator typeKey = reporting_.find(type);
+	ReportingType::iterator typeKey = reporting_.find(type);
 	if (typeKey!=reporting_.end())
 	{
 		reporting_[type] = enabled;
@@ -363,13 +363,13 @@ void ReporterNode::setMaxRate(float hz)
 
 // *****************************************************************************
 
-std::vector<lo_message> ReporterNode::getState ()
+std::vector<lo_message> ReporterNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedNode::getState();
     lo_message msg;
 
-    reportingType::iterator i;
+    ReportingType::const_iterator i;
     for (i=reporting_.begin(); i!=reporting_.end(); i++)
     {
         msg = lo_message_new();
@@ -377,7 +377,7 @@ std::vector<lo_message> ReporterNode::getState ()
         ret.push_back(msg);
     }
 
-    std::vector<reporterTarget>::iterator t;
+    std::vector<reporterTarget>::const_iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
     	if ((*t).node.valid())
@@ -395,3 +395,17 @@ std::vector<lo_message> ReporterNode::getState ()
 
     return ret;
 }
+	
+int ReporterNode::getReporting(const char *type) const 
+{ 
+    // don't do return (int)reporting_[type] because if report_[type] doesn't 
+    // exist, it will be created with a default value
+    std::map<std::string, bool>::const_iterator iter = reporting_.find(type);
+    if (iter != reporting_.end())
+        return iter->second;
+    else
+        return 0; // default value for bool == false, which as an int will be 0
+}
+
+
+

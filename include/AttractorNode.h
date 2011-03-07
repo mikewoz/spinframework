@@ -44,8 +44,7 @@
 #define __AttractorNode_H
 
 #include "GroupNode.h"
-
-typedef std::vector< osg::observer_ptr<GroupNode> > targetVector;
+class SceneManager;
 
 /**
  * \brief A node to attract (or repulse) other nodes
@@ -77,7 +76,7 @@ public:
 	 * implies a constant decay (independent of distance).
 	 */
 	void setDistanceDecay(float decay);
-	float getDistanceDecay() { return distanceDecay_; }
+	float getDistanceDecay() const { return distanceDecay_; }
 
 	/**
 	 * setAngularDecay specifies how the attractive force decays as a function
@@ -87,19 +86,19 @@ public:
 	 * target.
 	 */
 	void setAngularDecay(float decay);
-	float getAngularDecay() { return angularDecay_; }
+	float getAngularDecay() const { return angularDecay_; }
 
 	/**
 	 * Change the mode (see attractorMode enum).
 	 */
 	void setAttractorMode(attractorMode m);
-	int getAttractorMode() { return (int)mode_; }
+	int getAttractorMode() const { return (int)mode_; }
 
 	/**
 	 * Set the attractive force (negative force for repulsion)
 	 */
 	void setForce(float force);
-	float getForce() { return force_; }
+	float getForce() const { return force_; }
 
 	/**
 	 * Add a target node to the list
@@ -116,7 +115,7 @@ public:
 	 * For each subclass of ReferencedNode, we override the getState() method to
 	 * fill the vector with the correct set of methods for this particular node
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 protected:
 	
@@ -125,6 +124,8 @@ protected:
 	float distanceDecay_;
 	float angularDecay_;
 	
+    typedef std::vector< osg::observer_ptr<GroupNode> > targetVector;
+
 	targetVector targets_;
 
 private:

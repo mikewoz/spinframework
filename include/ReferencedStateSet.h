@@ -68,7 +68,7 @@ public:
 	/**
 	 * Abstract method getPath needs to be implemented
 	 */
-	virtual const char *getPath() = 0;
+	virtual const char *getPath() const = 0;
 
 	/**
 	* Remove this stateset from all parents... essentially destroying the state,
@@ -89,7 +89,7 @@ public:
 	 * Just like a ReferencedNode, each subclass of ReferencedStateSet must
 	 * override the getState() method to pass it's current state.
 	 */
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	/**
 	 * StateDump() is a request to broadcast the node state via SceneManager.

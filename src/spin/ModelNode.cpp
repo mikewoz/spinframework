@@ -538,7 +538,7 @@ void ModelNode::drawModel()
 	pthread_mutex_unlock(&sceneMutex);
 }
 
-std::vector<lo_message> ModelNode::getState ()
+std::vector<lo_message> ModelNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();

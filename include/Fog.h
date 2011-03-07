@@ -42,14 +42,20 @@
 #ifndef __Fog_H
 #define __Fog_H
 
-#include "SceneManager.h"
-#include <osg/Fog>
 #include <osg/Vec4>
+#include "ReferencedStateSet.h"
+
+namespace osg {
+    class Fog;
+}
 
 /**
  * \brief Basic GL Fog
  *
  */
+
+class SceneManager;
+
 class Fog : public ReferencedStateSet
 {
 
@@ -59,22 +65,22 @@ public:
 	~Fog();
 
 	// need to implement abstract method... ?!
-	const char *getPath() { return ""; }
+	const char *getPath() const { return ""; }
 	
 	/**
 	 * Set fog density (good values are around 0.001 - 0.1)
 	 */
 	void setFogDensity (float density);
-	float getFogDensity() { return fog_->getDensity(); }
+	float getFogDensity() const;
 
 	/**
 	 * Set fog color
 	 */
 	void setFogColor (float r, float g, float b, float a);
-	osg::Vec4 getFogColor() { return fog_->getColor(); }
+	osg::Vec4 getFogColor() const;
 
 	// must reimplement
-	virtual std::vector<lo_message> getState();
+	virtual std::vector<lo_message> getState() const;
 
 	
 private:

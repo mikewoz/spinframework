@@ -41,20 +41,18 @@
 
 #include <osg/StateSet>
 #include <osg/StateAttribute>
+#include <osg/TextureRectangle>
+#include <osg/Texture2D>
 #include <osgDB/ReadFile>
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
 
 #include <iostream>
 
+#include "SceneManager.h"
 #include "ImageTexture.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-
-
-
-using namespace std;
-
 
 // *****************************************************************************
 // constructor:
@@ -180,7 +178,7 @@ void ImageTexture::setRenderBin (int i)
 }
 
 // *****************************************************************************
-std::vector<lo_message> ImageTexture::getState ()
+std::vector<lo_message> ImageTexture::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedStateSet::getState();
@@ -202,3 +200,4 @@ std::vector<lo_message> ImageTexture::getState ()
 	return ret;
 }
 
+bool ImageTexture::isValid() const { return (_image.valid()); }

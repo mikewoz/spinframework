@@ -489,7 +489,7 @@ void ReferencedNode::debug()
     BROADCAST(this, "s", "debug");
 }
 
-std::vector<lo_message> ReferencedNode::getState ()
+std::vector<lo_message> ReferencedNode::getState () const
 {
     std::vector<lo_message> ret;
 
@@ -507,7 +507,7 @@ std::vector<lo_message> ReferencedNode::getState ()
     lo_message_add(msg, "sf", "setAlpha", this->getAlpha());
     ret.push_back(msg);
 
-    stringParamType::iterator stringIter;
+    stringParamType::const_iterator stringIter;
     for (stringIter=stringParams.begin(); stringIter!=stringParams.end(); stringIter++ )
     {
         msg = lo_message_new();
@@ -515,7 +515,7 @@ std::vector<lo_message> ReferencedNode::getState ()
         ret.push_back(msg);
     }
 
-    floatParamType::iterator floatIter;
+    floatParamType::const_iterator floatIter;
     for (floatIter=floatParams.begin(); floatIter!=floatParams.end(); floatIter++ )
     {
         msg = lo_message_new();
@@ -524,7 +524,7 @@ std::vector<lo_message> ReferencedNode::getState ()
     }
 
 
-    for ( CronScriptList::iterator it = _cronScriptList.begin();
+    for ( CronScriptList::const_iterator it = _cronScriptList.begin();
           it != _cronScriptList.end(); it++ ) {
 
         if ( !it->second ) continue;
@@ -538,7 +538,7 @@ std::vector<lo_message> ReferencedNode::getState ()
         ret.push_back(msg);
     }
 
-    for( EventScriptList::iterator it = _eventScriptList.begin();
+    for( EventScriptList::const_iterator it = _eventScriptList.begin();
          it != _eventScriptList.end(); it++ ) {
 
         if ( !it->second ) continue;
@@ -940,9 +940,6 @@ bool ReferencedNode::removeEventScript( const char* label ) {
 
     return false;
 }
-
-
-
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
