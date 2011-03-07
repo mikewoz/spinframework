@@ -51,46 +51,46 @@
 
 class wxSpinConfig: public wxPanel
 {
-	public:
+    public:
 
-		wxSpinConfig(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
-		virtual ~wxSpinConfig();
+        wxSpinConfig(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+        virtual ~wxSpinConfig();
 
-		//(*Declarations(wxSpinConfig)
-		wxTextCtrl* rxPort;
-		wxTextCtrl* rxAddr;
-		wxTextCtrl* txAddr;
-		wxStaticText* StaticText2;
-		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
-		wxStaticText* StaticText5;
-		wxTextCtrl* spinID;
-		wxTextCtrl* txPort;
-		wxStaticText* StaticText4;
-		wxPanel* spinConfigPanel;
-		//*)
+        //(*Declarations(wxSpinConfig)
+        wxTextCtrl* rxPort;
+        wxTextCtrl* rxAddr;
+        wxTextCtrl* txAddr;
+        wxStaticText* StaticText2;
+        wxStaticText* StaticText1;
+        wxStaticText* StaticText3;
+        wxStaticText* StaticText5;
+        wxTextCtrl* spinID;
+        wxTextCtrl* txPort;
+        wxStaticText* StaticText4;
+        wxPanel* spinConfigPanel;
+        //*)
 
-	private:
+    private:
 
-		//(*Identifiers(wxSpinConfig)
-		static const long ID_STATICTEXT1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_STATICTEXT2;
-		static const long ID_TEXTCTRL2;
-		static const long ID_STATICTEXT3;
-		static const long ID_TEXTCTRL3;
-		static const long ID_STATICTEXT4;
-		static const long ID_TEXTCTRL4;
-		static const long ID_STATICTEXT5;
-		static const long ID_TEXTCTRL5;
-		static const long ID_PANEL1;
-		//*)
+        //(*Identifiers(wxSpinConfig)
+        static const long ID_STATICTEXT1;
+        static const long ID_TEXTCTRL1;
+        static const long ID_STATICTEXT2;
+        static const long ID_TEXTCTRL2;
+        static const long ID_STATICTEXT3;
+        static const long ID_TEXTCTRL3;
+        static const long ID_STATICTEXT4;
+        static const long ID_TEXTCTRL4;
+        static const long ID_STATICTEXT5;
+        static const long ID_TEXTCTRL5;
+        static const long ID_PANEL1;
+        //*)
 
-		//(*Handlers(wxSpinConfig)
-		void OnClose(wxCloseEvent& event);
-		//*)
+        //(*Handlers(wxSpinConfig)
+        void OnClose(wxCloseEvent& event);
+        //*)
 
-		DECLARE_EVENT_TABLE()
+        DECLARE_EVENT_TABLE()
 };
 
 #endif

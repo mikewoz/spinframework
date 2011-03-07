@@ -60,50 +60,50 @@ class ReferencedStateSet : virtual public osg::StateSet
 
 public:
 
-	ReferencedStateSet(SceneManager *sceneManager, const char *initID);
-	~ReferencedStateSet();
+    ReferencedStateSet(SceneManager *sceneManager, const char *initID);
+    ~ReferencedStateSet();
 
-	virtual void updateCallback();
+    virtual void updateCallback();
 
-	/**
-	 * Abstract method getPath needs to be implemented
-	 */
-	virtual const char *getPath() const = 0;
+    /**
+     * Abstract method getPath needs to be implemented
+     */
+    virtual const char *getPath() const = 0;
 
-	/**
-	* Remove this stateset from all parents... essentially destroying the state,
-	* since no reference to it will exist anymore, and OSG will kill it.
-	*/
-	void removeFromScene();
+    /**
+    * Remove this stateset from all parents... essentially destroying the state,
+    * since no reference to it will exist anymore, and OSG will kill it.
+    */
+    void removeFromScene();
 
-	/**
-	 * Replaces a StateSet in the scene graph with this one. ie, goes through
-	 * all parents of the provided stateset and replaces the object's state with
-	 * this.
-	 */ 
-	void replace(osg::StateSet *ss);
-	
-	virtual void debug();
-	
-	/**
-	 * Just like a ReferencedNode, each subclass of ReferencedStateSet must
-	 * override the getState() method to pass it's current state.
-	 */
-	virtual std::vector<lo_message> getState() const;
+    /**
+     * Replaces a StateSet in the scene graph with this one. ie, goes through
+     * all parents of the provided stateset and replaces the object's state with
+     * this.
+     */ 
+    void replace(osg::StateSet *ss);
+    
+    virtual void debug();
+    
+    /**
+     * Just like a ReferencedNode, each subclass of ReferencedStateSet must
+     * override the getState() method to pass it's current state.
+     */
+    virtual std::vector<lo_message> getState() const;
 
-	/**
-	 * StateDump() is a request to broadcast the node state via SceneManager.
-	 */
-	virtual void stateDump();
-	virtual void stateDump(lo_address txAddr);
-	
-	
-	SceneManager *sceneManager;
-	t_symbol *id;
-	std::string classType;
+    /**
+     * StateDump() is a request to broadcast the node state via SceneManager.
+     */
+    virtual void stateDump();
+    virtual void stateDump(lo_address txAddr);
+    
+    
+    SceneManager *sceneManager;
+    t_symbol *id;
+    std::string classType;
 
 private:
-	
+    
 
 
 };
@@ -112,17 +112,17 @@ typedef std::vector< osg::ref_ptr<ReferencedStateSet> > stateListType;
 
 class ReferencedStateSet_callback : public osg::StateSet::StateSet::Callback
 {
-	public:
-		
-		virtual void operator()(osg::StateSet* ss, osg::NodeVisitor* /*nv*/)
-		{
-			osg::ref_ptr<ReferencedStateSet> thisState = dynamic_cast<ReferencedStateSet*> (ss->getUserData());
+    public:
+        
+        virtual void operator()(osg::StateSet* ss, osg::NodeVisitor* /*nv*/)
+        {
+            osg::ref_ptr<ReferencedStateSet> thisState = dynamic_cast<ReferencedStateSet*> (ss->getUserData());
 
-			if (thisState.valid())
-			{
-				thisState->updateCallback();
-			}
-		}
+            if (thisState.valid())
+            {
+                thisState->updateCallback();
+            }
+        }
 };
 
 

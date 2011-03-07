@@ -67,89 +67,89 @@ class ConstraintsNode : public GroupNode
 {
 
 public:
-	
+    
 
-	ConstraintsNode(SceneManager *sceneManager, char *initID);
-	virtual ~ConstraintsNode();
-	
-	/**
-	 * The following constraints are available:
-	 *
-	 * BASIC:
-	 * The node is just constrained within a cubic volume. Important note: the
-	 * BASIC constraint is always maintained, even if another mode is chosen.
-	 *
-	 * DROP:
-	 * The node sits on the surface of the target subgraph (ie, follows local
-	 * Z-axis down until it finds an intersection with the target surface)
-	 *
-	 * COLLIDE:
-	 * A form of collision detection, where the node is blocked by the parent's
-	 * surface. Note: this only works when node is moved using the
-	 * "translate" command.
-	 *
-	 * BOUNCE:
-	 * A form of collision detection, where the node reflects off the parent's
-	 * surface, and travels in the reflected direction (ie, the orientation of
-	 * the node is changed). Note: this only works when node is moved using the
-	 * "translate" command.
-	 *
-	 */
-	enum constraintMode {	BASIC,
-							DROP,
-							COLLIDE,
-							BOUNCE
-						};
+    ConstraintsNode(SceneManager *sceneManager, char *initID);
+    virtual ~ConstraintsNode();
+    
+    /**
+     * The following constraints are available:
+     *
+     * BASIC:
+     * The node is just constrained within a cubic volume. Important note: the
+     * BASIC constraint is always maintained, even if another mode is chosen.
+     *
+     * DROP:
+     * The node sits on the surface of the target subgraph (ie, follows local
+     * Z-axis down until it finds an intersection with the target surface)
+     *
+     * COLLIDE:
+     * A form of collision detection, where the node is blocked by the parent's
+     * surface. Note: this only works when node is moved using the
+     * "translate" command.
+     *
+     * BOUNCE:
+     * A form of collision detection, where the node reflects off the parent's
+     * surface, and travels in the reflected direction (ie, the orientation of
+     * the node is changed). Note: this only works when node is moved using the
+     * "translate" command.
+     *
+     */
+    enum constraintMode {    BASIC,
+                            DROP,
+                            COLLIDE,
+                            BOUNCE
+                        };
 
-		
-	virtual void callbackUpdate();
-	
-	void setTarget(const char *id);
-	const char *getTarget() const { return _target->s_name; }
-	
-	void setConstraintMode(constraintMode m);
-	int getConstraintMode() const { return (int)_mode; };
-	
-	void setCubeSize(float xScale, float yScale, float zScale);
-	void setCubeOffset(float x, float y, float z);
+        
+    virtual void callbackUpdate();
+    
+    void setTarget(const char *id);
+    const char *getTarget() const { return _target->s_name; }
+    
+    void setConstraintMode(constraintMode m);
+    int getConstraintMode() const { return (int)_mode; };
+    
+    void setCubeSize(float xScale, float yScale, float zScale);
+    void setCubeOffset(float x, float y, float z);
 
-	osg::Vec3 getCubeSize() const { return _cubeSize; }
-	osg::Vec3 getCubeOffset() const { return _cubeOffset; }
+    osg::Vec3 getCubeSize() const { return _cubeSize; }
+    osg::Vec3 getCubeOffset() const { return _cubeOffset; }
 
-	virtual void setTranslation (float x, float y, float z);
-	virtual void translate (float x, float y, float z);
-	virtual void move (float x, float y, float z);
-	
-	/**
-	 * A pseudo-recursive function that checks if a translation results in one
-	 * or more intersections with the target node. If no intersection, this
-	 * method defaults to just a setTranslation call. Otherwise, it will do a
-	 * setTranslation for the collision point, and call itself again until there
-	 * are no collisions left.
-	 */
-	void applyConstrainedTranslation(osg::Vec3 v);
-	
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState() const;
+    virtual void setTranslation (float x, float y, float z);
+    virtual void translate (float x, float y, float z);
+    virtual void move (float x, float y, float z);
+    
+    /**
+     * A pseudo-recursive function that checks if a translation results in one
+     * or more intersections with the target node. If no intersection, this
+     * method defaults to just a setTranslation call. Otherwise, it will do a
+     * setTranslation for the collision point, and call itself again until there
+     * are no collisions left.
+     */
+    void applyConstrainedTranslation(osg::Vec3 v);
+    
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
-	
+    
 private:
-	
-	enum constraintMode _mode;
-	
-	t_symbol* _target;
+    
+    enum constraintMode _mode;
+    
+    t_symbol* _target;
 
-	osg::Vec3 _cubeSize;
-	osg::Vec3 _cubeOffset;
+    osg::Vec3 _cubeSize;
+    osg::Vec3 _cubeOffset;
 
-	osg::ref_ptr< osg::Drawable > lastDrawable;
-	int lastPrimitiveIndex;
-	int recursionCounter;
+    osg::ref_ptr< osg::Drawable > lastDrawable;
+    int lastPrimitiveIndex;
+    int recursionCounter;
 };
 
 
-	
+    
 #endif

@@ -84,9 +84,9 @@ class spinLog;
 class SceneManager
 {
     public:
-		//SceneManager(const std::string &id);
-		SceneManager(std::string id);
-	    ~SceneManager();
+        //SceneManager(const std::string &id);
+        SceneManager(std::string id);
+        ~SceneManager();
 
         void init();
         void debug();
@@ -114,10 +114,10 @@ class SceneManager
         ReferencedStateSet* createStateSet(const char *id, const char *type);
         ReferencedStateSet* createStateSet(const char *fname);
 
-		std::vector<t_symbol*> findNodes(const char *pattern);
-		//nodeListType findNodes(const char *pattern);
-		//ReferencedStateSetList findStateSet(const char *pattern);
-			
+        std::vector<t_symbol*> findNodes(const char *pattern);
+        //nodeListType findNodes(const char *pattern);
+        //ReferencedStateSetList findStateSet(const char *pattern);
+            
         std::vector<SoundConnection*> getConnections();
 
         /**
@@ -145,14 +145,14 @@ class SceneManager
          */
         void doDelete(ReferencedNode *n);
 
-		/**
+        /**
          * The doDelete method performs all of the necessary steps to delete a
          * stateset. It is similar to the doDelete method for a note: it calls
-		 * the node's removeFromScene() method, releases resources (eg, videos),
-		 * removes it from the stateMap list, etc.
+         * the node's removeFromScene() method, releases resources (eg, videos),
+         * removes it from the stateMap list, etc.
          */
-		void doDelete(ReferencedStateSet *n);
-		
+        void doDelete(ReferencedStateSet *n);
+        
         /**
          * Clears scene elements that are not part of any user's subgraphs
          */

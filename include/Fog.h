@@ -61,31 +61,31 @@ class Fog : public ReferencedStateSet
 
 public:
 
-	Fog(SceneManager *sceneManager, const char *initID);
-	~Fog();
+    Fog(SceneManager *sceneManager, const char *initID);
+    ~Fog();
 
-	// need to implement abstract method... ?!
-	const char *getPath() const { return ""; }
-	
-	/**
-	 * Set fog density (good values are around 0.001 - 0.1)
-	 */
-	void setFogDensity (float density);
-	float getFogDensity() const;
+    // need to implement abstract method... ?!
+    const char *getPath() const { return ""; }
+    
+    /**
+     * Set fog density (good values are around 0.001 - 0.1)
+     */
+    void setFogDensity (float density);
+    float getFogDensity() const;
 
-	/**
-	 * Set fog color
-	 */
-	void setFogColor (float r, float g, float b, float a);
-	osg::Vec4 getFogColor() const;
+    /**
+     * Set fog color
+     */
+    void setFogColor (float r, float g, float b, float a);
+    osg::Vec4 getFogColor() const;
 
-	// must reimplement
-	virtual std::vector<lo_message> getState() const;
+    // must reimplement
+    virtual std::vector<lo_message> getState() const;
 
-	
+    
 private:
-	
-	osg::ref_ptr<osg::Fog> fog_;
+    
+    osg::ref_ptr<osg::Fog> fog_;
 
 };
 

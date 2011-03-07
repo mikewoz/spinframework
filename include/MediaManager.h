@@ -55,27 +55,27 @@
  */
 class MediaManager
 {
-	public:
-		
-		MediaManager(const std::string &dataPath);
-		~MediaManager();
-		
-		std::string getDataPath() const { return dataPath; }
-		
-		std::string getImagePath(const std::string &s) const;
-		std::string getModelPath(const std::string &s) const;
-		std::string getSoundPath(const std::string &s) const;
-		
-		std::string getImagePath(int id) const;
-		std::string getModelPath(int id) const;
-		std::string getSoundPath(int id) const;
-		
-		std::string getImageName(int id) const;
-		std::string getModelName(int id) const;
-		std::string getSoundName(int id) const;
+    public:
+        
+        MediaManager(const std::string &dataPath);
+        ~MediaManager();
+        
+        std::string getDataPath() const { return dataPath; }
+        
+        std::string getImagePath(const std::string &s) const;
+        std::string getModelPath(const std::string &s) const;
+        std::string getSoundPath(const std::string &s) const;
+        
+        std::string getImagePath(int id) const;
+        std::string getModelPath(int id) const;
+        std::string getSoundPath(int id) const;
+        
+        std::string getImageName(int id) const;
+        std::string getModelName(int id) const;
+        std::string getSoundName(int id) const;
 
-	private:
-		std::string dataPath;
+    private:
+        std::string dataPath;
 };
 
 

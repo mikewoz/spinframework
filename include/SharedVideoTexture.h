@@ -49,7 +49,7 @@
 
 #include "ReferencedStateSet.h"
 
-#ifdef WITH_SHARED_VIDEO		
+#ifdef WITH_SHARED_VIDEO        
 #include <scenic/sharedVideoBuffer.h>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
@@ -86,65 +86,65 @@ class SharedVideoTexture : public ReferencedStateSet
 
 public:
 
-	SharedVideoTexture(SceneManager *sceneManager, const char *initID);
-	~SharedVideoTexture();
+    SharedVideoTexture(SceneManager *sceneManager, const char *initID);
+    ~SharedVideoTexture();
 
-	void setTextureID(const char *id);
-	const char* getTextureID() const { return textureID.c_str(); }
+    void setTextureID(const char *id);
+    const char* getTextureID() const { return textureID.c_str(); }
 
-	// hack to get SceneManager::createStateSet to work:
-	const char* getPath() const { return textureID.c_str(); }
-		
-	std::vector<lo_message> getState () const;
-	
+    // hack to get SceneManager::createStateSet to work:
+    const char* getPath() const { return textureID.c_str(); }
+        
+    std::vector<lo_message> getState () const;
+    
 #ifdef WITH_SHARED_VIDEO
-	void updateCallback();
-	
-	void consumeFrame();
-	void signalKilled();
+    void updateCallback();
+    
+    void consumeFrame();
+    void signalKilled();
 
-	void start();
-	void stop();
+    void start();
+    void stop();
 #endif
-		
+        
 
 private:
-	
-	std::string textureID;
-	
-	osg::ref_ptr<osg::Texture2D> tex;
-	osg::ref_ptr<osg::Image> img;
-	
-	int width, height;
-		
-	osg::Timer_t lastTick;
-		
-	bool killed_;
-	
+    
+    std::string textureID;
+    
+    osg::ref_ptr<osg::Texture2D> tex;
+    osg::ref_ptr<osg::Image> img;
+    
+    int width, height;
+        
+    osg::Timer_t lastTick;
+        
+    bool killed_;
+    
 
-#ifdef WITH_SHARED_VIDEO		
-	boost::thread worker_;
-	boost::mutex displayMutex_;
-	boost::condition_variable textureUploadedCondition_;
-	SharedVideoBuffer *sharedBuffer;
+#ifdef WITH_SHARED_VIDEO        
+    boost::thread worker_;
+    boost::mutex displayMutex_;
+    boost::condition_variable textureUploadedCondition_;
+    SharedVideoBuffer *sharedBuffer;
 #endif
-		
+        
 };
 
 /*
 class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::Callback
 {
 
-	public:
-		virtual void operator()(osg::StateAttribute* attr, osg::NodeVisitor* nv)
-		{
-			osg::ref_ptr<SharedVideoTexture> thisAttr = dynamic_cast<SharedVideoTexture*> (attr->getUserData());
+    public:
+        virtual void operator()(osg::StateAttribute* attr, osg::NodeVisitor* nv)
+        {
+            osg::ref_ptr<SharedVideoTexture> thisAttr = dynamic_cast<SharedVideoTexture*> (attr->getUserData());
 
-			if (thisAttr != NULL)
-			{
-				thisAttr->updateCallback();
-			}
-		}
+            if (thisAttr != NULL)
+            {
+                thisAttr->updateCallback();
+            }
+        }
 };
 */
 

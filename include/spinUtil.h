@@ -107,15 +107,15 @@ bool isBroadcastAddress(const std::string &s);
 
 template <class T> bool fromString(T& t, const std::string& s)
 {
-	std::istringstream iss(s);
-	return !(iss >> t).fail();
+    std::istringstream iss(s);
+    return !(iss >> t).fail();
 }
 
 /*
 template <typename T> bool fromString(T &aValue, const std::string &aStr)
 {
-	std::stringstream ss(aStr);
-	return ss >> aValue;
+    std::stringstream ss(aStr);
+    return ss >> aValue;
 }
 */
 

@@ -9,13 +9,13 @@
 
 #include <ostream>
 namespace logstream_helper {
-	class logInterface : public std::streambuf
-	{
-		public:
-			virtual int overflow(int c = EOF) = 0;	
-			virtual void start_dump() =0;
-			virtual void stop_dump() =0;
-	};
+    class logInterface : public std::streambuf
+    {
+        public:
+            virtual int overflow(int c = EOF) = 0;    
+            virtual void start_dump() =0;
+            virtual void stop_dump() =0;
+    };
 }
 
-#endif	//_LOGINTERFACE_H_
+#endif    //_LOGINTERFACE_H_

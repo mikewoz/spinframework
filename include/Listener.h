@@ -53,27 +53,27 @@
  */
 class Listener : public SoundNode
 {
-	
-	public:
-		
-		Listener(SceneManager *sceneManager, char *initID);
-		virtual ~Listener();
-		
-		/**
-		 * For each subclass of ReferencedNode, we override the getState() method to
-		 * fill the vector with the correct set of methods for this particular node
-		 */
-		virtual std::vector<lo_message> getState() const;
-		
-		
-		void setType	(const char* t);
-		const char* getType() const { return type.c_str(); }
-		
-		std::string type;
-		
-		
-	private:
-		
+    
+    public:
+        
+        Listener(SceneManager *sceneManager, char *initID);
+        virtual ~Listener();
+        
+        /**
+         * For each subclass of ReferencedNode, we override the getState() method to
+         * fill the vector with the correct set of methods for this particular node
+         */
+        virtual std::vector<lo_message> getState() const;
+        
+        
+        void setType    (const char* t);
+        const char* getType() const { return type.c_str(); }
+        
+        std::string type;
+        
+        
+    private:
+        
 
 };
 

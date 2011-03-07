@@ -63,50 +63,50 @@ class ImageTexture : public ReferencedStateSet
 
 public:
 
-	ImageTexture(SceneManager *sceneManager, const char *initID);
-	~ImageTexture();
+    ImageTexture(SceneManager *sceneManager, const char *initID);
+    ~ImageTexture();
 
-	virtual void debug();
-	
-	/**
-	 * Returns whether there is a currently valid image texture
-	 */
-	bool isValid() const;
+    virtual void debug();
+    
+    /**
+     * Returns whether there is a currently valid image texture
+     */
+    bool isValid() const;
 
-	/**
-	 * Creates a texture from a path on disk.
-	 */
-	void setPath (const char* newPath);
-	const char *getPath() const { return _path.c_str(); }
+    /**
+     * Creates a texture from a path on disk.
+     */
+    void setPath (const char* newPath);
+    const char *getPath() const { return _path.c_str(); }
 
-	/**
-	 * Set whether the texture is influenced by lighting
-	 */
-	void setLighting(int i);
-	int getLighting() const { return (int)_lightingEnabled; }
+    /**
+     * Set whether the texture is influenced by lighting
+     */
+    void setLighting(int i);
+    int getLighting() const { return (int)_lightingEnabled; }
 
-	/**
-	 * Set the render bin for this texture. The higher the number, the later it
-	 * gets processed (ie, it appears on top). Default renderBin = 11
-	 */
-	void setRenderBin (int i);
-	int getRenderBin() const { return _renderBin; }
+    /**
+     * Set the render bin for this texture. The higher the number, the later it
+     * gets processed (ie, it appears on top). Default renderBin = 11
+     */
+    void setRenderBin (int i);
+    int getRenderBin() const { return _renderBin; }
 
 
 
-	// must reimplement
-	virtual std::vector<lo_message> getState() const;
+    // must reimplement
+    virtual std::vector<lo_message> getState() const;
 
-	
+    
 private:
-	
-	osg::ref_ptr<osg::Image> _image;
+    
+    osg::ref_ptr<osg::Image> _image;
 
-	std::string _path;
+    std::string _path;
 
-	bool _lightingEnabled;
-	int  _renderBin;
-	bool _useTextureRectangle;
+    bool _lightingEnabled;
+    int  _renderBin;
+    bool _useTextureRectangle;
 };
 
 

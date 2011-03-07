@@ -55,10 +55,10 @@
 
 
 #ifdef __APPLE__
-	#if !defined(isnan)
-		#include <math.h> // dont_vxl_filter: this is *not* supposed to be <cmath>
-		#define isnan(x) __inline_isnand((double)x)
-	#endif
+    #if !defined(isnan)
+        #include <math.h> // dont_vxl_filter: this is *not* supposed to be <cmath>
+        #define isnan(x) __inline_isnand((double)x)
+    #endif
 #endif
 
 
@@ -95,44 +95,44 @@ osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle);
 osg::Quat EulerToQuat(float roll, float pitch, float yaw);
 osg::Vec3 QuatToEuler(osg::Quat q);
 
-//osg::Geode* 	createGrid(int radius, osg::Vec4 color);
-osg::Geometry*	createPlane(float halfLength, osg::Vec4 color);
-osg::Geode*		createHollowSphere(float radius, osg::Vec4 color);
-osg::Geode*		createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color);
-osg::Geode*		createHollowCone(float length, float radius, osg::Vec4 color);
+//osg::Geode*     createGrid(int radius, osg::Vec4 color);
+osg::Geometry*    createPlane(float halfLength, osg::Vec4 color);
+osg::Geode*        createHollowSphere(float radius, osg::Vec4 color);
+osg::Geode*        createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color);
+osg::Geode*        createHollowCone(float length, float radius, osg::Vec4 color);
 
 
 // can't make this work (argh!):
 /*
 class worldMatrixUpdater : public osg::NodeVisitor
 {
-	public:
-		
-		worldMatrixUpdater() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
-		
-		virtual void apply(osg::PositionAttitudeTransform &node)
-	  {
+    public:
+        
+        worldMatrixUpdater() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
+        
+        virtual void apply(osg::PositionAttitudeTransform &node)
+      {
 
-			ss_soundNode *ourNode = dynamic_cast<ss_soundNode*>(node.getUserData());
-			osg::Matrix mat = osg::computeWorldToLocal( getNodePath() );
-			osg::Vec3 trans = mat.getTrans();
-			osg::notify(osg::NOTICE) << "global position of '" << ourNode->id->s_name << "' is (" << trans.x() << "," << trans.y() << "," << trans.z() << ")" << std::endl;
-			//ourNode->worldMatrix = osg::computeWorldToLocal( getNodePath() );
-			traverse(node);
+            ss_soundNode *ourNode = dynamic_cast<ss_soundNode*>(node.getUserData());
+            osg::Matrix mat = osg::computeWorldToLocal( getNodePath() );
+            osg::Vec3 trans = mat.getTrans();
+            osg::notify(osg::NOTICE) << "global position of '" << ourNode->id->s_name << "' is (" << trans.x() << "," << trans.y() << "," << trans.z() << ")" << std::endl;
+            //ourNode->worldMatrix = osg::computeWorldToLocal( getNodePath() );
+            traverse(node);
 
-			
-			//for (unsigned int i = 0; i< node.getNumChildren(); i++)
-			//{
-			//	osg::ref_ptr<osg::PositionAttitudeTransform> nd = dynamic_cast<osg::PositionAttitudeTransform*>( node.getChild(i) );
-			//	if ( nd.valid() ) traverse(*(nd.get()));
-			//}
-			
-		}
-		
-		virtual void apply(osg::Node &node) { traverse(node); }		 
-		virtual void apply(osg::Geode &node) { traverse(node); }
-		virtual void apply(osg::Group &node) { traverse(node); }
-		
+            
+            //for (unsigned int i = 0; i< node.getNumChildren(); i++)
+            //{
+            //    osg::ref_ptr<osg::PositionAttitudeTransform> nd = dynamic_cast<osg::PositionAttitudeTransform*>( node.getChild(i) );
+            //    if ( nd.valid() ) traverse(*(nd.get()));
+            //}
+            
+        }
+        
+        virtual void apply(osg::Node &node) { traverse(node); }         
+        virtual void apply(osg::Geode &node) { traverse(node); }
+        virtual void apply(osg::Group &node) { traverse(node); }
+        
 };
 */
 

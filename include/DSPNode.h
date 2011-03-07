@@ -64,74 +64,74 @@ class DSPNode : public GroupNode
 {
 
 public:
-		
-		DSPNode (SceneManager *sceneManager, char *initID);
-		virtual ~DSPNode();
-		
-		//virtual void callbackUpdate();
-		
-		SoundConnection *getConnection(DSPNode *snk);
-		SoundConnection *getConnection(const char *snk);
+        
+        DSPNode (SceneManager *sceneManager, char *initID);
+        virtual ~DSPNode();
+        
+        //virtual void callbackUpdate();
+        
+        SoundConnection *getConnection(DSPNode *snk);
+        SoundConnection *getConnection(const char *snk);
 
-		
+        
 
-		void connect(DSPNode *snk);
-		void connect(const char *snk);
-		void connectSource(const char *src);
+        void connect(DSPNode *snk);
+        void connect(const char *snk);
+        void connectSource(const char *src);
 
-		void disconnect(const char *snk);
-		void setActive (int i);
-		void setPlugin (const char *filename);
-		
-		// for sending messages to the connections of this (source) node:
-		//virtual void connectionMsg (char *snkName, char *method, float value);
+        void disconnect(const char *snk);
+        void setActive (int i);
+        void setPlugin (const char *filename);
+        
+        // for sending messages to the connections of this (source) node:
+        //virtual void connectionMsg (char *snkName, char *method, float value);
 
-		
-		int getActive() const { return (int)active; }
-		const char* getPlugin() const { return plugin.c_str(); }
-		
-		/**
-		 * We maintian 2 lists of all SoundConnection for this node (it is
-		 * redundant, but useful to have both forward and backward connection
-		 * pointers).
-		 */
-		std::vector<SoundConnection*> connectTO;
-		/**
-		 * We maintian 2 lists of all SoundConnection for this node (it is
-		 * redundant, but useful to have both forward and backward connection
-		 * pointers).
-		 */
-		std::vector<SoundConnection*> connectFROM;
-		
-		/**
-		 * For each subclass of ReferencedNode, we override the getState() method to
-		 * fill the vector with the correct set of methods for this particular node
-		 */
-		virtual std::vector<lo_message> getState() const;
-		
-		/**
-		 * We must include a stateDump() method that simply invokes the base class
-		 * method. Simple C++ inheritance is not enough, because osg::Introspection
-		 * won't see it.
-		 */
-		//virtual void stateDump() { ReferencedNode::stateDump(); };
-		
-		
+        
+        int getActive() const { return (int)active; }
+        const char* getPlugin() const { return plugin.c_str(); }
+        
+        /**
+         * We maintian 2 lists of all SoundConnection for this node (it is
+         * redundant, but useful to have both forward and backward connection
+         * pointers).
+         */
+        std::vector<SoundConnection*> connectTO;
+        /**
+         * We maintian 2 lists of all SoundConnection for this node (it is
+         * redundant, but useful to have both forward and backward connection
+         * pointers).
+         */
+        std::vector<SoundConnection*> connectFROM;
+        
+        /**
+         * For each subclass of ReferencedNode, we override the getState() method to
+         * fill the vector with the correct set of methods for this particular node
+         */
+        virtual std::vector<lo_message> getState() const;
+        
+        /**
+         * We must include a stateDump() method that simply invokes the base class
+         * method. Simple C++ inheritance is not enough, because osg::Introspection
+         * won't see it.
+         */
+        //virtual void stateDump() { ReferencedNode::stateDump(); };
+        
+        
 private:
-	
-		bool active;
-		
-		/**
-		 * dsp name (this is the name of a pd abstraction that handles the dsp):
-		 */
-		std::string plugin;
-		
-		/**
-		 * This node should always broadcast global position and orientation 
-		 * so that any audio spatializer software listening to messages can use
-		 * the data without needing to understand and maintain a scene graph.
-		 */
-		osg::Matrix _globalMatrix;
+    
+        bool active;
+        
+        /**
+         * dsp name (this is the name of a pd abstraction that handles the dsp):
+         */
+        std::string plugin;
+        
+        /**
+         * This node should always broadcast global position and orientation 
+         * so that any audio spatializer software listening to messages can use
+         * the data without needing to understand and maintain a scene graph.
+         */
+        osg::Matrix _globalMatrix;
 
 };
 

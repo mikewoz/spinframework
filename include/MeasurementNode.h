@@ -53,11 +53,11 @@
  *
  * The following items are measured:
  *
- * distance		the distance to the target
- * direction	the absolute direction (angle) on the XY plane
- * incidence	the angle difference between the measurement node's current orientation to that which would point at the target
- * eulers		the angle difference separated into pitch, roll, and yaw components (NOTE: possible inaccuracies due to gimbal lock)
- * quaternion	the rotation required to point at the target
+ * distance        the distance to the target
+ * direction    the absolute direction (angle) on the XY plane
+ * incidence    the angle difference between the measurement node's current orientation to that which would point at the target
+ * eulers        the angle difference separated into pitch, roll, and yaw components (NOTE: possible inaccuracies due to gimbal lock)
+ * quaternion    the rotation required to point at the target
  *
  * Other notes:
  *
@@ -70,63 +70,63 @@ class MeasurementNode : public ReferencedNode
 
 public:
 
-	MeasurementNode(SceneManager *sceneManager, char *initID);
-	virtual ~MeasurementNode();
-	
-	/**
-	 * Level of reporting that is sent (see setReportingLevel for more details)
-	 *
-	 * REPORT_NONE		sends no measurements
-	 *
-	 * REPORT_BASIC		sends distance, absolute direction, and incidence of orientation
-	 *
-	 * REPORT_ANGLES	sends above info, plus rotation information to target with respect to the MeasurementNode's current position and orientation (available as either euler angles or quaternion)
-	 *
-	 */
-	enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES };
+    MeasurementNode(SceneManager *sceneManager, char *initID);
+    virtual ~MeasurementNode();
+    
+    /**
+     * Level of reporting that is sent (see setReportingLevel for more details)
+     *
+     * REPORT_NONE        sends no measurements
+     *
+     * REPORT_BASIC        sends distance, absolute direction, and incidence of orientation
+     *
+     * REPORT_ANGLES    sends above info, plus rotation information to target with respect to the MeasurementNode's current position and orientation (available as either euler angles or quaternion)
+     *
+     */
+    enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES };
 
-	/**
-	 * The update callback for MeasurementNode checks to see if the target's or
-	 * the MeasurementNode's global matrix has changed (ie, whether it has been
-	 * moved or not). If so, it updates the internal matrices, and calls
-	 * sendMeasurements()
-	 */
-	virtual void callbackUpdate();
+    /**
+     * The update callback for MeasurementNode checks to see if the target's or
+     * the MeasurementNode's global matrix has changed (ie, whether it has been
+     * moved or not). If so, it updates the internal matrices, and calls
+     * sendMeasurements()
+     */
+    virtual void callbackUpdate();
 
-	/**
-	 * sendMeasurements is where the actual computation takes place, and,
-	 * depending on the reportMode, the measurements are sent out on the network
-	 */
-	void sendMeasurements();
+    /**
+     * sendMeasurements is where the actual computation takes place, and,
+     * depending on the reportMode, the measurements are sent out on the network
+     */
+    void sendMeasurements();
 
-	/**
-	 * MeasurementNode requires a targetNode to be set, which defines which node
-	 * in the scene is being measured.
-	 */
-	void setTarget (const char *targetID);
+    /**
+     * MeasurementNode requires a targetNode to be set, which defines which node
+     * in the scene is being measured.
+     */
+    void setTarget (const char *targetID);
 
-	/**
-	 * This sets the level of reporting (choose a reportMode)
-	 */
-	void setReportingLevel (reportMode level);
-	
+    /**
+     * This sets the level of reporting (choose a reportMode)
+     */
+    void setReportingLevel (reportMode level);
+    
 
-	const char* getTarget() const { return this->targetName_->s_name; }
-	int getReportingLevel() const { return (int) this->reportingLevel_; }
-	
-	
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState() const;
-	
+    const char* getTarget() const { return this->targetName_->s_name; }
+    int getReportingLevel() const { return (int) this->reportingLevel_; }
+    
+    
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
+    
 private:
-	
-	t_symbol *targetName_;
-	reportMode reportingLevel_;
-	
-	osg::Matrix thisMatrix_, targetMatrix_;
+    
+    t_symbol *targetName_;
+    reportMode reportingLevel_;
+    
+    osg::Matrix thisMatrix_, targetMatrix_;
 };
 
 

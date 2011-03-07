@@ -69,35 +69,35 @@ class OSGCanvas;
 
 class wxSpinRenderer: public wxFrame
 {
-	public:
+    public:
 
-		wxSpinRenderer(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
-		virtual ~wxSpinRenderer();
+        wxSpinRenderer(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+        virtual ~wxSpinRenderer();
 
         void OnIdle(wxIdleEvent& event);
 
-	private:
+    private:
 
-		//(*Declarations(wxSpinRenderer)
-		wxToolBarToolBase* ToolBarItem1;
-		wxToolBar* wxSpinRenderer_ToolBar;
-		//*)
+        //(*Declarations(wxSpinRenderer)
+        wxToolBarToolBase* ToolBarItem1;
+        wxToolBar* wxSpinRenderer_ToolBar;
+        //*)
 
-		//(*Identifiers(wxSpinRenderer)
-		static const long spinRenderer_grid;
-		static const long ID_TOOLBAR1;
-		//*)
+        //(*Identifiers(wxSpinRenderer)
+        static const long spinRenderer_grid;
+        static const long ID_TOOLBAR1;
+        //*)
 
-		//(*Handlers(wxSpinRenderer)
-		void OnGridToggle(wxCommandEvent& event);
-		//*)
+        //(*Handlers(wxSpinRenderer)
+        void OnGridToggle(wxCommandEvent& event);
+        //*)
 
         OSGCanvas *canvas;
 
         osg::ref_ptr<osgViewer::CompositeViewer> viewer;
         //osg::ref_ptr<osgViewer::Viewer> viewer;
 
-		DECLARE_EVENT_TABLE()
+        DECLARE_EVENT_TABLE()
 };
 
 

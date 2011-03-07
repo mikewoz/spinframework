@@ -335,13 +335,13 @@ public:
 
 class ReferencedNode_data : public osg::Referenced
 {
-	public:
-		ReferencedNode_data(ReferencedNode *n) { node_ = n; }
-		//~ReferencedNode_data();
-		void update() { if (node_.valid()) node_->callbackUpdate(); }
+    public:
+        ReferencedNode_data(ReferencedNode *n) { node_ = n; }
+        //~ReferencedNode_data();
+        void update() { if (node_.valid()) node_->callbackUpdate(); }
 
-	private:
-		osg::observer_ptr<ReferencedNode> node_;
+    private:
+        osg::observer_ptr<ReferencedNode> node_;
 };
 
 

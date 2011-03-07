@@ -43,7 +43,7 @@
 #define __SPIN_DEFAULTS_H__
 
 namespace spin_defaults {
-	static const char *SCENE_ID = "default";
+    static const char *SCENE_ID = "default";
     static const char *INFO_UDP_PORT = "54320";
     static const char *SYNC_UDP_PORT = "54321";
     static const char *SERVER_TCP_PORT = "54322";

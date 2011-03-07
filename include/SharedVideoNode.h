@@ -65,52 +65,52 @@ class SharedVideoNode : public ShapeNode
 
 public:
 
-	SharedVideoNode(SceneManager *sceneManager, char *initID);
-	virtual ~SharedVideoNode();
+    SharedVideoNode(SceneManager *sceneManager, char *initID);
+    virtual ~SharedVideoNode();
 
-	virtual void callbackUpdate();
-	
-	// from tristan:
-	void consumeFrame();
-	void signalKilled();
-
-	virtual void setHost(const char *newvalue);
-	
-	void setTextureID(const char *id);
-	const char* getTextureID() { return textureID.c_str(); }
-	
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState() const;
-
-
-	
-private:
-	
-	std::string textureID;
-	osg::ref_ptr<osg::TextureRectangle> textureRect;
-
-	osg::ref_ptr<osg::Image> textureImage;
-	
-	int width, height;
-	
-	// from tristan:
-	boost::thread worker;
-	boost::mutex displayMutex_;
-	boost::condition_variable textureUploadedCondition_;
-	SharedVideoBuffer *sharedBuffer;
-	
-	boost::interprocess::shared_memory_object *shm;
-	boost::interprocess::mapped_region *region;    
+    virtual void callbackUpdate();
     
-	bool killed_;
+    // from tristan:
+    void consumeFrame();
+    void signalKilled();
+
+    virtual void setHost(const char *newvalue);
+    
+    void setTextureID(const char *id);
+    const char* getTextureID() { return textureID.c_str(); }
+    
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
 
-	// must override draw methods:
-	virtual void drawShape();
-	virtual void drawTexture();
+    
+private:
+    
+    std::string textureID;
+    osg::ref_ptr<osg::TextureRectangle> textureRect;
+
+    osg::ref_ptr<osg::Image> textureImage;
+    
+    int width, height;
+    
+    // from tristan:
+    boost::thread worker;
+    boost::mutex displayMutex_;
+    boost::condition_variable textureUploadedCondition_;
+    SharedVideoBuffer *sharedBuffer;
+    
+    boost::interprocess::shared_memory_object *shm;
+    boost::interprocess::mapped_region *region;    
+    
+    bool killed_;
+
+
+    // must override draw methods:
+    virtual void drawShape();
+    virtual void drawTexture();
 
 };
 

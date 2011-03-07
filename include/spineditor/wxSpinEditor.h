@@ -54,61 +54,61 @@
 
 class wxSpinEditor: public wxFrame
 {
-	public:
+    public:
 
-		wxSpinEditor(wxWindow* parent,wxWindowID id=wxID_ANY);
-		virtual ~wxSpinEditor();
+        wxSpinEditor(wxWindow* parent,wxWindowID id=wxID_ANY);
+        virtual ~wxSpinEditor();
 
-		//(*Declarations(wxSpinEditor)
-		wxToolBarToolBase* ToolBarItem4;
-		wxToolBarToolBase* ToolBarItem3;
-		wxSplitterWindow* spinEditor_splitter;
-		wxSpinTreeCtrl* spinTree;
-		wxToolBarToolBase* ToolBarItem1;
-		wxToolBar* wxSpinEditor_ToolBar;
-		wxPanel* editorPanel;
-		wxToolBarToolBase* ToolBarItem5;
-		wxPanel* treePanel;
-		wxSpinPropGrid* SpinPropGrid;
-		wxToolBarToolBase* ToolBarItem2;
-		//*)
+        //(*Declarations(wxSpinEditor)
+        wxToolBarToolBase* ToolBarItem4;
+        wxToolBarToolBase* ToolBarItem3;
+        wxSplitterWindow* spinEditor_splitter;
+        wxSpinTreeCtrl* spinTree;
+        wxToolBarToolBase* ToolBarItem1;
+        wxToolBar* wxSpinEditor_ToolBar;
+        wxPanel* editorPanel;
+        wxToolBarToolBase* ToolBarItem5;
+        wxPanel* treePanel;
+        wxSpinPropGrid* SpinPropGrid;
+        wxToolBarToolBase* ToolBarItem2;
+        //*)
 
-	protected:
+    protected:
 
-		//(*Identifiers(wxSpinEditor)
-		static const long ID_SPIN_TREE;
-		static const long ID_treePanel;
-		static const long ID_CUSTOM1;
-		static const long ID_PANEL2;
-		static const long ID_SPLITTERWINDOW1;
-		static const long spinEditor_clear;
-		static const long spinEditor_refresh;
-		static const long spinEditor_debugPrint;
-		static const long spinEditor_newNode;
-		static const long spinEditor_deleteNode;
-		static const long ID_TOOLBAR1;
-		//*)
+        //(*Identifiers(wxSpinEditor)
+        static const long ID_SPIN_TREE;
+        static const long ID_treePanel;
+        static const long ID_CUSTOM1;
+        static const long ID_PANEL2;
+        static const long ID_SPLITTERWINDOW1;
+        static const long spinEditor_clear;
+        static const long spinEditor_refresh;
+        static const long spinEditor_debugPrint;
+        static const long spinEditor_newNode;
+        static const long spinEditor_deleteNode;
+        static const long ID_TOOLBAR1;
+        //*)
 
-	private:
+    private:
 
-		//(*Handlers(wxSpinEditor)
-		void OnNewNode(wxCommandEvent& event);
-		void OnRefresh(wxCommandEvent& event);
-		void OnspinTreePaint(wxPaintEvent& event);
-		void OnSpinTreeLeftDown(wxMouseEvent& event);
-		void OnspinTreePaint1(wxPaintEvent& event);
-		void OnspinTreePaint2(wxPaintEvent& event);
-		void OnSpinTreeLeftDClick(wxMouseEvent& event);
-		void OnCustom1Paint(wxPaintEvent& event);
-		void OnspinTreePaint3(wxPaintEvent& event);
-		void OnDebugPrint(wxCommandEvent& event);
-		void OnClear(wxCommandEvent& event);
-		void OnDeleteNode(wxCommandEvent& event);
-		//*)
+        //(*Handlers(wxSpinEditor)
+        void OnNewNode(wxCommandEvent& event);
+        void OnRefresh(wxCommandEvent& event);
+        void OnspinTreePaint(wxPaintEvent& event);
+        void OnSpinTreeLeftDown(wxMouseEvent& event);
+        void OnspinTreePaint1(wxPaintEvent& event);
+        void OnspinTreePaint2(wxPaintEvent& event);
+        void OnSpinTreeLeftDClick(wxMouseEvent& event);
+        void OnCustom1Paint(wxPaintEvent& event);
+        void OnspinTreePaint3(wxPaintEvent& event);
+        void OnDebugPrint(wxCommandEvent& event);
+        void OnClear(wxCommandEvent& event);
+        void OnDeleteNode(wxCommandEvent& event);
+        //*)
 
-		DECLARE_EVENT_TABLE()
+        DECLARE_EVENT_TABLE()
 
-		lo_server_thread listeningServer;
+        lo_server_thread listeningServer;
 };
 
 
