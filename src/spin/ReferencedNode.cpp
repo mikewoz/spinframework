@@ -47,6 +47,8 @@
 #include <osg/BlendFunc>
 #include <osg/BlendColor>
 #include <osg/BlendEquation>
+#include <osgIntrospection/Value>
+#include <osgIntrospection/Type>
 
 #include "spinApp.h"
 #include "spinBaseContext.h"

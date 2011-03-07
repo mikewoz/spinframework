@@ -54,6 +54,7 @@
 #include <osg/Node>
 #include <osg/observer_ptr>
 #include <boost/python.hpp>
+#include <osgIntrospection/Value>
 
 // forward declaration of SceneManager
 class SceneManager;

@@ -60,7 +60,8 @@ libSPIN_la_SOURCES = \
     spinBaseContext.cpp \
     spinClientContext.cpp \
     spinServerContext.cpp \
-    spinUtil.cpp
+    spinUtil.cpp \
+    introspect_helpers.cpp
 
 libSPIN_la_includedir = $(includedir)/spinFramework
 libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h
