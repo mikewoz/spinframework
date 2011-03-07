@@ -120,7 +120,7 @@ std::string getMyBroadcastAddress()
 	return myIP.substr(0,myIP.rfind(".")) + ".255";
 }
 
-bool isMulticastAddress(std::string s)
+bool isMulticastAddress(const std::string &s)
 {
 	bool b = false;
 	try {
@@ -134,7 +134,7 @@ bool isMulticastAddress(std::string s)
 	return b;
 }
 
-bool isBroadcastAddress(std::string s)
+bool isBroadcastAddress(const std::string &s)
 {
 	bool b = false;
 	try {
@@ -202,7 +202,7 @@ std::vector<std::string> tokenize(const std::string& str, const std::string& del
 	}
 }
 
-std::vector<float> floatsFromString (std::string theString)
+std::vector<float> floatsFromString (const std::string &theString)
 {
     using std::string;
     using std::vector;
@@ -231,7 +231,7 @@ bool wildcardMatch(const char *pat, const char *str)
 		case '\0':
 			return *str=='\0';
 		case '*':
-			return wildcardMatch(pat+1, str) || *str && wildcardMatch(pat, str+1);
+			return wildcardMatch(pat+1, str) || (*str && wildcardMatch(pat, str+1));
 		case '?':
 			return *str && wildcardMatch(pat+1, str+1);
 		default:
@@ -246,8 +246,6 @@ bool wildcardMatch(const char *pat, const char *str)
 
 bool fileExists(const std::string& fileName)
 {
-	using namespace std;
-	
 	std::fstream fin;
 	fin.open(fileName.c_str(),std::ios::in);
 	if( fin.is_open() )
@@ -259,9 +257,9 @@ bool fileExists(const std::string& fileName)
 	return false;
 }
 
-std::string getRelativePath(std::string path)
+std::string getRelativePath(const std::string &path)
 {
-	using namespace std;
+	using std::string;
 	
 	string relPath;
 	
@@ -283,9 +281,9 @@ std::string getRelativePath(std::string path)
 	return relPath;
 }
 
-std::string getAbsolutePath(std::string path)
+std::string getAbsolutePath(const std::string &path)
 {
-	using namespace std;
+	using std::string;
 
 	// TODO: also deal with: ./ ../
 	
@@ -295,9 +293,9 @@ std::string getAbsolutePath(std::string path)
 	} else return path;
 }
 
-bool isVideoPath(std::string path)
+bool isVideoPath(const std::string &path)
 {
-	using namespace std;
+	using std::string;
 	
 	string extension = osgDB::getLowerCaseFileExtension(path);
 	
@@ -331,11 +329,11 @@ bool isVideoPath(std::string path)
  * This checks the file/path name to see there is encoded path information, and
  * if it doesn't we assume the user wants to put it in the SPIN_DIRECTORY
  */
-std::string getSpinPath(std::string path)
+std::string getSpinPath(const std::string &path)
 {
-	using namespace std;
+	using std::string;
 
-	string filename = string(path);
+	string filename(path);
 
 	// check if the filename has specific path information:
 	if ( (filename.substr(0,1)==string("~")) || 
