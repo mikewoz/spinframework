@@ -82,142 +82,142 @@ static int timeval_subtract (struct timeval *result, struct timeval *x, struct t
 
 enum LogPriority
 {
-	INFO, // regular unimportant log messages
-	DEV, // debugging fluff
-	ERROR, // it's dead, jim
+    INFO, // regular unimportant log messages
+    DEV, // debugging fluff
+    ERROR, // it's dead, jim
 };
 
 class logbuf : public std::streambuf
 {
-	
+    
 public:
-	
-	// create a buffer and initialize our logfile
-	logbuf(const char* logpath) :
+    
+    // create a buffer and initialize our logfile
+    logbuf(const char* logpath) :
         bCOUT(false), bFILE(true), 
         logfile(),
-		priority(INFO), buf(0), buflen(1024)
-	{
-		// create our buffer
-		buf = new char_type[buflen];
-		setp(buf, buf + buflen);
+        priority(INFO), buf(0), buflen(1024)
+    {
+        // create our buffer
+        buf = new char_type[buflen];
+        setp(buf, buf + buflen);
 
-		// open the log file
-		logfile.open(logpath, std::ios::app);
+        // open the log file
+        logfile.open(logpath, std::ios::app);
 
-		if (!logfile.is_open())
-		{
+        if (!logfile.is_open())
+        {
             std::cout << "Error: Could not open log file: " << logpath << std::endl;
-			exit(1);
-		}
-		
-		gettimeofday(&startTime, NULL);
+            exit(1);
+        }
+        
+        gettimeofday(&startTime, NULL);
 
-	}
+    }
 
-	// free our buffer
-	~logbuf()
-	{
-		sync();
-		delete[] buf;
-	}
+    // free our buffer
+    ~logbuf()
+    {
+        sync();
+        delete[] buf;
+    }
 
-	// set the priority to be used on the next call to sync()
-	void set_priority(LogPriority p)
-	{
-		priority = p;
-	}
+    // set the priority to be used on the next call to sync()
+    void set_priority(LogPriority p)
+    {
+        priority = p;
+    }
 
-	// logging modes:
-	bool bCOUT;
-	bool bFILE;
-	
+    // logging modes:
+    bool bCOUT;
+    bool bFILE;
+    
 private:
-	
-	struct timeval startTime;
-	
-	// spit out the time, priority, and the log buffer to cerr and logfile
-	int sync()
-	{
-		// nifty time formatting functions from the C standard library
-		time_t t = time(NULL);
-		tm* tmp = localtime(&t);
-		char shortTime[128];
-		char longTime[128];
-		strftime(shortTime, sizeof(shortTime), "%H:%M:%S", tmp);
-		strftime(longTime, sizeof(longTime), "%Y-%m-%d %H:%M:%S", tmp);
-		
-		// for more precise time:
-		struct timeval elapsedTime;
-		gettimeofday(&elapsedTime, NULL);
-		struct timeval dt;
-		timeval_subtract(&dt, &startTime, &elapsedTime);
-		
+    
+    struct timeval startTime;
+    
+    // spit out the time, priority, and the log buffer to cerr and logfile
+    int sync()
+    {
+        // nifty time formatting functions from the C standard library
+        time_t t = time(NULL);
+        tm* tmp = localtime(&t);
+        char shortTime[128];
+        char longTime[128];
+        strftime(shortTime, sizeof(shortTime), "%H:%M:%S", tmp);
+        strftime(longTime, sizeof(longTime), "%Y-%m-%d %H:%M:%S", tmp);
+        
+        // for more precise time:
+        struct timeval elapsedTime;
+        gettimeofday(&elapsedTime, NULL);
+        struct timeval dt;
+        timeval_subtract(&dt, &startTime, &elapsedTime);
+        
 
-		// now we stream the time, then the priority, then the message
-		if (bCOUT) std::cout << shortTime << ' ';
-		if (bFILE) logfile << longTime << ' ';
-		
-		logfile << (int)(-dt.tv_sec) << "." << (int)(dt.tv_usec) << ' ';
+        // now we stream the time, then the priority, then the message
+        if (bCOUT) std::cout << shortTime << ' ';
+        if (bFILE) logfile << longTime << ' ';
+        
+        logfile << (int)(-dt.tv_sec) << "." << (int)(dt.tv_usec) << ' ';
 
-		/*
-		switch (priority)
-		{
-		case INFO:
-			if (bCOUT) cout << "[INFO:] ";
-			if (bFILE) logfile << "[INFO:] ";
-			break;
-		case DEV:
-			if (bCOUT) cout << "[DEBUG] ";
-			if (bFILE) logfile << "[DEBUG] ";
-			break;
-		case ERROR:
-			if (bCOUT) cout << "[ERROR] ";
-			if (bFILE) logfile << "[ERROR] ";
-			break;
-		}
-		*/
+        /*
+        switch (priority)
+        {
+        case INFO:
+            if (bCOUT) cout << "[INFO:] ";
+            if (bFILE) logfile << "[INFO:] ";
+            break;
+        case DEV:
+            if (bCOUT) cout << "[DEBUG] ";
+            if (bFILE) logfile << "[DEBUG] ";
+            break;
+        case ERROR:
+            if (bCOUT) cout << "[ERROR] ";
+            if (bFILE) logfile << "[ERROR] ";
+            break;
+        }
+        */
 
 
-		if (bCOUT) std::cout.write(pbase(), pptr() - pbase());
-		if (bFILE) logfile.write(pbase(), pptr() - pbase());
-		
-		// flush output
-		if (bCOUT) std::cout.flush();
-		if (bFILE) logfile.flush();
+        if (bCOUT) std::cout.write(pbase(), pptr() - pbase());
+        if (bFILE) logfile.write(pbase(), pptr() - pbase());
+        
+        // flush output
+        if (bCOUT) std::cout.flush();
+        if (bFILE) logfile.flush();
 
-		// reset our priority to INFO
-		priority = INFO;
+        // reset our priority to INFO
+        priority = INFO;
 
-		// reset the buffer
-		setp(pbase(), epptr());
-		return 0;
-	}
+        // reset the buffer
+        setp(pbase(), epptr());
+        return 0;
+    }
 
-	// we ran out of space, so grow the buffer
-	int overflow(int c)
-	{
-		// allocate a new buffer and copy our current data into it, then swap
-		// it with the old buffer
-		char_type newbuf[buflen + 1024];
-		memcpy(newbuf, buf, buflen);
-		delete[] buf;
-		buf = newbuf;
+    // we ran out of space, so grow the buffer
+    int overflow(int c)
+    {
+        // allocate a new buffer and copy our current data into it, then swap
+        // it with the old buffer
+        char_type newbuf[buflen + 1024];
+        memcpy(newbuf, buf, buflen);
+        delete[] buf;
+        buf = newbuf;
 
-		// now we need to stuff c into the buffer
-		sputc(c);
-		return 0;
-	}
+        // now we need to stuff c into the buffer
+        sputc(c);
+        return 0;
+    }
 
-	// our log file
+    // our log file
     std::ofstream logfile;
 
-	// current priority
-	LogPriority priority;
+    // current priority
+    LogPriority priority;
 
-	// our buffer
-	char_type* buf;
-	unsigned long buflen;
+    // our buffer
+    char_type* buf;
+    unsigned long buflen;
 };
 
 
@@ -225,40 +225,40 @@ class spinLog : public std::ostream
 {
 
 public:
-	// we initialize the ostream to use our logbuf
-	spinLog(const char* logpath) : std::ostream(new logbuf(logpath))
-	{
-		buf = (logbuf*) rdbuf();
-	}
+    // we initialize the ostream to use our logbuf
+    spinLog(const char* logpath) : std::ostream(new logbuf(logpath))
+    {
+        buf = (logbuf*) rdbuf();
+    }
 
-	// set priority
-	void set_priority(LogPriority pr)
-	{
-		buf->set_priority(pr);
-	}
-	
-	void enable_cout(bool b)
-	{
-		buf->bCOUT = b;
-	}
-	
-	void enable_logfile(bool b)
-	{
-		buf->bFILE = b;
-	}
+    // set priority
+    void set_priority(LogPriority pr)
+    {
+        buf->set_priority(pr);
+    }
+    
+    void enable_cout(bool b)
+    {
+        buf->bCOUT = b;
+    }
+    
+    void enable_logfile(bool b)
+    {
+        buf->bFILE = b;
+    }
 
-	
+    
 private:
-	// our logbuf object
-	logbuf *buf;
+    // our logbuf object
+    logbuf *buf;
 };
 
 // set the priority for a spinLog/logbuf this must be a global function and not
 // a member to work around C++'s type resolution of overloaded functions
 static spinLog& operator<<(spinLog& vlog, LogPriority pr)
 {
-	vlog.set_priority(pr);
-	return vlog;
+    vlog.set_priority(pr);
+    return vlog;
 }
 
 #endif

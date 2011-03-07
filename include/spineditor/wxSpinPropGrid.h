@@ -100,7 +100,7 @@ protected:
     //! Create a category and properties of the given object.
     void GenerateProperties(const osgIntrospection::Type& type, ReferencedNode* pObject);
 
-	void OnPropertyChanging(wxPropertyGridEvent& event);
+    void OnPropertyChanging(wxPropertyGridEvent& event);
 
     //! Property value changed event. Set the change to the osg object.
     void OnPropertyChanged(wxPropertyGridEvent& event);

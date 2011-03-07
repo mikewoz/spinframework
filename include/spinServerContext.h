@@ -54,10 +54,10 @@
 class spinServerContext : public spinBaseContext
 {
     public:
-		spinServerContext();
-		~spinServerContext();
+        spinServerContext();
+        ~spinServerContext();
 
-		bool start();
+        bool start();
 
         void refreshSubscribers();
 

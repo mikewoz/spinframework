@@ -66,94 +66,94 @@ class Contour : public ReferencedNode
 
 public:
 
-	Contour(SceneManager *sceneManager, char *initID);
-	virtual ~Contour();
-		
-	/**
-	 * IMPORTANT:
-	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
-	 * and can also change their attachmentNode so that children are attached
-	 * anywhere in this subgraph. If that is the case, the updateNodePath()
-	 * function MUST be overridden, and extra nodes must be manually pushed onto
-	 * the currentNodePath.
-	 */
-	virtual void updateNodePath();
+    Contour(SceneManager *sceneManager, char *initID);
+    virtual ~Contour();
+        
+    /**
+     * IMPORTANT:
+     * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
+     * and can also change their attachmentNode so that children are attached
+     * anywhere in this subgraph. If that is the case, the updateNodePath()
+     * function MUST be overridden, and extra nodes must be manually pushed onto
+     * the currentNodePath.
+     */
+    virtual void updateNodePath();
 
-	virtual void callbackUpdate();
-	
-	void updateTransforms();
-	osg::Quat getOrientation(int index) const;
-	osg::Vec3 getTranslation(float index) const;
-	
-	void setCurrentIndex (float newValue);
-	void prev();
-	void next();
+    virtual void callbackUpdate();
+    
+    void updateTransforms();
+    osg::Quat getOrientation(int index) const;
+    osg::Vec3 getTranslation(float index) const;
+    
+    void setCurrentIndex (float newValue);
+    void prev();
+    void next();
 
-	void reset();
-	
-	void add (float x, float y, float z);
-	void setMaxVertices (int newValue);
-	
-	void setTrackingMode(int newValue);
-	
-	void setVisible (int newValue);
-	void setThickness (float newValue);
-	void setLineType (int newValue);
-	void setColor (float newR, float newG, float newB, float newA);
-		
-	
-	float getCurrentIndex() const { return _currentIndex; }
-	int getMaxVertices() const { return _maxVertices; }
-	
-	int getTrackingMode() const { return (int) _trackingMode; }
-	
-	int getVisible() const { return (int) _visible; }
-	float getThickness() const { return _thickness; }
-	float getLineType() const { return (int) _lineType; }
-	osg::Vec4 getColor() const { return _color;  }
-	
-	
-	
-	void draw();
-	
+    void reset();
+    
+    void add (float x, float y, float z);
+    void setMaxVertices (int newValue);
+    
+    void setTrackingMode(int newValue);
+    
+    void setVisible (int newValue);
+    void setThickness (float newValue);
+    void setLineType (int newValue);
+    void setColor (float newR, float newG, float newB, float newA);
+        
+    
+    float getCurrentIndex() const { return _currentIndex; }
+    int getMaxVertices() const { return _maxVertices; }
+    
+    int getTrackingMode() const { return (int) _trackingMode; }
+    
+    int getVisible() const { return (int) _visible; }
+    float getThickness() const { return _thickness; }
+    float getLineType() const { return (int) _lineType; }
+    osg::Vec4 getColor() const { return _color;  }
+    
+    
+    
+    void draw();
+    
 
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState() const;
-	
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
-		
-	// ============
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
+    
+    /**
+     * We must include a stateDump() method that simply invokes the base class
+     * method. Simple C++ inheritance is not enough, because osg::Introspection
+     * won't see it.
+     */
+    //virtual void stateDump() { ReferencedNode::stateDump(); };
+        
+    // ============
 
 private:
-	
-	bool _visible;
-	
-	bool _redrawFlag;
-	
-	osg::ref_ptr<osg::Vec3Array> _vArray;
-	
-	float _currentIndex; // allow float indices for interpolation between values
-	int _maxVertices;
+    
+    bool _visible;
+    
+    bool _redrawFlag;
+    
+    osg::ref_ptr<osg::Vec3Array> _vArray;
+    
+    float _currentIndex; // allow float indices for interpolation between values
+    int _maxVertices;
 
-	trackingModeEnum _trackingMode;
+    trackingModeEnum _trackingMode;
 
-	
-	osg::Vec4 _color;
-	
-	ContourTypeEnum _lineType;
-	float _thickness;
+    
+    osg::Vec4 _color;
+    
+    ContourTypeEnum _lineType;
+    float _thickness;
 
-	osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
-	osg::ref_ptr<osg::Geode> vArrayGeode;
-	//osg::ref_ptr<osg::Geometry> vArrayGeometry;
+    osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
+    osg::ref_ptr<osg::Geode> vArrayGeode;
+    //osg::ref_ptr<osg::Geometry> vArrayGeometry;
 
 };
 

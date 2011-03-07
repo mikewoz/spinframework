@@ -70,21 +70,21 @@ class spinLog;
 class spinBaseContext
 {
     public:
-		spinBaseContext();
-		virtual ~spinBaseContext();
+        spinBaseContext();
+        virtual ~spinBaseContext();
 
-		static void sigHandler(int signum);
+        static void sigHandler(int signum);
 
-		/**
-		 * All threads need to stop according to the following flag:
-		 */
-		static bool signalStop;
+        /**
+         * All threads need to stop according to the following flag:
+         */
+        static bool signalStop;
 
         enum spinContextMode { SERVER_MODE, CLIENT_MODE };
 
         bool isServer() { return (bool)(mode==SERVER_MODE); }
 
-		virtual bool start() = 0;
+        virtual bool start() = 0;
 
         /**
          * Starts the context thread (passed as *threadFunction from a derived
@@ -111,7 +111,7 @@ class spinBaseContext
         /** Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters. */
         lo_address lo_syncAddr;
         lo_server lo_infoServ_;
-		
+        
         lo_server lo_tcpRxServer_;
 
         static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
@@ -125,7 +125,7 @@ class spinBaseContext
         static int debugCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
 
-	static void oscParser_error(int num, const char *msg, const char *path);
+    static void oscParser_error(int num, const char *msg, const char *path);
 
     protected:
 

@@ -54,15 +54,15 @@ class spinClientContext : public spinBaseContext
 {
     public:
 
-		spinClientContext();
-		~spinClientContext();
+        spinClientContext();
+        ~spinClientContext();
 
-		bool start();
+        bool start();
         lo_server lo_syncServ;
 
-		int pollUpdates();
+        int pollUpdates();
 
-		
+        
     private:
         // false once we've subscribed to a server in TCP
         bool doSubscribe_; 
@@ -82,7 +82,7 @@ class spinClientContext : public spinBaseContext
          * The sceneCallback is used for to listen to userRefresh messages.
          * If this client is running before the server comes up, the server will
          * send a userRefresh message, and this client can re-send his user info
-		 */
+         */
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
         /**

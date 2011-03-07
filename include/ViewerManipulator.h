@@ -70,42 +70,42 @@ namespace osgViewer {
 
 class ViewerManipulator : public osgGA::NodeTrackerManipulator
 {
-	public:
-		//ViewerManipulator(spinContext *s, UserNode *u);
-		//ViewerManipulator(UserNode *u);
-		ViewerManipulator();
-		
-		void setPicker(bool b);
-		void setMover(bool b);
-		void setRaw(bool b);
-		
-	    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
-	    void handleKeypress(const osgGA::GUIEventAdapter& ea);
-	    void handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
-		
-		//GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
-		//std::vector<GroupNode*> getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections);
+    public:
+        //ViewerManipulator(spinContext *s, UserNode *u);
+        //ViewerManipulator(UserNode *u);
+        ViewerManipulator();
+        
+        void setPicker(bool b);
+        void setMover(bool b);
+        void setRaw(bool b);
+        
+        bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
+        void handleKeypress(const osgGA::GUIEventAdapter& ea);
+        void handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
+        
+        //GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
+        //std::vector<GroupNode*> getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections);
 
-	    void sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint);
-		void sendEvent(const char *nodeId, const char *types, ...);
-		void sendEvent(const char *nodeId, const char *types, va_list ap);
+        void sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint);
+        void sendEvent(const char *nodeId, const char *types, ...);
+        void sendEvent(const char *nodeId, const char *types, va_list ap);
 
 
-	protected:
-		virtual ~ViewerManipulator();
-		
-		//spinContext *spin;
-		//osg::ref_ptr<UserNode> user;
-		t_symbol *user;
-		
-		//t_symbol *selectedNode;
-		std::vector<t_symbol*> selectedNodes;
-		
-		bool picker, mover, raw;
-		float lastX, lastY;
-		float clickX, clickY;
-		
-		osg::Vec3 lastHitPoint;
+    protected:
+        virtual ~ViewerManipulator();
+        
+        //spinContext *spin;
+        //osg::ref_ptr<UserNode> user;
+        t_symbol *user;
+        
+        //t_symbol *selectedNode;
+        std::vector<t_symbol*> selectedNodes;
+        
+        bool picker, mover, raw;
+        float lastX, lastY;
+        float clickX, clickY;
+        
+        osg::Vec3 lastHitPoint;
 };
 
 

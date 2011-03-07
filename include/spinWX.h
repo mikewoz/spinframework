@@ -67,11 +67,11 @@ class spinWX : public wxApp
 {
     public:
         virtual bool OnInit();
-		virtual void OnInitCmdLine(wxCmdLineParser& parser);
-		virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+        virtual void OnInitCmdLine(wxCmdLineParser& parser);
+        virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
-	private:
-		int startMode;
+    private:
+        int startMode;
 
 };
 

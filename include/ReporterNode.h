@@ -46,9 +46,9 @@
 #include <osg/Timer>
 
 typedef struct _reporterTarget {
-	osg::observer_ptr<ReferencedNode> node;
-	osg::Matrix matrix;
-	bool contained;
+    osg::observer_ptr<ReferencedNode> node;
+    osg::Matrix matrix;
+    bool contained;
 } reporterTarget;
 
 /**
@@ -58,15 +58,15 @@ typedef struct _reporterTarget {
  * respect to this node and it's subgraph. One must turn on each of these report
  * types using the setReport method. The current list is:
  *
- * DISTANCE		'distance' between this and the target
+ * DISTANCE        'distance' between this and the target
  *
- * INCIDENCE	'direction' (angle) to the target on the XY plane, and 'incidence', which is the angle difference between the reporterNode's current orientation to that which would point at the target
+ * INCIDENCE    'direction' (angle) to the target on the XY plane, and 'incidence', which is the angle difference between the reporterNode's current orientation to that which would point at the target
  *
- * ANGLES		reports the angle difference between the reporterNode's current orientation to that which would point at the target (available in both 'eulers' or 'quaternion' format)
+ * ANGLES        reports the angle difference between the reporterNode's current orientation to that which would point at the target (available in both 'eulers' or 'quaternion' format)
  *
- * CONTAINMENT	whether this node is contained within this bounds of the target's subgraph (note: assumes the target is convex)
+ * CONTAINMENT    whether this node is contained within this bounds of the target's subgraph (note: assumes the target is convex)
  *
- * OCCLUSION	whether the target is occluded (line-of-sight) for this object
+ * OCCLUSION    whether the target is occluded (line-of-sight) for this object
  *
  *
  * Notes:
@@ -82,63 +82,63 @@ class ReporterNode : public ReferencedNode
 
 public:
 
-	ReporterNode(SceneManager *sceneManager, char *initID);
-	virtual ~ReporterNode();
+    ReporterNode(SceneManager *sceneManager, char *initID);
+    virtual ~ReporterNode();
 
-	/**
-	 * The update callback for ReporterNode checks to see if a target or the
-	 * the ReporterNode's global matrix has changed (ie, whether it has been
-	 * moved or not). If so, it updates the internal matrices, and calls
-	 * sendReports()
-	 */
-	virtual void callbackUpdate();
+    /**
+     * The update callback for ReporterNode checks to see if a target or the
+     * the ReporterNode's global matrix has changed (ie, whether it has been
+     * moved or not). If so, it updates the internal matrices, and calls
+     * sendReports()
+     */
+    virtual void callbackUpdate();
 
-	/**
-	 * sendReports checks which reportTypes are enabled, and actually performs
-	 * computation for necessary reports, which are then sent out on the network
-	 */
-	void sendReports(reporterTarget *target);
+    /**
+     * sendReports checks which reportTypes are enabled, and actually performs
+     * computation for necessary reports, which are then sent out on the network
+     */
+    void sendReports(reporterTarget *target);
 
-	/**
-	 * Add a target node to the report list
-	 */
-	void addTarget (const char *targetID);
+    /**
+     * Add a target node to the report list
+     */
+    void addTarget (const char *targetID);
 
-	/**
-	 * Remove a target from the report list
-	 */
-	void removeTarget (const char *targetID);
-	
-	/**
-	 * This enables or disables a particular reporting type
-	 */
-	void setReporting(const char *type, bool enabled);
-	int getReporting(const char *type) const;
+    /**
+     * Remove a target from the report list
+     */
+    void removeTarget (const char *targetID);
+    
+    /**
+     * This enables or disables a particular reporting type
+     */
+    void setReporting(const char *type, bool enabled);
+    int getReporting(const char *type) const;
 
-	/**
-	 * Set the maximum reporting rate (hz). Note: updates are only sent when
-	 * necessary, so there is no constant reporting mode.
-	 */
-	void setMaxRate(float hz);
-	float getMaxRate() const { return maxRate_; }
-	
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState() const;
-	
+    /**
+     * Set the maximum reporting rate (hz). Note: updates are only sent when
+     * necessary, so there is no constant reporting mode.
+     */
+    void setMaxRate(float hz);
+    float getMaxRate() const { return maxRate_; }
+    
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
+    
 private:
-	
+    
     typedef std::map< std::string, bool > ReportingType;
-	ReportingType reporting_;
+    ReportingType reporting_;
 
-	std::vector<reporterTarget> targets_;
-	osg::Matrix matrix_;
+    std::vector<reporterTarget> targets_;
+    osg::Matrix matrix_;
 
-	float maxRate_;
+    float maxRate_;
 
-	osg::Timer_t lastTick;
+    osg::Timer_t lastTick;
 };
 
 

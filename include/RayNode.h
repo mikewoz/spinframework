@@ -60,44 +60,44 @@ class RayNode : public GroupNode
 
 public:
 
-	RayNode(SceneManager *sceneManager, char *initID);
-	virtual ~RayNode();
+    RayNode(SceneManager *sceneManager, char *initID);
+    virtual ~RayNode();
 
-	void setVisible		(int visibilityFlag);
-	void setLength		(float length);
-	void setThickness	(float thickness);
-	void setColor		(float red, float green, float blue, float alpha);
+    void setVisible        (int visibilityFlag);
+    void setLength        (float length);
+    void setThickness    (float thickness);
+    void setColor        (float red, float green, float blue, float alpha);
 
-	int getVisible() const { return (int) this->visible; }
-	float getLength() const { return this->length; };
-	float getThickness() const { return this->thickness; };
-	osg::Vec4 getColor() const { return this->color;  };
+    int getVisible() const { return (int) this->visible; }
+    float getLength() const { return this->length; };
+    float getThickness() const { return this->thickness; };
+    osg::Vec4 getColor() const { return this->color;  };
 
 
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState() const;
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
+    /**
+     * We must include a stateDump() method that simply invokes the base class
+     * method. Simple C++ inheritance is not enough, because osg::Introspection
+     * won't see it.
+     */
+    //virtual void stateDump() { ReferencedNode::stateDump(); };
 
 
 private:
 
-	void drawRay();
+    void drawRay();
 
-	osg::ref_ptr<osg::Geode> rayGeode;
+    osg::ref_ptr<osg::Geode> rayGeode;
 
-	bool visible;
-	float length;
-	float thickness;
-	osg::Vec4 color;
+    bool visible;
+    float length;
+    float thickness;
+    osg::Vec4 color;
 
 };
 

@@ -58,56 +58,56 @@ class LightSource : public GroupNode
 
 public:
 
-	LightSource(SceneManager *sceneManager, char *initID);
-	virtual ~LightSource();
+    LightSource(SceneManager *sceneManager, char *initID);
+    virtual ~LightSource();
 
-	void setVisible		(int visibilityFlag);
-	void setCutoff		(float cutoff);
-	void setExponent	(float exponent);
-	void setAttenuation	(float attenuation);
+    void setVisible        (int visibilityFlag);
+    void setCutoff        (float cutoff);
+    void setExponent    (float exponent);
+    void setAttenuation    (float attenuation);
 
-	void setAmbient		(float red, float green, float blue, float alpha);
-	void setDiffuse		(float red, float green, float blue, float alpha);
-	void setSpecular	(float red, float green, float blue, float alpha);
+    void setAmbient        (float red, float green, float blue, float alpha);
+    void setDiffuse        (float red, float green, float blue, float alpha);
+    void setSpecular    (float red, float green, float blue, float alpha);
 
-	int getVisible() const;
-	float getCutoff() const;
-	float getExponent() const;
-	float getAttenuation() const;
-	osg::Vec4 getAmbient() const;
-	osg::Vec4 getDiffuse() const;
-	osg::Vec4 getSpecular() const;
+    int getVisible() const;
+    float getCutoff() const;
+    float getExponent() const;
+    float getAttenuation() const;
+    osg::Vec4 getAmbient() const;
+    osg::Vec4 getDiffuse() const;
+    osg::Vec4 getSpecular() const;
 
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState() const;
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
+    /**
+     * We must include a stateDump() method that simply invokes the base class
+     * method. Simple C++ inheritance is not enough, because osg::Introspection
+     * won't see it.
+     */
+    //virtual void stateDump() { ReferencedNode::stateDump(); };
 
 
 private:
 
-	void drawLight();
+    void drawLight();
 
-	int lightNum;
-	osg::ref_ptr<osg::LightSource> lightSource;
+    int lightNum;
+    osg::ref_ptr<osg::LightSource> lightSource;
 
-	bool _visible;
-	float _cutoff;
-	float _exponent;
-	float _attenuation;
+    bool _visible;
+    float _cutoff;
+    float _exponent;
+    float _attenuation;
 
-	// lighting color parameters:
-	osg::Vec4 _ambient;
-	osg::Vec4 _diffuse;
-	osg::Vec4 _specular;
+    // lighting color parameters:
+    osg::Vec4 _ambient;
+    osg::Vec4 _diffuse;
+    osg::Vec4 _specular;
 
 };
 

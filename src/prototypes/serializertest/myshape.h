@@ -13,27 +13,27 @@ class myshape : public osg::PositionAttitudeTransform
 
 public:
 
-	enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
+    enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
 
-	myshape();
-	myshape(shapeType shp);
-	~myshape();
+    myshape();
+    myshape(shapeType shp);
+    ~myshape();
 
-	void init();
+    void init();
 
-	//void setTranslation(float x, float y, float z);
-	void setTranslation(osg::Vec3f v);
-	osg::Vec3f getTranslation();
+    //void setTranslation(float x, float y, float z);
+    void setTranslation(osg::Vec3f v);
+    osg::Vec3f getTranslation();
 
-	void setNote(const std::string&);
-	const std::string& getNote() const;
+    void setNote(const std::string&);
+    const std::string& getNote() const;
 
 
 private:
 
-	shapeType shape_;
-	osg::Vec3f trans_;
-	std::string note_;
+    shapeType shape_;
+    osg::Vec3f trans_;
+    std::string note_;
 };
 
 
