@@ -8,9 +8,15 @@ EXTRA_DIST = \
 
 if ENABLE_EDITOR
 bin_PROGRAMS = spineditor
-spineditor_SOURCES =  spinWX.cpp wxSpinMain.cpp wxSpinEditor.cpp wxSpinRenderer.cpp \
-		wxSpinPropGrid.cpp wxSpinSettings.cpp wxSpinTreeVisitor.cpp \
-		wxSpinTreeCtrl.cpp
+spineditor_SOURCES = \
+	wxSpinTreeCtrl.cpp \
+    spinWX.cpp \
+    wxSpinEditor.cpp \
+    wxSpinMain.cpp \
+    wxSpinPropGrid.cpp \
+    wxSpinRenderer.cpp \
+    wxSpinSettings.cpp \
+    wxSpinTreeVisitor.cpp
 spineditor_LDFLAGS = -lSPIN $(SPIN_LDFLAGS)
 
 # FIXME: I doubt this works
