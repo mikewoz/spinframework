@@ -99,8 +99,8 @@ namespace osg {
 std::string getHostname();
 std::string getMyIPaddress();
 std::string getMyBroadcastAddress();
-bool isMulticastAddress(std::string s);
-bool isBroadcastAddress(std::string s);
+bool isMulticastAddress(const std::string &s);
+bool isBroadcastAddress(const std::string &s);
 
 // *****************************************************************************
 // string handling functions
@@ -134,12 +134,12 @@ bool wildcardMatch(const char *pat, const char *str);
 // file helpers
 
 bool fileExists(const std::string& fileName);
-std::string getRelativePath(std::string path);
-std::string getAbsolutePath(std::string path);
+std::string getRelativePath(const std::string &path);
+std::string getAbsolutePath(const std::string &path);
 
-bool isVideoPath(std::string path);
+bool isVideoPath(const std::string &path);
 
-std::string getSpinPath(std::string path);
+std::string getSpinPath(const std::string &path);
 
 // *****************************************************************************
 // gensym stuff (from m_pd.h)
