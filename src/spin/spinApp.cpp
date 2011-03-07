@@ -350,14 +350,14 @@ void spinApp::registerUser()
 // *****************************************************************************
 // A BUNCH OF MESSAGE SENDING UTILITIES:
 
-void spinApp::InfoMessage(std::string OSCpath, const char *types, ...)
+void spinApp::InfoMessage(const std::string &OSCpath, const char *types, ...)
 {
     va_list ap;
     va_start(ap, types);
     InfoMessage(OSCpath, types, ap);
 }
 
-void spinApp::InfoMessage(std::string OSCpath, const char *types, va_list ap)
+void spinApp::InfoMessage(const std::string &OSCpath, const char *types, va_list ap)
 {
     lo_message msg = lo_message_new();
     int err = lo_message_add_varargs(msg, types, ap);
@@ -370,7 +370,7 @@ void spinApp::InfoMessage(std::string OSCpath, const char *types, va_list ap)
     }
 }
 
-void spinApp::InfoMessage(std::string OSCpath, lo_message msg)
+void spinApp::InfoMessage(const std::string &OSCpath, lo_message msg)
 {
     if (context)
     {
@@ -505,7 +505,7 @@ void spinApp::SceneBundle(std::vector<lo_message> msgs, lo_address addr)
 }
 
 
-void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs, lo_address txAddr)
+void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msgs, lo_address txAddr)
 {
 	lo_address sendingAddress;
 	if (txAddr == 0) sendingAddress = context->lo_txAddr;

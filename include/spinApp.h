@@ -90,9 +90,9 @@ class spinApp
          * will fail.  This is used to do simple error checking on the sizes of
          * parameters passed.
          */
-        void InfoMessage(std::string OSCpath, const char *types, ...);
-        void InfoMessage(std::string OSCpath, const char *types, va_list ap);
-        void InfoMessage(std::string OSCpath, lo_message msg);
+        void InfoMessage(const std::string &OSCpath, const char *types, ...);
+        void InfoMessage(const std::string &OSCpath, const char *types, va_list ap);
+        void InfoMessage(const std::string &OSCpath, lo_message msg);
 
         void SceneMessage(const char *types, ...);
         void SceneMessage(const char *types, va_list ap);
@@ -107,12 +107,12 @@ class spinApp
         //void SceneBundle(std::vector<lo_message> msgs);
         void SceneBundle(std::vector<lo_message> msgs, lo_address addr = 0);
 
-        void setSceneID(std::string s) { sceneID = s; }
-        std::string getSceneID() { return sceneID; }
+        void setSceneID(const std::string &s) { sceneID = s; }
+        std::string getSceneID() const { return sceneID; }
 
 
         void setSyncStart(osg::Timer_t t) { _syncStartTick = t; }
-        osg::Timer_t getSyncStart() { return _syncStartTick; }
+        osg::Timer_t getSyncStart() const { return _syncStartTick; }
 
 
         /**
@@ -137,12 +137,12 @@ class spinApp
         SceneManager *sceneManager;
         MediaManager *mediaManager;
         void setUserID(const std::string &id) { userID_ = id; }
-        std::string getUserID() { return userID_; }
+        std::string getUserID() const { return userID_; }
 
     private:
         // can be overridden in client apps
         std::string userID_;
-        void sendBundle(std::string OSCpath, std::vector<lo_message> msgs, lo_address txAddr = 0);
+        void sendBundle(const std::string &OSCpath, std::vector<lo_message> msgs, lo_address txAddr = 0);
 
         // singleton constructors & desctructor (hidden):
         spinApp();
