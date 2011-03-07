@@ -385,7 +385,7 @@ osg::Geode* createHollowSphere(float radius, osg::Vec4 color)
 
 
 
-osg::Geode* createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color)
+osg::Geode* createWireframeRolloff(int /*rolloff*/, float /*distortion*/, float /*scale*/, osg::Vec4 /*color*/)
 {
 	//int samples = 30; // the number of times we sample the rolloff table
 	//int resolution = 10; // level of detail
