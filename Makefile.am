@@ -45,3 +45,25 @@ apps:
 	$(MAKE) -C src/spin spinviewer.app
 
 INCLUDES = src/tinyxml
+
+html-local: htmldoc
+htmldoc:
+	@if [ -z `which doxygen` ]; then echo "No Doxygen!"; else doxygen; fi
+
+# man pages:
+if HAVE_DOXYGEN
+dist_man_MANS = $(top_srcdir)/man/man3/*.3
+$(top_srcdir)/man/man3/*.3: doxyfile.stamp
+
+doxyfile.stamp:
+	$(DOXYGEN) doxyfile
+	echo `date -R` > doxyfile.stamp
+
+CLEANFILES = doxyfile.stamp
+
+all-local: doxyfile.stamp
+clean-local:
+	rm -rf $(top_builddir)/man
+	rm -rf html
+endif 
+

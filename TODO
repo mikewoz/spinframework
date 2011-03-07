@@ -1,5 +1,33 @@
-Server side tcp handlers
-3)a new callback for that TCP port that responds to the dumpState message. the server then dumps the state to the client in the connection maintained in its list of connections.
-4)generic handler that dispatches calls to its callbacks (see bottom of SceneManager)
+Release-critical for 0.4
+------------------------
+ * Use OSG serializer, drop osgIntrospection
+ * enclose everything in the spin namespace
+ * write some tests
 
-SharedVideoTexture tests!
+Server side TCP handlers
+------------------------
+ * 3)a new callback for that TCP port that responds to the dumpState message. the server then dumps the state to the client in the connection maintained in its list of connections.
+ * 4)generic handler that dispatches calls to its callbacks (see bottom of SceneManager)
+
+Scenic-related tasks
+--------------------
+ * SharedVideoTexture tests
+
+Refactoring
+-----------
+
+SPIN Editor
+-----------
+ * Port the code we have to spin >= 0.3.3
+
+Tests
+-----
+ * Write some unit tests
+ * Write some network tests
+
+Examples
+--------
+
+Packaging
+---------
+

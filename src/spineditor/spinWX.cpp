@@ -49,7 +49,7 @@
 #include <wx/string.h>
 #include <wx/stdpaths.h>
 
-#include "spinContext.h"
+#include "spinBaseContext.h"
 
 //(*AppHeaders
 #include "wxSpinMain.h"
