@@ -50,8 +50,6 @@
 #include <wx/log.h>
 #include <wx/string.h>
 
-using namespace std;
-
 // code from http://www.advogato.org/person/elanthis/diary/363.html
 
 
@@ -80,7 +78,7 @@ public:
 
 		if (!logfile.is_open())
 		{
-			cout << "Error: Could not open log file: " << logpath << endl;
+            std::cout << "Error: Could not open log file: " << logpath << std::endl;
 			exit(1);
 		}
 
@@ -119,27 +117,27 @@ private:
 		strftime(longTime, sizeof(longTime), "%Y-%m-%d %H:%M:%S", tmp);
 
 		// now we stream the time, then the priority, then the message
-		if (bCOUT) cout << shortTime << ' ';
+		if (bCOUT) std::cout << shortTime << ' ';
 		if (bFILE) logfile << longTime << ' ';
 
 		switch (priority)
 		{
 		case INFO:
-			if (bCOUT) cout << "[INFO:] ";
+			if (bCOUT) std::cout << "[INFO:] ";
 			if (bFILE) logfile << "[INFO:] ";
 			break;
 		case DEV:
-			if (bCOUT) cout << "[DEBUG] ";
+			if (bCOUT) std::cout << "[DEBUG] ";
 			if (bFILE) logfile << "[DEBUG] ";
 			break;
 		case ERROR:
-			if (bCOUT) cout << "[ERROR] ";
+			if (bCOUT) std::cout << "[ERROR] ";
 			if (bFILE) logfile << "[ERROR] ";
 			break;
 		}
 
 
-		if (bCOUT) cout.write(pbase(), pptr() - pbase());
+		if (bCOUT) std::cout.write(pbase(), pptr() - pbase());
 		if (bFILE) logfile.write(pbase(), pptr() - pbase());
 		
 		if (bWXLG)
@@ -151,7 +149,7 @@ private:
 		}
 		
 		// flush output
-		if (bCOUT) cout.flush();
+		if (bCOUT) std::cout.flush();
 		if (bFILE) logfile.flush();
 
 		// reset our priority to INFO
@@ -189,12 +187,12 @@ private:
 };
 
 
-class spinLog : public ostream
+class spinLog : public std::ostream
 {
 
 public:
 	// we initialize the ostream to use our logbuf
-	spinLog(const char* logpath) : ostream(new logbuf(logpath))
+	spinLog(const char* logpath) : std::ostream(new logbuf(logpath))
 	{
 		buf = (logbuf*) rdbuf();
 	}
