@@ -14,10 +14,12 @@
 REGISTER_OBJECT_WRAPPER( myshape_wrapper, // The unique wrapper name
                          new spinframework::myshape, // The proto
                          spinframework::myshape, // The class typename
-                         "osg::PositionAttitudeTransform spinframework::myshape" )  // The inheritance relations
+                         "osg::Object osg::Node osg::Group osg::Transform osg::PositionAttitudeTransform spinframework::myshape" )  // The inheritance relations
 {
 	//ADD_VEC3_SERIALIZER( Translation, osg::Vec3() );
 	ADD_STRING_SERIALIZER( Note, "v" );
+	ADD_INT_SERIALIZER( Num, 0 );
+
 }
 
 
@@ -27,6 +29,8 @@ myshape::myshape ()
 {
 	// let default be a sphere:
 	shape_ = myshape::SPHERE;
+	note_ = "init";
+	num_ = -1;
 	init();
 }
 
@@ -94,4 +98,15 @@ void myshape::setNote(const std::string &s)
 const std::string& myshape::getNote() const
 {
 	return note_;
+}
+
+void myshape::setNum(int num)
+{
+	num_ = num;
+	std::cout << "Got new num: " << num_ << std::endl;
+}
+
+int myshape::getNum() const
+{
+	return num_;
 }

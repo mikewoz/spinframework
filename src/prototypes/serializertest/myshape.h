@@ -28,12 +28,16 @@ public:
 	void setNote(const std::string&);
 	const std::string& getNote() const;
 
+	void setNum(int num);
+	int getNum() const;
+
 
 private:
 
 	shapeType shape_;
 	osg::Vec3f trans_;
 	std::string note_;
+	int num_;
 };
 
 

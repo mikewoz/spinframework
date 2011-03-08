@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	sphere->setTranslation(osg::Vec3(-1, 0, 0));
 	box->setTranslation(osg::Vec3(1, 0, 0));
 
-	sphere->setNote("test string");
+	//sphere->setNote("test string");
 
 	osg::Group *grp = new osg::Group();
 	grp->addChild(sphere);
@@ -37,34 +37,59 @@ int main(int argc, char **argv)
         osgDB::ObjectWrapper* wrapper = wrapperManager->findWrapper("spinframework::myshape");
         if ( wrapper )
         {
-        	std::cout << "got wrapper: " << wrapper->getName() << std::endl;
-        	osgDB::BaseSerializer* serializer = wrapper->getSerializer("note");
+        	std::cout << "woohoo. Got wrapper: " << wrapper->getName() << std::endl;
+
+        	osgDB::StringList assoc = wrapper->getAssociates();
+        	std::cout << wrapper->getName() << " has " << assoc.size() << " associates: " << std::endl;
+        	for (unsigned int i=0; i<assoc.size(); i++)
+        	{
+        		std::cout << "  associate: " << assoc[i] << std::endl;
+        	}
+
+        	osgDB::StringList props;
+        	std::vector<int> types;
+        	wrapper->readSchema(props, types);
+        	std::cout << wrapper->getName() << " has " << props.size() << " properties: " << std::endl;
+        	for (unsigned int i=0; i<props.size(); i++)
+        	{
+        		std::cout << "  prop: " << props[i] << std::endl;
+        	}
+
+        	std::string serializerName = "Num";
+        	osgDB::BaseSerializer* serializer = wrapper->getSerializer(serializerName);
         	if ( serializer )
-        	{
         		std::cout << "got serializer for note: " << serializer->getName() << std::endl;
-        	}
         	else
-        	{
-        		std::cout << "oops. Couldn't find serializer for 'note'" << std::endl;
-        	}
+        		std::cout << "oops. Couldn't find serializer for '"<<serializerName<<"'" << std::endl;
 
         }
         else
         {
-        	std::cout << "oops. Couldn't find wrapper for " << name << std::endl;
+        	std::cout << "oops. Couldn't find wrapper for spinframework::myshape" << std::endl;
         }
     }
 
 
     // test osgreflection:
     ClassInfo* myshapeInfo = ReflectionManager::instance()->getClassInfo("spinframework::myshape");
-    Method* myshapeMethod = myshapeInfo->getMethod("note");
+
+    // try to create a new object:
     ClassInstance* newShape = myshapeInfo->createInstance();
-    myshapeMethod->set( newShape, "foo" );
 
+    // try to set the 'Num':
+    //Method* myshapeNumMethod = myshapeInfo->getMethod("Num");
+    //myshapeNumMethod->set( newShape, 4 );
 
+    // try to set the 'Note' string:
+    //Method* myshapeNoteMethod = myshapeInfo->getMethod("Note");
+    //myshapeNoteMethod->set( newShape, std::string("foo") );
+
+    // try to set the 'Translation' (osg x,y,z vector):
+    //Method* myshapeMethod = myshapeInfo->getMethod("Translation");
+    //myshapeMethod->set( newShape, osg::Vec3(0.0,0.0,1.0) );
 
 	/*
+	// view our scene:
 	osgViewer::Viewer viewer;
 	viewer.setSceneData( grp );
     return viewer.run();
