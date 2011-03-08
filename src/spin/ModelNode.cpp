@@ -47,6 +47,9 @@
 #include <osg/Group>
 #include <osg/Billboard>
 #include <osg/AutoTransform>
+#include <osg/MatrixTransform>
+#include <osg/Switch>
+#include <osg/Sequence>
 
 //#include <osgFX/Scribe>
 //#include <osgFX/Cartoon>
