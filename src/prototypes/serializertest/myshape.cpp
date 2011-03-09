@@ -7,9 +7,7 @@
 #include <osgDB/InputStream>
 #include <osgDB/OutputStream>
 
-
 #include "myshape.h"
-
 
 REGISTER_OBJECT_WRAPPER( myshape_wrapper, // The unique wrapper name
                          new spinframework::myshape, // The proto
@@ -21,7 +19,6 @@ REGISTER_OBJECT_WRAPPER( myshape_wrapper, // The unique wrapper name
 	ADD_INT_SERIALIZER( Num, 0 );
 
 }
-
 
 using namespace spinframework;
 

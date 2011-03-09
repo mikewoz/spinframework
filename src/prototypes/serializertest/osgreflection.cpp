@@ -29,9 +29,13 @@ ReflectionManager* ReflectionManager::instance()
 
 ReflectionManager::ReflectionManager()
 {
+/*
 	osgDB::Options *options = new osgDB::Options("Ascii");
 	_outputStream = new osgDB::OutputStream(options);
 	_inputStream = new osgDB::InputStream(options);
+*/
+	_outputStream = new osgDB::OutputStream(0);
+	_inputStream = new osgDB::InputStream(0);
 
     //_outputStream->setOutputIterator( new BinaryOutputIterator(&_source) );
     //_inputStream->setInputIterator( new BinaryInputIterator(&_source) );

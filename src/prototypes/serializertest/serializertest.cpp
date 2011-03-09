@@ -32,9 +32,10 @@ int main(int argc, char **argv)
 
 
     osgDB::ObjectWrapperManager* wrapperManager = osgDB::Registry::instance()->getObjectWrapperManager();
+    osgDB::ObjectWrapper* wrapper = wrapperManager->findWrapper("spinframework::myshape");
+
     if ( wrapperManager )
     {
-        osgDB::ObjectWrapper* wrapper = wrapperManager->findWrapper("spinframework::myshape");
         if ( wrapper )
         {
         	std::cout << "woohoo. Got wrapper: " << wrapper->getName() << std::endl;
@@ -58,14 +59,18 @@ int main(int argc, char **argv)
         	std::string serializerName = "Num";
         	osgDB::BaseSerializer* serializer = wrapper->getSerializer(serializerName);
         	if ( serializer )
-        		std::cout << "got serializer for note: " << serializer->getName() << std::endl;
+        		std::cout << "got serializer: " << serializer->getName() << std::endl;
         	else
         		std::cout << "oops. Couldn't find serializer for '"<<serializerName<<"'" << std::endl;
+
+
+
 
         }
         else
         {
         	std::cout << "oops. Couldn't find wrapper for spinframework::myshape" << std::endl;
+        	return 1;
         }
     }
 
@@ -80,6 +85,16 @@ int main(int argc, char **argv)
     //Method* myshapeNumMethod = myshapeInfo->getMethod("Num");
     //myshapeNumMethod->set( newShape, 4 );
 
+    // another way:
+    /*
+    osgDB::BaseSerializer* serializer = wrapper->getSerializer("Num");
+    if ( serializer )
+    {
+		ReflectionManager::instance()->getOutputStream() << 4;
+		serializer->read( ReflectionManager::instance()->getInputStream(), *(newShape->getObject()) );
+    } else std::cout << "ERROR" << std::endl;
+	*/
+
     // try to set the 'Note' string:
     //Method* myshapeNoteMethod = myshapeInfo->getMethod("Note");
     //myshapeNoteMethod->set( newShape, std::string("foo") );
@@ -88,8 +103,9 @@ int main(int argc, char **argv)
     //Method* myshapeMethod = myshapeInfo->getMethod("Translation");
     //myshapeMethod->set( newShape, osg::Vec3(0.0,0.0,1.0) );
 
-	/*
+
 	// view our scene:
+    /*
 	osgViewer::Viewer viewer;
 	viewer.setSceneData( grp );
     return viewer.run();
