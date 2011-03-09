@@ -1,12 +1,13 @@
 NAME=serializertest
-OBJS = myshape.o osgreflection.o
+OBJS = myshape.o osgreflection.o myshape_wrapper.o
+WRAPPER_OBJS = myshape_wrapper.o
 
 all: $(NAME)
 
 
 ###################################################################
 
-CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags)
+#CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags)
 #LDFLAGS +=  -llo -lSPIN $(shell python-config --libs)
 LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
 		-losgIntrospection -losgManipulator -losgText -losgUtil \
@@ -30,8 +31,8 @@ $(NAME): $(NAME).o $(OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-install:
-	-cp $(NAME) /usr/local/bin
+wrapper: $(WRAPPER_OBJS)
+	$(CXX) -shared -o $@ $^ $(LDFLAGS)
 
 clean:
 	-rm -f $(NAME) *.o

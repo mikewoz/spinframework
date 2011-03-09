@@ -5,19 +5,19 @@
 
 #define SHAPE_SCALE 1.0f
 
-namespace spinframework {
+namespace mytest {
 
 
-class myshape : public osg::PositionAttitudeTransform
+class MyShape : public osg::PositionAttitudeTransform
 {
 
 public:
 
 	enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
 
-	myshape();
-	myshape(shapeType shp);
-	~myshape();
+	MyShape();
+	MyShape(shapeType shp);
+	~MyShape();
 
 	void init();
 
