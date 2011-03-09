@@ -51,14 +51,14 @@ int main(int argc, char **argv)
         {
         	std::cout << "woohoo. Got wrapper: " << wrapper->getName() << std::endl;
 
-        	// (not: need to modify osg, to make serializers_ public)
+        	// (note: need to modify osg, to make serializers_ public)
         	/*
         	std::cout << "serializer list:" << std::endl;
-        	for ( osgDB::ObjectWrapper::SerializerList::iterator itr=wrapper->serializers_.begin(); itr!=wrapper->serializers_.end(); ++itr )
+        	for ( osgDB::ObjectWrapper::SerializerList::iterator itr=wrapper->_serializers.begin(); itr!=wrapper->_serializers.end(); ++itr )
         	{
         		std::cout << "  " << (*itr)->getName() << std::endl;
         	}
-			*/
+        	 */
 
         	osgDB::StringList assoc = wrapper->getAssociates();
         	std::cout << wrapper->getName() << " has " << assoc.size() << " associates: " << std::endl;
@@ -67,6 +67,7 @@ int main(int argc, char **argv)
         		std::cout << "  associate: " << assoc[i] << std::endl;
         	}
 
+        	/*
         	osgDB::StringList props;
         	std::vector<int> types;
         	wrapper->readSchema(props, types);
@@ -75,9 +76,10 @@ int main(int argc, char **argv)
         	{
         		std::cout << "  prop: " << props[i] << std::endl;
         	}
+        	*/
 
-        	std::string serializerName = "Num";
-        	osgDB::BaseSerializer* serializer = wrapper->getSerializer(serializerName);
+        	const std::string serializerName = "Num";
+        	osgDB::BaseSerializer* serializer = wrapper->getSerializer("Num");
         	if ( serializer )
         		std::cout << "got serializer: " << serializer->getName() << std::endl;
         	else
@@ -113,7 +115,7 @@ int main(int argc, char **argv)
 
     // try to set the 'Num':
     //Method* MyShapeNumMethod = MyShapeInfo->getMethod("Num");
-    //MyShapeNumMethod->set( newShape, <int>4 );
+    //MyShapeNumMethod->set( newShape, 4 );
 
 
     // try to set the 'Note' string:

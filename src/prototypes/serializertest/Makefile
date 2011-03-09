@@ -15,8 +15,8 @@ all: $(NAME)
 		-losgParticle -losgViewer 
 
 ifeq ($(shell uname -s),Darwin)
-  CPPFLAGS += -I/opt/local/include
-  LDFLAGS += -L/opt/local/lib
+  LDFLAGS += -L/opt/local/lib `pkg-config --libs openscenegraph`
+  CPPFLAGS += -I/opt/local/include `pkg-config --cflags openscenegraph`
 else #linux
   LDFLAGS += -lc -lm -ldl -lGL -lX11 `pkg-config --libs openscenegraph`
   CPPFLAGS += -I/usr/local/include `pkg-config --cflags openscenegraph`
