@@ -1,14 +1,15 @@
 NAME=serializertest
 OBJS = myshape.o osgreflection.o
+CXX = g++
 
 all: $(NAME)
 
 
 ###################################################################
 
-CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags)
+CPPFLAGS += -I../../include -g 
 #LDFLAGS +=  -llo -lSPIN $(shell python-config --libs)
-LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
+LDFLAGS += -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
 		-losgIntrospection -losgManipulator -losgText -losgUtil \
 		-losgParticle -losgViewer
 
@@ -29,9 +30,6 @@ endif
 $(NAME): $(NAME).o $(OBJS)
 	@echo "\n--------------- linking $@: ---------------" 
 	$(CXX) -o $@ $^ $(LDFLAGS)
-
-install:
-	-cp $(NAME) /usr/local/bin
 
 clean:
 	-rm -f $(NAME) *.o
