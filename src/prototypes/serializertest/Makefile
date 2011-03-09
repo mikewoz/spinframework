@@ -10,17 +10,17 @@ all: $(NAME)
 
 #CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags)
 #LDFLAGS +=  -llo -lSPIN $(shell python-config --libs)
-LDFLAGS += -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
+#LDFLAGS += -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
 		-losgIntrospection -losgManipulator -losgText -losgUtil \
-		-losgParticle -losgViewer
+		-losgParticle -losgViewer 
 
 ifeq ($(shell uname -s),Darwin)
   CPPFLAGS += -I/opt/local/include
-  LDFLAGS += -lboost_python -L/opt/local/lib
+  LDFLAGS += -L/opt/local/lib
 else #linux
-  LDFLAGS += -lc -lm -ldl -lGL -lX11 -lboost_python
+  LDFLAGS += -lc -lm -ldl -lGL -lX11 `pkg-config --libs openscenegraph`
+  CPPFLAGS += -I/usr/local/include `pkg-config --cflags openscenegraph`
 endif
-
 
 # TARGETS:
 
