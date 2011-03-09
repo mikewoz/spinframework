@@ -39,6 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "PointerNode.h"
+
 #include <osgManipulator/CommandManager>
 #include <osgManipulator/TabBoxDragger>
 #include <osgManipulator/TabPlaneDragger>
@@ -49,8 +51,6 @@
 #include <osgManipulator/TranslateAxisDragger>
 #include <osgUtil/IntersectionVisitor>
 
-
-#include "PointerNode.h"
 #include "RayNode.h"
 #include "GroupNode.h"
 #include "SceneManager.h"
