@@ -1,46 +1,45 @@
 #include <iostream>
-
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
-
 #include <osgDB/ObjectWrapper>
 #include <osgDB/InputStream>
 #include <osgDB/OutputStream>
 
 #include "myshape.h"
-
-REGISTER_OBJECT_WRAPPER( myshape_wrapper, // The unique wrapper name
-                         new spinframework::myshape, // The proto
-                         spinframework::myshape, // The class typename
-                         "osg::Object osg::Node osg::Group osg::Transform osg::PositionAttitudeTransform spinframework::myshape" )  // The inheritance relations
+/*
+REGISTER_OBJECT_WRAPPER( MyShape, // The unique wrapper name
+                         new mytest::MyShape, // The proto
+                         mytest::MyShape, // The class typename
+                         "osg::Object osg::Node osg::Group osg::Transform osg::PositionAttitudeTransform mytest::MyShape" )  // The inheritance relations
 {
 	//ADD_VEC3_SERIALIZER( Translation, osg::Vec3() );
 	ADD_STRING_SERIALIZER( Note, "v" );
 	ADD_INT_SERIALIZER( Num, 0 );
 
 }
+*/
 
-using namespace spinframework;
+using namespace mytest;
 
-myshape::myshape ()
+MyShape::MyShape ()
 {
 	// let default be a sphere:
-	shape_ = myshape::SPHERE;
+	shape_ = MyShape::SPHERE;
 	note_ = "init";
 	num_ = -1;
 	init();
 }
 
-myshape::myshape (shapeType shape)
+MyShape::MyShape (shapeType shape)
 {
 	shape_ = shape;
 	init();
 }
 
-myshape::~myshape(){}
+MyShape::~MyShape(){}
 
 
-void myshape::init()
+void MyShape::init()
 {
 	osg::TessellationHints* hints = new osg::TessellationHints;
 	hints->setDetailRatio(0.5f);
@@ -74,36 +73,36 @@ void myshape::init()
 
 }
 
-//void myshape::setTranslation(float x, float y, float z)
-void myshape::setTranslation(osg::Vec3f v)
+//void MyShape::setTranslation(float x, float y, float z)
+void MyShape::setTranslation(osg::Vec3f v)
 {
 	trans_ = v;
 	this->setPosition(v);
 }
 
-osg::Vec3f myshape::getTranslation()
+osg::Vec3f MyShape::getTranslation()
 {
 	return trans_;
 }
 
-void myshape::setNote(const std::string &s)
+void MyShape::setNote(const std::string &s)
 {
 	note_ = s;
 	std::cout << "Got note: " << note_ << std::endl;
 }
 
-const std::string& myshape::getNote() const
+const std::string& MyShape::getNote() const
 {
 	return note_;
 }
 
-void myshape::setNum(int num)
+void MyShape::setNum(int num)
 {
 	num_ = num;
 	std::cout << "Got new num: " << num_ << std::endl;
 }
 
-int myshape::getNum() const
+int MyShape::getNum() const
 {
 	return num_;
 }

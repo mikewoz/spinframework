@@ -5,6 +5,7 @@
 //
 // ***************************************************************************
 
+
 #include <osgIntrospection/ReflectionMacros>
 #include <osgIntrospection/TypedMethodInfo>
 #include <osgIntrospection/StaticMethodInfo>
