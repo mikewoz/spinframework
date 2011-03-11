@@ -66,7 +66,7 @@ libSPIN_la_includedir = $(includedir)/spinFramework
 libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
-libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
+# libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
 libSPINPyWrap_la_LIBADD = libSPIN.la
 
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
