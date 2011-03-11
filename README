@@ -41,6 +41,10 @@ A number of audio/video/image formats are supported by means of the OpenSceneGra
 
 Ultimately, the SPIN Framework allows for the creation of collaborative environments where several distributed users can share and interact with immersive 3D content.
 
+Dependencies
+------------
+1) compile and install openscenegraph 2.9.11
+3) compile and install osgintrospection from the https://github.com/sat-metalab/osgintrospection
 
 Compiling
 ---------
