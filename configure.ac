@@ -47,7 +47,6 @@ case "$host" in *-darwin* | *-macos10*)
     LDFLAGS="$LDFLAGS -L/sw/lib"
   fi
   ;;
-  LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 esac
 
 # OSX does not include /usr/local/lib/pkgconfig path, so we export it here
@@ -56,6 +55,7 @@ PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
+# LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
