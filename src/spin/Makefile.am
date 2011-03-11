@@ -11,13 +11,16 @@ libSPIN_la_LIBADD = \
 	$(top_builddir)/src/tinyxml/libtinyxml.la
 
 libSPIN_la_LDFLAGS = \
-	$(PYTHON_LDFLAGS) \
-	$(BOOST_LDFLAGS) \
 	$(BOOST_FILESYSTEM_LIB) \
+	$(BOOST_LDFLAGS) \
+	$(OSGINTROSPECTION_LIB) \
+	$(PYTHON_LDFLAGS) \
 	-l$(BOOST_PYTHON_LIB) \
+    $(BOOST_THREAD_LIB) \
+    $(LIBLO_LDFLAGS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
-	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS) $(BOOST_THREAD_LIB) $(SHARED_VIDEO_LIB)
+    $(SHARED_VIDEO_LIB)
 
 # please keep those in alphabetical order:
 libSPIN_la_SOURCES = \
@@ -72,7 +75,6 @@ libSPINPyWrap_la_LIBADD = libSPIN.la
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
 
-
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
@@ -84,7 +86,6 @@ spinviewer_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION
 spindocgenerator_SOURCES = docGenerator.cpp
 spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION_LIBS)
 
-
 ###############################################################################
 # CUSTOM targets:
 
@@ -92,7 +93,6 @@ spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSP
 #OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
 
 #OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
-
 
 # WARNING: the .app generation script pulls some libs (eg, libSPIN) from /usr/local
 # so you must do a 'make install' before this will work (TODO: fix this)
@@ -117,7 +117,6 @@ spinviewer.app: spinviewer$(EXEEXT)
 	cp /usr/local/bin/spinviewer $@/Contents/MacOS
 	../../util/dylibbundler/dylibbundler -of -b -x $@/Contents/MacOS/spinviewer -d $@/Contents/libs
 
-
 #	cp ../Resources/fonts/*.ttf $@/Contents/Resources/fonts
 #	cp ../Resources/images/*.icns ../Resources/images/*.xpm ../Resources/images/*.gif ../Resources/images/*.png $@/Contents/Resources/images
 #	cp ../Resources/scripts/*.py $@/Contents/Resources/scripts
@@ -141,7 +140,6 @@ spinviewer.app: spinviewer$(EXEEXT)
 #install_name_tool -change libosgViewer.55.dylib @executable_path/../libs/libosgViewer.55.dylib $@/Contents/MacOS/spinviewer
 #install_name_tool -change libosgIntrospection.55.dylib @executable_path/../libs/libosgIntrospection.55.dylib $@/Contents/MacOS/spinviewer
 
-
 #install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinviewer
 #-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
 #-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
@@ -150,4 +148,3 @@ spinviewer.app: spinviewer$(EXEEXT)
 doc:
 	./spindocgenerator
 	-cp *.html ../../doxygen/html
-
