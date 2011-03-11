@@ -15,6 +15,7 @@ libSPIN_la_LDFLAGS = \
 	$(BOOST_LDFLAGS) \
 	$(BOOST_FILESYSTEM_LIB) \
 	-l$(BOOST_PYTHON_LIB) \
+    $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
 	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS) $(BOOST_THREAD_LIB) $(SHARED_VIDEO_LIB)
 
@@ -75,13 +76,13 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libSPIN.la $(OSG_LIBS)
+spinserver_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION_LIBS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libSPIN.la $(OSG_LIBS)
+spinviewer_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libSPIN.la $(OSG_LIBS)
+spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION_LIBS)
 
 
 ###############################################################################

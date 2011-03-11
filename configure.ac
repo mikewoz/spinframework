@@ -160,6 +160,8 @@ PKG_CHECK_MODULES(OSGINTROSPECTION, osgintrospection-2.11 >= 2.11.0, , AC_MSG_ER
 #AC_CHECK_LIB(osg,osgGetVersion)
 #AC_CHECK_LIB(OpenThreads,OpenThreadsGetVersion)
 
+PKG_CHECK_MODULES(OPENTHREADS, openthreads >= 2.4.0, , AC_MSG_ERROR([missing OpenThreads]))
+
 # Mac OS X specific configure options
 #AC_ARG_WITH(osg_framework, [ --with-osg-framework=PREFIX Specify the prefix path to osg frameworks [default=standard framework paths]])
 #AC_CHECK_FRAMEWORK(osg, [#include <osg/Version>])

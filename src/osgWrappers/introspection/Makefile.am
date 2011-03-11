@@ -55,5 +55,5 @@ libSPINwrappers_la_SOURCES = \
 #    $(top_srcdir)/src/spin/*.h \
 #    $(top_srcdir)/src/tinyxml/*.h
 
-libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include -I$(top_srcdir)/src/spin $(PYTHON_CPPFLAGS) $(OSGINTROSPECTION_CFLAGS)
+libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include -I$(top_srcdir)/src/spin $(PYTHON_CPPFLAGS) $(OSGINTROSPECTION_CFLAGS) $(OPENTHREADS_CFLAGS)
 
