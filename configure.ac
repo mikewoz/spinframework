@@ -148,11 +148,13 @@ fi
 
 # Check for OpenSceneGraph:
 PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
-AC_CHECK_LIB(osg, osgGetVersion, , AC_MSG_ERROR([missing OpenSceneGraph]),)
 
 # and osgIntrospection:
-AC_CHECK_LIB(osgIntrospection, osgIntrospectionGetVersion, OSGINTROSPECTION_LIB="-losgIntrospection", AC_MSG_ERROR([missing OpenSceneGraph Introspection library]),)
-AC_SUBST([OSGINTROSPECTION_LIB])
+PKG_CHECK_MODULES(OSGINTROSPECTION, osgintrospection-2.11 >= 2.11.0, , AC_MSG_ERROR([missing OsgIntrospection]))
+
+# and osgIntrospection:
+#AC_CHECK_LIB(osgIntrospection, osgIntrospectionGetVersion, OSGINTROSPECTION_LIB="-losgIntrospection", AC_MSG_ERROR([missing OpenSceneGraph Introspection library]),)
+#AC_SUBST([OSGINTROSPECTION_LIB])
 
 # another way to check for OSG libs?:
 #AC_CHECK_LIB(osg,osgGetVersion)
