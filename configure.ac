@@ -147,7 +147,7 @@ if test -z "$BOOST_PYTHON_LIB" ; then
 fi
 
 # Check for OpenSceneGraph:
-#PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
+PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
 AC_CHECK_LIB(osg, osgGetVersion, , AC_MSG_ERROR([missing OpenSceneGraph]),)
 
 # and osgIntrospection:

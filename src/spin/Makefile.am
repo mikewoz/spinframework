@@ -1,4 +1,4 @@
-AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include $(PYTHON_CPPFLAGS)
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include $(PYTHON_CPPFLAGS) $(OSG_CFLAGS)
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
@@ -15,9 +15,7 @@ libSPIN_la_LDFLAGS = \
 	$(BOOST_LDFLAGS) \
 	$(BOOST_FILESYSTEM_LIB) \
 	-l$(BOOST_PYTHON_LIB) \
-	-lOpenThreads -losg \
-	-losgGA -losgDB -losgManipulator -losgText -losgUtil \
-	-losgFX -losgParticle -losgViewer \
+    $(OSG_LIBS) \
 	$(OSGINTROSPECTION_LIB) $(LIBLO_LDFLAGS) $(BOOST_THREAD_LIB) $(SHARED_VIDEO_LIB)
 
 # please keep those in alphabetical order:
@@ -77,23 +75,22 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libSPIN.la #$(SPIN_LDFLAGS)
+spinserver_LDADD = libSPIN.la $(OSG_LIBS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libSPIN.la # $(SPIN_LDFLAGS)D
+spinviewer_LDADD = libSPIN.la $(OSG_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDFLAGS = $(SPIN_LDFLAGS)
-spindocgenerator_LDADD = libSPIN.la
+spindocgenerator_LDADD = libSPIN.la $(OSG_LIBS)
 
 
 ###############################################################################
 # CUSTOM targets:
 
-OSG_VER = $(shell osgversion --so-number)
-OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
+#OSG_VER = $(shell osgversion --so-number)
+#OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
 
-OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
+#OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
 
 
 # WARNING: the .app generation script pulls some libs (eg, libSPIN) from /usr/local
