@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <SceneManager.h>
 #include <SharedVideoTexture.h>
