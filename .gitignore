@@ -46,3 +46,5 @@ doxyfile
 doxyfile.stamp
 html
 man
+doxygen
+latex
