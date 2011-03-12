@@ -252,6 +252,6 @@ class SceneManager
 
 
 
-int invokeMethod(const cppintrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
+int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs);
 
 #endif

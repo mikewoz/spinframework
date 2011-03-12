@@ -103,7 +103,7 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
     {
     	/*
         std::cout << "[DEBUG] These are all possible types:" << std::endl;
-        const cppintrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
+        const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
         for (cppintrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
         {
             if ( ((*it).second)->isDefined() )
@@ -113,7 +113,7 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
             }
         }
 		*/
-        const cppintrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
         //UNUSED(ReferencedNodeType);
         if (!ReferencedNodeType.isDefined())
         {

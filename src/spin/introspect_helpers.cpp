@@ -46,7 +46,7 @@
 // *****************************************************************************
 // introspection helpers
 
-bool introspect_type_order(const cppintrospection::Type *v1, const osgIntrospection::Type *v2)
+bool introspect_type_order(const cppintrospection::Type *v1, const cppintrospection::Type *v2)
 {
 	using namespace cppintrospection;
 	

@@ -253,8 +253,8 @@ int main()
 		return 1;
 	}
 	
-	const cppintrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-	const cppintrospection::Type &ReferencedStateSetType = osgIntrospection::Reflection::getType("ReferencedStateSet");
+	const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
+	const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("ReferencedStateSet");
 	
 	output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
 	output << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n";
@@ -281,7 +281,7 @@ int main()
 		   << "Below is the complete list of accepted OSC messages for the "
 		   << "following nodes:</p>\n";
 		   
-	const cppintrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
+	const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
 	cppintrospection::TypeMap::const_iterator it;
 	
 	output << "<ul>\n";
