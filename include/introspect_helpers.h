@@ -42,14 +42,14 @@
 #ifndef __INTROSPECT_HELPERS_H__
 #define __INTROSPECT_HELPERS_H__
 
-namespace osgIntrospection {
+namespace cppintrospection {
     class Type;
     class MethodInfo;
 }
 
-bool introspect_type_order(const osgIntrospection::Type *v1, const osgIntrospection::Type *v2);
-void introspect_print_method(const osgIntrospection::MethodInfo &mi);
-void introspect_print_type(const osgIntrospection::Type &type);
+bool introspect_type_order(const cppintrospection::Type *v1, const osgIntrospection::Type *v2);
+void introspect_print_method(const cppintrospection::MethodInfo &mi);
+void introspect_print_type(const cppintrospection::Type &type);
 void introspect_print_all_types();
 
 #endif // __INTROSPECT_HELPERS_H__

@@ -48,7 +48,7 @@
 #include <osg/Geode>
 
 #include <osgDB/SharedStateManager>
-#include <osgIntrospection/Value>
+#include <cppintrospection/Value>
 
 #include "ReferencedNode.h"
 #include "ReferencedStateSet.h"
@@ -252,6 +252,6 @@ class SceneManager
 
 
 
-int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
+int invokeMethod(const cppintrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
 
 #endif

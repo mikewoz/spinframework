@@ -54,7 +54,7 @@
 #include <osg/Node>
 #include <osg/observer_ptr>
 #include <boost/python.hpp>
-#include <osgIntrospection/Value>
+#include <cppintrospection/Value>
 
 // forward declaration of SceneManager
 class SceneManager;
@@ -286,7 +286,7 @@ public:
     bool addEventScript( bool serverSide, const std::string& label, const std::string& eventName,
                          const std::string& scriptPath,  const std::string& params );
     bool callEventScript( const std::string& eventName,
-                          osgIntrospection::ValueList& args );
+                          cppintrospection::ValueList& args );
     bool enableEventScript( const char* label, int enable );
     bool removeEventScript( const char* label );
 
@@ -304,7 +304,7 @@ public:
      * It used to be that we wanted to keep a list of all child ReferencedNode
      * nodes that are attached. Was this so that we could differentiate SPIN
      * nodes from other scene graph node? That seems silly, since one can always
-     * try a dynamic_cast or use osgIntrospection
+     * try a dynamic_cast or use cppintrospection
      */
     ReferencedNode *as_getChild(ReferencedNode *child);
     /**
