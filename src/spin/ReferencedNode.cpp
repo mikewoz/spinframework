@@ -47,8 +47,8 @@
 #include <osg/BlendFunc>
 #include <osg/BlendColor>
 #include <osg/BlendEquation>
-#include <osgIntrospection/Value>
-#include <osgIntrospection/Type>
+#include <cppintrospection/Value>
+#include <cppintrospection/Type>
 
 #include "spinApp.h"
 #include "spinBaseContext.h"
@@ -838,7 +838,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
 // *****************************************************************************
 
 bool ReferencedNode::callEventScript( const std::string& eventName,
-                                      osgIntrospection::ValueList& args ) {
+                                      cppintrospection::ValueList& args ) {
 
     if ( _eventScriptList.empty() ) return false;
 
@@ -861,17 +861,17 @@ bool ReferencedNode::callEventScript( const std::string& eventName,
                     const std::type_info* argt = &args[i].getType().getStdTypeInfo();
 
                     if ( *argt == typeid(int) ) {
-                        argList.append( osgIntrospection::variant_cast<int>(args[i]) );
+                        argList.append( cppintrospection::variant_cast<int>(args[i]) );
                     } else if ( *argt == typeid(float) ) {
-                        argList.append( osgIntrospection::variant_cast<float>(args[i]) );
+                        argList.append( cppintrospection::variant_cast<float>(args[i]) );
                     } else if ( *argt == typeid(double) ) {
-                        argList.append( osgIntrospection::variant_cast<double>(args[i]) );
+                        argList.append( cppintrospection::variant_cast<double>(args[i]) );
                     } else if ( *argt == typeid(std::string) ) {
-                        argList.append( osgIntrospection::variant_cast<std::string>(args[i]).c_str() );
+                        argList.append( cppintrospection::variant_cast<std::string>(args[i]).c_str() );
                     } else if ( *argt == typeid(const char*) ) {
-                        argList.append( osgIntrospection::variant_cast<const char*>(args[i]) );
+                        argList.append( cppintrospection::variant_cast<const char*>(args[i]) );
                     } else if ( *argt == typeid(char*) ) {
-                        argList.append( osgIntrospection::variant_cast<char*>(args[i]) );
+                        argList.append( cppintrospection::variant_cast<char*>(args[i]) );
                     } else {
                         std::cout << "callEventScript: unsupported argument type: " << argt->name() << std::endl;
                         return false;

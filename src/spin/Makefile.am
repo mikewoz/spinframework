@@ -1,4 +1,4 @@
-AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include $(PYTHON_CPPFLAGS) $(OSG_CFLAGS) $(OSGINTROSPECTION_CFLAGS)
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include $(PYTHON_CPPFLAGS) $(OSG_CFLAGS) $(CPPINTROSPECTION_CFLAGS)
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
@@ -13,7 +13,7 @@ libSPIN_la_LIBADD = \
 libSPIN_la_LDFLAGS = \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_LDFLAGS) \
-	$(OSGINTROSPECTION_LIB) \
+	$(CPPINTROSPECTION_LIB) \
 	$(PYTHON_LDFLAGS) \
 	-l$(BOOST_PYTHON_LIB) \
     $(BOOST_THREAD_LIB) \
@@ -78,13 +78,13 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION_LIBS)
+spinserver_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION_LIBS)
+spinviewer_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(OSGINTROSPECTION_LIBS)
+spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
 
 ###############################################################################
 # CUSTOM targets:
