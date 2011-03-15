@@ -1,8 +1,16 @@
 AM_CPPFLAGS = \
-    -I$(top_srcdir)/include/spineditor \
-    -I$(top_srcdir)/src/tinyxml \
+    $(BOOST_CPPFLAGS) \
+    $(CPPINTROSPECTION_CFLAGS) \
+    $(LIBLO_CFLAGS) \
+    $(OPENTHREADS_CFLAGS) \
+    $(OSG_CFLAGS) \
     $(PYTHON_CPPFLAGS) \
-    $(WX_CPPFLAGS) -arch x86_64
+    $(WX_CPPFLAGS) \
+    -I$(top_srcdir)/include \
+    -I$(top_srcdir)/include/spineditor \
+    -I$(top_srcdir)/src/tinyxml
+
+#  -arch x86_64
 
 EXTRA_DIST = \
     layout.cbp
@@ -19,7 +27,19 @@ spineditor_SOURCES = \
     main.cpp \
     main.h
 
-spineditor_LDFLAGS = -lSPIN $(SPIN_LDFLAGS) $(WX_LIBS) -arch x86_64
+spineditor_LDFLAGS = \
+    -lSPIN \
+    $(BOOST_FILESYSTEM_LIB) \
+    $(BOOST_LDFLAGS) \
+    $(BOOST_THREAD_LIB) \
+    $(CPPINTROSPECTION_LIBS) \
+    $(LIBLO_LIBS) \
+    $(OPENTHREADS_LIBS) \
+    $(OSG_LIBS) \
+    $(PYTHON_LDFLAGS) \
+    $(SHARED_VIDEO_LIB) \
+    -l$(BOOST_PYTHON_LIB) \
+    $(WX_LIBS)
 
 # dnl     CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
 # dnl     CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"

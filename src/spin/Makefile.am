@@ -1,7 +1,7 @@
 AM_CPPFLAGS = \
-	$(BOOST_CPPFLAGS) \
-	$(CPPINTROSPECTION_CFLAGS) \
-	$(PYTHON_CPPFLAGS) \
+    $(BOOST_CPPFLAGS) \
+    $(CPPINTROSPECTION_CFLAGS) \
+    $(PYTHON_CPPFLAGS) \
     $(LIBLO_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
     $(OSG_CFLAGS) \
@@ -16,15 +16,15 @@ lib_LTLIBRARIES = libSPIN.la
 python_LTLIBRARIES = libSPINPyWrap.la
 
 libSPIN_la_LIBADD = \
-	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
-	$(top_builddir)/src/tinyxml/libtinyxml.la
+    $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
+    $(top_builddir)/src/tinyxml/libtinyxml.la
 
 libSPIN_la_LDFLAGS = \
-	$(BOOST_FILESYSTEM_LIB) \
-	$(BOOST_LDFLAGS) \
-	$(CPPINTROSPECTION_LIB) \
-	$(PYTHON_LDFLAGS) \
-	-l$(BOOST_PYTHON_LIB) \
+    $(BOOST_FILESYSTEM_LIB) \
+    $(BOOST_LDFLAGS) \
+    $(CPPINTROSPECTION_LIBS) \
+    $(PYTHON_LDFLAGS) \
+    -l$(BOOST_PYTHON_LIB) \
     $(BOOST_THREAD_LIB) \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
@@ -33,16 +33,16 @@ libSPIN_la_LDFLAGS = \
 
 # please keep those in alphabetical order:
 libSPIN_la_SOURCES = \
-	AttractorNode.cpp \
-	ConstraintsNode.cpp \
-	DSPNode.cpp \
-	Fog.cpp \
-	GridNode.cpp \
-	ReferencedNode.cpp \
-	SceneManager.cpp \
-	UserNode.cpp \
-	osgUtil.cpp \
-	spinApp.cpp \
+    AttractorNode.cpp \
+    ConstraintsNode.cpp \
+    DSPNode.cpp \
+    Fog.cpp \
+    GridNode.cpp \
+    ReferencedNode.cpp \
+    SceneManager.cpp \
+    UserNode.cpp \
+    osgUtil.cpp \
+    spinApp.cpp \
     AnimationNode.cpp \
     Contour.cpp \
     GroupNode.cpp \
