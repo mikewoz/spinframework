@@ -177,7 +177,6 @@ AC_CONFIG_FILES([
         src/tinyxml/Makefile 
         src/osgWrappers/introspection/Makefile 
         src/spin/Makefile
-        src/editor/Makefile
         src/Resources/Makefile
         src/Resources/images/Makefile
         src/Resources/desktopentries/Makefile
