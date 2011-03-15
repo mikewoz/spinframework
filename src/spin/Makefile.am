@@ -1,4 +1,13 @@
-AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I$(top_srcdir)/include $(PYTHON_CPPFLAGS) $(OSG_CFLAGS) $(CPPINTROSPECTION_CFLAGS)
+AM_CPPFLAGS = \
+	$(BOOST_CPPFLAGS) \
+	$(CPPINTROSPECTION_CFLAGS) \
+	$(PYTHON_CPPFLAGS) \
+    $(LIBLO_CFLAGS) \
+    $(OPENTHREADS_CFLAGS) \
+    $(OSG_CFLAGS) \
+    -I$(top_srcdir)/include \
+    -I$(top_srcdir)/src/tinyxml
+
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
@@ -17,7 +26,7 @@ libSPIN_la_LDFLAGS = \
 	$(PYTHON_LDFLAGS) \
 	-l$(BOOST_PYTHON_LIB) \
     $(BOOST_THREAD_LIB) \
-    $(LIBLO_LDFLAGS) \
+    $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHARED_VIDEO_LIB)

@@ -56,7 +56,6 @@
 #include <boost/python.hpp>
 #include <cppintrospection/Value>
 
-// forward declaration of SceneManager
 class SceneManager;
 
 typedef struct {

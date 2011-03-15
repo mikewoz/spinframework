@@ -47,8 +47,6 @@
 #include <osg/BlendFunc>
 #include <osg/BlendColor>
 #include <osg/BlendEquation>
-#include <cppintrospection/Value>
-#include <cppintrospection/Type>
 
 #include "spinApp.h"
 #include "spinBaseContext.h"
@@ -56,6 +54,8 @@
 #include "SceneManager.h"
 #include "ReferencedNode.h"
 
+#include <cppintrospection/Value>
+#include <cppintrospection/Type>
 
 using namespace std;
 

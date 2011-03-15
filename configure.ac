@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(SPINFramework, [0.3.3], [https://sourceforge.net/apps/trac/spinframework/])
+AC_INIT(SPINFRAMEWORK, [0.3.3], [https://sourceforge.net/apps/trac/spinframework/], [spinframework], [http://www.spinframework.org])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -125,9 +125,7 @@ PKG_CHECK_MODULES(CPPINTROSPECTION, cppintrospection-2.11 >= 2.11.0, , AC_MSG_ER
 
 PKG_CHECK_MODULES(OPENTHREADS, openthreads >= 2.4.0, , AC_MSG_ERROR([missing OpenThreads]))
 
-# check for liblo:
-AC_CHECK_LIB(lo, lo_send_internal, LIBLO_LDFLAGS="-llo", AC_MSG_ERROR([missing liblo OSC library]),)
-AC_SUBST([LIBLO_LDFLAGS])
+PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 
 # FIXME: scenic should use pkg-config to say where shared video is
 OLD_LDFLAGS=$LDFLAGS
