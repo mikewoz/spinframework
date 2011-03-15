@@ -25,7 +25,8 @@ spineditor_SOURCES = \
     GUIFrame.cpp \
     GUIFrame.h \
     main.cpp \
-    main.h
+    main.h \
+    unused.h
 
 spineditor_LDFLAGS = \
     -lSPIN \
