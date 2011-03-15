@@ -2,8 +2,14 @@ Release-critical for 0.4
 ------------------------
  * Use OSG serializer, drop osgIntrospection
  * enclose everything in the spin namespace
- * write some tests
- * merge cleanup and master
+ * write some unit/system tests
+ * Write some network tests
+ * clean up the copyright header for each file
+ * Package wx dependencies for Ubuntu and/or Debian (if needed)
+ * fix examples, since they need to link to cppintrospection
+ * clean up doxygen configuration (remove private stuff, etc.)
+ * document the coding style
+
 
 Server side TCP handlers
 ------------------------
@@ -20,11 +26,6 @@ Refactoring
 SPIN Editor
 -----------
  * Port the code we have to spin >= 0.3.3
-
-Tests
------
- * Write some unit tests
- * Write some network tests
 
 Examples
 --------
