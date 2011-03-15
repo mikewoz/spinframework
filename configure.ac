@@ -183,6 +183,7 @@ AC_CONFIG_FILES([
         src/Resources/desktopentries/Makefile
         src/Resources/fonts/Makefile
         src/Resources/scripts/Makefile
+        src/editor/Makefile
         ])
 
 AC_OUTPUT
