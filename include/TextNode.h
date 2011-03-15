@@ -44,11 +44,15 @@
 
 #include "GroupNode.h"
 
+namespace osgText {
+class Text;
+}
 
-#include <osgText/Text>
-#include <osg/PositionAttitudeTransform>
+namespace osg {
+class Geode;
+}
 
-
+class SceneManager;
 
 /**
  * \brief Provides 3D text rendered in the scene

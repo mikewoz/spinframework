@@ -160,7 +160,6 @@ typedef struct _symbol
     ReferencedType s_type;
 } t_symbol;
 
-
 typedef float t_float;
 typedef float t_floatarg;  
 
@@ -172,17 +171,5 @@ EXTERN t_symbol *gensym(const char *s);
 EXTERN void *getbytes(size_t nbytes);
 EXTERN void *copybytes(void *src, size_t nbytes);
 EXTERN void freebytes(void *x, size_t nbytes);
-
-
-
-// *****************************************************************************
-// introspection helpers
-#include <osgIntrospection/Type>
-#include <osgIntrospection/MethodInfo>
-
-bool introspect_type_order(const osgIntrospection::Type *v1, const osgIntrospection::Type *v2);
-void introspect_print_method(const osgIntrospection::MethodInfo &mi);
-void introspect_print_type(const osgIntrospection::Type &type);
-void introspect_print_all_types();
 
 #endif

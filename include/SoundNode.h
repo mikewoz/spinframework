@@ -44,11 +44,10 @@
 
 #include "DSPNode.h"
 
-
-#define AS_LASER_RADIUS 0.0025
-#define DEFAULT_DIRECTIVITY_COLOR osg::Vec3(0.0,0.0,1.0) //blue
-
-class DSPNode;
+namespace osg {
+    class Geode;
+    class PositionAttitudeTransform;
+}
 
 /**
  * \brief Represents a point sound source (or sink).
@@ -151,8 +150,6 @@ class SoundNode : public DSPNode
 
         // VU meter:
         osg::ref_ptr<osg::PositionAttitudeTransform> VUmeterTransform;
-
-
 };
 
 

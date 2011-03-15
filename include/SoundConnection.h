@@ -43,13 +43,14 @@
 #ifndef __SoundConnection_H
 #define __SoundConnection_H
 
-#include "DSPNode.h"
-#include "SceneManager.h"
-#include "spinServerContext.h"
+#include <osg/Node>
+#include <lo/lo_types.h> // for lo_message
+#include "spinUtil.h" // for t_symbol
+
+class SceneManager;
+class DSPNode;
 
 enum connectionType { NORMAL, NODE_TO_SPACE, SPACE_TO_NODE };
-
-class DSPNode;
 
 /**
  * \brief An explicit connection between two sound elements (ie, subclassed from

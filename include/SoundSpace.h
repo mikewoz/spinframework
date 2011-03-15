@@ -43,11 +43,11 @@
 #define __SoundSpace_H
 
 
-#include "DSPNode.h"
-
+#ifdef AS_GRAPHICAL
 #include <osgUtil/IntersectVisitor>
+#endif
 
-class DSPNode;
+#include "DSPNode.h"
 
 /**
  * \brief Represents an acoustic enclosure or volume in space.

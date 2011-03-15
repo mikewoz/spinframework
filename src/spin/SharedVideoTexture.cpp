@@ -41,6 +41,8 @@
 
 #include "config.h"
 
+#include <osg/Texture2D>
+#include <osg/Image>
 #include <iostream>
 #include "SharedVideoTexture.h"
 #include "SceneManager.h"

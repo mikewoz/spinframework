@@ -44,6 +44,7 @@
 
 #include "spinBaseContext.h"
 #include <map>
+#include <string>
 
 /**
  * \brief A server-side spinContext for maintaining an instance of SPIN and

@@ -42,3 +42,9 @@ src/spin/spindocgenerator
 src/spin/spinserver
 src/spin/spinviewer
 spinframework-*.*.*
+doxyfile
+doxyfile.stamp
+html
+man
+doxygen
+latex

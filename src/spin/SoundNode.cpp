@@ -51,7 +51,10 @@
 
 using namespace std;
 
-//extern SceneManager *sceneManager;
+namespace {
+    const double AS_LASER_RADIUS = 0.0025;
+    const osg::Vec3 DEFAULT_DIRECTIVITY_COLOR(0.0,0.0,1.0); //blue
+} // end anonymous namespace
 
 extern pthread_mutex_t sceneMutex;
 

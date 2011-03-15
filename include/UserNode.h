@@ -43,12 +43,9 @@
 #define __UserNode_H
 
 
-#include "GroupNode.h"
 #include "ConstraintsNode.h"
 
 #include <osg/Timer>
-
-
 
 /**
  * \brief Represents a user in the scene.

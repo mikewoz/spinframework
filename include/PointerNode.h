@@ -42,17 +42,22 @@
 #ifndef ASMANIPULATOR_H_
 #define ASMANIPULATOR_H_
 
-#include <osg/MatrixTransform>
-#include <osgManipulator/Dragger>
-#include <osgManipulator/Selection>
-#include <osgManipulator/CommandManager>
+#include <osgGA/GUIActionAdapter>
+#include <osgManipulator/Dragger> // for PointerInf
+#include <osgManipulator/Selection> // for Selection (typedef)
 #include <osgUtil/LineSegmentIntersector>
-
 #include "ReferencedNode.h"
 
+namespace osgGA {
+    class GUIEventAdapter;
+}
+
+namespace osgManipulator {
+    class CommandManager;
+}
 
 // dummy class:
-class PointerNodeActionAdapter : public osgGA::GUIActionAdapter{
+class PointerNodeActionAdapter : public osgGA::GUIActionAdapter {
     void requestRedraw(void){};
     void requestContinuousUpdate(bool){};
     void requestWarpPointer(float,float) {};
@@ -71,79 +76,77 @@ class PointerNodeActionAdapter : public osgGA::GUIActionAdapter{
 class PointerNode : public ReferencedNode
 {
 
-public:
+    public:
 
-    PointerNode(SceneManager *sceneManager, char *initID);
-    virtual ~PointerNode();
-    
-    virtual void callbackUpdate();
-    
-    
-    void enableDragger();
-    void disableDragger();
+        PointerNode(SceneManager *sceneManager, char *initID);
+        virtual ~PointerNode();
 
-    ReferencedNode *getNodeFromIntersections();
-    //void computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T);
+        virtual void callbackUpdate();
 
-    void setType (char *s);
-    void highlight (int b);
-    void manipulate (int b);
-    
-    const char* getType() const { return draggerType.c_str(); }
-    int getHighlight() const { return (int) dragger.valid(); }
-    int getManipulate() const { return (int) doManipulation; }
-    
-    // grab stuff:
-    void grab (int b);
-    void pull (float f);
-    int getGrab() const { return (int) grabbedNode.valid(); }
-        
 
-    
-    /**
-     * For each subclass of ReferencedNode, we override the getState() method to
-     * fill the vector with the correct set of methods for this particular node
-     */
-    virtual std::vector<lo_message> getState() const;
-    
-    /**
-     * We must include a stateDump() method that simply invokes the base class
-     * method. Simple C++ inheritance is not enough, because osg::Introspection
-     * won't see it.
-     */
-    //virtual void stateDump() { ReferencedNode::stateDump(); };
-    
-    
-private:
-    
-    // intersector stuff:
-    osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
-    std::vector<t_symbol*> intersectList;
-    std::vector<osg::Vec3> intersectListOffsets;
-    std::vector<osgUtil::LineSegmentIntersector::Intersection> intersectData;
-    
-    // grabber stuff:
-    osg::ref_ptr<ReferencedNode> grabbedNode;
-    osg::Vec3 grabbedOffset;
-    t_symbol *previousParent;
-    
-    // dragger stuff:
-    std::string draggerType;
-    bool doManipulation;
-    osg::ref_ptr<ReferencedNode> targetNode;
-    
-    osg::Matrix origMatrix;
-    osg::Matrix previousMatrix;
-    
-    osg::ref_ptr<osgManipulator::Dragger> dragger;
-    osg::ref_ptr<osgManipulator::Selection> selection;
-    osg::ref_ptr<osgManipulator::CommandManager> cmdMgr;
-    
-    osg::ref_ptr<osgGA::GUIEventAdapter> ea;
-    PointerNodeActionAdapter aa;
-    osgManipulator::PointerInfo _pointer;
+        void enableDragger();
+        void disableDragger();
 
-    
+        ReferencedNode *getNodeFromIntersections();
+        //void computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T);
+
+        void setType (char *s);
+        void highlight (int b);
+        void manipulate (int b);
+
+        const char* getType() const { return draggerType.c_str(); }
+        int getHighlight() const { return (int) dragger.valid(); }
+        int getManipulate() const { return (int) doManipulation; }
+
+        // grab stuff:
+        void grab (int b);
+        void pull (float f);
+        int getGrab() const { return (int) grabbedNode.valid(); }
+
+
+
+        /**
+         * For each subclass of ReferencedNode, we override the getState() method to
+         * fill the vector with the correct set of methods for this particular node
+         */
+        virtual std::vector<lo_message> getState() const;
+
+        /**
+         * We must include a stateDump() method that simply invokes the base class
+         * method. Simple C++ inheritance is not enough, because osg::Introspection
+         * won't see it.
+         */
+        //virtual void stateDump() { ReferencedNode::stateDump(); };
+
+
+    private:
+
+        // intersector stuff:
+        osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
+        std::vector<t_symbol*> intersectList;
+        std::vector<osg::Vec3> intersectListOffsets;
+        std::vector<osgUtil::LineSegmentIntersector::Intersection> intersectData;
+
+        // grabber stuff:
+        osg::ref_ptr<ReferencedNode> grabbedNode;
+        osg::Vec3 grabbedOffset;
+        t_symbol *previousParent;
+
+        // dragger stuff:
+        std::string draggerType;
+        bool doManipulation;
+        osg::ref_ptr<ReferencedNode> targetNode;
+
+        osg::Matrix origMatrix;
+        osg::Matrix previousMatrix;
+
+        osg::ref_ptr<osgManipulator::Dragger> dragger;
+        osg::ref_ptr<osgManipulator::Selection> selection;
+        osg::ref_ptr<osgManipulator::CommandManager> cmdMgr;
+
+        osg::ref_ptr<osgGA::GUIEventAdapter> ea;
+        PointerNodeActionAdapter aa;
+        osgManipulator::PointerInfo _pointer;
 };
 
 #endif

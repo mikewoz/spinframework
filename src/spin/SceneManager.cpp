@@ -41,6 +41,7 @@
 
 
 #include "SceneManager.h"
+#include "DSPNode.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
 #include "MediaManager.h"
@@ -70,23 +71,23 @@
 #include <osgDB/Registry>
 #include <osgUtil/Optimizer>
 
-#include <osgIntrospection/Reflection>
-#include <osgIntrospection/Type>
-#include <osgIntrospection/Value>
-#include <osgIntrospection/variant_cast>
-#include <osgIntrospection/Exceptions>
-#include <osgIntrospection/MethodInfo>
-#include <osgIntrospection/PropertyInfo>
+#include <cppintrospection/Reflection>
+#include <cppintrospection/Type>
+#include <cppintrospection/Value>
+#include <cppintrospection/variant_cast>
+#include <cppintrospection/Exceptions>
+#include <cppintrospection/MethodInfo>
+#include <cppintrospection/PropertyInfo>
 
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
-#include <osgIntrospection/ExtendedTypeInfo>
+#include <cppintrospection/ExtendedTypeInfo>
 
-using namespace osgIntrospection;
+using namespace cppintrospection;
 
 extern pthread_mutex_t sceneMutex;
 
@@ -140,10 +141,10 @@ SceneManager::SceneManager(std::string id)
     {
 
         {
-        const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
         //nodeTypes.clear();
-        const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-        osgIntrospection::TypeMap::const_iterator it;
+        const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
+        cppintrospection::TypeMap::const_iterator it;
         for ( it=allTypes.begin(); it!=allTypes.end(); it++)
         {
             if (((*it).second)->isDefined())
@@ -162,9 +163,9 @@ SceneManager::SceneManager(std::string id)
 
         // Same thing for ReferencedStateSets:
         {
-        const osgIntrospection::Type &ReferencedStateSetType = osgIntrospection::Reflection::getType("ReferencedStateSet");
-        const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-        osgIntrospection::TypeMap::const_iterator it;
+        const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("ReferencedStateSet");
+        const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
+        cppintrospection::TypeMap::const_iterator it;
         for ( it=allTypes.begin(); it!=allTypes.end(); it++)
         {
             if (((*it).second)->isDefined())
@@ -179,7 +180,7 @@ SceneManager::SceneManager(std::string id)
         }
         }
     }
-    catch (const osgIntrospection::Exception & ex)
+    catch (const cppintrospection::Exception & ex)
     {
         std::cerr << "SceneManager could not set up:\n" << ex.what() << std::endl;
         std::cout << "These nodes were defined:";
@@ -587,12 +588,12 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         }
     }
 
-    osgIntrospection::Value sceneManagerPtr = osgIntrospection::Value(this);
+    cppintrospection::Value sceneManagerPtr = cppintrospection::Value(this);
 
     /*
        std::cout << "[DEBUG] These are all possible types:" << std::endl;
-       const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-       for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
+       const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
+       for (cppintrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
        {
 		   if ((*it).second->isDefined())
        			std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
@@ -605,7 +606,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
        std::cout << "is value null? " << sceneManagerPtr.isNullPointer() << std::endl;
        std::cout << "is value empty? " << sceneManagerPtr.isEmpty() << std::endl;
 
-       const osgIntrospection::Type &tt = sceneManagerPtr.getType();
+       const cppintrospection::Type &tt = sceneManagerPtr.getType();
        std::cout << "the type is:" << std::endl;
     //introspect_print_type(tt);
     std::cout << "name():" << tt.getStdTypeInfo().name() << std::endl;
@@ -613,18 +614,18 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
      */
 
     try {
-        // Let's use osgIntrospection to create a node of the proper type:
-        const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(type);
+        // Let's use cppintrospection to create a node of the proper type:
+        const cppintrospection::Type &t = cppintrospection::Reflection::getType(type);
 
         //std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
         //introspect_print_type(t);
 
-        osgIntrospection::ValueList args;
+        cppintrospection::ValueList args;
         args.push_back(sceneManagerPtr);
         //args.push_back(this);
         args.push_back(nodeID->s_name);
 
-        osgIntrospection::Value v = t.createInstance(args);
+        cppintrospection::Value v = t.createInstance(args);
 
 
         /*
@@ -632,11 +633,11 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
            std::cout << "is value null? " << v.isNullPointer() << std::endl;
            std::cout << "is value empty? " << v.isEmpty() << std::endl;
 
-           const osgIntrospection::Type &tt = v.getType();
+           const cppintrospection::Type &tt = v.getType();
            std::cout << "the reg type is:" << std::endl;
            introspect_print_type(tt);
 
-           const osgIntrospection::Type &ttt = v.getInstanceType();
+           const cppintrospection::Type &ttt = v.getInstanceType();
            std::cout << "the instantiated type is:" << std::endl;
            introspect_print_type(ttt);
 
@@ -644,20 +645,20 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
            std::cout << "type of ReferencedNode = " << typeid(ReferencedNode).name() << std::endl;
            std::cout << "type of ReferencedNode* = " << typeid(ReferencedNode*).name() << std::endl;
-           std::cout << "type of getInstance = " << typeid(osgIntrospection::getInstance<ReferencedNode>(v)).name() << std::endl;
-           std::cout << "type returned from variant_cast = " << typeid(osgIntrospection::variant_cast<ReferencedNode>(v)).name() << std::endl;
-           std::cout << "type returned from variant_cast* = " << typeid(osgIntrospection::variant_cast<ReferencedNode*>(v)).name() << std::endl;
-           std::cout << "type returned from extract_raw_data = " << typeid(osgIntrospection::extract_raw_data<ReferencedNode>(v)).name() << std::endl;
-           std::cout << "type returned from extract_raw_data (with reinterpret_cast)= " << typeid(reinterpret_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
-           std::cout << "type returned from extract_raw_data (with dynamic_cast)= " << typeid(dynamic_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
+           std::cout << "type of getInstance = " << typeid(cppintrospection::getInstance<ReferencedNode>(v)).name() << std::endl;
+           std::cout << "type returned from variant_cast = " << typeid(cppintrospection::variant_cast<ReferencedNode>(v)).name() << std::endl;
+           std::cout << "type returned from variant_cast* = " << typeid(cppintrospection::variant_cast<ReferencedNode*>(v)).name() << std::endl;
+           std::cout << "type returned from extract_raw_data = " << typeid(cppintrospection::extract_raw_data<ReferencedNode>(v)).name() << std::endl;
+           std::cout << "type returned from extract_raw_data (with reinterpret_cast)= " << typeid(reinterpret_cast<ReferencedNode*>(cppintrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
+           std::cout << "type returned from extract_raw_data (with dynamic_cast)= " << typeid(dynamic_cast<ReferencedNode*>(cppintrospection::extract_raw_data<ReferencedNode>(v))).name() << std::endl;
 
 
-        //ReferencedNode test = (osgIntrospection::getInstance<ReferencedNode>(v));
-        //ReferencedNode test = osgIntrospection::variant_cast<ReferencedNode>(v);
-        ReferencedNode *test = osgIntrospection::variant_cast<ReferencedNode*>(v);
-        //ReferencedNode *test = osgIntrospection::extract_raw_data<ReferencedNode>(v);
-        //ReferencedNode *test = reinterpret_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v));
-        //ReferencedNode *test = dynamic_cast<ReferencedNode*>(osgIntrospection::extract_raw_data<ReferencedNode>(v));
+        //ReferencedNode test = (cppintrospection::getInstance<ReferencedNode>(v));
+        //ReferencedNode test = cppintrospection::variant_cast<ReferencedNode>(v);
+        ReferencedNode *test = cppintrospection::variant_cast<ReferencedNode*>(v);
+        //ReferencedNode *test = cppintrospection::extract_raw_data<ReferencedNode>(v);
+        //ReferencedNode *test = reinterpret_cast<ReferencedNode*>(cppintrospection::extract_raw_data<ReferencedNode>(v));
+        //ReferencedNode *test = dynamic_cast<ReferencedNode*>(cppintrospection::extract_raw_data<ReferencedNode>(v));
 
         //std::cout << "test type = " << typeid(test).name() << std::endl;
         //std::cout << "test id = " << test.id->s_name << std::endl;
@@ -666,11 +667,11 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
         n = test;
          */
-        n = osgIntrospection::variant_cast<ReferencedNode*>(v);
+        n = cppintrospection::variant_cast<ReferencedNode*>(v);
 
     }
 
-    catch (osgIntrospection::Exception & ex)
+    catch (cppintrospection::Exception & ex)
     {
 
         std::cout << "ERROR: Type " << type << " is not defined." << std::endl;
@@ -797,26 +798,26 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
         }
     }
 
-    osgIntrospection::Value sceneManagerPtr = osgIntrospection::Value(this);
+    cppintrospection::Value sceneManagerPtr = cppintrospection::Value(this);
 
     try {
 
-        // Let's use osgIntrospection to create a node of the proper type:
-        const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(type);
+        // Let's use cppintrospection to create a node of the proper type:
+        const cppintrospection::Type &t = cppintrospection::Reflection::getType(type);
 
         //std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
         //introspect_print_type(t);
 
-        osgIntrospection::ValueList args;
+        cppintrospection::ValueList args;
         args.push_back(sceneManagerPtr);
         args.push_back((const char*)theID->s_name);
-        osgIntrospection::Value v = t.createInstance(args);
+        cppintrospection::Value v = t.createInstance(args);
 
-        n = osgIntrospection::variant_cast<ReferencedStateSet*>(v);
+        n = cppintrospection::variant_cast<ReferencedStateSet*>(v);
 
     }
 
-    catch (osgIntrospection::Exception & ex)
+    catch (cppintrospection::Exception & ex)
     {
         std::cout << "ERROR: Could not create " << type << " with id '" << id <<"'. Perhaps that type is not defined?" << std::endl;
         return NULL;
@@ -1048,7 +1049,7 @@ std::vector<SoundConnection*> SceneManager::getConnections()
     {
         std::string nodeType = (*it).first;
 
-        const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(nodeType);
+        const cppintrospection::Type &t = cppintrospection::Reflection::getType(nodeType);
         if (t.isDefined())
         {
             // check if the nodeType is a subclass of DSPNode:
@@ -1588,7 +1589,7 @@ std::string SceneManager::getConnectionsAsXML()
     {
         std::string nodeType = (*it).first;
 
-        const osgIntrospection::Type &t = osgIntrospection::Reflection::getType(nodeType);
+        const cppintrospection::Type &t = cppintrospection::Reflection::getType(nodeType);
         if (t.isDefined())
         {
             // check if the nodeType is a subclass of DSPNode:
@@ -1844,12 +1845,12 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
     char *types;
     std::string method;
     std::vector<std::string> argVector;
-    osgIntrospection::ValueList args;
+    cppintrospection::ValueList args;
     float f;
 
     char *nodeType = (char*) XMLnode->Value();
 
-    if (osgIntrospection::Reflection::getType(nodeType).isDefined())
+    if (cppintrospection::Reflection::getType(nodeType).isDefined())
     {
         if (XMLnode->Attribute("id"))
         {
@@ -1857,10 +1858,10 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
             osg::ref_ptr<ReferencedNode> n = getOrCreateNode(nodeID, nodeType);
 
             // get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
-            const osgIntrospection::Value introspectValue = osgIntrospection::Value(n.get());
+            const cppintrospection::Value introspectValue = cppintrospection::Value(n.get());
 
             // the getInstanceType() method however, gives us the real type being pointed at:
-            const osgIntrospection::Type &introspectType = introspectValue.getInstanceType();
+            const cppintrospection::Type &introspectType = introspectValue.getInstanceType();
 
 
 
@@ -1916,7 +1917,7 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
                     introspectType.invokeMethod(method, introspectValue, args, true); // the true means that it will try base classes as well
                 }
 
-                catch (const osgIntrospection::Exception & ex)
+                catch (const cppintrospection::Exception & ex)
                 {
                     std::cerr << "catch exception in loadXML: " << ex.what() << std::endl;
                 }
@@ -1942,12 +1943,12 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
     char *types;
     std::string method;
     std::vector<std::string> argVector;
-    osgIntrospection::ValueList args;
+    cppintrospection::ValueList args;
     float f;
 
     char *classType = (char*) XMLnode->Value();
 
-    if (osgIntrospection::Reflection::getType(classType).isDefined())
+    if (cppintrospection::Reflection::getType(classType).isDefined())
     {
         if (XMLnode->Attribute("id"))
         {
@@ -1955,10 +1956,10 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
             osg::ref_ptr<ReferencedStateSet> ss = createStateSet(statesetID, classType);
 
             // get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
-            const osgIntrospection::Value introspectValue = osgIntrospection::Value(ss.get());
+            const cppintrospection::Value introspectValue = cppintrospection::Value(ss.get());
 
             // the getInstanceType() method however, gives us the real type being pointed at:
-            const osgIntrospection::Type &introspectType = introspectValue.getInstanceType();
+            const cppintrospection::Type &introspectType = introspectValue.getInstanceType();
 
             for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
             {
@@ -1993,7 +1994,7 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
                     introspectType.invokeMethod(method, introspectValue, args, true); // the true means that it will try base classes as well
                 }
 
-                catch (const osgIntrospection::Exception & ex)
+                catch (const cppintrospection::Exception & ex)
                 {
                     std::cerr << "catch exception in loadXML: " << ex.what() << std::endl;
                 }
@@ -2206,14 +2207,14 @@ bool SceneManager::nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_p
  * Recursive function to invoke a method for a particular class, that will try
  * all base classes as well
  */
-int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, ValueList theArgs)
+int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, ValueList theArgs)
 {
 
     // TODO: we should try to store this globally somewhere, so that we don't do
     // a lookup every time there is a message:
 
     /*
-       const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+       const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
 
 
        if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
@@ -2225,7 +2226,7 @@ int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospec
         // we can return:
         return 1;
     }
-    catch (osgIntrospection::Exception & ex)
+    catch (cppintrospection::Exception & ex)
     {
         //std::cerr << "catch exception: " << ex.what() << std::endl;
     }

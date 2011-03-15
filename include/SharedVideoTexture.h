@@ -43,8 +43,6 @@
 #define __SharedVideoTexture_H
 
 #include "config.h"
-#include <osg/Image>
-#include <osg/Texture2D>
 #include <osg/Timer>
 
 #include "ReferencedStateSet.h"
@@ -58,6 +56,11 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #endif
+
+namespace osg {
+    class Texture2D;
+    class Image;
+}
 
 
 /**

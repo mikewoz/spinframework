@@ -44,13 +44,10 @@
 
 #include <string>
 #include <osgUtil/Optimizer>
-#include <osg/ImageStream>
-#include <osg/Image>
-
 
 #include "GroupNode.h"
-#include "SceneManager.h"
-#include "ReferencedStateSet.h"
+
+class SceneManager;
 
 #define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
 
