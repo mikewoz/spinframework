@@ -29,7 +29,6 @@ spineditor_SOURCES = \
     unused.h
 
 spineditor_LDFLAGS = \
-    -lSPIN \
     $(BOOST_FILESYSTEM_LIB) \
     $(BOOST_LDFLAGS) \
     $(BOOST_THREAD_LIB) \
