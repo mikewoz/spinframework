@@ -18,21 +18,26 @@
 * along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SPINEDITORMAIN_H
-#define SPINEDITORMAIN_H
+/**
+ * \file
+ * The MainFrame class.
+ */
+
+#ifndef __SPINEDITORMAIN_H__
+#define __SPINEDITORMAIN_H__
 
 #include "app.h"
 #include "GUIFrame.h"
 
-class spineditorFrame: public GUIFrame
+class MainFrame : public GuiFrame
 {
 public:
-    spineditorFrame(wxFrame *frame);
-    ~spineditorFrame();
+    MainFrame(wxFrame *frame);
+    ~MainFrame();
 private:
     virtual void OnClose(wxCloseEvent& event);
     virtual void OnQuit(wxCommandEvent& event);
     virtual void OnAbout(wxCommandEvent& event);
 };
 
-#endif // SPINEDITORMAIN_H
+#endif // __SPINEDITORMAIN_H__

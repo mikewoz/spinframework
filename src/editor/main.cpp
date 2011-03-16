@@ -111,8 +111,8 @@ wxString wxbuildinfo(wxbuildinfoformat format)
     return wxbuild;
 }
 
-spineditorFrame::spineditorFrame(wxFrame *frame) :
-    GUIFrame(frame)
+MainFrame::MainFrame(wxFrame *frame) :
+    GuiFrame(frame)
 {
 #if wxUSE_STATUSBAR
     statusBar->SetStatusText(_("Welcome to the SPIN Editor!"), 0);
@@ -124,27 +124,26 @@ spineditorFrame::spineditorFrame(wxFrame *frame) :
         std::cout << " * " << *iter << std::endl;
 }
 
-spineditorFrame::~spineditorFrame()
+MainFrame::~MainFrame()
 {
 }
 
-
-void spineditorFrame::OnClose(wxCloseEvent &event)
-{
-    UNUSED(event);
-    Destroy();
-}
-
-void spineditorFrame::OnQuit(wxCommandEvent &event)
+void MainFrame::OnClose(wxCloseEvent &event)
 {
     UNUSED(event);
     Destroy();
 }
 
-void spineditorFrame::OnAbout(wxCommandEvent &event)
+void MainFrame::OnQuit(wxCommandEvent &event)
+{
+    UNUSED(event);
+    Destroy();
+}
+
+void MainFrame::OnAbout(wxCommandEvent &event)
 {
     UNUSED(event);
     wxString msg = wxbuildinfo(long_f);
-    wxMessageBox(msg, _("Welcome to..."));
+    wxMessageBox(msg, _("Welcome to the SPIN Editor"));
 }
 

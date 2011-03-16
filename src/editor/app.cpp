@@ -28,14 +28,11 @@
 #include "app.h"
 #include "main.h"
 
-IMPLEMENT_APP( spineditorApp )
-;
+IMPLEMENT_APP(spineditorApp);
 
 bool spineditorApp::OnInit()
 {
-    spineditorFrame* frame = new spineditorFrame(0L);
-
+    MainFrame* frame = new MainFrame(0L);
     frame->Show();
-
     return true;
 }
