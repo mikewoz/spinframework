@@ -1,75 +1,126 @@
 /*
- * hworld.cpp
+* This file is part of the SPIN Framework.
+*
+* Copyright (c) 2009 Mike Wozniewski
+* Copyright (c) 2009 Zack Settel
+*
+* SPIN Framework is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+* 
+* SPIN Framework is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public License
+* along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/**
+ * The spin::editor::App and spin::editor::MainWindow classes.
  */
 
 #include "wx/wx.h" 
 
-class MyApp: public wxApp
+namespace spin
 {
+
+namespace editor
+{
+
+/**
+ * The Spin Editor application.
+ */
+class App: public wxApp
+{
+	/**
+	 * Called when this application is launched.
+	 * Creates the MainWindow instance.
+	 */
     virtual bool OnInit();
 };
 
-class MyFrame: public wxFrame
+/**
+ * The Spin Editor main GUI window.
+ */
+class MainWindow: public wxFrame
 {
-public:
-
-    MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-
-    void OnQuit(wxCommandEvent& event);
-    void OnAbout(wxCommandEvent& event);
-
-    DECLARE_EVENT_TABLE()
+    public:
+    	/**
+    	 * Constructor.
+    	 * @param title Title of the window.
+    	 * @param pos Initial position of the window.
+    	 * @param size Initial size of the window.
+    	 */
+        MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size);
+        void OnQuit(wxCommandEvent& event);
+        void OnAbout(wxCommandEvent& event);
+        DECLARE_EVENT_TABLE();
 };
 
+/**
+ * Signals of this application.
+ */
 enum
 {
     ID_Quit = 1,
     ID_About,
 };
 
-BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-    EVT_MENU(ID_Quit, MyFrame::OnQuit)
-    EVT_MENU(ID_About, MyFrame::OnAbout)
+/**
+ * Declare signals events
+ */
+BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+    EVT_MENU(ID_Quit, MainWindow::OnQuit)
+    EVT_MENU(ID_About, MainWindow::OnAbout)
 END_EVENT_TABLE()
 
-IMPLEMENT_APP(MyApp)
+/**
+ * This macros is expanded into the main() of this application.
+ */
+IMPLEMENT_APP(App)
 
-bool MyApp::OnInit()
+bool App::OnInit()
 {
-    MyFrame *frame = new MyFrame( _("Hello World"), wxPoint(50, 50),
-                                  wxSize(450,340) );
+    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(800, 600));
     frame->Show(true);
     SetTopWindow(frame);
     return true;
 } 
 
-MyFrame::MyFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
-: wxFrame( NULL, -1, title, pos, size )
+MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size)
+: 
+    wxFrame(NULL, -1, title, pos, size)
 {
     wxMenu *menuFile = new wxMenu;
 
-    menuFile->Append( ID_About, _("&About...") );
+    menuFile->Append(ID_About, _("&About..."));
     menuFile->AppendSeparator();
-    menuFile->Append( ID_Quit, _("E&xit") );
+    menuFile->Append(ID_Quit, _("E&xit"));
 
     wxMenuBar *menuBar = new wxMenuBar;
-    menuBar->Append( menuFile, _("&File") );
+    menuBar->Append(menuFile, _("&File"));
 
-    SetMenuBar( menuBar );
+    SetMenuBar(menuBar);
 
     CreateStatusBar();
-    SetStatusText( _("Welcome to wxWidgets!") );
+    SetStatusText(_("Starting the SPIN Editor"));
 }
 
-void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
     Close(TRUE);
 }
 
-void MyFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
+void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox( _("This is a wxWidgets Hello world sample"),
-                  _("About Hello World"),
+    wxMessageBox( _("This application is a work in progress."),
+                  _("About the SPIN Editor"),
                   wxOK | wxICON_INFORMATION, this);
 }
 
+} // end of namespace editor
+
+} // end of namespace spin
