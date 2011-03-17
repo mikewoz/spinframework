@@ -20,7 +20,7 @@
  */
 
 /** \file
- * The SpinEditorApp class.
+ * The main SpinEditorApp class and its implementation, as well as the main function of the application.
  */
 
 #include <wx/wx.h>

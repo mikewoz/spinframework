@@ -21,6 +21,8 @@
 
 #include <wx/wx.h>
 #include "main_window.h"
+#include "config.h"
+#include <sstream>
 
 namespace spin
 {
@@ -61,7 +63,12 @@ void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox( _("This application is a work in progress."),
+    std::ostringstream os;
+    os << PACKAGE_NAME << " " <<  wxString(_("version")).mb_str() << " " << PACKAGE_VERSION << std::endl << std::endl;
+    os << wxString(_("Authors: ")).mb_str()  << "Mike Wozniewski, Zack Settel, Alexandre Quessy." << std::endl;
+    os << wxString(_("License: ")).mb_str() << wxString(_("LGPL version 3")).mb_str() << std::endl;
+    
+    wxMessageBox(wxString(os.str().c_str(), wxConvUTF8),
                   _("About the SPIN Editor"),
                   wxOK | wxICON_INFORMATION, this);
 }
