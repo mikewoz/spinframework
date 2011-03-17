@@ -20,11 +20,13 @@
  */
 
 /** \file
- * The SpinEditorApp class.
+ * The spin::editor::MainWindow class.
  */
 
-#include <wx/wx.h>
-#include "main_window.h"
+#ifndef __MAIN_WINDOW_H__
+#define __MAIN_WINDOW_H__
+
+#include "wx/wx.h" 
 
 namespace spin
 {
@@ -32,30 +34,34 @@ namespace editor
 {
 
 /**
- * The Spin Editor application.
+ * The Spin Editor main GUI window.
  */
-class SpinEditorApp: public wxApp
+class MainWindow: public wxFrame
 {
-	/**
-	 * Called when this application is launched.
-	 * Creates the MainWindow instance.
-	 */
-    virtual bool OnInit();
+    public:
+    	/**
+    	 * Constructor.
+    	 * @param title Title of the window.
+    	 * @param pos Initial position of the window.
+    	 * @param size Initial size of the window.
+    	 */
+        MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size);
+        void OnQuit(wxCommandEvent& event);
+        void OnAbout(wxCommandEvent& event);
+        DECLARE_EVENT_TABLE();
 };
 
-bool SpinEditorApp::OnInit()
+/**
+ * Signals of this application.
+ */
+enum
 {
-    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(800, 600));
-    frame->Show(true);
-    SetTopWindow(frame);
-    return true;
-} 
+    ID_Quit = 1,
+    ID_About,
+};
 
 } // end of namespace editor
 } // end of namespace spin
 
-/**
- * This macros is expanded into the main() of this application.
- */
-IMPLEMENT_APP(spin::editor::SpinEditorApp)
+#endif
 

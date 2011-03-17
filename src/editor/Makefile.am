@@ -12,20 +12,14 @@ AM_CPPFLAGS = \
 
 #  -arch x86_64
 
-EXTRA_DIST = \
-    layout.cbp
-
 if ENABLE_EDITOR
 
 bin_PROGRAMS = spineditor
 
 spineditor_SOURCES = \
-    app.cpp \
-    app.h \
-    GUIFrame.cpp \
-    GUIFrame.h \
-    main.cpp \
-    main.h \
+    spineditor.cpp \
+    main_window.h \
+    main_window.cpp \
     unused.h
 
 spineditor_LDFLAGS = \
@@ -41,11 +35,6 @@ spineditor_LDFLAGS = \
     -l$(BOOST_PYTHON_LIB) \
     $(WX_LIBS)
 
-# dnl     CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
-# dnl     CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
-# dnl     CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
-
-# FIXME: I doubt this works
 spineditor_LDADD = ../spin/libSPIN.la
 
 endif

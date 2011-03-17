@@ -19,10 +19,6 @@
  * along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** \file
- * The SpinEditorApp class.
- */
-
 #include <wx/wx.h>
 #include "main_window.h"
 
@@ -32,30 +28,44 @@ namespace editor
 {
 
 /**
- * The Spin Editor application.
+ * Declare signals events
  */
-class SpinEditorApp: public wxApp
-{
-	/**
-	 * Called when this application is launched.
-	 * Creates the MainWindow instance.
-	 */
-    virtual bool OnInit();
-};
+BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+    EVT_MENU(ID_Quit, MainWindow::OnQuit)
+    EVT_MENU(ID_About, MainWindow::OnAbout)
+END_EVENT_TABLE()
 
-bool SpinEditorApp::OnInit()
+MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size)
+: 
+    wxFrame(NULL, -1, title, pos, size)
 {
-    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(800, 600));
-    frame->Show(true);
-    SetTopWindow(frame);
-    return true;
-} 
+    wxMenu *menuFile = new wxMenu;
+
+    menuFile->Append(ID_About, _("&About..."));
+    menuFile->AppendSeparator();
+    menuFile->Append(ID_Quit, _("E&xit"));
+
+    wxMenuBar *menuBar = new wxMenuBar;
+    menuBar->Append(menuFile, _("&File"));
+
+    SetMenuBar(menuBar);
+
+    CreateStatusBar();
+    SetStatusText(_("Starting the SPIN Editor"));
+}
+
+void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
+{
+    Close(TRUE);
+}
+
+void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
+{
+    wxMessageBox( _("This application is a work in progress."),
+                  _("About the SPIN Editor"),
+                  wxOK | wxICON_INFORMATION, this);
+}
 
 } // end of namespace editor
 } // end of namespace spin
-
-/**
- * This macros is expanded into the main() of this application.
- */
-IMPLEMENT_APP(spin::editor::SpinEditorApp)
 
