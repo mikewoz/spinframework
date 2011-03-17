@@ -48,16 +48,19 @@ class MainWindow: public wxFrame
         MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
+        void OnHelp(wxCommandEvent& event);
         DECLARE_EVENT_TABLE();
 };
 
 /**
  * Signals of this application.
+ * Each has a unique number greater than zero.
  */
 enum
 {
-    ID_Quit = 1,
-    ID_About,
+    SIGNAL_MENU_QUIT = 1,
+    SIGNAL_MENU_ABOUT,
+    SIGNAL_MENU_HELP,
 };
 
 } // end of namespace editor

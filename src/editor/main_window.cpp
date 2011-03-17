@@ -34,25 +34,31 @@ namespace editor
  * Declare signals events
  */
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
-    EVT_MENU(ID_Quit, MainWindow::OnQuit)
-    EVT_MENU(ID_About, MainWindow::OnAbout)
+    EVT_MENU(SIGNAL_MENU_QUIT, MainWindow::OnQuit)
+    EVT_MENU(SIGNAL_MENU_ABOUT, MainWindow::OnAbout)
+    EVT_MENU(SIGNAL_MENU_HELP, MainWindow::OnHelp)
 END_EVENT_TABLE()
 
 MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size)
 : 
     wxFrame(NULL, -1, title, pos, size)
 {
-    wxMenu *menuFile = new wxMenu;
-
-    menuFile->Append(ID_About, _("&About..."));
-    menuFile->AppendSeparator();
-    menuFile->Append(ID_Quit, _("E&xit"));
-
+    // Create menu bar:
     wxMenuBar *menuBar = new wxMenuBar;
-    menuBar->Append(menuFile, _("&File"));
+    // Create file menu:
+    wxMenu *file_menu = new wxMenu;
+    file_menu->Append(SIGNAL_MENU_QUIT, _("&Quit\tCtrl+Q"));
+    menuBar->Append(file_menu, _("&File"));
+    // Create help menu:
+    wxMenu *help_menu = new wxMenu;
+    help_menu->Append(SIGNAL_MENU_ABOUT, _("&About..."));
+    help_menu->AppendSeparator();
+    help_menu->Append(SIGNAL_MENU_HELP, _("SPIN Editor help\tCtrl+H"));
+    menuBar->Append(help_menu, _("&Help"));
 
     SetMenuBar(menuBar);
 
+    // Create status bar:
     CreateStatusBar();
     SetStatusText(_("Starting the SPIN Editor"));
 
@@ -77,6 +83,13 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
     
     wxMessageBox(wxString(os.str().c_str(), wxConvUTF8),
                   _("About the SPIN Editor"),
+                  wxOK | wxICON_INFORMATION, this);
+}
+
+void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event))
+{
+    wxMessageBox(_("TODO"),
+                  _("SPIN Editor Help"),
                   wxOK | wxICON_INFORMATION, this);
 }
 

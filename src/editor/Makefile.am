@@ -21,7 +21,7 @@ spineditor_SOURCES = \
     introspection.h \
     main_window.cpp \
     main_window.h \
-    spineditor.cpp \
+    main.cpp \
     unused.h
 
 spineditor_LDFLAGS = \
