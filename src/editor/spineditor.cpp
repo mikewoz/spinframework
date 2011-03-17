@@ -124,3 +124,4 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
 } // end of namespace editor
 
 } // end of namespace spin
+
