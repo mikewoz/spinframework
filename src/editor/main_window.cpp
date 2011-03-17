@@ -22,6 +22,7 @@
 #include <wx/wx.h>
 #include "main_window.h"
 #include "config.h"
+#include "introspection.h"
 #include <sstream>
 
 namespace spin
@@ -54,6 +55,12 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
 
     CreateStatusBar();
     SetStatusText(_("Starting the SPIN Editor"));
+
+    // Listing node types:
+    std::vector<std::string> nodeTypes = introspection::listSpinNodeTypes();
+    std::cout << "SPIN Node types:" << std::endl;
+    for (std::vector<std::string>::iterator iter = nodeTypes.begin(); iter != nodeTypes.end(); ++iter)
+        std::cout << " * " << *iter << std::endl;
 }
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))

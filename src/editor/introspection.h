@@ -20,11 +20,11 @@
 */
 
 /** \file
- * SPIN Introspection utilities.
+ * SPIN Editor Introspection utilities.
  */
 
-#ifndef __INTROSPECTION_H__
-#define __INTROSPECTION_H__
+#ifndef __SPINEDITOR_INTROSPECTION_H__
+#define __SPINEDITOR_INTROSPECTION_H__
 
 #include <vector>
 #include <string>

@@ -17,9 +17,11 @@ if ENABLE_EDITOR
 bin_PROGRAMS = spineditor
 
 spineditor_SOURCES = \
-    spineditor.cpp \
-    main_window.h \
+    introspection.cpp \
+    introspection.h \
     main_window.cpp \
+    main_window.h \
+    spineditor.cpp \
     unused.h
 
 spineditor_LDFLAGS = \

@@ -38,6 +38,8 @@ namespace spin
 {
 namespace editor
 {
+namespace introspection
+{
 std::vector<std::string> listSpinNodeTypes()
 {
     namespace intro = cppintrospection;
@@ -65,6 +67,7 @@ std::vector<std::string> listSpinNodeTypes()
     }
     return ret;
 }
+} // end of namespace introspection
 } // end of namespace editor
 } // end of namespace spin
 
