@@ -44,23 +44,40 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
     wxFrame(NULL, -1, title, pos, size)
 {
     // Create menu bar:
-    wxMenuBar *menuBar = new wxMenuBar;
+    wxMenuBar *menu_bar = new wxMenuBar;
     // Create file menu:
     wxMenu *file_menu = new wxMenu;
     file_menu->Append(SIGNAL_MENU_QUIT, _("&Quit\tCtrl+Q"));
-    menuBar->Append(file_menu, _("&File"));
+    menu_bar->Append(file_menu, _("&File"));
     // Create help menu:
     wxMenu *help_menu = new wxMenu;
-    help_menu->Append(SIGNAL_MENU_ABOUT, _("&About..."));
+    help_menu->Append(SIGNAL_MENU_ABOUT, _("&About"));
     help_menu->AppendSeparator();
-    help_menu->Append(SIGNAL_MENU_HELP, _("SPIN Editor help\tCtrl+H"));
-    menuBar->Append(help_menu, _("&Help"));
+    help_menu->Append(SIGNAL_MENU_HELP, _("SPIN Editor help\tF1"));
+    menu_bar->Append(help_menu, _("&Help"));
 
-    SetMenuBar(menuBar);
+    SetMenuBar(menu_bar);
 
     // Create status bar:
     CreateStatusBar();
-    SetStatusText(_("Starting the SPIN Editor"));
+    SetStatusText(_("Ready"));
+
+    // -----------------------
+	wxFlexGridSizer *sizer;
+	sizer = new wxFlexGridSizer(/* rows: */ 1, /* cols: */ 2, 0, 0);
+	sizer->SetFlexibleDirection(wxBOTH);
+	sizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+	
+	//treeControl_ = new wxTreeCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE);
+	//sizer->Add(treeControl_, 0, wxALL, 5);
+    wxButton *dummy0 = new wxButton(this, SIGNAL_BUTTON_HELLO_0, _("Hello"), wxDefaultPosition, wxDefaultSize, 0);
+	sizer->Add(dummy0, wxEXPAND | 0);
+    wxButton *dummy1 = new wxButton(this, SIGNAL_BUTTON_HELLO_1, _("Hello"), wxDefaultPosition, wxDefaultSize, 0);
+	sizer->Add(dummy1, wxEXPAND | 0);
+	
+	this->SetSizer(sizer);
+	this->Layout();
+    // -----------------------
 
     // Listing node types:
     std::vector<std::string> nodeTypes = introspection::listSpinNodeTypes();
@@ -74,6 +91,11 @@ void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
     Close(TRUE);
 }
 
+wxString toString(const std::string &text)
+{
+    return wxString(text.c_str(), wxConvUTF8);
+}
+
 void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
     std::ostringstream os;
@@ -81,16 +103,28 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
     os << wxString(_("Authors: ")).mb_str()  << "Mike Wozniewski, Zack Settel, Alexandre Quessy." << std::endl;
     os << wxString(_("License: ")).mb_str() << wxString(_("LGPL version 3")).mb_str() << std::endl;
     
-    wxMessageBox(wxString(os.str().c_str(), wxConvUTF8),
-                  _("About the SPIN Editor"),
-                  wxOK | wxICON_INFORMATION, this);
+    wxMessageBox(toString(os.str()),
+        _("About the SPIN Editor"),
+        wxOK | wxICON_INFORMATION, this);
 }
+
+const std::string HELP_URL = "http://www.spinframework.org/content/how_to_spin_editor";
 
 void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event))
 {
-    wxMessageBox(_("TODO"),
-                  _("SPIN Editor Help"),
-                  wxOK | wxICON_INFORMATION, this);
+    bool success = wxLaunchDefaultBrowser(toString(HELP_URL));
+    if (! success)
+    {
+        wxMessageBox(_("Could not launch a Web browser."),
+            _("SPIN Editor Error"),
+            wxOK | wxICON_ERROR, this);
+    }
+    else
+    {
+        wxMessageBox(_("Successfully launched a Web browser showing the documentation."),
+            _("SPIN Editor Information"),
+            wxOK | wxICON_INFORMATION, this);
+    }
 }
 
 } // end of namespace editor

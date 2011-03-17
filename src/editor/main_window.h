@@ -26,7 +26,7 @@
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
 
-#include "wx/wx.h" 
+#include <wx/wx.h>
 
 namespace spin
 {
@@ -50,6 +50,8 @@ class MainWindow: public wxFrame
         void OnAbout(wxCommandEvent& event);
         void OnHelp(wxCommandEvent& event);
         DECLARE_EVENT_TABLE();
+    private:
+        //wxTreeCtrl *treeControl_;
 };
 
 /**
@@ -61,7 +63,12 @@ enum
     SIGNAL_MENU_QUIT = 1,
     SIGNAL_MENU_ABOUT,
     SIGNAL_MENU_HELP,
+    SIGNAL_BUTTON_HELLO_0,
+    SIGNAL_BUTTON_HELLO_1,
 };
+// const long SIGNAL_MENU_HELP;
+// const long SIGNAL_MENU_ABOUT;
+// const long SIGNAL_MENU_QUIT; // = wxNewId();
 
 } // end of namespace editor
 } // end of namespace spin
