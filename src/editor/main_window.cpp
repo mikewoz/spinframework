@@ -31,7 +31,7 @@ namespace editor
 {
 
 /**
- * Declare signals events
+ * Connect handlers to the signal they handle.
  */
 BEGIN_EVENT_TABLE(MainWindow, wxFrame)
     EVT_MENU(SIGNAL_MENU_QUIT, MainWindow::OnQuit)
@@ -56,6 +56,13 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
     help_menu->Append(SIGNAL_MENU_HELP, _("SPIN Editor help\tF1"));
     menu_bar->Append(help_menu, _("&Help"));
 
+
+    // Create add menu:
+    //wxMenu *add_menu = new wxMenu;
+    //add_menu->Append(SIGNAL_MENU_HELP, _("SPIN Editor help\tF1"));
+    //add_bar->Append(add_menu, _("&Add"));
+
+    // finally:
     SetMenuBar(menu_bar);
 
     // Create status bar:
