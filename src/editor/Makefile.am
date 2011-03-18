@@ -22,6 +22,10 @@ spineditor_SOURCES = \
     main_window.cpp \
     main_window.h \
     main.cpp \
+	wxSpinTreeCtrl.cpp \
+	wxSpinTreeCtrl.h \
+	wxSpinTreeVisitor.cpp \
+	wxSpinTreeVisitor.h \
     unused.h
 
 spineditor_LDFLAGS = \

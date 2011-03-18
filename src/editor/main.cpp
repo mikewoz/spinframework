@@ -25,6 +25,11 @@
 
 #include <wx/wx.h>
 #include "main_window.h"
+#include "spinApp.h"
+#include "spinClientContext.h"
+#include "SceneManager.h"
+#include <ApplicationServices/ApplicationServices.h>
+
 
 namespace spin
 {
@@ -41,13 +46,39 @@ class SpinEditorApp: public wxApp
 	 * Creates the MainWindow instance.
 	 */
     virtual bool OnInit();
+
+private:
+    spinClientContext spinListener;
 };
 
 bool SpinEditorApp::OnInit()
 {
+#ifdef __WXMAC__
+    // need to give focus to the process (for development; should be fixed when
+    // using an .app bundle):
+    ProcessSerialNumber PSN;
+    GetCurrentProcess(&PSN);
+    TransformProcessType(&PSN,kProcessTransformToForegroundApplication);
+#endif
+
+    spinApp &spin = spinApp::Instance();
+
+    // TODO: parse commandline args and allow overrides for server host/port,
+    // user id, etc.
+
+    if (!spinListener.start())
+    {
+        std::cout << "ERROR: could not start SPIN listener" << std::endl;
+        return false;
+    }
+
     MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(800, 600));
     frame->Show(true);
     SetTopWindow(frame);
+
+    // ask for refresh:
+    spin.SceneMessage("s", "refresh", LO_ARGS_END);
+
     return true;
 } 
 

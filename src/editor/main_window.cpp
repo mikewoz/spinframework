@@ -25,10 +25,19 @@
 #include "introspection.h"
 #include <sstream>
 
+#include "wxSpinTreeCtrl.h"
+#include "spinApp.h"
+#include "spinBaseContext.h"
+#include "SceneManager.h"
+
+
 namespace spin
 {
 namespace editor
 {
+
+// can we do this like this? or should we use the enum in the .h?
+const long ID_SPIN_TREE = wxNewId();
 
 /**
  * Declare signals events
@@ -64,7 +73,7 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
 
     // -----------------------
 	wxFlexGridSizer *sizer;
-	sizer = new wxFlexGridSizer(/* rows: */ 1, /* cols: */ 2, 0, 0);
+	sizer = new wxFlexGridSizer(/* rows: */ 1, /* cols: */ 3, 0, 0);
 	sizer->SetFlexibleDirection(wxBOTH);
 	sizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 	
@@ -75,9 +84,15 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
     wxButton *dummy1 = new wxButton(this, SIGNAL_BUTTON_HELLO_1, _("Hello"), wxDefaultPosition, wxDefaultSize, 0);
 	sizer->Add(dummy1, wxEXPAND | 0);
 	
+	wxSpinTreeCtrl *tree = new wxSpinTreeCtrl(this,ID_SPIN_TREE,wxDefaultPosition,wxDefaultSize,wxTR_DEFAULT_STYLE,wxDefaultValidator,_T("ID_SPIN_TREE"));
+    sizer->Add(tree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    //sizer->Add(tree, wxEXPAND | 0);
+
 	this->SetSizer(sizer);
 	this->Layout();
     // -----------------------
+
+	tree->BuildTree(spinApp::Instance().sceneManager->worldNode.get());
 
     // Listing node types:
     std::vector<std::string> nodeTypes = introspection::listSpinNodeTypes();
@@ -88,6 +103,8 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
+    std::cout << "Got MainWindow::OnQuit" << std::endl;
+    spinApp::Instance().getContext()->stop();
     Close(TRUE);
 }
 
