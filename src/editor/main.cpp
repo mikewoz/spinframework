@@ -72,7 +72,10 @@ bool SpinEditorApp::OnInit()
         return false;
     }
 
-    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(800, 600));
+    int width = 600;
+    int height = 600;
+    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(width, height));
+
     frame->Show(true);
     SetTopWindow(frame);
 
