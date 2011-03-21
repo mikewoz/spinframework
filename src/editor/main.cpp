@@ -28,9 +28,11 @@
 #include "spinApp.h"
 #include "spinClientContext.h"
 #include "SceneManager.h"
-#include <ApplicationServices/ApplicationServices.h>
 
+// FIXME: what is this?
+//#include <ApplicationServices/ApplicationServices.h>
 
+// TODO: the namespace should be spineditor, as the editor is not part of spin, but uses spin. It's different!
 namespace spin
 {
 namespace editor
