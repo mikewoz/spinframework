@@ -41,6 +41,9 @@
 
 class wxSpinTreeCtrl;
 
+/**
+ * Visits a wxTreeCtrl widget to populate it with SPIN nodes.
+ */
 class wxSpinTreeVisitor : public osg::NodeVisitor
 {
 public:
@@ -57,13 +60,10 @@ public:
     virtual void apply(osg::StateSet& stateSet);
     virtual void apply(osg::StateAttribute& stateAttrib);
     */
-
+// FIXME: 2011-03-22:aalex:Get rid of protected methods
 protected:
-
     //wxTreeItemId AddToTree(osg::Referenced* pObject);
     wxTreeItemId AddToTree(ReferencedNode* pObject);
-
-protected:
     wxTreeItemId m_currentParentId;
     wxSpinTreeCtrl* m_pTreeCtrl;
 };
