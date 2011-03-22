@@ -245,3 +245,4 @@ wxTreeItemId wxSpinTreeVisitor::AddToTree(ReferencedNode* n)
 
     return currentId;
 }
+
