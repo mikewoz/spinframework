@@ -29,8 +29,9 @@
 #include "spinClientContext.h"
 #include "SceneManager.h"
 
-// FIXME: what is this?
-//#include <ApplicationServices/ApplicationServices.h>
+#ifdef __WXMAC__
+#include <ApplicationServices/ApplicationServices.h>
+#endif // __WXMAC__
 
 // TODO: the namespace should be spineditor, as the editor is not part of spin, but uses spin. It's different!
 namespace spin
