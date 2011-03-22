@@ -23,13 +23,13 @@
  * The main SpinEditorApp class and its implementation, as well as the main function of the application.
  */
 
-#include <wx/wx.h>
-#include <wx/cmdline.h>
+
 
 #include "config.h"
+#include "main.h"
 #include "main_window.h"
 #include "spinApp.h"
-#include "spinClientContext.h"
+
 #include "SceneManager.h"
 
 #ifdef __WXMAC__
@@ -38,60 +38,8 @@
 
 #include <iostream>
 
-namespace spineditor
-{
 
-/**
- * The Spin Editor application.
- */
-class SpinEditorApp: public wxApp
-{
-    public:
-        /**
-         * Constructor. We make it explicit.
-         */
-        SpinEditorApp() :
-            spinListener()
-        {
-        }
-        /**
-         * Called when this application is launched.
-         *
-         * Creates the MainWindow instance.
-         * We also make sure there is a SPIN context going on.
-         * We ask for a refresh.
-         */
-        virtual bool OnInit();
-        virtual int OnExit();
-
-        /**
-         * We listen to the wx event loop so that we can check if the spin
-         * listener thread is still running. If not, it either means that the
-         * user did CTRL-C on the command line, or something worse. Regargless,
-         * there's nothing we can do, so we send an event to exit the app.
-         */
-        virtual void OnEventLoopEnter (wxEventLoopBase *loop);
-
-        void OnIdle(wxIdleEvent &event);
-
-        /**
-         * Initializes commandline arguments
-         */
-        virtual void OnInitCmdLine(wxCmdLineParser& parser);
-
-        /**
-         * Does the actual parsing of commandline arguments
-         */
-        virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
-
-        /**
-         * If the user provides bad arguments, show the usage and exit
-         */
-        virtual bool OnCmdLineError(wxCmdLineParser & parser);
-
-    private:
-        spinClientContext spinListener;
-};
+namespace spineditor {
 
 bool SpinEditorApp::OnInit()
 {
@@ -110,8 +58,6 @@ bool SpinEditorApp::OnInit()
 #endif
 
 
-    // TODO: parse commandline args and allow overrides for server host/port,
-    // user id, etc.
     if (! spinListener.start())
     {
         std::cout << "ERROR: could not start SPIN listener" << std::endl;
@@ -125,6 +71,11 @@ bool SpinEditorApp::OnInit()
     frame->Show(true);
     SetTopWindow(frame);
 
+    // start a timer to act as a periodic polling function (eg, to check that
+    // the spinListener thread is still running
+    spinPollTimer_ = new wxTimer(this, SpinPollTimer_ID);
+    spinPollTimer_->Start(500); // milliseconds
+
     // ask for refresh:
     spin.SceneMessage("s", "refresh", LO_ARGS_END);
     return true;
@@ -135,61 +86,19 @@ int SpinEditorApp::OnExit()
     std::cout << "Got SpinEditorApp::OnExit()" << std::endl;
     // ??
     // spinApp::Instance().getContext()->stop();
+
+    return 1;
 }
 
-void SpinEditorApp::OnEventLoopEnter (wxEventLoopBase *loop)
+void SpinEditorApp::OnSpinPollTimer(wxTimerEvent& event)
 {
-    // do extra startup stuff here (ie, once the app is running)
-    std::cout << "Got SpinEditorApp::OnEventLoopEnter()" << std::endl;
-}
-
-void SpinEditorApp::OnIdle(wxIdleEvent &event)
-{
-    std::cout << "idle" << std::endl;
-    /*
-    if (spinListener.isRunning())
+    if (!spinListener.isRunning())
     {
-        wxWindow::Close()
+        GetTopWindow()->Close();
     }
-    */
 }
+
 // -----------------------------------------------------------------------------
-
-static const wxCmdLineEntryDesc g_cmdLineDesc[] =
-{
-     { wxCMD_LINE_SWITCH,
-             "h",
-             "help",
-             "displays command-line help",
-             wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP
-     },
-     { wxCMD_LINE_OPTION,
-             "s",
-             "scene-id",
-             "Specify the scene ID to listen to",
-             wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_NEEDS_SEPARATOR
-     },
-     { wxCMD_LINE_OPTION,
-             "r",
-             "server-addr",
-             "Specify the remote server address (Default is osc.udp://239.0.0.1:54323)",
-             wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_NEEDS_SEPARATOR
-     },
-     { wxCMD_LINE_OPTION,
-             "u",
-             "user-id",
-             "Specify a user ID for this editor (Default is the local hostname)",
-             wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_NEEDS_SEPARATOR
-     },
-     { wxCMD_LINE_SWITCH,
-             "v",
-             "version",
-             "Display the version number and exit",
-             wxCMD_LINE_VAL_NONE, wxCMD_LINE_PARAM_OPTIONAL
-     },
-     { wxCMD_LINE_NONE }
-};
-
 
 void SpinEditorApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
@@ -230,8 +139,14 @@ bool SpinEditorApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
 } // end of namespace spineditor
 
+// -----------------------------------------------------------------------------
 /**
- * This macros is expanded into the main() of this application.
+ * These are required macros for wx. The event table binds event ids to methods
+ * in SpinEditorApp, and the IMPLEMENT_APP macro expands to create a main()
  */
-IMPLEMENT_APP(spineditor::SpinEditorApp)
 
+BEGIN_EVENT_TABLE(spineditor::SpinEditorApp, wxApp)
+    EVT_TIMER(SpinPollTimer_ID, spineditor::SpinEditorApp::OnSpinPollTimer)
+END_EVENT_TABLE()
+
+IMPLEMENT_APP(spineditor::SpinEditorApp)

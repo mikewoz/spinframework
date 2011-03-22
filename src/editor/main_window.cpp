@@ -20,6 +20,9 @@
  */
 
 #include <wx/wx.h>
+#include <wx/stdpaths.h>
+#include <wx/aboutdlg.h>
+#include <wx/artprov.h>
 #include "main_window.h"
 #include "config.h"
 #include "introspection.h"
@@ -50,6 +53,17 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
 : 
     wxFrame(NULL, -1, title, pos, size)
 {
+    // there's probably a better way to do this:
+    resourcesPath = wxStandardPaths::Get().GetExecutablePath();
+    resourcesPath = resourcesPath.SubString(0,resourcesPath.Find('/',true)); // remove executable name
+    resourcesPath = resourcesPath + _T("../../Resources");
+    std::cout << "resourcesPath: " << resourcesPath << std::endl;
+
+
+
+    wxIcon SPINIcon(resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
+    SetIcon(SPINIcon);
+
     wxLog::SetActiveTarget(new wxLogStream(&std::cout));
     wxLog::SetVerbose(true);
     wxLogInfo(stringToWxString("XXXXXXXXXXXX set up logger"));
@@ -141,6 +155,7 @@ void MainWindow::log(LogLevel level, const std::string &text)
 
 void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
+    /*
     std::ostringstream os;
     os << PACKAGE_NAME << " " <<  wxString(_("version")).mb_str() << " " << PACKAGE_VERSION << std::endl << std::endl;
     os << wxString(_("Authors: ")).mb_str()  << "Mike Wozniewski, Zack Settel, Alexandre Quessy." << std::endl;
@@ -149,6 +164,17 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
     wxMessageBox(stringToWxString(os.str()),
         _("About the SPIN Editor"),
         wxOK | wxICON_INFORMATION, this);
+*/
+
+    wxIcon SPINIcon(resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
+    wxAboutDialogInfo info;
+    info.SetVersion(_("SPIN Editor"));
+    info.SetName(_(PACKAGE_NAME));
+    info.SetDescription(_("Part of the SPIN Framework\n(The Spatial Interaction Framework)\nhttp://www.spinframework.org"));
+    info.SetCopyright(_T("Copyright (C) 2011. Mike Wozniewski, Zack Settel, Alexandre Quessy."));
+    info.SetIcon(SPINIcon);
+
+    wxAboutBox(info);
 }
 
 const std::string HELP_URL = "http://www.spinframework.org/content/how_to_spin_editor";
