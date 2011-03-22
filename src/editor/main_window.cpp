@@ -30,10 +30,7 @@
 #include "spinBaseContext.h"
 #include "SceneManager.h"
 
-
-namespace spin
-{
-namespace editor
+namespace spineditor
 {
 
 // can we do this like this? or should we use the enum in the .h?
@@ -151,6 +148,5 @@ void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event))
     }
 }
 
-} // end of namespace editor
-} // end of namespace spin
+} // end of namespace spineditor
 

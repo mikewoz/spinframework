@@ -29,9 +29,7 @@
 #include <vector>
 #include <string>
 
-namespace spin
-{
-namespace editor
+namespace spineditor
 {
 namespace introspection
 {
@@ -39,7 +37,6 @@ namespace introspection
 std::vector<std::string> listSpinNodeTypes();
 
 } // end of namespace introspection
-} // end of namespace editor
-} // end of namespace spin
+} // end of namespace spineditor
 
 #endif

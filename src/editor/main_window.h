@@ -28,9 +28,7 @@
 
 #include <wx/wx.h>
 
-namespace spin
-{
-namespace editor
+namespace spineditor
 {
 
 /**
@@ -70,8 +68,7 @@ enum
 // const long SIGNAL_MENU_ABOUT;
 // const long SIGNAL_MENU_QUIT; // = wxNewId();
 
-} // end of namespace editor
-} // end of namespace spin
+} // end of namespace spineditor
 
 #endif
 

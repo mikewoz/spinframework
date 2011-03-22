@@ -33,10 +33,7 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif // __WXMAC__
 
-// TODO: the namespace should be spineditor, as the editor is not part of spin, but uses spin. It's different!
-namespace spin
-{
-namespace editor
+namespace spineditor
 {
 
 /**
@@ -88,11 +85,10 @@ bool SpinEditorApp::OnInit()
     return true;
 } 
 
-} // end of namespace editor
-} // end of namespace spin
+} // end of namespace spineditor
 
 /**
  * This macros is expanded into the main() of this application.
  */
-IMPLEMENT_APP(spin::editor::SpinEditorApp)
+IMPLEMENT_APP(spineditor::SpinEditorApp)
 
