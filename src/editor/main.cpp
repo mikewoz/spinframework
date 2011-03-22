@@ -33,6 +33,8 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif // __WXMAC__
 
+#include <iostream>
+
 namespace spineditor
 {
 
@@ -41,14 +43,24 @@ namespace spineditor
  */
 class SpinEditorApp: public wxApp
 {
-	/**
-	 * Called when this application is launched.
-	 * Creates the MainWindow instance.
-	 */
-    virtual bool OnInit();
-
-private:
-    spinClientContext spinListener;
+    public:
+        /**
+         * Constructor. We make it explicit.
+         */
+        SpinEditorApp() :
+            spinListener()
+        {
+        }
+        /**
+         * Called when this application is launched.
+         *
+         * Creates the MainWindow instance.
+         * We also make sure there is a SPIN context going on.
+         * We ask for a refresh.
+         */
+        virtual bool OnInit();
+    private:
+        spinClientContext spinListener;
 };
 
 bool SpinEditorApp::OnInit()
@@ -65,8 +77,7 @@ bool SpinEditorApp::OnInit()
 
     // TODO: parse commandline args and allow overrides for server host/port,
     // user id, etc.
-
-    if (!spinListener.start())
+    if (! spinListener.start())
     {
         std::cout << "ERROR: could not start SPIN listener" << std::endl;
         return false;
@@ -81,7 +92,6 @@ bool SpinEditorApp::OnInit()
 
     // ask for refresh:
     spin.SceneMessage("s", "refresh", LO_ARGS_END);
-
     return true;
 } 
 

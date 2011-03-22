@@ -32,6 +32,18 @@ namespace spineditor
 {
 
 /**
+ * Logging levels
+ */
+enum LogLevel
+{
+    LOG_DEBUG,
+    LOG_INFO,
+    LOG_WARNING,
+    LOG_ERROR,
+    LOG_CRITICAL
+};
+
+/**
  * The Spin Editor main GUI window.
  */
 class MainWindow: public wxFrame
@@ -47,6 +59,7 @@ class MainWindow: public wxFrame
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
         void OnHelp(wxCommandEvent& event);
+        static void log(LogLevel level, const std::string &text);
         DECLARE_EVENT_TABLE();
     private:
         //wxTreeCtrl *treeControl_;
@@ -64,6 +77,9 @@ enum
     SIGNAL_BUTTON_HELLO_0,
     SIGNAL_BUTTON_HELLO_1,
 };
+
+wxString stringToWxString(const std::string &text);
+
 // const long SIGNAL_MENU_HELP;
 // const long SIGNAL_MENU_ABOUT;
 // const long SIGNAL_MENU_QUIT; // = wxNewId();
