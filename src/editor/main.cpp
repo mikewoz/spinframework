@@ -24,6 +24,9 @@
  */
 
 #include <wx/wx.h>
+#include <wx/cmdline.h>
+
+#include "config.h"
 #include "main_window.h"
 #include "spinApp.h"
 #include "spinClientContext.h"
@@ -46,13 +49,106 @@ class SpinEditorApp: public wxApp
 	 * Creates the MainWindow instance.
 	 */
     virtual bool OnInit();
+    virtual int OnExit();
+    virtual void OnInitCmdLine(wxCmdLineParser& parser);
+    virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+    virtual bool OnCmdLineError(wxCmdLineParser & parser);
+
+
 
 private:
     spinClientContext spinListener;
 };
 
+static const wxCmdLineEntryDesc g_cmdLineDesc[] =
+{
+     { wxCMD_LINE_SWITCH,
+             "h",
+             "help",
+             "displays command-line help",
+             wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP
+     },
+     { wxCMD_LINE_OPTION,
+             "s",
+             "scene-id",
+             "Specify the scene ID to listen to",
+             wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_NEEDS_SEPARATOR
+     },
+     { wxCMD_LINE_OPTION,
+             "r",
+             "server-addr",
+             "Specify the remote server address (Default is osc.udp://239.0.0.1:54323)",
+             wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_NEEDS_SEPARATOR
+     },
+     { wxCMD_LINE_OPTION,
+             "u",
+             "user-id",
+             "Specify a user ID for this editor (Default is the local hostname)",
+             wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_NEEDS_SEPARATOR
+     },
+     { wxCMD_LINE_SWITCH,
+             "v",
+             "version",
+             "Display the version number and exit",
+             wxCMD_LINE_VAL_NONE, wxCMD_LINE_PARAM_OPTIONAL
+     },
+     { wxCMD_LINE_NONE }
+};
+
+
+void SpinEditorApp::OnInitCmdLine(wxCmdLineParser& parser)
+{
+
+    parser.SetDesc(g_cmdLineDesc);
+    // must refuse '/' as parameter starter or cannot use "/path" style paths
+    parser.SetSwitchChars (wxT("-"));
+}
+
+bool SpinEditorApp::OnCmdLineError(wxCmdLineParser & parser)
+{
+    parser.Usage();
+    return false;
+}
+
+bool SpinEditorApp::OnCmdLineParsed(wxCmdLineParser& parser)
+{
+    spinApp &spin = spinApp::Instance();
+
+    if ( parser.Found(wxT("v")) )
+    {
+        std::cout << "SPIN Framework: version " << VERSION << std::endl;
+        return false;
+    }
+
+    wxString sceneID;
+    if (parser.Found(wxT("s"), &sceneID))
+    {
+        spin.setSceneID(sceneID.ToStdString());
+    }
+
+    wxString userID;
+    if (parser.Found(wxT("u"), &userID))
+    {
+        spin.setUserID(userID.ToStdString());
+    }
+
+    wxString serverAddr;
+    if (parser.Found(wxT("r"), &serverAddr))
+    {
+        spinListener.lo_txAddr= lo_address_new_from_url(serverAddr.c_str());
+    }
+
+    return true;
+}
+
 bool SpinEditorApp::OnInit()
 {
+    spinApp &spin = spinApp::Instance();
+
+    // call parent init (mandatory)
+    if (!wxApp::OnInit())
+        return false;
+
 #ifdef __WXMAC__
     // need to give focus to the process (for development; should be fixed when
     // using an .app bundle):
@@ -61,7 +157,6 @@ bool SpinEditorApp::OnInit()
     TransformProcessType(&PSN,kProcessTransformToForegroundApplication);
 #endif
 
-    spinApp &spin = spinApp::Instance();
 
     // TODO: parse commandline args and allow overrides for server host/port,
     // user id, etc.
@@ -84,6 +179,13 @@ bool SpinEditorApp::OnInit()
 
     return true;
 } 
+
+int SpinEditorApp::OnExit()
+{
+    std::cout << "!!! Got SpinEditorApp::OnExit()" << std::endl;
+    // ??
+    // spinApp::Instance().getContext()->stop();
+}
 
 } // end of namespace spineditor
 
