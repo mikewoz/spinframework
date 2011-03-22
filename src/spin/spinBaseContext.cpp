@@ -74,7 +74,15 @@
 pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
-bool spinBaseContext::signalStop = false;
+/**
+ * All threads need to stop according to the following flag. Note this used to
+ * be a public class member, but we have sigHandler, which should be used
+ * instead
+ */
+namespace {
+    volatile bool signalStop;
+}
+//bool spinBaseContext::signalStop = false;
 
 /**
  * Constructor. 

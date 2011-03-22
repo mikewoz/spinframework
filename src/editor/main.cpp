@@ -65,6 +65,16 @@ class SpinEditorApp: public wxApp
         virtual int OnExit();
 
         /**
+         * We listen to the wx event loop so that we can check if the spin
+         * listener thread is still running. If not, it either means that the
+         * user did CTRL-C on the command line, or something worse. Regargless,
+         * there's nothing we can do, so we send an event to exit the app.
+         */
+        virtual void OnEventLoopEnter (wxEventLoopBase *loop);
+
+        void OnIdle(wxIdleEvent &event);
+
+        /**
          * Initializes commandline arguments
          */
         virtual void OnInitCmdLine(wxCmdLineParser& parser);
@@ -82,6 +92,68 @@ class SpinEditorApp: public wxApp
     private:
         spinClientContext spinListener;
 };
+
+bool SpinEditorApp::OnInit()
+{
+    spinApp &spin = spinApp::Instance();
+
+    // call parent init (mandatory)
+    if (!wxApp::OnInit())
+        return false;
+
+#ifdef __WXMAC__
+    // need to give focus to the process (for development; should be fixed when
+    // using an .app bundle):
+    ProcessSerialNumber PSN;
+    GetCurrentProcess(&PSN);
+    TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
+#endif
+
+
+    // TODO: parse commandline args and allow overrides for server host/port,
+    // user id, etc.
+    if (! spinListener.start())
+    {
+        std::cout << "ERROR: could not start SPIN listener" << std::endl;
+        return false;
+    }
+
+    int width = 600;
+    int height = 600;
+    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(width, height));
+
+    frame->Show(true);
+    SetTopWindow(frame);
+
+    // ask for refresh:
+    spin.SceneMessage("s", "refresh", LO_ARGS_END);
+    return true;
+}
+
+int SpinEditorApp::OnExit()
+{
+    std::cout << "Got SpinEditorApp::OnExit()" << std::endl;
+    // ??
+    // spinApp::Instance().getContext()->stop();
+}
+
+void SpinEditorApp::OnEventLoopEnter (wxEventLoopBase *loop)
+{
+    // do extra startup stuff here (ie, once the app is running)
+    std::cout << "Got SpinEditorApp::OnEventLoopEnter()" << std::endl;
+}
+
+void SpinEditorApp::OnIdle(wxIdleEvent &event)
+{
+    std::cout << "idle" << std::endl;
+    /*
+    if (spinListener.isRunning())
+    {
+        wxWindow::Close()
+    }
+    */
+}
+// -----------------------------------------------------------------------------
 
 static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 {
@@ -121,10 +193,8 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 
 void SpinEditorApp::OnInitCmdLine(wxCmdLineParser& parser)
 {
-
     parser.SetDesc(g_cmdLineDesc);
-    // must refuse '/' as parameter starter or cannot use "/path" style paths
-    parser.SetSwitchChars (wxT("-"));
+    parser.SetSwitchChars(wxT("-"));
 }
 
 bool SpinEditorApp::OnCmdLineError(wxCmdLineParser & parser)
@@ -137,7 +207,7 @@ bool SpinEditorApp::OnCmdLineParsed(wxCmdLineParser& parser)
 {
     spinApp &spin = spinApp::Instance();
 
-    if ( parser.Found(wxT("v")) )
+    if (parser.Found(wxT("v")))
     {
         std::cout << "SPIN Framework: version " << VERSION << std::endl;
         return false;
@@ -145,67 +215,17 @@ bool SpinEditorApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     wxString sceneID;
     if (parser.Found(wxT("s"), &sceneID))
-    {
         spin.setSceneID(sceneID.ToStdString());
-    }
 
     wxString userID;
     if (parser.Found(wxT("u"), &userID))
-    {
         spin.setUserID(userID.ToStdString());
-    }
 
     wxString serverAddr;
     if (parser.Found(wxT("r"), &serverAddr))
-    {
         spinListener.lo_txAddr= lo_address_new_from_url(serverAddr.c_str());
-    }
 
     return true;
-}
-
-bool SpinEditorApp::OnInit()
-{
-    spinApp &spin = spinApp::Instance();
-
-    // call parent init (mandatory)
-    if (!wxApp::OnInit())
-        return false;
-
-#ifdef __WXMAC__
-    // need to give focus to the process (for development; should be fixed when
-    // using an .app bundle):
-    ProcessSerialNumber PSN;
-    GetCurrentProcess(&PSN);
-    TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
-#endif
-
-
-    // TODO: parse commandline args and allow overrides for server host/port,
-    // user id, etc.
-    if (! spinListener.start())
-    {
-        std::cout << "ERROR: could not start SPIN listener" << std::endl;
-        return false;
-    }
-
-    int width = 600;
-    int height = 600;
-    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(width, height));
-
-    frame->Show(true);
-    SetTopWindow(frame);
-
-    // ask for refresh:
-    spin.SceneMessage("s", "refresh", LO_ARGS_END);
-    return true;
-} 
-
-int SpinEditorApp::OnExit()
-{
-    std::cout << "!!! Got SpinEditorApp::OnExit()" << std::endl;
-    // ??
-    // spinApp::Instance().getContext()->stop();
 }
 
 } // end of namespace spineditor
