@@ -70,7 +70,7 @@ bool SpinEditorApp::OnInit()
     // using an .app bundle):
     ProcessSerialNumber PSN;
     GetCurrentProcess(&PSN);
-    TransformProcessType(&PSN,kProcessTransformToForegroundApplication);
+    TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
 #endif
 
     spinApp &spin = spinApp::Instance();
