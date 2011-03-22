@@ -21,7 +21,6 @@
 
 #include "wxSpinTreeCtrl.h"
 #include "wxSpinTreeVisitor.h"
-
 #include "spinApp.h"
 #include "SceneManager.h"
 #include "spinBaseContext.h"
@@ -85,7 +84,6 @@ void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)
 {
     Freeze();
     DeleteAllItems();
-
     if (pRoot)
     {
         wxTreeItemId rootID = AddRoot(wxT("scene"));
@@ -94,11 +92,8 @@ void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)
         //m_pSceneTreeVisitor->SetParentTreeItem(NULL);
         pRoot->accept(*m_pSceneTreeVisitor.get());
     }
-
     Thaw();
-
     ExpandAll();
-
 }
 
 void wxSpinTreeCtrl::Refresh()
@@ -143,9 +138,7 @@ void wxSpinTreeCtrl::addNode(const char *id, const char *type)
         else
             addToTree(n,GetRootItem());
     }
-
 }
-
 
 void wxSpinTreeCtrl::removeNode(const char *id)
 {
@@ -172,7 +165,7 @@ bool wxSpinTreeCtrl::SelectNode(ReferencedNode* pNode)
         return false;
 
     // if pNode is NULL, we select the scene root
-    if (!pNode)
+    if (! pNode)
     {
         SelectItem(GetRootItem());
         UpdatePropGrid();
@@ -189,16 +182,13 @@ bool wxSpinTreeCtrl::SelectNode(ReferencedNode* pNode)
         UpdatePropGrid();
         return true;
     }
-
     // couldn't find the node, so return false
     return false;
 }
 
-
 wxTreeItemId wxSpinTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
     return GetTreeItem(pNode->id->s_name, idParent, cookie);
-
     /*
     if (!idParent.IsOk())
         return NULL;
@@ -231,7 +221,6 @@ wxTreeItemId wxSpinTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idP
 */
 }
 
-
 wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
     if (! idParent.IsOk())
@@ -240,7 +229,7 @@ wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idPare
     wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(idParent);
     if (treeData)
     {
-        if (strcmp(treeData->m_pNode->id->s_name,nodeId) == 0)
+        if (strcmp(treeData->m_pNode->id->s_name, nodeId) == 0)
         {
             return idParent;
         }
@@ -256,25 +245,22 @@ wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idPare
                 return targetItem;
         }
     }
-
     return GetTreeItem(nodeId, GetNextSibling(idParent), cookie);
 }
-
 
 ReferencedNode* wxSpinTreeCtrl::GetSelectedNode() const
 {
    if (! GetSelection())
         return NULL;
-    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(GetSelection());
+    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*) GetItemData(GetSelection());
     if (! treeData)
         return NULL;
     return treeData->m_pNode.get();
 }
 
-
 ReferencedNode* wxSpinTreeCtrl::GetNode(const wxTreeItemId& item) const
 {
-    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(item);
+    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*) GetItemData(item);
     if (! treeData)
         return NULL;
 
@@ -284,11 +270,11 @@ ReferencedNode* wxSpinTreeCtrl::GetNode(const wxTreeItemId& item) const
 void wxSpinTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
 {
     wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(id);
-    if (!treeData)
+    if (! treeData)
         return;
-    if (treeData->m_pNode->nodeType=="GroupNode")
+    if (treeData->m_pNode->nodeType == "GroupNode")
         SetItemImage(id, 1, wxTreeItemIcon_Normal);
-    else if (treeData->m_pNode->nodeType=="ShapeNode")
+    else if (treeData->m_pNode->nodeType == "ShapeNode")
         SetItemImage(id, wxTreeItemIcon_Normal);
     else
         SetItemImage(id, 0, wxTreeItemIcon_Normal);

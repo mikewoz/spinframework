@@ -45,14 +45,17 @@
 
 class wxSpinTreeVisitor;
 
-
+/**
+ * Item in a tree full of SPIN nodes.
+ */
 class wxSpinTreeItemData : public wxTreeItemData
 {
   public:
-    wxSpinTreeItemData() {
+    wxSpinTreeItemData()
+    {
         m_pNode = NULL;
     }
-
+    // FIXME: data should be private
     osg::ref_ptr<ReferencedNode> m_pNode;
 };
 
@@ -72,7 +75,6 @@ public:
                   long style = wxTR_HAS_BUTTONS, const wxValidator& validator = wxDefaultValidator,
                   const wxString& name = wxT("treeCtrl"));
     virtual ~wxSpinTreeCtrl();
-
 
     //void setListeningServer(lo_server_thread t);
 
@@ -152,7 +154,6 @@ public:
      */
     //void SetPropGrid(wxSpinPropGrid *PG);
 
-
      /**
      * When a user selects a node in the TreeCtrl, this event is produced.
      */
@@ -161,10 +162,7 @@ public:
     void OnSpinTreeDragBegin(wxTreeEvent &event);
     void OnSpinTreeDragEnd(wxTreeEvent &event);
 
-
-
-
-
+// FIXME:2011-03-22:aalex:Get rid of protected methods.
 protected:
 
     wxImageList* m_pImages;
@@ -186,5 +184,5 @@ protected:
  */
 int wxSpinTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-
 #endif // _wxSpinTreeCtrl_H_
+

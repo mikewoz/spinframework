@@ -36,6 +36,8 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif // __WXMAC__
 
+#include <iostream>
+
 namespace spineditor
 {
 
@@ -44,20 +46,41 @@ namespace spineditor
  */
 class SpinEditorApp: public wxApp
 {
-	/**
-	 * Called when this application is launched.
-	 * Creates the MainWindow instance.
-	 */
-    virtual bool OnInit();
-    virtual int OnExit();
-    virtual void OnInitCmdLine(wxCmdLineParser& parser);
-    virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
-    virtual bool OnCmdLineError(wxCmdLineParser & parser);
+    public:
+        /**
+         * Constructor. We make it explicit.
+         */
+        SpinEditorApp() :
+            spinListener()
+        {
+        }
+        /**
+         * Called when this application is launched.
+         *
+         * Creates the MainWindow instance.
+         * We also make sure there is a SPIN context going on.
+         * We ask for a refresh.
+         */
+        virtual bool OnInit();
+        virtual int OnExit();
 
+        /**
+         * Initializes commandline arguments
+         */
+        virtual void OnInitCmdLine(wxCmdLineParser& parser);
 
+        /**
+         * Does the actual parsing of commandline arguments
+         */
+        virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
-private:
-    spinClientContext spinListener;
+        /**
+         * If the user provides bad arguments, show the usage and exit
+         */
+        virtual bool OnCmdLineError(wxCmdLineParser & parser);
+
+    private:
+        spinClientContext spinListener;
 };
 
 static const wxCmdLineEntryDesc g_cmdLineDesc[] =
@@ -154,14 +177,13 @@ bool SpinEditorApp::OnInit()
     // using an .app bundle):
     ProcessSerialNumber PSN;
     GetCurrentProcess(&PSN);
-    TransformProcessType(&PSN,kProcessTransformToForegroundApplication);
+    TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
 #endif
 
 
     // TODO: parse commandline args and allow overrides for server host/port,
     // user id, etc.
-
-    if (!spinListener.start())
+    if (! spinListener.start())
     {
         std::cout << "ERROR: could not start SPIN listener" << std::endl;
         return false;
@@ -176,7 +198,6 @@ bool SpinEditorApp::OnInit()
 
     // ask for refresh:
     spin.SceneMessage("s", "refresh", LO_ARGS_END);
-
     return true;
 } 
 

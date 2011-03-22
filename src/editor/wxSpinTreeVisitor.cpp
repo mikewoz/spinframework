@@ -50,10 +50,9 @@ void wxSpinTreeVisitor::apply(osg::Group& node)
     // for osg::Group, we check if it can be cast as an ReferencedNode, and add
     // it to the treeCtrl if so:
 
-	ReferencedNode *n;
-
-	if (n=dynamic_cast<ReferencedNode*>(&node)) {
-
+	ReferencedNode *n = dynamic_cast<ReferencedNode*>(&node);
+	if (n)
+    {
 	    wxTreeItemId parentId = m_currentParentId;
         //m_currentParentId = AddToTree(&node);
         m_currentParentId = AddToTree(n);
@@ -63,8 +62,9 @@ void wxSpinTreeVisitor::apply(osg::Group& node)
         m_pTreeCtrl->Expand(m_currentParentId);
         m_currentParentId = parentId;
 
-	} else traverse(node);
-
+	}
+    else
+        traverse(node);
 }
 
 /*
@@ -175,17 +175,15 @@ void wxSpinTreeVisitor::apply(osg::StateAttribute& stateAttrib)
 
 */
 
-
 wxTreeItemId wxSpinTreeVisitor::AddToTree(ReferencedNode* n)
 {
-
     wxTreeItemId currentId;
-    if (!n) return currentId;
+    if (! n)
+        return currentId;
 
     std::string strLabel = n->nodeType + " : " + n->id->s_name;
     wxSpinTreeItemData *treeData = new wxSpinTreeItemData;
     treeData->m_pNode = n;
-
 
 /*
     std::string strLabel = "*";
@@ -207,15 +205,14 @@ wxTreeItemId wxSpinTreeVisitor::AddToTree(ReferencedNode* n)
     pNode->m_pObject = pObject;
     */
 
-
-    if (!m_currentParentId) {
-        currentId = m_pTreeCtrl->AddRoot(wxString(strLabel.c_str(),wxConvUTF8), -1, -1, treeData);
+    if (! m_currentParentId)
+    {
+        currentId = m_pTreeCtrl->AddRoot(wxString(strLabel.c_str(), wxConvUTF8), -1, -1, treeData);
         m_currentParentId = currentId;
-    } else
-        currentId = m_pTreeCtrl->AppendItem(m_currentParentId, wxString(strLabel.c_str(),wxConvUTF8), -1, -1, treeData);
-
+    }
+    else
+        currentId = m_pTreeCtrl->AppendItem(m_currentParentId, wxString(strLabel.c_str(), wxConvUTF8), -1, -1, treeData);
     m_pTreeCtrl->UpdateTreeItemIcon(currentId);
-
     return currentId;
 }
 

@@ -33,7 +33,8 @@
 namespace spineditor
 {
 
-// can we do this like this? or should we use the enum in the .h?
+// mike: can we do this like this? or should we use the enum in the .h?
+// 2011-03-22:aalex: well, I think so, but we still need to do the BEGIN_EVENT_TABLE thing
 const long ID_SPIN_TREE = wxNewId();
 
 /**
@@ -49,6 +50,10 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
 : 
     wxFrame(NULL, -1, title, pos, size)
 {
+    wxLog::SetActiveTarget(new wxLogStream(&std::cout));
+    wxLog::SetVerbose(true);
+    wxLogInfo(stringToWxString("XXXXXXXXXXXX set up logger"));
+    wxLogInfo(stringToWxString("Running the MainWindow constructor."));
     // Create menu bar:
     wxMenuBar *menu_bar = new wxMenuBar;
     // Create file menu:
@@ -62,7 +67,6 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
     help_menu->Append(SIGNAL_MENU_HELP, _("SPIN Editor help\tF1"));
     menu_bar->Append(help_menu, _("&Help"));
 
-
     // Create add menu:
     //wxMenu *add_menu = new wxMenu;
     //add_menu->Append(SIGNAL_MENU_HELP, _("SPIN Editor help\tF1"));
@@ -74,6 +78,7 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
     // Create status bar:
     CreateStatusBar();
     SetStatusText(_("Ready"));
+    wxLogInfo(stringToWxString("Ready\n"));
 
     // -----------------------
 	wxFlexGridSizer *sizer;
@@ -94,6 +99,7 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
 
 	this->SetSizer(sizer);
 	this->Layout();
+    wxLogInfo(stringToWxString("Done laying out window contents."));
     // -----------------------
 
 	tree->BuildTree(spinApp::Instance().sceneManager->worldNode.get());
@@ -102,7 +108,7 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
     std::vector<std::string> nodeTypes = introspection::listSpinNodeTypes();
     std::cout << "SPIN Node types:" << std::endl;
     for (std::vector<std::string>::iterator iter = nodeTypes.begin(); iter != nodeTypes.end(); ++iter)
-        std::cout << " * " << *iter << std::endl;
+        std::cout << " * " << (*iter) << std::endl;
 }
 
 void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
@@ -112,9 +118,25 @@ void MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
     Close(TRUE);
 }
 
-wxString toString(const std::string &text)
+wxString stringToWxString(const std::string &text)
 {
     return wxString(text.c_str(), wxConvUTF8);
+}
+
+void MainWindow::log(LogLevel level, const std::string &text)
+{
+    switch (level)
+    {
+        case LOG_INFO:
+            wxLogInfo(stringToWxString(text));
+            break;
+        case LOG_DEBUG:
+            wxLogDebug(stringToWxString(text));
+            break;
+        default:
+            wxLogInfo(stringToWxString(text));
+            break;
+    }
 }
 
 void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
@@ -124,7 +146,7 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
     os << wxString(_("Authors: ")).mb_str()  << "Mike Wozniewski, Zack Settel, Alexandre Quessy." << std::endl;
     os << wxString(_("License: ")).mb_str() << wxString(_("LGPL version 3")).mb_str() << std::endl;
     
-    wxMessageBox(toString(os.str()),
+    wxMessageBox(stringToWxString(os.str()),
         _("About the SPIN Editor"),
         wxOK | wxICON_INFORMATION, this);
 }
@@ -133,7 +155,7 @@ const std::string HELP_URL = "http://www.spinframework.org/content/how_to_spin_e
 
 void MainWindow::OnHelp(wxCommandEvent& WXUNUSED(event))
 {
-    bool success = wxLaunchDefaultBrowser(toString(HELP_URL));
+    bool success = wxLaunchDefaultBrowser(stringToWxString(HELP_URL));
     if (! success)
     {
         wxMessageBox(_("Could not launch a Web browser."),
