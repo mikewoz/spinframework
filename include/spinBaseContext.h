@@ -74,7 +74,7 @@ class spinBaseContext
         /**
          * All threads need to stop according to the following flag:
          */
-        //static volatile bool signalStop;
+        static volatile bool signalStop;
 
         enum SpinContextMode { SERVER_MODE, CLIENT_MODE };
 

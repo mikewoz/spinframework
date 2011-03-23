@@ -79,10 +79,10 @@ pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
  * be a public class member, but we have sigHandler, which should be used
  * instead
  */
-namespace {
-    volatile bool signalStop;
-}
-//bool spinBaseContext::signalStop = false;
+//namespace {
+//    volatile bool signalStop;
+//}
+volatile bool spinBaseContext::signalStop = false;
 
 /**
  * Constructor. 
