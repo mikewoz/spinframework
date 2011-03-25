@@ -53,21 +53,15 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
 : 
     wxFrame(NULL, -1, title, pos, size)
 {
-    // there's probably a better way to do this:
-    resourcesPath = wxStandardPaths::Get().GetExecutablePath();
-    resourcesPath = resourcesPath.SubString(0,resourcesPath.Find('/',true)); // remove executable name
-    resourcesPath = resourcesPath + _T("../../Resources");
-    std::cout << "resourcesPath: " << resourcesPath << std::endl;
-
-
-
-    wxIcon SPINIcon(resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
-    SetIcon(SPINIcon);
-
     wxLog::SetActiveTarget(new wxLogStream(&std::cout));
     wxLog::SetVerbose(true);
     wxLogInfo(stringToWxString("XXXXXXXXXXXX set up logger"));
     wxLogInfo(stringToWxString("Running the MainWindow constructor."));
+
+    // set icon
+    wxIcon SPINIcon(spinApp::Instance().sceneManager->resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
+    SetIcon(SPINIcon);
+
     // Create menu bar:
     wxMenuBar *menu_bar = new wxMenuBar;
     // Create file menu:
@@ -166,12 +160,12 @@ void MainWindow::OnAbout(wxCommandEvent& WXUNUSED(event))
         wxOK | wxICON_INFORMATION, this);
 */
 
-    wxIcon SPINIcon(resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
+    wxIcon SPINIcon(spinApp::Instance().sceneManager->resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
     wxAboutDialogInfo info;
-    info.SetVersion(_("SPIN Editor"));
-    info.SetName(_(PACKAGE_NAME));
-    info.SetDescription(_("Part of the SPIN Framework\n(The Spatial Interaction Framework)\nhttp://www.spinframework.org"));
-    info.SetCopyright(_T("Copyright (C) 2011. Mike Wozniewski, Zack Settel, Alexandre Quessy."));
+    info.SetVersion(_(PACKAGE_VERSION));
+    info.SetName(_("SPIN Editor"));
+    info.SetDescription(_("Part of the SPIN Framework\nhttp://www.spinframework.org\n\nLicense: LGPL version 3"));
+    info.SetCopyright(_T("Copyright (C) 2011 Mike Wozniewski, Zack Settel, Alexandre Quessy."));
     info.SetIcon(SPINIcon);
 
     wxAboutBox(info);

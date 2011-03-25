@@ -57,12 +57,16 @@ bool SpinEditorApp::OnInit()
     TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
 #endif
 
-
     if (! spinListener.start())
     {
         std::cout << "ERROR: could not start SPIN listener" << std::endl;
         return false;
     }
+
+    // initialize image handlers (for toolbar iconse, etc)
+    // TODO: use only the image handlers required
+    wxInitAllImageHandlers();
+
 
     int width = 600;
     int height = 600;
@@ -94,6 +98,7 @@ void SpinEditorApp::OnSpinPollTimer(wxTimerEvent& event)
 {
     if (!spinListener.isRunning())
     {
+        // tell wx to quit
         GetTopWindow()->Close();
     }
 }

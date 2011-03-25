@@ -63,7 +63,6 @@ class MainWindow: public wxFrame
         DECLARE_EVENT_TABLE();
     private:
         //wxTreeCtrl *treeControl_;
-        wxString resourcesPath;
 };
 
 /**
