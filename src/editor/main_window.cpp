@@ -110,6 +110,16 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
     wxLogInfo(stringToWxString("Done laying out window contents."));
     // -----------------------
 
+
+
+
+
+
+
+
+
+
+
 	tree->BuildTree(spinApp::Instance().sceneManager->worldNode.get());
 
     // Listing node types:
