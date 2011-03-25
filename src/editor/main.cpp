@@ -28,6 +28,7 @@
 #include "config.h"
 #include "main.h"
 #include "main_window.h"
+#include "mainFrame.h"
 #include "spinApp.h"
 
 #include "SceneManager.h"
@@ -68,9 +69,11 @@ bool SpinEditorApp::OnInit()
     wxInitAllImageHandlers();
 
 
-    int width = 600;
-    int height = 600;
-    MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(width, height));
+    int width = 400;
+    int height = 500;
+    //MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(width, height));
+    //MainFrame *frame = new MainFrame( NULL, wxID_ANY, _("SPIN Editor"), wxPoint(50, 50), wxSize(width, height), wxDEFAULT_FRAME_STYLE );
+    MainFrame *frame = new MainFrame( NULL );
 
     frame->Show(true);
     SetTopWindow(frame);

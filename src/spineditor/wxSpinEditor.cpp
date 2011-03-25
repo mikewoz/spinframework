@@ -90,7 +90,7 @@ wxSpinEditor::wxSpinEditor(wxWindow* parent,wxWindowID id)
 	treePanel = new wxPanel(spinEditor_splitter, ID_treePanel, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_treePanel"));
 	BoxSizer1 = new wxBoxSizer(wxVERTICAL);
 	spinTree = new wxSpinTreeCtrl(treePanel,ID_SPIN_TREE,wxDefaultPosition,wxDefaultSize,wxTR_DEFAULT_STYLE,wxDefaultValidator,_T("ID_SPIN_TREE"));
-	BoxSizer1->Add(spinTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	BoxSizer1->Add( , 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	treePanel->SetSizer(BoxSizer1);
 	BoxSizer1->Fit(treePanel);
 	BoxSizer1->SetSizeHints(treePanel);
