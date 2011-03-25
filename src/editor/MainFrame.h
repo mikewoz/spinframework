@@ -3,6 +3,9 @@
 
 #include "MainFrame_base.h"
 
+const std::string HELP_URL = "http://www.spinframework.org/content/how_to_spin_editor";
+
+
 class MainFrame : public MainFrame_base
 {
 public:
@@ -16,6 +19,8 @@ public:
     protected:
 
         virtual void OnNewNode( wxCommandEvent& event );
+        virtual void OnAbout( wxCommandEvent& event );
+        virtual void OnHelp( wxCommandEvent& event );
 };
 
 
