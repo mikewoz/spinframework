@@ -28,7 +28,7 @@
 #include "config.h"
 #include "main.h"
 #include "main_window.h"
-#include "mainFrame.h"
+#include "MainFrame.h"
 #include "spinApp.h"
 
 #include "SceneManager.h"
