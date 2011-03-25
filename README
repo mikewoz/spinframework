@@ -43,8 +43,9 @@ Ultimately, the SPIN Framework allows for the creation of collaborative environm
 
 Dependencies
 ------------
-1) compile and install openscenegraph 2.9.8 or later
-3) compile and install cppintrospection from the https://github.com/sat-metalab/cppintrospection
+ * compile and install openscenegraph 2.9.8 or later
+ * compile and install wxwidgets2.9 2.9.1 or later
+ * compile and install cppintrospection from the https://github.com/sat-metalab/cppintrospection
 
 Compiling
 ---------
