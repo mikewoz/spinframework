@@ -545,6 +545,16 @@ void SceneManager::debug()
 
 // *****************************************************************************
 
+std::vector<std::string> SceneManager::getAllNodeTypes()
+{
+    std::vector<std::string> result;
+    for (nodeMapType::iterator it = nodeMap.begin(); it != nodeMap.end(); ++it)
+    {
+        result.push_back(it->first);
+    }
+    return result;
+}
+
 ReferencedNode* SceneManager::createNode(std::string id, std::string type)
 {
     const char *charID = id.c_str();

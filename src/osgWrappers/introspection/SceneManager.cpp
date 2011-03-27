@@ -253,6 +253,7 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	I_SimpleProperty(spinLog &, Log, 
 	                 0, 
 	                 __void__setLog__spinLog_R1);
+	I_PublicMemberProperty(std::vector< std::string >, getAllNodeTypes);
 	I_PublicMemberProperty(std::string, sceneID);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Group >, rootNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, worldNode);

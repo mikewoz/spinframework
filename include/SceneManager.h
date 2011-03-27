@@ -103,6 +103,8 @@ class SceneManager
         void sendNodeList(std::string type, lo_address txAddr = 0);
         void sendConnectionList(lo_address txAddr = 0);
 
+        std::vector<std::string> getAllNodeTypes();
+
         ReferencedNode *createNode(std::string id, std::string type);
         ReferencedNode *createNode(const char *id, const char *type);
         ReferencedNode *getNode(std::string id);

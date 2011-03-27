@@ -26,6 +26,10 @@ spineditor_SOURCES = \
 	MainFrame.h \
 	MainFrame_base.cpp \
 	MainFrame_base.h \
+	dialog_NewNode.cpp \
+	dialog_NewNode.h \
+	dialog_NewNode_base.cpp \
+	dialog_NewNode_base.h \
 	wxSpinTreeCtrl.cpp \
 	wxSpinTreeCtrl.h \
 	wxSpinTreeVisitor.cpp \

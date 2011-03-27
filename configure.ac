@@ -10,11 +10,17 @@ AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST # fills $host variable
 
+
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
+
 AC_PROG_LIBTOOL
+# LT_INIT should be used instead of AC_PROG_LIBTOOL
+#LT_PREREQ([2.4])
+#LT_INIT
 
 AC_CHECK_PROGS([DOXYGEN], [doxygen])
 
@@ -37,6 +43,7 @@ fi
 
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
+  LIBTOOL="glibtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
   if test -d /opt/local ; then

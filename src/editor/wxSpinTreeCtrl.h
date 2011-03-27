@@ -78,6 +78,7 @@ public:
 
     //void setListeningServer(lo_server_thread t);
 
+
     /**
      * Build the tree based on the contents of the sceneManager
      */
@@ -87,11 +88,6 @@ public:
      * Refresh the tree based on the contents of the sceneManager
      */
     void Refresh();
-
-    /**
-     * Adds the ReferencedNode node to the tree
-     */
-    void addToTree(ReferencedNode *n, wxTreeItemId parentID);
 
     /**
      * This adds a node to the tree. Note that this function will typicall be
@@ -116,6 +112,23 @@ public:
     bool SelectNode(ReferencedNode* pNode);
 
     /**
+     * Get the current ReferencedNode node that the user has selected in the tree
+     */
+    ReferencedNode* GetSelectedNode() const;
+
+    /**
+     * Updates the tree item's icon
+     */
+    void UpdateTreeItemIcon(wxTreeItemId id);
+
+private:
+
+    /**
+     * Adds the ReferencedNode node to the tree
+     */
+    void addToTree(ReferencedNode *n, wxTreeItemId parentID);
+
+    /**
      * GetTreeItem returns the wxTreeItemId given an ReferencedNode node pointer
      */
     wxTreeItemId GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
@@ -129,19 +142,10 @@ public:
     wxTreeItemId GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
 
     /**
-     * Get the current ReferencedNode node that the user has selected in the tree
-     */
-    ReferencedNode* GetSelectedNode() const;
-
-    /**
      * Get the ReferencedNode node stored in a TreeCtrl leaf
      */
     ReferencedNode* GetNode(const wxTreeItemId& item) const;
 
-    /**
-     * Updates the tree item's icon
-     */
-    void UpdateTreeItemIcon(wxTreeItemId id);
 
     /**
      * this will cause propgrid to populate with the selected node's properties.
@@ -162,15 +166,12 @@ public:
     void OnSpinTreeDragBegin(wxTreeEvent &event);
     void OnSpinTreeDragEnd(wxTreeEvent &event);
 
-// FIXME:2011-03-22:aalex:Get rid of protected methods.
-protected:
 
     wxImageList* m_pImages;
     osg::ref_ptr<wxSpinTreeVisitor> m_pSceneTreeVisitor;
 
     //wxSpinPropGrid* SpinPropGrid;
 
-    //lo_server_thread listeningServer;
 
     wxTreeItemId draggedItem;
 

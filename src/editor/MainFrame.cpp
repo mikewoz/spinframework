@@ -5,38 +5,17 @@
 #include "spinApp.h"
 #include "SceneManager.h"
 #include "MainFrame.h"
+#include "dialog_NewNode.h"
+#include "wxSpinTreeCtrl.h"
 
+using namespace spineditor;
 
-MainFrame::MainFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : MainFrame_base( parent, id, title, pos, size, style )
-{
+MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent) {}
+MainFrame::~MainFrame() {}
 
-
-
-}
-MainFrame::~MainFrame()
-{
-
-}
-
-void MainFrame::OnNewNode( wxCommandEvent& event )
-{
-    std::cout << "Got OnNewNode" << std::endl;
-    event.Skip();
-}
 
 void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    /*
-    std::ostringstream os;
-    os << PACKAGE_NAME << " " <<  wxString(_("version")).mb_str() << " " << PACKAGE_VERSION << std::endl << std::endl;
-    os << wxString(_("Authors: ")).mb_str()  << "Mike Wozniewski, Zack Settel, Alexandre Quessy." << std::endl;
-    os << wxString(_("License: ")).mb_str() << wxString(_("LGPL version 3")).mb_str() << std::endl;
-
-    wxMessageBox(stringToWxString(os.str()),
-        _("About the SPIN Editor"),
-        wxOK | wxICON_INFORMATION, this);
-*/
-
     wxIcon SPINIcon(spinApp::Instance().sceneManager->resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
     wxAboutDialogInfo info;
     info.SetVersion(_(PACKAGE_VERSION));
@@ -48,6 +27,7 @@ void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     wxAboutBox(info);
 }
 
+const std::string HELP_URL = "http://www.spinframework.org/content/how_to_spin_editor";
 void MainFrame::OnHelp(wxCommandEvent& WXUNUSED(event))
 {
     bool success = wxLaunchDefaultBrowser(HELP_URL);
@@ -63,4 +43,54 @@ void MainFrame::OnHelp(wxCommandEvent& WXUNUSED(event))
             _("SPIN Editor Information"),
             wxOK | wxICON_INFORMATION, this);
     }
+}
+
+void MainFrame::OnNewNode( wxCommandEvent& WXUNUSED(event) )
+{
+    // creating nodes is handled in a dialog:
+    dialog_NewNode* d = new dialog_NewNode( this);
+    if ( d->ShowModal() == wxID_OK )
+    {
+        // how do we get the created node id from the dialog? eg, so that we can
+        // select it in the tree automatically?
+    }
+}
+
+void MainFrame::OnDeleteNode( wxCommandEvent& WXUNUSED(event) )
+{
+    // get currently selected node in the tree and tell the server to delete it:
+
+    ReferencedNode* n = spinTreeCtrl->GetSelectedNode();
+
+    if (n)
+    {
+        // TODO: need confirmation dialog here
+        int answer = wxMessageBox("Delete node "+n->getID()+"?", "Delete Node",
+                                  wxYES | wxCANCEL, this);
+        if (answer == wxYES)
+        {
+            std::cout << "Attempting to delete node: " << n->getID() << std::endl;
+            spinApp::Instance().SceneMessage("ss", "deleteNode", n->getID().c_str(), LO_ARGS_END);
+        }
+    }
+}
+
+void MainFrame::OnRefresh( wxCommandEvent& WXUNUSED(event) )
+{
+    spinApp::Instance().SceneMessage("s", "refresh", LO_ARGS_END);
+}
+
+void MainFrame::OnToggleGrid( wxCommandEvent& WXUNUSED(event) )
+{
+    // TODO
+}
+
+void MainFrame::OnToggleViewer( wxCommandEvent& WXUNUSED(event) )
+{
+    // TODO
+}
+
+void MainFrame::OnSceneDebug( wxCommandEvent& WXUNUSED(event) )
+{
+    spinApp::Instance().SceneMessage("s", "debug", LO_ARGS_END);
 }
