@@ -43,8 +43,14 @@ Ultimately, the SPIN Framework allows for the creation of collaborative environm
 
 Dependencies
 ------------
-1) compile and install openscenegraph 2.9.8 or later
-3) compile and install cppintrospection from the https://github.com/sat-metalab/cppintrospection
+ * Compile and install openscenegraph 2.9.8 or later.
+ * Compile and install wxwidgets2.9 2.9.1 or later.
+   On Ubuntu, you can get the libwxgtk2.9-dev package from the Metalab PPA. Do this:
+   $ sudo add-apt-repository ppa:sat-metalab/metalab
+   $ sudo apt-get update
+   $ sudo apt-get install libwxgtk2.9-dev libcppintrospection-2.11-dev
+   $ sudo ln -s /usr/lib/wx/config/gtk2-unicode-2.9 /usr/local/bin/wx-config
+ * Compile and install cppintrospection from the https://github.com/sat-metalab/cppintrospection
 
 Compiling
 ---------
