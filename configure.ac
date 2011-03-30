@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(SPINFramework, [0.3.3], [https://sourceforge.net/apps/trac/spinframework/])
+AC_INIT(SPINFRAMEWORK, [0.3.3], [https://sourceforge.net/apps/trac/spinframework/], [spinframework], [http://www.spinframework.org])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -54,9 +54,8 @@ esac
 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 export PKG_CONFIG_PATH
 
-#CXXFLAGS+=" -g3 -ggdb -Wall -Wextra -Wfatal-errors"
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
-LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
+# LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -71,8 +70,6 @@ AX_CHECK_GLUT
 AC_CHECK_LIB([m],[sqrt])
 PKG_CHECK_MODULES(XML, libxml-2.0 >= 2.0)
 PKG_CHECK_MODULES([LIBXML2], libxml-2.0 >= 2.0)
-#AC_SUBST(LIBXML_LIBS)
-#AC_SUBST(LIBXML_CFLAGS)
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
@@ -81,9 +78,7 @@ AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
-
 # Check for Python:
-#AX_PYTHON
 AM_PATH_PYTHON
 
 PYTHON_CPPFLAGS="`python-config --cflags`"
@@ -92,34 +87,12 @@ PYTHON_LDFLAGS="`python-config --ldflags`"
 AC_SUBST(PYTHON_CPPFLAGS)
 AC_SUBST(PYTHON_LDFLAGS)
 
-#AC_MSG_RESULT(["    PYTHON_LDFLAGS: $PYTHON_LDFLAGS"])
-#AC_MSG_RESULT(["    PYTHON_CPPFLAGS: $PYTHON_CPPFLAGS"])
-
-
 # manually set pythondir (where site-packages is located)
 # and pyexecdir for OSX
 case "$host" in *-darwin* | *-macos10*)
   pythondir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
   pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 esac
-
-# Using AX_PYTHON_DEVEL:
-#AX_PYTHON_DEVEL
-
-# Using AX_PYTHON_EMBED:
-#AX_PYTHON_WITH
-#AX_PYTHON_PATH
-#AX_PYTHON_VERSION_ENSURE( [2.5] )
-#AX_PYTHON_CSPEC
-#AX_PYTHON_LSPEC
-
-# Another python check: 
-#AM_PATH_PYTHON
-#AM_CHECK_PYTHON_HEADERS
-#AM_CHECK_PYTHON_LIB
-#if test -z "$PYTHON_INCLUDES" || test -z "$PYTHON_LIBS"; then
-#AC_MSG_ERROR([Could not find Python])
-#fi
 
 # Check for boost:
 AX_BOOST_BASE([1.35])
@@ -146,26 +119,13 @@ if test -z "$BOOST_PYTHON_LIB" ; then
     AC_MSG_ERROR([missing package. libboost-python-dev.])
 fi
 
-# Check for OpenSceneGraph:
-#PKG_CHECK_MODULES(OpenSceneGraph, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
-AC_CHECK_LIB(osg, osgGetVersion, , AC_MSG_ERROR([missing OpenSceneGraph]),)
+PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
 
-# and osgIntrospection:
-AC_CHECK_LIB(osgIntrospection, osgIntrospectionGetVersion, OSGINTROSPECTION_LIB="-losgIntrospection", AC_MSG_ERROR([missing OpenSceneGraph Introspection library]),)
-AC_SUBST([OSGINTROSPECTION_LIB])
+PKG_CHECK_MODULES(CPPINTROSPECTION, cppintrospection-2.11 >= 2.11.0, , AC_MSG_ERROR([missing cppintrospection]))
 
-# another way to check for OSG libs?:
-#AC_CHECK_LIB(osg,osgGetVersion)
-#AC_CHECK_LIB(OpenThreads,OpenThreadsGetVersion)
+PKG_CHECK_MODULES(OPENTHREADS, openthreads >= 2.4.0, , AC_MSG_ERROR([missing OpenThreads]))
 
-# Mac OS X specific configure options
-#AC_ARG_WITH(osg_framework, [ --with-osg-framework=PREFIX Specify the prefix path to osg frameworks [default=standard framework paths]])
-#AC_CHECK_FRAMEWORK(osg, [#include <osg/Version>])
-#AC_CHECK_FRAMEWORK(OpenThreads, [#include <OpenThreads/Version>])
-
-# check for liblo:
-AC_CHECK_LIB(lo, lo_send_internal, LIBLO_LDFLAGS="-llo", AC_MSG_ERROR([missing liblo OSC library]),)
-AC_SUBST([LIBLO_LDFLAGS])
+PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 
 # FIXME: scenic should use pkg-config to say where shared video is
 OLD_LDFLAGS=$LDFLAGS

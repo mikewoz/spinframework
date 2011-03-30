@@ -39,25 +39,25 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include <osgIntrospection/Reflection>
-#include <osgIntrospection/PropertyInfo>
+#include <cppintrospection/Reflection>
+#include <cppintrospection/PropertyInfo>
 #include <iostream>
 
 // *****************************************************************************
 // introspection helpers
 
-bool introspect_type_order(const osgIntrospection::Type *v1, const osgIntrospection::Type *v2)
+bool introspect_type_order(const cppintrospection::Type *v1, const cppintrospection::Type *v2)
 {
-	using namespace osgIntrospection;
+	using namespace cppintrospection;
 	
     if (!v1->isDefined()) return v2->isDefined();
     if (!v2->isDefined()) return false;
     return v1->getQualifiedName().compare(v2->getQualifiedName()) < 0;
 }
 
-void introspect_print_method(const osgIntrospection::MethodInfo &mi)
+void introspect_print_method(const cppintrospection::MethodInfo &mi)
 {
-	using namespace osgIntrospection;
+	using namespace cppintrospection;
 	
     std::cout << "\t    ";
 
@@ -109,9 +109,9 @@ void introspect_print_method(const osgIntrospection::MethodInfo &mi)
     std::cout << "\n";
 }
 
-void introspect_print_type(const osgIntrospection::Type &type)
+void introspect_print_type(const cppintrospection::Type &type)
 {
-	using namespace osgIntrospection;
+	using namespace cppintrospection;
 	
     // ignore pointer types and undefined types
     if (!type.isDefined() || type.isPointer() || type.isReference())
@@ -251,7 +251,7 @@ void introspect_print_type(const osgIntrospection::Type &type)
 
 void introspect_print_all_types()
 {
-	using namespace osgIntrospection;
+	using namespace cppintrospection;
 	
     // get the map of types that have been reflected
     const TypeMap &tm = Reflection::getTypes();

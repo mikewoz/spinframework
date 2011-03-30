@@ -46,8 +46,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include <osgDB/Registry>
-#include <osgIntrospection/Type>
-#include <osgIntrospection/Value>
+#include <cppintrospection/Type>
+#include <cppintrospection/Value>
 
 #include <osgUtil/Optimizer>
 
@@ -294,7 +294,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     int i;
     std::string theMethod, nodeStr;
-    osgIntrospection::ValueList theArgs;
+    cppintrospection::ValueList theArgs;
 
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;
@@ -319,23 +319,23 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     // get osgInrospection::Value from passed UserData by casting as the proper
     // referenced object pointer:
 
-    osgIntrospection::Value classInstance;
+    cppintrospection::Value classInstance;
     if (s->s_type == REFERENCED_STATESET)
     {
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
+        classInstance = cppintrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
     }
     else
     {
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
+        classInstance = cppintrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
     }
 
 
     // the getInstanceType() method however, gives us the real type being pointed at:
-    const osgIntrospection::Type &classType = classInstance.getInstanceType();
+    const cppintrospection::Type &classType = classInstance.getInstanceType();
 
     if (!classType.isDefined())
     {
-        std::cout << "ERROR: oscParser cound not process message '" << path << ". osgIntrospection has no data for that node." << std::endl;
+        std::cout << "ERROR: oscParser cound not process message '" << path << ". cppintrospection has no data for that node." << std::endl;
         return 1;
     }
 

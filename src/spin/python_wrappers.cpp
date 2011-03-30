@@ -63,21 +63,21 @@
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
-#include <osgIntrospection/Reflection>
-#include <osgIntrospection/Type>
-#include <osgIntrospection/Value>
-#include <osgIntrospection/variant_cast>
-#include <osgIntrospection/Exceptions>
-#include <osgIntrospection/MethodInfo>
-#include <osgIntrospection/PropertyInfo>
+#include <cppintrospection/Reflection>
+#include <cppintrospection/Type>
+#include <cppintrospection/Value>
+#include <cppintrospection/variant_cast>
+#include <cppintrospection/Exceptions>
+#include <cppintrospection/MethodInfo>
+#include <cppintrospection/PropertyInfo>
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
-#include <osgIntrospection/ExtendedTypeInfo>
-#include <osgIntrospection/variant_cast>
+#include <cppintrospection/ExtendedTypeInfo>
+#include <cppintrospection/variant_cast>
 
 
 #include "spinApp.h"
@@ -92,7 +92,7 @@ class ValueWrapper {
 
 public:
     ValueWrapper();
-    ValueWrapper(osgIntrospection::Value& v);
+    ValueWrapper(cppintrospection::Value& v);
     ValueWrapper(int v);
     ValueWrapper(float v);
     ValueWrapper(std::string& v);
@@ -106,35 +106,35 @@ public:
     boost::python::tuple getVector();
 
 protected:
-    osgIntrospection::Value _value;
+    cppintrospection::Value _value;
 };
 /******************************************************************************/
 ValueWrapper::ValueWrapper() {
-    _value = osgIntrospection::Value(0);
+    _value = cppintrospection::Value(0);
 }
 /******************************************************************************/
-ValueWrapper::ValueWrapper(osgIntrospection::Value& v) {
+ValueWrapper::ValueWrapper(cppintrospection::Value& v) {
     _value = v;
 }
 
 /******************************************************************************/
 ValueWrapper::ValueWrapper(int v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
 /******************************************************************************/
 ValueWrapper::ValueWrapper(float v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
 /******************************************************************************/
 ValueWrapper::ValueWrapper(std::string& v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
 /******************************************************************************/
 ValueWrapper::ValueWrapper(const std::string& v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
 /******************************************************************************/
@@ -145,14 +145,14 @@ ValueWrapper::~ValueWrapper() {
 /******************************************************************************/
 
 int ValueWrapper::getInt() {
-    int i = osgIntrospection::variant_cast<int>(_value);
+    int i = cppintrospection::variant_cast<int>(_value);
     return i;
 }
 
 /******************************************************************************/
 
 float ValueWrapper::getFloat() {
-    float i = osgIntrospection::variant_cast<float>(_value);
+    float i = cppintrospection::variant_cast<float>(_value);
     return i;
 }
 
@@ -168,7 +168,7 @@ boost::python::tuple ValueWrapper::getVector() {
 
     try {
         osg::Vec2 v2;
-        v2 = osgIntrospection::variant_cast<osg::Vec2>(_value);
+        v2 = cppintrospection::variant_cast<osg::Vec2>(_value);
         return make_tuple( v2.x(), v2.y() );
     } catch (...) {
         // not it..
@@ -176,7 +176,7 @@ boost::python::tuple ValueWrapper::getVector() {
 
     try {
         osg::Vec3 v3;
-        v3 = osgIntrospection::variant_cast<osg::Vec3>(_value);
+        v3 = cppintrospection::variant_cast<osg::Vec3>(_value);
         return make_tuple( v3.x(), v3.y(), v3.z() );
     } catch (...) {
         // still not it
@@ -184,7 +184,7 @@ boost::python::tuple ValueWrapper::getVector() {
 
     try {
         osg::Vec4 v4;
-        v4 = osgIntrospection::variant_cast<osg::Vec4>(_value);
+        v4 = cppintrospection::variant_cast<osg::Vec4>(_value);
         return make_tuple( v4.x(), v4.y(), v4.z(), v4.w() );
     } catch (...) {
         // damn
@@ -204,18 +204,18 @@ boost::python::tuple ValueWrapper::getVector() {
 /******************************************************************************/
 
 
-int invokeMethod(const osgIntrospection::Value classInstance,
-                 const osgIntrospection::Type &classType,
+int invokeMethod(const cppintrospection::Value classInstance,
+                 const cppintrospection::Type &classType,
                  const std::string& method,
-                 osgIntrospection::ValueList theArgs,
-                 osgIntrospection::Value &rval)
+                 cppintrospection::ValueList theArgs,
+                 cppintrospection::Value &rval)
 {
 
     // TODO: we should try to store this globally somewhere, so that we don't do
     // a lookup every time there is a message:
 
     /*
-    const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+    const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
 
 
     if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
@@ -227,7 +227,7 @@ int invokeMethod(const osgIntrospection::Value classInstance,
             // we can return:
             return 1;
         }
-        catch (osgIntrospection::Exception & ex)
+        catch (cppintrospection::Exception & ex)
         {
             //std::cerr << "catch exception: " << ex.what() << std::endl;
         }
@@ -304,7 +304,7 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
 
     //int i;
     std::string    theMethod( method );
-    osgIntrospection::ValueList theArgs;
+    cppintrospection::ValueList theArgs;
 
     //printf("SceneManagerCallback_script: hi! %s, %s, [%s]\n", symName, types, args.c_str());
 
@@ -319,21 +319,21 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
     // get osgInrospection::Value from passed UserData by casting as the proper
     // referenced object pointer:
 
-    osgIntrospection::Value classInstance;
+    cppintrospection::Value classInstance;
     if (s->s_type == REFERENCED_STATESET)
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
+        classInstance = cppintrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
     else
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
+        classInstance = cppintrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
 
 
 
     // the getInstanceType() method however, gives us the real type being pointed at:
-    const osgIntrospection::Type &classType = classInstance.getInstanceType();
+    const cppintrospection::Type &classType = classInstance.getInstanceType();
 
     if (!classType.isDefined())
     {
         std::cout << "ERROR: oscParser cound not process message '" << symName
-                  << ". osgIntrospection has no data for that node." << std::endl;
+                  << ". cppintrospection has no data for that node." << std::endl;
         return ValueWrapper(0);
     }
 
@@ -357,7 +357,7 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
     // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
 
-    osgIntrospection::Value v;
+    cppintrospection::Value v;
 
     bool eventScriptCalled = false;
     if (cascadeEvents) {

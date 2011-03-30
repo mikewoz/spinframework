@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <ReferencedNode.h>
 #include <SceneManager.h>
@@ -198,9 +198,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __bool__addEventScript__bool__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
 	          "",
 	          "");
-	I_Method2(bool, callEventScript, IN, const std::string &, eventName, IN, osgIntrospection::ValueList &, args,
+	I_Method2(bool, callEventScript, IN, const std::string &, eventName, IN, cppintrospection::ValueList &, args,
 	          Properties::NON_VIRTUAL,
-	          __bool__callEventScript__C5_std_string_R1__osgIntrospection_ValueList_R1,
+	          __bool__callEventScript__C5_std_string_R1__cppintrospection_ValueList_R1,
 	          "",
 	          "");
 	I_Method2(bool, enableEventScript, IN, const char *, label, IN, int, enable,

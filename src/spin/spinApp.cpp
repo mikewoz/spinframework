@@ -46,7 +46,7 @@
 
 
 #include <osgDB/Registry>
-#include <osgIntrospection/Type>
+#include <cppintrospection/Type>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
@@ -103,8 +103,8 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
     {
     	/*
         std::cout << "[DEBUG] These are all possible types:" << std::endl;
-        const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-        for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
+        const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
+        for (cppintrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
         {
             if ( ((*it).second)->isDefined() )
             {
@@ -113,7 +113,7 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
             }
         }
 		*/
-        const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
         //UNUSED(ReferencedNodeType);
         if (!ReferencedNodeType.isDefined())
         {
@@ -124,7 +124,7 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
         	//std::cout << "Successfully loaded SPIN library" << std::endl;
         }
     }
-    catch (osgIntrospection::Exception & ex)
+    catch (cppintrospection::Exception & ex)
     {
         std::cout << "ERROR: " << ex.what() << ". This is likely a dynamic library problem. Make sure that libSPIN exists and can be found." << std::endl;
         exit(1);
