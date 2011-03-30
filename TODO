@@ -3,7 +3,6 @@ Release-critical for 0.4
  * Use OSG serializer, drop osgIntrospection
  * enclose everything in the spin namespace
  * write some tests
- * merge cleanup and master
 
 Server side TCP handlers
 ------------------------
