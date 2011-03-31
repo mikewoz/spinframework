@@ -52,6 +52,9 @@ namespace osg {
 class Geode;
 }
 
+namespace spin
+{
+
 class SceneManager;
 
 /**
@@ -160,4 +163,6 @@ private:
 };
 
 
-#endif
+} // end of namespace spin
+
+#endif // include guard

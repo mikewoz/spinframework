@@ -61,6 +61,9 @@ using namespace std;
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
+
 // ***********************************************************
 // constructor (one arg required: the node ID)
 ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
@@ -945,3 +948,6 @@ bool ReferencedNode::removeEventScript( const char* label ) {
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
+
+} // end of namespace spin
+

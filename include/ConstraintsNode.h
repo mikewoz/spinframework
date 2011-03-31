@@ -48,6 +48,9 @@
 
 #include <vector>
 
+namespace spin
+{
+
 /**
  * \brief A node with constrained motion
  * 
@@ -150,6 +153,8 @@ private:
     int recursionCounter;
 };
 
+
+} // end of namespace spin
 
     
 #endif

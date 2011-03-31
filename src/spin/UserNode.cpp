@@ -44,6 +44,9 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructor:
 UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
@@ -128,3 +131,5 @@ std::vector<lo_message> UserNode::getState () const
 
 	return ret;
 }
+
+} // end of namespace spin

@@ -51,6 +51,11 @@
 
 #include <cstring>
 
+
+namespace spin
+{
+
+
 /* Subtract the `struct timeval' values X and Y, storing the result in RESULT.
  * Return 1 if the difference is negative, otherwise 0.
  */
@@ -261,4 +266,6 @@ static spinLog& operator<<(spinLog& vlog, LogPriority pr)
     return vlog;
 }
 
-#endif
+} // end of namespace spin
+
+#endif // not included

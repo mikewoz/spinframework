@@ -48,6 +48,9 @@ namespace osg {
     class LightSource;
 }
 
+namespace spin
+{
+
 /**
  * \brief A light source, with controllable intensity, color, etc.
  *
@@ -55,9 +58,7 @@ namespace osg {
  */
 class LightSource : public GroupNode
 {
-
 public:
-
     LightSource(SceneManager *sceneManager, char *initID);
     virtual ~LightSource();
 
@@ -91,7 +92,6 @@ public:
      */
     //virtual void stateDump() { ReferencedNode::stateDump(); };
 
-
 private:
 
     void drawLight();
@@ -108,9 +108,8 @@ private:
     osg::Vec4 _ambient;
     osg::Vec4 _diffuse;
     osg::Vec4 _specular;
-
 };
 
-
+} // end of namespace spin
 
 #endif

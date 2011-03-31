@@ -58,6 +58,9 @@ namespace osg {
     class MatrixTransform;
 }
 
+namespace spin
+{
+
 
 /**
  * \brief An OSG NodeVisitor class that allows us to search for a specific node
@@ -182,5 +185,7 @@ class TextureStateSetFinder : public osg::NodeVisitor
 
         TextureStateSetFinder& operator = (const TextureStateSetFinder&);
 };
+
+} // end of namespace spin
 
 #endif // __NODE_VISITORS_H__

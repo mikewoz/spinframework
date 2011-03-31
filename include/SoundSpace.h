@@ -42,12 +42,14 @@
 #ifndef __SoundSpace_H
 #define __SoundSpace_H
 
-
 #ifdef AS_GRAPHICAL
 #include <osgUtil/IntersectVisitor>
 #endif
 
 #include "DSPNode.h"
+
+namespace spin
+{
 
 /**
  * \brief Represents an acoustic enclosure or volume in space.
@@ -89,5 +91,7 @@ class SoundSpace : public DSPNode
 #endif
     
 };
+
+} // end of namespace spin
 
 #endif

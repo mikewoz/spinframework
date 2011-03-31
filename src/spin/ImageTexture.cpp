@@ -54,6 +54,9 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructor:
 ImageTexture::ImageTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
@@ -201,3 +204,6 @@ std::vector<lo_message> ImageTexture::getState () const
 }
 
 bool ImageTexture::isValid() const { return (_image.valid()); }
+
+} // end of namespace spin
+

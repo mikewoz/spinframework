@@ -45,6 +45,9 @@
 #include "MediaManager.h"
 #include "spinUtil.h"
 
+namespace spin
+{
+
 // ***********************************************************
 // constructor
 MediaManager::MediaManager (const std::string &p)
@@ -116,4 +119,7 @@ std::string MediaManager::getSoundPath(int id) const { return ""; }
 std::string MediaManager::getImageName(int id) const { return "NULL"; }
 std::string MediaManager::getModelName(int id) const { return "NULL"; }
 std::string MediaManager::getSoundName(int id) const { return "NULL"; }
+
+} // end of namespace spin
+
 

@@ -49,6 +49,9 @@ namespace osg {
     class PositionAttitudeTransform;
 }
 
+namespace spin
+{
+
 /**
  * \brief Represents a point sound source (or sink).
  * 
@@ -151,6 +154,8 @@ class SoundNode : public DSPNode
         // VU meter:
         osg::ref_ptr<osg::PositionAttitudeTransform> VUmeterTransform;
 };
+
+} // end of namespace spin
 
 
 #endif

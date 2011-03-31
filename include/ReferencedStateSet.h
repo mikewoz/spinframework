@@ -47,6 +47,9 @@
 
 #include <osg/StateSet>
 
+namespace spin
+{
+
 // forward declaration of SceneManager
 class SceneManager;
 
@@ -124,6 +127,8 @@ class ReferencedStateSet_callback : public osg::StateSet::StateSet::Callback
             }
         }
 };
+
+} // end of namespace spin
 
 
 #endif

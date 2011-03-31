@@ -58,6 +58,9 @@
 #include "lo/lo.h"
 #include "tinyxml.h"
 
+namespace spin
+{
+
 typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
 typedef std::map< std::string, nodeListType > nodeMapType;
 typedef std::pair< std::string, nodeListType > nodeMapPair;
@@ -177,20 +180,15 @@ class SceneManager
          */
         void update();
 
-
-
-
         osg::Matrix getWorldCoords(t_symbol *id);
 
         void exportScene (const char *nodeID, const char *filename);
-
 
         std::string sceneID;
 
         osg::ref_ptr<osg::Group> rootNode;
         osg::ref_ptr<osg::ClearNode> worldNode;
         osg::ref_ptr<osg::Geode> gridGeode;
-
 
         /**
          * The scene manager can operate in graphical mode or non-graphical.
@@ -248,10 +246,8 @@ class SceneManager
         ReferencedStateSetMap stateMap;
 };
 
-
-
-
-
 int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs);
+
+} // end of namespace spin
 
 #endif

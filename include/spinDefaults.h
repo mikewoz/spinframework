@@ -42,6 +42,9 @@
 #ifndef __SPIN_DEFAULTS_H__
 #define __SPIN_DEFAULTS_H__
 
+namespace spin
+{
+
 namespace spin_defaults {
     static const char *SCENE_ID = "default";
     static const char *INFO_UDP_PORT = "54320";
@@ -53,6 +56,8 @@ namespace spin_defaults {
     static const char *SERVER_TX_UDP_PORT = CLIENT_RX_UDP_PORT; // "54323"
     static const char *MULTICAST_GROUP = "239.0.0.1";
 }
+
+} // end of namespace spin
 
 #endif // __SPIN_DEFAULTS_H__
 

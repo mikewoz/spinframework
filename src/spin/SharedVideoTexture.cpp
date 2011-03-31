@@ -54,6 +54,9 @@ static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
 using namespace std;
 
 
+namespace spin
+{
+
 
 // ===================================================================
 // constructor:
@@ -331,3 +334,6 @@ void SharedVideoTexture::stop()
 }
 
 #endif
+
+} // end of namespace spin
+

@@ -54,7 +54,8 @@ using namespace std;
 
 //extern SceneManager *sceneManager;
 
-
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -213,3 +214,6 @@ std::vector<lo_message> RayNode::getState () const
 
     return ret;
 }
+
+} // end of namespace spin
+

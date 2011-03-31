@@ -58,6 +58,9 @@ namespace {
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
+
 // ===================================================================
 // constructor:
 SoundNode::SoundNode (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
@@ -428,3 +431,6 @@ std::vector<lo_message> SoundNode::getState () const
 	
 	return ret;
 }
+
+} // end of namespace spin
+

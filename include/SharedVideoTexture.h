@@ -62,6 +62,8 @@ namespace osg {
     class Image;
 }
 
+namespace spin
+{
 
 /**
  * \brief Allows sharing of a dynamc (video) GL texture from another process
@@ -150,5 +152,7 @@ class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::
         }
 };
 */
+
+} // end of namespace spin
 
 #endif

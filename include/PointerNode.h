@@ -56,6 +56,9 @@ namespace osgManipulator {
     class CommandManager;
 }
 
+namespace spin
+{
+
 // dummy class:
 class PointerNodeActionAdapter : public osgGA::GUIActionAdapter {
     void requestRedraw(void){};
@@ -148,5 +151,7 @@ class PointerNode : public ReferencedNode
         PointerNodeActionAdapter aa;
         osgManipulator::PointerInfo _pointer;
 };
+
+} // end of namespace spin
 
 #endif

@@ -49,6 +49,9 @@
 #include "SceneManager.h"
 #include "spinDefaults.h"
 
+namespace spin
+{
+
 
 spinClientContext::spinClientContext() : 
     lo_syncServ(NULL),
@@ -347,4 +350,7 @@ void spinClientContext::subscribe()
 
     doSubscribe_ = false;
 }
+
+} // end of namespace spin
+
 

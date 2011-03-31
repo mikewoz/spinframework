@@ -49,11 +49,11 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/sync/scoped_lock.hpp>
-
 #include "ShapeNode.h"
 #include "sharedVideoBuffer.h"
 
-
+namespace spin
+{
 
 /**
  * \brief This node shared a GL texture from memory with another process
@@ -106,13 +106,12 @@ private:
     boost::interprocess::mapped_region *region;    
     
     bool killed_;
-
-
     // must override draw methods:
     virtual void drawShape();
     virtual void drawTexture();
 
 };
 
+} // end of namespace spin
 
 #endif

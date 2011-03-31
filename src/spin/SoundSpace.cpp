@@ -49,17 +49,17 @@ using namespace std;
 
 //extern SceneManager *sceneManager;
 
+namespace spin
+{
 
 // ===================================================================
 // constructor:
 SoundSpace::SoundSpace (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
 {
 	nodeType = "SoundSpace";
-	
 	absorption = 0.6;
 	filterCoef = 0.0;
 	transition = 0.0;
-	
 }
 
 // ===================================================================
@@ -69,13 +69,9 @@ SoundSpace::~SoundSpace()
 
 }
 
-
-
 // ===================================================================
 // ======================= DRAW METHODS: =============================
 // ===================================================================
-
-
 
 void SoundSpace::setAbsorption (t_floatarg newval)
 {
@@ -101,4 +97,4 @@ std::vector<lo_message> SoundSpace::getState () const
 	return ret;
 }
 
-
+} // end of namespace spin

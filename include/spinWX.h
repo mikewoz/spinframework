@@ -58,6 +58,9 @@
 
 #include <wx/app.h>
 
+namespace spin
+{
+
 class spinWX : public wxApp
 {
     public:
@@ -75,5 +78,7 @@ static const wxCmdLineEntryDesc g_cmdLineDesc [] =
      { wxCMD_LINE_SWITCH, wxT("c"), wxT("client"), wxT("automatically start in client mode") },
      { wxCMD_LINE_NONE }
 };
+
+} // end of namespace spin
 
 #endif

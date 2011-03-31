@@ -48,6 +48,9 @@
 using namespace std;
 
 
+namespace spin
+{
+
 
 
 // ***********************************************************
@@ -306,4 +309,7 @@ std::vector<lo_message> AttractorNode::getState () const
 
     return ret;
 }
+
+
+} // end of namespace spin
 

@@ -73,6 +73,9 @@
 // TODO: make mutex a static member (perhaps of spinApp)?
 pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
 
+namespace spin
+{
+
 
 bool spinBaseContext::signalStop = false;
 
@@ -824,3 +827,6 @@ void spinBaseContext::createServers()
         }
     }
 }
+
+} // end of namespace spin
+

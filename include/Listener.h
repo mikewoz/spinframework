@@ -43,7 +43,8 @@
 #define __Listener_H
 
 #include "SoundNode.h"
-
+namespace spin
+{
 
 /**
  * \brief Represents an audio listener in 3D.
@@ -53,9 +54,7 @@
  */
 class Listener : public SoundNode
 {
-    
     public:
-        
         Listener(SceneManager *sceneManager, char *initID);
         virtual ~Listener();
         
@@ -65,17 +64,13 @@ class Listener : public SoundNode
          */
         virtual std::vector<lo_message> getState() const;
         
-        
         void setType    (const char* t);
         const char* getType() const { return type.c_str(); }
         
         std::string type;
-        
-        
     private:
-        
-
 };
 
+} // end of namespace spin
 
 #endif

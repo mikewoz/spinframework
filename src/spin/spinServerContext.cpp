@@ -54,6 +54,9 @@
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
+
 spinServerContext::spinServerContext() : syncThreadID(0)
 {
     using namespace spin_defaults;
@@ -441,7 +444,6 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     return 1;
 }
 
-
 void spinServerContext::refreshSubscribers()
 {
 	// TODO: call getState on all nodes in sceneManager and send them over TCP
@@ -451,4 +453,7 @@ void spinServerContext::refreshSubscribers()
 
     spinApp::Instance().sceneManager->refreshSubscribers(tcpClientAddrs_);
 }
+
+} // end of namespace spin
+
 

@@ -62,6 +62,9 @@ using namespace std;
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructor:
 PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
@@ -725,3 +728,6 @@ std::vector<lo_message> PointerNode::getState () const
 
     return ret;
 }
+
+} // end of namespace spin
+

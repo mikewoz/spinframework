@@ -44,8 +44,9 @@
 
 #include <osg/Geode>
 
-
 #include "GroupNode.h"
+namespace spin
+{
 
 /**
  * \brief Describes a ray (actually a line segment) in space.
@@ -101,6 +102,6 @@ private:
 
 };
 
-
+} // end of namespace spin
 
 #endif

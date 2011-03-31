@@ -49,6 +49,9 @@
 
 #include "spinUtil.h"
 
+namespace spin
+{
+
 class spinBaseContext;
 class SceneManager;
 class MediaManager;
@@ -158,6 +161,9 @@ class spinApp
 
         spinBaseContext *context;
 };
+
+} // end of namespace spin
+
 
 // Internal server-side MACROS for sending messages. Clients should NEVER use
 // these macros, and should rather use spinContext::send* methods. But just in

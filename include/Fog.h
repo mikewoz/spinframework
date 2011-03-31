@@ -49,6 +49,9 @@ namespace osg {
     class Fog;
 }
 
+namespace spin
+{
+
 /**
  * \brief Basic GL Fog
  *
@@ -88,5 +91,7 @@ private:
     osg::ref_ptr<osg::Fog> fog_;
 
 };
+
+} // end of namespace spin
 
 #endif

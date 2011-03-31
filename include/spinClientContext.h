@@ -44,6 +44,9 @@
 
 #include "spinBaseContext.h"
 
+namespace spin
+{
+
 
 /**
  * \brief A client-side spinContext for listening to a remote server
@@ -106,4 +109,9 @@ class spinClientContext : public spinBaseContext
         // register my ip and port for reliable communication with the server
         void subscribe();
 };
+
+
+} // end of namespace spin
+
+
 #endif

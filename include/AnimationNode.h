@@ -46,6 +46,9 @@
 
 #include <osg/AnimationPath>
 
+namespace spin
+{
+
 // forward declarations
 class SceneManager;
 
@@ -162,5 +165,7 @@ protected:
     
     osg::ref_ptr<osg::AnimationPath> _animationPath;
 };
+
+} // end of namespace spin
 
 #endif

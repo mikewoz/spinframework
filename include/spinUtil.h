@@ -92,6 +92,9 @@ namespace osg {
 
 
 
+namespace spin
+{
+
 
 // *****************************************************************************
 // networking functions
@@ -171,5 +174,7 @@ EXTERN t_symbol *gensym(const char *s);
 EXTERN void *getbytes(size_t nbytes);
 EXTERN void *copybytes(void *src, size_t nbytes);
 EXTERN void freebytes(void *x, size_t nbytes);
+
+} // end of namespace spin
 
 #endif

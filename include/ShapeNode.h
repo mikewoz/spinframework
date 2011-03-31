@@ -49,7 +49,8 @@
 #include <osg/PositionAttitudeTransform>
 #include <osg/Texture2D>
 #include <osgUtil/Optimizer>
-
+namespace spin
+{
 
 /**
  * \brief Node that represents a simple 3D geometry (spheres, boxes, etc).
@@ -144,5 +145,6 @@ protected:
 
 };
 
+} // end of namespace spin
 
 #endif

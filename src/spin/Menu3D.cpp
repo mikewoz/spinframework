@@ -49,6 +49,9 @@ extern pthread_mutex_t sceneMutex;
 
 static unsigned int COUNTER = 0;
 
+namespace spin
+{
+
 // -----------------------------------------------------------------------------
 // constructor:
 Menu3D::Menu3D (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
@@ -413,3 +416,6 @@ std::vector<lo_message> Menu3D::getState () const
 
 	return ret;
 }
+
+} // end of namespace spin
+

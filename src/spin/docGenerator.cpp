@@ -70,6 +70,9 @@ using namespace std;
 #define OUTPUT_FILE "oscprotocol.html"
 #define DEBUG 0
 
+namespace docgenerator
+{
+
 
 static bool IsGoodParam(const ParameterInfo& param)
 {
@@ -239,11 +242,12 @@ static void GenerateHTML(const cppintrospection::Type &classType, ofstream& outp
 }
 
 
-
+} // end of namespace docgenerator
 
 
 int main()
 {
+	using namespace docgenerator;
 	//std::ostringstream output("");
 	
 	ofstream output(OUTPUT_FILE);

@@ -55,6 +55,8 @@
 #include "spinBaseContext.h"
 #include "VideoTexture.h"
 
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -381,4 +383,6 @@ std::vector<lo_message> VideoTexture::getState () const
 
 	return ret;
 }
+
+} // end of namespace spin
 

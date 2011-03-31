@@ -47,6 +47,9 @@
 
 #include "GroupNode.h"
 
+namespace spin
+{
+
 class SceneManager;
 
 #define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
@@ -158,5 +161,6 @@ private:
 };
 
 
+} // end of namespace spin
 
 #endif

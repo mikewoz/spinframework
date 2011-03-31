@@ -77,6 +77,9 @@ struct frustum
 	double far;
 };
 
+namespace spinviewer
+{
+
 int run(int argc, char **argv)
 {
 	//std::cout <<"\nspinViewer launching..." << std::endl;
@@ -391,6 +394,8 @@ int run(int argc, char **argv)
     return 0;
 }
 
+} // end of namespace spinviewer
+
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -399,7 +404,7 @@ int main(int argc, char **argv)
     try {
         // Aug 19 2010:tmatth: Tried this to make multithreading work, didn't help
         // osg::Referenced::setThreadSafeReferenceCounting(true);
-        int result = run(argc, argv);
+        int result = spinviewer::run(argc, argv);
         std::cout << "\nspinviewer exited normally." << std::endl;
         return result;
     }

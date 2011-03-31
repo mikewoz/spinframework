@@ -52,9 +52,10 @@
 
 using namespace std;
 
-
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -210,3 +211,6 @@ std::vector<lo_message> GridNode::getState () const
 
 	return ret;
 }
+
+} // end of namespace spin
+

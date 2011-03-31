@@ -54,6 +54,9 @@
 using namespace std;
 
 
+namespace spin
+{
+
 
 // ***********************************************************
 // constructor:
@@ -474,3 +477,6 @@ std::vector<lo_message> ConstraintsNode::getState () const
 
     return ret;
 }
+
+} // end of namespace spin
+

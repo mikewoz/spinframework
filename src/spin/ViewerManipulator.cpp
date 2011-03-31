@@ -50,6 +50,9 @@
 
 using namespace osgGA;
 
+namespace spin
+{
+
 //ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
 //ViewerManipulator::ViewerManipulator(UserNode *u)
 ViewerManipulator::ViewerManipulator()
@@ -711,3 +714,7 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 	else 
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
 }
+
+} // end of namespace spin
+
+

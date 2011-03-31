@@ -48,6 +48,9 @@
 
 #include "osgUtil.h"
 
+namespace spin
+{
+
 /**
  * Returns an absolute angle difference between v1 and v2 (with no notion of
  * which is ahead or behind the other). Returned angle is from 0 to PI
@@ -515,4 +518,7 @@ osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 	return triGeode;
 
 }
+
+} // end of namespace spin
+
 

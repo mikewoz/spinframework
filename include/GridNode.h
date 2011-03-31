@@ -49,14 +49,15 @@ namespace osg {
     class Geode;
 }
 
+namespace spin
+{
+
 /**
  * \brief Draws a tiled grid, which is useful for debugging and measurements
  */
 class GridNode : public ReferencedNode
 {
-
 public:
-
     GridNode(SceneManager *sceneManager, char *initID);
     virtual ~GridNode();
 
@@ -91,9 +92,9 @@ private:
     int _size;
     float _thickness;
     osg::Vec4 _color;
-
 };
 
 
+} // end of namespace spin
 
 #endif

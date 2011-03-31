@@ -54,6 +54,9 @@ namespace osgViewer {
     class View;
 }
 
+namespace spin
+{
+
 /**
  * \brief This class provides camera control and picking for viewers that render
  *        a SPIN scene.
@@ -108,5 +111,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         osg::Vec3 lastHitPoint;
 };
 
+} // end of namespace spin
 
-#endif
+
+
+#endif // include guard

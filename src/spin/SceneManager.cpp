@@ -91,6 +91,9 @@ using namespace cppintrospection;
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructors:
 
@@ -2241,4 +2244,7 @@ int invokeMethod(const cppintrospection::Value classInstance, const cppintrospec
 
     return 0;
 }
+
+} // end of namespace spin
+
 

@@ -45,6 +45,11 @@
 #include <vector>
 #include <lo/lo_types.h>
 
+
+namespace spin
+{
+
+
 /**
  * \brief A class to facilitate communication with SPIN from any application.
  *
@@ -144,5 +149,7 @@ class spinBaseContext
         pthread_attr_t pthreadAttr;
 
 };
+
+} // end of namespace spin
 
 #endif
