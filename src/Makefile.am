@@ -1,2 +1,7 @@
-SUBDIRS= tinyxml osgWrappers/introspection spin Resources spineditor
+SUBDIRS = \
+    tinyxml \
+    spin \
+    osgWrappers/introspection \
+    Resources \
+    spineditor
 
