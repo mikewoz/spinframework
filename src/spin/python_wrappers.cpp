@@ -209,7 +209,7 @@ int invokeMethod(const cppintrospection::Value classInstance,
     // a lookup every time there is a message:
 
     /*
-    const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
+    //const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
 
 
     if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))

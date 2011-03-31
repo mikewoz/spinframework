@@ -113,7 +113,7 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
             }
         }
 		*/
-        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
         //UNUSED(ReferencedNodeType);
         if (!ReferencedNodeType.isDefined())
         {

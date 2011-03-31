@@ -144,7 +144,7 @@ SceneManager::SceneManager(std::string id)
     {
 
         {
-        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
         //nodeTypes.clear();
         const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
         cppintrospection::TypeMap::const_iterator it;
@@ -166,7 +166,7 @@ SceneManager::SceneManager(std::string id)
 
         // Same thing for ReferencedStateSets:
         {
-        const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("ReferencedStateSet");
+        const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("spin::ReferencedStateSet");
         const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
         cppintrospection::TypeMap::const_iterator it;
         for ( it=allTypes.begin(); it!=allTypes.end(); it++)
@@ -558,7 +558,7 @@ ReferencedNode* SceneManager::createNode(std::string id, std::string type)
 ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 {
     t_symbol *nodeID = gensym(id);
-    std::string nodeType = std::string(type);
+    std::string nodeType = std::string("spin::") + std::string(type);
 
     // disallow node with the name "NULL" or bad things might happen
     if (nodeID == gensym("NULL"))
@@ -618,7 +618,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
     try {
         // Let's use cppintrospection to create a node of the proper type:
-        const cppintrospection::Type &t = cppintrospection::Reflection::getType(type);
+        const cppintrospection::Type &t = cppintrospection::Reflection::getType(nodeType);
 
         //std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
         //introspect_print_type(t);
@@ -1207,7 +1207,7 @@ void SceneManager::clear()
 {
     // first find all UserNodes and check move them to the worldNode:
     nodeListType::iterator iter;
-    for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); iter++)
+    for (iter = nodeMap[std::string("spin::UserNode")].begin(); iter != nodeMap[std::string("spin::UserNode")].end(); iter++)
     {
         (*iter)->setParent("world");
     }
@@ -1290,9 +1290,9 @@ void SceneManager::clear()
 
 void SceneManager::clearUsers()
 {
-    while (nodeMap[std::string("UserNode")].size())
+    while (nodeMap[std::string("spin::UserNode")].size())
     {
-        deleteGraph(nodeMap[std::string("UserNode")][0]->id->s_name);
+        deleteGraph(nodeMap[std::string("spin::UserNode")][0]->id->s_name);
     }
 
     SCENE_MSG("s", "clearUsers");
@@ -1450,7 +1450,7 @@ void SceneManager::update()
 		// subgraph) if necessary:
 
 		nodeListType::iterator iter;
-	    for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
+	    for (iter = nodeMap[std::string("spin::UserNode")].begin(); iter != nodeMap[std::string("spin::UserNode")].end(); )
 	    {
 			if ((*iter)->scheduleForDeletion)
 			{
@@ -1547,7 +1547,7 @@ std::string SceneManager::getStateAsXML(std::vector<lo_message> nodeState)
 std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
 {
     // we can ignore UserNodes, and their entire subgraphs:
-    if (!withUsers && (n->nodeType=="UserNode"))
+    if (!withUsers && (n->nodeType=="spin::UserNode"))
     {
         return "";
     }
@@ -1647,7 +1647,7 @@ std::vector<t_symbol*> SceneManager::getSavableStateSets(ReferencedNode *n, bool
 
 
 	// we ignore UserNodes, and their entire subgraphs:
-	if (!withUsers && (n->nodeType=="UserNode"))
+	if (!withUsers && (n->nodeType=="spin::UserNode"))
 		return statesetsToSave;
 
 	// check for children:
@@ -1815,7 +1815,7 @@ bool SceneManager::saveUsers(const char *s)
         << "<!DOCTYPE SPIN SYSTEM>\n"
         << "<spinScene>\n";
 
-    for (nodeListType::iterator iter = nodeMap["UserNode"].begin(); iter != nodeMap["UserNode"].end(); iter++)
+    for (nodeListType::iterator iter = nodeMap["spin::UserNode"].begin(); iter != nodeMap["spin::UserNode"].end(); iter++)
     {
         output << getNodeAsXML((*iter).get(), true);
     }
