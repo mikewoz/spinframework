@@ -21,7 +21,7 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(CronScript)
+BEGIN_VALUE_REFLECTOR(spin::CronScript)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor0(____CronScript,
 	               "",
@@ -37,7 +37,7 @@ BEGIN_VALUE_REFLECTOR(CronScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(EventScript)
+BEGIN_VALUE_REFLECTOR(spin::EventScript)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor0(____EventScript,
 	               "",
@@ -52,13 +52,13 @@ BEGIN_VALUE_REFLECTOR(EventScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(ReferencedNode)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_DeclaringFile("ReferencedNode.h");
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ReferencedNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
-	I_Method1(void, registerNode, IN, SceneManager *, s,
+	I_Method1(void, registerNode, IN, spin::SceneManager *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__registerNode__SceneManager_P1,
 	          "",
@@ -234,34 +234,34 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_PublicMemberProperty(t_symbol *, id);
+	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(std::string, nodeType);
 	I_PublicMemberProperty(std::string, contextString);
 	I_PublicMemberProperty(int, pd_mail_id);
 	I_PublicMemberProperty(lo_method, oscHandler);
-	I_PublicMemberProperty(t_symbol *, parent);
-	I_PublicMemberProperty(t_symbol *, newParent);
+	I_PublicMemberProperty(spin::t_symbol *, parent);
+	I_PublicMemberProperty(spin::t_symbol *, newParent);
 	I_PublicMemberProperty(bool, scheduleForDeletion);
 	I_PublicMemberProperty(bool, textFlag);
-	I_PublicMemberProperty(stringParamType, stringParams);
-	I_PublicMemberProperty(floatParamType, floatParams);
+	I_PublicMemberProperty(spin::stringParamType, stringParams);
+	I_PublicMemberProperty(spin::floatParamType, floatParams);
 	I_PublicMemberProperty(float, subgraphAlpha_);
 	I_PublicMemberProperty(osg::NodePath, currentNodePath);
-	I_PublicMemberProperty(std::vector< ReferencedNode * >, children);
-	I_PublicMemberProperty(SceneManager *, sceneManager);
-	I_PublicMemberProperty(MediaManager *, mediaManager);
+	I_PublicMemberProperty(std::vector< spin::ReferencedNode * >, children);
+	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
+	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(ReferencedNode_callback)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_callback)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor0(____ReferencedNode_callback,
 	               "",
 	               "");
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(ReferencedNode_data)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_data)
 	I_DeclaringFile("ReferencedNode.h");
-	I_Constructor1(IN, ReferencedNode *, n,
+	I_Constructor1(IN, spin::ReferencedNode *, n,
 	               Properties::NON_EXPLICIT,
 	               ____ReferencedNode_data__ReferencedNode_P1,
 	               "",
@@ -272,4 +272,20 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode_data)
 	          "",
 	          "");
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::map< const std::string COMMA  spin::CronScript * >, spin::CronScriptList)
+
+TYPE_NAME_ALIAS(std::map< const std::string COMMA  spin::EventScript * >, spin::EventScriptList)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  std::string >, spin::stringParamType)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  float >, spin::floatParamType)
+
+STD_MAP_REFLECTOR(std::map< const std::string COMMA  spin::CronScript * >)
+
+STD_MAP_REFLECTOR(std::map< const std::string COMMA  spin::EventScript * >)
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  float >)
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  std::string >)
 

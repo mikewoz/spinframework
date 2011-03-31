@@ -21,28 +21,28 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(ShapeNode::shapeType)
+BEGIN_ENUM_REFLECTOR(spin::ShapeNode::shapeType)
 	I_DeclaringFile("ShapeNode.h");
-	I_EnumLabel(ShapeNode::NONE);
-	I_EnumLabel(ShapeNode::SPHERE);
-	I_EnumLabel(ShapeNode::BOX);
-	I_EnumLabel(ShapeNode::CYLINDER);
-	I_EnumLabel(ShapeNode::CAPSULE);
-	I_EnumLabel(ShapeNode::CONE);
-	I_EnumLabel(ShapeNode::PLANE);
+	I_EnumLabel(spin::ShapeNode::NONE);
+	I_EnumLabel(spin::ShapeNode::SPHERE);
+	I_EnumLabel(spin::ShapeNode::BOX);
+	I_EnumLabel(spin::ShapeNode::CYLINDER);
+	I_EnumLabel(spin::ShapeNode::CAPSULE);
+	I_EnumLabel(spin::ShapeNode::CONE);
+	I_EnumLabel(spin::ShapeNode::PLANE);
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(ShapeNode::billboardType)
+BEGIN_ENUM_REFLECTOR(spin::ShapeNode::billboardType)
 	I_DeclaringFile("ShapeNode.h");
-	I_EnumLabel(ShapeNode::RELATIVE);
-	I_EnumLabel(ShapeNode::POINT_EYE);
-	I_EnumLabel(ShapeNode::STAY_UP);
+	I_EnumLabel(spin::ShapeNode::RELATIVE);
+	I_EnumLabel(spin::ShapeNode::POINT_EYE);
+	I_EnumLabel(spin::ShapeNode::STAY_UP);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(ShapeNode)
+BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_DeclaringFile("ShapeNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ShapeNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -51,12 +51,12 @@ BEGIN_OBJECT_REFLECTOR(ShapeNode)
 	          __void__setContext__C5_char_P1,
 	          "",
 	          "A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
-	I_Method1(void, setShape, IN, ShapeNode::shapeType, t,
+	I_Method1(void, setShape, IN, spin::ShapeNode::shapeType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setShape__shapeType,
 	          "",
 	          "");
-	I_Method1(void, setBillboard, IN, ShapeNode::billboardType, t,
+	I_Method1(void, setBillboard, IN, spin::ShapeNode::billboardType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__billboardType,
 	          "",
@@ -148,9 +148,9 @@ BEGIN_OBJECT_REFLECTOR(ShapeNode)
 	                   __void__drawTexture,
 	                   "",
 	                   "");
-	I_SimpleProperty(ShapeNode::billboardType, Billboard, 
-	                 0, 
-	                 __void__setBillboard__billboardType);
+	I_SimpleProperty(int, Billboard, 
+	                 __int__getBillboard, 
+	                 0);
 	I_SimpleProperty(osg::Vec4, Color, 
 	                 __osg_Vec4__getColor, 
 	                 0);
@@ -163,9 +163,9 @@ BEGIN_OBJECT_REFLECTOR(ShapeNode)
 	I_SimpleProperty(int, RenderBin, 
 	                 __int__getRenderBin, 
 	                 __void__setRenderBin__int);
-	I_SimpleProperty(ShapeNode::shapeType, Shape, 
-	                 0, 
-	                 __void__setShape__shapeType);
+	I_SimpleProperty(int, Shape, 
+	                 __int__getShape, 
+	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
@@ -178,9 +178,9 @@ BEGIN_OBJECT_REFLECTOR(ShapeNode)
 	I_SimpleProperty(const char *, TextureFromFile, 
 	                 0, 
 	                 __void__setTextureFromFile__C5_char_P1);
-	I_PublicMemberProperty(ShapeNode::shapeType, shape);
-	I_PublicMemberProperty(t_symbol *, stateset);
-	I_PublicMemberProperty(ShapeNode::billboardType, billboard);
+	I_PublicMemberProperty(spin::ShapeNode::shapeType, shape);
+	I_PublicMemberProperty(spin::t_symbol *, stateset);
+	I_PublicMemberProperty(spin::ShapeNode::billboardType, billboard);
 	I_PublicMemberProperty(osg::Vec4, _color);
 	I_PublicMemberProperty(std::string, texturePath);
 	I_PublicMemberProperty(int, renderBin);

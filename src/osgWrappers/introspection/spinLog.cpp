@@ -20,14 +20,14 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(logbuf)
+BEGIN_VALUE_REFLECTOR(spin::logbuf)
 	I_DeclaringFile("spinLog.h");
 	I_Constructor1(IN, const char *, logpath,
 	               Properties::NON_EXPLICIT,
 	               ____logbuf__C5_char_P1,
 	               "",
 	               "");
-	I_Method1(void, set_priority, IN, LogPriority, p,
+	I_Method1(void, set_priority, IN, spin::LogPriority, p,
 	          Properties::NON_VIRTUAL,
 	          __void__set_priority__LogPriority,
 	          "",
@@ -37,7 +37,7 @@ BEGIN_VALUE_REFLECTOR(logbuf)
 	               ____logbuf__C5_char_P1,
 	               "",
 	               "");
-	I_Method1(void, set_priority, IN, LogPriority, p,
+	I_Method1(void, set_priority, IN, spin::LogPriority, p,
 	          Properties::NON_VIRTUAL,
 	          __void__set_priority__LogPriority,
 	          "",
@@ -47,14 +47,14 @@ BEGIN_VALUE_REFLECTOR(logbuf)
 	I_PublicMemberProperty(bool, bWXLG);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(spinLog)
+BEGIN_VALUE_REFLECTOR(spin::spinLog)
 	I_DeclaringFile("spinLog.h");
 	I_Constructor1(IN, const char *, logpath,
 	               Properties::NON_EXPLICIT,
 	               ____spinLog__C5_char_P1,
 	               "",
 	               "");
-	I_Method1(void, set_priority, IN, LogPriority, pr,
+	I_Method1(void, set_priority, IN, spin::LogPriority, pr,
 	          Properties::NON_VIRTUAL,
 	          __void__set_priority__LogPriority,
 	          "",
@@ -74,7 +74,7 @@ BEGIN_VALUE_REFLECTOR(spinLog)
 	               ____spinLog__C5_char_P1,
 	               "",
 	               "");
-	I_Method1(void, set_priority, IN, LogPriority, pr,
+	I_Method1(void, set_priority, IN, spin::LogPriority, pr,
 	          Properties::NON_VIRTUAL,
 	          __void__set_priority__LogPriority,
 	          "",
@@ -94,5 +94,15 @@ BEGIN_VALUE_REFLECTOR(spinLog)
 	          __void__enable_wxlog__bool,
 	          "",
 	          "");
+END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::LogPriority)
+	I_DeclaringFile("spinLog.h");
+	I_EnumLabel(spin::INFO);
+	I_EnumLabel(spin::DEV);
+	I_EnumLabel(spin::ERROR);
+	I_EnumLabel(spin::INFO);
+	I_EnumLabel(spin::DEV);
+	I_EnumLabel(spin::ERROR);
 END_REFLECTOR
 

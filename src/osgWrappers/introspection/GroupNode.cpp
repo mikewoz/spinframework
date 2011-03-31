@@ -21,32 +21,32 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(GroupNode::interactionMode)
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::interactionMode)
 	I_DeclaringFile("GroupNode.h");
-	I_EnumLabel(GroupNode::STATIC);
-	I_EnumLabel(GroupNode::SELECT);
-	I_EnumLabel(GroupNode::DRAG);
-	I_EnumLabel(GroupNode::THROW);
-	I_EnumLabel(GroupNode::DRAW);
+	I_EnumLabel(spin::GroupNode::STATIC);
+	I_EnumLabel(spin::GroupNode::SELECT);
+	I_EnumLabel(spin::GroupNode::DRAG);
+	I_EnumLabel(spin::GroupNode::THROW);
+	I_EnumLabel(spin::GroupNode::DRAW);
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(GroupNode::globalsReportMode)
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::globalsReportMode)
 	I_DeclaringFile("GroupNode.h");
-	I_EnumLabel(GroupNode::NONE);
-	I_EnumLabel(GroupNode::GLOBAL_6DOF);
-	I_EnumLabel(GroupNode::GLOBAL_ALL);
+	I_EnumLabel(spin::GroupNode::NONE);
+	I_EnumLabel(spin::GroupNode::GLOBAL_6DOF);
+	I_EnumLabel(spin::GroupNode::GLOBAL_ALL);
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(GroupNode::velocityMode)
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::velocityMode)
 	I_DeclaringFile("GroupNode.h");
-	I_EnumLabel(GroupNode::TRANSLATE);
-	I_EnumLabel(GroupNode::MOVE);
+	I_EnumLabel(spin::GroupNode::TRANSLATE);
+	I_EnumLabel(spin::GroupNode::MOVE);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(GroupNode)
+BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_DeclaringFile("GroupNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____GroupNode__SceneManager_P1__char_P1,
 	               "",
 	               " param initID will be converted into a t_symbol  ");
@@ -75,12 +75,12 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	          __void__debug,
 	          "",
 	          "Debug print (to log/console) ");
-	I_Method1(void, setReportMode, IN, GroupNode::globalsReportMode, mode,
+	I_Method1(void, setReportMode, IN, spin::GroupNode::globalsReportMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setReportMode__globalsReportMode,
 	          "",
 	          "");
-	I_Method1(void, setInteractionMode, IN, GroupNode::interactionMode, mode,
+	I_Method1(void, setInteractionMode, IN, spin::GroupNode::interactionMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setInteractionMode__interactionMode,
 	          "",
@@ -115,7 +115,7 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	          __void__setVelocity__float__float__float,
 	          "",
 	          "A translational velocity (m/s). This is computed in the callbackUpdate() function. ");
-	I_Method1(void, setVelocityMode, IN, GroupNode::velocityMode, mode,
+	I_Method1(void, setVelocityMode, IN, spin::GroupNode::velocityMode, mode,
 	          Properties::VIRTUAL,
 	          __void__setVelocityMode__velocityMode,
 	          "",
@@ -227,15 +227,15 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	I_SimpleProperty(osg::Matrix, GlobalMatrix, 
 	                 __osg_Matrix__getGlobalMatrix, 
 	                 0);
-	I_SimpleProperty(GroupNode::interactionMode, InteractionMode, 
-	                 0, 
-	                 __void__setInteractionMode__interactionMode);
+	I_SimpleProperty(int, InteractionMode, 
+	                 __int__getInteractionMode, 
+	                 0);
 	I_SimpleProperty(osg::Vec3, Orientation, 
 	                 __osg_Vec3__getOrientation, 
 	                 0);
-	I_SimpleProperty(GroupNode::globalsReportMode, ReportMode, 
-	                 0, 
-	                 __void__setReportMode__globalsReportMode);
+	I_SimpleProperty(int, ReportMode, 
+	                 __int__getReportMode, 
+	                 0);
 	I_SimpleProperty(osg::Vec3, Scale, 
 	                 __osg_Vec3__getScale, 
 	                 0);
@@ -248,8 +248,8 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	I_SimpleProperty(osg::Vec3, Velocity, 
 	                 __osg_Vec3__getVelocity, 
 	                 0);
-	I_SimpleProperty(GroupNode::velocityMode, VelocityMode, 
-	                 0, 
-	                 __void__setVelocityMode__velocityMode);
+	I_SimpleProperty(int, VelocityMode, 
+	                 __int__getVelocityMode, 
+	                 0);
 END_REFLECTOR
 

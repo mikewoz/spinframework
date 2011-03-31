@@ -62,6 +62,9 @@ namespace osg {
     class Image;
 }
 
+// forward declaration
+class SharedVideoBuffer;
+
 namespace spin
 {
 
@@ -83,8 +86,6 @@ namespace spin
  * ie, this node still has reduced funtionality on non-supported platforms.
  */
 
-// forward declaration
-class SharedVideoBuffer;
 
 class SharedVideoTexture : public ReferencedStateSet
 {

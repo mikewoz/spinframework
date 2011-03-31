@@ -21,7 +21,7 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(ViewerManipulator)
+BEGIN_OBJECT_REFLECTOR(spin::ViewerManipulator)
 	I_DeclaringFile("ViewerManipulator.h");
 	I_Constructor0(____ViewerManipulator,
 	               "",
@@ -56,9 +56,9 @@ BEGIN_OBJECT_REFLECTOR(ViewerManipulator)
 	          __void__handleMouse__osgViewer_View_P1__C5_osgGA_GUIEventAdapter_R1,
 	          "",
 	          "");
-	I_Method9(void, sendPick, IN, osg::ref_ptr< GroupNode >, hitNode, IN, unsigned int, eventType, IN, unsigned int, modKeyMask, IN, unsigned int, buttonMask, IN, float, scrollX, IN, float, scrollY, IN, float, dX, IN, float, dY, IN, osg::Vec3, hitPoint,
+	I_Method9(void, sendPick, IN, spin::GroupNode *, hitNode, IN, unsigned int, eventType, IN, unsigned int, modKeyMask, IN, unsigned int, buttonMask, IN, float, scrollX, IN, float, scrollY, IN, float, dX, IN, float, dY, IN, osg::Vec3, hitPoint,
 	          Properties::NON_VIRTUAL,
-	          __void__sendPick__osg_ref_ptrT1_GroupNode___unsigned_int__unsigned_int__unsigned_int__float__float__float__float__osg_Vec3,
+	          __void__sendPick__GroupNode_P1__unsigned_int__unsigned_int__unsigned_int__float__float__float__float__osg_Vec3,
 	          "",
 	          "");
 	I_Method3(void, sendEvent, IN, const char *, nodeId, IN, const char *, types, IN, ..., x,

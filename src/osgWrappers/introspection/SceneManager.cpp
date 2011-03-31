@@ -15,6 +15,7 @@
 #include <SceneManager.h>
 #include <SoundConnection.h>
 #include <spinLog.h>
+#include <spinUtil.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -24,7 +25,7 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(SceneManager)
+BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_DeclaringFile("SceneManager.h");
 	I_Constructor1(IN, std::string, id,
 	               Properties::NON_EXPLICIT,
@@ -51,17 +52,17 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	          __bool__isGraphical,
 	          "",
 	          "");
-	I_Method1(void, setLog, IN, spinLog &, log,
+	I_Method1(void, setLog, IN, spin::spinLog &, log,
 	          Properties::NON_VIRTUAL,
 	          __void__setLog__spinLog_R1,
 	          "",
 	          "");
-	I_Method1(void, registerStateSet, IN, ReferencedStateSet *, s,
+	I_Method1(void, registerStateSet, IN, spin::ReferencedStateSet *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__registerStateSet__ReferencedStateSet_P1,
 	          "",
 	          "");
-	I_Method1(void, unregisterStateSet, IN, ReferencedStateSet *, s,
+	I_Method1(void, unregisterStateSet, IN, spin::ReferencedStateSet *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__unregisterStateSet__ReferencedStateSet_P1,
 	          "",
@@ -76,57 +77,57 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	                      __void__sendConnectionList__lo_address,
 	                      "",
 	                      "");
-	I_Method2(ReferencedNode *, createNode, IN, std::string, id, IN, std::string, type,
+	I_Method2(spin::ReferencedNode *, createNode, IN, std::string, id, IN, std::string, type,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__createNode__std_string__std_string,
 	          "",
 	          "");
-	I_Method2(ReferencedNode *, createNode, IN, const char *, id, IN, const char *, type,
+	I_Method2(spin::ReferencedNode *, createNode, IN, const char *, id, IN, const char *, type,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__createNode__C5_char_P1__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(ReferencedNode *, getNode, IN, std::string, id,
+	I_Method1(spin::ReferencedNode *, getNode, IN, std::string, id,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__getNode__std_string,
 	          "",
 	          "");
-	I_Method1(ReferencedNode *, getNode, IN, const char *, id,
+	I_Method1(spin::ReferencedNode *, getNode, IN, const char *, id,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__getNode__C5_char_P1,
 	          "",
 	          "");
-	I_Method2(ReferencedNode *, getNode, IN, const char *, id, IN, const char *, type,
+	I_Method2(spin::ReferencedNode *, getNode, IN, const char *, id, IN, const char *, type,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__getNode__C5_char_P1__C5_char_P1,
 	          "",
 	          "");
-	I_Method2(ReferencedNode *, getOrCreateNode, IN, const char *, id, IN, const char *, type,
+	I_Method2(spin::ReferencedNode *, getOrCreateNode, IN, const char *, id, IN, const char *, type,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__getOrCreateNode__C5_char_P1__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(ReferencedStateSet *, getStateSet, IN, const char *, id,
+	I_Method1(spin::ReferencedStateSet *, getStateSet, IN, const char *, id,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedStateSet_P1__getStateSet__C5_char_P1,
 	          "",
 	          "");
-	I_Method2(ReferencedStateSet *, createStateSet, IN, const char *, id, IN, const char *, type,
+	I_Method2(spin::ReferencedStateSet *, createStateSet, IN, const char *, id, IN, const char *, type,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedStateSet_P1__createStateSet__C5_char_P1__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(ReferencedStateSet *, createStateSet, IN, const char *, fname,
+	I_Method1(spin::ReferencedStateSet *, createStateSet, IN, const char *, fname,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedStateSet_P1__createStateSet__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(std::vector< t_symbol * >, findNodes, IN, const char *, pattern,
+	I_Method1(std::vector< spin::t_symbol * >, findNodes, IN, const char *, pattern,
 	          Properties::NON_VIRTUAL,
 	          __std_vectorT1_t_symbol_P1___findNodes__C5_char_P1,
 	          "",
 	          "");
-	I_Method0(std::vector< SoundConnection * >, getConnections,
+	I_Method0(std::vector< spin::SoundConnection * >, getConnections,
 	          Properties::NON_VIRTUAL,
 	          __std_vectorT1_SoundConnection_P1___getConnections,
 	          "",
@@ -141,12 +142,12 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	          __void__deleteGraph__C5_char_P1,
 	          "",
 	          "deleteGraph() operates similarly to deleteNode(), except that all children are also deleted. ");
-	I_Method1(void, doDelete, IN, ReferencedNode *, n,
+	I_Method1(void, doDelete, IN, spin::ReferencedNode *, n,
 	          Properties::NON_VIRTUAL,
 	          __void__doDelete__ReferencedNode_P1,
 	          "",
 	          "The doDelete method performs all of the necessary steps to remove a node from the scene: The node's detach() method is called, which will actually remove it from the scene graph, and eliminate the OSC callback. The callbackUpdate() function is unregistered. And finally, a message is broadcasted to all clients. ");
-	I_Method1(void, doDelete, IN, ReferencedStateSet *, n,
+	I_Method1(void, doDelete, IN, spin::ReferencedStateSet *, n,
 	          Properties::NON_VIRTUAL,
 	          __void__doDelete__ReferencedStateSet_P1,
 	          "",
@@ -171,7 +172,7 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	          __void__update,
 	          "",
 	          "The update method is where any thread-safe changes to the scene graph should go. The method is guaranteed to be called only when there are no traversals being performed. ");
-	I_Method1(osg::Matrix, getWorldCoords, IN, t_symbol *, id,
+	I_Method1(osg::Matrix, getWorldCoords, IN, spin::t_symbol *, id,
 	          Properties::NON_VIRTUAL,
 	          __osg_Matrix__getWorldCoords__t_symbol_P1,
 	          "",
@@ -186,7 +187,7 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	          __std_string__getStateAsXML__std_vectorT1_lo_message_,
 	          "",
 	          "");
-	I_Method2(std::string, getNodeAsXML, IN, ReferencedNode *, n, IN, bool, withUsers,
+	I_Method2(std::string, getNodeAsXML, IN, spin::ReferencedNode *, n, IN, bool, withUsers,
 	          Properties::NON_VIRTUAL,
 	          __std_string__getNodeAsXML__ReferencedNode_P1__bool,
 	          "",
@@ -196,7 +197,7 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	          __std_string__getConnectionsAsXML,
 	          "",
 	          "");
-	I_Method2(std::vector< t_symbol * >, getSavableStateSets, IN, ReferencedNode *, n, IN, bool, withUsers,
+	I_Method2(std::vector< spin::t_symbol * >, getSavableStateSets, IN, spin::ReferencedNode *, n, IN, bool, withUsers,
 	          Properties::NON_VIRTUAL,
 	          __std_vectorT1_t_symbol_P1___getSavableStateSets__ReferencedNode_P1__bool,
 	          "",
@@ -241,7 +242,7 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	          __void__refreshSubscribers__C5_std_mapT1_std_stringComma_lo_address__R1,
 	          "",
 	          "The refreshSubscribers method results in a publication of all nodelists to the given TCP subscribers. Then, the full node state is published to the subscribers, for ALL nodes. ");
-	I_SimpleProperty(std::vector< SoundConnection * >, Connections, 
+	I_SimpleProperty(std::vector< spin::SoundConnection * >, Connections, 
 	                 __std_vectorT1_SoundConnection_P1___getConnections, 
 	                 0);
 	I_SimpleProperty(std::string, ConnectionsAsXML, 
@@ -250,7 +251,7 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	I_SimpleProperty(bool, Graphical, 
 	                 0, 
 	                 __void__setGraphical__bool);
-	I_SimpleProperty(spinLog &, Log, 
+	I_SimpleProperty(spin::spinLog &, Log, 
 	                 0, 
 	                 __void__setLog__spinLog_R1);
 	I_PublicMemberProperty(std::string, sceneID);
@@ -258,14 +259,36 @@ BEGIN_VALUE_REFLECTOR(SceneManager)
 	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, worldNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, gridGeode);
 	I_PublicMemberProperty(bool, graphicalMode);
-	I_PublicMemberProperty(osg::ref_ptr< GroupNode >, globalObserver);
+	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);
-	I_PublicMemberProperty(MediaManager *, mediaManager);
+	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::nodeListType >, spin::nodeMapType)
+
+TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::nodeListType >, spin::nodeMapPair)
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >, spin::ReferencedStateSetList)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetMap)
+
+TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetPair)
 
 STD_MAP_REFLECTOR(std::map< std::string COMMA  lo_address >)
 
-STD_VECTOR_REFLECTOR(std::vector< SoundConnection * >)
+STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::ReferencedStateSetList >)
 
-STD_VECTOR_REFLECTOR(std::vector< t_symbol * >)
+STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::nodeListType >)
+
+STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::ReferencedStateSetList >)
+
+STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::nodeListType >)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedNode > >)
+
+STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
+
+STD_VECTOR_REFLECTOR(std::vector< spin::t_symbol * >)
 

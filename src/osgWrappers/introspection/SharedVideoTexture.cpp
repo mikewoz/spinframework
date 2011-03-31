@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(SharedVideoTexture)
+BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	I_DeclaringFile("SharedVideoTexture.h");
-	I_BaseType(ReferencedStateSet);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, const char *, initID,
+	I_BaseType(spin::ReferencedStateSet);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____SharedVideoTexture__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
@@ -48,31 +48,6 @@ BEGIN_OBJECT_REFLECTOR(SharedVideoTexture)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "Just like a ReferencedNode, each subclass of ReferencedStateSet must override the getState() method to pass it's current state. ");
-	I_Method0(void, updateCallback,
-	          Properties::VIRTUAL,
-	          __void__updateCallback,
-	          "",
-	          "");
-	I_Method0(void, consumeFrame,
-	          Properties::NON_VIRTUAL,
-	          __void__consumeFrame,
-	          "This function is executed in the worker thread. ",
-	          "");
-	I_Method0(void, signalKilled,
-	          Properties::NON_VIRTUAL,
-	          __void__signalKilled,
-	          "",
-	          "");
-	I_Method0(void, start,
-	          Properties::NON_VIRTUAL,
-	          __void__start,
-	          "",
-	          "");
-	I_Method0(void, stop,
-	          Properties::NON_VIRTUAL,
-	          __void__stop,
-	          "",
-	          "");
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 0);

@@ -21,39 +21,39 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(TextNode::billboardType)
+BEGIN_ENUM_REFLECTOR(spin::TextNode::billboardType)
 	I_DeclaringFile("TextNode.h");
-	I_EnumLabel(TextNode::RELATIVE);
-	I_EnumLabel(TextNode::POINT_EYE);
-	I_EnumLabel(TextNode::STAY_UP);
+	I_EnumLabel(spin::TextNode::RELATIVE);
+	I_EnumLabel(spin::TextNode::POINT_EYE);
+	I_EnumLabel(spin::TextNode::STAY_UP);
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(TextNode::decorationType)
+BEGIN_ENUM_REFLECTOR(spin::TextNode::decorationType)
 	I_DeclaringFile("TextNode.h");
-	I_EnumLabel(TextNode::DROP_SHADOW_BOTTOM_RIGHT);
-	I_EnumLabel(TextNode::DROP_SHADOW_CENTER_RIGHT);
-	I_EnumLabel(TextNode::DROP_SHADOW_TOP_RIGHT);
-	I_EnumLabel(TextNode::DROP_SHADOW_BOTTOM_CENTER);
-	I_EnumLabel(TextNode::DROP_SHADOW_TOP_CENTER);
-	I_EnumLabel(TextNode::DROP_SHADOW_BOTTOM_LEFT);
-	I_EnumLabel(TextNode::DROP_SHADOW_CENTER_LEFT);
-	I_EnumLabel(TextNode::DROP_SHADOW_TOP_LEFT);
-	I_EnumLabel(TextNode::OUTLINE);
-	I_EnumLabel(TextNode::NONE);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_BOTTOM_RIGHT);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_CENTER_RIGHT);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_TOP_RIGHT);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_BOTTOM_CENTER);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_TOP_CENTER);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_BOTTOM_LEFT);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_CENTER_LEFT);
+	I_EnumLabel(spin::TextNode::DROP_SHADOW_TOP_LEFT);
+	I_EnumLabel(spin::TextNode::OUTLINE);
+	I_EnumLabel(spin::TextNode::NONE);
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(TextNode::backgroundType)
+BEGIN_ENUM_REFLECTOR(spin::TextNode::backgroundType)
 	I_DeclaringFile("TextNode.h");
-	I_EnumLabel(TextNode::NO_BACKGROUND);
-	I_EnumLabel(TextNode::FILLED);
-	I_EnumLabel(TextNode::WIREFRAME);
-	I_EnumLabel(TextNode::ALL);
+	I_EnumLabel(spin::TextNode::NO_BACKGROUND);
+	I_EnumLabel(spin::TextNode::FILLED);
+	I_EnumLabel(spin::TextNode::WIREFRAME);
+	I_EnumLabel(spin::TextNode::ALL);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(TextNode)
+BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_DeclaringFile("TextNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____TextNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -92,17 +92,17 @@ BEGIN_OBJECT_REFLECTOR(TextNode)
 	          __void__setMargin__float,
 	          "",
 	          "");
-	I_Method1(void, setBillboard, IN, TextNode::billboardType, t,
+	I_Method1(void, setBillboard, IN, spin::TextNode::billboardType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__billboardType,
 	          "",
 	          "");
-	I_Method1(void, setDecoration, IN, TextNode::decorationType, t,
+	I_Method1(void, setDecoration, IN, spin::TextNode::decorationType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setDecoration__decorationType,
 	          "",
 	          "");
-	I_Method1(void, setBackground, IN, TextNode::backgroundType, t,
+	I_Method1(void, setBackground, IN, spin::TextNode::backgroundType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBackground__backgroundType,
 	          "",
@@ -162,7 +162,7 @@ BEGIN_OBJECT_REFLECTOR(TextNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_SimpleProperty(TextNode::backgroundType, Background, 
+	I_SimpleProperty(spin::TextNode::backgroundType, Background, 
 	                 0, 
 	                 __void__setBackground__backgroundType);
 	I_SimpleProperty(int, Backround, 
@@ -171,18 +171,18 @@ BEGIN_OBJECT_REFLECTOR(TextNode)
 	I_SimpleProperty(osg::Vec4, BgColor, 
 	                 __osg_Vec4__getBgColor, 
 	                 0);
-	I_SimpleProperty(TextNode::billboardType, Billboard, 
-	                 0, 
-	                 __void__setBillboard__billboardType);
+	I_SimpleProperty(int, Billboard, 
+	                 __int__getBillboard, 
+	                 0);
 	I_SimpleProperty(osg::Vec4, Color, 
 	                 __osg_Vec4__getColor, 
 	                 0);
 	I_SimpleProperty(const char *, Context, 
 	                 0, 
 	                 __void__setContext__C5_char_P1);
-	I_SimpleProperty(TextNode::decorationType, Decoration, 
-	                 0, 
-	                 __void__setDecoration__decorationType);
+	I_SimpleProperty(int, Decoration, 
+	                 __int__getDecoration, 
+	                 0);
 	I_SimpleProperty(const char *, Font, 
 	                 __C5_char_P1__getFont, 
 	                 __void__setFont__C5_char_P1);

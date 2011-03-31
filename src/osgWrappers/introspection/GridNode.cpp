@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(GridNode)
+BEGIN_OBJECT_REFLECTOR(spin::GridNode)
 	I_DeclaringFile("GridNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____GridNode__SceneManager_P1__char_P1,
 	               "",
 	               "");

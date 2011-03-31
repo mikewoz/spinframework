@@ -21,20 +21,20 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(_reporterTarget)
+BEGIN_VALUE_REFLECTOR(spin::_reporterTarget)
 	I_DeclaringFile("ReporterNode.h");
 	I_Constructor0(_____reporterTarget,
 	               "",
 	               "");
-	I_PublicMemberProperty(osg::observer_ptr< ReferencedNode >, node);
+	I_PublicMemberProperty(osg::observer_ptr< spin::ReferencedNode >, node);
 	I_PublicMemberProperty(osg::Matrix, matrix);
 	I_PublicMemberProperty(bool, contained);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(ReporterNode)
+BEGIN_OBJECT_REFLECTOR(spin::ReporterNode)
 	I_DeclaringFile("ReporterNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ReporterNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -43,7 +43,7 @@ BEGIN_OBJECT_REFLECTOR(ReporterNode)
 	          __void__callbackUpdate,
 	          "",
 	          "The update callback for ReporterNode checks to see if a target or the the ReporterNode's global matrix has changed (ie, whether it has been moved or not). If so, it updates the internal matrices, and calls sendReports() ");
-	I_Method1(void, sendReports, IN, reporterTarget *, target,
+	I_Method1(void, sendReports, IN, spin::reporterTarget *, target,
 	          Properties::NON_VIRTUAL,
 	          __void__sendReports__reporterTarget_P1,
 	          "",
@@ -90,4 +90,6 @@ BEGIN_OBJECT_REFLECTOR(ReporterNode)
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(struct spin::_reporterTarget, spin::reporterTarget)
 

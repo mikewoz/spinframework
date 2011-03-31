@@ -20,14 +20,28 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(_symbol)
+BEGIN_VALUE_REFLECTOR(spin::_symbol)
 	I_DeclaringFile("spinUtil.h");
 	I_Constructor0(_____symbol,
 	               "",
 	               "");
 	I_PublicMemberProperty(char *, s_name);
 	I_PublicMemberProperty(osg::Object *, s_thing);
-	I_PublicMemberProperty(struct _symbol *, s_next);
-	I_PublicMemberProperty(ReferencedType, s_type);
+	I_PublicMemberProperty(struct spin::_symbol *, s_next);
+	I_PublicMemberProperty(spin::ReferencedType, s_type);
 END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::ReferencedType)
+	I_DeclaringFile("spinUtil.h");
+	I_EnumLabel(spin::REFERENCED_NODE);
+	I_EnumLabel(spin::REFERENCED_STATESET);
+END_REFLECTOR
+
+TYPE_NAME_ALIAS(struct spin::_symbol, spin::t_symbol)
+
+TYPE_NAME_ALIAS(float, spin::t_float)
+
+TYPE_NAME_ALIAS(float, spin::t_floatarg)
+
+TYPE_NAME_ALIAS(t_class *, spin::t_pd)
 

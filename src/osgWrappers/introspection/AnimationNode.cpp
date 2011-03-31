@@ -21,17 +21,17 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(AnimationNode::LoopMode)
+BEGIN_ENUM_REFLECTOR(spin::AnimationNode::LoopMode)
 	I_DeclaringFile("AnimationNode.h");
-	I_EnumLabel(AnimationNode::SWING);
-	I_EnumLabel(AnimationNode::LOOP);
-	I_EnumLabel(AnimationNode::NO_LOOPING);
+	I_EnumLabel(spin::AnimationNode::SWING);
+	I_EnumLabel(spin::AnimationNode::LOOP);
+	I_EnumLabel(spin::AnimationNode::NO_LOOPING);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(AnimationNode)
+BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	I_DeclaringFile("AnimationNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____AnimationNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -80,7 +80,7 @@ BEGIN_OBJECT_REFLECTOR(AnimationNode)
 	          __int__getRecord,
 	          "",
 	          "");
-	I_Method1(void, setLoopMode, IN, AnimationNode::LoopMode, mode,
+	I_Method1(void, setLoopMode, IN, spin::AnimationNode::LoopMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setLoopMode__LoopMode,
 	          "",
@@ -133,9 +133,9 @@ BEGIN_OBJECT_REFLECTOR(AnimationNode)
 	I_SimpleProperty(float, Index, 
 	                 0, 
 	                 __void__setIndex__float);
-	I_SimpleProperty(AnimationNode::LoopMode, LoopMode, 
-	                 0, 
-	                 __void__setLoopMode__LoopMode);
+	I_SimpleProperty(int, LoopMode, 
+	                 __int__getLoopMode, 
+	                 0);
 	I_SimpleProperty(int, Play, 
 	                 __int__getPlay, 
 	                 __void__setPlay__int);

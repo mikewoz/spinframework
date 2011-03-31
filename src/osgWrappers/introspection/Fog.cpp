@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(Fog)
+BEGIN_OBJECT_REFLECTOR(spin::Fog)
 	I_DeclaringFile("Fog.h");
-	I_BaseType(ReferencedStateSet);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, const char *, initID,
+	I_BaseType(spin::ReferencedStateSet);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____Fog__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");

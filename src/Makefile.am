@@ -1,7 +1,7 @@
 SUBDIRS = \
     tinyxml \
-    spin \
     osgWrappers/introspection \
+    spin \
     Resources \
     spineditor
 

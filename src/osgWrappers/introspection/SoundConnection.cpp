@@ -22,9 +22,9 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(SoundConnection)
+BEGIN_VALUE_REFLECTOR(spin::SoundConnection)
 	I_DeclaringFile("SoundConnection.h");
-	I_Constructor3(IN, SceneManager *, s, IN, osg::ref_ptr< DSPNode >, src, IN, osg::ref_ptr< DSPNode >, snk,
+	I_Constructor3(IN, spin::SceneManager *, s, IN, osg::ref_ptr< spin::DSPNode >, src, IN, osg::ref_ptr< spin::DSPNode >, snk,
 	               ____SoundConnection__SceneManager_P1__osg_ref_ptrT1_DSPNode___osg_ref_ptrT1_DSPNode_,
 	               "",
 	               "");
@@ -116,8 +116,15 @@ BEGIN_VALUE_REFLECTOR(SoundConnection)
 	I_SimpleProperty(int, Thru, 
 	                 __int__getThru, 
 	                 __void__setThru__int);
-	I_PublicMemberProperty(t_symbol *, id);
-	I_PublicMemberProperty(DSPNode *, source);
-	I_PublicMemberProperty(DSPNode *, sink);
+	I_PublicMemberProperty(spin::t_symbol *, id);
+	I_PublicMemberProperty(spin::DSPNode *, source);
+	I_PublicMemberProperty(spin::DSPNode *, sink);
+END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::connectionType)
+	I_DeclaringFile("SoundConnection.h");
+	I_EnumLabel(spin::NORMAL);
+	I_EnumLabel(spin::NODE_TO_SPACE);
+	I_EnumLabel(spin::SPACE_TO_NODE);
 END_REFLECTOR
 

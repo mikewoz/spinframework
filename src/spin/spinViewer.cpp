@@ -83,7 +83,7 @@ namespace spinviewer
 int run(int argc, char **argv)
 {
 	//std::cout <<"\nspinViewer launching..." << std::endl;
-
+    using namespace spin;
 	spinClientContext spinListener;
 	spinApp &spin = spinApp::Instance();
 
