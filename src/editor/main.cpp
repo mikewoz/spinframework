@@ -50,6 +50,8 @@ bool SpinEditorApp::OnInit()
     if (!wxApp::OnInit())
         return false;
 
+
+
 #ifdef __WXMAC__
     // need to give focus to the process (for development; should be fixed when
     // using an .app bundle):
@@ -58,51 +60,79 @@ bool SpinEditorApp::OnInit()
     TransformProcessType(&PSN, kProcessTransformToForegroundApplication);
 #endif
 
-    if (! spinListener.start())
-    {
-        std::cout << "ERROR: could not start SPIN listener" << std::endl;
-        return false;
-    }
-
     // initialize image handlers (for toolbar iconse, etc)
     // TODO: use only the image handlers required
     wxInitAllImageHandlers();
 
+    // needs to be called before the MainFrame is constructed (because
+    // wxSpinTreeCtrl needs to set OSC callbacks)
+    this->start();
 
-    int width = 400;
-    int height = 500;
-    //MainWindow *frame = new MainWindow(_("SPIN Editor"), wxPoint(50, 50), wxSize(width, height));
-    //MainFrame *frame = new MainFrame( NULL, wxID_ANY, _("SPIN Editor"), wxPoint(50, 50), wxSize(width, height), wxDEFAULT_FRAME_STYLE );
+    // create the main window:
     MainFrame *frame = new MainFrame( NULL );
+
+    // tell the app to exit automatically when the frame closes:
+    wxApp::SetExitOnFrameDelete(true);
 
     frame->Show(true);
     SetTopWindow(frame);
 
-    // start a timer to act as a periodic polling function (eg, to check that
-    // the spinListener thread is still running
-    spinPollTimer_ = new wxTimer(this, SpinPollTimer_ID);
-    spinPollTimer_->Start(500); // milliseconds
-
-    // ask for refresh:
-    spin.SceneMessage("s", "refresh", LO_ARGS_END);
     return true;
 }
 
 int SpinEditorApp::OnExit()
 {
     std::cout << "Got SpinEditorApp::OnExit()" << std::endl;
-    // ??
-    // spinApp::Instance().getContext()->stop();
 
+    // tell spin to stop
+    spinApp::Instance().getContext()->stop();
     return 1;
 }
 
-void SpinEditorApp::OnSpinPollTimer(wxTimerEvent& event)
+void SpinEditorApp::start()
 {
+    if (!spinListener.start())
+    {
+        std::cout << "ERROR: could not start SPIN listener" << std::endl;
+        wxSafeShowMessage("ERROR", "Could not start SPIN listener. Quitting.");
+        return;
+    }
+
+    // start a timer to act as a periodic polling function (eg, to check that
+    // the spinListener thread is still running
+    spinPollTimer_ = new wxTimer(this, SpinPollTimer_ID);
+    spinPollTimer_->Start(500); // milliseconds
+}
+
+void SpinEditorApp::OnSpinPollTimer(wxTimerEvent& WXUNUSED(event))
+{
+    // This checks that the spin client thread is still running. If not, it
+    // probably means that the user did a CTRL-C in the terminal window, or
+    // something more ugly that I can't think of...
+
     if (!spinListener.isRunning())
     {
-        // tell wx to quit
-        GetTopWindow()->Close();
+        std::cout << "SPIN stopped running (CTRL-C ?)" << std::endl;
+
+        // Tell this timer that it can stop:
+        spinPollTimer_->Stop();
+        //delete spinPollTimer_;
+
+        // Tell main frame to quit (with force=TRUE so that it doesn't ask for
+        // any confirmation). Once that window closes, the wxapp will be told
+        // to quit automatically.
+        GetTopWindow()->Close(true);
+
+        std::cout << "top window should be closed" << std::endl;
+
+        if (GetTopWindow())
+        {
+            std::cout << "got topwindow" << GetTopWindow() << " why does it still exist?!" << std::endl;
+            GetTopWindow()->Destroy();
+            SetTopWindow(0);
+        }
+
+        //this->ExitMainLoop();
     }
 }
 

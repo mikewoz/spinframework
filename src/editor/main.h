@@ -75,6 +75,13 @@ class SpinEditorApp : public wxApp
         virtual bool OnInit();
         virtual int OnExit();
 
+        /**
+         * Starts spinListener threads (can possibly be changed in the future
+         * to start either a client or server context, depending on choices
+         * made in the GUI)
+         */
+        void start();
+
         void OnSpinPollTimer(wxTimerEvent& event);
 
         /**
@@ -92,11 +99,13 @@ class SpinEditorApp : public wxApp
          */
         virtual bool OnCmdLineError(wxCmdLineParser & parser);
 
+        DECLARE_EVENT_TABLE()
+
     private:
         spinClientContext spinListener;
         wxTimer *spinPollTimer_;
 
-        DECLARE_EVENT_TABLE()
+
 };
 
 

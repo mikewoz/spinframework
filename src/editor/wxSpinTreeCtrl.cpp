@@ -78,6 +78,7 @@ wxSpinTreeCtrl::wxSpinTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& p
 
 wxSpinTreeCtrl::~wxSpinTreeCtrl()
 {
+    delete m_pSceneTreeVisitor;
 }
 
 void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)

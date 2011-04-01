@@ -4,14 +4,82 @@
 #include "config.h"
 #include "spinApp.h"
 #include "SceneManager.h"
+#include "spinBaseContext.h"
 #include "MainFrame.h"
 #include "dialog_NewNode.h"
 #include "wxSpinTreeCtrl.h"
 
 using namespace spineditor;
 
-MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent) {}
-MainFrame::~MainFrame() {}
+MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent)
+{
+    // some OSX specific things (eg, bind the special apple about menu)
+#ifdef __WXMAC__
+    wxApp::s_macAboutMenuItemId = wxID_ABOUT;
+#endif
+
+    // set the target for log messages to the text ctrl
+    wxLog::SetActiveTarget(new wxLogTextCtrl(logTextCtrl));
+
+    // redirect std::cout to the logTextCtrl (but make sure to save a pointer to
+    // the old streambuf object so we can direct it back to std::cout). This
+    // means that we don't have to use wxLogMessage!
+#if wxUSE_STD_IOSTREAM
+    //redirector = new wxStreamToTextRedirector(logTextCtrl);
+#else
+    std::cout << "Oops. The log window is not yet supported on this platform...\nAll messages will be displayed in the console instead." << std::endl;
+#endif
+
+    // start spinListener:
+    // can't do this here, because wxSpinTreeCtrl needs it to be running already
+    // when the constructor is called
+    //wxGetApp().start();
+
+
+    // ask for refresh:
+    spinApp::Instance().SceneMessage("s", "refresh", LO_ARGS_END);
+}
+
+
+MainFrame::~MainFrame()
+{
+#if wxUSE_STD_IOSTREAM
+    //delete redirector;
+#endif
+}
+
+void MainFrame::OnClose(wxCloseEvent& event)
+{
+    std::cout << "Got MainFrame::OnClose" << std::endl;
+
+    if ( event.CanVeto() )
+    {
+        if ( wxMessageBox("Are you sure you want to Quit?", "Quit", wxICON_QUESTION | wxYES_NO) != wxYES )
+        {
+            event.Veto();
+            return;
+        }
+    }
+
+
+    // destroy the window. Note: we could also do event.Skip() since the default
+    // event handler does call Destroy(), too
+
+    //this->Destroy();
+    event.Skip();
+}
+
+void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+{
+    // called when user selects Quit from File menu
+    std::cout << "Got MainFrame::OnQuit" << std::endl;
+
+    // tell the window to close (with force=TRUE, which will not allow us to
+    // confirm with a message box, which is appropriate if they chose Quit from
+    // the menu)
+    Close(true); // this calls the OnClose handler
+}
+
 
 
 void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
@@ -64,7 +132,6 @@ void MainFrame::OnDeleteNode( wxCommandEvent& WXUNUSED(event) )
 
     if (n)
     {
-        // TODO: need confirmation dialog here
         int answer = wxMessageBox("Delete node "+n->getID()+"?", "Delete Node",
                                   wxYES | wxCANCEL, this);
         if (answer == wxYES)
@@ -75,9 +142,21 @@ void MainFrame::OnDeleteNode( wxCommandEvent& WXUNUSED(event) )
     }
 }
 
-void MainFrame::OnRefresh( wxCommandEvent& WXUNUSED(event) )
+void MainFrame::OnRefreshScene( wxCommandEvent& WXUNUSED(event) )
 {
     spinApp::Instance().SceneMessage("s", "refresh", LO_ARGS_END);
+}
+
+void MainFrame::OnClearScene( wxCommandEvent& WXUNUSED(event) )
+{
+    // TODO: need confirmation dialog here
+    int answer = wxMessageBox("You are about to clear the entire scene. Continue?", "Clear Scene",
+                              wxYES | wxCANCEL, this);
+    if (answer == wxYES)
+    {
+        std::cout << "Attempting to clear scene" << std::endl;
+        spinApp::Instance().SceneMessage("s", "clear", LO_ARGS_END);
+    }
 }
 
 void MainFrame::OnToggleGrid( wxCommandEvent& WXUNUSED(event) )

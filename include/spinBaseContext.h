@@ -95,6 +95,8 @@ class spinBaseContext
 
         bool isRunning() { return running; }
 
+        void setTTL(int ttl);
+
         /** list of address/port combinations on which the server listens for messages that alters the scene graph. */
         std::vector<lo_address> lo_rxAddrs_;
         std::vector<lo_server> lo_rxServs_;

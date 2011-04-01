@@ -175,6 +175,14 @@ void spinBaseContext::sigHandler(int signum)
     if (interruptCount >= MAX_INTERRUPTS)
         throw std::runtime_error("Got multiple interrupts, exitting rudely");
 }
+
+void spinBaseContext::setTTL(int ttl)
+{
+    lo_address_set_ttl(lo_txAddr, ttl);
+    lo_address_set_ttl(lo_infoAddr, ttl);
+    lo_address_set_ttl(lo_syncAddr, ttl);
+}
+
 /**
  * Startup point of the server's thread.
  */
