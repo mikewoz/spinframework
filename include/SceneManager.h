@@ -238,6 +238,7 @@ class SceneManager
          */
         void refreshSubscribers(const std::map<std::string, lo_address> &clients);
 
+
     private:
 
         static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
@@ -246,6 +247,27 @@ class SceneManager
         ReferencedStateSetMap stateMap;
 };
 
+class Introspector
+{
+    public:
+        /**
+         * Prepends "spin::" to a type name.
+         */
+        static std::string prependNamespace(const std::string &name);
+        /**
+         * Removes "spin::" from a type name.
+         */
+        static std::string removeNamespace(const std::string &name);
+        /**
+         * Prepends "spin::" to a type name and returns its cppintrospection::Type.
+         */
+        static const cppintrospection::Type& getType(const std::string &name);
+};
+
+/**
+ * Recursive function to invoke a method for a particular class, that will try
+ * all base classes as well
+ */
 int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs);
 
 } // end of namespace spin

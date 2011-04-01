@@ -69,7 +69,6 @@ namespace spin
 ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
     contextString("NULL")
 {
-
     id = gensym(initID);
     id->s_thing = this;
     id->s_type = REFERENCED_NODE;
@@ -77,7 +76,6 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
     nodeType = "ReferencedNode";
 
     this->setName(string(id->s_name) + ".ReferencedNode");
-
 
     // set some initial symbols:
     parent = WORLD_SYMBOL;
@@ -87,29 +85,23 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
     scheduleForDeletion = false;
     subgraphAlpha_ = 1.0;
 
-
     // When children are attached to this, they get added to the attachmentNode:
     attachmentNode = this;
 
     // We need to set up a callback. This should be on the topmost node, so that during node
     // traversal, we update our parameters before anything is drawn.
     //this->setUserData( dynamic_cast<osg::Referenced*>(this) );
-    this->setUserData( new ReferencedNode_data(this) );
+    this->setUserData(new ReferencedNode_data(this));
     this->setUpdateCallback(new ReferencedNode_callback);
 
     // tell OSG that this object will be updated dynamically
     this->setDataVariance(osg::Object::DYNAMIC);
 
-
     // set initial nodepath:
     currentNodePath.clear();
-
     registerNode(sceneManager);
-
     this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
-
     attach();
-
 }
 
 // ***********************************************************
@@ -118,7 +110,7 @@ ReferencedNode::~ReferencedNode()
 {
     string oscPattern = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + string(id->s_name);
 
-    if (!spinBaseContext::signalStop)
+    if (! spinBaseContext::signalStop)
     {
         // unregister with OSC parser:
         std::vector<lo_server>::iterator it;
@@ -127,12 +119,9 @@ ReferencedNode::~ReferencedNode()
         	lo_server_del_method((*it), oscPattern.c_str(), NULL);
         }
 		lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
-		
     }
-
     id->s_thing = 0;
 }
-
 
 void ReferencedNode::registerNode(SceneManager *s)
 {
@@ -149,7 +138,6 @@ void ReferencedNode::registerNode(SceneManager *s)
 	                         NULL,
 	                         spinBaseContext::nodeCallback,
 	                         (void*)id);
-		
     }
 
 	// and with the TCP receiver in the server case:
@@ -161,21 +149,15 @@ void ReferencedNode::registerNode(SceneManager *s)
 
 }
 
-// *****************************************************************************
-
 void ReferencedNode::callbackUpdate()
 {
     callCronScripts();
-
-
 }
-
-
-// *****************************************************************************
 
 void ReferencedNode::attach()
 {
-    if (this->newParent==NULL_SYMBOL) return;
+    if (this->newParent == NULL_SYMBOL)
+        return;
 
     pthread_mutex_lock(&sceneMutex);
 	
@@ -183,16 +165,16 @@ void ReferencedNode::attach()
 
     // if the parent is invalid (which will be the case, for example, if the user
     // specified 'world' as the parent), we attach to the worldNode:
-    if (!newParentNode.valid())
+    if (! newParentNode.valid())
     {
-        if (!(sceneManager->worldNode->containsNode( this ))) sceneManager->worldNode->addChild(this);
+        if (! (sceneManager->worldNode->containsNode(this)))
+            sceneManager->worldNode->addChild(this);
         this->newParent = WORLD_SYMBOL;
     }
-
     // Otherwise attach to the parent:
     else
     {
-        if (!(newParentNode->attachmentNode->containsNode(this)))
+        if (! (newParentNode->attachmentNode->containsNode(this)))
         {
             newParentNode->attachmentNode->addChild(this);
             newParentNode->as_addChild(this);
@@ -216,21 +198,20 @@ void ReferencedNode::attach()
 
     // broadcast this change to any remote clients:
     BROADCAST(this, "ss", "setParent", this->parent->s_name);
-
 }
 
-// ***********************************************************
-// remove this node from the scenegraph:
+// removes this node from the scenegraph:
 void ReferencedNode::detach()
 {
     pthread_mutex_lock(&sceneMutex);
 
     if (parent == WORLD_SYMBOL)
     {
-        if (sceneManager->worldNode->containsNode(this)) sceneManager->worldNode->removeChild(this);
+        if (sceneManager->worldNode->containsNode(this))
+            sceneManager->worldNode->removeChild(this);
     }
-
-    else {
+    else
+    {
         osg::ref_ptr<ReferencedNode> pNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
         if (pNode.valid())
         {
@@ -241,12 +222,9 @@ void ReferencedNode::detach()
             }
         }
     }
-
     pthread_mutex_unlock(&sceneMutex);
 }
 
-
-// *****************************************************************************
 // IMPORTANT:
 // subclasses of ReferencedNode are allowed to contain complicated subgraphs, and
 // can also change their attachmentNode so that children are attached anywhere
@@ -256,7 +234,7 @@ void ReferencedNode::detach()
 void ReferencedNode::updateNodePath(bool updateChildren)
 {
     currentNodePath.clear();
-    if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
+    if ((parent != WORLD_SYMBOL) && (parent != NULL_SYMBOL))
     {
         osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
         if (parentNode.valid())
@@ -269,8 +247,8 @@ void ReferencedNode::updateNodePath(bool updateChildren)
     currentNodePath.push_back(this);
 
     // now update NodePaths for all children:
-    if (updateChildren) updateChildNodePaths();
-
+    if (updateChildren)
+        updateChildNodePaths();
 }
 
 
@@ -291,22 +269,18 @@ int ReferencedNode::setAttachmentNode(osg::Group *n)
 
         // update the nodepath now that we've defined a new attachmentNode
         this->updateNodePath();
-
         return 1;
-
     }
-
     return 0;
 }
 
-
-// *****************************************************************************
 ReferencedNode *ReferencedNode::as_getChild(ReferencedNode *child)
 {
     vector<ReferencedNode*>::iterator iter;
     for (iter = children.begin(); iter != children.end() ; iter++)
     {
-        if ((*iter) == child) return (*iter);
+        if ((*iter) == child)
+            return (*iter);
     }
     return NULL;
 }
@@ -329,9 +303,6 @@ void ReferencedNode::as_removeChild(ReferencedNode *child)
     }
 }
 
-
-
-// *****************************************************************************
 bool ReferencedNode::legalParent (t_symbol *newParent)
 {
     vector<ReferencedNode*>::iterator childIter;
@@ -340,15 +311,14 @@ bool ReferencedNode::legalParent (t_symbol *newParent)
     {
         return false;
     }
-
     else
     {
         for (childIter = children.begin(); childIter != children.end() ; childIter++)
         {
-            if ((*childIter)->id == newParent) return false;
+            if ((*childIter)->id == newParent)
+                return false;
         }
     }
-
     return true;
 }
 
@@ -369,8 +339,6 @@ void ReferencedNode::setParent (const char *newvalue)
 	}
 }
 
-// *****************************************************************************
-
 void ReferencedNode::setContext (const char *newvalue)
 {
     contextString = string(newvalue);
@@ -379,11 +347,14 @@ void ReferencedNode::setContext (const char *newvalue)
 
 void ReferencedNode::setAlpha (float alpha)
 {
-	if (subgraphAlpha_ == alpha) return;
+	if (subgraphAlpha_ == alpha)
+        return;
 
 	subgraphAlpha_ = alpha;
-	if (subgraphAlpha_ < 0.0) subgraphAlpha_ = 0.0;
-	else if (subgraphAlpha_ > 1.0) subgraphAlpha_ = 1.0;
+	if (subgraphAlpha_ < 0.0)
+        subgraphAlpha_ = 0.0;
+	else if (subgraphAlpha_ > 1.0)
+        subgraphAlpha_ = 1.0;
 
 	osg::StateSet *ss = this->getOrCreateStateSet();
 	ss->setDataVariance(osg::Object::DYNAMIC);
@@ -405,9 +376,6 @@ void ReferencedNode::setAlpha (float alpha)
 
 	this->setStateSet(ss);
 
-
-
-
     /*
     osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
     blendEquation->setDataVariance(osg::Object::DYNAMIC);
@@ -424,11 +392,7 @@ void ReferencedNode::setAlpha (float alpha)
     ss->setAttributeAndModes(blendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     */
 
-
-
-
 	std::cout << "set alpha for " << this->id->s_name << " to " << subgraphAlpha_ << std::endl;
-
 }
 
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)
@@ -444,8 +408,6 @@ void ReferencedNode::setParam (const char *paramName, float paramValue)
     BROADCAST(this, "ssf", "setParam", paramName, paramValue);
 }
 
-// *****************************************************************************
-
 void ReferencedNode::debug()
 {
     lo_arg **args;
@@ -454,7 +416,6 @@ void ReferencedNode::debug()
 
     std::cout << "****************************************" << std::endl;
     std::cout << "************* NODE  DEBUG: *************" << std::endl;
-
     std::cout << "\nnode: " << id->s_name << ", type: " << nodeType << std::endl;
 
     vector<lo_message> nodeState = this->getState();
@@ -466,22 +427,25 @@ void ReferencedNode::debug()
         args = lo_message_get_argv(*nodeStateIterator);
 
         std::cout << "  ";
-        for (i = 0; i<argc; i++) {
+        for (i = 0; i < argc; i++)
+        {
             std::cout << " ";
             if (lo_is_numerical_type((lo_type)argTypes[i]))
             {
                 std::cout << (float) lo_hires_val( (lo_type)argTypes[i], args[i] );
-            } else if (strlen((char*) args[i])) {
+            } else if (strlen((char*) args[i]))
+            {
                 std::cout << (char*) args[i];
-            } else {
+            }
+            else
+            {
                 std::cout << "NULL";
             }
         }
         std::cout << std::endl;
     }
 
-
-    if (!this->children.empty())
+    if (! this->children.empty())
     {
         std::cout << "   children:" << std::endl;
         vector<ReferencedNode*>::iterator childIter;
@@ -490,11 +454,10 @@ void ReferencedNode::debug()
             std::cout << "      " << (*childIter)->id->s_name << std::endl;
         }
     }
-
     BROADCAST(this, "s", "debug");
 }
 
-std::vector<lo_message> ReferencedNode::getState () const
+std::vector<lo_message> ReferencedNode::getState() const
 {
     std::vector<lo_message> ret;
 
@@ -513,7 +476,7 @@ std::vector<lo_message> ReferencedNode::getState () const
     ret.push_back(msg);
 
     stringParamType::const_iterator stringIter;
-    for (stringIter=stringParams.begin(); stringIter!=stringParams.end(); stringIter++ )
+    for (stringIter = stringParams.begin(); stringIter != stringParams.end(); stringIter++ )
     {
         msg = lo_message_new();
         lo_message_add(msg, "sss", "setParam", (*stringIter).first.c_str(), (const char*)(*stringIter).second.c_str());
@@ -521,53 +484,51 @@ std::vector<lo_message> ReferencedNode::getState () const
     }
 
     floatParamType::const_iterator floatIter;
-    for (floatIter=floatParams.begin(); floatIter!=floatParams.end(); floatIter++ )
+    for (floatIter = floatParams.begin(); floatIter != floatParams.end(); floatIter++ )
     {
         msg = lo_message_new();
         lo_message_add(msg, "ssf", "setParam", (*floatIter).first.c_str(), (*floatIter).second);
         ret.push_back(msg);
     }
 
-
-    for ( CronScriptList::const_iterator it = _cronScriptList.begin();
-          it != _cronScriptList.end(); it++ ) {
-
-        if ( !it->second ) continue;
+    for ( CronScriptList::const_iterator it = _cronScriptList.begin(); it != _cronScriptList.end(); it++ )
+    {
+        if (! it->second )
+            continue;
         msg = lo_message_new();
         lo_message_add(msg, "ssssf", "addCronScript",
                        it->second->serverSide ? "S" : "C",
                        it->first.c_str(), // the label is the key of the pair!
                        it->second->path.c_str(),
                        it->second->freq);
-        if (it->second->params != "") lo_message_add_string(msg, it->second->params.c_str() );
+        if (it->second->params != "")
+            lo_message_add_string(msg, it->second->params.c_str() );
         ret.push_back(msg);
     }
 
-    for( EventScriptList::const_iterator it = _eventScriptList.begin();
-         it != _eventScriptList.end(); it++ ) {
-
-        if ( !it->second ) continue;
+    for( EventScriptList::const_iterator it = _eventScriptList.begin(); it != _eventScriptList.end(); it++ )
+    {
+        if (! it->second )
+            continue;
         msg = lo_message_new();
         lo_message_add(msg, "sssss", "addEventScript",
                        it->second->serverSide ? "S" : "C",
                        it->first.c_str(), // the label!
                        it->second->eventName.c_str(),
                        it->second->path.c_str() );
-        if (it->second->params != "") lo_message_add_string(msg, it->second->params.c_str() );
+        if (it->second->params != "")
+            lo_message_add_string(msg, it->second->params.c_str());
         ret.push_back(msg);
-
     }
 
     return ret;
 }
 
-// *****************************************************************************
-void ReferencedNode::stateDump ()
+void ReferencedNode::stateDump()
 {
     spinApp::Instance().NodeBundle(this->id, this->getState());
 }
 
-// *****************************************************************************
 void ReferencedNode::stateDump(lo_address txAddr)
 {
     spinApp::Instance().NodeBundle(this->id, this->getState(), txAddr);
@@ -578,17 +539,14 @@ std::string ReferencedNode::getID() const
     return std::string(id->s_name);
 }
 
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-
 bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
                                     double freq, const std::string& params )
 {
    // do we already have a script with the same label?
     CronScriptList::iterator it;
-    it = _cronScriptList.find( std::string(label) );
-    if ( it != _cronScriptList.end() ) return false; // yes! don't reload it.
+    it = _cronScriptList.find(std::string(label));
+    if (it != _cronScriptList.end())
+        return false; // yes! don't reload it.
 
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -610,7 +568,8 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
     cs->freq = freq;
     cs->enabled = false;
 
-    if ( spin.getContext()->isServer() != serverSide ) {
+    if ( spin.getContext()->isServer() != serverSide )
+    {
         cs->lastRun = 0;
         cs->enabled = false;
         cs->pyModule = "";
@@ -619,7 +578,8 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
         return true;
     }
 
-    try {
+    try
+    {
         sprintf( cmd, "mod%llx", utick );
         pyModule = cmd;
         sprintf( cmd, "script%llx", utick );
@@ -648,118 +608,117 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
 
         _cronScriptList.insert( pair<const std::string, CronScript*>( std::string(label), cs ) );
 
-    } catch ( boost::python::error_already_set const & ) {
+    } 
+    catch ( boost::python::error_already_set const & ) 
+    {
         std::cout << "Python error: " << std::endl;
         PyErr_Print();
         PyErr_Clear();
         return false;
-    } catch ( std::exception& e ) {
+    } 
+    catch ( std::exception& e ) 
+    {
         std::cout << "Python error: " << e.what() << std::endl;
         return false;
-    } catch(...) {                        // catch all other exceptions
+    }
+    catch(...) 
+    {                        // catch all other exceptions
         std::cout << "Python error... Caught... something??\n";
         return false;
     }
-
     return true;
-
 }
 
-// *****************************************************************************
-
-bool ReferencedNode::callCronScripts() {
-
-    if (_cronScriptList.empty()) return false;
+bool ReferencedNode::callCronScripts()
+{
+    if (_cronScriptList.empty())
+        return false;
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
     double d;
 
-    try {
-
-        for ( CronScriptList::iterator it = _cronScriptList.begin();
-              it != _cronScriptList.end(); it++ ) {
-
-            if ( !it->second ) continue;
-            if ( it->second->serverSide != spin.getContext()->isServer() ) continue;
-
+    try
+    {
+        for (CronScriptList::iterator it = _cronScriptList.begin(); it != _cronScriptList.end(); it++) 
+        {
+            if (! it->second )
+                continue;
+            if (it->second->serverSide != spin.getContext()->isServer())
+                continue;
             d = 1.0 / it->second->freq;
-            if ( timer->time_s() >= d + it->second->lastRun ) {
+            if (timer->time_s() >= d + it->second->lastRun)
+            {
                 it->second->lastRun += d;
-                if ( it->second->enabled ) it->second->run();
+                if (it->second->enabled )
+                    it->second->run();
             }
         }
-
-
-    } catch ( boost::python::error_already_set & ) {
+    }
+    catch ( boost::python::error_already_set & )
+    {
         std::cout << spin.getCurrentPyException() << std::endl;
         std::cout << "Python error: [";
         PyErr_Print();
         PyErr_Clear();
         std::cout << "]" << std::endl;
         return false;
-    } catch ( std::exception& e ) {
+    }
+    catch ( std::exception& e )
+    {
         std::cout << "Python error: "<< e.what() << std::endl;
         return false;
-    } catch(...) {                        // catch all other exceptions
+    }
+    catch(...)
+    {                        // catch all other exceptions
         std::cout << "Python error: Caught... something??\n";
         return false;
     }
-
     return true;
 }
 
-// *****************************************************************************
-
-bool ReferencedNode::enableCronScript( const char* label, int enable ) {
-
+bool ReferencedNode::enableCronScript( const char* label, int enable )
+{
     CronScriptList::iterator it;
-    it = _cronScriptList.find( std::string(label) );
+    it = _cronScriptList.find(std::string(label));
 
-    if ( it != _cronScriptList.end() ) {
+    if (it != _cronScriptList.end())
+    {
         it->second->enabled = (enable != 0);
         return true;
     }
-
     return false;
 }
 
-// *****************************************************************************
-
-bool ReferencedNode::removeCronScript( const char* label ) {
-
+bool ReferencedNode::removeCronScript( const char* label )
+{
     spinApp &spin = spinApp::Instance();
     char cmd[100];
     CronScriptList::iterator it;
     it = _cronScriptList.find( std::string(label) );
-
-    if ( it != _cronScriptList.end() ) {
-
-        if ( spin.getContext()->isServer() == it->second->serverSide ) {
+    if (it != _cronScriptList.end())
+    {
+        if (spin.getContext()->isServer() == it->second->serverSide)
+        {
             sprintf( cmd, "del %s", it->second->pyScript.c_str() );
-            if ( !spin.execPython( cmd ) ) return false;
+            if (! spin.execPython(cmd))
+                return false;
         }
-        delete( it->second );
+        delete(it->second);
         it->second = NULL;
-        _cronScriptList.erase( it );
+        _cronScriptList.erase(it);
         return true;
     }
-
     return false;
 }
 
-
-
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-
 bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, const std::string& eventName,
-                                     const std::string& scriptPath, const std::string& params ) {
-
+                                     const std::string& scriptPath, const std::string& params )
+{
     // do we already have a script with the same label?
     EventScriptList::iterator it;
     it = _eventScriptList.find( std::string(label) );
-    if ( it != _eventScriptList.end() ) return false; // yes! don't reload it.
+    if (it != _eventScriptList.end())
+        return false; // yes! don't reload it.
 
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
@@ -779,7 +738,8 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     es->eventName = eventName;
     es->enabled = false;
 
-    if ( spin.getContext()->isServer() != serverSide ) {
+    if ( spin.getContext()->isServer() != serverSide )
+    {
         es->enabled = false;
         es->pyModule = "";
         es->pyScript = "";
@@ -787,8 +747,8 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
         return true;
     }
 
-
-    try {
+    try
+    {
         sprintf( cmd, "mod%llx", utick );
         pyModule = cmd;
         sprintf( cmd, "script%llx", utick );
@@ -834,62 +794,81 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     }
 
     return true;
-
 }
 
-
-// *****************************************************************************
-
 bool ReferencedNode::callEventScript( const std::string& eventName,
-                                      cppintrospection::ValueList& args ) {
-
-    if ( _eventScriptList.empty() ) return false;
-
+                                      cppintrospection::ValueList& args )
+{
+    if (_eventScriptList.empty())
+        return false;
     spinApp &spin = spinApp::Instance();
     boost::python::list argList;
     bool argListBuilt = false;
     bool eventScriptCalled = false;
 
     for( EventScriptList::iterator it = _eventScriptList.begin();
-         it != _eventScriptList.end(); it++ ) {
+         it != _eventScriptList.end(); it++ )
+    {
 
-        if ( !it->second ) continue;
-        if ( it->second->eventName != eventName ) continue;
-        if ( it->second->serverSide != spin.getContext()->isServer() ) continue;
-        if ( !it->second->enabled ) continue;
+        if (! it->second )
+            continue;
+        if (it->second->eventName != eventName )
+            continue;
+        if (it->second->serverSide != spin.getContext()->isServer() )
+            continue;
+        if (! it->second->enabled )
+            continue;
 
-        if ( !argListBuilt ) {
-            try {
-                for ( size_t i = 0; i < args.size(); i++ ) {
+        if (! argListBuilt )
+        {
+            try
+            {
+                for ( size_t i = 0; i < args.size(); i++ )
+                {
                     const std::type_info* argt = &args[i].getType().getStdTypeInfo();
 
-                    if ( *argt == typeid(int) ) {
+                    if ( *argt == typeid(int) )
+                    {
                         argList.append( cppintrospection::variant_cast<int>(args[i]) );
-                    } else if ( *argt == typeid(float) ) {
+                    } 
+                    else if ( *argt == typeid(float) )
+                    {
                         argList.append( cppintrospection::variant_cast<float>(args[i]) );
-                    } else if ( *argt == typeid(double) ) {
+                    }
+                    else if ( *argt == typeid(double) )
+                    {
                         argList.append( cppintrospection::variant_cast<double>(args[i]) );
-                    } else if ( *argt == typeid(std::string) ) {
+                    }
+                    else if ( *argt == typeid(std::string) )
+                    {
                         argList.append( cppintrospection::variant_cast<std::string>(args[i]).c_str() );
-                    } else if ( *argt == typeid(const char*) ) {
+                    }
+                    else if ( *argt == typeid(const char*) )
+                    {
                         argList.append( cppintrospection::variant_cast<const char*>(args[i]) );
-                    } else if ( *argt == typeid(char*) ) {
+                    }
+                    else if (*argt == typeid(char*))
+                    {
                         argList.append( cppintrospection::variant_cast<char*>(args[i]) );
-                    } else {
+                    }
+                    else
+                    {
                         std::cout << "callEventScript: unsupported argument type: " << argt->name() << std::endl;
                         return false;
                     }
                 }
-            } catch (...) {
+            }
+            catch (...)
+            {
                 std::cout << "callEventScript: something went wrong" << std::endl;
                 return false;
             }
         }
 
-        try {
+        try
+        {
             it->second->run( eventName.c_str(), argList );
             eventScriptCalled = true;
-
         } catch (boost::python::error_already_set const & ) {
             std::cout << "0: Python error: " << std::endl;
             PyErr_Print();
@@ -903,51 +882,44 @@ bool ReferencedNode::callEventScript( const std::string& eventName,
             return false;
         }
     }
-
     return eventScriptCalled;
-
 }
 
-// *****************************************************************************
-
-bool ReferencedNode::enableEventScript( const char* label, int enable ) {
-
+bool ReferencedNode::enableEventScript(const char* label, int enable)
+{
     EventScriptList::iterator it;
     it = _eventScriptList.find( std::string(label) );
 
-    if ( it != _eventScriptList.end() ) {
+    if (it != _eventScriptList.end())
+    {
         it->second->enabled = (enable != 0);
         return true;
     }
-
     return false;
 }
 
-// *****************************************************************************
-
-bool ReferencedNode::removeEventScript( const char* label ) {
-
+bool ReferencedNode::removeEventScript(const char* label)
+{
     spinApp &spin = spinApp::Instance();
     char cmd[100];
     EventScriptList::iterator it;
     it = _eventScriptList.find( std::string(label) );
 
-    if ( it != _eventScriptList.end() ) {
-        if ( spin.getContext()->isServer() == it->second->serverSide ) {
+    if (it != _eventScriptList.end())
+    {
+        if (spin.getContext()->isServer() == it->second->serverSide)
+        {
             sprintf( cmd, "del %s", it->second->pyScript.c_str() );
-            if ( !spin.execPython( cmd ) ) return false;
+            if (! spin.execPython(cmd))
+                return false;
         }
-        delete( it->second );
+        delete(it->second);
         it->second = NULL;
         _eventScriptList.erase( it );
         return true;
     }
-
     return false;
 }
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
 
 } // end of namespace spin
 

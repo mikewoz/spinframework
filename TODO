@@ -9,6 +9,8 @@ Release-critical for 0.4
  * fix examples, since they need to link to cppintrospection
  * clean up doxygen configuration (remove private stuff, etc.)
  * document the coding style
+ * path to package data in SceneManager.cpp should not be hard-coded
+ * use 0, not NULL?
 
 
 Server side TCP handlers
