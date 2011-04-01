@@ -24,12 +24,13 @@ MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent)
     // redirect std::cout to the logTextCtrl (but make sure to save a pointer to
     // the old streambuf object so we can direct it back to std::cout). This
     // means that we don't have to use wxLogMessage!
+#ifndef __WXMAC__
 #if wxUSE_STD_IOSTREAM
-    //redirector = new wxStreamToTextRedirector(logTextCtrl);
+    redirector = new wxStreamToTextRedirector(logTextCtrl);
 #else
     std::cout << "Oops. The log window is not yet supported on this platform...\nAll messages will be displayed in the console instead." << std::endl;
 #endif
-
+#endif
     // start spinListener:
     // can't do this here, because wxSpinTreeCtrl needs it to be running already
     // when the constructor is called
@@ -43,8 +44,10 @@ MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent)
 
 MainFrame::~MainFrame()
 {
+#ifndef __WXMAC__
 #if wxUSE_STD_IOSTREAM
-    //delete redirector;
+    delete redirector;
+#endif
 #endif
 }
 
