@@ -3,10 +3,13 @@ AUTOMAKE_OPTIONS = foreign
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src
+# Order of compilation really matters:
+SUBDIRS = \
+    src \
+    tests
 
 man_MANS = spinserver.1 spinviewer.1 
-MAN_TEXT_FILES=man-spinserver.txt man-spinviewer.txt
+MAN_TEXT_FILES = man-spinserver.txt man-spinviewer.txt
 EXTRA_DIST = \
     LICENSE \
     README \

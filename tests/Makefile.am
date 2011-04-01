@@ -1,0 +1,31 @@
+AM_CPPFLAGS = \
+	$(BOOST_CPPFLAGS) \
+	$(CPPINTROSPECTION_CFLAGS) \
+	$(PYTHON_CPPFLAGS) \
+    $(LIBLO_CFLAGS) \
+    $(OPENTHREADS_CFLAGS) \
+    $(OSG_CFLAGS) \
+    -I$(top_srcdir)/include \
+    -I$(top_srcdir)/src/tinyxml
+
+LDADD = $(top_builddir)/src/spin/libSPIN.la
+
+AM_LDFLAGS = \
+	$(BOOST_FILESYSTEM_LIB) \
+	$(BOOST_LDFLAGS) \
+	$(CPPINTROSPECTION_LIBS) \
+	$(PYTHON_LDFLAGS) \
+	-l$(BOOST_PYTHON_LIB) \
+    $(BOOST_THREAD_LIB) \
+    $(LIBLO_LIBS) \
+    $(OPENTHREADS_LIBS) \
+    $(OSG_LIBS) \
+    $(SHARED_VIDEO_LIB)
+
+check_PROGRAMS = \
+    check_it_works
+
+TESTS = $(check_PROGRAMS)
+
+check_it_works_SOURCES = check_it_works.cpp
+

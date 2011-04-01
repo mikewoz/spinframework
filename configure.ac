@@ -184,6 +184,7 @@ AC_CONFIG_FILES([
         src/Resources/desktopentries/Makefile
         src/Resources/fonts/Makefile
         src/Resources/scripts/Makefile
+        tests/Makefile
         ])
 
 AC_OUTPUT

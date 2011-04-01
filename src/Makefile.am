@@ -1,3 +1,4 @@
+# Order of compilation really matters:
 SUBDIRS = \
     tinyxml \
     osgWrappers/introspection \
