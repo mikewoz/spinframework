@@ -33,9 +33,11 @@ protected:
 
 private:
 
+#ifndef __WXMAC__
     #if wxUSE_STD_IOSTREAM
         wxStreamToTextRedirector *redirector;
     #endif
+#endif
 
 };
 
