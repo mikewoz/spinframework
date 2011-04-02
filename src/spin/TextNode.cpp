@@ -157,18 +157,18 @@ void TextNode::setColor (float r, float g, float b, float a)
 void TextNode::setBgColor (float r, float g, float b, float a)
 {
 	_bgColor = osg::Vec4(r,g,b,a);
-#if OSG_MIN_VERSION_REQUIRED(2,9,7)
-	textLabel->setBoundingBoxColor(_bgColor);
-#endif
+//#if OSG_MIN_VERSION_REQUIRED(2,9,7)
+//	textLabel->setBoundingBoxColor(_bgColor);
+//#endif
 	BROADCAST(this, "sffff", "setBgColor", r, g, b, a);
 }
 
 void TextNode::setMargin (float margin)
 {
 	_margin = margin;
-#if OSG_MIN_VERSION_REQUIRED(2,9,7)
-	textLabel->setBoundingBoxMargin(_margin);
-#endif
+//#if OSG_MIN_VERSION_REQUIRED(2,9,7)
+//	textLabel->setBoundingBoxMargin(_margin);
+//#endif
 	BROADCAST(this, "sf", "setMargin", getMargin());
 }
 
@@ -255,10 +255,10 @@ void TextNode::drawText()
 		//textLabel->setFontResolution(40,40);
 		textLabel->setFontResolution(80,80);
 		textLabel->setColor( _color );
-#if OSG_MIN_VERSION_REQUIRED(2,9,7)
-		textLabel->setBoundingBoxColor(_bgColor);
-		textLabel->setBoundingBoxMargin(_margin);
-#endif
+//#if OSG_MIN_VERSION_REQUIRED(2,9,7)
+//		textLabel->setBoundingBoxColor(_bgColor);
+//		textLabel->setBoundingBoxMargin(_margin);
+//#endif
 		textLabel->setBackdropType((osgText::Text::BackdropType)_decoration);
 
 		// setDrawMode (background):
@@ -266,21 +266,21 @@ void TextNode::drawText()
 			textLabel->setDrawMode(osgText::Text::TEXT);
 		else if (_background == FILLED)
         {
-#if OSG_MIN_VERSION_REQUIRED(2,9,7)
-			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::FILLEDBOUNDINGBOX);
-#else
+//#if OSG_MIN_VERSION_REQUIRED(2,9,7)
+//			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::FILLEDBOUNDINGBOX);
+//#else
 			textLabel->setDrawMode(osgText::Text::TEXT);
-#endif
+//#endif
         }
 		else if (_background == WIREFRAME)
 			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
 		else if (_background == ALL)
         {
-#if OSG_MIN_VERSION_REQUIRED(2,9,7)
-			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::BOUNDINGBOX);
-#else
+//#if OSG_MIN_VERSION_REQUIRED(2,9,7)
+//			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::FILLEDBOUNDINGBOX | osgText::Text::BOUNDINGBOX);
+//#else
 			textLabel->setDrawMode(osgText::Text::TEXT | osgText::Text::BOUNDINGBOX);
-#endif
+//#endif
         }
 
 
