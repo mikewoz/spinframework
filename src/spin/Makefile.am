@@ -101,7 +101,7 @@ spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSP
 #OSG_VER = $(shell osgversion --so-number)
 #OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
 
-#OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
+#OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer cppintrospection
 
 # WARNING: the .app generation script pulls some libs (eg, libSPIN) from /usr/local
 # so you must do a 'make install' before this will work (TODO: fix this)
@@ -147,7 +147,7 @@ spinviewer.app: spinviewer$(EXEEXT)
 #install_name_tool -change libosgFX.55.dylib @executable_path/../libs/libosgFX.55.dylib $@/Contents/MacOS/spinviewer
 #install_name_tool -change libosgParticle.55.dylib @executable_path/../libs/libosgParticle.55.dylib $@/Contents/MacOS/spinviewer
 #install_name_tool -change libosgViewer.55.dylib @executable_path/../libs/libosgViewer.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgIntrospection.55.dylib @executable_path/../libs/libosgIntrospection.55.dylib $@/Contents/MacOS/spinviewer
+#install_name_tool -change libcppintrospection.55.dylib @executable_path/../libs/libcppintrospection.55.dylib $@/Contents/MacOS/spinviewer
 
 #install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinviewer
 #-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks

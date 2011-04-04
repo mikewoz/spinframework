@@ -1791,7 +1791,7 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
             char *nodeID = (char*) XMLnode->Attribute("id");
             osg::ref_ptr<ReferencedNode> n = getOrCreateNode(nodeID, nodeType);
 
-            // get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
+            // get node as an cppintrospection::Value (note that type will be ReferencedNode pointer):
             const cppintrospection::Value introspectValue = cppintrospection::Value(n.get());
 
             // the getInstanceType() method however, gives us the real type being pointed at:
@@ -1890,7 +1890,7 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
             char *statesetID = (char*) XMLnode->Attribute("id");
             osg::ref_ptr<ReferencedStateSet> ss = createStateSet(statesetID, classType);
 
-            // get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
+            // get node as an cppintrospection::Value (note that type will be ReferencedNode pointer):
             const cppintrospection::Value introspectValue = cppintrospection::Value(ss.get());
 
             // the getInstanceType() method however, gives us the real type being pointed at:

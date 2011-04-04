@@ -44,18 +44,16 @@
 
 void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, const char *typespec, void *userdata)
 {
-
-	internal_lo_server s = (internal_lo_server) (lo_serv);
-
+    internal_lo_server s = (internal_lo_server) (lo_serv);
     int pattern = 0;
 
-    if (path) pattern = strpbrk(path, " #*,?[]{}") != NULL;
+    if (path)
+        pattern = strpbrk(path, " #*,?[]{}") != NULL;
 
-
-    if (!s->first)
+    if (! s->first)
     {
-		// The server has no registered callbacks, so nothing to be done
-    	return;
+    // The server has no registered callbacks, so nothing to be done
+        return;
     }
 
     internal_lo_method it, prev, next;
@@ -64,8 +62,8 @@ void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, con
 
     while (it)
     {
-    	// in case we free it:
-    	next = it->next;
+        // in case we free it:
+        next = it->next;
 
         // If paths match or handler is wildcard:
         if ((it->path == path) ||
@@ -75,15 +73,16 @@ void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, con
             // If types match or handler is wildcard:
             if ((it->typespec == typespec) || (typespec && it->typespec && !strcmp(typespec, it->typespec)))
             {
-
                 // If the user_data points to the user data provided:
                 if (it->user_data == (char*)userdata)
                 {
-
                     // Take care when removing the head:
-                    if (it == s->first) {
+                    if (it == s->first)
+                    {
                         s->first = it->next;
-                    } else {
+                    }
+                    else
+                    {
                         prev->next = it->next;
                     }
                     next = it->next;
@@ -95,15 +94,15 @@ void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, con
                 }
             }
         }
-    	prev = it;
-	    if (it) it = next;
-
+        prev = it;
+        if (it)
+            it = next;
     }
 
-	// if no remaining methods are registered, we could return a message or
+    // if no remaining methods are registered, we could return a message or
     // destroy the server... TODO?
     if (!s->first)
     {
+        // TODO
     }
-
 }
