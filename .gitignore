@@ -48,3 +48,6 @@ html
 man
 doxygen
 latex
+tests/check_it_works
+tests/stats
+
