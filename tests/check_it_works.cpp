@@ -8,29 +8,32 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+#include <tr1/memory>
 
 /**
  * This example shows how to send commands to a spin server. The result is an
  * orbiting sphere.
  */
-int main(int argc, char **argv)
+
+bool check_client_server()
 {
     using namespace spin;
-    spinServerContext *server = new spinServerContext();
+    spinApp &spin = spinApp::Instance();
+
+    std::tr1::shared_ptr<spinServerContext> server(new spinServerContext());
 	server->start();
     if (! server->isRunning())
     {
         std::cout << "Failed: Could not start a SPIN server." << std::endl;
-        std::exit(EXIT_FAILURE);
+        return false;
     }
 
-    spinClientContext spinListener;
-    spinApp &spin = spinApp::Instance();
-    if (! spinListener.start())
-    {
-        std::cout << "Failed: could not start SPIN client thread" << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
+    //spinClientContext spinListener;
+    //if (! spinListener.start())
+    // {
+    //    std::cout << "Failed: could not start SPIN client thread" << std::endl;
+    //    return false;
+    // }
     spin.SceneMessage("sss", "createNode", "shp", "ShapeNode", LO_ARGS_END);
     spin.NodeMessage("shp", "si", "setShape", (int)ShapeNode::SPHERE, LO_ARGS_END);
 
@@ -44,13 +47,13 @@ int main(int argc, char **argv)
 
     try
     {	
-        while (spinListener.isRunning()) // send signal (eg, ctrl-c to stop)
+        while (true) //spinListener.isRunning()) // send signal (eg, ctrl-c to stop)
         {
 
             if (! server->isRunning())
             {
                 std::cout << "Failed: Our spin server is not running anymore!" << std::endl;
-                std::exit(EXIT_FAILURE);
+                return false;
             }
             for (int i = 0; i < numSamples; ++i)
             {
@@ -68,10 +71,18 @@ int main(int argc, char **argv)
     catch (const std::exception &e)
     {
         std::cerr << "Failed: Got exception " << e.what() << std::endl;
-        return 1;
+        return false;
     }
     usleep(100);
     std::cout << "Info: Exited normally." << std::endl;
-    return 0;
+    return true;
+}
+
+int main(int argc, char **argv)
+{
+    if (check_client_server())
+        return 0;
+    else
+        return 1;
 }
 
