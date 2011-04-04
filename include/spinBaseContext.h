@@ -63,6 +63,11 @@ namespace spin
  * Note that this class can be instantiated in different modes, depending on
  * whether the process is to act as a server or a client.
  *
+ * All contexts would probably like to listen to infoPort broadcasts.
+ * A client can listen for info about the server, such as the correct
+ * ports to send messages. The server can listen to pings from clients
+ * to determine if they are still alive and connected.
+ *
  */
 
 // Forward declarations
@@ -71,12 +76,27 @@ class spinLog;
 class spinBaseContext
 {
     public:
+        /**
+         * Constructor. 
+         * 
+         * This is where the actual default port numbers and multicast groups are defined.
+         */
         spinBaseContext();
+
+        /**
+         * Destructor 
+         * 
+         * Frees the senders and receivers. 
+         */
         virtual ~spinBaseContext();
 
         static void sigHandler(int signum);
 
         /**
+         * Signal handler. 
+         * 
+         * Called, for example, when the user presses Control-C
+         * 
          * All threads need to stop according to the following flag:
          */
         static bool signalStop;
@@ -90,6 +110,8 @@ class spinBaseContext
         /**
          * Starts the context thread (passed as *threadFunction from a derived
          * class)
+         * 
+         * Startup point of the server's thread.
          */
         bool startThread( void *(*threadFunction) (void*) );
 
@@ -100,16 +122,26 @@ class spinBaseContext
 
         bool isRunning() { return running; }
 
-        /** list of address/port combinations on which the server listens for messages that alters the scene graph. */
+        /**
+         * List of address/port combinations on which the server listens for messages that alters the scene graph.
+         */
         std::vector<lo_address> lo_rxAddrs_;
+        /**
+         * List of OSC receivers on which the server listens for messages that alters the scene graph.
+         */
         std::vector<lo_server> lo_rxServs_;
 
-
-        /** Multicast group and port number to which the server sends the messages that clients sent to it to alter the scene graph. */
+        /**
+         * Multicast group and port number to which the server sends the messages that clients sent to it to alter the scene graph. 
+         */
         lo_address lo_txAddr;
-        /** Multicast group and port number to which the server sends the addresses and port numbers on which it sends and receives. */
+        /**
+         * Multicast group and port number to which the server sends the addresses and port numbers on which it sends and receives.
+         */
         lo_address lo_infoAddr;
-        /** Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters. */
+        /**
+         * Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters.
+         */
         lo_address lo_syncAddr;
         lo_server lo_infoServ_;
         
@@ -117,8 +149,51 @@ class spinBaseContext
 
         static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
+        /**
+         * Callback for messages sent to a node in the scene graph.
+         * 
+         * Messages to node should have an OSC address in the form /SPIN/<scene ID>/<node ID>
+         * Their first argument is the name of the method to call. 
+         * 
+         * Methods to manage Python scripts for a node:
+         * - addCronScript <label> <path> <frequency>
+         * - addEventScript <label> <event> <path> [*args...]
+         * - enableCronScript <label>
+         * - removeCronScript <label>
+         * - enableEventScript <label>
+         * - removeEventScript <label>
+         * 
+         * We use C++ introspection to figure out the other methods that can be called for a given node.
+         */
         static int nodeCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
+        /**
+         * Callback for the OSC message to the whole scene. 
+         * 
+         * The address of the OSC messages sent to the scene are in the form /SPIN/<scene ID> <method name> [args...]
+         * 
+         * They are used mostly to delete all nodes from a scene, or to ask the server to refresh the information about all nodes. It's also possible to save the current scene graph to an XML file, and to load a previously saved XML file. 
+         * 
+         * Some valid method include:
+         * - clear
+         * - clearUsers
+         * - clearStates
+         * - userRefresh
+         * - refresh
+         * - refreshSubscribers
+         * - getNodeList
+         * - nodeList [node names...] : Creates many nodes
+         * - stateList [] : Creates many state sets
+         * - exportScene [] []
+         * - load [XML file]
+         * - save [XML file] 
+         * - saveAll [XML file]
+         * - saveUsers [XML file]
+         * - createNode [node name] [node type]
+         * - createStateSet [name] [type]
+         * - deleteNode [name]
+         * - deleteGraph [name]
+         */
         static int sceneCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
         static int logCallback(const char *path, const char *types, lo_arg **argv, 
@@ -133,13 +208,11 @@ class spinBaseContext
         bool running;
         SpinContextMode mode;
         void setLog(spinLog &log);
-        virtual void createServers() = 0;
+
         /**
-         * All contexts would probably like to listen to infoPort broadcasts.
-         * A client can listen for info about the server, such as the correct
-         * ports to send messages. The server can listen to pings from clients
-         * to determine if they are still alive and connected.
+         * this method is used by both spinClientContext and spinServerContext
          */
+        virtual void createServers() = 0;
 
 
     private:
