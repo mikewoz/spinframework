@@ -22,7 +22,6 @@ noinst_LTLIBRARIES = libSPINwrappers.la
 
 # please keep those in alphabetical order:
 libSPINwrappers_la_SOURCES = \
-	ReferencedNode.cpp \
     AnimationNode.cpp \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
@@ -32,24 +31,42 @@ libSPINwrappers_la_SOURCES = \
     GridNode.cpp \
     GroupNode.cpp \
     ImageTexture.cpp \
+    introspect_helpers.cpp \
+    libloUtil.cpp \
     LightSource.cpp \
     Listener.cpp \
     MeasurementNode.cpp \
+    MediaManager.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    nodeVisitors.cpp \
     PointerNode.cpp \
     RayNode.cpp \
+    ReferencedNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    SceneManager.cpp \
     ShapeNode.cpp \
+    SharedVideoNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \
     SoundNode.cpp \
     SoundSpace.cpp \
+    spinApp.cpp \
+    spinBaseContext.cpp \
+    spinClientContext.cpp \
+    spinDefaults.cpp \
+    spinLog.cpp \
+    spinLogWX.cpp \
+    spinServerContext.cpp \
+    spinUtil.cpp \
+    spinWX.cpp \
     SwitchNode.cpp \
     TextNode.cpp \
     UserNode.cpp \
-    VideoTexture.cpp
+    videoSize.cpp \
+    VideoTexture.cpp \
+    ViewerManipulator.cpp
 
 #    $(top_srcdir)/include/*.h \
 #    $(top_srcdir)/src/spin/*.h \
