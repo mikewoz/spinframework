@@ -106,7 +106,7 @@ typedef struct _lo_server {
  * Thus, we've copied the lo_server struct (and named it internal_lo_server)
  * so that we can remove methods if their user_data matches
  */
-extern "C" void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, const char *typespec, void *userdata);
+void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, const char *typespec, void *userdata);
 
 
 

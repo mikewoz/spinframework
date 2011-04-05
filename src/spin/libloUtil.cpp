@@ -40,7 +40,7 @@
 // -----------------------------------------------------------------------------
 
 #include "libloUtil.h"
-#include <string>
+#include <string.h>
 
 void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, const char *typespec, void *userdata)
 {
@@ -48,7 +48,12 @@ void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, con
     int pattern = 0;
 
     if (path)
-        pattern = strpbrk(path, " #*,?[]{}") != NULL;
+    {
+        if (strpbrk(path, " #*,?[]{}") != 0)
+            pattern = 1;
+        else
+            pattern = 0;
+    }
 
     if (! s->first)
     {
@@ -90,7 +95,6 @@ void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, con
                     free((char *)it->typespec);
                     free(it);
                     it = prev;
-
                 }
             }
         }
@@ -101,8 +105,9 @@ void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, con
 
     // if no remaining methods are registered, we could return a message or
     // destroy the server... TODO?
-    if (!s->first)
+    if (! s->first)
     {
         // TODO
     }
 }
+
