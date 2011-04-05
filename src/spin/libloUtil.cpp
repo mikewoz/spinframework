@@ -41,6 +41,7 @@
 
 #include "libloUtil.h"
 #include <string.h>
+#include <string>
 
 void lo_server_del_method_with_userdata(lo_server lo_serv, const char *path, const char *typespec, void *userdata)
 {
