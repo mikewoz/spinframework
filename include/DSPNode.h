@@ -46,6 +46,9 @@
 #include <lo/lo_types.h>
 #include "GroupNode.h"
 
+namespace spin
+{
+
 class SoundConnection;
 class SceneManager;
 
@@ -135,5 +138,6 @@ private:
 
 };
 
+} // end of namespace spin
 
 #endif

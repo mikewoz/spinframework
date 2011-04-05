@@ -47,6 +47,9 @@
 
 #include <osg/Timer>
 
+namespace spin
+{
+
 /**
  * \brief Represents a user in the scene.
  *
@@ -129,6 +132,9 @@ class UserNode : public ConstraintsNode
         osg::ref_ptr<osg::Group> cameraAttachmentNode;
 
 };
+
+} // end of namespace spin
+
 
 
 #endif

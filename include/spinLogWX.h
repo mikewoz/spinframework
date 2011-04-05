@@ -52,6 +52,9 @@
 
 // code from http://www.advogato.org/person/elanthis/diary/363.html
 
+namespace spin
+{
+
 
 enum LogPriority
 {
@@ -231,6 +234,8 @@ static spinLog& operator<<(spinLog& vlog, LogPriority pr)
     vlog.set_priority(pr);
     return vlog;
 }
+
+} // end of namespace spin
 
 
 #endif

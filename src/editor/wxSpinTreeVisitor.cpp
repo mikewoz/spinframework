@@ -50,7 +50,7 @@ void wxSpinTreeVisitor::apply(osg::Group& node)
     // for osg::Group, we check if it can be cast as an ReferencedNode, and add
     // it to the treeCtrl if so:
 
-	ReferencedNode *n = dynamic_cast<ReferencedNode*>(&node);
+	spin::ReferencedNode *n = dynamic_cast<spin::ReferencedNode*>(&node);
 	if (n)
     {
 	    wxTreeItemId parentId = m_currentParentId;
@@ -175,7 +175,7 @@ void wxSpinTreeVisitor::apply(osg::StateAttribute& stateAttrib)
 
 */
 
-wxTreeItemId wxSpinTreeVisitor::AddToTree(ReferencedNode* n)
+wxTreeItemId wxSpinTreeVisitor::AddToTree(spin::ReferencedNode* n)
 {
     wxTreeItemId currentId;
     if (! n)

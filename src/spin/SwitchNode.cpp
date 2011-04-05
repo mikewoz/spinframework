@@ -54,6 +54,9 @@
 
 //extern SceneManager *sceneManager;
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructor:
 SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
@@ -145,6 +148,7 @@ std::vector<lo_message> SwitchNode::getState () const
 			ret.push_back(msg);
 		}
 	}
-
 	return ret;
 }
+
+} // end of namespace spin

@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(LightSource)
+BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	I_DeclaringFile("LightSource.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____LightSource__SceneManager_P1__char_P1,
 	               "",
 	               "");

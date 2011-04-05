@@ -47,6 +47,9 @@
 #include "spinBaseContext.h"
 #include "MediaManager.h"
 
+namespace spin
+{
+
 class SceneManager;
 
 // *****************************************************************************
@@ -325,3 +328,6 @@ std::vector<lo_message> AnimationNode::getState () const
 
     return ret;
 }
+
+} // end of namespace spin
+

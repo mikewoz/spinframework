@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(SoundNode)
+BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	I_DeclaringFile("SoundNode.h");
-	I_BaseType(DSPNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::DSPNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____SoundNode__SceneManager_P1__char_P1,
 	               "",
 	               "");

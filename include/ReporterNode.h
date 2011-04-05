@@ -45,6 +45,9 @@
 #include "ReferencedNode.h"
 #include <osg/Timer>
 
+namespace spin
+{
+
 typedef struct _reporterTarget {
     osg::observer_ptr<ReferencedNode> node;
     osg::Matrix matrix;
@@ -141,6 +144,8 @@ private:
     osg::Timer_t lastTick;
 };
 
+
+} // end of namespace spin
 
 
 #endif

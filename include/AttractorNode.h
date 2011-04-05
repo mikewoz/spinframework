@@ -44,6 +44,10 @@
 #define __AttractorNode_H
 
 #include "GroupNode.h"
+
+namespace spin
+{
+
 class SceneManager;
 
 /**
@@ -133,5 +137,7 @@ private:
     osg::Timer_t lastTick_;
 
 };
+
+} // end of namespace spin
 
 #endif

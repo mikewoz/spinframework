@@ -56,6 +56,9 @@
 #include <boost/python.hpp>
 #include <cppintrospection/Value>
 
+namespace spin
+{
+
 class SceneManager;
 
 typedef struct {
@@ -356,6 +359,8 @@ class ReferencedNode_callback : public osg::NodeCallback
             traverse(node, nv);
         }
 };
+
+} // end of namespace spin
 
 
 #endif

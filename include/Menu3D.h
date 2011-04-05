@@ -46,8 +46,10 @@
 #include "GroupNode.h"
 #include "TextNode.h"
 
-typedef std::vector< osg::observer_ptr<TextNode> > MenuVector;
+namespace spin
+{
 
+typedef std::vector< osg::observer_ptr<TextNode> > MenuVector;
 
 /**
  * \brief Provides a positionable 3D menu composed of TextNodes
@@ -145,5 +147,6 @@ private:
     osg::ref_ptr<osg::Switch> switcher;
 };
 
+} // end of namespace spin
 
 #endif

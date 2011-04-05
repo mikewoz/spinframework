@@ -21,17 +21,17 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(ModelNode::animationModeType)
+BEGIN_ENUM_REFLECTOR(spin::ModelNode::animationModeType)
 	I_DeclaringFile("ModelNode.h");
-	I_EnumLabel(ModelNode::OFF);
-	I_EnumLabel(ModelNode::SWITCH);
-	I_EnumLabel(ModelNode::SEQUENCE);
+	I_EnumLabel(spin::ModelNode::OFF);
+	I_EnumLabel(spin::ModelNode::SWITCH);
+	I_EnumLabel(spin::ModelNode::SEQUENCE);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(ModelNode)
+BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	I_DeclaringFile("ModelNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ModelNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -109,6 +109,6 @@ BEGIN_OBJECT_REFLECTOR(ModelNode)
 	I_SimpleProperty(int, StateRegistration, 
 	                 __int__getStateRegistration, 
 	                 __void__setStateRegistration__int);
-	I_PublicMemberProperty(std::vector< t_symbol * >, _statesetList);
+	I_PublicMemberProperty(std::vector< spin::t_symbol * >, _statesetList);
 END_REFLECTOR
 

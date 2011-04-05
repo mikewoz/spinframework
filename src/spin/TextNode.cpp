@@ -53,6 +53,9 @@
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
+
 // ===================================================================
 // constructor:
 TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
@@ -363,3 +366,6 @@ std::vector<lo_message> TextNode::getState () const
 	ret.push_back(msg);
 	return ret;
 }
+
+} // end of namespace spin
+

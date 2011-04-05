@@ -44,6 +44,9 @@
 
 #include <string>
 
+namespace spin
+{
+
 /**
  * \brief Provides an interface for finding media locations (models, textures,
  *        sounds, etc.)
@@ -78,5 +81,6 @@ class MediaManager
         std::string dataPath;
 };
 
+} // end of namespace spin
 
 #endif /*MediaManager_H_*/

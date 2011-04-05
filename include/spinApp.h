@@ -49,9 +49,15 @@
 
 #include "spinUtil.h"
 
+namespace spin
+{
+
 class spinBaseContext;
 class SceneManager;
 class MediaManager;
+class UserNode;
+
+#define SPIN_ARGS_END LO_ARGS_END
 
 /**
  * \brief A singleton class to facilitate communication with SPIN.
@@ -61,7 +67,6 @@ class MediaManager;
  *
  */
 
-class UserNode;
 
 class spinApp
 {
@@ -82,6 +87,7 @@ class spinApp
          * current application context, even if a server is not running.
          */
         void registerUser();
+
 
         /**
          * This sends a variable length message.
@@ -158,6 +164,9 @@ class spinApp
 
         spinBaseContext *context;
 };
+
+} // end of namespace spin
+
 
 // Internal server-side MACROS for sending messages. Clients should NEVER use
 // these macros, and should rather use spinContext::send* methods. But just in

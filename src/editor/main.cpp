@@ -44,13 +44,15 @@ namespace spineditor {
 
 bool SpinEditorApp::OnInit()
 {
-    spinApp &spin = spinApp::Instance();
+    spin::spinApp &spin = spin::spinApp::Instance();
 
     // call parent init (mandatory)
     if (!wxApp::OnInit())
         return false;
 
-
+    // needs to be called before the MainFrame is constructed (because
+    // wxSpinTreeCtrl needs to set OSC callbacks)
+    this->start();
 
 #ifdef __WXMAC__
     // need to give focus to the process (for development; should be fixed when
@@ -64,9 +66,7 @@ bool SpinEditorApp::OnInit()
     // TODO: use only the image handlers required
     wxInitAllImageHandlers();
 
-    // needs to be called before the MainFrame is constructed (because
-    // wxSpinTreeCtrl needs to set OSC callbacks)
-    this->start();
+
 
     // create the main window:
     MainFrame *frame = new MainFrame( NULL );
@@ -77,6 +77,11 @@ bool SpinEditorApp::OnInit()
     frame->Show(true);
     SetTopWindow(frame);
 
+    // start a timer to act as a periodic polling function (eg, to check that
+    // the spinListener thread is still running
+    spinPollTimer_ = new wxTimer(this, SpinPollTimer_ID);
+    spinPollTimer_->Start(500); // milliseconds
+
     return true;
 }
 
@@ -85,7 +90,7 @@ int SpinEditorApp::OnExit()
     std::cout << "Got SpinEditorApp::OnExit()" << std::endl;
 
     // tell spin to stop
-    spinApp::Instance().getContext()->stop();
+    spin::spinApp::Instance().getContext()->stop();
     return 1;
 }
 
@@ -98,10 +103,7 @@ void SpinEditorApp::start()
         return;
     }
 
-    // start a timer to act as a periodic polling function (eg, to check that
-    // the spinListener thread is still running
-    spinPollTimer_ = new wxTimer(this, SpinPollTimer_ID);
-    spinPollTimer_->Start(500); // milliseconds
+
 }
 
 void SpinEditorApp::OnSpinPollTimer(wxTimerEvent& WXUNUSED(event))
@@ -152,7 +154,7 @@ bool SpinEditorApp::OnCmdLineError(wxCmdLineParser & parser)
 
 bool SpinEditorApp::OnCmdLineParsed(wxCmdLineParser& parser)
 {
-    spinApp &spin = spinApp::Instance();
+    spin::spinApp &spin = spin::spinApp::Instance();
 
     if (parser.Found(wxT("v")))
     {

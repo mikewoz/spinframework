@@ -12,6 +12,7 @@
 
 #include <spinApp.h>
 #include <spinBaseContext.h>
+#include <spinUtil.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -21,18 +22,18 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(spinApp)
+BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	I_DeclaringFile("spinApp.h");
-	I_StaticMethod0(spinApp &, Instance,
+	I_StaticMethod0(spin::spinApp &, Instance,
 	                __spinApp_R1__Instance_S,
 	                "",
 	                "");
-	I_Method1(void, setContext, IN, spinBaseContext *, c,
+	I_Method1(void, setContext, IN, spin::spinBaseContext *, c,
 	          Properties::NON_VIRTUAL,
 	          __void__setContext__spinBaseContext_P1,
 	          "",
 	          "The first thing that any app must do is set the context for the spinApp singleton. This will provide the singleton with access to the liblo addresses so messages can be sent from anywhere. ");
-	I_Method0(spinBaseContext *, getContext,
+	I_Method0(spin::spinBaseContext *, getContext,
 	          Properties::NON_VIRTUAL,
 	          __spinBaseContext_P1__getContext,
 	          "",
@@ -97,7 +98,7 @@ BEGIN_OBJECT_REFLECTOR(spinApp)
 	          __void__NodeMessage__C5_char_P1__lo_message,
 	          "",
 	          "");
-	I_MethodWithDefaults3(void, NodeBundle, IN, t_symbol *, nodeSym, , IN, std::vector< lo_message >, msgs, , IN, lo_address, addr, 0,
+	I_MethodWithDefaults3(void, NodeBundle, IN, spin::t_symbol *, nodeSym, , IN, std::vector< lo_message >, msgs, , IN, lo_address, addr, 0,
 	                      Properties::NON_VIRTUAL,
 	                      __void__NodeBundle__t_symbol_P1__std_vectorT1_lo_message___lo_address,
 	                      "",
@@ -152,7 +153,7 @@ BEGIN_OBJECT_REFLECTOR(spinApp)
 	          __std_string__getUserID,
 	          "",
 	          "");
-	I_SimpleProperty(spinBaseContext *, Context, 
+	I_SimpleProperty(spin::spinBaseContext *, Context, 
 	                 __spinBaseContext_P1__getContext, 
 	                 __void__setContext__spinBaseContext_P1);
 	I_SimpleProperty(std::string, CurrentPyException, 
@@ -170,8 +171,8 @@ BEGIN_OBJECT_REFLECTOR(spinApp)
 	I_PublicMemberProperty(boost::python::object, _pyMainModule);
 	I_PublicMemberProperty(boost::python::object, _pyNamespace);
 	I_PublicMemberProperty(bool, _pyInitialized);
-	I_PublicMemberProperty(osg::ref_ptr< UserNode >, userNode);
-	I_PublicMemberProperty(SceneManager *, sceneManager);
-	I_PublicMemberProperty(MediaManager *, mediaManager);
+	I_PublicMemberProperty(osg::ref_ptr< spin::UserNode >, userNode);
+	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
+	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
 

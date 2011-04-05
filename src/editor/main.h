@@ -102,7 +102,7 @@ class SpinEditorApp : public wxApp
         DECLARE_EVENT_TABLE()
 
     private:
-        spinClientContext spinListener;
+        spin::spinClientContext spinListener;
         wxTimer *spinPollTimer_;
 
 

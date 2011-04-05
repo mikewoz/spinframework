@@ -66,19 +66,21 @@ wxSpinTreeCtrl::wxSpinTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& p
     m_pSceneTreeVisitor = new wxSpinTreeVisitor(this);
 
     // add our liblo callback to all listener sockets:
-    spinBaseContext *listener = spinApp::Instance().getContext();
+    spin::spinBaseContext *listener = spin::spinApp::Instance().getContext();
     std::vector<lo_server>::iterator servIter;
     for (servIter = listener->lo_rxServs_.begin(); servIter != listener->lo_rxServs_.end(); ++servIter)
     {
         lo_server_add_method((*servIter),
-            std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
+            std::string("/SPIN/" + spin::spinApp::Instance().getSceneID()).c_str(),
             NULL, wxSpinTreeCtrl_liblo_callback, this);
     }
 }
 
 wxSpinTreeCtrl::~wxSpinTreeCtrl()
 {
-    delete m_pSceneTreeVisitor;
+
+    m_pSceneTreeVisitor = 0; // OSG should handle deletion
+    //delete m_pSceneTreeVisitor;
 }
 
 void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)
@@ -90,7 +92,6 @@ void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)
         wxTreeItemId rootID = AddRoot(wxT("scene"));
 
         m_pSceneTreeVisitor->SetParentTreeItem(&rootID);
-        //m_pSceneTreeVisitor->SetParentTreeItem(NULL);
         pRoot->accept(*m_pSceneTreeVisitor.get());
     }
     Thaw();
@@ -103,10 +104,10 @@ void wxSpinTreeCtrl::Refresh()
     // graph, and adds or removes nodes accordingly while keeping the existing
     // ones
 
-    BuildTree(spinApp::Instance().sceneManager->worldNode.get());
+    BuildTree(spin::spinApp::Instance().sceneManager->worldNode.get());
 }
 
-void wxSpinTreeCtrl::addToTree(ReferencedNode *n, wxTreeItemId parentID)
+void wxSpinTreeCtrl::addToTree(spin::ReferencedNode *n, wxTreeItemId parentID)
 {
     Freeze();
     std::string strLabel = n->nodeType + " : " + n->id->s_name;
@@ -125,7 +126,7 @@ void wxSpinTreeCtrl::addNode(const char *id, const char *type)
     // note that a createNode message was broadcast from SPIN AFTER the node was
     // instantiated, so we should now be able to find it in the sceneManager,
     // and so we'll create a tree item (if it doesn't already exist).
-    ReferencedNode *n = spinApp::Instance().sceneManager->getNode(id, type);
+    spin::ReferencedNode *n = spin::spinApp::Instance().sceneManager->getNode(id, type);
     if (! n)
         return;
 
@@ -158,7 +159,7 @@ void wxSpinTreeCtrl::removeNode(const char *id)
     }
 }
 
-bool wxSpinTreeCtrl::SelectNode(ReferencedNode* pNode)
+bool wxSpinTreeCtrl::SelectNode(spin::ReferencedNode* pNode)
 {
     // there should always be at least one node (the scene root). If not, return
     // because this is a problem.
@@ -187,7 +188,7 @@ bool wxSpinTreeCtrl::SelectNode(ReferencedNode* pNode)
     return false;
 }
 
-wxTreeItemId wxSpinTreeCtrl::GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
+wxTreeItemId wxSpinTreeCtrl::GetTreeItem(spin::ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
     return GetTreeItem(pNode->id->s_name, idParent, cookie);
     /*
@@ -228,7 +229,7 @@ wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idPare
         return NULL;
 
     wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(idParent);
-    if (treeData)
+    if (treeData && treeData->m_pNode.valid())
     {
         if (strcmp(treeData->m_pNode->id->s_name, nodeId) == 0)
         {
@@ -249,20 +250,26 @@ wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idPare
     return GetTreeItem(nodeId, GetNextSibling(idParent), cookie);
 }
 
-ReferencedNode* wxSpinTreeCtrl::GetSelectedNode() const
+spin::ReferencedNode* wxSpinTreeCtrl::GetSelectedNode() const
 {
-   if (! GetSelection())
+   if (!GetSelection())
         return NULL;
     wxSpinTreeItemData *treeData = (wxSpinTreeItemData*) GetItemData(GetSelection());
-    if (! treeData)
+    if (!treeData)
         return NULL;
+    if (!treeData->m_pNode.valid())
+        return NULL;
+
     return treeData->m_pNode.get();
 }
 
-ReferencedNode* wxSpinTreeCtrl::GetNode(const wxTreeItemId& item) const
+spin::ReferencedNode* wxSpinTreeCtrl::GetNode(const wxTreeItemId& item) const
 {
     wxSpinTreeItemData *treeData = (wxSpinTreeItemData*) GetItemData(item);
-    if (! treeData)
+    if (!treeData)
+        return NULL;
+
+    if (!treeData->m_pNode.valid())
         return NULL;
 
     return treeData->m_pNode.get();
@@ -271,7 +278,7 @@ ReferencedNode* wxSpinTreeCtrl::GetNode(const wxTreeItemId& item) const
 void wxSpinTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
 {
     wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(id);
-    if (! treeData)
+    if ((!treeData) || (!treeData->m_pNode.valid()))
         return;
     if (treeData->m_pNode->nodeType == "GroupNode")
         SetItemImage(id, 1, wxTreeItemIcon_Normal);
@@ -309,7 +316,7 @@ void wxSpinTreeCtrl::UpdatePropGrid()
 
 void wxSpinTreeCtrl::OnSpinSelectionChange(wxTreeEvent & WXUNUSED(event))
 {
-    ReferencedNode *n = GetSelectedNode();
+    spin::ReferencedNode *n = GetSelectedNode();
     if (n)
     {
         std::cout << "got tree selection: " << n->getID() << std::endl;
@@ -327,7 +334,7 @@ void wxSpinTreeCtrl::OnSpinTreeDragBegin(wxTreeEvent &event)
 void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
 {
 
-    if (ReferencedNode *child = this->GetNode(draggedItem))
+    if (spin::ReferencedNode *child = this->GetNode(draggedItem))
     {
         std::string parentString;
 
@@ -339,7 +346,7 @@ void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
 
         // otherwise, we get the node that this was dropped on, and set the
         // parent to that symbol:
-        else if (ReferencedNode *parent = this->GetNode(event.GetItem()))
+        else if (spin::ReferencedNode *parent = this->GetNode(event.GetItem()))
         {
             parentString = parent->id->s_name;
         }
@@ -351,7 +358,7 @@ void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
             lo_message_add(msg, "ss", "setParent", parentString.c_str());
             spin->nodeMessage(child->id, msg);
             */
-            spinApp::Instance().NodeMessage(child->id->s_name, "ss", "setParent", parentString.c_str(), LO_ARGS_END);
+            spin::spinApp::Instance().NodeMessage(child->id->s_name, "ss", "setParent", parentString.c_str(), SPIN_ARGS_END);
         }
     }
 }

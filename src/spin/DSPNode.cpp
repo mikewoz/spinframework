@@ -47,6 +47,9 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
+namespace spin
+{
+
 //extern SceneManager *sceneManager;
 
 // *****************************************************************************
@@ -212,8 +215,6 @@ void DSPNode::disconnect(const char *snk)
 // *****************************************************************************
 // *****************************************************************************
 
-
-
 void DSPNode::setActive (int i)
 {
 	active = (bool)i;
@@ -301,3 +302,6 @@ std::vector<lo_message> DSPNode::getState() const
 	
 	return ret;
 }
+
+} // end of namespace spin
+

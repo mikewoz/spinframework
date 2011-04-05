@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(SharedVideoTexture)
+BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	I_DeclaringFile("SharedVideoTexture.h");
-	I_BaseType(ReferencedStateSet);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, const char *, initID,
+	I_BaseType(spin::ReferencedStateSet);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____SharedVideoTexture__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");

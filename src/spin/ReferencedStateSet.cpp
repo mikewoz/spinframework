@@ -41,7 +41,6 @@
 
 #include <osg/StateSet>
 #include <osg/StateAttribute>
-
 #include <iostream>
 
 #include "spinApp.h"
@@ -49,12 +48,12 @@
 #include "SceneManager.h"
 #include "ReferencedStateSet.h"
 
-
-
 using namespace std;
 
-
 extern pthread_mutex_t sceneMutex;
+
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -234,3 +233,6 @@ void ReferencedStateSet::stateDump(lo_address addr)
 {
     spinApp::Instance().NodeBundle(this->id, this->getState(), addr);
 }
+
+} // end of namespace spin
+

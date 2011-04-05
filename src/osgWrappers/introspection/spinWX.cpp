@@ -20,7 +20,7 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(spinWX)
+BEGIN_VALUE_REFLECTOR(spin::spinWX)
 	I_DeclaringFile("spinWX.h");
 	I_Constructor0(____spinWX,
 	               "",

@@ -20,7 +20,7 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(DebugVisitor)
+BEGIN_VALUE_REFLECTOR(spin::DebugVisitor)
 	I_DeclaringFile("nodeVisitors.h");
 	I_Constructor0(____DebugVisitor,
 	               "",
@@ -47,7 +47,7 @@ BEGIN_VALUE_REFLECTOR(DebugVisitor)
 	          "");
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(NodeSearcher)
+BEGIN_VALUE_REFLECTOR(spin::NodeSearcher)
 	I_DeclaringFile("nodeVisitors.h");
 	I_Constructor1(IN, NodeList &, list,
 	               Properties::NON_EXPLICIT,
@@ -67,7 +67,7 @@ BEGIN_VALUE_REFLECTOR(NodeSearcher)
 	I_PublicMemberProperty(std::string, _searchName);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(SearchVisitor)
+BEGIN_VALUE_REFLECTOR(spin::SearchVisitor)
 	I_DeclaringFile("nodeVisitors.h");
 	I_Constructor0(____SearchVisitor,
 	               "",
@@ -162,9 +162,9 @@ BEGIN_VALUE_REFLECTOR(SearchVisitor)
 	                 0);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(TextureStateSetFinder)
+BEGIN_VALUE_REFLECTOR(spin::TextureStateSetFinder)
 	I_DeclaringFile("nodeVisitors.h");
-	I_Constructor1(IN, StateSetList &, list,
+	I_Constructor1(IN, spin::StateSetList &, list,
 	               Properties::NON_EXPLICIT,
 	               ____TextureStateSetFinder__StateSetList_R1,
 	               "",
@@ -186,7 +186,7 @@ BEGIN_VALUE_REFLECTOR(TextureStateSetFinder)
 	          "");
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(UpdateSceneVisitor)
+BEGIN_VALUE_REFLECTOR(spin::UpdateSceneVisitor)
 	I_DeclaringFile("nodeVisitors.h");
 	I_Constructor0(____UpdateSceneVisitor,
 	               "",
@@ -202,4 +202,8 @@ BEGIN_VALUE_REFLECTOR(UpdateSceneVisitor)
 	          "",
 	          "");
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< osg::StateSet > >, spin::StateSetList)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< osg::StateSet > >)
 

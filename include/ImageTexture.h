@@ -54,6 +54,9 @@ namespace osg {
 #include <osg/ref_ptr>
 #include "ReferencedStateSet.h"
 
+namespace spin
+{
+
 /**
  * \brief A texture state that holds a static image
  *
@@ -109,5 +112,6 @@ private:
     bool _useTextureRectangle;
 };
 
+} // end of namespace spin
 
 #endif

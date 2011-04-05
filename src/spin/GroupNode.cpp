@@ -39,10 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-
 #include <osg/ComputeBoundsVisitor>
 #include <osgGA/GUIEventAdapter>
-
 #include "GroupNode.h"
 #include "SceneManager.h"
 #include "spinApp.h"
@@ -51,12 +49,10 @@
 #include "UserNode.h"
 #include "spinApp.h"
 
-
-
 using namespace std;
 
-
-
+namespace spin
+{
 
 // ***********************************************************
 // constructor:
@@ -82,8 +78,6 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
     clipNode->setName(string(id->s_name) + ".clipNode");
     mainTransform->addChild(clipNode.get());
 
-
-
     _velocity = osg::Vec3(0.0,0.0,0.0);
     _velocityMode = GroupNode::TRANSLATE;
     _spin = osg::Vec3(0.0,0.0,0.0);
@@ -95,7 +89,6 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 
     // keep a timer for velocity calculation:
     lastTick = osg::Timer::instance()->tick();
-
 }
 
 // ***********************************************************
@@ -109,7 +102,6 @@ GroupNode::~GroupNode()
 
 void GroupNode::callbackUpdate()
 {
-
     ReferencedNode::callbackUpdate();
 
     //printf("GroupNode: damping = %f\n", _damping);
@@ -153,13 +145,10 @@ void GroupNode::callbackUpdate()
             }
             else _spin = osg::Vec3(0,0,0);
 
-
             lastTick = tick;
         }
     }
-
 }
-
 
 void GroupNode::updateNodePath(bool updateChildren)
 {
@@ -195,7 +184,6 @@ void GroupNode::updateNodePath(bool updateChildren)
     */
 
 }
-
 
 // *****************************************************************************
 
@@ -701,4 +689,7 @@ std::vector<lo_message> GroupNode::getState () const
 
     return ret;
 }
+
+} // end of namespace spin
+
 

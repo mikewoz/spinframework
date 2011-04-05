@@ -49,6 +49,9 @@ namespace osg {
 
 #include "ReferencedNode.h"
 
+namespace spin
+{
+
 enum ContourTypeEnum { THIN, CUBIC, CYLINDRICAL };
 enum trackingModeEnum { POSITION, FULL6DOF };
 
@@ -157,5 +160,6 @@ private:
 
 };
 
+} // end of namespace spin
 
 #endif

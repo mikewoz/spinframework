@@ -69,7 +69,8 @@
 
 extern pthread_mutex_t sceneMutex;
 
-
+namespace spin
+{
 
 spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
 {
@@ -78,7 +79,6 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
     setenv("DYLD_LIBRARY_PATH", "@executable_path/../libs", 1);
 #endif
-
 
     // Load the SPIN library:
     /*
@@ -113,7 +113,7 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
             }
         }
 		*/
-        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
         //UNUSED(ReferencedNodeType);
         if (!ReferencedNodeType.isDefined())
         {
@@ -523,7 +523,6 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
 			msgs.erase(iter); // iterator automatically advances after erase()
 		}
 	}
-
 	// if it's any UDP socket, then bundle the messages:
 	else
 	{
@@ -535,9 +534,9 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
 			lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
 			msgs.erase(iter); // iterator automatically advances after erase()
 		}
-
         lo_send_bundle(sendingAddress, b);
         lo_bundle_free_messages(b);
-
 	}
 }
+
+} // end of namespace spin

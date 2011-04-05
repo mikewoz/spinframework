@@ -22,6 +22,9 @@
 #ifndef _VIDEO_SIZE_H_
 #define _VIDEO_SIZE_H_
 
+namespace spin
+{
+
 namespace videosize 
 {
     const int WIDTH = 640;
@@ -30,5 +33,8 @@ namespace videosize
     const int MAX_HEIGHT = 1080;
     const int FRAMERATE = 30;
 }
+
+} // end of namespace spin
+
 
 #endif // _VIDEO_SIZE_H_

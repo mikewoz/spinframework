@@ -63,7 +63,7 @@ public:
 // FIXME: 2011-03-22:aalex:Get rid of protected methods
 protected:
     //wxTreeItemId AddToTree(osg::Referenced* pObject);
-    wxTreeItemId AddToTree(ReferencedNode* pObject);
+    wxTreeItemId AddToTree(spin::ReferencedNode* pObject);
     wxTreeItemId m_currentParentId;
     wxSpinTreeCtrl* m_pTreeCtrl;
 };

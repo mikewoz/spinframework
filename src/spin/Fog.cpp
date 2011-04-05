@@ -47,6 +47,8 @@
 #include "spinBaseContext.h"
 #include "SceneManager.h"
 
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -115,3 +117,4 @@ std::vector<lo_message> Fog::getState () const
 	return ret;
 }
 
+} // end of namespace spin

@@ -14,6 +14,9 @@
 
 #include <iostream>
 
+namespace spin
+{
+
 SearchVisitor::SearchVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
 {
     // Flag all osg object as NULL
@@ -246,3 +249,6 @@ void TextureStateSetFinder::apply(osg::StateSet* stateset)
 }
         
 TextureStateSetFinder& TextureStateSetFinder::operator= (const TextureStateSetFinder&) { return *this; }
+
+} // end of namespace spin
+

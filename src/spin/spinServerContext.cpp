@@ -54,6 +54,9 @@
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
+
 spinServerContext::spinServerContext() : syncThreadID(0)
 {
     using namespace spin_defaults;
@@ -288,6 +291,12 @@ void *spinServerContext::syncThread(void * /*arg*/)
 
 int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
+    if (!argc)
+    {
+        std::cout << "ERROR: got message for " << path << " without any method or arguments" << std::endl;
+        return 1;
+    }
+
     spinServerContext *context = static_cast<spinServerContext*>(user_data);
     std::string method(reinterpret_cast<const char*>(argv[0]));
 
@@ -317,7 +326,7 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     	return 1;
     }
 
-    if (method == "subscribe")
+    if ((method == "subscribe") && (argc==4))
     {
         std::string clientID(reinterpret_cast<const char*>(argv[1]));
 
@@ -441,7 +450,6 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     return 1;
 }
 
-
 void spinServerContext::refreshSubscribers()
 {
 	// TODO: call getState on all nodes in sceneManager and send them over TCP
@@ -451,4 +459,7 @@ void spinServerContext::refreshSubscribers()
 
     spinApp::Instance().sceneManager->refreshSubscribers(tcpClientAddrs_);
 }
+
+} // end of namespace spin
+
 

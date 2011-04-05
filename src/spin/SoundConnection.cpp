@@ -46,6 +46,9 @@
 #include "spinBaseContext.h"
 #include <iostream>
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructors:
 
@@ -516,3 +519,6 @@ void SoundConnection::stateDump (lo_address addr)
 {
     spinApp::Instance().NodeBundle(this->id, this->getState(), addr);
 }
+
+} // end of namespace spin
+

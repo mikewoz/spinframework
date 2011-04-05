@@ -39,7 +39,6 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-
 #include <boost/utility.hpp>
 #include <boost/python.hpp>
 #include <boost/python/raw_function.hpp>
@@ -51,18 +50,14 @@
 #include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
 #include <string.h>
-
 #include <iostream>
 #include <sstream>
-
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
-
 #include <cppintrospection/Reflection>
 #include <cppintrospection/Type>
 #include <cppintrospection/Value>
@@ -70,21 +65,20 @@
 #include <cppintrospection/Exceptions>
 #include <cppintrospection/MethodInfo>
 #include <cppintrospection/PropertyInfo>
-
 #include <cppintrospection/ReflectionMacros>
 #include <cppintrospection/TypedMethodInfo>
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
-
 #include <cppintrospection/ExtendedTypeInfo>
 #include <cppintrospection/variant_cast>
-
-
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "SceneManager.h"
 
 using namespace boost::python;
+
+namespace spin
+{
 
 /******************************************************************************/
 
@@ -215,7 +209,7 @@ int invokeMethod(const cppintrospection::Value classInstance,
     // a lookup every time there is a message:
 
     /*
-    const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
+    //const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
 
 
     if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
@@ -293,9 +287,6 @@ std::string pyextract( boost::python::object obj ) {
 
     return s;
 }
-
-
-
 
 /******************************************************************************/
 ValueWrapper SceneManagerCallback_script( const char* symName, const char* method,
@@ -436,6 +427,9 @@ BOOST_PYTHON_MODULE(libSPINPyWrap)
     ;
 
 }
+
+
+} // end of namespace spin
 
 
 /******************************************************************************/

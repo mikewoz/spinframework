@@ -56,7 +56,7 @@ class wxSpinTreeItemData : public wxTreeItemData
         m_pNode = NULL;
     }
     // FIXME: data should be private
-    osg::ref_ptr<ReferencedNode> m_pNode;
+    osg::observer_ptr<spin::ReferencedNode> m_pNode;
 };
 
 /**
@@ -109,12 +109,12 @@ public:
      * This method allows us to select a node in the tree programatically. It is
      * useful, for example, when the selected node is deleted.
      */
-    bool SelectNode(ReferencedNode* pNode);
+    bool SelectNode(spin::ReferencedNode* pNode);
 
     /**
      * Get the current ReferencedNode node that the user has selected in the tree
      */
-    ReferencedNode* GetSelectedNode() const;
+    spin::ReferencedNode* GetSelectedNode() const;
 
     /**
      * Updates the tree item's icon
@@ -126,12 +126,12 @@ private:
     /**
      * Adds the ReferencedNode node to the tree
      */
-    void addToTree(ReferencedNode *n, wxTreeItemId parentID);
+    void addToTree(spin::ReferencedNode *n, wxTreeItemId parentID);
 
     /**
      * GetTreeItem returns the wxTreeItemId given an ReferencedNode node pointer
      */
-    wxTreeItemId GetTreeItem(ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
+    wxTreeItemId GetTreeItem(spin::ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
 
     /**
      * GetTreeItem returns the wxTreeItemId given an id. This is useful in the case
@@ -144,7 +144,7 @@ private:
     /**
      * Get the ReferencedNode node stored in a TreeCtrl leaf
      */
-    ReferencedNode* GetNode(const wxTreeItemId& item) const;
+    spin::ReferencedNode* GetNode(const wxTreeItemId& item) const;
 
 
     /**

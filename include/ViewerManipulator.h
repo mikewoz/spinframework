@@ -47,12 +47,16 @@
 #include <cstdarg>
 #include "spinUtil.h" // for t_symbol
 
-// forward declarations
-class GroupNode;
 
 namespace osgViewer {
     class View;
 }
+
+namespace spin
+{
+
+// forward declarations
+class GroupNode;
 
 /**
  * \brief This class provides camera control and picking for viewers that render
@@ -86,7 +90,7 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         //GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
         //std::vector<GroupNode*> getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections);
 
-        void sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint);
+        void sendPick(GroupNode *hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint);
         void sendEvent(const char *nodeId, const char *types, ...);
         void sendEvent(const char *nodeId, const char *types, va_list ap);
 
@@ -108,5 +112,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         osg::Vec3 lastHitPoint;
 };
 
+} // end of namespace spin
 
-#endif
+
+
+#endif // include guard

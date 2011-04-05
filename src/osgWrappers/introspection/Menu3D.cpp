@@ -22,10 +22,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(Menu3D)
+BEGIN_OBJECT_REFLECTOR(spin::Menu3D)
 	I_DeclaringFile("Menu3D.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____Menu3D__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -59,7 +59,7 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	          __void__removeItem__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(int, doRemoveItem, IN, osg::observer_ptr< TextNode >, n,
+	I_Method1(int, doRemoveItem, IN, osg::observer_ptr< spin::TextNode >, n,
 	          Properties::NON_VIRTUAL,
 	          __int__doRemoveItem__osg_observer_ptrT1_TextNode_,
 	          "",
@@ -84,7 +84,7 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	          __void__setHighlighted__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(int, doHighlight, IN, osg::observer_ptr< TextNode >, n,
+	I_Method1(int, doHighlight, IN, osg::observer_ptr< spin::TextNode >, n,
 	          Properties::NON_VIRTUAL,
 	          __int__doHighlight__osg_observer_ptrT1_TextNode_,
 	          "",
@@ -134,7 +134,7 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	          __void__setFont__C5_char_P1,
 	          "",
 	          "wrapped from TextNode: ");
-	I_Method1(void, setBillboard, IN, TextNode::billboardType, t,
+	I_Method1(void, setBillboard, IN, spin::TextNode::billboardType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__TextNode_billboardType,
 	          "",
@@ -149,7 +149,7 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_SimpleProperty(TextNode::billboardType, Billboard, 
+	I_SimpleProperty(spin::TextNode::billboardType, Billboard, 
 	                 0, 
 	                 __void__setBillboard__TextNode_billboardType);
 	I_SimpleProperty(int, Enabled, 
@@ -171,4 +171,8 @@ BEGIN_OBJECT_REFLECTOR(Menu3D)
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::observer_ptr< spin::TextNode > >, spin::MenuVector)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::observer_ptr< spin::TextNode > >)
 

@@ -47,6 +47,9 @@
 #include <lo/lo_types.h> // for lo_message
 #include "spinUtil.h" // for t_symbol
 
+namespace spin
+{
+
 class SceneManager;
 class DSPNode;
 
@@ -111,5 +114,7 @@ class SoundConnection : virtual public osg::Node
         SceneManager *sceneManager;
 
 };
+
+} // end of namespace spin
 
 #endif

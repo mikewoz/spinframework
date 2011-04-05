@@ -64,6 +64,10 @@
 
 #include "ReferencedNode.h"
 
+
+namespace spin
+{
+
 #define Vec3inDegrees(v) (osg::Vec3( osg::RadiansToDegrees(v.x()), osg::RadiansToDegrees(v.y()), osg::RadiansToDegrees(v.z()) ))
 
 
@@ -137,6 +141,6 @@ class worldMatrixUpdater : public osg::NodeVisitor
 */
 
 
-
+} // end of namespace spin
 
 #endif

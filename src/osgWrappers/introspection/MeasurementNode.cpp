@@ -21,17 +21,17 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(MeasurementNode::reportMode)
+BEGIN_ENUM_REFLECTOR(spin::MeasurementNode::reportMode)
 	I_DeclaringFile("MeasurementNode.h");
-	I_EnumLabel(MeasurementNode::REPORT_NONE);
-	I_EnumLabel(MeasurementNode::REPORT_BASIC);
-	I_EnumLabel(MeasurementNode::REPORT_ANGLES);
+	I_EnumLabel(spin::MeasurementNode::REPORT_NONE);
+	I_EnumLabel(spin::MeasurementNode::REPORT_BASIC);
+	I_EnumLabel(spin::MeasurementNode::REPORT_ANGLES);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(MeasurementNode)
+BEGIN_OBJECT_REFLECTOR(spin::MeasurementNode)
 	I_DeclaringFile("MeasurementNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____MeasurementNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -50,7 +50,7 @@ BEGIN_OBJECT_REFLECTOR(MeasurementNode)
 	          __void__setTarget__C5_char_P1,
 	          "",
 	          "MeasurementNode requires a targetNode to be set, which defines which node in the scene is being measured. ");
-	I_Method1(void, setReportingLevel, IN, MeasurementNode::reportMode, level,
+	I_Method1(void, setReportingLevel, IN, spin::MeasurementNode::reportMode, level,
 	          Properties::NON_VIRTUAL,
 	          __void__setReportingLevel__reportMode,
 	          "",
@@ -70,9 +70,9 @@ BEGIN_OBJECT_REFLECTOR(MeasurementNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_SimpleProperty(MeasurementNode::reportMode, ReportingLevel, 
-	                 0, 
-	                 __void__setReportingLevel__reportMode);
+	I_SimpleProperty(int, ReportingLevel, 
+	                 __int__getReportingLevel, 
+	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

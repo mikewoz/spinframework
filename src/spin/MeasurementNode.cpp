@@ -47,6 +47,8 @@
 
 using namespace std;
 
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -90,7 +92,6 @@ void MeasurementNode::callbackUpdate()
         thisMatrix_ = mthis;
         targetMatrix_ = mtarget;
     }
-
     if ((int)reportingLevel_ > 0) sendMeasurements();
 }
 
@@ -170,10 +171,7 @@ void MeasurementNode::sendMeasurements()
         msg = lo_message_new();
         lo_message_add( msg, "sfff", "test", rotEulers.x(), rotEulers.y(), rotEulers.z());
         msgs.push_back(msg);
-
-
     }
-
     spinApp::Instance().NodeBundle(this->id, msgs);
 }
 
@@ -193,7 +191,6 @@ void MeasurementNode::setReportingLevel (reportMode level)
     BROADCAST(this, "si", "setReportingLevel", getReportingLevel());
 }
 
-
 // *****************************************************************************
 
 std::vector<lo_message> MeasurementNode::getState () const
@@ -202,8 +199,6 @@ std::vector<lo_message> MeasurementNode::getState () const
     std::vector<lo_message> ret = ReferencedNode::getState();
 
     lo_message msg;
-
-
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setTarget", this->getTarget());
     ret.push_back(msg);
@@ -214,3 +209,6 @@ std::vector<lo_message> MeasurementNode::getState () const
 
     return ret;
 }
+
+} // end of namespace spin
+

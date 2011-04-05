@@ -20,9 +20,9 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(spinClientContext)
+BEGIN_OBJECT_REFLECTOR(spin::spinClientContext)
 	I_DeclaringFile("spinClientContext.h");
-	I_BaseType(spinBaseContext);
+	I_BaseType(spin::spinBaseContext);
 	I_Constructor0(____spinClientContext,
 	               "",
 	               "");

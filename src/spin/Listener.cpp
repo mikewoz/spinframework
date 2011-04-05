@@ -46,6 +46,8 @@
 
 using namespace std;
 
+namespace spin
+{
 
 // ===================================================================
 // constructor:
@@ -62,7 +64,6 @@ Listener::Listener (SceneManager *sceneManager, char *initID) : SoundNode(sceneM
 Listener::~Listener()
 {
 }
-
 
 void Listener::setType (const char* t)
 {
@@ -84,3 +85,6 @@ std::vector<lo_message> Listener::getState () const
 	
 	return ret;
 }
+
+} // end of namespace spin
+

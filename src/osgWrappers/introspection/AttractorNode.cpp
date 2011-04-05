@@ -21,16 +21,16 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(AttractorNode::attractorMode)
+BEGIN_ENUM_REFLECTOR(spin::AttractorNode::attractorMode)
 	I_DeclaringFile("AttractorNode.h");
-	I_EnumLabel(AttractorNode::EXTRINSIC);
-	I_EnumLabel(AttractorNode::INTRINSIC);
+	I_EnumLabel(spin::AttractorNode::EXTRINSIC);
+	I_EnumLabel(spin::AttractorNode::INTRINSIC);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(AttractorNode)
+BEGIN_OBJECT_REFLECTOR(spin::AttractorNode)
 	I_DeclaringFile("AttractorNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____AttractorNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -59,7 +59,7 @@ BEGIN_OBJECT_REFLECTOR(AttractorNode)
 	          __float__getAngularDecay,
 	          "",
 	          "");
-	I_Method1(void, setAttractorMode, IN, AttractorNode::attractorMode, m,
+	I_Method1(void, setAttractorMode, IN, spin::AttractorNode::attractorMode, m,
 	          Properties::NON_VIRTUAL,
 	          __void__setAttractorMode__attractorMode,
 	          "",
@@ -97,9 +97,9 @@ BEGIN_OBJECT_REFLECTOR(AttractorNode)
 	I_SimpleProperty(float, AngularDecay, 
 	                 __float__getAngularDecay, 
 	                 __void__setAngularDecay__float);
-	I_SimpleProperty(AttractorNode::attractorMode, AttractorMode, 
-	                 0, 
-	                 __void__setAttractorMode__attractorMode);
+	I_SimpleProperty(int, AttractorMode, 
+	                 __int__getAttractorMode, 
+	                 0);
 	I_SimpleProperty(float, DistanceDecay, 
 	                 __float__getDistanceDecay, 
 	                 __void__setDistanceDecay__float);

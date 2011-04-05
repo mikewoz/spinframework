@@ -44,6 +44,9 @@
 
 #include "ReferencedNode.h"
 
+namespace spin
+{
+
 /**
  * \brief Reports geometric measurements in relation to another node
  * 
@@ -129,6 +132,6 @@ private:
     osg::Matrix thisMatrix_, targetMatrix_;
 };
 
-
+} // end of namespace spin
 
 #endif

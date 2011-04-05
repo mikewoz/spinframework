@@ -46,6 +46,9 @@
 #include <map>
 #include <string>
 
+namespace spin
+{
+
 /**
  * \brief A server-side spinContext for maintaining an instance of SPIN and
  * updating all clients
@@ -106,4 +109,9 @@ class spinServerContext : public spinBaseContext
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
 };
+
+
+} // end of namespace spin
+
+
 #endif

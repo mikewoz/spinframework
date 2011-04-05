@@ -46,6 +46,9 @@
 // *****************************************************************************
 // introspection helpers
 
+namespace spin
+{
+
 bool introspect_type_order(const cppintrospection::Type *v1, const cppintrospection::Type *v2)
 {
 	using namespace cppintrospection;
@@ -272,3 +275,6 @@ void introspect_print_all_types()
         introspect_print_type(**i);
     }
 }
+
+} // end of namespace spin
+

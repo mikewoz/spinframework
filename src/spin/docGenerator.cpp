@@ -70,6 +70,9 @@ using namespace std;
 #define OUTPUT_FILE "oscprotocol.html"
 #define DEBUG 0
 
+namespace docgenerator
+{
+
 
 static bool IsGoodParam(const ParameterInfo& param)
 {
@@ -239,11 +242,12 @@ static void GenerateHTML(const cppintrospection::Type &classType, ofstream& outp
 }
 
 
-
+} // end of namespace docgenerator
 
 
 int main()
 {
+	using namespace docgenerator;
 	//std::ostringstream output("");
 	
 	ofstream output(OUTPUT_FILE);
@@ -253,8 +257,8 @@ int main()
 		return 1;
 	}
 	
-	const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
-	const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("ReferencedStateSet");
+	const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
+	const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("spin::ReferencedStateSet");
 	
 	output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
 	output << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n";

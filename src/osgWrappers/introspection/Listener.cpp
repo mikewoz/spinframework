@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(Listener)
+BEGIN_OBJECT_REFLECTOR(spin::Listener)
 	I_DeclaringFile("Listener.h");
-	I_BaseType(SoundNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::SoundNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____Listener__SceneManager_P1__char_P1,
 	               "",
 	               "");

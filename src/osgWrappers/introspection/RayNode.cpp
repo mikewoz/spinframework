@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(RayNode)
+BEGIN_OBJECT_REFLECTOR(spin::RayNode)
 	I_DeclaringFile("RayNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____RayNode__SceneManager_P1__char_P1,
 	               "",
 	               "");

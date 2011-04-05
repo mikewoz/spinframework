@@ -48,6 +48,9 @@ namespace osg {
     class Switch;
 }
 
+namespace spin
+{
+
 /**
  * \brief Allows for selectively enabling/disabling child nodes
  *
@@ -93,6 +96,8 @@ private:
     osg::ref_ptr<osg::Switch> switcher;
 };
 
+
+} // end of namespace spin
 
 
 #endif

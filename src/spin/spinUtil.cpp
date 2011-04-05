@@ -52,7 +52,8 @@
 #include <osgDB/FileUtils>
 #include "spinUtil.h"
 
-
+namespace spin
+{
 
 // *****************************************************************************
 // networking functions
@@ -409,9 +410,10 @@ t_symbol *dogensym(const char *s, t_symbol *oldsym)
     return (sym2);
 }
 
-
 t_symbol *gensym(const char *s)
 {
     return(dogensym(s, 0));
 }
+
+} // end of namespace spin
 

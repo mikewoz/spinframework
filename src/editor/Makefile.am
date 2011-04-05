@@ -19,8 +19,6 @@ bin_PROGRAMS = spineditor
 spineditor_SOURCES = \
     introspection.cpp \
     introspection.h \
-    main_window.cpp \
-    main_window.h \
     main.cpp \
 	MainFrame.cpp \
 	MainFrame.h \

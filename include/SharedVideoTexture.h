@@ -62,6 +62,11 @@ namespace osg {
     class Image;
 }
 
+// forward declaration
+class SharedVideoBuffer;
+
+namespace spin
+{
 
 /**
  * \brief Allows sharing of a dynamc (video) GL texture from another process
@@ -81,8 +86,6 @@ namespace osg {
  * ie, this node still has reduced funtionality on non-supported platforms.
  */
 
-// forward declaration
-class SharedVideoBuffer;
 
 class SharedVideoTexture : public ReferencedStateSet
 {
@@ -150,5 +153,7 @@ class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::
         }
 };
 */
+
+} // end of namespace spin
 
 #endif

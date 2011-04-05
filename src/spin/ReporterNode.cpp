@@ -51,6 +51,9 @@
 using namespace std;
 
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructor:
 ReporterNode::ReporterNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
@@ -407,5 +410,4 @@ int ReporterNode::getReporting(const char *type) const
         return 0; // default value for bool == false, which as an int will be 0
 }
 
-
-
+} // end of namespace spin

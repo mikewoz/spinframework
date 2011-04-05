@@ -44,22 +44,19 @@
 #include <osg/TexEnv>
 #include <osg/StateSet>
 #include <osg/StateAttribute>
-
-
 #include <iostream>
-
-
-
 #include "videoSize.h"
 #include "osgUtil.h"
 #include "SharedVideoNode.h"
 #include "SceneManager.h"
 #include "MediaManager.h"
 
-
 static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
 
 using namespace std;
+
+namespace spin
+{
 
 // ===================================================================
 // constructor:
@@ -87,7 +84,6 @@ SharedVideoNode::~SharedVideoNode()
 {
 
 }
-
 
 void SharedVideoNode::callbackUpdate()
 {
@@ -118,15 +114,9 @@ void SharedVideoNode::callbackUpdate()
         //textureImage->flipVertical();
 
         //textureImage->setOrigin(osg::Image::TOP_LEFT);
-
-
         textureUploadedCondition_.notify_one();
-
     }
-
-
 }
-
 
 /// This function is executed in the worker thread
 void SharedVideoNode::consumeFrame()
@@ -138,7 +128,6 @@ void SharedVideoNode::consumeFrame()
     // get frames until the other process marks the end
     bool end_loop = false;
 
-
     // make sure there's no sentinel
     {
         // Lock the mutex
@@ -146,20 +135,14 @@ void SharedVideoNode::consumeFrame()
         sharedBuffer->startPushing();   // tell appsink to give us buffers
     }
 
-
-
     do
     {
         {
-
-
             // Lock the mutex
             scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
-
             // wait for new buffer to be pushed if it's empty
             sharedBuffer->waitOnProducer(lock);
-
 
             if (!sharedBuffer->isPushing())
                 end_loop = true;
@@ -167,9 +150,7 @@ void SharedVideoNode::consumeFrame()
             {
                 // got a new buffer, wait until we upload it in gl thread before notifying producer
                 {
-
                     boost::mutex::scoped_lock displayLock(displayMutex_);
-
                     if (killed_)
                     {
                         sharedBuffer->stopPushing();   // tell appsink not to give us any more buffers
@@ -178,7 +159,6 @@ void SharedVideoNode::consumeFrame()
                     else
                         textureUploadedCondition_.wait(displayLock);
                 }
-
                 // Notify the other process that the buffer status has changed
                 sharedBuffer->notifyProducer();
             }
@@ -186,7 +166,6 @@ void SharedVideoNode::consumeFrame()
         }
     }
     while (!end_loop);
-
 
     // erase shared memory
     //shared_memory_object::remove(textureID.c_str());
@@ -379,9 +358,7 @@ void SharedVideoNode::drawTexture()
         shapeStateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
         shapeGeode->setStateSet( shapeStateSet );
-
     }
-
 }
 
 std::vector<lo_message> SharedVideoNode::getState () const
@@ -397,4 +374,7 @@ std::vector<lo_message> SharedVideoNode::getState () const
 
     return ret;
 }
+
+} // end of namespace spin
+
 

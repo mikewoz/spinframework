@@ -20,7 +20,7 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(MediaManager)
+BEGIN_VALUE_REFLECTOR(spin::MediaManager)
 	I_DeclaringFile("MediaManager.h");
 	I_Constructor1(IN, const std::string &, dataPath,
 	               Properties::NON_EXPLICIT,

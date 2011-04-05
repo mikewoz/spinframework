@@ -73,6 +73,9 @@
 // TODO: make mutex a static member (perhaps of spinApp)?
 pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
 
+namespace spin
+{
+
 
 /**
  * All threads need to stop according to the following flag. Note this used to
@@ -114,11 +117,12 @@ spinBaseContext::spinBaseContext() :
     if (infoPortStr)
     {
         std::string tmpStr = std::string(infoPortStr);
-        std::string infoAddr = tmpStr.substr(0,tmpStr.rfind(":"));
-        std::string infoPort = tmpStr.substr(tmpStr.find(":")+1);
+        std::string infoAddr = tmpStr.substr(0, tmpStr.rfind(":"));
+        std::string infoPort = tmpStr.substr(tmpStr.find(":") + 1);
         lo_infoAddr = lo_address_new(infoAddr.c_str(), infoPort.c_str());
     }
 }
+
 /**
  * Destructor 
  * 
@@ -129,14 +133,14 @@ spinBaseContext::~spinBaseContext()
     this->stop();
 	
     std::vector<lo_address>::iterator addrIter;
-    for (addrIter=lo_rxAddrs_.begin(); addrIter != lo_rxAddrs_.end(); ++addrIter)
+    for (addrIter = lo_rxAddrs_.begin(); addrIter != lo_rxAddrs_.end(); ++addrIter)
     {
     	lo_address_free(*addrIter);
     }
     lo_rxAddrs_.clear();
 
     std::vector<lo_server>::iterator servIter;
-    for (servIter=lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
+    for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
         lo_server_free(*servIter);
     lo_rxServs_.clear();
 
@@ -159,6 +163,7 @@ void spinBaseContext::setLog(spinLog &log)
         lo_server_add_method((*it), NULL, NULL, logCallback, &log);
     }
 }
+
 /**
  * Signal handler. 
  * 
@@ -217,14 +222,16 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
     //pthread_join(pthreadID, NULL); // if not DETACHED thread
 
     // wait until the thread gets into it's loop before returning:
-    while (!running) usleep(10);
+    while (! running)
+        usleep(10);
 
     return true;
 }
 
 void spinBaseContext::stop()
 {
-    if (isRunning()) signalStop = true;
+    if (isRunning())
+        signalStop = true;
 
     if (pthreadID != 0) 
     {
@@ -239,21 +246,24 @@ int spinBaseContext::connectionCallback(const char *path,
         void * /*data*/, 
         void *user_data)
 {
-    std::string theMethod, idStr;
+    std::string idStr;
+    std::string theMethod;
 
     // make sure there is at least one argument (ie, a method to call):
-    if (!argc) return 1;
+    if (! argc)
+        return 1;
 
     // get the method (argv[0]):
-    if (lo_is_string_type((lo_type)types[0]))
+    if (lo_is_string_type((lo_type) types[0]))
     {
-        theMethod = std::string((char *)argv[0]);
+        theMethod = std::string((char *) argv[0]);
     }
-    else return 1;
+    else
+        return 1;
 
     // get the instance of the connection:
     SoundConnection *conn = (SoundConnection*) user_data;
-    if (!conn)
+    if (! conn)
     {
         std::cout << "oscParser: Could not find connection: " << idStr << std::endl;
         return 1;
@@ -261,33 +271,32 @@ int spinBaseContext::connectionCallback(const char *path,
 
     // TODO: replace method call with osg::Introspection
 
-    if (theMethod=="stateDump")
+    if (theMethod == "stateDump")
         conn->stateDump();
-    else if (theMethod=="debug")
+    else if (theMethod == "debug")
         conn->debug();
-    else if ((argc==2) && (lo_is_numerical_type((lo_type)types[1])))
+    else if ((argc==2) && (lo_is_numerical_type((lo_type) types[1])))
     {
-        float value = lo_hires_val((lo_type)types[1], argv[1]);
+        float value = lo_hires_val((lo_type) types[1], argv[1]);
 
-        if (theMethod=="setThru")
+        if (theMethod == "setThru")
             conn->setThru((bool) value);
-        else if (theMethod=="setDistanceEffect")
+        else if (theMethod == "setDistanceEffect")
             conn->setDistanceEffect(value);
-        else if (theMethod=="setRolloffEffect")
+        else if (theMethod == "setRolloffEffect")
             conn->setRolloffEffect(value);
-        else if (theMethod=="setDopplerEffect")
+        else if (theMethod == "setDopplerEffect")
             conn->setDopplerEffect(value);
-        else if (theMethod=="setDiffractionEffect")
+        else if (theMethod == "setDiffractionEffect")
             conn->setDiffractionEffect(value);
         else
             std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
     }
-
     else
         std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-
     return 1;
 }
+
 /**
  * Callback for messages sent to a node in the scene graph.
  * 
@@ -307,14 +316,15 @@ int spinBaseContext::connectionCallback(const char *path,
 int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **argv, int argc, void * /*data*/, void *user_data)
 {
     // NOTE: user_data is a t_symbol pointer
+    // FIXME: this method is way too long
 
     int i;
     std::string theMethod, nodeStr;
     cppintrospection::ValueList theArgs;
 
     // make sure there is at least one argument (ie, a method to call):
-    if (!argc) return 1;
-
+    if (! argc)
+        return 1;
     // get the method (argv[0]):
     if (lo_is_string_type((lo_type)types[0]))
     {
@@ -322,11 +332,9 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     }
     else
         return 1;
-
-
     t_symbol *s = (t_symbol*) user_data;
-
-    if (!s->s_thing)
+    
+    if (! s->s_thing)
     {
         std::cout << "oscParser: Could not find referenced object named: " << nodeStr << std::endl;
         return 1;
@@ -345,11 +353,10 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
         classInstance = cppintrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
     }
 
-
     // the getInstanceType() method however, gives us the real type being pointed at:
     const cppintrospection::Type &classType = classInstance.getInstanceType();
 
-    if (!classType.isDefined())
+    if (! classType.isDefined())
     {
         std::cout << "ERROR: oscParser cound not process message '" << path << ". cppintrospection has no data for that node." << std::endl;
         return 1;
@@ -357,203 +364,248 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     spinApp &spin = spinApp::Instance();
 
-    if (theMethod == "addCronScript") {
-
+    if (theMethod == "addCronScript")
+    {
         // client or server?
-        if ( !lo_is_numerical_type((lo_type)types[1]) ) {
-
-            std::string s( (const char*)argv[1] );
-            if ( s[0] == 'S' || s[0] == 's' ) {
-
-                if ( !spin.getContext()->isServer() ) return 0;
-                theArgs.push_back( true );
-
-            } else if ( s[0] == 'C' || s[0] == 'c' ) {
-
-                if ( spin.getContext()->isServer() ) {
+        if (! lo_is_numerical_type((lo_type)types[1]))
+        {
+            std::string s((const char*) argv[1]);
+            if (s[0] == 'S' || s[0] == 's')
+            {
+                if (! spin.getContext()->isServer())
+                    return 0;
+                theArgs.push_back(true);
+            }
+            else if (s[0] == 'C' || s[0] == 'c')
+            {
+                if (spin.getContext()->isServer())
+                {
                     lo_message msg = lo_message_new();
-                    for (int i = 0; i < argc; i++) {
-                        if (lo_is_numerical_type((lo_type)types[i])) {
-                            lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
-                        } else {
+                    for (int i = 0; i < argc; i++)
+                    {
+                        if (lo_is_numerical_type((lo_type) types[i]))
+                        {
+                            lo_message_add_float(msg, (float) lo_hires_val((lo_type) types[i], argv[i]));
+                        }
+                        else
+                        {
                             lo_message_add_string(msg, (const char*) argv[i] );
                         }
                     }
                     lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
-
                 }
-                theArgs.push_back( false ); // serverSide arg
-
-            } else {
+                theArgs.push_back(false); // serverSide arg
+            }
+            else
+            {
                 std::cout << "wrong server / client specifier... must be C or S" << std::endl;
             }
 
-        } else {
+        }
+        else
+        {
             std::cout << "ERROR: client or server specifier for addCronScript is not a char" << std::endl;
             return 1;
         }
 
         // label
-        if (!lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back( std::string( (const char*)argv[2] ) );
-        } else {
+        if (! lo_is_numerical_type((lo_type)types[2]))
+        {
+            theArgs.push_back(std::string((const char*) argv[2]));
+        }
+        else
+        {
             std::cout << "ERROR: label for addCronScript is not a string" << std::endl;
             return 1;
         }
 
         // Script path
-        if (!lo_is_numerical_type((lo_type)types[3])) {
-            theArgs.push_back( std::string( (const char*)argv[3] ) );
+        if (! lo_is_numerical_type((lo_type) types[3]))
+        {
+            theArgs.push_back(std::string((const char*) argv[3]));
         } else {
             std::cout << "ERROR: script path for addCronScript is not a string" << std::endl;
             return 1;
         }
 
         // frequency
-        if (lo_is_numerical_type((lo_type)types[4])) {
-            theArgs.push_back( (double) lo_hires_val((lo_type)types[4], argv[4]) );
-        } else {
+        if (lo_is_numerical_type((lo_type) types[4]))
+        {
+            theArgs.push_back((double) lo_hires_val((lo_type) types[4], argv[4]) );
+        }
+        else
+        {
             std::cout << "ERROR: frequency for addCronScript is not a number" << std::endl;
             return 1;
         }
 
         // rest of args are comma separated and passed as a string
         std::stringstream params("");
-        for (i = 5; i < argc; i++) {
-            if (lo_is_numerical_type((lo_type)types[i]))  {
-                params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
-            } else {
+        for (i = 5; i < argc; i++)
+        {
+            if (lo_is_numerical_type((lo_type) types[i]))
+            {
+                params << ", " << (float) lo_hires_val((lo_type) types[i], argv[i]);
+            }
+            else
+            {
                 params << ", \"" << (const char*)argv[i] << "\"";
             }
         }
-        theArgs.push_back( params.str() );
-
-    } else if (theMethod == "addEventScript") {
-
+        theArgs.push_back(params.str());
+    }
+    else if (theMethod == "addEventScript")
+    {
         // client or server?
-        if ( !lo_is_numerical_type((lo_type)types[1]) ) { /// (lo_type)types[1] == LO_CHAR )
-            std::string s( (const char*)argv[1] );
-
-            if ( s[0] == 'S' || s[0] == 's' ) {
-
-                if ( !spin.getContext()->isServer() ) return 0;
-                theArgs.push_back( true );
-
-            } else if ( s[0] == 'C' || s[0] == 'c' ) {
-
-                if ( spin.getContext()->isServer() ) {
+        if (! lo_is_numerical_type((lo_type) types[1]))
+        { /// (lo_type)types[1] == LO_CHAR )
+            std::string s((const char*) argv[1]);
+            if (s[0] == 'S' || s[0] == 's')
+            {
+                if (! spin.getContext()->isServer())
+                    return 0;
+                theArgs.push_back(true);
+            } 
+            else if (s[0] == 'C' || s[0] == 'c')
+            {
+                if (spin.getContext()->isServer())
+                {
                     lo_message msg = lo_message_new();
-                    for (int i = 0; i < argc; i++) {
-                        if (lo_is_numerical_type((lo_type)types[i])) {
-                            lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
-                        } else {
-                            lo_message_add_string(msg, (const char*) argv[i] );
+                    for (int i = 0; i < argc; i++)
+                    {
+                        if (lo_is_numerical_type((lo_type) types[i]))
+                        {
+                            lo_message_add_float(msg, (float) lo_hires_val((lo_type) types[i], argv[i]));
+                        }
+                        else
+                        {
+                            lo_message_add_string(msg, (const char*) argv[i]);
                         }
                     }
                     lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
                 }
-                theArgs.push_back( false ); // serverSide arg
+                theArgs.push_back(false); // serverSide arg
             }
-        } else {
+        }
+        else 
+        {
             std::cout << "ERROR: client or server specifier for addCronScript is not a char" << std::endl;
             return 1;
         }
 
         // label
-        if (!lo_is_numerical_type((lo_type)types[2])) {
-            theArgs.push_back( std::string( (const char*)argv[2] ) );
-        } else {
+        if (! lo_is_numerical_type((lo_type) types[2])) {
+            theArgs.push_back(std::string((const char*) argv[2]));
+        }
+        else
+        {
             std::cout << "ERROR: label for addEventScript is not a string" << std::endl;
             return 1;
         }
 
         // event method name
-        if (!lo_is_numerical_type((lo_type)types[3])) {
-            theArgs.push_back( std::string( (const char*)argv[3] ) );
-        } else {
+        if (! lo_is_numerical_type((lo_type) types[3]))
+        {
+            theArgs.push_back(std::string((const char*) argv[3]));
+        }
+        else 
+        {
             std::cout << "ERROR: event method name for addEventScript is not a string" << std::endl;
             return 1;
         }
 
         // Script path
-        if (!lo_is_numerical_type((lo_type)types[4])) {
-            theArgs.push_back(  std::string( (const char*)argv[4] ) );
-        } else {
+        if (! lo_is_numerical_type((lo_type) types[4]))
+        {
+            theArgs.push_back(std::string((const char*) argv[4]));
+        }
+        else 
+        {
             std::cout << "ERROR: script path for addEventScript is not a string" << std::endl;
             return 1;
         }
 
         // rest of args are comma separated and passed as a string
         std::stringstream params("");
-        for (i = 5; i < argc; i++) {
-            if (lo_is_numerical_type((lo_type)types[i]))  {
-                params << ", " << (float) lo_hires_val((lo_type)types[i], argv[i]);
-            } else {
-                params << ", \"" << (const char*)argv[i] << "\"";
+        for (i = 5; i < argc; i++)
+        {
+            if (lo_is_numerical_type((lo_type) types[i]))
+            {
+                params << ", " << (float) lo_hires_val((lo_type) types[i], argv[i]);
+            }
+            else 
+            {
+                params << ", \"" << (const char*) argv[i] << "\"";
             }
         }
-
-        theArgs.push_back( params.str() );
-
-    } else {
-
-        for (i=1; i<argc; i++) {
-            if (lo_is_numerical_type((lo_type)types[i]))  {
-                theArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-            } else {
-                theArgs.push_back( (const char*) argv[i] );
+        theArgs.push_back(params.str());
+    }
+    else 
+    {
+        for (i = 1; i < argc; i++) 
+        {
+            if (lo_is_numerical_type((lo_type)types[i]))
+            {
+                theArgs.push_back((float) lo_hires_val((lo_type)types[i], argv[i]));
+            } 
+            else
+            {
+                theArgs.push_back((const char*) argv[i]);
             }
         }
     }
 
-    if ( spin.getContext()->isServer() &&
+    if (spin.getContext()->isServer() &&
             (theMethod == "enableCronScript" || theMethod == "removeCronScript" ||
-             theMethod == "enableEventScript" || theMethod == "removeEventScript") ) {
-
+             theMethod == "enableEventScript" || theMethod == "removeEventScript"))
+    {
         lo_message msg = lo_message_new();
-        for (int i = 0; i < argc; i++) {
-            if (lo_is_numerical_type((lo_type)types[i])) {
+        for (int i = 0; i < argc; i++)
+        {
+            if (lo_is_numerical_type((lo_type)types[i]))
+            {
                 lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
-            } else {
+            } 
+            else
+            {
                 lo_message_add_string(msg, (const char*) argv[i] );
             }
         }
         lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
-
     }
 
     bool eventScriptCalled = false;
-    if ( s->s_type == REFERENCED_NODE ) {
+    if ( s->s_type == REFERENCED_NODE )
+    {
         //printf("calling eventscript...\n");
         eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, theArgs );
     }
 
-    if ( !eventScriptCalled ) { // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
+    if (! eventScriptCalled ) 
+    {   // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
         // invoke the method on the node, and if it doesn't work, then just forward
         // the message:
-        if (!invokeMethod(classInstance, classType, theMethod, theArgs))
+        if (! invokeMethod(classInstance, classType, theMethod, theArgs))
         {
             //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
             // HACK: TODO: fix this
             if (spin.getContext()->isServer())
             {
                 lo_message msg = lo_message_new();
-                for (i=0; i<argc; i++)
+                for (i = 0; i < argc; i++)
                 {
-                    if (lo_is_numerical_type((lo_type)types[i]))
+                    if (lo_is_numerical_type((lo_type) types[i]))
                     {
-                        lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+                        lo_message_add_float(msg, (float) lo_hires_val((lo_type) types[i], argv[i]));
                     } else {
-                        lo_message_add_string(msg, (const char*) argv[i] );
+                        lo_message_add_string(msg, (const char*) argv[i]);
                     }
                 }
                 lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
             }
         }
     }
-
     //pthread_mutex_unlock(&sceneMutex);
-
     return 1;
 }
 
@@ -603,27 +655,28 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     //pthread_mutex_lock(&sceneMutex);
 
     // note that args start at argv[1] now:
-    if (theMethod=="debug")
+    if (theMethod == "debug")
         sceneManager->debug();
-    else if (theMethod=="clear")
+    else if (theMethod == "clear")
         sceneManager->clear();
-    else if (theMethod=="clearUsers")
+    else if (theMethod == "clearUsers")
         sceneManager->clearUsers();
-    else if (theMethod=="clearStates")
+    else if (theMethod == "clearStates")
         sceneManager->clearStates();
-    else if (theMethod=="userRefresh")
+    else if (theMethod == "userRefresh")
     {
         if (spin.getContext()->isServer())
         {
             SCENE_MSG("s", "userRefresh");
         }
-        else {
+        else
+        {
             spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
         }
     }
-    else if (theMethod=="refresh")
+    else if (theMethod == "refresh")
         sceneManager->refreshAll();
-    else if (theMethod=="refreshSubscribers")
+    else if (theMethod == "refreshSubscribers")
     {
         if (spin.getContext()->isServer())
         {
@@ -631,53 +684,56 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             server->refreshSubscribers();
         }
     }
-    else if (theMethod=="getNodeList")
+    else if (theMethod == "getNodeList")
         sceneManager->sendNodeList("*");
-    else if ((theMethod=="nodeList") && (argc>2))
+    else if ((theMethod == "nodeList") && (argc>2))
     {
-        for (int i=2; i<argc; i++)
+        for (int i = 2; i < argc; i++)
         {
-            if (strcmp((char*)argv[i],"NULL")!=0) sceneManager->createNode((char*)argv[i], (char*)argv[1]);
+            if (strcmp((char*) argv[i],"NULL") != 0)
+                sceneManager->createNode((char*)argv[i], (char*)argv[1]);
         }
     }
     else if ((theMethod=="stateList") && (argc>2))
     {
         for (int i=2; i<argc; i++)
         {
-            if (strcmp((char*)argv[i],"NULL")!=0) sceneManager->createStateSet((char*)argv[i], (char*)argv[1]);
+            if (strcmp((char*) argv[i],"NULL") != 0)
+                sceneManager->createStateSet((char*) argv[i], (char*) argv[1]);
         }
     }
-    else if ((theMethod=="exportScene") && (argc==3))
-        sceneManager->exportScene((char*)argv[1], (char*)argv[2]);
-    else if ((theMethod=="load") && (argc==2))
-        sceneManager->loadXML((char*)argv[1]);
-    else if ((theMethod=="save") && (argc==2))
-        sceneManager->saveXML((char*)argv[1]);
-    else if ((theMethod=="saveAll") && (argc==2))
-        sceneManager->saveXML((char*)argv[1], true);
-    else if ((theMethod=="saveUsers") && (argc==2))
-        sceneManager->saveUsers((char*)argv[1]);
-    else if ((theMethod=="createNode") && (argc==3))
-        sceneManager->createNode((char*)argv[1], (char*)argv[2]);
-    else if ((theMethod=="createStateSet") && (argc==3))
-        sceneManager->createStateSet((char*)argv[1], (char*)argv[2]);
-    else if ((theMethod=="createStateSet") && (argc==2))
-        sceneManager->createStateSet((char*)argv[1]);
-    else if ((theMethod=="deleteNode") && (argc==2))
-        sceneManager->deleteNode((char*)argv[1]);
-    else if ((theMethod=="deleteGraph") && (argc==2))
-        sceneManager->deleteGraph((char*)argv[1]);
-    else if ((theMethod=="optimize") && (argc==2))
+    else if ((theMethod == "exportScene") && (argc==3))
+        sceneManager->exportScene((char*) argv[1], (char*) argv[2]);
+    else if ((theMethod == "load") && (argc==2))
+        sceneManager->loadXML((char*) argv[1]);
+    else if ((theMethod == "save") && (argc==2))
+        sceneManager->saveXML((char*) argv[1]);
+    else if ((theMethod == "saveAll") && (argc==2))
+        sceneManager->saveXML((char*) argv[1], true);
+    else if ((theMethod == "saveUsers") && (argc==2))
+        sceneManager->saveUsers((char*) argv[1]);
+    else if ((theMethod == "createNode") && (argc==3))
+        sceneManager->createNode((char*) argv[1], (char*) argv[2]);
+    else if ((theMethod == "createStateSet") && (argc==3))
+        sceneManager->createStateSet((char*) argv[1], (char*) argv[2]);
+    else if ((theMethod == "createStateSet") && (argc==2))
+        sceneManager->createStateSet((char*) argv[1]);
+    else if ((theMethod == "deleteNode") && (argc==2))
+        sceneManager->deleteNode((char*) argv[1]);
+    else if ((theMethod == "deleteGraph") && (argc==2))
+        sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "optimize") && (argc==2))
     {
         osgUtil::Optimizer optimizer;
-        if (std::string((char*)argv[1])=="all")
+        if (std::string((char*) argv[1]) == "all")
         {
             std::cout << "Optimizing scene (all)" << std::endl;
             pthread_mutex_lock(&sceneMutex); 
             optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
-            pthread_mutex_unlock(&sceneMutex); 
-
-        } else {
+            pthread_mutex_unlock(&sceneMutex);
+        }
+        else
+        {
             std::cout << "Optimizing scene" << std::endl;
             pthread_mutex_lock(&sceneMutex); 
             optimizer.optimize(sceneManager->worldNode.get());
@@ -685,7 +741,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         }
         SCENE_MSG("ss", "optimize", (char*)argv[1]);
     }
-    else {
+    else
+    {
         // FIXME: this used to rebroadcast messages that did not match command
 #if 0
         spinApp &spin = spinApp::Instance();
@@ -714,18 +771,16 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     return 1;
 }
 
-
-
 int spinBaseContext::logCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data)
 {
     spinLog *log = (spinLog*) user_data;
 
     *log << path << ' ' << types << ' ';
-    for (int i=0; i<argc; i++)
+    for (int i = 0; i < argc; i++)
     {
-        if (lo_is_numerical_type((lo_type)types[i]))
+        if (lo_is_numerical_type((lo_type) types[i]))
         {
-            *log << (float) lo_hires_val((lo_type)types[i], argv[i]);
+            *log << (float) lo_hires_val((lo_type) types[i], argv[i]);
         } else {
             *log << (const char*) argv[i];
         }
@@ -740,17 +795,16 @@ int spinBaseContext::debugCallback(const char *path, const char *types, lo_arg *
 {
     printf("************ oscCallback_debug() got message: %s\n", (char*)path);
     printf("user_data: %s\n", (char*) user_data);
-    for (int i=0; i<argc; i++) {
+    for (int i = 0; i < argc; i++)
+    {
         printf("arg %d '%c' ", i, types[i]);
         lo_arg_pp((lo_type) types[i], argv[i]);
         printf("\n");
     }
     printf("\n");
     fflush(stdout);
-
     return 1;
 }
-
 
 void spinBaseContext::oscParser_error(int num, const char *msg, const char *path)
 {
@@ -840,3 +894,6 @@ void spinBaseContext::createServers()
         }
     }
 }
+
+} // end of namespace spin
+

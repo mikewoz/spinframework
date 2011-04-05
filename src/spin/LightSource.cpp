@@ -52,6 +52,8 @@ using namespace std;
 
 //extern SceneManager *sceneManager;
 
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -311,3 +313,5 @@ float LightSource::getAttenuation()	const { return this->_attenuation; }
 osg::Vec4 LightSource::getAmbient() const { return this->_ambient; }
 osg::Vec4 LightSource::getDiffuse() const { return this->_diffuse; }
 osg::Vec4 LightSource::getSpecular() const { return this->_specular; }
+
+} // end of namespace spin

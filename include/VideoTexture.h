@@ -44,11 +44,14 @@
 
 #include "ReferencedStateSet.h"
 
-class SceneManager;
-
 namespace osg {
     class ImageStream;
 }
+
+namespace spin
+{
+	
+class SceneManager;
 
 /**
  * \brief A video texture node that allows dynamic textures to be applied
@@ -138,4 +141,7 @@ private:
 };
 
 
-#endif
+} // end of namespace spin
+
+#endif // include guard
+

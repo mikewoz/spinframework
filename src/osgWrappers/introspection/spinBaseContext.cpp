@@ -20,13 +20,13 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(spinBaseContext::SpinContextMode)
+BEGIN_ENUM_REFLECTOR(spin::spinBaseContext::SpinContextMode)
 	I_DeclaringFile("spinBaseContext.h");
-	I_EnumLabel(spinBaseContext::SERVER_MODE);
-	I_EnumLabel(spinBaseContext::CLIENT_MODE);
+	I_EnumLabel(spin::spinBaseContext::SERVER_MODE);
+	I_EnumLabel(spin::spinBaseContext::CLIENT_MODE);
 END_REFLECTOR
 
-BEGIN_ABSTRACT_OBJECT_REFLECTOR(spinBaseContext)
+BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	I_DeclaringFile("spinBaseContext.h");
 	I_Constructor0(____spinBaseContext,
 	               "",
@@ -84,7 +84,7 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spinBaseContext)
 	                __void__oscParser_error__int__C5_char_P1__C5_char_P1_S,
 	                "",
 	                "");
-	I_ProtectedMethod1(void, setLog, IN, spinLog &, log,
+	I_ProtectedMethod1(void, setLog, IN, spin::spinLog &, log,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
 	                   __void__setLog__spinLog_R1,

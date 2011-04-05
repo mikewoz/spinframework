@@ -53,6 +53,9 @@
 
 #include <vector>
 
+namespace spin
+{
+
 class UserNode;
 class SceneManager;
 
@@ -259,5 +262,7 @@ private:
     osg::Timer_t lastTick;
 
 };
+
+} // end of namespace spin
 
 #endif

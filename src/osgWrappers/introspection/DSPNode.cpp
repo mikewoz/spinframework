@@ -22,24 +22,24 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(DSPNode)
+BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_DeclaringFile("DSPNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____DSPNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
-	I_Method1(SoundConnection *, getConnection, IN, DSPNode *, snk,
+	I_Method1(spin::SoundConnection *, getConnection, IN, spin::DSPNode *, snk,
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__DSPNode_P1,
 	          "",
 	          "");
-	I_Method1(SoundConnection *, getConnection, IN, const char *, snk,
+	I_Method1(spin::SoundConnection *, getConnection, IN, const char *, snk,
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(void, connect, IN, DSPNode *, snk,
+	I_Method1(void, connect, IN, spin::DSPNode *, snk,
 	          Properties::NON_VIRTUAL,
 	          __void__connect__DSPNode_P1,
 	          "",
@@ -93,7 +93,7 @@ BEGIN_OBJECT_REFLECTOR(DSPNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_PublicMemberProperty(std::vector< SoundConnection * >, connectTO);
-	I_PublicMemberProperty(std::vector< SoundConnection * >, connectFROM);
+	I_PublicMemberProperty(std::vector< spin::SoundConnection * >, connectTO);
+	I_PublicMemberProperty(std::vector< spin::SoundConnection * >, connectFROM);
 END_REFLECTOR
 

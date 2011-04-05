@@ -38,7 +38,7 @@ MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent)
 
 
     // ask for refresh:
-    spinApp::Instance().SceneMessage("s", "refresh", LO_ARGS_END);
+    spin::spinApp::Instance().SceneMessage("s", "refresh", SPIN_ARGS_END);
 }
 
 
@@ -87,7 +87,7 @@ void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-    wxIcon SPINIcon(spinApp::Instance().sceneManager->resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
+    wxIcon SPINIcon(spin::spinApp::Instance().sceneManager->resourcesPath + wxT("/images/spin_48x48.png"), wxBITMAP_TYPE_PNG);
     wxAboutDialogInfo info;
     info.SetVersion(_(PACKAGE_VERSION));
     info.SetName(_("SPIN Editor"));
@@ -131,7 +131,7 @@ void MainFrame::OnDeleteNode( wxCommandEvent& WXUNUSED(event) )
 {
     // get currently selected node in the tree and tell the server to delete it:
 
-    ReferencedNode* n = spinTreeCtrl->GetSelectedNode();
+    spin::ReferencedNode* n = spinTreeCtrl->GetSelectedNode();
 
     if (n)
     {
@@ -140,14 +140,14 @@ void MainFrame::OnDeleteNode( wxCommandEvent& WXUNUSED(event) )
         if (answer == wxYES)
         {
             std::cout << "Attempting to delete node: " << n->getID() << std::endl;
-            spinApp::Instance().SceneMessage("ss", "deleteNode", n->getID().c_str(), LO_ARGS_END);
+            spin::spinApp::Instance().SceneMessage("ss", "deleteNode", n->getID().c_str(), SPIN_ARGS_END);
         }
     }
 }
 
 void MainFrame::OnRefreshScene( wxCommandEvent& WXUNUSED(event) )
 {
-    spinApp::Instance().SceneMessage("s", "refresh", LO_ARGS_END);
+    spin::spinApp::Instance().SceneMessage("s", "refresh", SPIN_ARGS_END);
 }
 
 void MainFrame::OnClearScene( wxCommandEvent& WXUNUSED(event) )
@@ -158,7 +158,7 @@ void MainFrame::OnClearScene( wxCommandEvent& WXUNUSED(event) )
     if (answer == wxYES)
     {
         std::cout << "Attempting to clear scene" << std::endl;
-        spinApp::Instance().SceneMessage("s", "clear", LO_ARGS_END);
+        spin::spinApp::Instance().SceneMessage("s", "clear", SPIN_ARGS_END);
     }
 }
 
@@ -174,5 +174,5 @@ void MainFrame::OnToggleViewer( wxCommandEvent& WXUNUSED(event) )
 
 void MainFrame::OnSceneDebug( wxCommandEvent& WXUNUSED(event) )
 {
-    spinApp::Instance().SceneMessage("s", "debug", LO_ARGS_END);
+    spin::spinApp::Instance().SceneMessage("s", "debug", SPIN_ARGS_END);
 }
