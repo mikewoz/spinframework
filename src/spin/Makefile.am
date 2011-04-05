@@ -75,7 +75,59 @@ libSPIN_la_SOURCES = \
     introspect_helpers.cpp
 
 libSPIN_la_includedir = $(includedir)/spinFramework
-libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h
+libSPIN_la_include_HEADERS = \
+    $(top_srcdir)/include/AnimationNode.h \
+    $(top_srcdir)/include/AttractorNode.h \
+    $(top_srcdir)/include/config.h \
+    $(top_srcdir)/include/ConstraintsNode.h \
+    $(top_srcdir)/include/Contour.h \
+    $(top_srcdir)/include/DSPNode.h \
+    $(top_srcdir)/include/Fog.h \
+    $(top_srcdir)/include/GridNode.h \
+    $(top_srcdir)/include/GroupNode.h \
+    $(top_srcdir)/include/ImageTexture.h \
+    $(top_srcdir)/include/introspect_helpers.h \
+    $(top_srcdir)/include/libloUtil.h \
+    $(top_srcdir)/include/LightSource.h \
+    $(top_srcdir)/include/Listener.h \
+    $(top_srcdir)/include/mainpage.h \
+    $(top_srcdir)/include/MeasurementNode.h \
+    $(top_srcdir)/include/MediaManager.h \
+    $(top_srcdir)/include/Menu3D.h \
+    $(top_srcdir)/include/ModelNode.h \
+    $(top_srcdir)/include/nodeVisitors.h \
+    $(top_srcdir)/include/oscParser.h \
+    $(top_srcdir)/include/osgUtil.h \
+    $(top_srcdir)/include/PointerNode.h \
+    $(top_srcdir)/include/RayNode.h \
+    $(top_srcdir)/include/ReferencedNode.h \
+    $(top_srcdir)/include/ReferencedStateSet.h \
+    $(top_srcdir)/include/ReporterNode.h \
+    $(top_srcdir)/include/SceneManager.h \
+    $(top_srcdir)/include/ShapeNode.h \
+    $(top_srcdir)/include/SharedVideoNode.h \
+    $(top_srcdir)/include/SharedVideoTexture.h \
+    $(top_srcdir)/include/SoundConnection.h \
+    $(top_srcdir)/include/SoundNode.h \
+    $(top_srcdir)/include/SoundSpace.h \
+    $(top_srcdir)/include/spinApp.h \
+    $(top_srcdir)/include/spinBaseContext.h \
+    $(top_srcdir)/include/spinClientContext.h \
+    $(top_srcdir)/include/spinDefaults.h \
+    $(top_srcdir)/include/spinLog.h \
+    $(top_srcdir)/include/spinLogWX.h \
+    $(top_srcdir)/include/spinServerContext.h \
+    $(top_srcdir)/include/spinUtil.h \
+    $(top_srcdir)/include/spinWX.h \
+    $(top_srcdir)/include/SwitchNode.h \
+    $(top_srcdir)/include/TextNode.h \
+    $(top_srcdir)/include/UserNode.h \
+    $(top_srcdir)/include/util.h \
+    $(top_srcdir)/include/videoSize.h \
+    $(top_srcdir)/include/VideoTexture.h \
+    $(top_srcdir)/include/ViewerManipulator.h \
+    $(top_srcdir)/src/tinyxml/tinystr.h \
+    $(top_srcdir)/src/tinyxml/tinyxml.h
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 # libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
