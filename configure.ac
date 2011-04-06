@@ -37,6 +37,7 @@ fi
 
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
+  LIBTOOL="glibtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
   if test -d /opt/local ; then
