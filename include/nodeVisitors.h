@@ -108,9 +108,10 @@ private:
 
 };
 
+typedef std::vector< osg::ref_ptr<osg::Node> > NodeList;
+
 class NodeSearcher : public osg::NodeVisitor
 {
-    typedef std::vector< osg::ref_ptr<osg::Node> > NodeList;
     public:
         NodeSearcher(NodeList& list);
 

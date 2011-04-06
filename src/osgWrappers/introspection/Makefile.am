@@ -32,7 +32,6 @@ libSPINwrappers_la_SOURCES = \
     GroupNode.cpp \
     ImageTexture.cpp \
     introspect_helpers.cpp \
-    libloUtil.cpp \
     LightSource.cpp \
     Listener.cpp \
     MeasurementNode.cpp \

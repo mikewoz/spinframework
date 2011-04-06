@@ -49,7 +49,7 @@ END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::NodeSearcher)
 	I_DeclaringFile("nodeVisitors.h");
-	I_Constructor1(IN, NodeList &, list,
+	I_Constructor1(IN, spin::NodeList &, list,
 	               Properties::NON_EXPLICIT,
 	               ____NodeSearcher__NodeList_R1,
 	               "",
@@ -203,7 +203,11 @@ BEGIN_VALUE_REFLECTOR(spin::UpdateSceneVisitor)
 	          "");
 END_REFLECTOR
 
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< osg::Node > >, spin::NodeList)
+
 TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< osg::StateSet > >, spin::StateSetList)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< osg::Node > >)
 
 STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< osg::StateSet > >)
 
