@@ -601,9 +601,9 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
     try
     {
-        std::string fullTypeName = Introspector::prependNamespace(nodeType);
+        std::string fullTypeName = introspector::prependNamespace(nodeType);
         // Let's use cppintrospection to create a node of the proper type:
-        const cppintrospection::Type &t = Introspector::getType(nodeType);
+        const cppintrospection::Type &t = introspector::getType(nodeType);
 
         //std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
         //introspect_print_type(t);
@@ -1518,18 +1518,6 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
     return output.str();
 }
 
-// TODO: Move to introspector.cpp
-std::string Introspector::prependNamespace(const std::string &name)
-{
-    // FIXME: is this the fastest way to do this?
-    return std::string("spin::").append(name);
-}
-
-// TODO: Move to introspector.cpp
-const cppintrospection::Type& Introspector::getType(const std::string &name)
-{
-    return cppintrospection::Reflection::getType(prependNamespace(name));
-}
 
 std::string SceneManager::getConnectionsAsXML()
 {
@@ -1544,11 +1532,11 @@ std::string SceneManager::getConnectionsAsXML()
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
         std::string nodeType = (*it).first;
-        const cppintrospection::Type &t = Introspector::getType(nodeType);
+        const cppintrospection::Type &t = introspector::getType(nodeType);
         if (t.isDefined())
         {
             // check if the nodeType is a subclass of DSPNode:
-            if (t.getBaseType(0).getName() == Introspector::prependNamespace("DSPNode"))
+            if (t.getBaseType(0).getName() == introspector::prependNamespace("DSPNode"))
             {
                 for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
                 {
@@ -1883,7 +1871,7 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
 
     char *classType = (char*) XMLnode->Value();
 
-    if (Introspector::getType(std::string(classType)).isDefined())
+    if (introspector::getType(std::string(classType)).isDefined())
     {
         if (XMLnode->Attribute("id"))
         {
@@ -2124,10 +2112,8 @@ bool SceneManager::nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_p
     return (std::string(n1->id->s_name) < std::string(n2->id->s_name));
 }
 
-
-// *****************************************************************************
-// OSC callback functions below (need to be valid C function pointers, so they
-// are declared here as static functions):
+namespace introspector
+{
 
 int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, ValueList theArgs)
 {
@@ -2158,13 +2144,28 @@ int invokeMethod(const cppintrospection::Value classInstance, const cppintrospec
     // through all base classes to see if method is contained in a parent class:
     for (int i = 0; i < classType.getNumBaseTypes(); i++)
     {
-        if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs))
+        if (introspector::invokeMethod(classInstance, classType.getBaseType(i), method, theArgs))
             return 1;
     }
     // }
 
     return 0;
 }
+
+// TODO: Move to introspector.cpp
+std::string prependNamespace(const std::string &name)
+{
+    // FIXME: is this the fastest way to do this?
+    return std::string("spin::").append(name);
+}
+
+// TODO: Move to introspector.cpp
+const cppintrospection::Type& getType(const std::string &name)
+{
+    return cppintrospection::Reflection::getType(prependNamespace(name));
+}
+
+} // end of namespace introspector
 
 } // end of namespace spin
 

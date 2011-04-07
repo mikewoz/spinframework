@@ -536,7 +536,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     {   // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
         // invoke the method on the node, and if it doesn't work, then just forward
         // the message:
-        if (! invokeMethod(classInstance, classType, theMethod, theArgs))
+        if (! introspector::invokeMethod(classInstance, classType, theMethod, theArgs))
         {
             //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
             // HACK: TODO: fix this
