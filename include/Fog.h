@@ -45,51 +45,59 @@
 #include <osg/Vec4>
 #include "ReferencedStateSet.h"
 
-namespace osg {
+namespace osg
+{
     class Fog;
 }
 
 namespace spin
 {
 
-/**
- * \brief Basic GL Fog
- *
- */
-
 class SceneManager;
 
+/**
+ * \brief Basic GL Fog node.
+ */
 class Fog : public ReferencedStateSet
 {
-
 public:
 
     Fog(SceneManager *sceneManager, const char *initID);
+    /**
+     * FIXME: should be virtual 
+     */
     ~Fog();
 
-    // need to implement abstract method... ?!
+    /**
+     * need to implement abstract method... ?!
+     */
     const char *getPath() const { return ""; }
     
     /**
      * Set fog density (good values are around 0.001 - 0.1)
      */
     void setFogDensity (float density);
+    /**
+     * Get fog density (good values are around 0.001 - 0.1)
+     */
     float getFogDensity() const;
 
     /**
      * Set fog color
      */
     void setFogColor (float r, float g, float b, float a);
+    /**
+     * Get fog color
+     */
     osg::Vec4 getFogColor() const;
 
-    // must reimplement
+    /**
+     * must reimplement
+     */
     virtual std::vector<lo_message> getState() const;
-
     
 private:
-    
     osg::ref_ptr<osg::Fog> fog_;
-
 };
 
 } // end of namespace spin
