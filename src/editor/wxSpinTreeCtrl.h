@@ -90,13 +90,18 @@ public:
     void Refresh();
 
     /**
-     * This adds a node to the tree. Note that this function will typicall be
+     * This adds a node to the tree. Note that this function will typically be
      * called as a result of a createNode message broadcasted from SPIN AFTER
      * the node is actually instantiated in memory, so we don't need to actually
      * create it. We should be able to find it in the sceneManager, and just
      * create a tree item (using the addToTree() method).
      */
-    void addNode(const char *id, const char *type);
+    void addNode(const char *id);
+
+    /**
+     * Same as addNode but must match a particular node type
+     */
+    //void addNode(const char *id, const char *type);
 
     /**
      * Remove a node from the tree. Note that the node may not exist in the
@@ -124,14 +129,25 @@ public:
 private:
 
     /**
-     * Adds the ReferencedNode node to the tree
+    * Adds the ReferencedNode node to the tree
+    */
+    void addToTree(spin::ReferencedNode *n);
+
+    /**
+     * Adds the ReferencedNode node to the tree, once you know the parent
      */
     void addToTree(spin::ReferencedNode *n, wxTreeItemId parentID);
 
     /**
      * GetTreeItem returns the wxTreeItemId given an ReferencedNode node pointer
      */
-    wxTreeItemId GetTreeItem(spin::ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
+    //wxTreeItemId GetTreeItem(spin::ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie=0);
+    wxTreeItemId GetTreeItem(spin::ReferencedNode* pNode);
+
+    /**
+     * Get the wxTreeItemId given a node id string
+     */
+    wxTreeItemId GetTreeItem(const char *nodeId);
 
     /**
      * GetTreeItem returns the wxTreeItemId given an id. This is useful in the case

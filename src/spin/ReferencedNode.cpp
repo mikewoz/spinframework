@@ -198,6 +198,11 @@ void ReferencedNode::attach()
 
     // broadcast this change to any remote clients:
     BROADCAST(this, "ss", "setParent", this->parent->s_name);
+
+    // send a parentChange message to clients who are only listening to scene
+    // messages (ie, they are not filtering every single node message).
+    // TODO: do this via TCP?
+    SCENE_MSG("sss", "parentChange", this->id->s_name, this->parent->s_name);
 }
 
 // removes this node from the scenegraph:

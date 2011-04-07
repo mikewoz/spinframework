@@ -24,6 +24,7 @@
 #include "spinApp.h"
 #include "SceneManager.h"
 #include "spinBaseContext.h"
+#include "spinUtil.h"
 
 BEGIN_EVENT_TABLE(wxSpinTreeCtrl, wxTreeCtrl)
     //EVT_TREE_SEL_CHANGED(wxSpinEditor::publicSpinTree, wxSpinEditor::OnSpinSelectionChange)
@@ -73,6 +74,10 @@ wxSpinTreeCtrl::wxSpinTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& p
         lo_server_add_method((*servIter),
             std::string("/SPIN/" + spin::spinApp::Instance().getSceneID()).c_str(),
             NULL, wxSpinTreeCtrl_liblo_callback, this);
+
+        // TODO: we should really have callbacks for node messages and scene
+        // messages rather than parsing every single message received
+        //lo_server_add_method((*servIter), NULL, NULL, wxSpinTreeCtrl_liblo_callback, this);
     }
 }
 
@@ -89,7 +94,7 @@ void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)
     DeleteAllItems();
     if (pRoot)
     {
-        wxTreeItemId rootID = AddRoot(wxT("scene"));
+        wxTreeItemId rootID = AddRoot(wxT("world"));
 
         m_pSceneTreeVisitor->SetParentTreeItem(&rootID);
         pRoot->accept(*m_pSceneTreeVisitor.get());
@@ -107,6 +112,38 @@ void wxSpinTreeCtrl::Refresh()
     BuildTree(spin::spinApp::Instance().sceneManager->worldNode.get());
 }
 
+void wxSpinTreeCtrl::addToTree(spin::ReferencedNode *n)
+{
+    wxTreeItemId nodeInTree = GetTreeItem(n);
+    if (nodeInTree)
+    {
+        // If node is already in the tree, we check to see if the parent has
+        // changed. If it has, we remove it first
+        wxTreeItemId parentTreeItem = GetTreeItem(n->getParent());
+        if (parentTreeItem == GetItemParent(nodeInTree))
+        {
+            // the parent in the tree is already correct, so we don't need to do
+            // anything
+            std::cout << "Warning (wxSpinTreeCtrl::addToTree). Node " << n->getID() << " already exists in tree." << std::endl;
+        }
+        else
+        {
+            // The node in the tree has the wrong parent, so we need to first
+            // remove the node from the tree, before we can add it to the proper
+            // parent.
+            Freeze();
+            Delete(nodeInTree);
+            Thaw();
+        }
+    }
+
+    wxTreeItemId parentTreeItem = GetTreeItem(n->getParent());
+    if (parentTreeItem)
+        addToTree(n,parentTreeItem);
+    else
+        addToTree(n,GetRootItem());
+}
+
 void wxSpinTreeCtrl::addToTree(spin::ReferencedNode *n, wxTreeItemId parentID)
 {
     Freeze();
@@ -121,36 +158,33 @@ void wxSpinTreeCtrl::addToTree(spin::ReferencedNode *n, wxTreeItemId parentID)
     ExpandAll();
 }
 
+void wxSpinTreeCtrl::addNode(const char *id)
+{
+    spin::ReferencedNode *n = spin::spinApp::Instance().sceneManager->getNode(id);
+    if (n) addToTree(n);
+}
+
+/*
 void wxSpinTreeCtrl::addNode(const char *id, const char *type)
 {
     // note that a createNode message was broadcast from SPIN AFTER the node was
     // instantiated, so we should now be able to find it in the sceneManager,
     // and so we'll create a tree item (if it doesn't already exist).
     spin::ReferencedNode *n = spin::spinApp::Instance().sceneManager->getNode(id, type);
-    if (! n)
-        return;
-
-    wxTreeItemId nodeInTree = GetTreeItem(n, GetRootItem());
-    if (! nodeInTree)
-    {
-        //ReferencedNode *parentNode = spinApp::Instance().sceneManager->getNode(n->getParent(), type);
-        wxTreeItemId parentInTree = GetTreeItem(n, GetRootItem());
-        if (parentInTree)
-            addToTree(n,parentInTree);
-        else
-            addToTree(n,GetRootItem());
-    }
+    if (n) addToTree(n);
 }
+*/
 
 void wxSpinTreeCtrl::removeNode(const char *id)
 {
     // if the node to be removed is currently selected, then select NULL (root)
-    if (strcmp(GetSelectedNode()->id->s_name,id)==0)
+    spin::ReferencedNode* n = GetSelectedNode();
+    if (n && strcmp(n->id->s_name,id)==0)
     {
         SelectNode(NULL);
     }
     // We need to find the node based on the string id provided:
-    wxTreeItemId nodeInTree = GetTreeItem(id, GetRootItem());
+    wxTreeItemId nodeInTree = GetTreeItem(id);
     if (nodeInTree)
     {
         Freeze();
@@ -177,7 +211,7 @@ bool wxSpinTreeCtrl::SelectNode(spin::ReferencedNode* pNode)
     if (pNode == GetSelectedNode())
         return true;
 
-    wxTreeItemId id = GetTreeItem(pNode, GetRootItem());
+    wxTreeItemId id = GetTreeItem(pNode);
     if (id)
     {
         SelectItem(id);
@@ -188,39 +222,20 @@ bool wxSpinTreeCtrl::SelectNode(spin::ReferencedNode* pNode)
     return false;
 }
 
+/*
 wxTreeItemId wxSpinTreeCtrl::GetTreeItem(spin::ReferencedNode* pNode, wxTreeItemId idParent, wxTreeItemIdValue cookie)
 {
     return GetTreeItem(pNode->id->s_name, idParent, cookie);
-    /*
-    if (!idParent.IsOk())
-        return NULL;
-
-    std::cout << "lookging for node '" << pNode->id->s_name "' in tree ... " << std::endl;
-
-    wxSpinTreeItemData *treeData = (wxSpinTreeItemData*)GetItemData(idParent);
-    if (treeData)
-    {
-        if (treeData->m_pNode.get() == pNode)
-            return idParent;
-    }
-
-    wxTreeItemId child;
-
-    if (!cookie)
-        child = GetFirstChild(idParent, cookie);
-    else
-        child = GetNextChild(idParent, cookie);
-
-    if (!child.IsOk())
-        return NULL;
-
-    if (ItemHasChildren(child))
-    {
-        wxTreeItemId nextChild = GetTreeItem(pNode, child);
-        if (nextChild) return nextChild;
-    }
-    return GetTreeItem(pNode, child, cookie);
+}
 */
+wxTreeItemId wxSpinTreeCtrl::GetTreeItem(spin::ReferencedNode* pNode)
+{
+    return GetTreeItem(pNode->id->s_name);
+}
+
+wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId)
+{
+    return GetTreeItem(nodeId, GetRootItem());
 }
 
 wxTreeItemId wxSpinTreeCtrl::GetTreeItem(const char *nodeId, wxTreeItemId idParent, wxTreeItemIdValue cookie)
@@ -319,7 +334,7 @@ void wxSpinTreeCtrl::OnSpinSelectionChange(wxTreeEvent & WXUNUSED(event))
     spin::ReferencedNode *n = GetSelectedNode();
     if (n)
     {
-        std::cout << "got tree selection: " << n->getID() << std::endl;
+        //std::cout << "got tree selection: " << n->getID() << std::endl;
     }
     else std::cout << "got tree selection, but couldn't find spin node" << std::endl;
     //UpdatePropGrid();
@@ -327,8 +342,12 @@ void wxSpinTreeCtrl::OnSpinSelectionChange(wxTreeEvent & WXUNUSED(event))
 
 void wxSpinTreeCtrl::OnSpinTreeDragBegin(wxTreeEvent &event)
 {
-    draggedItem = event.GetItem();
-    event.Allow();
+    spin::ReferencedNode *spinNode = this->GetNode(event.GetItem());
+    if (spinNode)
+    {
+        draggedItem = event.GetItem();
+        event.Allow();
+    }
 }
 
 void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
@@ -364,8 +383,9 @@ void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
 }
 
 
-int wxSpinTreeCtrl_liblo_callback(const char * WXUNUSED(path), const char *types, lo_arg **argv, int argc, void * WXUNUSED(data), void *user_data)
+int wxSpinTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void * WXUNUSED(data), void *user_data)
 {
+    // DEBUG PRINT:
     /*
     printf("wx got spin message: %s", path);
     for (int i=0; i<argc; i++) {
@@ -373,17 +393,37 @@ int wxSpinTreeCtrl_liblo_callback(const char * WXUNUSED(path), const char *types
         lo_arg_pp((lo_type) types[i], argv[i]);
     }
     printf("\n");
-    */
+     */
 
-    // make sure there is at least one argument (ie, a method to call):
-    if (! argc)
-        return 0;
+    if (!argc)
+    {
+        std::cout << "ERROR: got message for " << path << " without any method or arguments" << std::endl;
+        return 1;
+    }
 
+    // check that the treeCtrl was provided as user_data
     wxSpinTreeCtrl *treeCtrl = (wxSpinTreeCtrl*) user_data;
-
     if (! treeCtrl)
-        return 0;
+        return 1;
 
+
+    // WARNING: this callback will match ANY path, so we must manually check
+    // if it is within the SPIN namespace, and if it matches the sceneID:
+    // TODO: replace this with node/scene callbacks!!!
+    /*
+    std::string spinToken, sceneString, nodeString;
+    std::istringstream pathstream(path);
+    pathstream.get(); // ignore leading slash
+    getline(pathstream, spinToken, '/');
+    getline(pathstream, sceneString, '/');
+    getline(pathstream, nodeString, '/');
+
+    if ((spinToken!="SPIN") || !spin::wildcardMatch(sceneString.c_str(), spin::spinApp::Instance().getSceneID().c_str()) )
+    {
+        std::cout << "Warning: wxSpinTreeCtrl is ignoring message: " << path << std::endl;
+        return 1;
+    }
+     */
     // get the method (argv[0]):
     std::string theMethod;
     if (lo_is_string_type((lo_type) types[0]))
@@ -393,31 +433,53 @@ int wxSpinTreeCtrl_liblo_callback(const char * WXUNUSED(path), const char *types
     else
         return 0;
 
-    // now look for messages that will affect the tree:
-    if ((theMethod=="nodeList") && (argc>2))
+    // SCENE MESSAGES:
+    if (1)//(nodeString.empty())
     {
-        for (int i = 2; i < argc; ++i)
+        if ((theMethod=="nodeList") && (argc>2))
         {
-            if (strcmp((char*) argv[i], "NULL") != 0) treeCtrl->addNode((char*) argv[i], (char*) argv[1]);
+            for (int i = 2; i < argc; ++i)
+            {
+                if (strcmp((char*) argv[i], "NULL") != 0) treeCtrl->addNode((char*) argv[i]);
+            }
+        }
+        else if ((theMethod=="createNode") && (argc==3))
+        {
+            treeCtrl->addNode((char*) argv[1]);
+        }
+        else if ((theMethod=="deleteNode") && (argc==2))
+        {
+            treeCtrl->removeNode((char*) argv[1]);
+        }
+        else if (theMethod=="refresh")
+        {
+            treeCtrl->Refresh();
+        }
+        else if (theMethod=="clear")
+        {
+            treeCtrl->Refresh();
+            treeCtrl->SelectNode(NULL);
+        }
+        else if ((theMethod=="parentChange") && (argc==3))
+        {
+            //std::cout << "got parentChange for node " << (char*)argv[1] << ". New parent: " << (char*)argv[2] << std::endl;
+            //treeCtrl->removeNode((char*) argv[1]);
+            //treeCtrl->addNode((char*) argv[1]);
+            treeCtrl->addNode((char*)argv[1]);
+
         }
     }
-    else if ((theMethod=="createNode") && (argc==3))
+/*
+    // NODE MESSAGES:
+    else
     {
-        treeCtrl->addNode((char*) argv[1], (char*) argv[2]);
+        if ((theMethod=="setParent") && (argc==2))
+        {
+            treeCtrl->removeNode(nodeString.c_str());
+            treeCtrl->addNode(nodeString.c_str());
+        }
     }
-    else if ((theMethod=="deleteNode") && (argc==2))
-    {
-        treeCtrl->removeNode((char*) argv[1]);
-    }
-    else if (theMethod=="refresh")
-    {
-        treeCtrl->Refresh();
-    }
-    else if (theMethod=="clear")
-    {
-        treeCtrl->Refresh();
-        treeCtrl->SelectNode(NULL);
-    }
+*/
     return 1;
 }
 

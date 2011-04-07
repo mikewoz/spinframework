@@ -170,13 +170,21 @@ class spinApp
 
 // Internal server-side MACROS for sending messages. Clients should NEVER use
 // these macros, and should rather use spinContext::send* methods. But just in
-// case, the macros always check that the passed SceneManager (s) is a server.
+// case, the macros always check that spinApp is operating in server mode
 
 #define SCENE_MSG(types, ...) \
     if (spinApp::Instance().getContext() && \
         (spinApp::Instance().getContext()->isRunning()) && \
         (spinApp::Instance().getContext()->isServer()) ) \
         lo_send(spinApp::Instance().getContext()->lo_txAddr, \
+            ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
+            types, ##__VA_ARGS__, LO_ARGS_END)
+
+#define SCENE_MSG_TCP(types, addr, ...) \
+    if (spinApp::Instance().getContext() && \
+        (spinApp::Instance().getContext()->isRunning()) && \
+        (spinApp::Instance().getContext()->isServer()) ) \
+        lo_send((addr), \
             ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
             types, ##__VA_ARGS__, LO_ARGS_END)
 
