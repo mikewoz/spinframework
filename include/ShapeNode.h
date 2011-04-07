@@ -49,6 +49,7 @@
 #include <osg/PositionAttitudeTransform>
 #include <osg/Texture2D>
 #include <osgUtil/Optimizer>
+
 namespace spin
 {
 
@@ -66,23 +67,45 @@ namespace spin
  */
 class ShapeNode : public GroupNode
 {
-
 public:
 
     ShapeNode(SceneManager *sceneManager, char *initID);
     virtual ~ShapeNode();
 
     /**
+     * Possible shapes for a ShapeNode.
+     * 
+     * Each of these types of shape is identified by a unique number. The first of these shape types has number 0, the second is number 1, and so on.
+     * 
      * We provide several possible shapes
      */
-    enum shapeType { NONE, SPHERE, BOX, CYLINDER, CAPSULE, CONE, PLANE };
+    enum shapeType
+    {
+        NONE = 0,
+        SPHERE,
+        BOX,
+        CYLINDER,
+        CAPSULE,
+        CONE,
+        PLANE
+    };
     enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
     
     virtual void setContext (const char *newvalue);
 
+    /**
+     * Sets the shape this ShapeNode should have, identified by its number.
+     */
     void setShape            (shapeType t);
     void setBillboard        (billboardType t);
 
+    /**
+     * Sets the color of this shape node.
+     * \param red Red channel. Number in the range [0, 1]
+     * \param green Green channel. Number in the range [0, 1]
+     * \param blue Blue channel. Number in the range [0, 1]
+     * \param alpha Opacity channel. Number in the range [0, 1]
+     */
     void setColor            (float red, float green, float blue, float alpha);
     void setTextureFromFile    (const char* filename);
     void setRenderBin        (int i);
@@ -99,21 +122,15 @@ public:
     int getRenderBin() const { return renderBin; }
     int getLighting() const { return (int)lightingEnabled; }
 
-    
     //void addSharedVideoTexture(osg::Node *n, std::string shID);
     //void addVideoTexture(osg::Node *n, std::string texturePath);
     void addImageTexture(osg::Node *n, std::string texturePath);
     
-
-
-
     /**
      * For each subclass of ReferencedNode, we override the getState() method to
      * fill the vector with the correct set of methods for this particular node
      */
     virtual std::vector<lo_message> getState() const;
-
-
 
     shapeType shape;
     
@@ -128,7 +145,6 @@ public:
 
     int renderBin;
 
-
     bool lightingEnabled;
 
     //osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
@@ -137,9 +153,7 @@ public:
 
     osgUtil::Optimizer optimizer;
 
-
 protected:
-
     virtual void drawShape();
     virtual void drawTexture();
 
