@@ -105,7 +105,6 @@ libSPIN_la_include_HEADERS = \
     $(top_srcdir)/include/ReporterNode.h \
     $(top_srcdir)/include/SceneManager.h \
     $(top_srcdir)/include/ShapeNode.h \
-    $(top_srcdir)/include/SharedVideoNode.h \
     $(top_srcdir)/include/SharedVideoTexture.h \
     $(top_srcdir)/include/SoundConnection.h \
     $(top_srcdir)/include/SoundNode.h \
@@ -123,11 +122,12 @@ libSPIN_la_include_HEADERS = \
     $(top_srcdir)/include/TextNode.h \
     $(top_srcdir)/include/UserNode.h \
     $(top_srcdir)/include/util.h \
-    $(top_srcdir)/include/videoSize.h \
     $(top_srcdir)/include/VideoTexture.h \
     $(top_srcdir)/include/ViewerManipulator.h \
     $(top_srcdir)/src/tinyxml/tinystr.h \
     $(top_srcdir)/src/tinyxml/tinyxml.h
+
+# $(top_srcdir)/include/videoSize.h
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 # libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
