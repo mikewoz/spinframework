@@ -1,35 +1,39 @@
+#!/usr/bin/env python
+"""
+Please document this file.
+
+This example is in the public domain.
+"""
 import time
 import sys
 import os
+import spinFramework
 
-from spinFramework import *
-#import spinFramework.*
-
-
-
-class spinClient(pySpinContext):
-	def sceneCallback(self, d):
-		print "in python sceneCallback"
-		print d
-
-# old way before singleton:
-#spin = spinClient(pySpinContext.mode.LISTENER_MODE)
-
-spin = spinClient()
+class spinClient(spinFramework.pySpinContext):
+    """
+    Please document this class.
+    """
+    def sceneCallback(self, d):
+        """
+        Please document this method.
+        """
+        print "in python sceneCallback"
+        print d
 
 
-spin.start()
+if __name__ == "__main__":
+    # old way before singleton:
+    #client = spinClient(pySpinContext.mode.LISTENER_MODE)
 
-spin.sendSceneMessage(["createNode", "foo", "GroupNode"])
-spin.sendSceneMessage(["debug"])
+    client = spinClient()
+    client.start()
 
-spin.sendNodeMessage(["foo", "debug"])
+    client.sendSceneMessage(["createNode", "foo", "GroupNode"])
+    client.sendSceneMessage(["debug"])
+    client.sendNodeMessage(["foo", "debug"])
+    time.sleep(2)
 
-time.sleep(2)
-
-spin.sendSceneMessage(["clear"])
-spin.sendSceneMessage(["debug"])
-
-time.sleep(5)
-
+    client.sendSceneMessage(["clear"])
+    client.sendSceneMessage(["debug"])
+    time.sleep(5)
 
