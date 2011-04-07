@@ -1,26 +1,8 @@
-#BUILT_SOURCES = \
-#        ReferencedNode.cpp ReferencedStateSet.cpp \
-#        UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
-#        GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
-#        ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
-#        AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
-#        DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-#        ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
-#CLEANFILES=$(BUILT_SOURCES)
-#%.cpp: %.h
-
-#FIXME: These depend on the headers, and more specifically, each generated wrapper should only depend on one header
-#$(BUILT_SOURCES):
-#	-rm -f $(top_srcdir)/include/*.h~
-#	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -
-#	cd $(top_srcdir) && src/genwrapper/genwrapper -v QUIET -c genwrapper.conf doxygen . && cd -
-
 # use noinst_LIBRARIES to create a library that won't be installed
 noinst_LTLIBRARIES = libSPINwrappers.la
 
-#libSPINwrappers_la_SOURCES = #$(BUILT_SOURCES)
-
 # please keep those in alphabetical order:
+# We only need to wrap the childs of ReferencedNode and ReferencedStateSet:
 libSPINwrappers_la_SOURCES = \
     AnimationNode.cpp \
     AttractorNode.cpp \
@@ -51,26 +33,6 @@ libSPINwrappers_la_SOURCES = \
     UserNode.cpp \
     VideoTexture.cpp
 
-# nodeVisitors.cpp \
-    #SharedVideoNode.cpp \
-#    introspect_helpers.cpp \
-#    SceneManager.cpp \
-#    MediaManager.cpp \
-#    spinApp.cpp \
-#    spinBaseContext.cpp \
-#    spinClientContext.cpp \
-#    spinDefaults.cpp \
-#    spinLog.cpp \
-#    spinLogWX.cpp \
-#    spinServerContext.cpp \
-#    spinUtil.cpp \
-#    spinWX.cpp \
-#    ViewerManipulator.cpp
-#    videoSize.cpp \
-#    $(top_srcdir)/include/*.h \
-#    $(top_srcdir)/src/spin/*.h \
-#    $(top_srcdir)/src/tinyxml/*.h
-
 libSPINwrappers_la_CPPFLAGS = \
     $(BOOST_CPPFLAGS) \
     $(CPPINTROSPECTION_CFLAGS) \
@@ -80,3 +42,9 @@ libSPINwrappers_la_CPPFLAGS = \
     -I$(top_srcdir)/src/spin \
     -I$(top_srcdir)/src/tinyxml
 
+# TODO: Could be nice to regenerate the wrapper every time a source file from src/spin changes:
+# FIXME: These depend on the headers, and more specifically, each generated wrapper should only depend on one header
+#$(BUILT_SOURCES):
+#	-rm -f $(top_srcdir)/include/*.h~
+#	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -
+#	cd $(top_srcdir) && src/genwrapper/genwrapper -v QUIET -c genwrapper.conf doxygen . && cd -
