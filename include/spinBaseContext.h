@@ -45,10 +45,11 @@
 #include <vector>
 #include <lo/lo_types.h>
 
-
 namespace spin
 {
 
+// Forward declarations
+class spinLog;
 
 /**
  * \brief A class to facilitate communication with SPIN from any application.
@@ -67,12 +68,7 @@ namespace spin
  * A client can listen for info about the server, such as the correct
  * ports to send messages. The server can listen to pings from clients
  * to determine if they are still alive and connected.
- *
  */
-
-// Forward declarations
-class spinLog;
-
 class spinBaseContext
 {
     public:
@@ -201,28 +197,24 @@ class spinBaseContext
         static int debugCallback(const char *path, const char *types, lo_arg **argv, 
                 int argc, void *data, void *user_data);
 
-    static void oscParser_error(int num, const char *msg, const char *path);
+        static void oscParser_error(int num, const char *msg, const char *path);
 
     protected:
-
         bool running;
         SpinContextMode mode;
         void setLog(spinLog &log);
-
         /**
          * this method is used by both spinClientContext and spinServerContext
          */
         virtual void createServers() = 0;
 
-
     private:
-
         // pthread stuff
         pthread_t pthreadID; // id of child thread
         pthread_attr_t pthreadAttr;
-
 };
 
 } // end of namespace spin
 
 #endif
+

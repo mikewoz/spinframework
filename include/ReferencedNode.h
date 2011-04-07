@@ -61,6 +61,9 @@ namespace spin
 
 class SceneManager;
 
+/**
+ * Python script that is ran periodically.
+ */
 typedef struct {
     boost::python::object run;
     double freq;
@@ -73,6 +76,9 @@ typedef struct {
     std::string pyModule;
 } CronScript;
 
+/**
+ * Python script that is ran when some event happens.
+ */
 typedef struct {
     boost::python::object run;
     std::string eventName;
@@ -90,9 +96,8 @@ typedef std::map< const std::string, EventScript* > EventScriptList;
 typedef std::map< std::string, std::string > stringParamType;
 typedef std::map< std::string, float > floatParamType;
 
-
 /**
- * \brief The base class for all SPIN-related scene graph nodes
+ * \brief The base class for all SPIN scene graph nodes.
  *
  * Any node that is to be attached to the scene graph needs to be extended from
  * the ReferencedNode class. By doing so, the OSC networking interface is created
@@ -101,13 +106,7 @@ typedef std::map< std::string, float > floatParamType;
  */
 class ReferencedNode : virtual public osg::Group
 {
-
 public:
-
-
-    // ***********************************************************
-    // methods:
-
     ReferencedNode(SceneManager *sceneManager, char *initID);
     ~ReferencedNode();
 
@@ -154,14 +153,11 @@ public:
 
     int setAttachmentNode(osg::Group *n);
 
-
     /**
      * An internal method that keeps track of the nodepath (for efficient
      * computation of global position, etc.
      */
     void updateChildNodePaths();
-
-
 
     /**
      * This method schedules a change in parent for this node. The setParent()
@@ -228,19 +224,18 @@ public:
     virtual std::vector<lo_message> getState() const;
 
     /**
-     * StateDump() is a request to broadcast the node state via SceneManager.
+     * Request to broadcast the node state via SceneManager.
      */
     virtual void stateDump();
     
     /**
-     * StateDump() is a request to send the node state to one address
+     * Request to send the node state to one address
      */
     virtual void stateDump(lo_address addr);
 
-
     // ***********************************************************
     // data:
-
+    // FIXME: Please make data members private.
 
     t_symbol *id;
     std::string nodeType;
@@ -254,7 +249,6 @@ public:
 
     bool scheduleForDeletion;
 
-
     // debug
 
     bool textFlag;
@@ -267,8 +261,6 @@ public:
     osg::NodePath currentNodePath;
 
     std::vector<ReferencedNode*> children;
-
-
 
     //osg::ref_ptr<osg::Geode> textGeode;
 
@@ -326,7 +318,6 @@ public:
      */
     bool legalParent (t_symbol *newParent);
 
-
     /**
      * The node that children get attached to:
      * We keep it private to force the use of setAttachmentNode(), which results
@@ -336,31 +327,39 @@ public:
 
 };
 
+/**
+ * FIXME: Please document this.
+ */
 class ReferencedNode_data : public osg::Referenced
 {
     public:
         ReferencedNode_data(ReferencedNode *n) { node_ = n; }
         //~ReferencedNode_data();
-        void update() { if (node_.valid()) node_->callbackUpdate(); }
-
+        void update()
+        {
+            if (node_.valid())
+                node_->callbackUpdate();
+        }
     private:
         osg::observer_ptr<ReferencedNode> node_;
 };
 
-
+/**
+ * FIXME: Please document this.
+ */
 class ReferencedNode_callback : public osg::NodeCallback
 {
     public:
         virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
         {
             osg::ref_ptr<ReferencedNode_data> data = dynamic_cast<ReferencedNode_data*> (node->getUserData());
-            if (data != NULL) data->update();
-
+            if (data != NULL)
+                data->update();
             traverse(node, nv);
         }
 };
 
 } // end of namespace spin
 
-
 #endif
+

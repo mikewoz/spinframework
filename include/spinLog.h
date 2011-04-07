@@ -48,42 +48,38 @@
 #include <sys/time.h>
 #include <cstdio>
 #include <cstdlib>
-
 #include <cstring>
-
 
 namespace spin
 {
 
-
-/* Subtract the `struct timeval' values X and Y, storing the result in RESULT.
+/**
+ * Subtracts the `struct timeval' values X and Y, storing the result in RESULT.
  * Return 1 if the difference is negative, otherwise 0.
  */
 static int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
 {
-  // Perform the carry for the later subtraction by updating y:
-  if (x->tv_usec < y->tv_usec) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
-    y->tv_usec -= 1000000 * nsec;
-    y->tv_sec += nsec;
-  }
-  if (x->tv_usec - y->tv_usec > 1000000) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000;
-    y->tv_usec += 1000000 * nsec;
-    y->tv_sec -= nsec;
-  }
+    // Perform the carry for the later subtraction by updating y:
+    if (x->tv_usec < y->tv_usec) {
+        int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
+        y->tv_usec -= 1000000 * nsec;
+        y->tv_sec += nsec;
+    }
+    if (x->tv_usec - y->tv_usec > 1000000) {
+        int nsec = (y->tv_usec - x->tv_usec) / 1000000;
+        y->tv_usec += 1000000 * nsec;
+        y->tv_sec -= nsec;
+    }
 
-  // Compute the time remaining to wait. tv_usec is certainly positive:
-  result->tv_sec = x->tv_sec - y->tv_sec;
-  result->tv_usec = x->tv_usec - y->tv_usec;
+    // Compute the time remaining to wait. tv_usec is certainly positive:
+    result->tv_sec = x->tv_sec - y->tv_sec;
+    result->tv_usec = x->tv_usec - y->tv_usec;
 
-  // Return 1 if result is negative:
-  return x->tv_sec < y->tv_sec;
+    // Return 1 if result is negative:
+    return x->tv_sec < y->tv_sec;
 }
 
-
 // code from http://www.advogato.org/person/elanthis/diary/363.html
-
 
 enum LogPriority
 {
@@ -92,9 +88,11 @@ enum LogPriority
     ERROR, // it's dead, jim
 };
 
+/**
+ * Buffer for text sent to the standard output so that it is stored to a file or displayed in a GUI.
+ */
 class logbuf : public std::streambuf
 {
-    
 public:
     
     // create a buffer and initialize our logfile
@@ -110,14 +108,12 @@ public:
         // open the log file
         logfile.open(logpath, std::ios::app);
 
-        if (!logfile.is_open())
+        if (! logfile.is_open())
         {
             std::cout << "Error: Could not open log file: " << logpath << std::endl;
             exit(1);
         }
-        
         gettimeofday(&startTime, NULL);
-
     }
 
     // free our buffer
@@ -138,7 +134,6 @@ public:
     bool bFILE;
     
 private:
-    
     struct timeval startTime;
     
     // spit out the time, priority, and the log buffer to cerr and logfile
@@ -160,8 +155,10 @@ private:
         
 
         // now we stream the time, then the priority, then the message
-        if (bCOUT) std::cout << shortTime << ' ';
-        if (bFILE) logfile << longTime << ' ';
+        if (bCOUT)
+            std::cout << shortTime << ' ';
+        if (bFILE)
+            logfile << longTime << ' ';
         
         logfile << (int)(-dt.tv_sec) << "." << (int)(dt.tv_usec) << ' ';
 
@@ -183,13 +180,16 @@ private:
         }
         */
 
-
-        if (bCOUT) std::cout.write(pbase(), pptr() - pbase());
-        if (bFILE) logfile.write(pbase(), pptr() - pbase());
+        if (bCOUT)
+            std::cout.write(pbase(), pptr() - pbase());
+        if (bFILE)
+            logfile.write(pbase(), pptr() - pbase());
         
         // flush output
-        if (bCOUT) std::cout.flush();
-        if (bFILE) logfile.flush();
+        if (bCOUT)
+            std::cout.flush();
+        if (bFILE)
+            logfile.flush();
 
         // reset our priority to INFO
         priority = INFO;
@@ -225,10 +225,11 @@ private:
     unsigned long buflen;
 };
 
-
+/**
+ * Redirects SPIN's standard output using a logbuf.
+ */
 class spinLog : public std::ostream
 {
-
 public:
     // we initialize the ostream to use our logbuf
     spinLog(const char* logpath) : std::ostream(new logbuf(logpath))
@@ -236,7 +237,9 @@ public:
         buf = (logbuf*) rdbuf();
     }
 
-    // set priority
+    /**
+     * Sets priority
+     */
     void set_priority(LogPriority pr)
     {
         buf->set_priority(pr);
@@ -251,8 +254,6 @@ public:
     {
         buf->bFILE = b;
     }
-
-    
 private:
     // our logbuf object
     logbuf *buf;
@@ -269,3 +270,4 @@ static spinLog& operator<<(spinLog& vlog, LogPriority pr)
 } // end of namespace spin
 
 #endif // not included
+
