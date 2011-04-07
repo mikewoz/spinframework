@@ -61,7 +61,6 @@ namespace osg {
 namespace spin
 {
 
-
 /**
  * \brief An OSG NodeVisitor class that allows us to search for a specific node
  *        name/type in the scene graph.
@@ -70,10 +69,9 @@ namespace spin
  * an OSG model in the ModelNode class, so that we may discover animation features
  */
 
-class SearchVisitor : public osg::NodeVisitor {
-
+class SearchVisitor : public osg::NodeVisitor
+{
 public:
-
     SearchVisitor();
 
     virtual void apply(osg::Node &searchNode);
@@ -96,7 +94,6 @@ public:
     osg::ref_ptr<osg::Sequence> getSequenceNode();
 
 private:
-
     std::string searchForName;
 
     osg::ref_ptr<osg::Group> GroupNode;
@@ -105,11 +102,14 @@ private:
     osg::ref_ptr<osg::PositionAttitudeTransform> PATNode;
     osg::ref_ptr<osg::Switch> SwitchNode;
     osg::ref_ptr<osg::Sequence> SequenceNode;
-
 };
 
 typedef std::vector< osg::ref_ptr<osg::Node> > NodeList;
 
+// FIXME: is the definition below OK?
+/**
+ * \brief A NodeVisitor that stores a list of all node whose name match the one we are looking for.
+ */
 class NodeSearcher : public osg::NodeVisitor
 {
     public:
@@ -124,11 +124,8 @@ class NodeSearcher : public osg::NodeVisitor
         NodeList& _nodeList;
 
     protected:
-
         NodeSearcher& operator = (const NodeSearcher&) { return *this; }
 };
-
-
 
 /**
  * \brief An OSG NodeVisitor class that pretty prints the scene graph
@@ -136,7 +133,6 @@ class NodeSearcher : public osg::NodeVisitor
 class DebugVisitor : public osg::NodeVisitor
 {
     public:
-
         DebugVisitor();
 
         virtual void apply(osg::Node &node);
@@ -166,7 +162,6 @@ class TextureStateSetFinder : public osg::NodeVisitor
         TextureStateSetFinder(StateSetList& list);
         virtual void apply(osg::Node& node);
         virtual void apply(osg::Geode& geode);
-
         virtual void apply(osg::StateSet* stateset);
 
         /*
@@ -183,7 +178,6 @@ class TextureStateSetFinder : public osg::NodeVisitor
         StateSetList& _statesetList;
 
     protected:
-
         TextureStateSetFinder& operator = (const TextureStateSetFinder&);
 };
 
