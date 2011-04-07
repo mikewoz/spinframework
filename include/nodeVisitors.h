@@ -152,10 +152,11 @@ class UpdateSceneVisitor : public osg::NodeVisitor
         virtual void apply(osg::Group &node);
 };
 
+typedef std::vector< osg::ref_ptr<osg::StateSet> > StateSetList;
+
 /**
  * \brief A NodeVisitor class that finds all textured statesets in a node:
  */
-typedef std::vector< osg::ref_ptr<osg::StateSet> > StateSetList;
 class TextureStateSetFinder : public osg::NodeVisitor
 {
     public:
