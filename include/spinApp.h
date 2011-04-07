@@ -55,23 +55,23 @@ namespace spin
 class spinBaseContext;
 class SceneManager;
 class MediaManager;
+class UserNode;
 
 /**
  * \brief A singleton class to facilitate communication with SPIN.
  *
  * By instantiating this class, we load the OSG nodekit for SPIN -- otherwise
  * known as libSPIN, and create
- *
  */
-
-class UserNode;
-
 class spinApp
 {
     public:
-        // Meyers Singleton design pattern:
+        /**
+         * Meyers Singleton design pattern
+         * 
+         * FIXME: Do we really need this?
+         */
         static spinApp& Instance();
-
 
         void setContext(spinBaseContext *c);
         spinBaseContext *getContext() { return context; }
@@ -113,10 +113,8 @@ class spinApp
         void setSceneID(const std::string &s) { sceneID = s; }
         std::string getSceneID() const { return sceneID; }
 
-
         void setSyncStart(osg::Timer_t t) { _syncStartTick = t; }
         osg::Timer_t getSyncStart() const { return _syncStartTick; }
-
 
         /**
          * initializes the embedded python interpreter
@@ -208,7 +206,6 @@ class spinApp
         lo_send_message(spinApp::Instance().getContext()->lo_txAddr, \
             ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
             std::string(pNode->id->s_name)).c_str(), msg)
-
 
 // backwards compatibility (TODO: replace all BROADCAST messages with NODE_MSG)
 #define BROADCAST(pNode, types, ...) NODE_MSG(pNode, types, ##__VA_ARGS__)

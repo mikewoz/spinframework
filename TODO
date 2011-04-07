@@ -10,6 +10,7 @@ Release-critical for 0.4
  * path to package data in SceneManager.cpp should not be hard-coded
  * use 0, not NULL?
  * Make tests succeed each time consistently
+ * get rid of spinApp's singleton
 
 
 Server side TCP handlers
