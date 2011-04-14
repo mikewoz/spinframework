@@ -186,7 +186,7 @@ void ConstraintsNode::translate (float x, float y, float z)
 
     if ( !sceneManager->isGraphical() )
     {
-    	if ((_mode==BOUNCE)||(_mode==COLLIDE))
+    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==STICK))
     	{
     		// reset the lastDrawable
     		lastDrawable = 0;
@@ -208,7 +208,7 @@ void ConstraintsNode::move (float x, float y, float z)
     {
     	osg::Vec3 v = mainTransform->getAttitude() * osg::Vec3(x,y,z);
 
-    	if ((_mode==BOUNCE)||(_mode==COLLIDE))
+    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==STICK))
     	{
     		lastDrawable = 0;
     		lastPrimitiveIndex = -1;
@@ -340,7 +340,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					//std::cout << "newHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
 
-					if (_mode==COLLIDE)
+					if ((_mode==COLLIDE)||(_mode==STICK))
 					{
 						// Let the collisionPoint be just a bit before the real
 						// hitpoint (to avoid numerical imprecision placing the
@@ -350,25 +350,26 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// place the node at the collision point
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
 
-
-						// SLIDE along the hit plane with the left over energy:
-						// ie, project the remaining vector onto the surface we
-						// just intersected with.
-						//
-						// using:
-						//   cos(theta) = distToSurface / remainderVector length
-						//
-						double cosTheta = (dirVec * -localHitNormal) ; // dot product
-						osg::Vec3 remainderVector = (localPos + v) - localHitPoint;
-						double distToSurface = cosTheta * remainderVector.length();
-						osg::Vec3 slideVector = remainderVector + (localHitNormal * distToSurface);
-
-
-						// pseudo-recursively apply remainder of bounce:
-						applyConstrainedTranslation( slideVector );
-
 						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
+
+						if (_mode==COLLIDE)
+						{
+                            // SLIDE along the hit plane with the left over energy:
+                            // ie, project the remaining vector onto the surface we
+                            // just intersected with.
+                            //
+                            // using:
+                            //   cos(theta) = distToSurface / remainderVector length
+                            //
+                            double cosTheta = (dirVec * -localHitNormal) ; // dot product
+                            osg::Vec3 remainderVector = (localPos + v) - localHitPoint;
+                            double distToSurface = cosTheta * remainderVector.length();
+                            osg::Vec3 slideVector = remainderVector + (localHitNormal * distToSurface);
+
+                            // pseudo-recursively apply remainder of bounce:
+                            applyConstrainedTranslation( slideVector );
+						}
 
 						return;
 					}
@@ -426,11 +427,11 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						setTranslation(localHitPoint.x()-dirVec.x()*HAIR, localHitPoint.y()-dirVec.y()*HAIR, localHitPoint.z()-dirVec.z()*HAIR);
 						//setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
 
+                        //std::cout << "rotEulers = " << osg::RadiansToDegrees(rotEulers.x())<<","<<osg::RadiansToDegrees(rotEulers.y())<<","<<osg::RadiansToDegrees(rotEulers.z()) << std::endl;
+                        BROADCAST(this, "ssfff", "bounce", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);
-
-						//std::cout << "rotEulers = " << osg::RadiansToDegrees(rotEulers.x())<<","<<osg::RadiansToDegrees(rotEulers.y())<<","<<osg::RadiansToDegrees(rotEulers.z()) << std::endl;
-						BROADCAST(this, "ssfff", "bounce", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 						return;
 

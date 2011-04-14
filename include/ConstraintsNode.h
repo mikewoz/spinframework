@@ -87,9 +87,11 @@ public:
      * Z-axis down until it finds an intersection with the target surface)
      *
      * COLLIDE:
-     * A form of collision detection, where the node is blocked by the parent's
-     * surface. Note: this only works when node is moved using the
-     * "translate" command.
+     * A form of collision detection, where the node is blocked (and slides
+     * along) the target's surface. Note: sliding only works when the target is
+     * locally convex. Concavities are not checked, and may position the node
+     * on the other side of the target's surface. Use STICK instead for
+     * non-convex geometries.
      *
      * BOUNCE:
      * A form of collision detection, where the node reflects off the parent's
@@ -97,11 +99,15 @@ public:
      * the node is changed). Note: this only works when node is moved using the
      * "translate" command.
      *
+     * STICK:
+     * Equivalent to COLLIDE, but without sliding.
+     *
      */
     enum constraintMode {    BASIC,
                             DROP,
                             COLLIDE,
-                            BOUNCE
+                            BOUNCE,
+                            STICK
                         };
 
         
