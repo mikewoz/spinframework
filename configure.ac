@@ -122,7 +122,7 @@ fi
 
 PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
 
-PKG_CHECK_MODULES(CPPINTROSPECTION, cppintrospection-2.11 >= 2.11.0, , AC_MSG_ERROR([missing cppintrospection]))
+PKG_CHECK_MODULES(CPPINTROSPECTION, cppintrospection-3.0, , AC_MSG_ERROR([missing cppintrospection]))
 
 PKG_CHECK_MODULES(OPENTHREADS, openthreads >= 2.4.0, , AC_MSG_ERROR([missing OpenThreads]))
 
