@@ -5,6 +5,7 @@ AM_CPPFLAGS = \
     $(LIBLO_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
     $(OSG_CFLAGS) \
+    $(SHAREDVIDEO_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/tinyxml
 
@@ -20,7 +21,7 @@ AM_LDFLAGS = \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
-    $(SHARED_VIDEO_LIB)
+    $(SHAREDVIDEO_LIBS)
 
 check_PROGRAMS = \
     check_it_works

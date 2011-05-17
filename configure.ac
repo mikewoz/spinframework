@@ -128,17 +128,10 @@ PKG_CHECK_MODULES(OPENTHREADS, openthreads >= 2.4.0, , AC_MSG_ERROR([missing Ope
 
 PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 
-# FIXME: scenic should use pkg-config to say where shared video is
-OLD_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS -L/usr/local/lib/scenic -L/usr/lib/scenic"
-AC_CHECK_LIB([shared_video], [shared_video_is_present], 
-        SHARED_VIDEO_LIB="-lshared_video"; 
+PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, 
         [AC_DEFINE([WITH_SHARED_VIDEO],[],
             [A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])], 
-        [AC_MSG_WARN([missing Scenic shared_video library]); 
-        LDFLAGS=$OLD_LDFLAGS],[-pthread])
-
-AC_SUBST([SHARED_VIDEO_LIB])
+        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
