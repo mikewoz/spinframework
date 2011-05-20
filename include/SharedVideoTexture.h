@@ -48,7 +48,8 @@
 #include "ReferencedStateSet.h"
 
 #ifdef WITH_SHARED_VIDEO        
-#include <scenic/sharedVideoBuffer.h>
+#include <shared-video-0.6/sharedVideoBuffer.h>
+//#include <sharedVideoBuffer.h>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
