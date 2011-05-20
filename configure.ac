@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(SPINFRAMEWORK, [0.3.3], [https://sourceforge.net/apps/trac/spinframework/], [spinframework], [http://www.spinframework.org])
+AC_INIT(SPINFRAMEWORK, [0.3.3], [http://github.com/mikewoz/spinframework], [spinframework], [http://www.spinframework.org])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -128,10 +128,20 @@ PKG_CHECK_MODULES(OPENTHREADS, openthreads >= 2.4.0, , AC_MSG_ERROR([missing Ope
 
 PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, 
-        [AC_DEFINE([WITH_SHARED_VIDEO],[],
-            [A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])], 
-        [AC_MSG_WARN([missing Scenic shared_video library])])
+#PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, 
+#        [AC_DEFINE([WITH_SHARED_VIDEO],[],
+#            [A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])], 
+#        [AC_MSG_WARN([missing Scenic shared_video library])])
+
+
+PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, have_sharedvideo=true, have_sharedvideo=false)
+if test "x${have_sharedvideo}" = "xfalse" ; then
+    AC_MSG_WARN([missing package: libshared-video-0.6-dev ])
+else
+    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])
+    AC_MSG_NOTICE([SHAREDVIDEO_CFLAGS:    ${SHAREDVIDEO_CFLAGS}])
+    AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
+fi
 
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
