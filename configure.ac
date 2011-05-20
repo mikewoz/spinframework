@@ -47,13 +47,13 @@ case "$host" in *-darwin* | *-macos10*)
     CPPFLAGS="$CPPFLAGS -I/sw/include"
     LDFLAGS="$LDFLAGS -L/sw/lib"
   fi
+  # OSX does not include /usr/local/lib/pkgconfig path, so we export it here
+  # (for everyone, just in case)
+  # TODO: also need to add the path for linux64
+  PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+  export PKG_CONFIG_PATH
   ;;
 esac
-
-# OSX does not include /usr/local/lib/pkgconfig path, so we export it here
-# (for everyone, just in case)
-PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
-export PKG_CONFIG_PATH
 
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
 # LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
