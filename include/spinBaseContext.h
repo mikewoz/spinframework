@@ -118,6 +118,8 @@ class spinBaseContext
 
         bool isRunning() { return running; }
 
+        void setTTL(int ttl);
+
         /**
          * List of address/port combinations on which the server listens for messages that alters the scene graph.
          */

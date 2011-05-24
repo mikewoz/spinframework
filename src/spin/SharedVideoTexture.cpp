@@ -246,6 +246,7 @@ void SharedVideoTexture::consumeFrame()
 
         do
         {
+            std::cout << "lock for frame" << std::endl;
             // Lock the mutex
             scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
@@ -297,7 +298,7 @@ void SharedVideoTexture::consumeFrame()
         }
         else
         {
-            std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet (error: " << ex.what() << "\n";
+            std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet\n";
             //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
         }
     }

@@ -32,7 +32,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Fog)
 	          Properties::VIRTUAL,
 	          __C5_char_P1__getPath,
 	          "",
-	          "Abstract method getPath needs to be implemented ");
+	          "need to implement abstract method... ?! ");
 	I_Method1(void, setFogDensity, IN, float, density,
 	          Properties::NON_VIRTUAL,
 	          __void__setFogDensity__float,
@@ -42,7 +42,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Fog)
 	          Properties::NON_VIRTUAL,
 	          __float__getFogDensity,
 	          "",
-	          "");
+	          "Get fog density (good values are around 0.001 - 0.1) ");
 	I_Method4(void, setFogColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
 	          Properties::NON_VIRTUAL,
 	          __void__setFogColor__float__float__float__float,
@@ -52,12 +52,12 @@ BEGIN_OBJECT_REFLECTOR(spin::Fog)
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getFogColor,
 	          "",
-	          "");
+	          "Get fog color ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
-	          "Just like a ReferencedNode, each subclass of ReferencedStateSet must override the getState() method to pass it's current state. ");
+	          "must reimplement ");
 	I_SimpleProperty(osg::Vec4, FogColor, 
 	                 __osg_Vec4__getFogColor, 
 	                 0);

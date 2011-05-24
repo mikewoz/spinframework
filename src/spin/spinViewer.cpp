@@ -106,6 +106,7 @@ int run(int argc, char **argv)
 	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddrs_[0]);
 	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddrs_[0]);
 	std::string syncPort = lo_address_get_port(spinListener.lo_syncAddr);
+    int ttl=1;
 
 	// *************************************************************************
 
@@ -126,6 +127,7 @@ int run(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
 	arguments.getApplicationUsage()->addCommandLineOption("--server-addr <host> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the receiving port for timecode sync (Default: " + syncPort + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
 
 	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
     arguments.getApplicationUsage()->addCommandLineOption("--hide-cursor", "Hide the mouse cursor");
@@ -170,6 +172,9 @@ int run(int argc, char **argv)
 	while (arguments.read("--sync-port", syncPort)) {
 		spinListener.lo_syncAddr = lo_address_new(rxHost.c_str(), syncPort.c_str());
 	}
+    while (arguments.read("--ttl", ttl)) {
+        spinListener.setTTL(ttl);
+    }
 
 	frustum frust;
 	frust.valid = false;

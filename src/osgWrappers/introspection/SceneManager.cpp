@@ -25,25 +25,6 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(spin::Introspector)
-	I_DeclaringFile("SceneManager.h");
-	I_Constructor0(____Introspector,
-	               "",
-	               "");
-	I_StaticMethod1(std::string, prependNamespace, IN, const std::string &, name,
-	                __std_string__prependNamespace__C5_std_string_R1_S,
-	                "",
-	                "Prepends \"spin::\" to a type name. ");
-	I_StaticMethod1(std::string, removeNamespace, IN, const std::string &, name,
-	                __std_string__removeNamespace__C5_std_string_R1_S,
-	                "",
-	                "Removes \"spin::\" from a type name. ");
-	I_StaticMethod1(const cppintrospection::Type &, getType, IN, const std::string &, name,
-	                __C5_cppintrospection_Type_R1__getType__C5_std_string_R1_S,
-	                "",
-	                "Prepends \"spin::\" to a type name and returns its cppintrospection::Type. ");
-END_REFLECTOR
-
 BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_DeclaringFile("SceneManager.h");
 	I_Constructor1(IN, std::string, id,

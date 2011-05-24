@@ -55,7 +55,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setShape__shapeType,
 	          "",
-	          "");
+	          "Sets the shape this ShapeNode should have, identified by its number. ");
 	I_Method1(void, setBillboard, IN, spin::ShapeNode::billboardType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__billboardType,
@@ -65,7 +65,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
 	          "",
-	          "");
+	          " param red Red channel. Number in the range [0, 1]  green Green channel. Number in the range [0, 1]  blue Blue channel. Number in the range [0, 1]  alpha Opacity channel. Number in the range [0, 1]  ");
 	I_Method1(void, setTextureFromFile, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __void__setTextureFromFile__C5_char_P1,

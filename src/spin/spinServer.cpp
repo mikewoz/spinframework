@@ -73,6 +73,7 @@ int main(int argc, char **argv)
 	std::string rxHost = lo_address_get_hostname(server->lo_rxAddrs_[0]);
 	std::string rxPort = lo_address_get_port(server->lo_rxAddrs_[0]);
 	std::string syncPort = lo_address_get_port(server->lo_syncAddr);
+    int ttl=1;
 
 	// set up the usage document, which a user can acess with -h or --help
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
@@ -87,6 +88,7 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--rx-addr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: <local host name> " + rxPort + ")");
     // FIXME: rxHost (see comment above)
 	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
 
 
 	// PARSE ARGS:
@@ -121,6 +123,10 @@ int main(int argc, char **argv)
 	while (arguments.read("--sync-port", syncPort)) {
 		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
 	}
+
+    while (arguments.read("--ttl", ttl)) {
+        server->setTTL(ttl);
+    }
 
 	
 	// any option left unread are converted into errors to write out later

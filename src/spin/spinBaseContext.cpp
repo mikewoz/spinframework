@@ -158,12 +158,19 @@ void spinBaseContext::sigHandler(int signum)
         throw std::runtime_error("Got multiple interrupts, exitting rudely");
 }
 
+void spinBaseContext::setTTL(int ttl)
+{
+    lo_address_set_ttl(lo_txAddr, ttl);
+    lo_address_set_ttl(lo_infoAddr, ttl);
+    lo_address_set_ttl(lo_syncAddr, ttl);
+}
+
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << std::endl;
-    std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
-    std::cout << "  Sending on TX channel:\t" << lo_address_get_url(lo_txAddr) << std::endl;
+    std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
+    std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
+    std::cout << "  Sending on TX channel:\t" << lo_address_get_url(lo_txAddr) << " TTL=" << lo_address_get_ttl(lo_txAddr) << std::endl;
 
     signalStop = false;
 

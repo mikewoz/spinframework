@@ -83,6 +83,7 @@
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
 #include <cppintrospection/ExtendedTypeInfo>
+#include "introspect_helpers.h"
 
 using namespace cppintrospection;
 
@@ -142,7 +143,7 @@ SceneManager::SceneManager(std::string id)
     try
     {
         {
-        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = introspector::getType("ReferencedNode");
         //nodeTypes.clear();
         const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
         cppintrospection::TypeMap::const_iterator it;
@@ -164,7 +165,7 @@ SceneManager::SceneManager(std::string id)
 
         // Same thing for ReferencedStateSets:
         {
-        const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("spin::ReferencedStateSet");
+        const cppintrospection::Type &ReferencedStateSetType = introspector::getType("ReferencedStateSet");
         const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
         cppintrospection::TypeMap::const_iterator it;
         for (it = allTypes.begin(); it != allTypes.end(); it++)
@@ -782,8 +783,8 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
 
     try {
 
-        // Let's use cppintrospection to create a node of the proper type:
-        const cppintrospection::Type &t = cppintrospection::Reflection::getType(type);
+        // Let's use cppintrospection to create a stateset of the proper type:
+        const cppintrospection::Type &t = introspector::getType(type);
 
         //std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
         //introspect_print_type(t);
@@ -1021,7 +1022,7 @@ std::vector<SoundConnection*> SceneManager::getConnections()
     {
         std::string nodeType = (*it).first;
 
-        const cppintrospection::Type &t = cppintrospection::Reflection::getType("spin::" + nodeType);
+        const cppintrospection::Type &t = introspector::getType(nodeType);
         if (t.isDefined())
         {
             // check if the nodeType is a subclass of DSPNode:
@@ -1772,7 +1773,7 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
 
     char *nodeType = (char*) XMLnode->Value();
 
-    if (cppintrospection::Reflection::getType(nodeType).isDefined())
+    if (introspector::getType(nodeType).isDefined())
     {
         if (XMLnode->Attribute("id"))
         {
