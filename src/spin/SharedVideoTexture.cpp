@@ -297,7 +297,7 @@ void SharedVideoTexture::consumeFrame()
         }
         else
         {
-            std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet\n";
+            std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet (error: " << ex.what() << "\n";
             //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
         }
     }
