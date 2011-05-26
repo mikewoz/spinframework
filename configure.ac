@@ -186,6 +186,7 @@ AC_CONFIG_FILES([
         src/Resources/Makefile
         src/Resources/images/Makefile
         src/Resources/desktopentries/Makefile
+        src/Resources/camconfig/Makefile
         src/Resources/fonts/Makefile
         src/Resources/scripts/Makefile
         tests/Makefile
