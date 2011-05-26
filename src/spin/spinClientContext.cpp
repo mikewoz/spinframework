@@ -62,6 +62,8 @@ spinClientContext::spinClientContext() :
     // Important: first thing to do is set the context mode (client vs server)
     mode = CLIENT_MODE;
 
+    tcpPort_ = CLIENT_TCP_PORT;
+
     // Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
@@ -87,10 +89,13 @@ void spinClientContext::createServers()
 
     using boost::lexical_cast;
     using std::string;
+
+    /*
     // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
     lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
     std::cout << "  TCP channel:\t\t\t" << lo_server_get_url(lo_tcpRxServer_) <<
         std::endl;
+*/
 
     spinBaseContext::createServers();
 

@@ -116,6 +116,7 @@ void spinServerContext::createServers()
 {
 	std::vector<lo_server>::iterator servIter;
 
+    /*
     // passing null means we'll be assigned a random port, which we can access later with lo_server_get_port
     lo_tcpRxServer_ = lo_server_new_with_proto(spin_defaults::SERVER_TCP_PORT, LO_TCP, oscParser_error);
     // liblo will try a random free port if the default failed
@@ -128,7 +129,7 @@ void spinServerContext::createServers()
 
     std::cout << "  Receiving on TCP channel:\t" << lo_server_get_url(lo_tcpRxServer_) <<
         std::endl;
-
+*/
 
     spinBaseContext::createServers();
 #if 0
