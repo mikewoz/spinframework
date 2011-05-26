@@ -7,15 +7,15 @@
         <windowPosition>50 50</windowPosition>
         <windowSize>400 400</windowSize>
         <clearColor>0 0 0 0</clearColor>
-        <windowDecoration>false</windowDecoration>
+        <windowDecoration>true</windowDecoration>
         <useCursor>true</useCursor>
-        <supportsResize>true</supportsResize>
+        <supportsResize>false</supportsResize>
         <camera id="leftCamera">
             <parent>world</parent>
             <offset>0 0 0</offset>
-            <direction>0 0 -90</direction>
-            <viewport>0 0 1 1</viewport>
-            <frustum>-1.54 0.0 -0.26 0.26 1 1000</frustum>
+            <direction>0 0 0</direction>
+            <viewport>0% 0% 100% 100%</viewport>
+            <frustum>-0.54 0.0 -0.26 0.26 1 1000</frustum>
         </camera>
     </window>
     <window id="rightWindow">
@@ -24,14 +24,14 @@
         <windowPosition>450 50</windowPosition>
         <windowSize>400 400</windowSize>
         <clearColor>1 0 0 0</clearColor>
-        <windowDecoration>false</windowDecoration>
+        <windowDecoration>true</windowDecoration>
         <useCursor>true</useCursor>
         <supportsResize>true</supportsResize>
         <camera id="rightCamera">
             <parent>world</parent>
             <offset>0 0 0</offset>
-            <direction>0 0 -90</direction>
-            <viewport>0 0 1 1</viewport>
+            <direction>0 0 0</direction>
+            <viewport>0% 0% 100% 100%</viewport>
             <frustum>0.0 0.54 -0.26 0.26 1 1000</frustum>
         </camera>
     </window>

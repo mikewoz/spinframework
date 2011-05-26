@@ -21,7 +21,7 @@
             <eye>0 0 10</eye>
             <lookat>0 0 9</lookat>
             <up>0 1 0</up>
-            <viewport>75% 10% 20$ 20%</viewport>
+            <viewport>5% 5% 20% 20%</viewport>
             <clearColor>0.1 0.1 0.1 0.1</clearColor>
         </camera>
     </window>

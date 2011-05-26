@@ -7,7 +7,7 @@
         <windowPosition>50 50</windowPosition>
         <windowSize>800 400</windowSize>
         <clearColor>0 0 0 0</clearColor>
-        <windowDecoration>false</windowDecoration>
+        <windowDecoration>true</windowDecoration>
         <useCursor>true</useCursor>
         <supportsResize>true</supportsResize>
         <camera id="forwardCamera">
@@ -15,7 +15,7 @@
             <eye>0 0 0</eye>
             <lookat>0 1 0</lookat>
             <up>0 0 1</up>
-            <viewport>0 0.5 0 0</viewport>
+            <viewport>0% 0% 0% 50% 100%</viewport>
             <clearColor>0.2 0.2 0.2 0</clearColor>
         </camera>
         <camera id="topview">
@@ -23,7 +23,7 @@
             <eye>0 0 10</eye>
             <lookat>0 0 9</lookat>
             <up>0 1 0</up>
-            <viewport>0.5 1.0 0 0</viewport>
+            <viewport>50% 0% 50% 100%</viewport>
             <clearColor>0.2 0 0 0</clearColor>
         </camera>
     </window>

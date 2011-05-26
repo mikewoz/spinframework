@@ -4,7 +4,7 @@
     <window id="window01">
         <screen>0</screen>
         <windowPosition>0 0</windowPosition>
-        <windowSize>1280 1024</windowSize>
+        <windowSize>1280 1020</windowSize>
         <windowDecoration>false</windowDecoration>
         <useCursor>true</useCursor>
         <supportsResize>true</supportsResize>
