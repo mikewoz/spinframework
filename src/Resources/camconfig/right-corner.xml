@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE soundEngine SYSTEM>
+<camConfig>
+    <window id="window01">
+        <screen>0</screen>
+        <fullscreen>false</fullscreen>
+        <windowPosition>50% 0%</windowPosition>
+        <windowSize>50% 50%</windowSize>
+        <windowDecoration>true</windowDecoration>
+        <useCursor>true</useCursor>
+        <supportsResize>true</supportsResize>
+        <camera id="cam01">
+            <eye>0 0 0</eye>
+            <lookat>0 0.00001 0</lookat>
+            <up>0 0 1</up>
+            <viewport>0% 0% 100% 100%</viewport>
+            <frustum>-1 1 -0.6666 0.6666 1 1000</frustum>
+            <perspective_>90 1 1 1000</perspective_>
+            <clearColor>0 0 0 0</clearColor>
+        </camera>
+    </window>
+    <window id="window02">
+        <screen>1</screen>
+        <fullscreen>false</fullscreen>
+        <windowPosition>0% 0%</windowPosition>
+        <windowSize>50% 50%</windowSize>
+        <windowDecoration>true</windowDecoration>
+        <useCursor>true</useCursor>
+        <supportsResize>true</supportsResize>
+        <camera id="cam02">
+            <eye>0 0 0</eye>
+            <lookat>0.00001 0 0</lookat>
+            <up>0 0 1</up>
+            <viewport>0% 0% 100% 100%</viewport>
+            <frustum>-1 1 -0.6666 0.6666 1 1000</frustum>
+            <perspective_>90 1 1 1000</perspective_>
+            <clearColor>0 0 0 0</clearColor>
+        </camera>
+    </window>
+</camConfig>

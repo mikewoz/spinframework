@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE soundEngine SYSTEM>
+<camConfig>
+    <window id="leftWindow">
+        <screen>0</screen>
+        <fullscreen>true</fullscreen>
+        <windowPosition>50 50</windowPosition>
+        <windowSize>500 500</windowSize>
+        <clearColor>0 0 0 0</clearColor>
+        <windowDecoration>false</windowDecoration>
+        <useCursor>true</useCursor>
+        <supportsResize>true</supportsResize>
+        <camera id="leftCamera">
+            <parent>world</parent>
+            <offset>0 0 0</offset>
+            <direction>0 0 -90</direction>
+            <viewport>0 0 0.5 1</viewport>
+        </camera>
+        <camera id="centreCamera">
+            <parent>world</parent>
+            <offset>0 0 0</offset>
+            <direction>0 0 0</direction>
+            <viewport>0.5 0 0.5 1</viewport>
+        </camera>
+    </window>
+</camConfig>

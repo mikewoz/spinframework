@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE spinframework SYSTEM>
+<camConfig>
+    <window id="PIP">
+        <screen>0</screen>
+        <fullscreen>false</fullscreen>
+        <windowPosition>50 50</windowPosition>
+        <windowSize>500 500</windowSize>
+        <windowDecoration>true</windowDecoration>
+        <useCursor>true</useCursor>
+        <supportsResize>true</supportsResize>
+        <camera id="forwardCamera">
+            <eye>0 0 0</eye>
+            <lookat>0 0.00001 0</lookat>
+            <up>0 0 1</up>
+            <viewport>0% 0% 100% 100%</viewport>
+            <clearColor>0 0 0 0</clearColor>
+        </camera>
+        <camera id="topview">
+            <parent>world</parent>
+            <eye>0 0 10</eye>
+            <lookat>0 0 9</lookat>
+            <up>0 1 0</up>
+            <viewport>75% 10% 20$ 20%</viewport>
+            <clearColor>0.1 0.1 0.1 0.1</clearColor>
+        </camera>
+    </window>
+</camConfig>
