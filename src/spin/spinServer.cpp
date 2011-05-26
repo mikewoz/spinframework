@@ -87,6 +87,7 @@ int main(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--tx-addr <hostname> <port>", "Set the transmission address where the server sends updates to (Default: " + txHost + " " + txPort + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("--rx-addr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: <local host name> " + rxPort + ")");
     // FIXME: rxHost (see comment above)
+	arguments.getApplicationUsage()->addCommandLineOption("--tcp-port <port>", "Set the port on which we receive TCP subscription requests (Default: " + server->tcpPort_ + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
     arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
 
@@ -119,6 +120,8 @@ int main(int argc, char **argv)
 		server->lo_rxAddrs_.push_back(lo_address_new(rxHost.c_str(), rxPort.c_str()));
 		passed_rxAddrs = true;
 	}
+
+	arguments.read("--tcp-port", server->tcpPort_);
 
 	while (arguments.read("--sync-port", syncPort)) {
 		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());

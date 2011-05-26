@@ -98,6 +98,8 @@ spinBaseContext::spinBaseContext() :
     lo_txAddr = lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT);
     lo_syncAddr = lo_address_new(MULTICAST_GROUP, SYNC_UDP_PORT);
 
+    tcpPort_ = SERVER_TCP_PORT;
+
     // override infoPort based on environment variable:
     char *infoPortStr = getenv("AS_INFOPORT");
     if (infoPortStr)
@@ -747,7 +749,18 @@ void spinBaseContext::createServers()
 {
     using boost::lexical_cast;
     using std::string;
-    // set up OSC event listener:
+
+    lo_tcpRxServer_ = lo_server_new_with_proto(tcpPort_.c_str(), LO_TCP, oscParser_error);
+    if (lo_tcpRxServer_ == 0)
+    {
+        // liblo will try a random free port if the default failed
+        std::cerr << "TCP receiver port " << tcpPort_ <<
+            " failed; trying a random port" << std::endl;
+        lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
+    }
+    std::cout << "  Receiving on TCP channel:\t" << lo_server_get_url(lo_tcpRxServer_) << std::endl;
+
+
 
     std::vector<lo_address>::iterator it;
     for (it = lo_rxAddrs_.begin(); it != lo_rxAddrs_.end(); ++it)

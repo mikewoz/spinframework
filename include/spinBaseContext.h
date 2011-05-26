@@ -142,7 +142,8 @@ class spinBaseContext
          */
         lo_address lo_syncAddr;
         lo_server lo_infoServ_;
-        
+       
+        std::string tcpPort_; 
         lo_server lo_tcpRxServer_;
 
         static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
