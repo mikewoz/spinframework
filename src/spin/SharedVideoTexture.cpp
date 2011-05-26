@@ -246,7 +246,6 @@ void SharedVideoTexture::consumeFrame()
 
         do
         {
-            std::cout << "lock for frame" << std::endl;
             // Lock the mutex
             scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
 
