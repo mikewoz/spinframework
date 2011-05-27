@@ -524,10 +524,16 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
 	else sendingAddress = txAddr;
 */
 
+    std::vector<lo_message>::iterator iter;
+    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+    for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
+    {
+        lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+    }
+
     std::vector<lo_address>::iterator addrIter;
     for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
     {
-        std::vector<lo_message>::iterator iter;
 
         // TCP in liblo can't handle bundles
         if (lo_address_get_protocol(*addrIter) == LO_TCP)
@@ -536,24 +542,28 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
             while (iter != msgs.end())
             {
                 lo_send_message((*addrIter), OSCpath.c_str(), (*iter));
-                msgs.erase(iter); // iterator automatically advances after erase()
+                ++iter;
+                //msgs.erase(iter); // iterator automatically advances after erase()
             }
         }
         // if it's any UDP socket, then bundle the messages:
         else
         {
+/*
             lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
-
-            iter = msgs.begin();
-            while (iter != msgs.end())
+            for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
+            //iter = msgs.begin();
+            //while (iter != msgs.end())
             {
                 lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
-                msgs.erase(iter); // iterator automatically advances after erase()
+                //msgs.erase(iter); // iterator automatically advances after erase()
             }
+*/
             lo_send_bundle((*addrIter), b);
-            lo_bundle_free_messages(b);
+            //lo_bundle_free_messages(b);
         }
     }
+    lo_bundle_free_messages(b);
 }
 
 } // end of namespace spin
