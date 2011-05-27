@@ -1391,7 +1391,19 @@ void SceneManager::update()
 {
 
 #ifdef WITH_SHARED_VIDEO
-    //if (shTex.valid()) shTex->updateCallback();
+    // it's possible that a SharedVideoTexture is in the sceneManager, but not
+    // currently applied on any geometry. In this canse, it will not be be
+    // seen in the update traversal of the scene graph, and it's updateCallback
+    // will not be called. As a result, frames don't get consumed, and we need
+    // to consume all the frames before we are back in sync. If the framerate
+    // of the viewer is low, this can take a very long time and appears like a
+    // huge delay.
+    ReferencedStateSetList::iterator sIter;
+    for (sIter = stateMap[std::string("SharedVideoTexture")].begin(); sIter != stateMap[std::string("SharedVideoTexture")].end(); sIter++)
+    {
+        if (!(*sIter)->getNumParents())
+            (*sIter)->updateCallback();
+    }
 #endif
 
 	if (spinApp::Instance().getContext()->isServer())
