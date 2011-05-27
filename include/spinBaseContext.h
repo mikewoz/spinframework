@@ -121,6 +121,15 @@ class spinBaseContext
         void setTTL(int ttl);
 
         /**
+         * List of clients to send to, each is an address and port
+         * combination to which the server sends updates to the scene.
+         * The vector usually just contains one multicast
+         * address, but for special situations (eg, across many routers,
+         * it's sometimes easier to use a list of addresses)
+         */
+        std::vector<lo_address> lo_txAddrs_;
+
+        /**
          * List of address/port combinations on which the server listens for messages that alters the scene graph.
          */
         std::vector<lo_address> lo_rxAddrs_;
@@ -129,10 +138,6 @@ class spinBaseContext
          */
         std::vector<lo_server> lo_rxServs_;
 
-        /**
-         * Multicast group and port number to which the server sends the messages that clients sent to it to alter the scene graph. 
-         */
-        lo_address lo_txAddr;
         /**
          * Multicast group and port number to which the server sends the addresses and port numbers on which it sends and receives.
          */

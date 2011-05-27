@@ -68,8 +68,8 @@ int main(int argc, char **argv)
 
 	std::string sceneID = spinApp::Instance().getSceneID();
 
-	std::string txHost = lo_address_get_hostname(server->lo_txAddr);
-	std::string txPort = lo_address_get_port(server->lo_txAddr);
+	std::string txHost = lo_address_get_hostname(server->lo_txAddrs_[0]);
+	std::string txPort = lo_address_get_port(server->lo_txAddrs_[0]);
 	std::string rxHost = lo_address_get_hostname(server->lo_rxAddrs_[0]);
 	std::string rxPort = lo_address_get_port(server->lo_rxAddrs_[0]);
 	std::string syncPort = lo_address_get_port(server->lo_syncAddr);
@@ -110,15 +110,18 @@ int main(int argc, char **argv)
 	arguments.read("--scene-id", param_spinID);
 	spinApp::Instance().setSceneID(sceneID);
 
-	while (arguments.read("--tx-addr", txHost, txPort)) {
-		server->lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
+	bool passed_addrs = false;
+    while (arguments.read("--tx-addr", txHost, txPort)) {
+		if (!passed_addrs) server->lo_txAddrs_.clear();
+		server->lo_txAddrs_.push_back(lo_address_new(txHost.c_str(), txPort.c_str()));
+		passed_addrs = true;
 	}
 
-	bool passed_rxAddrs = false;
+	passed_addrs = false;
 	while (arguments.read("--rx-addr", rxHost, rxPort)) {
-		if (!passed_rxAddrs) server->lo_rxAddrs_.clear();
+		if (!passed_addrs) server->lo_rxAddrs_.clear();
 		server->lo_rxAddrs_.push_back(lo_address_new(rxHost.c_str(), rxPort.c_str()));
-		passed_rxAddrs = true;
+		passed_addrs = true;
 	}
 
 	arguments.read("--tcp-port", server->tcpPort_);

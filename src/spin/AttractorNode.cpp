@@ -187,7 +187,7 @@ void AttractorNode::setDistanceDecay (float decay)
 	{
 		distanceDecay_ = decay;
 		BROADCAST(this, "sf", "setDistanceDecay", getDistanceDecay());
-	}
+    }
 }
 void AttractorNode::setAngularDecay (float decay)
 {
