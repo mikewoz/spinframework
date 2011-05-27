@@ -79,7 +79,6 @@ namespace spin
 bool spinBaseContext::signalStop = false;
 
 spinBaseContext::spinBaseContext() :
-    lo_txAddr(NULL),
     lo_infoAddr(NULL),
     lo_syncAddr(NULL),
     lo_infoServ_(NULL),
@@ -95,7 +94,7 @@ spinBaseContext::spinBaseContext() :
     // set default addresses (can be overridden):
     lo_infoAddr = lo_address_new(MULTICAST_GROUP, INFO_UDP_PORT);
     //lo_rxAddrs.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT));
-    lo_txAddr = lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT);
+    //lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT));
     lo_syncAddr = lo_address_new(MULTICAST_GROUP, SYNC_UDP_PORT);
 
     tcpPort_ = SERVER_TCP_PORT;
@@ -117,6 +116,12 @@ spinBaseContext::~spinBaseContext()
     this->stop();
 	
     std::vector<lo_address>::iterator addrIter;
+    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
+    {
+    	lo_address_free(*addrIter);
+    }
+    lo_txAddrs_.clear();
+    
     for (addrIter = lo_rxAddrs_.begin(); addrIter != lo_rxAddrs_.end(); ++addrIter)
     {
     	lo_address_free(*addrIter);
@@ -128,7 +133,6 @@ spinBaseContext::~spinBaseContext()
         lo_server_free(*servIter);
     lo_rxServs_.clear();
 
-    lo_address_free(lo_txAddr);
 	lo_address_free(lo_infoAddr);
     lo_address_free(lo_syncAddr);
 
@@ -162,7 +166,10 @@ void spinBaseContext::sigHandler(int signum)
 
 void spinBaseContext::setTTL(int ttl)
 {
-    lo_address_set_ttl(lo_txAddr, ttl);
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
+        lo_address_set_ttl((*addrIter), ttl);
+    
     lo_address_set_ttl(lo_infoAddr, ttl);
     lo_address_set_ttl(lo_syncAddr, ttl);
 }
@@ -172,7 +179,11 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
     std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
-    std::cout << "  Sending on TX channel:\t" << lo_address_get_url(lo_txAddr) << " TTL=" << lo_address_get_ttl(lo_txAddr) << std::endl;
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
+    {
+        std::cout << "  Sending on TX channel:\t" << lo_address_get_url(*addrIter) << " TTL=" << lo_address_get_ttl(*addrIter) << std::endl;
+    }
 
     signalStop = false;
 
@@ -352,7 +363,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                             lo_message_add_string(msg, (const char*) argv[i] );
                         }
                     }
-                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+                    std::vector<lo_address>::iterator addrIter;
+                    for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+                    {
+                        lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+                    }
                 }
                 theArgs.push_back(false); // serverSide arg
             }
@@ -442,7 +457,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                             lo_message_add_string(msg, (const char*) argv[i]);
                         }
                     }
-                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+                    std::vector<lo_address>::iterator addrIter;
+                    for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+                    {
+                        lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+                    }
                 }
                 theArgs.push_back(false); // serverSide arg
             }
@@ -531,7 +550,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                 lo_message_add_string(msg, (const char*) argv[i] );
             }
         }
-        lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+        std::vector<lo_address>::iterator addrIter;
+        for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+        {
+            lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+        }
     }
 
     bool eventScriptCalled = false;
@@ -561,7 +584,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                         lo_message_add_string(msg, (const char*) argv[i]);
                     }
                 }
-                lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+                std::vector<lo_address>::iterator addrIter;
+                for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+                {
+                    lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+                }
             }
         }
     }

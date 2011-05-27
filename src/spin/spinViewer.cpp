@@ -435,6 +435,8 @@ int run(int argc, char **argv)
 	std::string sceneID = spin.getSceneID();
 	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddrs_[0]);
 	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddrs_[0]);
+	std::string txHost = lo_address_get_hostname(spinListener.lo_txAddrs_[0]);
+	std::string txPort = lo_address_get_port(spinListener.lo_txAddrs_[0]);
 	std::string syncPort = lo_address_get_port(spinListener.lo_syncAddr);
     int ttl=1;
 
@@ -455,7 +457,8 @@ int run(int argc, char **argv)
     //: '" + userID + "')");
 
 	arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("--server-addr <host> <port>", "Set the receiving address for incoming OSC messages (Default: " + rxHost + " " + rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--server-addr <host> <port>", "Tell the viewer where the spinserver is located, and which port it receives UDP messages (Default: " + rxHost + " " + rxPort + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--recv-addr <host> <port>", "Set the receiving address for incoming UDP messages (Default: " + txHost + " " + txPort + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("--tcp-port <port>", "Specify an incoming TCP port when subscribing to the server's TCP channel (Default: " + spinListener.tcpPort_ + ")");
 	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the receiving port for timecode sync (Default: " + syncPort + ")");
     arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
@@ -501,7 +504,12 @@ int run(int argc, char **argv)
 	arguments.read("--config", param_camConfig);
     
 	while (arguments.read("--server-addr", rxHost, rxPort)) {
-		spinListener.lo_txAddr= lo_address_new(rxHost.c_str(), rxPort.c_str());
+        spinListener.lo_txAddrs_.clear();
+		spinListener.lo_txAddrs_.push_back(lo_address_new(rxHost.c_str(), rxPort.c_str()));
+	}
+	while (arguments.read("--recv-addr", txHost, txPort)) {
+        spinListener.lo_rxAddrs_.clear();
+		spinListener.lo_rxAddrs_.push_back(lo_address_new(txHost.c_str(), txPort.c_str()));
 	}
 
     arguments.read("--tcp-port", spinListener.tcpPort_);	
@@ -681,7 +689,7 @@ int run(int argc, char **argv)
 	// ***************************************************************************
 	// debug print camera info
 	
-	if (1)
+	if (0)
 	{
         std::cout << std::endl << "CAMERA DEBUG PRINT:" << std::endl;
         

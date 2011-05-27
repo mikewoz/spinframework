@@ -68,7 +68,7 @@ spinServerContext::spinServerContext() : syncThreadID(0)
 
     // override sender and receiver addresses in server mode:
     lo_rxAddrs_.push_back(lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT));
-    lo_txAddr = lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT);
+    lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT));
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
@@ -193,7 +193,7 @@ void *spinServerContext::spinServerThread(void *arg)
     // convert ports to integers for sending:
     int i_rxPort, i_txPort, i_syncPort;
     fromString<int>(i_rxPort, lo_address_get_port(context->lo_rxAddrs_[0]));
-    fromString<int>(i_txPort, lo_address_get_port(context->lo_txAddr));
+    fromString<int>(i_txPort, lo_address_get_port(context->lo_txAddrs_[0]));
     fromString<int>(i_syncPort, lo_address_get_port(context->lo_syncAddr));
 
     UpdateSceneVisitor visitor;
@@ -209,12 +209,13 @@ void *spinServerContext::spinServerThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
+            if (0)
             spin.InfoMessage("/SPIN/__server__", "ssiisii",
                              spin.getSceneID().c_str(),
                              myIP.c_str(), // server's IP address
                              i_rxPort, // server's receiving port
                              lo_server_get_port(context->lo_tcpRxServer_), // server's receiving TCP port
-                             lo_address_get_hostname(context->lo_txAddr), // server multicasting group
+                             lo_address_get_hostname(context->lo_txAddrs_[0]), // server multicasting group
                              i_txPort,  // server multicast port
                              i_syncPort, // server multicast port for sync (timecode)
                              LO_ARGS_END);

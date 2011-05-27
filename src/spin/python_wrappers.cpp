@@ -349,7 +349,11 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
                     }
                 }
                 std::string path = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + s->s_name;
-                lo_send_message_from(spinApp::Instance().getContext()->lo_txAddr, spinApp::Instance().getContext()->lo_infoServ_, path.c_str(), msg);
+                std::vector<lo_address>::iterator addrIter;
+                for (addrIter = spinApp::Instance().getContext()->lo_txAddrs_.begin(); addrIter != spinApp::Instance().getContext()->lo_txAddrs_.end(); ++addrIter)
+                {
+                    lo_send_message_from((*addrIter), spinApp::Instance().getContext()->lo_infoServ_, path.c_str(), msg);
+                }
             }
         }
 

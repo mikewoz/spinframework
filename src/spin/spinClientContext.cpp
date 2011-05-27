@@ -68,7 +68,7 @@ spinClientContext::spinClientContext() :
     spinApp &spin = spinApp::Instance();
     spin.setContext(this);
     lo_rxAddrs_.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT));
-    lo_txAddr = lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT);
+    lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT));
 }
 
 spinClientContext::~spinClientContext()
