@@ -143,6 +143,26 @@ spinBaseContext::~spinBaseContext()
     lo_server_free(lo_tcpRxServer_);
 }
 
+void spinBaseContext::debugPrint()
+{
+    std::cout << "\nSPIN context information:" << std::endl;
+    std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
+    std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
+    std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
+    {
+        std::cout << "  Sending on TX channel:\t" << lo_address_get_url(*addrIter) << " TTL=" << lo_address_get_ttl(*addrIter) << std::endl;
+    }
+    std::vector<lo_server>::iterator servIter;
+    for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
+    {
+        std::cout << "  SceneManager receiving on:\t" << lo_server_get_url(*servIter) << std::endl;
+    }
+
+
+}
+
 void spinBaseContext::setLog(spinLog &log)
 {
     std::vector<lo_server>::iterator it;

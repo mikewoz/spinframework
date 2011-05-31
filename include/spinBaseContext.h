@@ -103,6 +103,8 @@ class spinBaseContext
 
         virtual bool start() = 0;
 
+        virtual void debugPrint();
+
         /**
          * Starts the context thread (passed as *threadFunction from a derived
          * class)

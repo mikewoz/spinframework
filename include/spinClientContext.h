@@ -61,6 +61,7 @@ class spinClientContext : public spinBaseContext
         ~spinClientContext();
 
         bool start();
+        void debugPrint();
         lo_server lo_syncServ;
 
         int pollUpdates();

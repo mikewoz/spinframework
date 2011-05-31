@@ -62,7 +62,7 @@ class spinServerContext : public spinBaseContext
         ~spinServerContext();
 
         bool start();
-
+        void debugPrint();
         void refreshSubscribers();
 
         /**

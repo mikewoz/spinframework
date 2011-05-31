@@ -465,9 +465,13 @@ void SceneManager::sendConnectionList(lo_address txAddr)
 
 void SceneManager::debug()
 {
+    std::cout << "\n****************************************" << std::endl;
+    std::cout << "************** SPIN DEBUG: *************" << std::endl;
+	
+    spinApp::Instance().getContext()->debugPrint();
 
-    std::cout << "****************************************" << std::endl;
-    std::cout << "************* SCENE DEBUG: *************" << std::endl;
+    std::cout << "\n****************************************" << std::endl;
+    std::cout << "************** SCENE INFO: *************" << std::endl;
 
     std::cout << "\nNODE LIST for scene with id '" << sceneID << "':" << std::endl;
     nodeMapType::iterator it;

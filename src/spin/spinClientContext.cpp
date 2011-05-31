@@ -82,6 +82,16 @@ bool spinClientContext::start()
     return startThread(&spinClientThread);
 }
 
+void spinClientContext::debugPrint()
+{
+    spinBaseContext::debugPrint();
+
+    // print other client-specific details:
+    std::cout << "  THIS IS A CLIENT LISTENING ON TCP " << tcpPort_ << std::endl;
+}
+
+
+
 // FIXME: Push this up to base context
 void spinClientContext::createServers()
 {

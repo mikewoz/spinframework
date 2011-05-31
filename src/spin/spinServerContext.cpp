@@ -89,6 +89,17 @@ bool spinServerContext::start()
     return startThread(&spinServerThread);
 }
 
+void spinServerContext::debugPrint()
+{
+    spinBaseContext::debugPrint();
+
+    std::cout << "Server has " << tcpClientAddrs_.size() << " subscribers:" << std::endl;
+    std::map<std::string, lo_address>::const_iterator client;
+    for (client = tcpClientAddrs_.begin(); client != tcpClientAddrs_.end(); ++client)
+    {
+        std::cout << "  " << client->first << ": " << lo_address_get_url(client->second) << std::endl;
+    }
+}
 
 // *****************************************************************************
 // *****************************************************************************
