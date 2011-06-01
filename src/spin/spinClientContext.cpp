@@ -88,6 +88,7 @@ bool spinClientContext::start()
 void spinClientContext::debugPrint()
 {
     spinBaseContext::debugPrint();
+    std::cout << "  Receiving TCP on:\t\tosc.tcp://" << recv_tcp_addr << ":" << lo_server_get_port(lo_tcpRxServer_) << "/" << std::endl;
 
     std::cout << "  Sending TCP to:\t\t" << lo_address_get_url(lo_serverTCPAddr) << std::endl;
     std::cout << "  Receiving SYNC on:\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;

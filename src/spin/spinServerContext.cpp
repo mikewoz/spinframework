@@ -93,6 +93,7 @@ void spinServerContext::debugPrint()
 {
     spinBaseContext::debugPrint();
 
+    std::cout << "  Receiving TCP on:\t\t" << lo_server_get_url(lo_tcpRxServer_) << std::endl;
     std::cout << "  Sending SYNC to:\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
 
     if (tcpClientAddrs_.size())

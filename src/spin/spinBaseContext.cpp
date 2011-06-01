@@ -159,7 +159,6 @@ void spinBaseContext::debugPrint()
     {
         std::cout << "  Receiving UDP on:\t\t" << lo_server_get_url(*servIter) << std::endl;
     }
-    std::cout << "  Receiving TCP on:\t\t" << lo_server_get_url(lo_tcpRxServer_) << std::endl;
     std::cout << "  Receiving INFO on:\t\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
 }
 
