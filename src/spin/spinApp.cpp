@@ -338,7 +338,6 @@ void spinApp::registerUser()
 
         SceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
 
-        std::cout << "  Registered user\t\t'" << userNode->id->s_name << "'" << std::endl;
     }
 
     if (!userNode.valid())

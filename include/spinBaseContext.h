@@ -44,6 +44,7 @@
 
 #include <vector>
 #include <lo/lo_types.h>
+#include <osg/ArgumentParser>
 
 namespace spin
 {
@@ -104,6 +105,9 @@ class spinBaseContext
         virtual bool start() = 0;
 
         virtual void debugPrint();
+
+        virtual void addCommandLineOptions(osg::ArgumentParser *arguments);
+        virtual void parseCommandLineOptions(osg::ArgumentParser *arguments);
 
         /**
          * Starts the context thread (passed as *threadFunction from a derived

@@ -55,14 +55,16 @@ namespace spin
 
 spinClientContext::spinClientContext() : 
     lo_syncServ(NULL),
-    doSubscribe_(true),
-    lo_serverTCPAddr(NULL)
+    doSubscribe_(true)
 {
     using namespace spin_defaults;
     // Important: first thing to do is set the context mode (client vs server)
     mode = CLIENT_MODE;
 
     tcpPort_ = CLIENT_TCP_PORT;
+
+    // start by assuming the spinserver is on localhost:
+    lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP, "localhost", SERVER_TCP_PORT);
 
     // Next, tell spinApp that this is the current context running:
     spinApp &spin = spinApp::Instance();
@@ -86,11 +88,61 @@ void spinClientContext::debugPrint()
 {
     spinBaseContext::debugPrint();
 
+    std::cout << "  Receiving SYNC on:\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
+
+
     // print other client-specific details:
-    std::cout << "  THIS IS A CLIENT LISTENING ON TCP " << tcpPort_ << std::endl;
+    std::cout << "  UserNode id:\t\t\t" << spinApp::Instance().getUserID() << std::endl;
 }
 
+void spinClientContext::addCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    // first, include any base class command line options:
+    spinBaseContext::addCommandLineOptions(arguments);
 
+    using namespace spin_defaults;
+
+    arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-msg <host> <port>", "Set the receiving address/port for UDP messages from the server. The address can be a multicast address, or 'localhost'. (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(CLIENT_RX_UDP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--send-udp-msg <host> <port>", "Specify the address/port of the server's UDP channel. This is where we stream high-throughput scene events, such as position updates (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SERVER_RX_UDP_PORT) + ")");
+	arguments->getApplicationUsage()->addCommandLineOption("--send-tcp-msg <host> <port>", "Specify the address/port of the server's TCP channel. This is wwhere we send subscription requests, and scene events that require reliable transmission (Default: localhost " + std::string(SERVER_TCP_PORT) + ")");
+	arguments->getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <port>", "Set the desired receiving TCP port when subscribing to the server. ie, spinserver will connect back to this port once we have subscribed (Default: " + std::string(CLIENT_TCP_PORT) + ")");
+	arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-sync <address> <port>", "Set the address/port for timecode (sync) messages (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SYNC_UDP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
+
+}
+
+void spinClientContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    spinBaseContext::parseCommandLineOptions(arguments);
+
+	bool passed_addrs = false;
+    std::string addr, port;
+
+    while (arguments->read("--send-udp-msg", addr, port)) {
+		if (!passed_addrs) this->lo_txAddrs_.clear();
+		this->lo_txAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
+		passed_addrs = true;
+	}
+
+	passed_addrs = false;
+	while (arguments->read("--recv-udp-msg", addr, port)) {
+		if (!passed_addrs) this->lo_rxAddrs_.clear();
+		this->lo_rxAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
+		passed_addrs = true;
+	}
+
+	arguments->read("--recv-tcp-msg", this->tcpPort_);
+
+	while (arguments->read("--send-udp-sync", addr, port)) {
+		this->lo_syncAddr = lo_address_new(addr.c_str(), port.c_str());
+	}
+
+    int ttl=1;
+    while (arguments->read("--ttl", ttl)) {
+        this->setTTL(ttl);
+    }
+
+}
 
 // FIXME: Push this up to base context
 void spinClientContext::createServers()
@@ -127,7 +179,6 @@ void spinClientContext::createServers()
     	lo_server_add_method((*servIter),
             std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
             NULL, sceneCallback, NULL);
-    	std::cout << "  SceneManager receiving on:\t" << lo_server_get_url(*servIter) << std::endl;
     }
 
     // sync (timecode) receiver:
@@ -194,6 +245,8 @@ void *spinClientContext::spinClientThread(void *arg)
 
     // registerUser needs the context to be running (since it sends messages)
     spin.registerUser();
+
+    context->debugPrint();
 
     // TIMEOUT in liblo was 10; We set it to zero, and sleep only if there are
     // no received messages. ie, if there are messages, we eat them as fast as
@@ -347,12 +400,20 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
 
 void spinClientContext::subscribe()
 {
-	// TODO: this should also be called whenever client gets a UserRefresh...
+	// Tthis should also be called whenever client gets a UserRefresh...
 	// the idea is that if the server crashed and came back online, it sends a
 	// userRefresh message and the client can re-subscribe.
-	//
-	// ie, UserRefresh should set doSubscribe_ to true.
 
+    // TODO: the server should send a message to confirm the subscription, and
+    // doSubscribe_ should only be set to false then. Otherwise, it's possible
+    // that the subscription will fail, and future info channel messages will
+    // have no effect because the flag is not set.
+
+    if (!lo_tcpRxServer_)
+    {
+        std::cout << "ERROR: tried to subscribe, but no TCP receive port is specified" << std::endl;
+        return;
+    }
 
 	std::stringstream sstr;
 	// convert to port number to string

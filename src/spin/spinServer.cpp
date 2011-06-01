@@ -59,38 +59,53 @@
 int main(int argc, char **argv)
 {
 	using namespace spin;
-	spinServerContext *server = new spinServerContext();
+	//spinServerContext *server = new spinServerContext();
+	spinServerContext server;
 
 	// *************************************************************************
 	// ARGUMENTS::
 
 	osg::ArgumentParser arguments(&argc,argv);
 
+    /*
 	std::string sceneID = spinApp::Instance().getSceneID();
+    
+    // UDP from clients
+    std::string recv_udp_msg_addr =  spin::spin_defaults::MULTICAST_GROUP;
+    std::string recv_udp_msg_port =  spin::spin_defaults::CLIENT_RX_UDP_PORT;
 
-	std::string txHost = lo_address_get_hostname(server->lo_txAddrs_[0]);
-	std::string txPort = lo_address_get_port(server->lo_txAddrs_[0]);
-	std::string rxHost = lo_address_get_hostname(server->lo_rxAddrs_[0]);
-	std::string rxPort = lo_address_get_port(server->lo_rxAddrs_[0]);
-	std::string syncPort = lo_address_get_port(server->lo_syncAddr);
+    // UDP multicast (or you can specify this arg multiple times for
+    // multi-unicast)
+    std::string send_udp_msg_addr =  spin::spin_defaults::MULTICAST_GROUP;
+    std::string send_udp_msg_port =  spin::spin_defaults::SERVER_RX_UDP_PORT;
+
+    // TCP port where we listen for subscription requests from clients
+    // (note, clients may also send scene events to this port, if they desire
+    // reliability)
+    std::string recv_tcp_msg_port =  spin::spin_defaults::CLIENT_TCP_PORT;
+
+    // Port for timecode (SYNC) messages
+    std::string send_udp_sync_addr =  spin::spin_defaults::MULTICAST_GROUP;
+    std::string send_udp_sync_port =  spin::spin_defaults::SYNC_UDP_PORT;
+
     int ttl=1;
-
+*/
 	// set up the usage document, which a user can acess with -h or --help
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] <scene-to-load.xml>");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
 
-	arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify a unique ID for this scene (Default: the local host name)"); 
-    //FIXME: Printing current local host in help is no good for the man page generation
-    //'" + sceneID + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("--tx-addr <hostname> <port>", "Set the transmission address where the server sends updates to (Default: " + txHost + " " + txPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("--rx-addr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: <local host name> " + rxPort + ")");
-    // FIXME: rxHost (see comment above)
-	arguments.getApplicationUsage()->addCommandLineOption("--tcp-port <port>", "Set the port on which we receive TCP subscription requests (Default: " + server->tcpPort_ + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
-    arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
+    server.addCommandLineOptions(&arguments);
 
+    /*
+    arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify a unique ID for this scene (Default: default)"); 
+    arguments.getApplicationUsage()->addCommandLineOption("--recv-udp-msg <host> <port>", "Set the address/port for listening to UDP messages from clients. This argument may be repeated for multiple multicast groups and/or ports (Default: " + recv_udp_msg_address + " " + recv_udp_msg_port + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--send-udp-msg <host> <port>", "Set the address/port for UDP multicast of scene events, or this argument may be repeated for several unicast connections (Default: " + send_udp_msg_address + " " + send_udp_msg_port + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <port>", "Set the port where we listen for subscription requests from clients. Clients may also send scene events to this port is they desire reliability. (Default: " + recv_tcp_msg_port + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--send-udp-sync <host> <port>", "Set the address/port for timecode (sync) messages (Default: " + send_udp_sync_address + " " + send_udp_sync_port + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
+*/
 
 	// PARSE ARGS:
 
@@ -105,36 +120,39 @@ int main(int argc, char **argv)
         std::cout << VERSION << std::endl;
         return 0;
     }
-    // otherwise, try to start the server:
-	osg::ArgumentParser::Parameter param_spinID(sceneID);
+
+    server.parseCommandLineOptions(&arguments);
+
+    /*
+    osg::ArgumentParser::Parameter param_spinID(sceneID);
 	arguments.read("--scene-id", param_spinID);
 	spinApp::Instance().setSceneID(sceneID);
 
 	bool passed_addrs = false;
-    while (arguments.read("--tx-addr", txHost, txPort)) {
+    while (arguments.read("--send-udp-msg", send_udp_msg_addr, send_udp_msg_port)) {
 		if (!passed_addrs) server->lo_txAddrs_.clear();
-		server->lo_txAddrs_.push_back(lo_address_new(txHost.c_str(), txPort.c_str()));
+		server->lo_txAddrs_.push_back(lo_address_new(send_udp_msg_addr.c_str(), send_udp_msg_port.c_str()));
 		passed_addrs = true;
 	}
 
 	passed_addrs = false;
-	while (arguments.read("--rx-addr", rxHost, rxPort)) {
+	while (arguments.read("--recv-udp-msg", recv_udp_msg_addr, recv_udp_msg_port)) {
 		if (!passed_addrs) server->lo_rxAddrs_.clear();
-		server->lo_rxAddrs_.push_back(lo_address_new(rxHost.c_str(), rxPort.c_str()));
+		server->lo_rxAddrs_.push_back(lo_address_new(recv_udp_msg_addr.c_str(), recv_udp_msg_port.c_str()));
 		passed_addrs = true;
 	}
 
-	arguments.read("--tcp-port", server->tcpPort_);
+	arguments.read("--recv-tcp-msg", server->tcpPort_);
 
-	while (arguments.read("--sync-port", syncPort)) {
-		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
+	while (arguments.read("--send-udp-sync", send_udp_sync_addr, send_udp_sync_port)) {
+		server->lo_syncAddr = lo_address_new(send_udp_sync_addr.c_str(), send_udp_sync_port.c_str());
 	}
 
     while (arguments.read("--ttl", ttl)) {
         server->setTTL(ttl);
     }
+	*/
 
-	
 	// any option left unread are converted into errors to write out later
 	arguments.reportRemainingOptionsAsUnrecognized();
 
@@ -163,7 +181,7 @@ int main(int argc, char **argv)
 
 	// *************************************************************************
 	// start spin:
-	server->start();
+	server.start();
 
 	// *************************************************************************
 	// send a userRefresh message:
@@ -171,8 +189,9 @@ int main(int argc, char **argv)
 	
 	// *************************************************************************
 	// loop:
+    std::cout << "\nSTARTING spinserver..." << std::endl;
     try {	
-        while (server->isRunning())
+        while (server.isRunning())
         {
             sleep(1);
             // loop until a quit message is received (TODO)

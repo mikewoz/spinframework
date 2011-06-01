@@ -431,32 +431,31 @@ int run(int argc, char **argv)
 	int screen=-1;
 	
 	std::string camConfig;
-	
 	std::string sceneID = spin.getSceneID();
-	std::string rxHost = lo_address_get_hostname(spinListener.lo_rxAddrs_[0]);
-	std::string rxPort = lo_address_get_port(spinListener.lo_rxAddrs_[0]);
-	std::string txHost = lo_address_get_hostname(spinListener.lo_txAddrs_[0]);
-	std::string txPort = lo_address_get_port(spinListener.lo_txAddrs_[0]);
-	std::string syncPort = lo_address_get_port(spinListener.lo_syncAddr);
-    
+
+    /*
+    // UDP from server (usually multicast):
     std::string recv_udp_msg_addr =  spin::spin_defaults::MULTICAST_GROUP;
     std::string recv_udp_msg_port =  spin::spin_defaults::CLIENT_RX_UDP_PORT;
+    
+    // UDP to server:
     std::string send_udp_msg_addr =  spin::spin_defaults::MULTICAST_GROUP;
     std::string send_udp_msg_port =  spin::spin_defaults::SERVER_RX_UDP_PORT;
     
+    // TCP to server (including subscription requests):
     std::string send_tcp_msg_addr =  "localhost";
     std::string send_tcp_msg_port =  spin::spin_defaults::SERVER_TCP_PORT;
     
-    std::string recv_tcp_msg_addr =  "localhost"; // ??? necessary
+    // desired TCP listening port (this is sent to server when subscribing):
+    //std::string recv_tcp_msg_addr =  "localhost"; // ??? necessary
     std::string recv_tcp_msg_port =  spin::spin_defaults::CLIENT_TCP_PORT;
 
+    // UDP port for timecode messages:
     std::string send_udp_sync_addr =  spin::spin_defaults::MULTICAST_GROUP;
     std::string recv_udp_sync_port =  spin::spin_defaults::SYNC_UDP_PORT;
  
-    std::string recv_udp_sync_addr = spin::spin_defaults::MULTICAST_GROUP;
-
     int ttl=1;
-
+*/
 	// *************************************************************************
 
 	// get arguments:
@@ -468,29 +467,28 @@ int run(int argc, char **argv)
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options]");
 	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
 	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
-
-	arguments.getApplicationUsage()->addCommandLineOption("--user-id <uniqueID>", "Specify a user ID for this viewer (Default is the local host name)"); 
-    // FIXME: see note in spinServer.cpp
-    //: '" + userID + "')");
-
-	arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("--send-udp-msg <host> <port>", "Set the address/port for sending UDP messages to spinserver (Default: " + rxHost + " " + rxPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("--send-tcp-msg <host> <port>", "Set the address/port for sending TCP messages to spinserver, and also to send TCP subscription requests (Default: localhost " + send_tcp_msg_port + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("--recv-udp-msg <host> <port>", "Set the receiving address/port for incoming UDP messages. The address can be a multicast address, or 'localhost'. (Default: " + txHost + " " + txPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <port>", "Set the receiving TCP port when subscribing to the server. ie, spinserver will connect back to this port (Default: " + spinListener.tcpPort_ + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("--recv-udp-sync <address> <port>", "Set the receiving port for timecode sync (Default: " + recv_udp_sync_addr + " " + syncPort + ")");
-    arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
-
+    
+    spinListener.addCommandLineOptions(&arguments);
+	
+    arguments.getApplicationUsage()->addCommandLineOption("--user-id <uniqueID>", "Specify a user ID for this viewer (Default: <this computer's name>)"); 
+	//arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify the scene ID to listen to (Default: '" + sceneID + "')");
 	arguments.getApplicationUsage()->addCommandLineOption("--fullscreen", "Expand viewer to fullscreen");
     arguments.getApplicationUsage()->addCommandLineOption("--hide-cursor", "Hide the mouse cursor");
-	arguments.getApplicationUsage()->addCommandLineOption("--config <filename>", "Provide a configuration file to set up a view for multiple windows/cameras.");
+	arguments.getApplicationUsage()->addCommandLineOption("--config <filename>", "Provide a configuration file to customize the setup of multiple windows/cameras.");
 	arguments.getApplicationUsage()->addCommandLineOption("--window <x y w h>", "Set the position (x,y) and size (w,h) of the viewer window (Default: 50 50 640 480)");
 	arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
 
-    //TODO:2010-08-16:aalex:rename --disabled to --disable-camera-controls
-	arguments.getApplicationUsage()->addCommandLineOption("--disabled", "Disable camera controls for this user");
-	arguments.getApplicationUsage()->addCommandLineOption("--picker", "Enable the mouse picker, and send events to the server");
+	arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-baed camera controls for this user. This is helpful when using a mouse picker.");
+	arguments.getApplicationUsage()->addCommandLineOption("--enable-mouse-picker", "Enable the mouse picker, and send events to the server");
+  /*
+    arguments.getApplicationUsage()->addCommandLineOption("--recv-udp-msg <host> <port>", "Set the receiving address/port for UDP messages from the server. The address can be a multicast address, or 'localhost'. (Default: " + recv_udp_msg_addr + " " + recv_udp_msg_port + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--send-udp-msg <host> <port>", "Specify the address/port of the server's UDP channel. This is where we stream high-throughput scene events, such as position updates (Default: " + send_udp_msg_addr + " " + send_udp_msg_port + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--send-tcp-msg <host> <port>", "Specify the address/port of the server's TCP channel. This is wwhere we send subscription requests, and scene events that require reliable transmission (Default: localhost " + send_tcp_msg_port + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <port>", "Set the desired receiving TCP port when subscribing to the server. ie, spinserver will connect back to this port once we have subscribed (Default: " + recv_tcp_msg_port + ")");
+	arguments.getApplicationUsage()->addCommandLineOption("--recv-udp-sync <address> <port>", "Set the address/port for timecode (sync) messages (Default: " + recv_udp_sync_addr + " " + recv_udp_sync_port + ")");
+    arguments.getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
+*/
 
 
 	// *************************************************************************
@@ -508,23 +506,75 @@ int run(int argc, char **argv)
         std::cout << VERSION << std::endl;
         return 0;
     }
+
+    spinListener.parseCommandLineOptions(&arguments);
+    
     // otherwise, start the viewer:
 	osg::ArgumentParser::Parameter param_userID(userID);
 	arguments.read("--user-id", param_userID);
     if (not userID.empty())
         spin.setUserID(userID);
 
+    /*
 	osg::ArgumentParser::Parameter param_spinID(sceneID);
 	arguments.read("--scene-id", param_spinID);
 	spin.setSceneID(sceneID);
-
+*/
 	osg::ArgumentParser::Parameter param_camConfig(camConfig);
 	arguments.read("--config", param_camConfig);
+   
+	frustum frust;
+	frust.valid = false;
+	while (arguments.read("--frustum", frust.left, frust.right, frust.bottom, frust.top)) {
+		frust.near = 1.0;
+		frust.far = 10000.0;
+		frust.valid = true;
+	}
+	if (arguments.read("--fullscreen")) fullscreen=true;
+    if (arguments.read("--hide-cursor")) hideCursor=true;
+	while (arguments.read("--window",x,y,width,height)) {}
+	while (arguments.read("--screen",screen)) {}
+	while (arguments.read("--framerate",maxFrameRate)) {}
+	if (arguments.read("--disable-camera-controls")) mover=false;
+	if (arguments.read("--enable-mouse-picker")) picker=true;
+
+
     
-	while (arguments.read("--send-udp-msg", rxHost, rxPort)) {
+    /*
+    bool passed_addrs = false;
+    while (arguments.read("--send-udp-msg", send_udp_msg_addr, send_udp_msg_port))
+    {
+        if (!passed_addrs) server->lo_txAddrs_.clear();
+        spinListener->lo_txAddrs_.push_back(lo_address_new(send_udp_msg_addr.c_str(), send_udp_msg_port.c_str()));
+        passed_addrs = true;
+    }
+
+    passed_addrs = false;
+    while (arguments.read("--recv-udp-msg", recv_udp_msg_addr, recv_udp_msg_port))
+    {
+                            if (!passed_addrs) server->lo_rxAddrs_.clear();
+                                    server->lo_rxAddrs_.push_back(lo_address_new(recv_udp_msg_addr.c_str(), recv_udp_msg_port.c_str()));
+                                            passed_addrs = true;
+                                                }
+
+                    arguments.read("--recv-tcp-msg", server->tcpPort_);
+
+                        while (arguments.read("--send-udp-sync", send_udp_sync_addr, send_udp_sync_port)) {
+                                    server->lo_syncAddr = lo_address_new(send_udp_sync_addr.c_str(), send_udp_sync_port.c_str());
+                                        }
+
+
+
+
+
+
+	while (arguments.read("--send-udp-msg", rxHost, rxPort))
+    {
+        // clear default sender first:
         spinListener.lo_txAddrs_.clear();
 		spinListener.lo_txAddrs_.push_back(lo_address_new(rxHost.c_str(), rxPort.c_str()));
 	}
+
 	while (arguments.read("--recv-addr", txHost, txPort)) {
         spinListener.lo_rxAddrs_.clear();
 		spinListener.lo_rxAddrs_.push_back(lo_address_new(txHost.c_str(), txPort.c_str()));
@@ -538,23 +588,7 @@ int run(int argc, char **argv)
     while (arguments.read("--ttl", ttl)) {
         spinListener.setTTL(ttl);
     }
-
-	frustum frust;
-	frust.valid = false;
-	while (arguments.read("--frustum", frust.left, frust.right, frust.bottom, frust.top)) {
-		frust.near = 1.0;
-		frust.far = 10000.0;
-		frust.valid = true;
-	}
-
-	if (arguments.read("--fullscreen")) fullscreen=true;
-    if (arguments.read("--hide-cursor")) hideCursor=true;
-	while (arguments.read("--window",x,y,width,height)) {}
-	while (arguments.read("--screen",screen)) {}
-	while (arguments.read("--framerate",maxFrameRate)) {}
-	
-	if (arguments.read("--disabled")) mover=false;
-	if (arguments.read("--picker")) picker=true;
+*/
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
 	osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
@@ -791,6 +825,12 @@ int run(int argc, char **argv)
 	// start threads:
 	viewer.realize();
 
+    // Try to subscribe with the current (default or manually specified) TCP
+    // subscription information. If this fails, it's likely because the server
+    // is not online, but when it comes online, it will send a userRefresh
+    // message which will invoke another subscription attempt:
+    spinListener.subscribe();
+
 	// ask for refresh:
 	spin.SceneMessage("s", "refresh", LO_ARGS_END);
 
@@ -800,6 +840,7 @@ int run(int argc, char **argv)
 
 
 	//std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
+    std::cout << "\nSTARTING spinviewer..." << std::endl;
 
 	// program loop:
 	while(not viewer.done())

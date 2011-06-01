@@ -62,10 +62,17 @@ class spinClientContext : public spinBaseContext
 
         bool start();
         void debugPrint();
+        void addCommandLineOptions(osg::ArgumentParser *arguments);
+        void parseCommandLineOptions(osg::ArgumentParser *arguments);
+        
         lo_server lo_syncServ;
 
         int pollUpdates();
 
+        /**
+         * Register the client's ip and port for reliable communication with the server
+         */
+        void subscribe();
         
     private:
         // false once we've subscribed to a server in TCP
@@ -107,8 +114,6 @@ class spinClientContext : public spinBaseContext
          */
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-        // register my ip and port for reliable communication with the server
-        void subscribe();
 };
 
 

@@ -61,6 +61,7 @@
 #include "SceneManager.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
+#include "spinClientContext.h"
 #include "spinUtil.h"
 #include "spinApp.h"
 #include "spinLog.h"
@@ -147,20 +148,37 @@ void spinBaseContext::debugPrint()
 {
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
-    std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
+    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
     std::vector<lo_address>::iterator addrIter;
     for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
     {
-        std::cout << "  Sending on TX channel:\t" << lo_address_get_url(*addrIter) << " TTL=" << lo_address_get_ttl(*addrIter) << std::endl;
+        std::cout << "  Sending UDP to:\t\t" << lo_address_get_url(*addrIter) << " TTL=" << lo_address_get_ttl(*addrIter) << std::endl;
     }
     std::vector<lo_server>::iterator servIter;
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-        std::cout << "  SceneManager receiving on:\t" << lo_server_get_url(*servIter) << std::endl;
+        std::cout << "  Receiving UDP on:\t\t" << lo_server_get_url(*servIter) << std::endl;
     }
+    std::cout << "  Receiving TCP on:\t\t" << lo_server_get_url(lo_tcpRxServer_) << std::endl;
+    std::cout << "  Receiving INFO on:\t\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
+}
 
+void spinBaseContext::addCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    arguments->getApplicationUsage()->addCommandLineOption("--scene-id <id>", "Specify the id of the SPIN scene (Default: default)");
 
+}
+
+void spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    //std::string sceneID = spinApp::Instance().setSceneID(sceneID);
+    //osg::ArgumentParser::Parameter param_spinID(sceneID);
+    //arguments->read("--scene-id", param_spinID);
+    std::string sceneID;
+    if (arguments->read("--scene-id", sceneID))
+    {
+        spinApp::Instance().setSceneID(sceneID);
+    }
 }
 
 void spinBaseContext::setLog(spinLog &log)
@@ -196,15 +214,6 @@ void spinBaseContext::setTTL(int ttl)
 
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
-    std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
-    std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
-    std::vector<lo_address>::iterator addrIter;
-    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
-    {
-        std::cout << "  Sending on TX channel:\t" << lo_address_get_url(*addrIter) << " TTL=" << lo_address_get_ttl(*addrIter) << std::endl;
-    }
-
     signalStop = false;
 
     // create thread:
@@ -652,6 +661,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         else
         {
             spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
+            
+            // if the server sends a userRefresh, it's possible that it has
+            // only recently come online, so we need to re-subsrcibe:
+            spinClientContext *clientContext = dynamic_cast<spinClientContext*>(spin.getContext());
+            clientContext->subscribe();
         }
     }
     else if (theMethod == "refresh")
@@ -805,9 +819,6 @@ void spinBaseContext::createServers()
             " failed; trying a random port" << std::endl;
         lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
     }
-    std::cout << "  Receiving on TCP channel:\t" << lo_server_get_url(lo_tcpRxServer_) << std::endl;
-
-
 
     std::vector<lo_address>::iterator it;
     for (it = lo_rxAddrs_.begin(); it != lo_rxAddrs_.end(); ++it)

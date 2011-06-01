@@ -93,13 +93,68 @@ void spinServerContext::debugPrint()
 {
     spinBaseContext::debugPrint();
 
-    std::cout << "Server has " << tcpClientAddrs_.size() << " subscribers:" << std::endl;
-    std::map<std::string, lo_address>::const_iterator client;
-    for (client = tcpClientAddrs_.begin(); client != tcpClientAddrs_.end(); ++client)
+    std::cout << "  Sending SYNC to:\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
+
+    if (tcpClientAddrs_.size())
     {
-        std::cout << "  " << client->first << ": " << lo_address_get_url(client->second) << std::endl;
+        std::cout << "\nServer has " << tcpClientAddrs_.size() << " subscribers:" << std::endl;
+        std::map<std::string, lo_address>::const_iterator client;
+        for (client = tcpClientAddrs_.begin(); client != tcpClientAddrs_.end(); ++client)
+        {
+            std::cout << "  " << client->first << ": " << lo_address_get_url(client->second) << std::endl;
+        }
     }
 }
+
+void spinServerContext::addCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    // first, include any base class command line options:
+    spinBaseContext::addCommandLineOptions(arguments);
+
+    using namespace spin_defaults;
+
+    arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-msg <host> <port>", "Set the address/port for listening to UDP messages from clients. This argument may be repeated for multiple multicast groups and/or ports (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(CLIENT_RX_UDP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--send-udp-msg <host> <port>", "Set the address/port for UDP multicast of scene events, or this argument may be repeated for several unicast connections (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SERVER_RX_UDP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <port>", "Set the port where we listen for subscription requests from clients. Clients may also send scene events to this port is they desire reliability. (Default: " + std::string(SERVER_TCP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--send-udp-sync <host> <port>", "Set the address/port for timecode (sync) messages (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SYNC_UDP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
+
+}
+
+void spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    spinBaseContext::parseCommandLineOptions(arguments);
+
+	bool passed_addrs = false;
+    std::string addr, port;
+
+    while (arguments->read("--send-udp-msg", addr, port)) {
+		if (!passed_addrs) this->lo_txAddrs_.clear();
+		this->lo_txAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
+		passed_addrs = true;
+	}
+
+	passed_addrs = false;
+	while (arguments->read("--recv-udp-msg", addr, port)) {
+		if (!passed_addrs) this->lo_rxAddrs_.clear();
+		this->lo_rxAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
+		passed_addrs = true;
+	}
+
+	arguments->read("--recv-tcp-msg", this->tcpPort_);
+
+	while (arguments->read("--send-udp-sync", addr, port)) {
+		this->lo_syncAddr = lo_address_new(addr.c_str(), port.c_str());
+	}
+
+    int ttl=1;
+    while (arguments->read("--ttl", ttl)) {
+        this->setTTL(ttl);
+    }
+
+}
+
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -163,8 +218,6 @@ void spinServerContext::createServers()
     {
     	lo_server_add_method((*servIter), std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
     			NULL, sceneCallback, NULL);
-
-    	std::cout << "  SceneManager receiving on:\t" << lo_server_get_url(*servIter) << std::endl;
     }
 
 	lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
@@ -213,6 +266,9 @@ void *spinServerContext::spinServerThread(void *arg)
 
     // start sync (timecode) thread:
     context->startSyncThread();
+
+    // print some info about addresses/ports to console:
+    context->debugPrint();
 
     static const int TIMEOUT = 0;
     while (!spinBaseContext::signalStop)
