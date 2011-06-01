@@ -132,6 +132,10 @@ void spinClientContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
 	}
 
 	arguments->read("--recv-tcp-msg", this->tcpPort_);
+	
+    while (arguments->read("--send-tcp-msg", addr, port)){
+        lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP, addr.c_str(), port.c_str());
+    }
 
 	while (arguments->read("--send-udp-sync", addr, port)) {
 		this->lo_syncAddr = lo_address_new(addr.c_str(), port.c_str());
