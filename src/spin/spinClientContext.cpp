@@ -62,6 +62,7 @@ spinClientContext::spinClientContext() :
     mode = CLIENT_MODE;
 
     tcpPort_ = CLIENT_TCP_PORT;
+    recv_tcp_addr = getMyIPaddress();
 
     // start by assuming the spinserver is on localhost:
     lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP, "localhost", SERVER_TCP_PORT);
@@ -106,7 +107,7 @@ void spinClientContext::addCommandLineOptions(osg::ArgumentParser *arguments)
     arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-msg <host> <port>", "Set the receiving address/port for UDP messages from the server. The address can be a multicast address, or 'localhost'. (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(CLIENT_RX_UDP_PORT) + ")");
     arguments->getApplicationUsage()->addCommandLineOption("--send-udp-msg <host> <port>", "Specify the address/port of the server's UDP channel. This is where we stream high-throughput scene events, such as position updates (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SERVER_RX_UDP_PORT) + ")");
 	arguments->getApplicationUsage()->addCommandLineOption("--send-tcp-msg <host> <port>", "Specify the address/port of the server's TCP channel. This is wwhere we send subscription requests, and scene events that require reliable transmission (Default: localhost " + std::string(SERVER_TCP_PORT) + ")");
-	arguments->getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <port>", "Set the desired receiving TCP port when subscribing to the server. ie, spinserver will connect back to this port once we have subscribed (Default: " + std::string(CLIENT_TCP_PORT) + ")");
+	arguments->getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <host> <port>", "Set the desired receiving address/port when subscribing for TCP with the server. ie, spinserver will connect back to this port once we have subscribed (Default: " + std::string(CLIENT_TCP_PORT) + ")");
 	arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-sync <address> <port>", "Set the address/port for timecode (sync) messages (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SYNC_UDP_PORT) + ")");
     arguments->getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
 
@@ -132,7 +133,7 @@ void spinClientContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
 		passed_addrs = true;
 	}
 
-	arguments->read("--recv-tcp-msg", this->tcpPort_);
+	arguments->read("--recv-tcp-msg", this->recv_tcp_addr, this->tcpPort_);
 	
     while (arguments->read("--send-tcp-msg", addr, port)){
         lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP, addr.c_str(), port.c_str());
@@ -426,7 +427,7 @@ void spinClientContext::subscribe()
 
 	lo_send(lo_serverTCPAddr, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "ssss",
 			"subscribe", spinApp::Instance().getUserID().c_str(),
-			getMyIPaddress().c_str(),
+			recv_tcp_addr.c_str(),
 			sstr.str().c_str());
 
     doSubscribe_ = false;

@@ -80,6 +80,11 @@ class spinClientContext : public spinBaseContext
         // address to which messages can be sent over TCP
         lo_address lo_serverTCPAddr;
 
+        // we need to store the TCP address so that the user can override
+        // it manually. By default, this is filled with getMyIPaddress(),
+        // but this may be wrong if transmitting across subnets.
+        std::string recv_tcp_addr;
+
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
          * listens to incoming SPIN messages. It does NOT re-transmit those messages,
