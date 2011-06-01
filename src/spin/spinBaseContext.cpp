@@ -68,6 +68,7 @@
 #include "nodeVisitors.h"
 #include "SoundConnection.h"
 #include "spinDefaults.h"
+#include "config.h"
 
 #define UNUSED(x) ( (void)(x) )
 
@@ -164,20 +165,33 @@ void spinBaseContext::debugPrint()
 
 void spinBaseContext::addCommandLineOptions(osg::ArgumentParser *arguments)
 {
+    arguments->getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
+    arguments->getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
     arguments->getApplicationUsage()->addCommandLineOption("--scene-id <id>", "Specify the id of the SPIN scene (Default: default)");
 
 }
 
-void spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
+int spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
 {
-    //std::string sceneID = spinApp::Instance().setSceneID(sceneID);
-    //osg::ArgumentParser::Parameter param_spinID(sceneID);
-    //arguments->read("--scene-id", param_spinID);
+    // if user request help or version write it out to cout and quit.
+    if (arguments->read("-h") || arguments->read("--help"))
+    {
+        arguments->getApplicationUsage()->write(std::cout);
+        return 0;
+    }
+    if (arguments->read("--version"))
+    {
+        std::cout << VERSION << std::endl;
+        return 0;
+    }
+
     std::string sceneID;
     if (arguments->read("--scene-id", sceneID))
     {
         spinApp::Instance().setSceneID(sceneID);
     }
+
+    return 1;
 }
 
 void spinBaseContext::setLog(spinLog &log)

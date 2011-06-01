@@ -122,9 +122,10 @@ void spinServerContext::addCommandLineOptions(osg::ArgumentParser *arguments)
 
 }
 
-void spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
+int spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
 {
-    spinBaseContext::parseCommandLineOptions(arguments);
+    if (!spinBaseContext::parseCommandLineOptions(arguments))
+        return 0;
 
 	bool passed_addrs = false;
     std::string addr, port;
@@ -153,6 +154,7 @@ void spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
         this->setTTL(ttl);
     }
 
+    return 1;
 }
 
 

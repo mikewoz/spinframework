@@ -63,7 +63,7 @@ class spinClientContext : public spinBaseContext
         bool start();
         void debugPrint();
         void addCommandLineOptions(osg::ArgumentParser *arguments);
-        void parseCommandLineOptions(osg::ArgumentParser *arguments);
+        int parseCommandLineOptions(osg::ArgumentParser *arguments);
         
         lo_server lo_syncServ;
 

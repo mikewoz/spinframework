@@ -107,7 +107,7 @@ class spinBaseContext
         virtual void debugPrint();
 
         virtual void addCommandLineOptions(osg::ArgumentParser *arguments);
-        virtual void parseCommandLineOptions(osg::ArgumentParser *arguments);
+        virtual int parseCommandLineOptions(osg::ArgumentParser *arguments);
 
         /**
          * Starts the context thread (passed as *threadFunction from a derived
