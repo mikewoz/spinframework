@@ -202,8 +202,8 @@ void SharedVideoTexture::updateCallback()
             lastTick = osg::Timer::instance()->tick();
         }
     }
-    else
-        std::cerr << "texture id is empty and we're killed" << std::endl;
+    //else
+    //    std::cerr << "texture id is empty and we're killed" << std::endl;
 }
 
 
