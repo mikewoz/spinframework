@@ -213,6 +213,16 @@ class spinBaseContext
 
         static void oscParser_error(int num, const char *msg, const char *path);
 
+        /**
+         * Enable or disable multicast discovery services, which uses
+         * the INFO port.
+         *
+         * For a server, this disables sending via spinApp::infoMessage. For a
+         * client, this disables the info port listener callback in 
+         * spinClientContext.
+         */
+        bool doDiscovery_;
+
     protected:
         bool running;
         SpinContextMode mode;

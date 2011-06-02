@@ -91,7 +91,7 @@ void spinClientContext::debugPrint()
     std::cout << "  Receiving TCP on:\t\tosc.tcp://" << recv_tcp_addr << ":" << lo_server_get_port(lo_tcpRxServer_) << "/" << std::endl;
 
     std::cout << "  Sending TCP to:\t\t" << lo_address_get_url(lo_serverTCPAddr) << std::endl;
-    std::cout << "  Receiving SYNC on:\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
+    std::cout << "  Receiving SYNC on:\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
 
 
     // print other client-specific details:
@@ -345,6 +345,14 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
         lo_arg ** argv, int argc, void * /*data*/, void * user_data)
 {
     spinClientContext *context = static_cast<spinClientContext*>(user_data);
+    
+    // TODO: we should not even create the server if doDiscovery is disabled,
+    // but then we need a setter method which adds/removes the server and
+    // callback if the user changes this.
+    if (!context->doDiscovery_) return 1;
+
+    // this message is not valid unless the arguments exactly match the
+    // info channel message.
     if (argc != 7)
         return 1;
     std::string theirSceneID(reinterpret_cast<const char*>(argv[0]));
@@ -368,6 +376,8 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
 int spinClientContext::tcpCallback(const char *path, const char *types,
         lo_arg **argv, int argc, void *data, void *user_data)
 {
+    spinClientContext *context = static_cast<spinClientContext*>(user_data);
+    
     // WARNING: tcpCallback is registered to match ANY path, so we must manually
     // check if it is within the /SPIN namespace, and if it matches the sceneID:
 
@@ -383,6 +393,20 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
     	std::cout << "Warning: server is ignoring TCP message: " << path << std::endl;
     	return 1;
     }
+
+    // get the method (argv[0]):
+    std::string theMethod;
+    if (lo_is_string_type((lo_type)types[0]))
+        theMethod = std::string((char *)argv[0]);
+    else
+        return 1;
+
+    if (theMethod == "subscribed")
+    {
+        std::cout << "Successfully subscribed to the server" << std::endl;
+        context->doSubscribe_ = false;
+    }
+
 
 	// It's a valid message, so we just forward it to the regular OSC callback
     // methods:
@@ -413,11 +437,6 @@ void spinClientContext::subscribe()
 	// the idea is that if the server crashed and came back online, it sends a
 	// userRefresh message and the client can re-subscribe.
 
-    // TODO: the server should send a message to confirm the subscription, and
-    // doSubscribe_ should only be set to false then. Otherwise, it's possible
-    // that the subscription will fail, and future info channel messages will
-    // have no effect because the flag is not set.
-
     if (!lo_tcpRxServer_)
     {
         std::cout << "ERROR: tried to subscribe, but no TCP receive port is specified" << std::endl;
@@ -433,7 +452,11 @@ void spinClientContext::subscribe()
 			recv_tcp_addr.c_str(),
 			sstr.str().c_str());
 
-    doSubscribe_ = false;
+    // TODO: the server should send a message to confirm the subscription, and
+    // doSubscribe_ should only be set to false then. Otherwise, it's possible
+    // that the subscription will fail, and future info channel messages will
+    // have no effect because the flag is not set.
+    //doSubscribe_ = false;
 }
 
 } // end of namespace spin

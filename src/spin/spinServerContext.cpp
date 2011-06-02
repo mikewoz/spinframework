@@ -94,7 +94,10 @@ void spinServerContext::debugPrint()
     spinBaseContext::debugPrint();
 
     std::cout << "  Receiving TCP on:\t\t" << lo_server_get_url(lo_tcpRxServer_) << std::endl;
-    std::cout << "  Sending SYNC to:\t\t" << lo_address_get_url(lo_syncAddr) << " TTL=" << lo_address_get_ttl(lo_syncAddr) << std::endl;
+    std::cout << "  Sending SYNC to:\t\t" << lo_address_get_url(lo_syncAddr); 
+    if (lo_address_get_ttl(lo_syncAddr)>0)
+        std::cout << " TTL=" << lo_address_get_ttl(lo_syncAddr);
+    std::cout << std::endl;
 
     if (tcpClientAddrs_.size())
     {
@@ -279,7 +282,6 @@ void *spinServerContext::spinServerThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-            if (0)
             spin.InfoMessage("/SPIN/__server__", "ssiisii",
                              spin.getSceneID().c_str(),
                              myIP.c_str(), // server's IP address
@@ -425,6 +427,11 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
                     portString.c_str());
         std::cout << "Got new subscriber " << clientID << "@" <<
         lo_address_get_url(context->tcpClientAddrs_[clientID]) << std::endl;
+
+        // send a message to the new client to indicate that subscription
+        // request was successful:
+        //SCENE_MSG("si", "subscribed", 1);
+        lo_send(context->tcpClientAddrs_[clientID], ("/SPIN/"+spinApp::Instance().getSceneID()).c_str(), "si", "subscribed", 1, LO_ARGS_END);
     }
 
     else if (method == "optimize")

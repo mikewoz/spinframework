@@ -371,7 +371,7 @@ void spinApp::InfoMessage(const std::string &OSCpath, const char *types, va_list
 
 void spinApp::InfoMessage(const std::string &OSCpath, lo_message msg)
 {
-    if (context)
+    if ((context) && (context->doDiscovery_))
     {
         lo_send_message_from(context->lo_infoAddr, context->lo_infoServ_, OSCpath.c_str(), msg);
 

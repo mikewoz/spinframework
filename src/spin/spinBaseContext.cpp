@@ -85,7 +85,8 @@ spinBaseContext::spinBaseContext() :
     lo_syncAddr(NULL),
     lo_infoServ_(NULL),
     lo_tcpRxServer_(NULL),
-    pthreadID(0)
+    pthreadID(0),
+    doDiscovery_(true)
 {
     using namespace spin_defaults;
     signalStop = true;
@@ -150,17 +151,28 @@ void spinBaseContext::debugPrint()
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+    if (doDiscovery_)
+    {
+        std::cout << "  Auto discovery address:\t" << lo_address_get_url(lo_infoAddr);
+        if (lo_address_get_ttl(lo_infoAddr)>0)
+            std::cout << " TTL=" << lo_address_get_ttl(lo_infoAddr);
+        std::cout << std::endl;
+    } else {
+        std::cout << "  Auto discovery address:\tOFF" << std::endl;
+    }
     std::vector<lo_address>::iterator addrIter;
     for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
     {
-        std::cout << "  Sending UDP to:\t\t" << lo_address_get_url(*addrIter) << " TTL=" << lo_address_get_ttl(*addrIter) << std::endl;
+        std::cout << "  Sending UDP to:\t\t" << lo_address_get_url(*addrIter);
+        if (lo_address_get_ttl(*addrIter)>0)
+            std::cout << " TTL=" << lo_address_get_ttl(*addrIter);
+        std::cout << std::endl;
     }
     std::vector<lo_server>::iterator servIter;
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
         std::cout << "  Receiving UDP on:\t\t" << lo_server_get_url(*servIter) << std::endl;
     }
-    std::cout << "  Receiving INFO on:\t\t" << lo_address_get_url(lo_infoAddr) << " TTL=" << lo_address_get_ttl(lo_infoAddr) << std::endl;
 }
 
 void spinBaseContext::addCommandLineOptions(osg::ArgumentParser *arguments)
@@ -168,7 +180,11 @@ void spinBaseContext::addCommandLineOptions(osg::ArgumentParser *arguments)
     arguments->getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
     arguments->getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
     arguments->getApplicationUsage()->addCommandLineOption("--scene-id <id>", "Specify the id of the SPIN scene (Default: default)");
+    arguments->getApplicationUsage()->addCommandLineOption("--disable-discovery", "Disables the multicast discovery service");
 
+    // TODO: add discovery addr <host> <port> (defaults is MULTICAST_GROUP:INFO_UDP_PORT)
+    // for a client, this would be --recv-udp-discovery <host> <port>
+    // for a server, this would be --send-udp-discovery <host> <port>
 }
 
 int spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
@@ -190,6 +206,13 @@ int spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     {
         spinApp::Instance().setSceneID(sceneID);
     }
+
+    if (arguments->read("--disable-discovery"))
+{
+        doDiscovery_ = false;
+    }
+
+
 
     return 1;
 }
