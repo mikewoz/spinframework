@@ -737,7 +737,7 @@ int run(int argc, char **argv)
 
 
 	//std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
-    std::cout << "\nSTARTING spinviewer..." << std::endl;
+    std::cout << "\nspinviewer is READY" << std::endl;
 
 	// program loop:
 	while(not viewer.done())

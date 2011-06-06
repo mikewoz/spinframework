@@ -76,12 +76,24 @@ ReporterNode::ReporterNode (SceneManager *sceneManager, char *initID) : Referenc
     lastTick = osg::Timer::instance()->tick();
 }
 
-// *****************************************************************************
 // destructor
 ReporterNode::~ReporterNode()
 {
 	targets_.clear();
 	reporting_.clear();
+}
+
+// *****************************************************************************
+void ReporterNode::debug()
+{
+    ReferencedNode::debug();
+    std::cout << "  " << targets_.size() << " targets:";
+    std::vector<reporterTarget>::const_iterator t;
+    for (t = targets_.begin(); t != targets_.end(); t++)
+    {
+    	if ((*t).node.valid()) std::cout << " " << (*t).node->id->s_name;
+    }
+    std::cout << std::endl;
 }
 
 void ReporterNode::callbackUpdate()

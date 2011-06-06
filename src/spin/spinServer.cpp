@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 	
 	// *************************************************************************
 	// loop:
-    std::cout << "\nSTARTING spinserver..." << std::endl;
+    std::cout << "\nspinserver is READY" << std::endl;
     try {	
         while (server.isRunning())
         {

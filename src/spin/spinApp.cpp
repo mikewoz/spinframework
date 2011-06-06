@@ -523,8 +523,8 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
 	else sendingAddress = txAddr;
 */
 
-    std::vector<lo_message>::iterator iter;
     lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+    std::vector<lo_message>::iterator iter;
     for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
     {
         lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
@@ -548,6 +548,7 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
         // if it's any UDP socket, then bundle the messages:
         else
         {
+            //std::cout << "sending bundle of " << msgs.size() << " to " << lo_address_get_url(txAddr) << ", for:  " << OSCpath << std::endl;
 /*
             lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
             for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
