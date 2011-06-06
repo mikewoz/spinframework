@@ -1409,26 +1409,29 @@ void SceneManager::update()
     }
 #endif
 
+    
 	if (spinApp::Instance().getContext()->isServer())
-	{
-		// check if any UserNodes have stopped pinging, and remove them (and their
-		// subgraph) if necessary:
-
-		nodeListType::iterator iter;
-	    for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
+    {
+        spinServerContext *spinserv = dynamic_cast<spinServerContext*>(spinApp::Instance().getContext());
+        if (spinserv->shouldAutoClean())
 	    {
-			if ((*iter)->scheduleForDeletion)
-			{
-				// this user stopped pinging, so we should remove him from the
-				// subgraph.
+		    // check if any UserNodes have stopped pinging, and remove them
+            // (and their subgraph) if necessary:
 
-				//uncomment when ready:
-				spinApp::Instance().sceneManager->deleteGraph((*iter)->id->s_name);
-			}
-            else
-                iter++;
+		    nodeListType::iterator iter;
+	        for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
+	        {
+			    if ((*iter)->scheduleForDeletion)
+			    {
+				    // this user stopped pinging, so we should remove him
+                    // from the subgraph.
+				    spinApp::Instance().sceneManager->deleteGraph((*iter)->id->s_name);
+			    }
+                else
+                    iter++;
+	        }
 	    }
-	}
+    }
 }
 
 // save scene as .osg

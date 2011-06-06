@@ -70,6 +70,8 @@ spinServerContext::spinServerContext() : syncThreadID(0)
     lo_rxAddrs_.push_back(lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT));
     lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT));
 
+    autoCleanup_ = true;
+
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
 }
@@ -99,6 +101,11 @@ void spinServerContext::debugPrint()
         std::cout << " TTL=" << lo_address_get_ttl(lo_syncAddr);
     std::cout << std::endl;
 
+    if (autoCleanup_)
+        std::cout << "  Auto-clean inactive users:\tENABLED" << std::endl;
+    else
+        std::cout << "  Auto-clean inactive users:\tDISABLED" << std::endl;
+
     if (tcpClientAddrs_.size())
     {
         std::cout << "\nServer has " << tcpClientAddrs_.size() << " subscribers:" << std::endl;
@@ -122,6 +129,7 @@ void spinServerContext::addCommandLineOptions(osg::ArgumentParser *arguments)
     arguments->getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <port>", "Set the port where we listen for subscription requests from clients. Clients may also send scene events to this port is they desire reliability. (Default: " + std::string(SERVER_TCP_PORT) + ")");
     arguments->getApplicationUsage()->addCommandLineOption("--send-udp-sync <host> <port>", "Set the address/port for timecode (sync) messages (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SYNC_UDP_PORT) + ")");
     arguments->getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
+    arguments->getApplicationUsage()->addCommandLineOption("--disable-auto-cleanup", "Disables the auto-cleanup of user nodes if they stop sending ping messages.");
 
 }
 
@@ -156,6 +164,9 @@ int spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     while (arguments->read("--ttl", ttl)) {
         this->setTTL(ttl);
     }
+
+    if (arguments->read("--disable-auto-cleanup"))
+        autoCleanup_ = false;
 
     return 1;
 }
