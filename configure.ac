@@ -190,6 +190,7 @@ AC_CONFIG_FILES([
         src/Resources/fonts/Makefile
         src/Resources/scripts/Makefile
         tests/Makefile
+        completion/Makefile
         ])
 
 AC_OUTPUT
