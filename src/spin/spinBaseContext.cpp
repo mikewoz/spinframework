@@ -850,16 +850,17 @@ void spinBaseContext::createServers()
     using std::string;
 
     lo_tcpRxServer_ = lo_server_new_with_proto(tcpPort_.c_str(), LO_TCP, oscParser_error);
-    if ((lo_tcpRxServer_ == 0) && (canAutoAssignPorts()))
+    if (lo_tcpRxServer_ == 0)
     {
-        // liblo will try a random free port if the default failed
-        std::cerr << "TCP receiver port " << tcpPort_ <<
-            " failed; trying a random port" << std::endl;
-        lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
-    } else
-    {
-        std::cerr << "TCP receiver port " << tcpPort_ << " failed; SPIN was provided this port manually, so it will not attempt to use a random port. Quitting." << std::endl;
-        exit(0);
+        if (canAutoAssignPorts())
+        {
+            // liblo will try a random free port if the default failed
+            std::cerr << "TCP receiver port " << tcpPort_ << " failed; trying a random port" << std::endl;
+            lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
+        } else {
+            std::cerr << "TCP receiver port " << tcpPort_ << " failed; SPIN was provided this port manually, so it will not attempt to use a random port. Quitting." << std::endl;
+            exit(0);
+        }
     }
 
     std::vector<lo_address>::iterator it;
