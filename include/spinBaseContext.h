@@ -124,6 +124,17 @@ class spinBaseContext
 
         bool isRunning() { return running; }
 
+        /**
+         * Check if spin is allowed to assign automatic ports (eg, in the case
+         * where a port is busy). This is usually true, but if a user specifies
+         * ports manually with command-line options, this becomes false.
+         */
+        bool canAutoAssignPorts() { return autoPorts_; }
+        
+        /**
+         * Set the time-to-live for multicast packets (corresponds to the
+         * number of routers a packet will hop).
+         */
         void setTTL(int ttl);
 
         /**
@@ -225,6 +236,7 @@ class spinBaseContext
 
     protected:
         bool running;
+        bool autoPorts_;
         SpinContextMode mode;
         void setLog(spinLog &log);
         /**

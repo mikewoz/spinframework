@@ -73,8 +73,14 @@ class spinServerContext : public spinBaseContext
          */
         void startSyncThread();
 
+        /**
+         * A flag that decides if user nodes should be automatically cleaned up
+         * (ie, their entire subgraph deleted) if they stop sending ping
+         * messages. This is set by the --disable-auto-cleanup argument.
+         */
         bool shouldAutoClean() { return autoCleanup_; }
 
+        
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
     private:
@@ -99,11 +105,6 @@ class spinServerContext : public spinBaseContext
          */
         static void *syncThread(void *arg);
 
-        /**
-         * A flag that decides if user nodes should be automatically cleaned up
-         * (ie, their entire subgraph deleted) if they stop sending ping
-         * messages.
-         */
         bool autoCleanup_;
 
         /**

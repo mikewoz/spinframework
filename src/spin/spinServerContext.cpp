@@ -70,8 +70,6 @@ spinServerContext::spinServerContext() : syncThreadID(0)
     lo_rxAddrs_.push_back(lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT));
     lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT));
 
-    autoCleanup_ = true;
-
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
 }
@@ -154,7 +152,12 @@ int spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
 		passed_addrs = true;
 	}
 
-	arguments->read("--recv-tcp-msg", this->tcpPort_);
+	if (arguments->read("--recv-tcp-msg", this->tcpPort_))
+    {
+        // if user provides manual tcp port, then disallow spin from assigining
+        // an automatic port (eg, in the case where that port is busy)
+        autoPorts_ = false;
+    }
 
 	while (arguments->read("--send-udp-sync", addr, port)) {
 		this->lo_syncAddr = lo_address_new(addr.c_str(), port.c_str());

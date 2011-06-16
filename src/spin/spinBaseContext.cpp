@@ -86,7 +86,8 @@ spinBaseContext::spinBaseContext() :
     lo_infoServ_(NULL),
     lo_tcpRxServer_(NULL),
     pthreadID(0),
-    doDiscovery_(true)
+    doDiscovery_(true),
+    autoPorts_(true)
 {
     using namespace spin_defaults;
     signalStop = true;
@@ -99,6 +100,7 @@ spinBaseContext::spinBaseContext() :
     //lo_rxAddrs.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT));
     //lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT));
     lo_syncAddr = lo_address_new(MULTICAST_GROUP, SYNC_UDP_PORT);
+    
 
     tcpPort_ = SERVER_TCP_PORT;
 
@@ -848,12 +850,16 @@ void spinBaseContext::createServers()
     using std::string;
 
     lo_tcpRxServer_ = lo_server_new_with_proto(tcpPort_.c_str(), LO_TCP, oscParser_error);
-    if (lo_tcpRxServer_ == 0)
+    if ((lo_tcpRxServer_ == 0) && (canAutoAssignPorts()))
     {
         // liblo will try a random free port if the default failed
         std::cerr << "TCP receiver port " << tcpPort_ <<
             " failed; trying a random port" << std::endl;
         lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
+    } else
+    {
+        std::cerr << "TCP receiver port " << tcpPort_ << " failed; SPIN was provided this port manually, so it will not attempt to use a random port. Quitting." << std::endl;
+        exit(0);
     }
 
     std::vector<lo_address>::iterator it;
