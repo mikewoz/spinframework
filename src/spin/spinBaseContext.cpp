@@ -683,7 +683,21 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
 
     // note that args start at argv[1] now:
     if (theMethod == "debug")
-        sceneManager->debug();
+    {
+        if (argc>1)
+        {
+            std::string debugType = (char*)argv[1];
+            if (debugType=="context")
+                sceneManager->debugContext();
+            else if (debugType=="nodes")
+                sceneManager->debugNodes();
+            else if (debugType=="statesets")
+                sceneManager->debugStateSets();
+            else if (debugType=="scenegraph")
+                sceneManager->debugSceneGraph();
+        }
+        else sceneManager->debug();
+    }
     else if (theMethod == "clear")
         sceneManager->clear();
     else if (theMethod == "clearUsers")

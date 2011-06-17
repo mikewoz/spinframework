@@ -92,6 +92,10 @@ class SceneManager
         ~SceneManager();
 
         void init();
+        void debugContext();
+        void debugNodes();
+        void debugStateSets();
+        void debugSceneGraph();
         void debug();
 
         void setGraphical(bool b) { graphicalMode = b; }

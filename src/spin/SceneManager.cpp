@@ -462,17 +462,21 @@ void SceneManager::sendConnectionList(lo_address txAddr)
     }
 }
 
-void SceneManager::debug()
+void SceneManager::debugContext()
 {
-    std::cout << "\n--------------------------------------------------------------------------------" << std::endl;
-    std::cout << "| SPIN DEBUG:" << std::endl;
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- SPIN CONTEXT DEBUG:" << std::endl;
 	
     spinApp::Instance().getContext()->debugPrint();
+    
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "context");
+}
 
-    std::cout << "\n--------------------------------------------------------------------------------" << std::endl;
-    std::cout << "| SCENE INFO:" << std::endl;
-
-    std::cout << "\nNODE LIST for scene with id '" << sceneID << "':" << std::endl;
+void SceneManager::debugNodes()
+{
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- NODE LIST for scene with id '" << sceneID << "':" << std::endl;
     nodeMapType::iterator it;
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
@@ -484,8 +488,15 @@ void SceneManager::debug()
             std::cout << "    " << (*iter)->id->s_name << " (parent=" << (*iter)->parent->s_name << ")" << std::endl;
         }
     }
+    
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "nodes");
+}
 
-    std::cout << "\n STATE LIST: " << std::endl;
+void SceneManager::debugStateSets()
+{
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- STATE LIST for scene with id '" << sceneID << "': " << std::endl;
     ReferencedStateSetMap::iterator sIt;
     for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
     {
@@ -526,13 +537,28 @@ void SceneManager::debug()
     }
     }
      */
+    
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "statesets");
+}
 
-    std::cout << "\nSCENE GRAPH:" << std::endl;
+void SceneManager::debugSceneGraph()
+{
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- SCENE GRAPH:" << std::endl;
     DebugVisitor ev;
     ev.apply(*(this->rootNode.get()));
 
-    // send debug message to all clients:
-    SCENE_MSG("s", "debug");
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "scenegraph");
+}
+
+void SceneManager::debug()
+{
+    debugContext();
+    debugNodes();
+    debugStateSets();
+    debugSceneGraph();
 }
 
 ReferencedNode* SceneManager::createNode(std::string id, std::string type)
