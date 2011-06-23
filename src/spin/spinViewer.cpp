@@ -274,7 +274,8 @@ static void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &vie
     // create a GraphicsContext::Traits for this window and initialize with
     // some defaults:
 	//osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits(view->getDisplaySettings());
-	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits(ds);
+	//osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits(ds);
+	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits();
 
 	//traits->hostName = si.hostName;
     traits->displayNum = 0;//si.displayNum;
