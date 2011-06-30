@@ -162,12 +162,12 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          Properties::VIRTUAL,
 	          __void__stateDump,
 	          "",
-	          "StateDump() is a request to broadcast the node state via SceneManager. ");
+	          "Request to broadcast the node state via SceneManager. ");
 	I_Method1(void, stateDump, IN, lo_address, addr,
 	          Properties::VIRTUAL,
 	          __void__stateDump__lo_address,
 	          "",
-	          "StateDump() is a request to send the node state to one address ");
+	          "Request to send the node state to one address ");
 	I_Method0(std::string, getID,
 	          Properties::NON_VIRTUAL,
 	          __std_string__getID,

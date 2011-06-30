@@ -8,8 +8,10 @@ LDFLAGS += -weak_framework 3DconnexionClient
 
 ###################################################################
 
-CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags)
-LDFLAGS +=  -llo -lSPIN $(shell python-config --libs)
+DEPS = cppintrospection-2.11
+
+CPPFLAGS += -I../../include -g -I/usr/include/boost `pkg-config --cflags $(DEPS)` $(shell python-config --cflags)
+LDFLAGS +=  -llo -lSPIN `pkg-config --libs $(DEPS)` $(shell python-config --libs)
 LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
 		-losgIntrospection -losgManipulator -losgText -losgUtil \
 		-losgParticle -losgViewer

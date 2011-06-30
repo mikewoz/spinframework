@@ -1,7 +1,5 @@
 Release-critical for 0.4
 ------------------------
- * Use OSG serializer, drop osgIntrospection
- * enclose everything in the spin namespace
  * write some unit/system tests
  * Write some network tests
  * clean up the copyright header for each file
@@ -11,6 +9,8 @@ Release-critical for 0.4
  * document the coding style
  * path to package data in SceneManager.cpp should not be hard-coded
  * use 0, not NULL?
+ * Make tests succeed each time consistently
+ * get rid of spinApp's singleton
 
 
 Server side TCP handlers

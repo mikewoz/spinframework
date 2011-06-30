@@ -92,6 +92,10 @@ class SceneManager
         ~SceneManager();
 
         void init();
+        void debugContext();
+        void debugNodes();
+        void debugStateSets();
+        void debugSceneGraph();
         void debug();
 
         void setGraphical(bool b) { graphicalMode = b; }
@@ -249,28 +253,39 @@ class SceneManager
         ReferencedStateSetMap stateMap;
 };
 
-class Introspector
-{
-    public:
-        /**
-         * Prepends "spin::" to a type name.
-         */
-        static std::string prependNamespace(const std::string &name);
-        /**
-         * Removes "spin::" from a type name.
-         */
-        static std::string removeNamespace(const std::string &name);
-        /**
-         * Prepends "spin::" to a type name and returns its cppintrospection::Type.
-         */
-        static const cppintrospection::Type& getType(const std::string &name);
-};
-
 /**
- * Recursive function to invoke a method for a particular class, that will try
- * all base classes as well
+ * \namespace introspector
+ * \brief Function that deal with cppintrospection-wrapped namespaces, classes and methods from SPIN.
  */
-int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs);
+namespace introspector
+{
+    /**
+     * Prepends "spin::" to a type name.
+     */
+    std::string prependNamespace(const std::string &name);
+    /**
+     * Prepends "spin::" to a type name and returns its cppintrospection::Type.
+     */
+    const cppintrospection::Type& getType(const std::string &name);
+
+    /**
+     * Recursive function to invoke a method for a particular class, that will try
+     * all base classes as well
+     * 
+     * This OSC callback functions need to be valid C function pointers, so it's
+     * declared here as a function, not a method):
+     */
+    int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs);
+
+#if 0
+    /**
+     * Removes "spin::" from a type name.
+     */
+    std::string removeNamespace(const std::string &name);
+#endif
+
+} // end of namespace introspector
+
 
 } // end of namespace spin
 

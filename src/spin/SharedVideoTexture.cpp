@@ -157,6 +157,8 @@ std::vector<lo_message> SharedVideoTexture::getState () const
 
 void SharedVideoTexture::updateCallback()
 {
+    if (!sceneManager->isGraphical()) return;
+
     // do update here
     // FIXME: killed should be protected
     if (not killed_)
@@ -200,8 +202,8 @@ void SharedVideoTexture::updateCallback()
             lastTick = osg::Timer::instance()->tick();
         }
     }
-    else
-        std::cerr << "texture id is empty and we're killed" << std::endl;
+    //else
+    //    std::cerr << "texture id is empty and we're killed" << std::endl;
 }
 
 

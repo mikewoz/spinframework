@@ -27,7 +27,7 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	I_StaticMethod0(spin::spinApp &, Instance,
 	                __spinApp_R1__Instance_S,
 	                "",
-	                "");
+	                "Meyers Singleton design patternFIXME: Do we really need this? ");
 	I_Method1(void, setContext, IN, spin::spinBaseContext *, c,
 	          Properties::NON_VIRTUAL,
 	          __void__setContext__spinBaseContext_P1,

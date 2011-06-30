@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <time.h>
-
+#include <sys/utsname.h>
 
 //#include <3DconnexionClient/ConnexionClient.h>
 #include <3DConnexionClient/ConnexionClientAPI.h>
@@ -28,11 +28,26 @@ pthread_mutex_t spacenavMutex;
 lo_address txAddr;
 time_t lastTime;
 float speedScaleValue;
-
+std::string userID;
 
 // scalars when using move and rotate:
 //#define VELOCITY_SCALAR 0.0005
 //#define SPIN_SCALAR 0.0005
+
+std::string getHostname()
+{
+	struct utsname ugnm;
+    std::string hostname;
+
+	if (uname(&ugnm) < 0) return "";
+	hostname = std::string(ugnm.nodename);
+	
+	// for OSX, remove .local
+	size_t pos = hostname.rfind(".local");
+	if (pos!=std::string::npos) hostname = hostname.substr(0,pos);
+	
+	return hostname;
+}
 
 
 // Make the linker happy for the framework check (see link below for more info)
@@ -122,7 +137,8 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
                      	//std::cout << " dir=("<<(int)state->axis[0]<<","<<(int)state->axis[1]<<","<<(int)state->axis[2]<<")";
                     	//std::cout << " rot=("<<(int)state->axis[3]<<","<<(int)state->axis[4]<<","<<(int)state->axis[5]<<")";
 
-                    	lo_send(txAddr, "/SPIN/default/posture??",
+                    	//lo_send(txAddr, "/SPIN/default/posture??",
+                    	lo_send(txAddr, std::string("/SPIN/default/"+userID).c_str(),
                     			"sfff", "setVelocity",
                     			dX*speedScaleValue, dY*speedScaleValue, dZ*speedScaleValue,
                     			/*
@@ -131,14 +147,15 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
                     			(float) -VELOCITY_SCALAR*state->axis[1],
                     			*/
                     			LO_ARGS_END);
-                    	/*
-                    	lo_send(txAddr, "/SPIN/default/posture??",
+                    	
+                    	//lo_send(txAddr, "/SPIN/default/posture??",
+                    	lo_send(txAddr, std::string("/SPIN/default/"+userID).c_str(),
                     			"sfff", "setSpin",
                     			(float)  SPIN_SCALAR*state->axis[3],
                     			(float)  SPIN_SCALAR*state->axis[5],
                     			(float) -SPIN_SCALAR*state->axis[4]*10.0, // yaw should be faster
                     			LO_ARGS_END);
-                    	*/
+                    	
 
 
                     	break;
@@ -190,7 +207,10 @@ int main(int argc, char **argv)
 
 	std::cout << "\nRunning example. Press CTRL-C to quit..." << std::endl;
 
-	txAddr = lo_address_new("10.20.10.104", "54324");
+	//txAddr = lo_address_new("10.20.10.104", "54324");
+	txAddr = lo_address_new("239.0.0.1", "54324");
+    userID = getHostname();
+    lo_send(txAddr, std::string("/SPIN/default/"+userID).c_str(),"si","setVelocityMode",1,LO_ARGS_END);
 
 	time( &lastTime );
 	speedScaleValue = 1.0;

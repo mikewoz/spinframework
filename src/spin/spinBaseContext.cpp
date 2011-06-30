@@ -61,12 +61,14 @@
 #include "SceneManager.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
+#include "spinClientContext.h"
 #include "spinUtil.h"
 #include "spinApp.h"
 #include "spinLog.h"
 #include "nodeVisitors.h"
 #include "SoundConnection.h"
 #include "spinDefaults.h"
+#include "config.h"
 
 #define UNUSED(x) ( (void)(x) )
 
@@ -75,7 +77,6 @@ pthread_mutex_t sceneMutex = PTHREAD_MUTEX_INITIALIZER;
 
 namespace spin
 {
-
 
 /**
  * All threads need to stop according to the following flag. Note this used to
@@ -87,18 +88,14 @@ namespace spin
 //}
 volatile bool spinBaseContext::signalStop = false;
 
-/**
- * Constructor. 
- * 
- * This is where the actual default port numbers and multicast groups are defined.
- */
 spinBaseContext::spinBaseContext() :
-    lo_txAddr(NULL),
     lo_infoAddr(NULL),
     lo_syncAddr(NULL),
     lo_infoServ_(NULL),
     lo_tcpRxServer_(NULL),
-    pthreadID(0)
+    pthreadID(0),
+    doDiscovery_(true),
+    autoPorts_(true)
 {
     using namespace spin_defaults;
     signalStop = true;
@@ -109,8 +106,11 @@ spinBaseContext::spinBaseContext() :
     // set default addresses (can be overridden):
     lo_infoAddr = lo_address_new(MULTICAST_GROUP, INFO_UDP_PORT);
     //lo_rxAddrs.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_RX_UDP_PORT));
-    lo_txAddr = lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT);
+    //lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, CLIENT_TX_UDP_PORT));
     lo_syncAddr = lo_address_new(MULTICAST_GROUP, SYNC_UDP_PORT);
+    
+
+    tcpPort_ = SERVER_TCP_PORT;
 
     // override infoPort based on environment variable:
     char *infoPortStr = getenv("AS_INFOPORT");
@@ -119,20 +119,22 @@ spinBaseContext::spinBaseContext() :
         std::string tmpStr = std::string(infoPortStr);
         std::string infoAddr = tmpStr.substr(0, tmpStr.rfind(":"));
         std::string infoPort = tmpStr.substr(tmpStr.find(":") + 1);
+        lo_address_free(lo_infoAddr);
         lo_infoAddr = lo_address_new(infoAddr.c_str(), infoPort.c_str());
     }
 }
 
-/**
- * Destructor 
- * 
- * Frees the senders and receivers. 
- */
 spinBaseContext::~spinBaseContext()
 {
     this->stop();
 	
     std::vector<lo_address>::iterator addrIter;
+    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
+    {
+    	lo_address_free(*addrIter);
+    }
+    lo_txAddrs_.clear();
+    
     for (addrIter = lo_rxAddrs_.begin(); addrIter != lo_rxAddrs_.end(); ++addrIter)
     {
     	lo_address_free(*addrIter);
@@ -144,7 +146,6 @@ spinBaseContext::~spinBaseContext()
         lo_server_free(*servIter);
     lo_rxServs_.clear();
 
-    lo_address_free(lo_txAddr);
 	lo_address_free(lo_infoAddr);
     lo_address_free(lo_syncAddr);
 
@@ -153,6 +154,77 @@ spinBaseContext::~spinBaseContext()
 	
     lo_server_free(lo_infoServ_);
     lo_server_free(lo_tcpRxServer_);
+}
+
+void spinBaseContext::debugPrint()
+{
+    std::cout << "\nSPIN context information:" << std::endl;
+    std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
+    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+    if (doDiscovery_)
+    {
+        std::cout << "  Auto discovery address:\t" << lo_address_get_url(lo_infoAddr);
+        if (lo_address_get_ttl(lo_infoAddr)>0)
+            std::cout << " TTL=" << lo_address_get_ttl(lo_infoAddr);
+        std::cout << std::endl;
+    } else {
+        std::cout << "  Auto discovery address:\tOFF" << std::endl;
+    }
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
+    {
+        std::cout << "  Sending UDP to:\t\t" << lo_address_get_url(*addrIter);
+        if (lo_address_get_ttl(*addrIter)>0)
+            std::cout << " TTL=" << lo_address_get_ttl(*addrIter);
+        std::cout << std::endl;
+    }
+    std::vector<lo_server>::iterator servIter;
+    for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
+    {
+        std::cout << "  Receiving UDP on:\t\t" << lo_server_get_url(*servIter) << std::endl;
+    }
+}
+
+void spinBaseContext::addCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    arguments->getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
+    arguments->getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
+    arguments->getApplicationUsage()->addCommandLineOption("--scene-id <id>", "Specify the id of the SPIN scene (Default: default)");
+    arguments->getApplicationUsage()->addCommandLineOption("--disable-discovery", "Disables the multicast discovery service");
+
+    // TODO: add discovery addr <host> <port> (defaults is MULTICAST_GROUP:INFO_UDP_PORT)
+    // for a client, this would be --recv-udp-discovery <host> <port>
+    // for a server, this would be --send-udp-discovery <host> <port>
+}
+
+int spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
+{
+    // if user request help or version write it out to cout and quit.
+    if (arguments->read("-h") || arguments->read("--help"))
+    {
+        arguments->getApplicationUsage()->write(std::cout);
+        return 0;
+    }
+    if (arguments->read("--version"))
+    {
+        std::cout << VERSION << std::endl;
+        return 0;
+    }
+
+    std::string sceneID;
+    if (arguments->read("--scene-id", sceneID))
+    {
+        spinApp::Instance().setSceneID(sceneID);
+    }
+
+    if (arguments->read("--disable-discovery"))
+{
+        doDiscovery_ = false;
+    }
+
+
+
+    return 1;
 }
 
 void spinBaseContext::setLog(spinLog &log)
@@ -164,11 +236,6 @@ void spinBaseContext::setLog(spinLog &log)
     }
 }
 
-/**
- * Signal handler. 
- * 
- * Called, for example, when the user presses Control-C
- */
 void spinBaseContext::sigHandler(int signum)
 {
     std::cout << "SPIN thread caught signal: " << signum << std::endl;
@@ -183,11 +250,14 @@ void spinBaseContext::sigHandler(int signum)
 
 void spinBaseContext::setTTL(int ttl)
 {
-    lo_address_set_ttl(lo_txAddr, ttl);
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
+        lo_address_set_ttl((*addrIter), ttl);
+
     lo_address_set_ttl(lo_infoAddr, ttl);
     lo_address_set_ttl(lo_syncAddr, ttl);
 }
-
+    
 void spinBaseContext::addInfoHandler(EventHandler *obs)
 {
     infoHandlers.push_back(obs);
@@ -217,11 +287,6 @@ void spinBaseContext::removeHandlerForAllEvents(EventHandler *obs)
  */
 bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
 {
-    std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Receiving on INFO channel:\t" << lo_address_get_url(lo_infoAddr) << std::endl;
-    std::cout << "  SYNC channel:\t\t\t" << lo_address_get_url(lo_syncAddr) << std::endl;
-    std::cout << "  Sending on TX channel:\t" << lo_address_get_url(lo_txAddr) << std::endl;
-
     signalStop = false;
 
     // create thread:
@@ -326,22 +391,6 @@ int spinBaseContext::connectionCallback(const char *path,
     return 1;
 }
 
-/**
- * Callback for messages sent to a node in the scene graph.
- * 
- * Messages to node should have an OSC address in the form /SPIN/<scene ID>/<node ID>
- * Their first argument is the name of the method to call. 
- * 
- * Methods to manage Python scripts for a node:
- * - addCronScript <label> <path> <frequency>
- * - addEventScript <label> <event> <path> [*args...]
- * - enableCronScript <label>
- * - removeCronScript <label>
- * - enableEventScript <label>
- * - removeEventScript <label>
- * 
- * We use C++ introspection to figure out the other methods that can be called for a given node.
- */
 int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **argv, int argc, void * /*data*/, void *user_data)
 {
     // NOTE: user_data is a t_symbol pointer
@@ -421,7 +470,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                             lo_message_add_string(msg, (const char*) argv[i] );
                         }
                     }
-                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+                    std::vector<lo_address>::iterator addrIter;
+                    for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+                    {
+                        lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+                    }
                 }
                 theArgs.push_back(false); // serverSide arg
             }
@@ -511,7 +564,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                             lo_message_add_string(msg, (const char*) argv[i]);
                         }
                     }
-                    lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+                    std::vector<lo_address>::iterator addrIter;
+                    for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+                    {
+                        lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+                    }
                 }
                 theArgs.push_back(false); // serverSide arg
             }
@@ -600,7 +657,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                 lo_message_add_string(msg, (const char*) argv[i] );
             }
         }
-        lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+        std::vector<lo_address>::iterator addrIter;
+        for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+        {
+            lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+        }
     }
 
     bool eventScriptCalled = false;
@@ -614,7 +675,7 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     {   // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
         // invoke the method on the node, and if it doesn't work, then just forward
         // the message:
-        if (! invokeMethod(classInstance, classType, theMethod, theArgs))
+        if (! introspector::invokeMethod(classInstance, classType, theMethod, theArgs))
         {
             //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
             // HACK: TODO: fix this
@@ -630,7 +691,11 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
                         lo_message_add_string(msg, (const char*) argv[i]);
                     }
                 }
-                lo_send_message_from(spin.getContext()->lo_txAddr, spin.getContext()->lo_infoServ_, path, msg);
+                std::vector<lo_address>::iterator addrIter;
+                for (addrIter = spin.getContext()->lo_txAddrs_.begin(); addrIter != spin.getContext()->lo_txAddrs_.end(); ++addrIter)
+                {
+                    lo_send_message_from((*addrIter), spin.getContext()->lo_infoServ_, path, msg);
+                }
             }
         }
     }
@@ -638,33 +703,6 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     return 1;
 }
 
-/**
- * Callback for the OSC message to the whole scene. 
- * 
- * The address of the OSC messages sent to the scene are in the form /SPIN/<scene ID> <method name> [args...]
- * 
- * They are used mostly to delete all nodes from a scene, or to ask the server to refresh the information about all nodes. It's also possible to save the current scene graph to an XML file, and to load a previously saved XML file. 
- * 
- * Some valid method include:
- * - clear
- * - clearUsers
- * - clearStates
- * - userRefresh
- * - refresh
- * - refreshSubscribers
- * - getNodeList
- * - nodeList [node names...] : Creates many nodes
- * - stateList [] : Creates many state sets
- * - exportScene [] []
- * - load [XML file]
- * - save [XML file] 
- * - saveAll [XML file]
- * - saveUsers [XML file]
- * - createNode [node name] [node type]
- * - createStateSet [name] [type]
- * - deleteNode [name]
- * - deleteGraph [name]
- */
 int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg **argv, int argc,
         void * /*data*/, void * /*user_data*/)
 {
@@ -685,7 +723,21 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
 
     // note that args start at argv[1] now:
     if (theMethod == "debug")
-        sceneManager->debug();
+    {
+        if (argc>1)
+        {
+            std::string debugType = (char*)argv[1];
+            if (debugType=="context")
+                sceneManager->debugContext();
+            else if (debugType=="nodes")
+                sceneManager->debugNodes();
+            else if (debugType=="statesets")
+                sceneManager->debugStateSets();
+            else if (debugType=="scenegraph")
+                sceneManager->debugSceneGraph();
+        }
+        else sceneManager->debug();
+    }
     else if (theMethod == "clear")
         sceneManager->clear();
     else if (theMethod == "clearUsers")
@@ -701,6 +753,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         else
         {
             spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
+            
+            // if the server sends a userRefresh, it's possible that it has
+            // only recently come online, so we need to re-subsrcibe:
+            spinClientContext *clientContext = dynamic_cast<spinClientContext*>(spin.getContext());
+            clientContext->subscribe();
         }
     }
     else if (theMethod == "refresh")
@@ -841,12 +898,24 @@ void spinBaseContext::oscParser_error(int num, const char *msg, const char *path
     fflush(stdout);
 }
 
-/// this method is used by both spinClientContext and spinServerContext
 void spinBaseContext::createServers()
 {
     using boost::lexical_cast;
     using std::string;
-    // set up OSC event listener:
+
+    lo_tcpRxServer_ = lo_server_new_with_proto(tcpPort_.c_str(), LO_TCP, oscParser_error);
+    if (lo_tcpRxServer_ == 0)
+    {
+        if (canAutoAssignPorts())
+        {
+            // liblo will try a random free port if the default failed
+            std::cerr << "TCP receiver port " << tcpPort_ << " failed; trying a random port" << std::endl;
+            lo_tcpRxServer_ = lo_server_new_with_proto(NULL, LO_TCP, oscParser_error);
+        } else {
+            std::cerr << "TCP receiver port " << tcpPort_ << " failed; SPIN was provided this port manually, so it will not attempt to use a random port. Quitting." << std::endl;
+            exit(0);
+        }
+    }
 
     std::vector<lo_address>::iterator it;
     for (it = lo_rxAddrs_.begin(); it != lo_rxAddrs_.end(); ++it)

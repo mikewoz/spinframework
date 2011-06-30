@@ -77,7 +77,7 @@ ViewerManipulator::ViewerManipulator()
 	setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
 	//setMinimumDistance( 0.0001 );
 	setMinimumDistance( 0.0 );
-	setHomePosition( osg::Vec3(0,-0.001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+	setHomePosition( osg::Vec3(0,-0.00001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 	//setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,0.0001,0), osg::Vec3(0,0,1), false );
 
 }

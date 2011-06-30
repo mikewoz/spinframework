@@ -59,8 +59,11 @@ namespace osgManipulator {
 namespace spin
 {
 
-// dummy class:
-class PointerNodeActionAdapter : public osgGA::GUIActionAdapter {
+/**
+ * Used internally by PointerNode. Dummy class.
+ */
+class PointerNodeActionAdapter : public osgGA::GUIActionAdapter
+{
     void requestRedraw(void){};
     void requestContinuousUpdate(bool){};
     void requestWarpPointer(float,float) {};
@@ -86,7 +89,6 @@ class PointerNode : public ReferencedNode
 
         virtual void callbackUpdate();
 
-
         void enableDragger();
         void disableDragger();
 
@@ -106,8 +108,6 @@ class PointerNode : public ReferencedNode
         void pull (float f);
         int getGrab() const { return (int) grabbedNode.valid(); }
 
-
-
         /**
          * For each subclass of ReferencedNode, we override the getState() method to
          * fill the vector with the correct set of methods for this particular node
@@ -120,7 +120,6 @@ class PointerNode : public ReferencedNode
          * won't see it.
          */
         //virtual void stateDump() { ReferencedNode::stateDump(); };
-
 
     private:
 

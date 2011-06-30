@@ -80,10 +80,11 @@ using namespace boost::python;
 namespace spin
 {
 
-/******************************************************************************/
-
-class ValueWrapper {
-
+/**
+ * \brief Utility to wrap types for the Python wrapper.
+ */
+class ValueWrapper
+{
 public:
     ValueWrapper();
     ValueWrapper(cppintrospection::Value& v);
@@ -93,7 +94,6 @@ public:
     ValueWrapper(const std::string& v);
     ~ValueWrapper();
 
-
     int getInt();
     float getFloat();
     std::string getString();
@@ -102,64 +102,53 @@ public:
 protected:
     cppintrospection::Value _value;
 };
-/******************************************************************************/
+
 ValueWrapper::ValueWrapper() {
     _value = cppintrospection::Value(0);
 }
-/******************************************************************************/
+
 ValueWrapper::ValueWrapper(cppintrospection::Value& v) {
     _value = v;
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(int v) {
     _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(float v) {
     _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(std::string& v) {
     _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(const std::string& v) {
     _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::~ValueWrapper() {
 }
 
-
-/******************************************************************************/
-
-int ValueWrapper::getInt() {
+int ValueWrapper::getInt()
+{
     int i = cppintrospection::variant_cast<int>(_value);
     return i;
 }
 
-/******************************************************************************/
-
-float ValueWrapper::getFloat() {
+float ValueWrapper::getFloat()
+{
     float i = cppintrospection::variant_cast<float>(_value);
     return i;
 }
 
-/******************************************************************************/
-
-std::string ValueWrapper::getString() {
+std::string ValueWrapper::getString()
+{
     return _value.toString();
-
 }
-/******************************************************************************/
 
-boost::python::tuple ValueWrapper::getVector() {
-
+boost::python::tuple ValueWrapper::getVector()
+{
     try {
         osg::Vec2 v2;
         v2 = cppintrospection::variant_cast<osg::Vec2>(_value);
@@ -183,20 +172,8 @@ boost::python::tuple ValueWrapper::getVector() {
     } catch (...) {
         // damn
     }
-
-
-
-
     return make_tuple(0);
-
-
 }
-
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
 
 int invokeMethod(const cppintrospection::Value classInstance,
                  const cppintrospection::Type &classType,
@@ -207,11 +184,8 @@ int invokeMethod(const cppintrospection::Value classInstance,
 
     // TODO: we should try to store this globally somewhere, so that we don't do
     // a lookup every time there is a message:
-
     /*
     //const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
-
-
     if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
     {
     */
@@ -233,28 +207,22 @@ int invokeMethod(const cppintrospection::Value classInstance,
             if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs, rval)) return 1;
         }
    // }
-
     return 0;
 }
 
-/******************************************************************************/
-/******************************************************************************/
-
-bool pyextract( boost::python::object obj, double* d ) {
-
+bool pyextract( boost::python::object obj, double* d )
+{
     try {
         *d = boost::python::extract<double>( obj );
     } catch (...) {
         PyErr_Clear();
         return false;
     }
-
     return true;
 }
 
-
-bool pyextract( boost::python::object obj, float* d ) {
-
+bool pyextract( boost::python::object obj, float* d )
+{
     try {
         *d = boost::python::extract<float>( obj );
     } catch (...) {
@@ -265,40 +233,35 @@ bool pyextract( boost::python::object obj, float* d ) {
     return true;
 }
 
-bool pyextract( boost::python::object obj, int* d ) {
-
+bool pyextract( boost::python::object obj, int* d )
+{
     try {
         *d = boost::python::extract<int>( obj );
     } catch (...) {
         PyErr_Clear();
         return false;
     }
-
     return true;
 }
 
-std::string pyextract( boost::python::object obj ) {
-	std::string s;
+std::string pyextract( boost::python::object obj )
+{
+    std::string s;
     try {
         s = boost::python::extract<std::string>( obj );
     } catch (...) {
         PyErr_Clear();
     }
-
     return s;
 }
 
-/******************************************************************************/
 ValueWrapper SceneManagerCallback_script( const char* symName, const char* method,
                                           boost::python::list& argList, int cascadeEvents )
 {
-
     //int i;
     std::string    theMethod( method );
     cppintrospection::ValueList theArgs;
-
     //printf("SceneManagerCallback_script: hi! %s, %s, [%s]\n", symName, types, args.c_str());
-
     t_symbol *s = gensym( symName );
 
     if (!s->s_thing)
@@ -309,19 +272,16 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
 
     // get osgInrospection::Value from passed UserData by casting as the proper
     // referenced object pointer:
-
     cppintrospection::Value classInstance;
     if (s->s_type == REFERENCED_STATESET)
         classInstance = cppintrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
     else
         classInstance = cppintrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
 
-
-
     // the getInstanceType() method however, gives us the real type being pointed at:
     const cppintrospection::Type &classType = classInstance.getInstanceType();
 
-    if (!classType.isDefined())
+    if (! classType.isDefined())
     {
         std::cout << "ERROR: oscParser cound not process message '" << symName
                   << ". cppintrospection has no data for that node." << std::endl;
@@ -331,86 +291,97 @@ ValueWrapper SceneManagerCallback_script( const char* symName, const char* metho
     size_t nbArgs = boost::python::len( argList );
     double da; float fa; int ia; std::string sa;
 
-    for ( size_t i = 0; i < nbArgs; i++ ) {
+    for ( size_t i = 0; i < nbArgs; i++ )
+    {
 
-        if ( pyextract( argList[i], &da ) ) theArgs.push_back( (double) da );
-        else if ( pyextract( argList[i], &fa ) ) theArgs.push_back( (float) fa );
-        else if ( pyextract( argList[i], &ia ) ) theArgs.push_back( (int) ia );
+        if ( pyextract( argList[i], &da ) )
+            theArgs.push_back( (double) da );
+        else if ( pyextract( argList[i], &fa ) )
+            theArgs.push_back( (float) fa );
+        else if ( pyextract( argList[i], &ia ) )
+            theArgs.push_back( (int) ia );
         else
         {
-        	sa = pyextract( argList[i] );
-        	if (sa != "" ) theArgs.push_back( (const char*) sa.c_str() );
+            sa = pyextract( argList[i] );
+            if (sa != "" )
+                theArgs.push_back( (const char*) sa.c_str() );
         }
     }
 
-
-
     // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
-
     cppintrospection::Value v;
-
     bool eventScriptCalled = false;
-    if (cascadeEvents) {
-        if (s->s_type == REFERENCED_NODE) {
+    if (cascadeEvents)
+    {
+        if (s->s_type == REFERENCED_NODE)
+        {
             //printf("calling eventscript...\n");
             eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, theArgs );
         }
     }
 
-    if (eventScriptCalled) { // cascaded event script called successful, do not invokeMethod, return nothing to the python script
+    if (eventScriptCalled)
+    { // cascaded event script called successful, do not invokeMethod, return nothing to the python script
         return ValueWrapper(0);
-    } else { // no cascaded event assigned to theMethod or cascaded event script failed.  call invokeMethod and return result to python script
-        if (invokeMethod(classInstance, classType, theMethod, theArgs, v)) {
+    }
+    else
+    { // no cascaded event assigned to theMethod or cascaded event script failed.  call invokeMethod and return result to python script
+        if (invokeMethod(classInstance, classType, theMethod, theArgs, v))
+        {
             return ValueWrapper(v);
-        } else {
+        }
+        else
+        {
             if (spinApp::Instance().getContext()->isServer())
-			{
-				lo_message msg = lo_message_new();
-				lo_message_add_string(msg, theMethod.c_str());
-			    for ( size_t i = 0; i < nbArgs; i++ )
-			    {
-			        if ( pyextract( argList[i], &da ) ) lo_message_add_float(msg, (float) da );
-			        else if ( pyextract( argList[i], &fa ) ) lo_message_add_float(msg, (float) fa );
-			        else if ( pyextract( argList[i], &ia ) ) lo_message_add_float(msg, (float) ia );
-			        else
-			        {
-			        	sa = pyextract( argList[i] );
-			        	if (sa != "" ) lo_message_add_string(msg, (const char*) sa.c_str() );
-			        }
-			    }
-
-				std::string path = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + s->s_name;
-				lo_send_message_from(spinApp::Instance().getContext()->lo_txAddr, spinApp::Instance().getContext()->lo_infoServ_, path.c_str(), msg);
-			}
+            {
+                lo_message msg = lo_message_new();
+                lo_message_add_string(msg, theMethod.c_str());
+                for ( size_t i = 0; i < nbArgs; i++ )
+                {
+                    if ( pyextract( argList[i], &da ) ) lo_message_add_float(msg, (float) da );
+                    else if ( pyextract( argList[i], &fa ) ) lo_message_add_float(msg, (float) fa );
+                    else if ( pyextract( argList[i], &ia ) ) lo_message_add_float(msg, (float) ia );
+                    else
+                    {
+                        sa = pyextract( argList[i] );
+                        if (sa != "" ) lo_message_add_string(msg, (const char*) sa.c_str() );
+                    }
+                }
+                std::string path = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + s->s_name;
+                std::vector<lo_address>::iterator addrIter;
+                for (addrIter = spinApp::Instance().getContext()->lo_txAddrs_.begin(); addrIter != spinApp::Instance().getContext()->lo_txAddrs_.end(); ++addrIter)
+                {
+                    lo_send_message_from((*addrIter), spinApp::Instance().getContext()->lo_infoServ_, path.c_str(), msg);
+                }
+            }
         }
 
     }
     //pthread_mutex_unlock(&sceneMutex);
-
     return ValueWrapper(0);
 }
 
-
-/******************************************************************************/
-
-double time_s() {
+double time_s()
+{
     return osg::Timer::instance()->time_s();
 }
-double time_m() {
+double time_m()
+{
     return osg::Timer::instance()->time_m();
 }
-double time_u() {
+double time_u()
+{
     return osg::Timer::instance()->time_u();
 }
-double time_n() {
+double time_n()
+{
     return osg::Timer::instance()->time_n();
 }
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
+/**
+ * Please document this.
+ */
 BOOST_PYTHON_MODULE(libSPINPyWrap)
 {
     def("callback", &SceneManagerCallback_script);
@@ -425,11 +396,7 @@ BOOST_PYTHON_MODULE(libSPINPyWrap)
         .def("getString", &ValueWrapper::getString)  // Add a regular member function.
         .def("getVector", &ValueWrapper::getVector)
     ;
-
 }
-
 
 } // end of namespace spin
 
-
-/******************************************************************************/

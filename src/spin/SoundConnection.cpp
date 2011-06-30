@@ -426,7 +426,7 @@ void SoundConnection::debug()
 	std::cout << "****************************************" << std::endl;
 	std::cout << "********** CONNECTION  DEBUG: **********" << std::endl;
 	
-	std::cout << "\nSoundConnection [" << this->id << "]:" << std::endl;
+	std::cout << "\nSoundConnection [" << this->id->s_name << "]:" << std::endl;
 	
     std::vector<lo_message> nodeState = this->getState();
     std::vector<lo_message>::iterator nodeStateIterator;

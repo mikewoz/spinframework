@@ -5,6 +5,7 @@ AM_CPPFLAGS = \
     $(LIBLO_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
     $(OSG_CFLAGS) \
+    $(SHAREDVIDEO_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/tinyxml
 
@@ -29,7 +30,7 @@ libSPIN_la_LDFLAGS = \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
-    $(SHARED_VIDEO_LIB)
+    $(SHAREDVIDEO_LIBS)
 
 # please keep those in alphabetical order:
 libSPIN_la_SOURCES = \
@@ -76,7 +77,59 @@ libSPIN_la_SOURCES = \
     introspect_helpers.cpp
 
 libSPIN_la_includedir = $(includedir)/spinFramework
-libSPIN_la_include_HEADERS = $(top_srcdir)/include/*.h $(top_srcdir)/src/tinyxml/*.h
+libSPIN_la_include_HEADERS = \
+    $(top_srcdir)/include/AnimationNode.h \
+    $(top_srcdir)/include/AttractorNode.h \
+    $(top_srcdir)/include/config.h \
+    $(top_srcdir)/include/ConstraintsNode.h \
+    $(top_srcdir)/include/Contour.h \
+    $(top_srcdir)/include/DSPNode.h \
+    $(top_srcdir)/include/Fog.h \
+    $(top_srcdir)/include/GridNode.h \
+    $(top_srcdir)/include/GroupNode.h \
+    $(top_srcdir)/include/ImageTexture.h \
+    $(top_srcdir)/include/introspect_helpers.h \
+    $(top_srcdir)/include/libloUtil.h \
+    $(top_srcdir)/include/LightSource.h \
+    $(top_srcdir)/include/Listener.h \
+    $(top_srcdir)/include/mainpage.h \
+    $(top_srcdir)/include/MeasurementNode.h \
+    $(top_srcdir)/include/MediaManager.h \
+    $(top_srcdir)/include/Menu3D.h \
+    $(top_srcdir)/include/ModelNode.h \
+    $(top_srcdir)/include/nodeVisitors.h \
+    $(top_srcdir)/include/oscParser.h \
+    $(top_srcdir)/include/osgUtil.h \
+    $(top_srcdir)/include/PointerNode.h \
+    $(top_srcdir)/include/RayNode.h \
+    $(top_srcdir)/include/ReferencedNode.h \
+    $(top_srcdir)/include/ReferencedStateSet.h \
+    $(top_srcdir)/include/ReporterNode.h \
+    $(top_srcdir)/include/SceneManager.h \
+    $(top_srcdir)/include/ShapeNode.h \
+    $(top_srcdir)/include/SharedVideoTexture.h \
+    $(top_srcdir)/include/SoundConnection.h \
+    $(top_srcdir)/include/SoundNode.h \
+    $(top_srcdir)/include/SoundSpace.h \
+    $(top_srcdir)/include/spinApp.h \
+    $(top_srcdir)/include/spinBaseContext.h \
+    $(top_srcdir)/include/spinClientContext.h \
+    $(top_srcdir)/include/spinDefaults.h \
+    $(top_srcdir)/include/spinLog.h \
+    $(top_srcdir)/include/spinLogWX.h \
+    $(top_srcdir)/include/spinServerContext.h \
+    $(top_srcdir)/include/spinUtil.h \
+    $(top_srcdir)/include/spinWX.h \
+    $(top_srcdir)/include/SwitchNode.h \
+    $(top_srcdir)/include/TextNode.h \
+    $(top_srcdir)/include/UserNode.h \
+    $(top_srcdir)/include/util.h \
+    $(top_srcdir)/include/VideoTexture.h \
+    $(top_srcdir)/include/ViewerManipulator.h \
+    $(top_srcdir)/src/tinyxml/tinystr.h \
+    $(top_srcdir)/src/tinyxml/tinyxml.h
+
+# $(top_srcdir)/include/videoSize.h
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 # libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
@@ -102,7 +155,7 @@ spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSP
 #OSG_VER = $(shell osgversion --so-number)
 #OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
 
-#OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer osgIntrospection
+#OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer cppintrospection
 
 # WARNING: the .app generation script pulls some libs (eg, libSPIN) from /usr/local
 # so you must do a 'make install' before this will work (TODO: fix this)
@@ -148,7 +201,7 @@ spinviewer.app: spinviewer$(EXEEXT)
 #install_name_tool -change libosgFX.55.dylib @executable_path/../libs/libosgFX.55.dylib $@/Contents/MacOS/spinviewer
 #install_name_tool -change libosgParticle.55.dylib @executable_path/../libs/libosgParticle.55.dylib $@/Contents/MacOS/spinviewer
 #install_name_tool -change libosgViewer.55.dylib @executable_path/../libs/libosgViewer.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgIntrospection.55.dylib @executable_path/../libs/libosgIntrospection.55.dylib $@/Contents/MacOS/spinviewer
+#install_name_tool -change libcppintrospection.55.dylib @executable_path/../libs/libcppintrospection.55.dylib $@/Contents/MacOS/spinviewer
 
 #install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinviewer
 #-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks

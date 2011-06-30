@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(SPINFRAMEWORK, [0.3.3], [https://sourceforge.net/apps/trac/spinframework/], [spinframework], [http://www.spinframework.org])
+AC_INIT(SPINFRAMEWORK, [0.3.3], [http://github.com/mikewoz/spinframework], [spinframework], [http://www.spinframework.org])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -53,13 +53,13 @@ case "$host" in *-darwin* | *-macos10*)
     CPPFLAGS="$CPPFLAGS -I/sw/include"
     LDFLAGS="$LDFLAGS -L/sw/lib"
   fi
+  # OSX does not include /usr/local/lib/pkgconfig path, so we export it here
+  # (for everyone, just in case)
+  # TODO: also need to add the path for linux64
+  PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+  export PKG_CONFIG_PATH
   ;;
 esac
-
-# OSX does not include /usr/local/lib/pkgconfig path, so we export it here
-# (for everyone, just in case)
-PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
-export PKG_CONFIG_PATH
 
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
 # LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
@@ -128,23 +128,26 @@ fi
 
 PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
 
-PKG_CHECK_MODULES(CPPINTROSPECTION, cppintrospection-2.11 >= 2.11.0, , AC_MSG_ERROR([missing cppintrospection]))
+PKG_CHECK_MODULES(CPPINTROSPECTION, cppintrospection-3.0, , AC_MSG_ERROR([missing cppintrospection]))
 
 PKG_CHECK_MODULES(OPENTHREADS, openthreads >= 2.4.0, , AC_MSG_ERROR([missing OpenThreads]))
 
 PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 
-# FIXME: scenic should use pkg-config to say where shared video is
-OLD_LDFLAGS=$LDFLAGS
-LDFLAGS="$LDFLAGS -L/usr/local/lib/scenic -L/usr/lib/scenic"
-AC_CHECK_LIB([shared_video], [shared_video_is_present], 
-        SHARED_VIDEO_LIB="-lshared_video"; 
-        [AC_DEFINE([WITH_SHARED_VIDEO],[],
-            [A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])], 
-        [AC_MSG_WARN([missing Scenic shared_video library]); 
-        LDFLAGS=$OLD_LDFLAGS],[-pthread])
+#PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, 
+#        [AC_DEFINE([WITH_SHARED_VIDEO],[],
+#            [A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])], 
+#        [AC_MSG_WARN([missing Scenic shared_video library])])
 
-AC_SUBST([SHARED_VIDEO_LIB])
+
+PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, have_sharedvideo=true, have_sharedvideo=false)
+if test "x${have_sharedvideo}" = "xfalse" ; then
+    AC_MSG_WARN([missing package: libshared-video-0.6-dev ])
+else
+    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])
+    AC_MSG_NOTICE([SHAREDVIDEO_CFLAGS:    ${SHAREDVIDEO_CFLAGS}])
+    AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
+fi
 
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
@@ -187,9 +190,11 @@ AC_CONFIG_FILES([
         src/Resources/Makefile
         src/Resources/images/Makefile
         src/Resources/desktopentries/Makefile
+        src/Resources/camconfig/Makefile
         src/Resources/fonts/Makefile
         src/Resources/scripts/Makefile
         src/editor/Makefile
+        tests/Makefile
         ])
 
 AC_OUTPUT

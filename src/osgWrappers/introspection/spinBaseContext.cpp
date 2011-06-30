@@ -59,7 +59,7 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	I_StaticMethod1(void, sigHandler, IN, int, signum,
 	                __void__sigHandler__int_S,
 	                "",
-	                "Signal handler.Called, for example, when the user presses Control-C ");
+	                "");
 	I_StaticMethod6(int, connectionCallback, IN, const char *, path, IN, const char *, types, IN, lo_arg **, argv, IN, int, argc, IN, void *, data, IN, void *, user_data,
 	                __int__connectionCallback__C5_char_P1__C5_char_P1__lo_arg_P1P1__int__void_P1__void_P1_S,
 	                "",
@@ -94,8 +94,8 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	                   Properties::PURE_VIRTUAL,
 	                   Properties::NON_CONST,
 	                   __void__createServers,
-	                   "this method is used by both spinClientContext and spinServerContext ",
-	                   "");
+	                   "",
+	                   "this method is used by both spinClientContext and spinServerContext ");
 	I_PublicMemberProperty(std::vector< lo_address >, lo_rxAddrs_);
 	I_PublicMemberProperty(std::vector< lo_server >, lo_rxServs_);
 	I_PublicMemberProperty(lo_address, lo_txAddr);

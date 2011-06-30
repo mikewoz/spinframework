@@ -58,7 +58,7 @@ BEGIN_VALUE_REFLECTOR(spin::spinLog)
 	          Properties::NON_VIRTUAL,
 	          __void__set_priority__LogPriority,
 	          "",
-	          "");
+	          "Sets priority ");
 	I_Method1(void, enable_cout, IN, bool, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enable_cout__bool,

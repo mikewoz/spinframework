@@ -88,6 +88,8 @@ public:
     ReporterNode(SceneManager *sceneManager, char *initID);
     virtual ~ReporterNode();
 
+    virtual void debug();
+
     /**
      * The update callback for ReporterNode checks to see if a target or the
      * the ReporterNode's global matrix has changed (ie, whether it has been

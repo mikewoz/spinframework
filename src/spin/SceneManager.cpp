@@ -83,6 +83,7 @@
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
 #include <cppintrospection/ExtendedTypeInfo>
+#include "introspect_helpers.h"
 
 using namespace cppintrospection;
 
@@ -118,7 +119,6 @@ SceneManager::SceneManager(std::string id)
         resourcesPath = "/usr/local/share/spinFramework";
     }
     //resourcesPath = "../Resources";
-    std::cout << "  Resources path:\t\t" << resourcesPath << std::endl;
 
     // get user defined env variable OSG_FILE_PATH
     osgDB::Registry::instance()->initDataFilePathList();
@@ -142,7 +142,7 @@ SceneManager::SceneManager(std::string id)
     try
     {
         {
-        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
+        const cppintrospection::Type &ReferencedNodeType = introspector::getType("ReferencedNode");
         //nodeTypes.clear();
         const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
         cppintrospection::TypeMap::const_iterator it;
@@ -164,7 +164,7 @@ SceneManager::SceneManager(std::string id)
 
         // Same thing for ReferencedStateSets:
         {
-        const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("spin::ReferencedStateSet");
+        const cppintrospection::Type &ReferencedStateSetType = introspector::getType("ReferencedStateSet");
         const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
         cppintrospection::TypeMap::const_iterator it;
         for (it = allTypes.begin(); it != allTypes.end(); it++)
@@ -462,13 +462,21 @@ void SceneManager::sendConnectionList(lo_address txAddr)
     }
 }
 
-void SceneManager::debug()
+void SceneManager::debugContext()
 {
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- SPIN CONTEXT DEBUG:" << std::endl;
+	
+    spinApp::Instance().getContext()->debugPrint();
+    
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "context");
+}
 
-    std::cout << "****************************************" << std::endl;
-    std::cout << "************* SCENE DEBUG: *************" << std::endl;
-
-    std::cout << "\nNODE LIST for scene with id '" << sceneID << "':" << std::endl;
+void SceneManager::debugNodes()
+{
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- NODE LIST for scene with id '" << sceneID << "':" << std::endl;
     nodeMapType::iterator it;
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
@@ -480,8 +488,15 @@ void SceneManager::debug()
             std::cout << "    " << (*iter)->id->s_name << " (parent=" << (*iter)->parent->s_name << ")" << std::endl;
         }
     }
+    
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "nodes");
+}
 
-    std::cout << "\n STATE LIST: " << std::endl;
+void SceneManager::debugStateSets()
+{
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- STATE LIST for scene with id '" << sceneID << "': " << std::endl;
     ReferencedStateSetMap::iterator sIt;
     for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
     {
@@ -522,13 +537,28 @@ void SceneManager::debug()
     }
     }
      */
+    
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "statesets");
+}
 
-    std::cout << "\nSCENE GRAPH:" << std::endl;
+void SceneManager::debugSceneGraph()
+{
+    std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
+    std::cout << "-- SCENE GRAPH:" << std::endl;
     DebugVisitor ev;
     ev.apply(*(this->rootNode.get()));
 
-    // send debug message to all clients:
-    SCENE_MSG("s", "debug");
+    // forward debug message to all clients:
+    SCENE_MSG("ss", "debug", "scenegraph");
+}
+
+void SceneManager::debug()
+{
+    debugContext();
+    debugNodes();
+    debugStateSets();
+    debugSceneGraph();
 }
 
 // *****************************************************************************
@@ -613,9 +643,9 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
 
     try
     {
-        std::string fullTypeName = Introspector::prependNamespace(nodeType);
+        std::string fullTypeName = introspector::prependNamespace(nodeType);
         // Let's use cppintrospection to create a node of the proper type:
-        const cppintrospection::Type &t = Introspector::getType(nodeType);
+        const cppintrospection::Type &t = introspector::getType(nodeType);
 
         //std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
         //introspect_print_type(t);
@@ -794,8 +824,8 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
 
     try {
 
-        // Let's use cppintrospection to create a node of the proper type:
-        const cppintrospection::Type &t = cppintrospection::Reflection::getType(type);
+        // Let's use cppintrospection to create a stateset of the proper type:
+        const cppintrospection::Type &t = introspector::getType(type);
 
         //std::cout << "... about to create node of type [" << t.getStdTypeInfo().name() << "]" << std::endl;
         //introspect_print_type(t);
@@ -1033,7 +1063,7 @@ std::vector<SoundConnection*> SceneManager::getConnections()
     {
         std::string nodeType = (*it).first;
 
-        const cppintrospection::Type &t = cppintrospection::Reflection::getType("spin::" + nodeType);
+        const cppintrospection::Type &t = introspector::getType(nodeType);
         if (t.isDefined())
         {
             // check if the nodeType is a subclass of DSPNode:
@@ -1402,29 +1432,44 @@ void SceneManager::update()
 {
 
 #ifdef WITH_SHARED_VIDEO
-    //if (shTex.valid()) shTex->updateCallback();
+    // it's possible that a SharedVideoTexture is in the sceneManager, but not
+    // currently applied on any geometry. In this canse, it will not be be
+    // seen in the update traversal of the scene graph, and it's updateCallback
+    // will not be called. As a result, frames don't get consumed, and we need
+    // to consume all the frames before we are back in sync. If the framerate
+    // of the viewer is low, this can take a very long time and appears like a
+    // huge delay.
+    ReferencedStateSetList::iterator sIter;
+    for (sIter = stateMap[std::string("SharedVideoTexture")].begin(); sIter != stateMap[std::string("SharedVideoTexture")].end(); sIter++)
+    {
+        if (!(*sIter)->getNumParents())
+            (*sIter)->updateCallback();
+    }
 #endif
 
+    
 	if (spinApp::Instance().getContext()->isServer())
-	{
-		// check if any UserNodes have stopped pinging, and remove them (and their
-		// subgraph) if necessary:
-
-		nodeListType::iterator iter;
-	    for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
+    {
+        spinServerContext *spinserv = dynamic_cast<spinServerContext*>(spinApp::Instance().getContext());
+        if (spinserv->shouldAutoClean())
 	    {
-			if ((*iter)->scheduleForDeletion)
-			{
-				// this user stopped pinging, so we should remove him from the
-				// subgraph.
+		    // check if any UserNodes have stopped pinging, and remove them
+            // (and their subgraph) if necessary:
 
-				//uncomment when ready:
-				spinApp::Instance().sceneManager->deleteGraph((*iter)->id->s_name);
-			}
-            else
-                iter++;
+		    nodeListType::iterator iter;
+	        for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
+	        {
+			    if ((*iter)->scheduleForDeletion)
+			    {
+				    // this user stopped pinging, so we should remove him
+                    // from the subgraph.
+				    spinApp::Instance().sceneManager->deleteGraph((*iter)->id->s_name);
+			    }
+                else
+                    iter++;
+	        }
 	    }
-	}
+    }
 }
 
 // save scene as .osg
@@ -1530,18 +1575,6 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
     return output.str();
 }
 
-// TODO: Move to introspector.cpp
-std::string Introspector::prependNamespace(const std::string &name)
-{
-    // FIXME: is this the fastest way to do this?
-    return std::string("spin::").append(name);
-}
-
-// TODO: Move to introspector.cpp
-const cppintrospection::Type& Introspector::getType(const std::string &name)
-{
-    return cppintrospection::Reflection::getType(prependNamespace(name));
-}
 
 std::string SceneManager::getConnectionsAsXML()
 {
@@ -1556,11 +1589,11 @@ std::string SceneManager::getConnectionsAsXML()
     for (it = nodeMap.begin(); it != nodeMap.end(); it++)
     {
         std::string nodeType = (*it).first;
-        const cppintrospection::Type &t = Introspector::getType(nodeType);
+        const cppintrospection::Type &t = introspector::getType(nodeType);
         if (t.isDefined())
         {
             // check if the nodeType is a subclass of DSPNode:
-            if (t.getBaseType(0).getName() == Introspector::prependNamespace("DSPNode"))
+            if (t.getBaseType(0).getName() == introspector::prependNamespace("DSPNode"))
             {
                 for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
                 {
@@ -1796,14 +1829,14 @@ bool SceneManager::createNodeFromXML(TiXmlElement *XMLnode, const char *parentNo
 
     char *nodeType = (char*) XMLnode->Value();
 
-    if (cppintrospection::Reflection::getType(nodeType).isDefined())
+    if (introspector::getType(nodeType).isDefined())
     {
         if (XMLnode->Attribute("id"))
         {
             char *nodeID = (char*) XMLnode->Attribute("id");
             osg::ref_ptr<ReferencedNode> n = getOrCreateNode(nodeID, nodeType);
 
-            // get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
+            // get node as an cppintrospection::Value (note that type will be ReferencedNode pointer):
             const cppintrospection::Value introspectValue = cppintrospection::Value(n.get());
 
             // the getInstanceType() method however, gives us the real type being pointed at:
@@ -1895,14 +1928,14 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
 
     char *classType = (char*) XMLnode->Value();
 
-    if (Introspector::getType(std::string(classType)).isDefined())
+    if (introspector::getType(std::string(classType)).isDefined())
     {
         if (XMLnode->Attribute("id"))
         {
             char *statesetID = (char*) XMLnode->Attribute("id");
             osg::ref_ptr<ReferencedStateSet> ss = createStateSet(statesetID, classType);
 
-            // get node as an osgInrospection::Value (note that type will be ReferencedNode pointer):
+            // get node as an cppintrospection::Value (note that type will be ReferencedNode pointer):
             const cppintrospection::Value introspectValue = cppintrospection::Value(ss.get());
 
             // the getInstanceType() method however, gives us the real type being pointed at:
@@ -2136,10 +2169,8 @@ bool SceneManager::nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_p
     return (std::string(n1->id->s_name) < std::string(n2->id->s_name));
 }
 
-
-// *****************************************************************************
-// OSC callback functions below (need to be valid C function pointers, so they
-// are declared here as static functions):
+namespace introspector
+{
 
 int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, ValueList theArgs)
 {
@@ -2170,13 +2201,28 @@ int invokeMethod(const cppintrospection::Value classInstance, const cppintrospec
     // through all base classes to see if method is contained in a parent class:
     for (int i = 0; i < classType.getNumBaseTypes(); i++)
     {
-        if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs))
+        if (introspector::invokeMethod(classInstance, classType.getBaseType(i), method, theArgs))
             return 1;
     }
     // }
 
     return 0;
 }
+
+// TODO: Move to introspector.cpp
+std::string prependNamespace(const std::string &name)
+{
+    // FIXME: is this the fastest way to do this?
+    return std::string("spin::").append(name);
+}
+
+// TODO: Move to introspector.cpp
+const cppintrospection::Type& getType(const std::string &name)
+{
+    return cppintrospection::Reflection::getType(prependNamespace(name));
+}
+
+} // end of namespace introspector
 
 } // end of namespace spin
 

@@ -338,7 +338,6 @@ void spinApp::registerUser()
 
         SceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
 
-        std::cout << "  Registered user\t\t'" << userNode->id->s_name << "'" << std::endl;
     }
 
     if (!userNode.valid())
@@ -372,7 +371,7 @@ void spinApp::InfoMessage(const std::string &OSCpath, const char *types, va_list
 
 void spinApp::InfoMessage(const std::string &OSCpath, lo_message msg)
 {
-    if (context)
+    if ((context) && (context->doDiscovery_))
     {
         lo_send_message_from(context->lo_infoAddr, context->lo_infoServ_, OSCpath.c_str(), msg);
 
@@ -413,7 +412,10 @@ void spinApp::NodeMessage(const char *nodeId, lo_message msg)
         // the rxAddr of the spinServer (unicast)
         if ( !context->isServer() )
         {
-            lo_send_message(context->lo_txAddr, OSCpath.c_str(), msg);
+            std::vector<lo_address>::iterator addrIter;
+            for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+                lo_send_message((*addrIter), OSCpath.c_str(), msg);
+
         }
 
         // if, however, this process acts as a server, we can optimize and send
@@ -459,7 +461,9 @@ void spinApp::SceneMessage(lo_message msg)
         // the rxAddr of the spinServer (unicast)
         if ( !context->isServer() )
         {
-            lo_send_message(context->lo_txAddr, OSCpath.c_str(), msg);
+            std::vector<lo_address>::iterator addrIter;
+            for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+                lo_send_message((*addrIter), OSCpath.c_str(), msg);
         }
         else
         {
@@ -507,36 +511,59 @@ void spinApp::SceneBundle(std::vector<lo_message> msgs, lo_address addr)
 
 void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msgs, lo_address txAddr)
 {
+    // If a txAddr is provided, it is probably a TCP request. Otherwise, txAddr
+    // will be 0, and we will send to all lo_txAddrs_ in the list.
+    std::vector<lo_address> addressesToSendTo;
+    if (txAddr == 0) addressesToSendTo = context->lo_txAddrs_;
+    else addressesToSendTo.push_back(txAddr);
+
+/*
 	lo_address sendingAddress;
 	if (txAddr == 0) sendingAddress = context->lo_txAddr;
 	else sendingAddress = txAddr;
+*/
 
-	std::vector<lo_message>::iterator iter;
+    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+    std::vector<lo_message>::iterator iter;
+    for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
+    {
+        lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+    }
 
-	// TCP in liblo can't handle bundles
-	if (lo_address_get_protocol(sendingAddress) == LO_TCP)
-	{
-		iter = msgs.begin();
-		while (iter != msgs.end())
-		{
-			lo_send_message(sendingAddress, OSCpath.c_str(), (*iter));
-			msgs.erase(iter); // iterator automatically advances after erase()
-		}
-	}
-	// if it's any UDP socket, then bundle the messages:
-	else
-	{
-		lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+    {
 
-		iter = msgs.begin();
-		while (iter != msgs.end())
-		{
-			lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
-			msgs.erase(iter); // iterator automatically advances after erase()
-		}
-        lo_send_bundle(sendingAddress, b);
-        lo_bundle_free_messages(b);
-	}
+        // TCP in liblo can't handle bundles
+        if (lo_address_get_protocol(*addrIter) == LO_TCP)
+        {
+            iter = msgs.begin();
+            while (iter != msgs.end())
+            {
+                lo_send_message((*addrIter), OSCpath.c_str(), (*iter));
+                ++iter;
+                //msgs.erase(iter); // iterator automatically advances after erase()
+            }
+        }
+        // if it's any UDP socket, then bundle the messages:
+        else
+        {
+            //std::cout << "sending bundle of " << msgs.size() << " to " << lo_address_get_url(txAddr) << ", for:  " << OSCpath << std::endl;
+/*
+            lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+            for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
+            //iter = msgs.begin();
+            //while (iter != msgs.end())
+            {
+                lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+                //msgs.erase(iter); // iterator automatically advances after erase()
+            }
+*/
+            lo_send_bundle((*addrIter), b);
+            //lo_bundle_free_messages(b);
+        }
+    }
+    lo_bundle_free_messages(b);
 }
 
 } // end of namespace spin

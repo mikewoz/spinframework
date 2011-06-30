@@ -61,11 +61,34 @@ class spinClientContext : public spinBaseContext
         ~spinClientContext();
 
         bool start();
+        void debugPrint();
+        void addCommandLineOptions(osg::ArgumentParser *arguments);
+        int parseCommandLineOptions(osg::ArgumentParser *arguments);
+        
         lo_server lo_syncServ;
 
         int pollUpdates();
 
-    protected:
+    //protected:
+        /**
+         * Register the client's ip and port for reliable communication with the server
+         */
+        void subscribe();
+        
+
+    private:
+
+        // false once we've subscribed to a server in TCP
+        bool doSubscribe_; 
+        // address to which messages can be sent over TCP
+        lo_address lo_serverTCPAddr;
+
+        std::vector<InfoMessage*> serverList;
+        
+        // we need to store the TCP address so that the user can override
+        // it manually. By default, this is filled with getMyIPaddress(),
+        // but this may be wrong if transmitting across subnets.
+        std::string recv_tcp_addr;
 
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
@@ -101,21 +124,7 @@ class spinClientContext : public spinBaseContext
          */
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-        /**
-         * Register this client's IP address and port for TCP communication with
-         * the server. Subscribed clients can receive a reliable refresh using
-         * the refreshSubscribers scene message
-         */
-        void subscribe();
 
-    private:
-
-        // false once we've subscribed to a server in TCP
-        bool doSubscribe_;
-        // address to which messages can be sent over TCP
-        lo_address lo_serverTCPAddr;
-
-        std::vector<InfoMessage*> serverList;
 };
 
 

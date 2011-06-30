@@ -49,7 +49,7 @@ namespace cppintrospection {
 namespace spin
 {
 
-bool introspect_type_order(const cppintrospection::Type *v1, const osgIntrospection::Type *v2);
+bool introspect_type_order(const cppintrospection::Type *v1, const cppintrospection::Type *v2);
 void introspect_print_method(const cppintrospection::MethodInfo &mi);
 void introspect_print_type(const cppintrospection::Type &type);
 void introspect_print_all_types();

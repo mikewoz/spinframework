@@ -1,1 +1,1 @@
-SUBDIRS = fonts images scripts desktopentries
+SUBDIRS = fonts camconfig images scripts desktopentries

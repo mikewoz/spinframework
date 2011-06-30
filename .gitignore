@@ -41,6 +41,7 @@ include/stamp-h1
 src/spin/spindocgenerator
 src/spin/spinserver
 src/spin/spinviewer
+src/editor/spineditor
 spinframework-*.*.*
 doxyfile
 doxyfile.stamp
@@ -48,4 +49,6 @@ html
 man
 doxygen
 latex
-src/editor/spineditor
+tests/check_it_works
+tests/stats
+xml/

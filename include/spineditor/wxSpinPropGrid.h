@@ -53,7 +53,7 @@
 #include <osg/Vec4f>
 #include <osg/BoundingSphere>
 #include <osg/Plane>
-#include <osgIntrospection/PropertyInfo>
+#include <cppintrospection/PropertyInfo>
 
 #include "ReferencedNode.h"
 #include "lo/lo.h"
@@ -98,7 +98,7 @@ public:
 protected:
 
     //! Create a category and properties of the given object.
-    void GenerateProperties(const osgIntrospection::Type& type, ReferencedNode* pObject);
+    void GenerateProperties(const cppintrospection::Type& type, ReferencedNode* pObject);
 
     void OnPropertyChanging(wxPropertyGridEvent& event);
 
