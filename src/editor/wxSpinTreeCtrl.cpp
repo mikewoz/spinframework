@@ -66,19 +66,7 @@ wxSpinTreeCtrl::wxSpinTreeCtrl(wxWindow* parent, wxWindowID id, const wxPoint& p
     // create and store and instance of wxSpinTreeVisitor:
     m_pSceneTreeVisitor = new wxSpinTreeVisitor(this);
 
-    // add our liblo callback to all listener sockets:
-    spin::spinBaseContext *listener = spin::spinApp::Instance().getContext();
-    std::vector<lo_server>::iterator servIter;
-    for (servIter = listener->lo_rxServs_.begin(); servIter != listener->lo_rxServs_.end(); ++servIter)
-    {
-        lo_server_add_method((*servIter),
-            std::string("/SPIN/" + spin::spinApp::Instance().getSceneID()).c_str(),
-            NULL, wxSpinTreeCtrl_liblo_callback, this);
-
-        // TODO: we should really have callbacks for node messages and scene
-        // messages rather than parsing every single message received
-        //lo_server_add_method((*servIter), NULL, NULL, wxSpinTreeCtrl_liblo_callback, this);
-    }
+    this->connectToSpin();
 }
 
 wxSpinTreeCtrl::~wxSpinTreeCtrl()
@@ -86,6 +74,27 @@ wxSpinTreeCtrl::~wxSpinTreeCtrl()
 
     m_pSceneTreeVisitor = 0; // OSG should handle deletion
     //delete m_pSceneTreeVisitor;
+}
+
+void wxSpinTreeCtrl::connectToSpin()
+{
+    // add our liblo callback to all listener sockets:
+    spin::spinBaseContext *listener = spin::spinApp::Instance().getContext();
+    std::vector<lo_server>::iterator servIter;
+    for (servIter = listener->lo_rxServs_.begin(); servIter != listener->lo_rxServs_.end(); ++servIter)
+    {
+        std::string oscPattern = std::string("/SPIN/" + spin::spinApp::Instance().getSceneID());
+
+        // remove existing callback (if exists):
+        lo_server_del_method((*servIter), oscPattern.c_str(), NULL);
+
+        // add new callback:
+        lo_server_add_method((*servIter), oscPattern.c_str(), NULL, wxSpinTreeCtrl_liblo_callback, this);
+
+        // TODO: we should really have callbacks for node messages and scene
+        // messages rather than parsing every single message received
+        //lo_server_add_method((*servIter), NULL, NULL, wxSpinTreeCtrl_liblo_callback, this);
+    }
 }
 
 void wxSpinTreeCtrl::BuildTree(osg::Node* pRoot)
@@ -386,14 +395,14 @@ void wxSpinTreeCtrl::OnSpinTreeDragEnd(wxTreeEvent &event)
 int wxSpinTreeCtrl_liblo_callback(const char *path, const char *types, lo_arg **argv, int argc, void * WXUNUSED(data), void *user_data)
 {
     // DEBUG PRINT:
-    /*
-    printf("wx got spin message: %s", path);
+
+    printf("wxSpinTreeCtrl got spin message: %s", path);
     for (int i=0; i<argc; i++) {
         printf(" ");
         lo_arg_pp((lo_type) types[i], argv[i]);
     }
     printf("\n");
-     */
+
 
     if (!argc)
     {

@@ -78,6 +78,12 @@ public:
 
     //void setListeningServer(lo_server_thread t);
 
+    /**
+     * This registers the callback function (wxSpinTreeCtrl_liblo_callback) with
+     * SPIN so that the TreeCtrl is updates when the scene changes. Note that
+     * this function must be called again if the server ever changes.
+     */
+    void connectToSpin();
 
     /**
      * Build the tree based on the contents of the sceneManager

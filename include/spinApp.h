@@ -42,6 +42,7 @@
 #ifndef __spinApp_H
 #define __spinApp_H
 
+//#include "Python.h"
 #include <boost/python.hpp>
 #include <osg/Timer>
 #include <lo/lo_types.h>

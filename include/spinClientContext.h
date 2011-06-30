@@ -65,12 +65,7 @@ class spinClientContext : public spinBaseContext
 
         int pollUpdates();
 
-        
-    private:
-        // false once we've subscribed to a server in TCP
-        bool doSubscribe_; 
-        // address to which messages can be sent over TCP
-        lo_address lo_serverTCPAddr;
+    protected:
 
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
@@ -106,8 +101,21 @@ class spinClientContext : public spinBaseContext
          */
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-        // register my ip and port for reliable communication with the server
+        /**
+         * Register this client's IP address and port for TCP communication with
+         * the server. Subscribed clients can receive a reliable refresh using
+         * the refreshSubscribers scene message
+         */
         void subscribe();
+
+    private:
+
+        // false once we've subscribed to a server in TCP
+        bool doSubscribe_;
+        // address to which messages can be sent over TCP
+        lo_address lo_serverTCPAddr;
+
+        std::vector<InfoMessage*> serverList;
 };
 
 

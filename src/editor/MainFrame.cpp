@@ -13,6 +13,9 @@ using namespace spineditor;
 
 MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent)
 {
+    // register this class with spin to receiver INFO channel messages:
+    spin::spinApp::Instance().getContext()->addInfoHandler(this);
+
     // some OSX specific things (eg, bind the special apple about menu)
 #ifdef __WXMAC__
     wxApp::s_macAboutMenuItemId = wxID_ABOUT;
@@ -49,6 +52,69 @@ MainFrame::~MainFrame()
     delete redirector;
 #endif
 #endif
+}
+
+void MainFrame::onInfoMessage(spin::InfoMessage *msg)
+{
+    /*
+    std::cout << "Got info message:"
+            << " scene=" << msg->sceneID
+            << " server=" << msg->serverAddr
+            << " (UDP: " << msg->serverUDPPort
+            << " TCP: " << msg->serverTCPport
+            << ") multicast=" << msg->multicastAddr
+            << " (DATA: " << msg->multicastDataPort
+            << " SYNC: " << msg->multicastSyncPort
+            << ")" << std::endl;
+            */
+}
+
+void MainFrame::onServerChange(std::vector<spin::InfoMessage*> serverList)
+{
+    // get the currently selected item:
+    wxString prevServer = serverChooser->GetStringSelection();
+    std::cout << "MainFrame got updated server list (prev=" << prevServer << "): ";
+
+    //spin::InfoMessage *prevServerInfo;
+
+
+    // replace choices with new list:
+    Freeze();
+    serverChooser->Clear();
+    std::vector<spin::InfoMessage*>::iterator sIt;
+    serverChooser->Append("<not-connected>");
+    for (sIt=serverList.begin(); sIt!=serverList.end(); ++sIt)
+    {
+        serverChooser->Append((*sIt)->sceneID);
+        std::cout << " " << (*sIt)->sceneID;
+    }
+    std::cout << std::endl;
+    Thaw();
+
+    // if previous server was <not-connected>, let's automatically connect
+    if ((prevServer=="<not-connected>") && (serverChooser->GetCount()>1))
+    {
+        serverChooser->SetSelection(1);
+    }
+
+    // otherwise, select the same selection as we had previously, or the
+    // <not-connected> option if the previous server is not online anymore:
+    else
+    {
+        if (!serverChooser->SetStringSelection(prevServer))
+            serverChooser->SetStringSelection("<not-connected>");
+    }
+
+    // SetSelection and SetStringSelection do not emit an event, so we simulate
+    // an event here:
+    //serverChooser->Command(wxEVT_COMMAND_CHOICE_SELECTED, this->GetId());
+    //serverChooser->Command(wxEVT_COMMAND_CHOICE_SELECTED);
+
+    wxCommandEvent event(wxEVT_COMMAND_CHOICE_SELECTED, this->GetId());
+    event.SetEventObject(serverChooser);
+    //event.SetText(serverChooser->GetStringSelection());
+    GetEventHandler()->ProcessEvent( event );
+
 }
 
 void MainFrame::OnClose(wxCloseEvent& event)
@@ -175,4 +241,24 @@ void MainFrame::OnToggleViewer( wxCommandEvent& WXUNUSED(event) )
 void MainFrame::OnSceneDebug( wxCommandEvent& WXUNUSED(event) )
 {
     spin::spinApp::Instance().SceneMessage("s", "debug", SPIN_ARGS_END);
+}
+
+void MainFrame::OnServerChange( wxCommandEvent& event )
+{
+    // TODO
+    std::cout << "SELECTED NEW SERVER: " << event.GetString() << std::endl;
+
+    Freeze();
+    spin::spinApp::Instance().getContext()->stop();
+    spin::spinApp::Instance().setSceneID(event.GetString().ToStdString());
+    spin::spinApp::Instance().getContext()->start();
+    Thaw();
+
+    std::cout << "Changed scene id to: " << spin::spinApp::Instance().getSceneID() << std::endl;
+
+    // need to reconnect any ui components that have callbacks which listen to
+    // SPIN messages:
+    spinTreeCtrl->connectToSpin();
+
+    event.Skip();
 }

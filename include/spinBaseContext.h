@@ -43,8 +43,9 @@
 #define __spinBaseContext_H
 
 #include <vector>
+#include <string>
 #include <lo/lo_types.h>
-
+#include "EventTypes.h"
 
 namespace spin
 {
@@ -67,6 +68,7 @@ namespace spin
 
 // Forward declarations
 class spinLog;
+class EventHandler;
 
 class spinBaseContext
 {
@@ -102,10 +104,22 @@ class spinBaseContext
 
         void setTTL(int ttl);
 
+        /**
+         * Add an event handler to the list of classes that will be notified
+         * when a message is received on the INFO channel:
+         */
+        void addInfoHandler(EventHandler *obs);
+        /**
+         * Remove an INFO channel event handler
+         */
+        void removeInfoHandler(EventHandler *obs);
+
+        void removeHandlerForAllEvents(EventHandler *obs);
+
+
         /** list of address/port combinations on which the server listens for messages that alters the scene graph. */
         std::vector<lo_address> lo_rxAddrs_;
         std::vector<lo_server> lo_rxServs_;
-
 
         /** Multicast group and port number to which the server sends the messages that clients sent to it to alter the scene graph. */
         lo_address lo_txAddr;
@@ -136,6 +150,12 @@ class spinBaseContext
         SpinContextMode mode;
         void setLog(spinLog &log);
         virtual void createServers() = 0;
+
+
+        std::vector<EventHandler*> infoHandlers;
+        std::vector<EventHandler*> nodeHandlers;
+        std::vector<EventHandler*> sceneHandlers;
+
         /**
          * All contexts would probably like to listen to infoPort broadcasts.
          * A client can listen for info about the server, such as the correct

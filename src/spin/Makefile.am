@@ -36,6 +36,7 @@ libSPIN_la_SOURCES = \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
     DSPNode.cpp \
+    EventHandler.cpp \
     Fog.cpp \
     GridNode.cpp \
     ReferencedNode.cpp \

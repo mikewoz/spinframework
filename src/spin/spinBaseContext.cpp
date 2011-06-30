@@ -188,6 +188,30 @@ void spinBaseContext::setTTL(int ttl)
     lo_address_set_ttl(lo_syncAddr, ttl);
 }
 
+void spinBaseContext::addInfoHandler(EventHandler *obs)
+{
+    infoHandlers.push_back(obs);
+}
+
+void spinBaseContext::removeInfoHandler(EventHandler *obs)
+{
+    std::vector<EventHandler*>::iterator it;
+    for (it=infoHandlers.begin(); it!=infoHandlers.end(); ++it)
+    {
+        if ((*it)==obs)
+        {
+            infoHandlers.erase(it);
+            return;
+        }
+    }
+}
+void spinBaseContext::removeHandlerForAllEvents(EventHandler *obs)
+{
+    removeInfoHandler(obs);
+    //removeNodeHandler(obs);
+    //removeSceneHandler(obs);
+}
+
 /**
  * Startup point of the server's thread.
  */
@@ -237,6 +261,11 @@ void spinBaseContext::stop()
     {
         pthread_join(pthreadID, NULL);
     }
+
+    // wait here until the thread has really exited:
+    while (isRunning())
+        usleep(10);
+
 }
 
 int spinBaseContext::connectionCallback(const char *path, 

@@ -48,6 +48,7 @@
 #include "spinApp.h"
 #include "SceneManager.h"
 #include "spinDefaults.h"
+#include "EventHandler.h"
 
 namespace spin
 {
@@ -201,9 +202,9 @@ void *spinClientContext::spinClientThread(void *arg)
     }
 
     std::cout << "Exiting spin client thread\n";
-    context->running = false;
+    spin.destroyScene();
 
-	spin.destroyScene();
+    context->running = false;
     return arg;
 }
 
@@ -263,6 +264,8 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
     return 1;
 }
 
+
+
 /// this comes from the server's multicast info message
 int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*/,
         lo_arg ** argv, int argc, void * /*data*/, void * user_data)
@@ -270,18 +273,92 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
     spinClientContext *context = static_cast<spinClientContext*>(user_data);
     if (argc != 7)
         return 1;
-    std::string theirSceneID(reinterpret_cast<const char*>(argv[0]));
 
-    // make sure my sceneID matches the sceneID whose info message this is
-    if (spinApp::Instance().getSceneID() == theirSceneID and context->doSubscribe_)
+    std::string sceneID = reinterpret_cast<const char*>(argv[0]);
+
+    InfoMessage *msg = 0;
+    bool serverListChanged = false;
+    osg::Timer_t now = osg::Timer::instance()->tick();
+    std::vector<InfoMessage*>::iterator sIt;
+    for (sIt=context->serverList.begin(); sIt!=context->serverList.end();)
+    {
+        // Check the lastUpdate time and remove any old servers
+        // (eg, remove after 20s of inactivity):
+        if (osg::Timer::instance()->delta_s((*sIt)->lastUpdate,now) > 20.0)
+        {
+            std::cout << "[spinClientContext] Removing inactive server from list: " << sceneID << std::endl;
+            delete (*sIt);
+            sIt = context->serverList.erase(sIt);
+            serverListChanged = true;
+        }
+
+        else
+        {
+            // If this message is for a server already in the list, we'll just
+            // update it's current information.
+            if ((*sIt)->sceneID == sceneID)
+            {
+                //std::cout << "got duplicate info message for " << sceneID << std::endl;
+                msg = (*sIt);
+                break;
+            }
+            ++sIt;
+        }
+
+    }
+
+    // If the server was not found in the list, create a new one:
+    if (!msg)
+    {
+        std::cout << "[spinClientContext] Discovered new server online: " << sceneID << std::endl;
+        //msg = (InfoMessage *) malloc(sizeof(InfoMessage));
+        msg = new InfoMessage(sceneID);
+        context->serverList.push_back(msg);
+        //msg->sceneID = sceneID;
+        serverListChanged = true;
+    }
+
+    //std::cout << "about to update infomessage: " << msg->sceneID << std::endl;
+
+    // Update the server info in case something has changed:
+    msg->serverAddr = reinterpret_cast<const char*>(argv[1]);
+    msg->serverUDPPort = (int)argv[2]->i;
+    msg->serverTCPport = (int)argv[3]->i;
+    msg->multicastAddr = reinterpret_cast<const char*>(argv[4]);
+    msg->multicastDataPort = (int)argv[5]->i;
+    msg->multicastSyncPort = (int)argv[6]->i;
+    msg->lastUpdate = osg::Timer::instance()->tick();
+
+    // Check if this client needs to subscribe (TCP) to the server (as long as
+    // the sceneID matches this context's sceneID)
+    if (context->doSubscribe_ && (spinApp::Instance().getSceneID() == sceneID))
     {
         std::ostringstream sstr;
-        sstr << argv[3]->i;    // convert to string
+        sstr << msg->serverTCPport;    // convert to string
         context->lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP,
-                reinterpret_cast<const char*>(argv[1]),
+                msg->serverAddr.c_str(),
                 sstr.str().c_str());
         context->subscribe();
     }
+
+    // Forward this message to the event handlers:
+    std::vector<EventHandler*>::iterator eIt;
+    for (eIt=context->infoHandlers.begin(); eIt!=context->infoHandlers.end(); ++eIt)
+    {
+        (*eIt)->onInfoMessage(msg);
+    }
+
+
+    // If the server list has changed, send an event:
+    if (serverListChanged)
+    {
+        // TODO
+        for (eIt=context->infoHandlers.begin(); eIt!=context->infoHandlers.end(); ++eIt)
+        {
+            (*eIt)->onServerChange(context->serverList);
+        }
+    }
+
 
     return 1;
 }
