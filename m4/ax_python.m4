@@ -61,7 +61,7 @@ CPPFLAGS_SAVE=$CPPFLAGS
 case "$host" in *-darwin* | *-macos10*)
   CPPFLAGS="$CPPFLAGS -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include"
 esac
-for python in python2.6 python2.5 python2.4 python2.3 python2.2 python2.1 python; do
+for python in python2.7 python2.6 python2.5 python2.4 python2.3 python2.2 python2.1 python; do
 AC_CHECK_PROGS(PYTHON_BIN, [$python])
 ax_python_bin=$PYTHON_BIN
 if test x$ax_python_bin != x; then
