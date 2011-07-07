@@ -172,7 +172,10 @@ bool SpinEditorApp::OnCmdLineParsed(wxCmdLineParser& parser)
 
     wxString serverAddr;
     if (parser.Found(wxT("r"), &serverAddr))
-        spinListener.lo_txAddr= lo_address_new_from_url(serverAddr.c_str());
+    {
+        spinListener.lo_txAddrs_.clear();
+        spinListener.lo_txAddrs_.push_back(lo_address_new_from_url(serverAddr.c_str()));
+    }
 
     return true;
 }
