@@ -33,6 +33,9 @@ spineditor_SOURCES = \
 	wxSpinTreeVisitor.cpp \
 	wxSpinTreeVisitor.h \
     unused.h
+	
+#	wxSpinPropGrid.cpp \
+#	wxSpinPropGrid.h 
 
 spineditor_LDFLAGS = \
     $(BOOST_FILESYSTEM_LIB) \
