@@ -313,29 +313,23 @@ void wxSpinTreeCtrl::UpdateTreeItemIcon(wxTreeItemId id)
 }
 
 // TODO:
-/*
-void wxSpinTreeCtrl::SetPropGrid(wxSpinPropGrid *PG)
+void wxSpinTreeCtrl::SetPropGrid(wxSpinPropGrid *pg)
 {
-    if (!PG) return;
-    SpinPropGrid = PG;
+    if (!pg) return;
+    spinPropGrid = pg;
 }
-*/
+
 void wxSpinTreeCtrl::UpdatePropGrid()
 {
-    // TODO
-    std::cout << "TODO: UpdatePropGrid()" << std::endl;
-
-    /*
-    if (!SpinPropGrid)
+    if (!spinPropGrid)
     {
         std::cout << "wxSpinTreeCtrl: Oops. SpinPropGrid does not exist. Cannot populate the property editor." << std::endl;
         return;
     }
 
-    ReferencedNode *n = GetSelectedNode();
-    if (n) SpinPropGrid->SetNode(n);
-    else SpinPropGrid->SetNode(NULL); // This will empty the propgrid editor
-     */
+    spin::ReferencedNode *n = GetSelectedNode();
+    if (n) spinPropGrid->SetNode(n);
+    else spinPropGrid->SetNode(NULL); // This will empty the propgrid editor
 }
 
 void wxSpinTreeCtrl::OnSpinSelectionChange(wxTreeEvent & WXUNUSED(event))
@@ -346,7 +340,7 @@ void wxSpinTreeCtrl::OnSpinSelectionChange(wxTreeEvent & WXUNUSED(event))
         //std::cout << "got tree selection: " << n->getID() << std::endl;
     }
     else std::cout << "got tree selection, but couldn't find spin node" << std::endl;
-    //UpdatePropGrid();
+    UpdatePropGrid();
 }
 
 void wxSpinTreeCtrl::OnSpinTreeDragBegin(wxTreeEvent &event)

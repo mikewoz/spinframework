@@ -39,6 +39,10 @@ MainFrame::MainFrame( wxWindow* parent) : MainFrame_base( parent)
     // when the constructor is called
     //wxGetApp().start();
 
+    // provide SpinTree with a pointer to SpinPropGrid so that it can fill it:
+    spinTreeCtrl->SetPropGrid(spinPropGrid);
+
+
 
     // ask for refresh:
     spin::spinApp::Instance().SceneMessage("s", "refresh", SPIN_ARGS_END);

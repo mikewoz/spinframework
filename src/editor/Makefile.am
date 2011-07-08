@@ -1,11 +1,11 @@
 AM_CPPFLAGS = \
+    $(WX_CPPFLAGS) \
     $(BOOST_CPPFLAGS) \
     $(CPPINTROSPECTION_CFLAGS) \
     $(LIBLO_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
     $(OSG_CFLAGS) \
     $(PYTHON_CPPFLAGS) \
-    $(WX_CPPFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/include/spineditor \
     -I$(top_srcdir)/src/tinyxml
@@ -32,10 +32,10 @@ spineditor_SOURCES = \
 	wxSpinTreeCtrl.h \
 	wxSpinTreeVisitor.cpp \
 	wxSpinTreeVisitor.h \
-    unused.h
-	
-#	wxSpinPropGrid.cpp \
-#	wxSpinPropGrid.h 
+	wxSpinPropGrid.cpp \
+	wxSpinPropGrid.h \
+	unused.h
+
 
 spineditor_LDFLAGS = \
     $(BOOST_FILESYSTEM_LIB) \
