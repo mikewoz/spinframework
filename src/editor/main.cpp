@@ -54,6 +54,7 @@ bool SpinEditorApp::OnInit()
     // wxSpinTreeCtrl needs to set OSC callbacks)
     this->start();
 
+
 #ifdef __WXMAC__
     // need to give focus to the process (for development; should be fixed when
     // using an .app bundle):

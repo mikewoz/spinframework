@@ -56,7 +56,7 @@
 #define wxUSE_PROPGRID 1
 
 #include <wx/propgrid/propgrid.h>
-//#include <wx/propgrid/propdev.h>
+//#include <wx/propgrid/propdev.h> // bug
 #include <wx/propgrid/advprops.h>
 #include <wx/propgrid/manager.h>
 
@@ -67,7 +67,9 @@
 
 
 /**
- * Property grid for SPIN scene
+ * Property grid widget for editing a node.
+ *
+ * The widget is automatically generated using cppIntrospection
  */
 
 class wxSpinPropGrid : public wxPropertyGridManager
@@ -81,8 +83,6 @@ public:
                   const wxSize& size = wxDefaultSize,
                   long style = wxPG_SPLITTER_AUTO_CENTER | wxTAB_TRAVERSAL | wxPG_TOOLBAR | wxPG_DESCRIPTION,
                   const wxChar* name = wxT("propGrid"));
-
-    void setListeningServer(lo_server_thread t);
 
     //! Set a new node to show.
     void SetNode(spin::ReferencedNode* pObject, bool forceUpdate=false);
@@ -108,7 +108,7 @@ protected:
 
     osg::ref_ptr<spin::ReferencedNode> currentNode;    //!< Current osg object
 
-    lo_server_thread listeningServer;
+    //lo_server_thread listeningServer;
 
     DECLARE_EVENT_TABLE()
 };

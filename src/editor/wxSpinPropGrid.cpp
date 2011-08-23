@@ -129,10 +129,28 @@ wxSpinPropGrid::wxSpinPropGrid(wxWindow *parent, wxWindowID id, const wxPoint& p
 
 }
 
+/*
+void wxSpinPropGrid::connectToSpin()
+{
+    // add our liblo callback to all listener sockets:
+    spin::spinBaseContext *listener = spin::spinApp::Instance().getContext();
+    std::vector<lo_server>::iterator servIter;
+    for (servIter = listener->lo_rxServs_.begin(); servIter != listener->lo_rxServs_.end(); ++servIter)
+    {
+        std::string oscPattern = std::string("/SPIN/" + spin::spinApp::Instance().getSceneID());
 
-void wxSpinPropGrid::setListeningServer(lo_server_thread t) {
-    this->listeningServer = t;
+        // remove existing callback (if exists):
+        lo_server_del_method((*servIter), oscPattern.c_str(), NULL);
+
+        // add new callback:
+        lo_server_add_method((*servIter), oscPattern.c_str(), NULL, wxSpinPropGrid_liblo_callback, this);
+
+        // TODO: we should really have callbacks for node messages and scene
+        // messages rather than parsing every single message received
+        //lo_server_add_method((*servIter), NULL, NULL, wxSpinTreeCtrl_liblo_callback, this);
+    }
 }
+*/
 
 /*!
     Set a new node to show.
@@ -172,21 +190,20 @@ void wxSpinPropGrid::SetNode(spin::ReferencedNode* newNode, bool forceUpdate)
 
         // Add a callback method to the listeningServer that will listen for
         // messages related to the new node, and update props:
-        if (listeningServer)
+
+        std::string oscPattern;
+
+        // first remove the previously registered method:
+        if (currentNode.valid())
         {
-            std::string oscPattern;
-
-            // first remove the previously registered method:
-            if (currentNode.valid())
-            {
-                oscPattern = "/SPIN/" + spin::spinApp::Instance().getSceneID() + "/" + std::string(currentNode->id->s_name);
-                lo_server_del_method_with_userdata(spin::spinApp::Instance().getContext()->lo_rxServs_[0], oscPattern.c_str(), NULL, (void*)this);
-            }
-
-            // add the new method:
-            oscPattern = "/SPIN/" + spin::spinApp::Instance().getSceneID() + "/" + std::string(newNode->id->s_name);
-            lo_server_add_method(spin::spinApp::Instance().getContext()->lo_rxServs_[0], oscPattern.c_str(), NULL, wxSpinPropGrid_liblo_callback, (void*)this);
+            oscPattern = "/SPIN/" + spin::spinApp::Instance().getSceneID() + "/" + std::string(currentNode->id->s_name);
+            lo_server_del_method_with_userdata(spin::spinApp::Instance().getContext()->lo_rxServs_[0], oscPattern.c_str(), NULL, (void*)this);
         }
+
+        // add the new method:
+        oscPattern = "/SPIN/" + spin::spinApp::Instance().getSceneID() + "/" + std::string(newNode->id->s_name);
+        lo_server_add_method(spin::spinApp::Instance().getContext()->lo_rxServs_[0], oscPattern.c_str(), NULL, wxSpinPropGrid_liblo_callback, (void*)this);
+
 
     }
 
