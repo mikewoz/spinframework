@@ -64,6 +64,9 @@
 #include "spinLog.h"
 #include "nodeVisitors.h"
 
+#ifdef WITH_SPATOSC
+#include <spatosc/scene.h>
+#endif
 
 #define UNUSED(x) ( (void)(x) )
 
@@ -72,7 +75,7 @@ extern pthread_mutex_t sceneMutex;
 namespace spin
 {
 
-spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
+spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
 {
 
 #ifdef __Darwin
@@ -153,6 +156,11 @@ spinApp::spinApp() : userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
     // timecode init:
     setSyncStart(0);
 
+#ifdef WITH_SPATOSC
+    audioScene = new spatosc::Scene();
+    audioScene->setVerbose(true);
+#endif
+
     _pyInitialized = false;
 }
 
@@ -163,6 +171,7 @@ spinApp::~spinApp()
 		sceneManager->doDelete(userNode.get());
 		userNode = 0;
 	}
+	delete audioScene;
 	delete sceneManager;
     //spinBaseContext::signalStop = true;
 }

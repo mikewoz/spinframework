@@ -42,7 +42,13 @@
 #ifndef __Listener_H
 #define __Listener_H
 
-#include "SoundNode.h"
+#include "DSPNode.h"
+
+namespace spatosc
+{
+    class Listener;
+}
+
 namespace spin
 {
 
@@ -52,12 +58,14 @@ namespace spin
  * The Listener class is a special type of SoundNode, that allows for different
  * types of connections. 
  */
-class Listener : public SoundNode
+class Listener : public DSPNode
 {
     public:
         Listener(SceneManager *sceneManager, char *initID);
         virtual ~Listener();
         
+        virtual void callbackUpdate();
+
         /**
          * For each subclass of ReferencedNode, we override the getState() method to
          * fill the vector with the correct set of methods for this particular node
@@ -68,7 +76,12 @@ class Listener : public SoundNode
         const char* getType() const { return type.c_str(); }
         
         std::string type;
+
     private:
+
+#ifdef WITH_SPATOSC
+        spatosc::Listener *spatOSCListener;
+#endif
 };
 
 } // end of namespace spin

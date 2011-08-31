@@ -37,6 +37,26 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__init,
 	          "",
 	          "");
+	I_Method0(void, debugContext,
+	          Properties::NON_VIRTUAL,
+	          __void__debugContext,
+	          "",
+	          "");
+	I_Method0(void, debugNodes,
+	          Properties::NON_VIRTUAL,
+	          __void__debugNodes,
+	          "",
+	          "");
+	I_Method0(void, debugStateSets,
+	          Properties::NON_VIRTUAL,
+	          __void__debugStateSets,
+	          "",
+	          "");
+	I_Method0(void, debugSceneGraph,
+	          Properties::NON_VIRTUAL,
+	          __void__debugSceneGraph,
+	          "",
+	          "");
 	I_Method0(void, debug,
 	          Properties::NON_VIRTUAL,
 	          __void__debug,
@@ -77,6 +97,11 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	                      __void__sendConnectionList__lo_address,
 	                      "",
 	                      "");
+	I_Method0(std::vector< std::string >, getAllNodeTypes,
+	          Properties::NON_VIRTUAL,
+	          __std_vectorT1_std_string___getAllNodeTypes,
+	          "",
+	          "");
 	I_Method2(spin::ReferencedNode *, createNode, IN, std::string, id, IN, std::string, type,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__createNode__std_string__std_string,
@@ -242,6 +267,9 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__refreshSubscribers__C5_std_mapT1_std_stringComma_lo_address__R1,
 	          "",
 	          "The refreshSubscribers method results in a publication of all nodelists to the given TCP subscribers. Then, the full node state is published to the subscribers, for ALL nodes. ");
+	I_SimpleProperty(std::vector< std::string >, AllNodeTypes, 
+	                 __std_vectorT1_std_string___getAllNodeTypes, 
+	                 0);
 	I_SimpleProperty(std::vector< spin::SoundConnection * >, Connections, 
 	                 __std_vectorT1_SoundConnection_P1___getConnections, 
 	                 0);
@@ -254,18 +282,16 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_SimpleProperty(spin::spinLog &, Log, 
 	                 0, 
 	                 __void__setLog__spinLog_R1);
-	I_PublicMemberProperty(std::vector< std::string >, getAllNodeTypes);
 	I_PublicMemberProperty(std::string, sceneID);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Group >, rootNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, worldNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, gridGeode);
+	I_PublicMemberProperty(spatosc::Scene, audioScene);
 	I_PublicMemberProperty(bool, graphicalMode);
 	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);
 	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
-
-TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)
 
 TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::nodeListType >, spin::nodeMapType)
 
@@ -287,9 +313,9 @@ STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::ReferencedStateSetList >)
 
 STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::nodeListType >)
 
-STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedNode > >)
-
 STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::t_symbol * >)
+
+STD_VECTOR_REFLECTOR(std::vector< std::string >)
 

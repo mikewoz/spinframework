@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+
 #include <string>
 #include <iostream>
 #include <pthread.h>
@@ -69,6 +70,11 @@
 #include "SoundConnection.h"
 #include "spinDefaults.h"
 #include "config.h"
+
+#ifdef WITH_SPATOSC
+#include <spatosc/spatosc.h>
+#endif
+
 
 #define UNUSED(x) ( (void)(x) )
 
@@ -161,6 +167,11 @@ void spinBaseContext::debugPrint()
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+#ifdef WITH_SPATOSC
+    std::cout << "  SpatOSC version:\t\t"<< SPATOSC_VERSION << " (enabled=" << spinApp::Instance().hasAudioRenderer << ")" << std::endl;
+#else
+    std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
+#endif
     if (doDiscovery_)
     {
         std::cout << "  Auto discovery address:\t" << lo_address_get_url(lo_infoAddr);
@@ -218,11 +229,25 @@ int spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     }
 
     if (arguments->read("--disable-discovery"))
-{
+    {
         doDiscovery_ = false;
     }
 
+    std::string translatorName;
+    std::string translatorAddr;
+    std::string translatorPort;
 
+    if (arguments->read("--spatosc", translatorName, translatorAddr, translatorPort))
+    {
+        // set up SpatOSC:
+        #ifdef WITH_SPATOSC
+        std::cout << "got commandline args: " << translatorName << " " << translatorAddr<< " " << translatorPort << std::endl;
+        spinApp::Instance().audioScene->addTranslator<spatosc::BasicTranslator>("basic", "localhost", spatosc::BasicTranslator::DEFAULT_SEND_PORT);
+        spinApp::Instance().hasAudioRenderer = true;
+        #else
+        std::cout << "WARNING: commandline option --spatosc not accepted. This version of SPIN was not built with support for SpatOSC."
+        #endif
+    }
 
     return 1;
 }
@@ -726,7 +751,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     {
         if (argc>1)
         {
-            std::string debugType = (char*)argv[1];
+            std::string debugType = (const char*)argv[1];
             if (debugType=="context")
                 sceneManager->debugContext();
             else if (debugType=="nodes")
@@ -735,8 +760,24 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
                 sceneManager->debugStateSets();
             else if (debugType=="scenegraph")
                 sceneManager->debugSceneGraph();
+            else if (debugType=="spatosc")
+            {
+                #ifdef WITH_SPATOSC
+                if (spinApp::Instance().hasAudioRenderer)
+                    spinApp::Instance().audioScene->debugPrint();
+                else
+                    std::cout << "SpatOSC not enabled for this SPIN application" << std::endl;
+                #endif
+            }
+
+            // forward debug message to all clients:
+            SCENE_MSG("ss", "debug", (const char*)argv[1]);
         }
-        else sceneManager->debug();
+        else
+        {
+            sceneManager->debug();
+            SCENE_MSG("s", "debug");
+        }
     }
     else if (theMethod == "clear")
         sceneManager->clear();

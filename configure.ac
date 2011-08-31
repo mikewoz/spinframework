@@ -149,6 +149,15 @@ else
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
 
+PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
+if test "x${have_spatosc}" = "xfalse" ; then
+    AC_MSG_WARN([missing package: libspatosc-0.3])
+else
+    AC_DEFINE([WITH_SPATOSC],[1],[Enables linking with the SpatOSC library so that compatible audio renderers can be used for 3D sound spatialization]) AC_MSG_NOTICE([Enabled SpatOSC for audio])
+    AC_MSG_NOTICE([SPATOSC_CFLAGS:        ${SPATOSC_CFLAGS}])
+    AC_MSG_NOTICE([SPATOSC_LIBS:          ${SPATOSC_LIBS}])
+fi
+
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
     [with_editor=$enableval],

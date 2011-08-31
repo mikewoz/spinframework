@@ -53,17 +53,17 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	          __void__registerUser,
 	          "",
 	          "This method should be used to register a user for a listener-style SPIN client. The user is definitively created and stored in the current application context, even if a server is not running. ");
-	I_Method3(void, InfoMessage, IN, const std::string &, OSCpath, IN, const char *, types, IN, ..., x,
+	I_Method3(void, spin::InfoMessage, IN, const std::string &, OSCpath, IN, const char *, types, IN, ..., x,
 	          Properties::NON_VIRTUAL,
 	          __void__InfoMessage__C5_std_string_R1__C5_char_P1__...,
 	          "",
 	          "This sends a variable length message.IMPORTANT: the list must be terminated with LO_ARGS_END, or this call will fail. This is used to do simple error checking on the sizes of parameters passed. ");
-	I_Method3(void, InfoMessage, IN, const std::string &, OSCpath, IN, const char *, types, IN, va_list, ap,
+	I_Method3(void, spin::InfoMessage, IN, const std::string &, OSCpath, IN, const char *, types, IN, va_list, ap,
 	          Properties::NON_VIRTUAL,
 	          __void__InfoMessage__C5_std_string_R1__C5_char_P1__va_list,
 	          "",
 	          "");
-	I_Method2(void, InfoMessage, IN, const std::string &, OSCpath, IN, lo_message, msg,
+	I_Method2(void, spin::InfoMessage, IN, const std::string &, OSCpath, IN, lo_message, msg,
 	          Properties::NON_VIRTUAL,
 	          __void__InfoMessage__C5_std_string_R1__lo_message,
 	          "",

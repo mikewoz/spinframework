@@ -31,6 +31,21 @@ BEGIN_OBJECT_REFLECTOR(spin::spinServerContext)
 	          __bool__start,
 	          "",
 	          "");
+	I_Method0(void, debugPrint,
+	          Properties::VIRTUAL,
+	          __void__debugPrint,
+	          "",
+	          "");
+	I_Method1(void, addCommandLineOptions, IN, osg::ArgumentParser *, arguments,
+	          Properties::VIRTUAL,
+	          __void__addCommandLineOptions__osg_ArgumentParser_P1,
+	          "",
+	          "");
+	I_Method1(int, parseCommandLineOptions, IN, osg::ArgumentParser *, arguments,
+	          Properties::VIRTUAL,
+	          __int__parseCommandLineOptions__osg_ArgumentParser_P1,
+	          "",
+	          "");
 	I_Method0(void, refreshSubscribers,
 	          Properties::NON_VIRTUAL,
 	          __void__refreshSubscribers,
@@ -41,5 +56,10 @@ BEGIN_OBJECT_REFLECTOR(spin::spinServerContext)
 	          __void__startSyncThread,
 	          "",
 	          "Starts the thread that sends synchronization timecode (syncThread) ");
+	I_Method0(bool, shouldAutoClean,
+	          Properties::NON_VIRTUAL,
+	          __bool__shouldAutoClean,
+	          "",
+	          "A flag that decides if user nodes should be automatically cleaned up (ie, their entire subgraph deleted) if they stop sending ping messages. This is set by the --disable-auto-cleanup argument. ");
 END_REFLECTOR
 

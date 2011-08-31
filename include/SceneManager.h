@@ -50,6 +50,7 @@
 #include <osgDB/SharedStateManager>
 #include <cppintrospection/Value>
 
+#include "config.h"
 #include "ReferencedNode.h"
 #include "ReferencedStateSet.h"
 

@@ -6,6 +6,7 @@ AM_CPPFLAGS = \
     $(OPENTHREADS_CFLAGS) \
     $(OSG_CFLAGS) \
     $(SHAREDVIDEO_CFLAGS) \
+    $(SPATOSC_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/tinyxml
 
@@ -30,7 +31,8 @@ libSPIN_la_LDFLAGS = \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
-    $(SHAREDVIDEO_LIBS)
+    $(SHAREDVIDEO_LIBS) \
+    $(SPATOSC_LIBS)
 
 # please keep those in alphabetical order:
 libSPIN_la_SOURCES = \

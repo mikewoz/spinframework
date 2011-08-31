@@ -45,6 +45,7 @@
 
 #include <string>
 
+#include "config.h"
 #include "spinUtil.h"
 #include "libloUtil.h"
 #include "MediaManager.h"
@@ -200,8 +201,8 @@ public:
     const char *getContext() const { return contextString.c_str(); }
     std::string getContextString() const { return contextString; }
 
-    void setParam (const char *paramName, const char *paramValue);
-    void setParam (const char *paramName, float paramValue);
+    virtual void setParam (const char *paramName, const char *paramValue);
+    virtual void setParam (const char *paramName, float paramValue);
 
     /**
      * subclasses of ReferencedNode may contain complicated subgraphs, and any

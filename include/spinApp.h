@@ -48,7 +48,13 @@
 #include <lo/lo_types.h>
 #include <osg/ref_ptr>
 
+#include "config.h"
 #include "spinUtil.h"
+
+namespace spatosc
+{
+class Scene;
+}
 
 namespace spin
 {
@@ -138,6 +144,17 @@ class spinApp
         bool _pyInitialized;
 
         osg::ref_ptr<UserNode> userNode;
+
+#ifdef WITH_SPATOSC
+        spatosc::Scene *audioScene;
+#endif
+
+        /**
+         * A spinApp instance may or may not have an embedded audio renderer
+         * using SpatOSC. For instance, there may be a renderer on the server
+         * side or viewer side, but probably not both.
+         */
+        bool hasAudioRenderer;
 
         SceneManager *sceneManager;
         MediaManager *mediaManager;

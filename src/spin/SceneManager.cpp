@@ -260,6 +260,9 @@ SceneManager::SceneManager(std::string id)
     opt->setObjectCacheHint(osgDB::Options::CACHE_ALL);
     osgDB::Registry::instance()->setOptions(opt);
     */
+
+
+
 }
 
 // destructor
@@ -468,9 +471,6 @@ void SceneManager::debugContext()
     std::cout << "-- SPIN CONTEXT DEBUG:" << std::endl;
 	
     spinApp::Instance().getContext()->debugPrint();
-    
-    // forward debug message to all clients:
-    SCENE_MSG("ss", "debug", "context");
 }
 
 void SceneManager::debugNodes()
@@ -488,9 +488,6 @@ void SceneManager::debugNodes()
             std::cout << "    " << (*iter)->id->s_name << " (parent=" << (*iter)->parent->s_name << ")" << std::endl;
         }
     }
-    
-    // forward debug message to all clients:
-    SCENE_MSG("ss", "debug", "nodes");
 }
 
 void SceneManager::debugStateSets()
@@ -537,9 +534,6 @@ void SceneManager::debugStateSets()
     }
     }
      */
-    
-    // forward debug message to all clients:
-    SCENE_MSG("ss", "debug", "statesets");
 }
 
 void SceneManager::debugSceneGraph()
@@ -548,9 +542,6 @@ void SceneManager::debugSceneGraph()
     std::cout << "-- SCENE GRAPH:" << std::endl;
     DebugVisitor ev;
     ev.apply(*(this->rootNode.get()));
-
-    // forward debug message to all clients:
-    SCENE_MSG("ss", "debug", "scenegraph");
 }
 
 void SceneManager::debug()

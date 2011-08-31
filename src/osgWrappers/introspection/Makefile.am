@@ -38,6 +38,7 @@ libSPINwrappers_la_CPPFLAGS = \
     $(CPPINTROSPECTION_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
     $(PYTHON_CPPFLAGS) \
+    $(SPATOSC_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/spin \
     -I$(top_srcdir)/src/tinyxml
