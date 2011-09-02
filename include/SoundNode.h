@@ -69,9 +69,12 @@ class SoundNode : public DSPNode
 
         virtual void callbackUpdate();
         
-        // override setParam methods so that we can send them to SpatOSC:
+        // override some methods so that we can send them to SpatOSC:
         virtual void setParam (const char *paramName, const char *paramValue);
         virtual void setParam (const char *paramName, float paramValue);
+        virtual void setTranslation (float x, float y, float z);
+        virtual void setOrientation (float p, float r, float y);
+        virtual void setOrientationQuat (float x, float y, float z, float w);
 
         /**
          * For each subclass of ReferencedNode, we override the getState()

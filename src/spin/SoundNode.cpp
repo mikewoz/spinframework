@@ -116,6 +116,46 @@ void SoundNode::setParam (const char *paramName, float paramValue)
 #endif
 }
 
+void SoundNode::setTranslation (float x, float y, float z)
+{
+    GroupNode::setTranslation(x,y,z);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        this->_globalMatrix = getGlobalMatrix();
+        osg::Vec3 myPos = _globalMatrix.getTrans();
+        spatOSCSource->setPosition(myPos.x(), myPos.y(), myPos.z());
+    }
+#endif
+
+}
+
+void SoundNode::setOrientation (float p, float r, float y)
+{
+    GroupNode::setOrientation(p,r,y);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        this->_globalMatrix = getGlobalMatrix();
+        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
+    }
+#endif
+}
+
+void SoundNode::setOrientationQuat (float x, float y, float z, float w)
+{
+    GroupNode::setOrientationQuat(x,y,z,w);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        this->_globalMatrix = getGlobalMatrix();
+        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
+    }
+#endif
+}
+
 std::vector<lo_message> SoundNode::getState () const
 {
 	// inherit state from base class
