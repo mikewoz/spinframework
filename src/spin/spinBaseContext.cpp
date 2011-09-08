@@ -243,7 +243,7 @@ int spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
         spinApp::Instance().audioScene->addTranslator(translatorID, translatorType, translatorAddr, translatorPort);
         spinApp::Instance().hasAudioRenderer = true;
         #else
-        std::cout << "WARNING: commandline option --spatosc not accepted. This version of SPIN was not built with support for SpatOSC."
+        std::cout << "WARNING: commandline option --spatosc not accepted. This version of SPIN was not built with support for SpatOSC." << std::endl;
         #endif
     }
 
