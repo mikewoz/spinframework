@@ -171,7 +171,9 @@ spinApp::~spinApp()
 		sceneManager->doDelete(userNode.get());
 		userNode = 0;
 	}
+#ifdef WITH_SPATOSC
 	delete audioScene;
+#endif
 	delete sceneManager;
     //spinBaseContext::signalStop = true;
 }
