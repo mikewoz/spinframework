@@ -85,7 +85,19 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	this->setName(string(id->s_name) + ".ModelNode");
 	nodeType = "ModelNode";
 
-	_registerStates = false;
+    // Save a pointer to the current attachmentNode (we will attach the loaded
+    // 3D mesh there:
+    _modelAttachmentNode = this->getAttachmentNode();
+    
+    // Now, add a new 'centroid' node, and make that the new attachmentNode.
+    // Children of this node will be attached there, and an offset will be added
+    // depending whether _attachCentroid is enabled or not:
+    _centroid = new osg::PositionAttitudeTransform();
+    this->getAttachmentNode()->addChild(_centroid.get());
+    this->setAttachmentNode(_centroid.get());
+
+    _attachCentroid = false;
+    _registerStates = false;
 	_statesetList.clear();
     _renderBin = 10;
 
@@ -127,6 +139,30 @@ void ModelNode::setModelFromFile (const char* filename)
 	drawModel();
 
 	BROADCAST(this, "ss", "setModelFromFile", getModelFromFile());
+}
+
+void ModelNode::setAttachCentroid (int i)
+{
+    _attachCentroid = (bool)i;
+
+    // TODO: bound may change dynamically (eg, animations, switch nodes, etc)
+    // so this should be done in the update callback whenever bound is made 
+    // dirty(). Can we check for that?
+    
+    if (_attachCentroid)
+    {
+        osg::BoundingSphere bound = model->computeBound();
+        _centroid->setPosition(bound.center());
+        osg::Vec3 c = bound.center();
+        std::cout << "setting centroid for model: " <<c.x()<<","<<c.y()<< ","<<c.z() << std::endl;
+    }
+    else
+    {
+        std::cout << "setting centroid for model: 0,0,0" << std::endl;
+        _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
+    }
+    		
+    BROADCAST(this, "si", "setAttachCentroid", getAttachCentroid());
 }
 
 void ModelNode::setStateRegistration (int i)
@@ -172,7 +208,7 @@ void ModelNode::setStateSet (int i, const char *replacement)
 {
 	osg::ref_ptr<ReferencedStateSet> ssOrig, ssReplacement;
 
-	if ( i < _statesetList.size() )
+	if ( i < (int)_statesetList.size() )
 	{
 		ssOrig = dynamic_cast<ReferencedStateSet*>(_statesetList[i]->s_thing);
 	}
@@ -235,11 +271,11 @@ void ModelNode::drawModel()
 	if (model.valid())
 	{
 
-		this->getAttachmentNode()->removeChild(model.get());
-		model = NULL;
-		
+        _modelAttachmentNode->removeChild(model.get());
+            
+        model = NULL;
+        _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
 		_statesetList.clear();
-		
 		_ssDrawableList.clear();
 		_ssNodeList.clear();
 
@@ -509,14 +545,16 @@ void ModelNode::drawModel()
 			
 			// *****************************************************************
 
-			this->getAttachmentNode()->addChild(model.get());
+			_modelAttachmentNode->addChild(model.get());
 
 			std::cout << "Created model " << modelPath << std::endl;
 			osg::BoundingSphere bound = model->computeBound();
 			osg::Vec3 c = bound.center();
 			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << "  numTextures=" << statesets.size() << std::endl;
 
-
+            if (_attachCentroid)
+                _centroid->setPosition(c);
+            
 			//osg::StateSet *modelStateSet = new osg::StateSet();
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);
 			//model->setStateSet(modelStateSet);
@@ -558,6 +596,10 @@ std::vector<lo_message> ModelNode::getState () const
 	lo_message_add(msg, "ss", "setModelFromFile", modelPath.c_str());
 	ret.push_back(msg);
 
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setAttachCentroid", getAttachCentroid());
+	ret.push_back(msg);
+    
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);

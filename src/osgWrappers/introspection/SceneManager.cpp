@@ -286,12 +286,13 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_PublicMemberProperty(osg::ref_ptr< osg::Group >, rootNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, worldNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, gridGeode);
-	I_PublicMemberProperty(spatosc::Scene, audioScene);
 	I_PublicMemberProperty(bool, graphicalMode);
 	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);
 	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)
 
 TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::nodeListType >, spin::nodeMapType)
 
@@ -312,6 +313,8 @@ STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::nodeListType >)
 STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::ReferencedStateSetList >)
 
 STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::nodeListType >)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedNode > >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
 
