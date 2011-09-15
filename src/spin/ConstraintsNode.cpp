@@ -186,7 +186,7 @@ void ConstraintsNode::translate (float x, float y, float z)
 
     if ( !sceneManager->isGraphical() )
     {
-    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==STICK))
+    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==COLLIDE_THRU)||(_mode==STICK))
     	{
     		// reset the lastDrawable
     		lastDrawable = 0;
@@ -208,7 +208,7 @@ void ConstraintsNode::move (float x, float y, float z)
     {
     	osg::Vec3 v = mainTransform->getAttitude() * osg::Vec3(x,y,z);
 
-    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==STICK))
+    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==COLLIDE_THRU)||(_mode==STICK))
     	{
     		lastDrawable = 0;
     		lastPrimitiveIndex = -1;
@@ -340,7 +340,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					//std::cout << "newHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
 
-					if ((_mode==COLLIDE)||(_mode==STICK))
+					if ((_mode==COLLIDE)||(_mode==COLLIDE_THRU)||(_mode==STICK))
 					{
 						// Let the collisionPoint be just a bit before the real
 						// hitpoint (to avoid numerical imprecision placing the
@@ -370,6 +370,14 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
                             // pseudo-recursively apply remainder of bounce:
                             applyConstrainedTranslation( slideVector );
 						}
+                        else if (_mode==COLLIDE_THRU)
+						{
+                            // allow the node to pass thru (ie, just apply the
+                            // translation):
+                            //setTranslation(v.x(), v.y(), v.z());
+                            osg::Vec3 newPos = localPos + v;
+	                        setTranslation(newPos.x(), newPos.y(), newPos.z());
+                        }
 
 						return;
 					}

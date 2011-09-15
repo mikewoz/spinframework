@@ -149,7 +149,7 @@ void ModelNode::setAttachCentroid (int i)
     // so this should be done in the update callback whenever bound is made 
     // dirty(). Can we check for that?
     
-    if (_attachCentroid)
+    if (model.valid() && _attachCentroid)
     {
         osg::BoundingSphere bound = model->computeBound();
         _centroid->setPosition(bound.center());
