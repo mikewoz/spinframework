@@ -114,6 +114,27 @@ ModelNode::~ModelNode()
 }
 
 
+void ModelNode::updateNodePath(bool updateChildren)
+{
+	// call GroupNode's method, which will update all the way from the root, and
+	// we just need to add the centroid node:
+	GroupNode::updateNodePath(false);
+	currentNodePath.push_back(_centroid.get());
+
+    /*
+    osg::NodePath::iterator iter;
+    std::cout << "nodepath for " << id->s_name << ":" << std::endl;
+    for (iter = currentNodePath.begin(); iter!=currentNodePath.end(); iter++)
+    {
+        std::cout << " > " << (*iter)->getName() << std::endl;
+    }
+    */
+    
+	// now update NodePaths for all children:
+	updateChildNodePaths();
+}
+
+
 // ===================================================================
 // ======================== SET METHODS: =============================
 // ===================================================================

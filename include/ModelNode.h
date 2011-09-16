@@ -75,6 +75,12 @@ public:
 
     enum animationModeType { OFF, SWITCH, SEQUENCE };
 
+    /**
+     * We change our attachmentNode (add attachment to the centroid), so we MUST
+     * override updateNodePath(), and manually push the centroid transform onto
+     * the currentNodePath.
+     */
+    virtual void updateNodePath(bool updateChildren = true);
 
     /**
      * The context is an arbitrary keyword that associates this node with a
