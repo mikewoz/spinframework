@@ -76,6 +76,15 @@ Listener::Listener (SceneManager *sceneManager, char *initID) : DSPNode(sceneMan
 // destructor
 Listener::~Listener()
 {
+#ifdef WITH_SPATOSC
+	if (spinApp::Instance().hasAudioRenderer)
+	{
+	    spinApp::Instance().audioScene->deleteNode(spatOSCListener);
+        std::cout << "Deleted SpatOSC Listener:" << std::endl;
+        spinApp::Instance().audioScene->debugPrint();
+	}
+#endif
+    
 }
 // ===================================================================
 void Listener::callbackUpdate()

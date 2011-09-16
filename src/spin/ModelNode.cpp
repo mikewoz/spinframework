@@ -150,7 +150,7 @@ void ModelNode::setAttachCentroid (int i)
     // dirty(). Can we check for that?
     
     if (model.valid() && _attachCentroid)
-    {
+    {	
         osg::BoundingSphere bound = model->computeBound();
         _centroid->setPosition(bound.center());
         osg::Vec3 c = bound.center();

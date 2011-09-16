@@ -85,6 +85,10 @@
 #include <cppintrospection/ExtendedTypeInfo>
 #include "introspect_helpers.h"
 
+#ifdef WITH_SPATOSC
+#include <spatosc/spatosc.h>
+#endif
+
 using namespace cppintrospection;
 
 extern pthread_mutex_t sceneMutex;
@@ -1273,6 +1277,14 @@ void SceneManager::clear()
 
     SCENE_MSG("s", "clear");
     sendNodeList("*");
+
+#ifdef WITH_SPATOSC
+	if (spinApp::Instance().hasAudioRenderer)
+	{
+	    spinApp::Instance().audioScene->deleteAllNodes();
+	}
+#endif
+    
     std::cout << "Cleared scene." << std::endl;
 }
 
