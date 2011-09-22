@@ -86,6 +86,8 @@ libSPIN_la_include_HEADERS = \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
     $(top_srcdir)/include/DSPNode.h \
+    $(top_srcdir)/include/EventHandler.h \
+    $(top_srcdir)/include/EventTypes.h \
     $(top_srcdir)/include/Fog.h \
     $(top_srcdir)/include/GridNode.h \
     $(top_srcdir)/include/GroupNode.h \
@@ -125,7 +127,6 @@ libSPIN_la_include_HEADERS = \
     $(top_srcdir)/include/SwitchNode.h \
     $(top_srcdir)/include/TextNode.h \
     $(top_srcdir)/include/UserNode.h \
-    $(top_srcdir)/include/util.h \
     $(top_srcdir)/include/VideoTexture.h \
     $(top_srcdir)/include/ViewerManipulator.h \
     $(top_srcdir)/src/tinyxml/tinystr.h \
