@@ -44,6 +44,10 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
+#ifdef WITH_SPATOSC
+#include <spatosc/spatosc.h>
+#endif
+
 using namespace std;
 
 namespace spin
@@ -51,18 +55,57 @@ namespace spin
 
 // ===================================================================
 // constructor:
-Listener::Listener (SceneManager *sceneManager, char *initID) : SoundNode(sceneManager, initID)
+Listener::Listener (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
 {
 	nodeType = "Listener";
 	this->setPlugin("listener-stereo~");
 	type = "listener-stereo.conn~";
 	this->setName(string(id->s_name) + ".Listener");
+
+#ifdef WITH_SPATOSC
+	if (spinApp::Instance().hasAudioRenderer)
+	{
+        spatOSCListener = spinApp::Instance().audioScene->createListener(std::string(id->s_name));
+        std::cout << "Created SpatOSC Listener:" << std::endl;
+        spinApp::Instance().audioScene->debugPrint();
+	}
+#endif
 }
 
 // ===================================================================
 // destructor
 Listener::~Listener()
 {
+#ifdef WITH_SPATOSC
+	if (spinApp::Instance().hasAudioRenderer)
+	{
+	    spinApp::Instance().audioScene->deleteNode(spatOSCListener);
+        std::cout << "Deleted SpatOSC Listener:" << std::endl;
+        spinApp::Instance().audioScene->debugPrint();
+	}
+#endif
+    
+}
+// ===================================================================
+void Listener::callbackUpdate()
+{
+    // need to first call the superclass update method (specifically, GroupNode)
+    // which will update _globalMatrix
+    DSPNode::callbackUpdate();
+
+    // now, we can get the global position and orientation, and we can forward
+    // it to SpatOSC
+
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        osg::Vec3 myPos = _globalMatrix.getTrans();
+        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+
+        spatOSCListener->setPosition(myPos.x(), myPos.y(), myPos.z());
+        spatOSCListener->setOrientation(myRot.x(), myRot.y(), myRot.z());
+    }
+#endif
 }
 
 void Listener::setType (const char* t)
@@ -77,7 +120,7 @@ void Listener::setType (const char* t)
 std::vector<lo_message> Listener::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = SoundNode::getState();
+	std::vector<lo_message> ret = DSPNode::getState();
 	
 	lo_message msg = lo_message_new();
 	lo_message_add(msg,  "ss", "setType", getType());

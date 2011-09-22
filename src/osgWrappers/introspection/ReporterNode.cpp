@@ -38,6 +38,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ReporterNode)
 	               ____ReporterNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "Debug print (to log/console) ");
 	I_Method0(void, callbackUpdate,
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate,

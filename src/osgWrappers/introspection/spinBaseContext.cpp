@@ -10,6 +10,7 @@
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
 
+#include <EventHandler.h>
 #include <spinBaseContext.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
@@ -41,11 +42,26 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	          __bool__start,
 	          "",
 	          "");
+	I_Method0(void, debugPrint,
+	          Properties::VIRTUAL,
+	          __void__debugPrint,
+	          "",
+	          "");
+	I_Method1(void, addCommandLineOptions, IN, osg::ArgumentParser *, arguments,
+	          Properties::VIRTUAL,
+	          __void__addCommandLineOptions__osg_ArgumentParser_P1,
+	          "",
+	          "");
+	I_Method1(int, parseCommandLineOptions, IN, osg::ArgumentParser *, arguments,
+	          Properties::VIRTUAL,
+	          __int__parseCommandLineOptions__osg_ArgumentParser_P1,
+	          "",
+	          "");
 	I_Method1(bool, startThread, IN, void *(*)(void *), threadFunction,
 	          Properties::NON_VIRTUAL,
 	          __bool__startThread__void_P1(P1)(void_P1),
 	          "",
-	          "Starts the context thread (passed as *threadFunction from a derived class)Startup point of the server's thread. ");
+	          "Starts the context thread (passed as *threadFunction from a derived class)Startup point of the server's thread.Startup point of the server's thread. ");
 	I_Method0(void, stop,
 	          Properties::NON_VIRTUAL,
 	          __void__stop,
@@ -56,6 +72,31 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	          __bool__isRunning,
 	          "",
 	          "");
+	I_Method1(void, addInfoHandler, IN, spin::EventHandler *, obs,
+	          Properties::NON_VIRTUAL,
+	          __void__addInfoHandler__EventHandler_P1,
+	          "",
+	          "Add an event handler to the list of classes that will be notified when a message is received on the INFO channel: ");
+	I_Method1(void, removeInfoHandler, IN, spin::EventHandler *, obs,
+	          Properties::NON_VIRTUAL,
+	          __void__removeInfoHandler__EventHandler_P1,
+	          "",
+	          "Remove an INFO channel event handler ");
+	I_Method1(void, removeHandlerForAllEvents, IN, spin::EventHandler *, obs,
+	          Properties::NON_VIRTUAL,
+	          __void__removeHandlerForAllEvents__EventHandler_P1,
+	          "",
+	          "");
+	I_Method0(bool, canAutoAssignPorts,
+	          Properties::NON_VIRTUAL,
+	          __bool__canAutoAssignPorts,
+	          "",
+	          "Check if spin is allowed to assign automatic ports (eg, in the case where a port is busy). This is usually true, but if a user specifies ports manually with command-line options, this becomes false. ");
+	I_Method1(void, setTTL, IN, int, ttl,
+	          Properties::NON_VIRTUAL,
+	          __void__setTTL__int,
+	          "",
+	          "Set the time-to-live for multicast packets (corresponds to the number of routers a packet will hop). ");
 	I_StaticMethod1(void, sigHandler, IN, int, signum,
 	                __void__sigHandler__int_S,
 	                "",
@@ -96,12 +137,17 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	                   __void__createServers,
 	                   "",
 	                   "this method is used by both spinClientContext and spinServerContext ");
+	I_SimpleProperty(int, TTL, 
+	                 0, 
+	                 __void__setTTL__int);
+	I_PublicMemberProperty(std::vector< lo_address >, lo_txAddrs_);
 	I_PublicMemberProperty(std::vector< lo_address >, lo_rxAddrs_);
 	I_PublicMemberProperty(std::vector< lo_server >, lo_rxServs_);
-	I_PublicMemberProperty(lo_address, lo_txAddr);
 	I_PublicMemberProperty(lo_address, lo_infoAddr);
 	I_PublicMemberProperty(lo_address, lo_syncAddr);
 	I_PublicMemberProperty(lo_server, lo_infoServ_);
+	I_PublicMemberProperty(std::string, tcpPort_);
 	I_PublicMemberProperty(lo_server, lo_tcpRxServer_);
+	I_PublicMemberProperty(bool, doDiscovery_);
 END_REFLECTOR
 

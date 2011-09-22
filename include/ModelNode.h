@@ -75,6 +75,12 @@ public:
 
     enum animationModeType { OFF, SWITCH, SEQUENCE };
 
+    /**
+     * We change our attachmentNode (add attachment to the centroid), so we MUST
+     * override updateNodePath(), and manually push the centroid transform onto
+     * the currentNodePath.
+     */
+    virtual void updateNodePath(bool updateChildren = true);
 
     /**
      * The context is an arbitrary keyword that associates this node with a
@@ -91,6 +97,14 @@ public:
      */
     void setModelFromFile        (const char *filename);
     const char* getModelFromFile() const { return modelPath.c_str(); }
+
+    /**
+     * If attachCentroid is enabled, then children will be attached to the
+     * centroid of the currently loaded model. If not then it will be attached
+     * to this ModelNode's local origin.
+     */
+    void setAttachCentroid(int i);
+    int  getAttachCentroid() const { return (int)_attachCentroid; }
     
     /**
      * The StateRegistration flag should be set if you want any textures or
@@ -142,11 +156,13 @@ private:
     // the model:
     //std::string modelName;
     std::string modelPath;
-    
+ 
     std::vector<osg::Drawable*> _ssDrawableList;
     std::vector<osg::Node*> _ssNodeList;
 
+    osg::Group *_modelAttachmentNode;
     osg::ref_ptr<osg::Group> model;
+    osg::ref_ptr<osg::PositionAttitudeTransform> _centroid;
 
     // animation stuff for gfx:
     float _keyframe[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
@@ -156,6 +172,7 @@ private:
 
     osgUtil::Optimizer optimizer;
 
+    bool _attachCentroid;
     bool _registerStates;
     int _renderBin;
 };

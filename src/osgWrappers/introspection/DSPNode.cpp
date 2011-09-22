@@ -29,6 +29,11 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	               ____DSPNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_Method0(void, callbackUpdate,
+	          Properties::VIRTUAL,
+	          __void__callbackUpdate,
+	          "",
+	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
 	I_Method1(spin::SoundConnection *, getConnection, IN, spin::DSPNode *, snk,
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__DSPNode_P1,
@@ -84,15 +89,139 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_Method1(void, setRolloff, IN, const char *, newvalue,
+	          Properties::NON_VIRTUAL,
+	          __void__setRolloff__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(void, setSpread, IN, float, newvalue,
+	          Properties::NON_VIRTUAL,
+	          __void__setSpread__float,
+	          "",
+	          "");
+	I_Method1(void, setLength, IN, float, newvalue,
+	          Properties::NON_VIRTUAL,
+	          __void__setLength__float,
+	          "",
+	          "");
+	I_Method4(void, setDirectivityColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
+	          Properties::NON_VIRTUAL,
+	          __void__setDirectivityColor__float__float__float__float,
+	          "",
+	          "");
+	I_Method1(void, setVUmeterFlag, IN, float, newFlag,
+	          Properties::NON_VIRTUAL,
+	          __void__setVUmeterFlag__float,
+	          "",
+	          "");
+	I_Method1(void, setDirectivityFlag, IN, float, newFlag,
+	          Properties::NON_VIRTUAL,
+	          __void__setDirectivityFlag__float,
+	          "",
+	          "");
+	I_Method1(void, setLaserFlag, IN, float, newFlag,
+	          Properties::NON_VIRTUAL,
+	          __void__setLaserFlag__float,
+	          "",
+	          "");
+	I_Method1(void, setIntensity, IN, float, newvalue,
+	          Properties::NON_VIRTUAL,
+	          __void__setIntensity__float,
+	          "",
+	          "");
+	I_Method0(const char *, getRolloff,
+	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getRolloff,
+	          "",
+	          "");
+	I_Method0(float, getSpread,
+	          Properties::NON_VIRTUAL,
+	          __float__getSpread,
+	          "",
+	          "");
+	I_Method0(float, getLength,
+	          Properties::NON_VIRTUAL,
+	          __float__getLength,
+	          "",
+	          "");
+	I_Method0(osg::Vec4, getDirectivityColor,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec4__getDirectivityColor,
+	          "",
+	          "");
+	I_Method0(float, getVUmeterFlag,
+	          Properties::NON_VIRTUAL,
+	          __float__getVUmeterFlag,
+	          "",
+	          "");
+	I_Method0(float, getDirectivityFlag,
+	          Properties::NON_VIRTUAL,
+	          __float__getDirectivityFlag,
+	          "",
+	          "");
+	I_Method0(float, getLaserFlag,
+	          Properties::NON_VIRTUAL,
+	          __float__getLaserFlag,
+	          "",
+	          "");
+	I_Method0(void, updateVUmeter,
+	          Properties::NON_VIRTUAL,
+	          __void__updateVUmeter,
+	          "",
+	          "");
+	I_Method0(void, updateLaser,
+	          Properties::NON_VIRTUAL,
+	          __void__updateLaser,
+	          "",
+	          "");
+	I_Method0(void, drawVUmeter,
+	          Properties::NON_VIRTUAL,
+	          __void__drawVUmeter,
+	          "",
+	          "");
+	I_Method0(void, drawDirectivity,
+	          Properties::NON_VIRTUAL,
+	          __void__drawDirectivity,
+	          "",
+	          "");
+	I_Method0(void, drawLaser,
+	          Properties::NON_VIRTUAL,
+	          __void__drawLaser,
+	          "",
+	          "");
 	I_SimpleProperty(int, Active, 
 	                 __int__getActive, 
 	                 __void__setActive__int);
+	I_SimpleProperty(osg::Vec4, DirectivityColor, 
+	                 __osg_Vec4__getDirectivityColor, 
+	                 0);
+	I_SimpleProperty(float, DirectivityFlag, 
+	                 __float__getDirectivityFlag, 
+	                 __void__setDirectivityFlag__float);
+	I_SimpleProperty(float, Intensity, 
+	                 0, 
+	                 __void__setIntensity__float);
+	I_SimpleProperty(float, LaserFlag, 
+	                 __float__getLaserFlag, 
+	                 __void__setLaserFlag__float);
+	I_SimpleProperty(float, Length, 
+	                 __float__getLength, 
+	                 __void__setLength__float);
 	I_SimpleProperty(const char *, Plugin, 
 	                 __C5_char_P1__getPlugin, 
 	                 __void__setPlugin__C5_char_P1);
+	I_SimpleProperty(const char *, Rolloff, 
+	                 __C5_char_P1__getRolloff, 
+	                 __void__setRolloff__C5_char_P1);
+	I_SimpleProperty(float, Spread, 
+	                 __float__getSpread, 
+	                 __void__setSpread__float);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(float, VUmeterFlag, 
+	                 __float__getVUmeterFlag, 
+	                 __void__setVUmeterFlag__float);
 	I_PublicMemberProperty(std::vector< spin::SoundConnection * >, connectTO);
 	I_PublicMemberProperty(std::vector< spin::SoundConnection * >, connectFROM);
 END_REFLECTOR

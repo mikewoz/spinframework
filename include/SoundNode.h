@@ -44,9 +44,9 @@
 
 #include "DSPNode.h"
 
-namespace osg {
-    class Geode;
-    class PositionAttitudeTransform;
+namespace spatosc
+{
+    class SoundSource;
 }
 
 namespace spin
@@ -66,93 +66,30 @@ class SoundNode : public DSPNode
         
         SoundNode(SceneManager *sceneManager, char *initID);
         virtual ~SoundNode();
-            
-        // SET methods:
-        void setRolloff (const char *newvalue);
-        void setSpread (float newvalue);
-        void setLength (float newvalue);
-        
-        void setDirectivityColor(float r, float g, float b, float a);
 
-        void setVUmeterFlag (float newFlag);
-        void setDirectivityFlag (float newFlag);
-        void setLaserFlag (float newFlag);
+        virtual void callbackUpdate();
         
-        // 
-        void setIntensity(float newvalue);
-        
-        // GET methods:
-        const char* getRolloff() const { return _rolloff.c_str(); }
-        float getSpread() const { return _spread; }
-        float getLength() const { return _length; }
+        // override some methods so that we can send them to SpatOSC:
+        virtual void setParam (const char *paramName, const char *paramValue);
+        virtual void setParam (const char *paramName, float paramValue);
+        virtual void setTranslation (float x, float y, float z);
+        virtual void setOrientation (float p, float r, float y);
+        virtual void setOrientationQuat (float x, float y, float z, float w);
 
-        osg::Vec4 getDirectivityColor() const { return directivityColor; }
-        
-        float getVUmeterFlag() const { return VUmeterFlag; }
-        float getDirectivityFlag() const { return directivityFlag; }
-        float getLaserFlag() const { return laserFlag; }
-        
-        void updateVUmeter();
-        void updateLaser();
-
-        
-        // DRAW methods:
-        void drawVUmeter();
-        void drawDirectivity();
-        void drawLaser();
-        
         /**
-         * For each subclass of ReferencedNode, we override the getState() method to
-         * fill the vector with the correct set of methods for this particular node
+         * For each subclass of ReferencedNode, we override the getState()
+         * method to fill the vector with the correct set of methods for this
+         * particular node
          */
         virtual std::vector<lo_message> getState() const;
         
-        /**
-         * We must include a stateDump() method that simply invokes the base class
-         * method. Simple C++ inheritance is not enough, because osg::Introspection
-         * won't see it.
-         */
-        //virtual void stateDump() { ReferencedNode::stateDump(); };
-        
-        /**
-         * Same goes shared functions from DSPNode. We must redefine them here
-         * so that osg::Introspection will see them:
-         */
-        //virtual void connect(char *snk) { DSPNode::connect(snk); };
-        //virtual void disconnect(char *snk) { DSPNode::disconnect(snk); };
-        //virtual void setActive(int i) { DSPNode::setActive(i); };
-        //virtual void setDSP(char *newDSP) {DSPNode::setDSP(newDSP); };
-        
     private:
         
-        float currentSoundIntensity;
-        osg::Vec3 currentSoundColor;
-        
-        
-        std::string _rolloff; // we keep a reference name for the rolloff (directivity) table
-        float _spread; // propagation cone for source
-        float _length; // the length of the laser and cone
-
-        // TODO: add toggle for PRE/POST
-
-        // flags with continuous values (can be used for alpha, etc):
-        float VUmeterFlag;
-        float directivityFlag;
-        float laserFlag;
+#ifdef WITH_SPATOSC
+        spatosc::SoundSource *spatOSCSource;
+#endif
 
 
-        // The following methods and parameters are for drawing aspects of the
-        // soundNode using OSG (eg, directivity pattern, laser, etc)
-
-        // directivity patterns:
-        osg::ref_ptr<osg::Geode> directivityGeode;
-        osg::Vec4 directivityColor;
-
-        // laser beams:
-        osg::ref_ptr<osg::Geode> laserGeode;
-
-        // VU meter:
-        osg::ref_ptr<osg::PositionAttitudeTransform> VUmeterTransform;
 };
 
 } // end of namespace spin

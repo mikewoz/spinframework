@@ -31,11 +31,31 @@ BEGIN_OBJECT_REFLECTOR(spin::spinClientContext)
 	          __bool__start,
 	          "",
 	          "");
+	I_Method0(void, debugPrint,
+	          Properties::VIRTUAL,
+	          __void__debugPrint,
+	          "",
+	          "");
+	I_Method1(void, addCommandLineOptions, IN, osg::ArgumentParser *, arguments,
+	          Properties::VIRTUAL,
+	          __void__addCommandLineOptions__osg_ArgumentParser_P1,
+	          "",
+	          "");
+	I_Method1(int, parseCommandLineOptions, IN, osg::ArgumentParser *, arguments,
+	          Properties::VIRTUAL,
+	          __int__parseCommandLineOptions__osg_ArgumentParser_P1,
+	          "",
+	          "");
 	I_Method0(int, pollUpdates,
 	          Properties::NON_VIRTUAL,
 	          __int__pollUpdates,
 	          "",
 	          "");
+	I_Method0(void, subscribe,
+	          Properties::NON_VIRTUAL,
+	          __void__subscribe,
+	          "",
+	          "Register the client's ip and port for reliable communication with the server ");
 	I_PublicMemberProperty(lo_server, lo_syncServ);
 END_REFLECTOR
 
