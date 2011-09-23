@@ -172,6 +172,7 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	I_PublicMemberProperty(boost::python::object, _pyNamespace);
 	I_PublicMemberProperty(bool, _pyInitialized);
 	I_PublicMemberProperty(osg::ref_ptr< spin::UserNode >, userNode);
+	I_PublicMemberProperty(bool, hasAudioRenderer);
 	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
 	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR

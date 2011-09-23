@@ -50,6 +50,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          __C5_char_P1__getModelFromFile,
 	          "",
 	          "");
+	I_Method1(void, setAttachCentroid, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setAttachCentroid__int,
+	          "",
+	          "If attachCentroid is enabled, then children will be attached to the centroid of the currently loaded model. If not then it will be attached to this ModelNode's local origin. ");
+	I_Method0(int, getAttachCentroid,
+	          Properties::NON_VIRTUAL,
+	          __int__getAttachCentroid,
+	          "",
+	          "");
 	I_Method1(void, setStateRegistration, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setStateRegistration__int,
@@ -90,6 +100,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(int, AttachCentroid, 
+	                 __int__getAttachCentroid, 
+	                 __void__setAttachCentroid__int);
 	I_SimpleProperty(const char *, Context, 
 	                 0, 
 	                 __void__setContext__C5_char_P1);

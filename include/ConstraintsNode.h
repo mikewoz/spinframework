@@ -102,12 +102,16 @@ public:
      * STICK:
      * Equivalent to COLLIDE, but without sliding.
      *
+     * COLLIDE_THRU:
+     * A fake constraint, which can be used to simply report when a collision 
+     * occurs. The event reported is the same as that for COLLIDE.
      */
-    enum constraintMode {    BASIC,
+    enum constraintMode {   BASIC,
                             DROP,
                             COLLIDE,
                             BOUNCE,
-                            STICK
+                            STICK,
+                            COLLIDE_THRU
                         };
 
         

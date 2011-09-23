@@ -70,6 +70,15 @@ SoundNode::SoundNode (SceneManager *sceneManager, char *initID) : DSPNode(sceneM
 SoundNode::~SoundNode()
 {
 	//std::cout << "In SoundNode destructor... node: " << this->id->s_name << std::endl;
+#ifdef WITH_SPATOSC
+	if (spinApp::Instance().hasAudioRenderer)
+	{
+	    spinApp::Instance().audioScene->deleteNode(spatOSCSource);
+        std::cout << "Deleted SpatOSC Source:" << std::endl;
+        spinApp::Instance().audioScene->debugPrint();
+	}
+#endif
+    
 }
 
 // ===================================================================

@@ -134,12 +134,12 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          "",
 	          "");
 	I_Method2(void, setParam, IN, const char *, paramName, IN, const char *, paramValue,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setParam__C5_char_P1__C5_char_P1,
 	          "",
 	          "");
 	I_Method2(void, setParam, IN, const char *, paramName, IN, float, paramValue,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setParam__C5_char_P1__float,
 	          "",
 	          "");

@@ -33,6 +33,31 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          __void__callbackUpdate,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
+	I_Method2(void, setParam, IN, const char *, paramName, IN, const char *, paramValue,
+	          Properties::VIRTUAL,
+	          __void__setParam__C5_char_P1__C5_char_P1,
+	          "",
+	          "");
+	I_Method2(void, setParam, IN, const char *, paramName, IN, float, paramValue,
+	          Properties::VIRTUAL,
+	          __void__setParam__C5_char_P1__float,
+	          "",
+	          "");
+	I_Method3(void, setTranslation, IN, float, x, IN, float, y, IN, float, z,
+	          Properties::VIRTUAL,
+	          __void__setTranslation__float__float__float,
+	          "",
+	          "The local translation offset for this node with respect to it's parent ");
+	I_Method3(void, setOrientation, IN, float, pitch, IN, float, roll, IN, float, yaw,
+	          Properties::VIRTUAL,
+	          __void__setOrientation__float__float__float,
+	          "",
+	          "The local orientation offset for this node with respect to it's parent ");
+	I_Method4(void, setOrientationQuat, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
+	          Properties::VIRTUAL,
+	          __void__setOrientationQuat__float__float__float__float,
+	          "",
+	          "Set the orientation offset as a quaternion ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
