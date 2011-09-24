@@ -44,6 +44,7 @@ fi
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
   LIBTOOL="glibtool"
+  #LIBTOOL="libtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
   if test -d /opt/local ; then
@@ -69,6 +70,7 @@ AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_CHECK_TYPES([ptrdiff_t])
+AC_PROG_LN_S
 
 # OpenGL:
 AX_CHECK_GLUT
