@@ -28,6 +28,7 @@ BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::constraintMode)
 	I_EnumLabel(spin::ConstraintsNode::COLLIDE);
 	I_EnumLabel(spin::ConstraintsNode::BOUNCE);
 	I_EnumLabel(spin::ConstraintsNode::STICK);
+	I_EnumLabel(spin::ConstraintsNode::COLLIDE_THRU);
 END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)

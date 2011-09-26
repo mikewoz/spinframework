@@ -35,6 +35,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	               ____ModelNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
+	                      Properties::VIRTUAL,
+	                      __void__updateNodePath__bool,
+	                      "",
+	                      "We change our attachmentNode (add attachment to the centroid), so we MUST override updateNodePath(), and manually push the centroid transform onto the currentNodePath. ");
 	I_Method1(void, setContext, IN, const char *, newvalue,
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,

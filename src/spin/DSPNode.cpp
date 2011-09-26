@@ -288,6 +288,14 @@ void DSPNode::setLength (float newvalue)
     BROADCAST(this, "sf", "setLength", _length);
 }
 
+void DSPNode::setRadius (float newvalue)
+{
+    _radius = newvalue;
+    if (_radius < 0) _radius = 0;
+    if (_radius > 0) this->setLength(_radius/AS_DEBUG_SCALE);
+    BROADCAST(this, "sf", "setRadius", getRadius());
+}
+
 void DSPNode::setDirectivityFlag (float newFlag)
 {
     directivityFlag = newFlag;
@@ -572,11 +580,15 @@ std::vector<lo_message> DSPNode::getState() const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    lo_message_add(msg, "sf", "setSpread", _spread);
+    lo_message_add(msg, "sf", "setSpread", getSpread());
     ret.push_back(msg);
 
     msg = lo_message_new();
-    lo_message_add(msg, "sf", "setLength", _length);
+    lo_message_add(msg, "sf", "setLength", getLength());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setRadius", getRadius());
     ret.push_back(msg);
 
     msg = lo_message_new();
