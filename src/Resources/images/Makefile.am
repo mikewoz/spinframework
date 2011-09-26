@@ -2,8 +2,9 @@
 imagesdir = $(datadir)/spinFramework/images
 images_DATA = icon_3Dsphere.xpm icon_avatar.xpm icon_D.xpm icon_next.xpm icon_prev.xpm \
               icon_reload.xpm icon_tree.xpm icon_3Dview.gif icon_configuration.gif \
-              icon_eraser.gif icon_grid.gif icon_network.gif icon_question_text.gif \
-              icon_refresh.gif icon_tree2.gif logo_SPIN_v2_512px.png spin_48x48.png \
+              icon_eraser.gif icon_eraser_16x16.png icon_grid.gif icon_network.gif \
+			  icon_toolbar_properties_16x16.png icon_question_text.gif \
+              icon_refresh.gif icon_toolbar_save_16x16.png icon_tree2.gif logo_SPIN_v2_512px.png spin_48x48.png \
               spinserver.png spinviewer.png spin.icns spinViewer.icns
 
 desktopicondir = $(datadir)/pixmaps

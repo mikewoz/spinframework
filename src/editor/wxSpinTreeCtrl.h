@@ -28,9 +28,7 @@
 
 #include "ReferencedNode.h"
 
-//#include "spinWX.h"
-//#include "wxSpinPropGrid.h"
-//#include "wxSpinEditor.h"
+#include "wxSpinPropGrid.h"
 
 #include <osg/Node>
 #include <osg/Group>
@@ -132,6 +130,12 @@ public:
      */
     void UpdateTreeItemIcon(wxTreeItemId id);
 
+    /**
+     * Sets the internal spinPropGrid pointer. This is needed because when a
+     * node is selected in the tree, it will populate the prop grid below.
+     */
+    void SetPropGrid(wxSpinPropGrid *pg);
+
 private:
 
     /**
@@ -174,12 +178,6 @@ private:
      */
     void UpdatePropGrid();
 
-    /**
-     * Sets the internal SpinPropGrid pointer. This is needed because when a
-     * node is selected in the tree, it will populate the prop grid below.
-     */
-    //void SetPropGrid(wxSpinPropGrid *PG);
-
      /**
      * When a user selects a node in the TreeCtrl, this event is produced.
      */
@@ -192,7 +190,7 @@ private:
     wxImageList* m_pImages;
     osg::ref_ptr<wxSpinTreeVisitor> m_pSceneTreeVisitor;
 
-    //wxSpinPropGrid* SpinPropGrid;
+    wxSpinPropGrid* spinPropGrid;
 
 
     wxTreeItemId draggedItem;

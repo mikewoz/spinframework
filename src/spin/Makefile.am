@@ -135,11 +135,22 @@ libSPIN_la_include_HEADERS = \
 # $(top_srcdir)/include/videoSize.h
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
-# libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libSPIN.la
+#libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
+libSPINPyWrap_la_LIBADD = libSPIN.la \
+	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
+
+# On OSX, we need the python module to have a .so extension, but the -shrext option
+# doesn't work with glibtool, so we make a symbolic link in an install hook instead.
+# On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
+# do this only for OSX?
+install-exec-hook:
+	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+
+#$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
+
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
