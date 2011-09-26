@@ -4,7 +4,7 @@
     <window id="window01">
         <screen>0</screen>
         <windowPosition>0 0</windowPosition>
-        <windowSize>1280 1020</windowSize>
+        <windowSize>50% 100%</windowSize>
         <windowDecoration>false</windowDecoration>
         <useCursor>true</useCursor>
         <supportsResize>true</supportsResize>
@@ -20,8 +20,8 @@
     <window id="window02">
         <screen>0</screen>
         <fullscreen>false</fullscreen>
-        <windowPosition>1280 0</windowPosition>
-        <windowSize>1920 1080</windowSize>
+        <windowPosition>50% 0%</windowPosition>
+        <windowSize>50% 100%</windowSize>
         <windowDecoration>false</windowDecoration>
         <useCursor>true</useCursor>
         <supportsResize>true</supportsResize>
