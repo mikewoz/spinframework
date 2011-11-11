@@ -172,6 +172,7 @@ void spinBaseContext::debugPrint()
 #else
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
+    std::cout << "  My IP:\t\t\t" << getMyIPaddress() << std::endl;
     if (doDiscovery_)
     {
         std::cout << "  Auto discovery address:\t" << lo_address_get_url(lo_infoAddr);

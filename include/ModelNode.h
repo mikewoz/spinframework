@@ -107,6 +107,11 @@ public:
     int  getAttachCentroid() const { return (int)_attachCentroid; }
     
     /**
+     * Translate the model so that the centroid is at the local (0,0,0)
+     */
+    void makeCentered();
+
+    /**
      * The StateRegistration flag should be set if you want any textures or
      * shaders to be parsed out when loading a model. Any statesets found in
      * the file will generate corresponding ReferencedStateSets for use within
@@ -140,12 +145,18 @@ public:
      */
     void setStateSet (int index, const char *replacement);
 
-
     /**
      * For each subclass of ReferencedNode, we override the getState() method to
      * fill the vector with the correct set of methods for this particular node
      */
     virtual std::vector<lo_message> getState() const;
+
+    /**
+     * This lets you enable or disable the lighting for the entire model, BUT,
+     * really this should be done in individual statesets and can be overridden
+     */
+    void setLighting (int i);
+    int getLighting() const { return (int)_lightingOverride; }
 
     std::vector<t_symbol*> _statesetList;
 
@@ -172,6 +183,7 @@ private:
 
     osgUtil::Optimizer optimizer;
 
+    bool _lightingOverride;
     bool _attachCentroid;
     bool _registerStates;
     int _renderBin;

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE spinframework SYSTEM>
+<camConfig>
+    <window id="dome view">
+        <screen>0</screen>
+        <fullscreen>false</fullscreen>
+        <windowPosition>50 50</windowPosition>
+        <windowSize>500 500</windowSize>
+        <windowDecoration>true</windowDecoration>
+        <useCursor>true</useCursor>
+        <supportsResize>true</supportsResize>
+        <camera id="domeCamera">
+            <spherical>true</spherical>
+            <collar>-0.43</collar>
+            <radius>1.0</radius>
+            <crop>93.0</crop>
+            <viewport>0% 0% 100% 100%</viewport>
+            <clearColor>0.5 0.5 0.5 0</clearColor>
+        </camera>
+    </window>
+    <window id="perspective view">
+        <screen>0</screen>
+        <fullscreen>false</fullscreen>
+        <windowPosition>550 50</windowPosition>
+        <windowSize>500 500</windowSize>
+        <windowDecoration>true</windowDecoration>
+        <useCursor>true</useCursor>
+        <supportsResize>true</supportsResize>
+        <camera id="domeCamera">
+            <viewport>0% 0% 100% 100%</viewport>
+            <clearColor>0.5 0.5 0.5 0</clearColor>
+        </camera>
+    </window>
+</camConfig>

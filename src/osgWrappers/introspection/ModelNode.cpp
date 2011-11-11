@@ -65,6 +65,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          __int__getAttachCentroid,
 	          "",
 	          "");
+	I_Method0(void, makeCentered,
+	          Properties::NON_VIRTUAL,
+	          __void__makeCentered,
+	          "",
+	          "Translate the model so that the centroid is at the local (0,0,0) ");
 	I_Method1(void, setStateRegistration, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setStateRegistration__int,
@@ -105,6 +110,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_Method1(void, setLighting, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setLighting__int,
+	          "",
+	          "This lets you enable or disable the lighting for the entire model, BUT, really this should be done in individual statesets and can be overridden ");
+	I_Method0(int, getLighting,
+	          Properties::NON_VIRTUAL,
+	          __int__getLighting,
+	          "",
+	          "");
 	I_SimpleProperty(int, AttachCentroid, 
 	                 __int__getAttachCentroid, 
 	                 __void__setAttachCentroid__int);
@@ -115,6 +130,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	                  __float__getKeyframe__int, 
 	                  __void__setKeyframe__int__float, 
 	                  0);
+	I_SimpleProperty(int, Lighting, 
+	                 __int__getLighting, 
+	                 __void__setLighting__int);
 	I_SimpleProperty(const char *, ModelFromFile, 
 	                 __C5_char_P1__getModelFromFile, 
 	                 __void__setModelFromFile__C5_char_P1);

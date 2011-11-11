@@ -186,6 +186,38 @@ void ModelNode::setAttachCentroid (int i)
     BROADCAST(this, "si", "setAttachCentroid", getAttachCentroid());
 }
 
+void ModelNode::makeCentered()
+{
+    if (model.valid())
+    {
+        osg::BoundingSphere bound = _modelAttachmentNode->computeBound();
+
+        std::cout << "centering the model to centroid: ("<<bound.center().x()<<","<<bound.center().y()<<","<<bound.center().z()<<") length="<< bound.center().length() << std::endl;
+
+        if (bound.center().length() > 0.00001)
+        {
+            _modelAttachmentNode->removeChild(model.get());
+
+            osg::PositionAttitudeTransform *mpat = new osg::PositionAttitudeTransform();
+            mpat->setPosition(-bound.center());
+
+            mpat->addChild(model.get());
+            _modelAttachmentNode->addChild(mpat);
+
+            //mpat->addChild(model.get());
+            //_modelAttachmentNode->replaceChild(model.get(), mpat);
+        }
+
+        _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
+
+        bound = _modelAttachmentNode->computeBound();
+        std::cout << "new centroid: ("<<bound.center().x()<<","<<bound.center().y()<<","<<bound.center().z()<<") length="<< bound.center().length() << std::endl;
+
+    }
+
+
+}
+
 void ModelNode::setStateRegistration (int i)
 {
 	_registerStates = (bool)i;
@@ -279,6 +311,22 @@ void ModelNode::setStateSet (int i, const char *replacement)
 	}
 }
 
+void ModelNode::setLighting(int i)
+{
+
+    if (_lightingOverride==(bool)i) return;
+    _lightingOverride = (bool)i;
+
+    if (model.valid())// && !stateset->s_thing)
+    {
+        osg::StateSet *ss = model->getOrCreateStateSet();
+        if (_lightingOverride) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+        else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    }
+
+    BROADCAST(this, "si", "setLighting", getLighting());
+
+}
 
 // ===================================================================
 // ===================================================================
@@ -620,6 +668,10 @@ std::vector<lo_message> ModelNode::getState () const
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setAttachCentroid", getAttachCentroid());
 	ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setLighting", getLighting());
+    ret.push_back(msg);
     
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
