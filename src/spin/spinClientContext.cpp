@@ -395,7 +395,7 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
     // If the server was not found in the list, create a new one:
     if (!msg)
     {
-        std::cout << "[spinClientContext] Discovered new server online: " << sceneID << std::endl;
+        std::cout << "[spinClientContext] Discovered new server online: " << sceneID << " (" << reinterpret_cast<const char*>(argv[1]) << ")" << std::endl;
         //msg = (InfoMessage *) malloc(sizeof(InfoMessage));
         msg = new InfoMessage(sceneID);
         context->serverList.push_back(msg);

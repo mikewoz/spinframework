@@ -46,6 +46,7 @@
 #include <osgViewer/View>
 #include <osgViewer/ViewerEventHandlers>
 #include <osg/GraphicsContext>
+#include <osg/TextureCubeMap>
 
 #include <osgGA/NodeTrackerManipulator>
 #include <osgGA/TrackballManipulator>
@@ -79,11 +80,375 @@ struct frustum
 	float far;
 };
 
-static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Camera *cam, int screenWidth, int screenHeight)
+
+static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, const osg::Vec3& widthVector, const osg::Vec3& heightVector, double sphere_radius, double collar_radius,osg::Image* intensityMap, const osg::Matrix& projectorMatrix)
+{
+    osg::Vec3d center(0.0,0.0,0.0);
+    osg::Vec3d eye(0.0,0.0,0.0);
+
+    double distance = sqrt(sphere_radius*sphere_radius - collar_radius*collar_radius);
+
+    //bool centerProjection = true;
+    bool centerProjection = false;
+
+    osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
+
+    //projector = osg::Vec3d(0.0, 0.0, -2.5);
+
+    //std::cout <<"create3DSphericalDisplayDistortionMesh : Projector position = "<<projector<<std::endl;
+    std::cout <<"create3DSphericalDisplayDistortionMesh : distance = "<<distance<<std::endl;
+
+
+    // create the quad to visualize.
+    osg::Geometry* geometry = new osg::Geometry();
+
+    geometry->setSupportsDisplayList(false);
+
+    osg::Vec3 xAxis(widthVector);
+    float width = widthVector.length();
+    xAxis /= width;
+
+    osg::Vec3 yAxis(heightVector);
+    float height = heightVector.length();
+    yAxis /= height;
+
+    int noSteps = 50;
+
+    osg::Vec3Array* vertices = new osg::Vec3Array;
+    osg::Vec3Array* texcoords0 = new osg::Vec3Array;
+    osg::Vec2Array* texcoords1 = intensityMap==0 ? new osg::Vec2Array : 0;
+    osg::Vec4Array* colors = new osg::Vec4Array;
+
+    osg::Vec3 bottom = origin;
+    osg::Vec3 dx = xAxis*(width/((float)(noSteps-1)));
+    osg::Vec3 dy = yAxis*(height/((float)(noSteps-1)));
+
+    osg::Vec3d screenCenter = origin + widthVector*0.5f + heightVector*0.5f;
+    float screenRadius = heightVector.length() * 0.5f;
+
+    int i,j;
+
+    if (centerProjection)
+    {
+        for(i=0;i<noSteps;++i)
+        {
+            osg::Vec3 cursor = bottom+dy*(float)i;
+            for(j=0;j<noSteps;++j)
+            {
+                osg::Vec2 delta(cursor.x() - screenCenter.x(), cursor.y() - screenCenter.y());
+                double theta = atan2(-delta.y(), delta.x());
+                double phi = osg::PI_2 * delta.length() / screenRadius;
+                if (phi > osg::PI_2) phi = osg::PI_2;
+
+                phi *= 2.0;
+
+                if (theta<0.0) theta += 2.0*osg::PI;
+
+                // OSG_NOTICE<<"theta = "<<theta<< "phi="<<phi<<std::endl;
+
+                osg::Vec3 texcoord(sin(phi) * cos(theta),
+                                   sin(phi) * sin(theta),
+                                   cos(phi));
+
+                vertices->push_back(cursor);
+                texcoords0->push_back(texcoord * projectorMatrix);
+
+                osg::Vec2 texcoord1(theta/(2.0*osg::PI), 1.0f - phi/osg::PI_2);
+                if (intensityMap)
+                {
+                    colors->push_back(intensityMap->getColor(texcoord1));
+                }
+                else
+                {
+                    colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+                    if (texcoords1) texcoords1->push_back( texcoord1 );
+                }
+
+                cursor += dx;
+            }
+            // OSG_NOTICE<<std::endl;
+        }
+    }
+    else
+    {
+        for(i=0;i<noSteps;++i)
+        {
+            osg::Vec3 cursor = bottom+dy*(float)i;
+            for(j=0;j<noSteps;++j)
+            {
+                osg::Vec2 delta(cursor.x() - screenCenter.x(), cursor.y() - screenCenter.y());
+                double theta = atan2(-delta.y(), delta.x());
+                double phi = osg::PI_2 * delta.length() / screenRadius;
+                if (phi > osg::PI_2) phi = osg::PI_2;
+                if (theta<0.0) theta += 2.0*osg::PI;
+
+                // OSG_NOTICE<<"theta = "<<theta<< "phi="<<phi<<std::endl;
+
+                double f = distance * sin(phi);
+                double e = distance * cos(phi) + sqrt( sphere_radius*sphere_radius - f*f);
+                double l = e * cos(phi);
+                double h = e * sin(phi);
+                double z = l - distance;
+
+                osg::Vec3 texcoord(h * cos(theta) / sphere_radius,
+                                   h * sin(theta) / sphere_radius,
+                                   z / sphere_radius);
+
+                vertices->push_back(cursor);
+                texcoords0->push_back(texcoord * projectorMatrix);
+
+                osg::Vec2 texcoord1(theta/(2.0*osg::PI), 1.0f - phi/osg::PI_2);
+                if (intensityMap)
+                {
+                    colors->push_back(intensityMap->getColor(texcoord1));
+                }
+                else
+                {
+                    colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+                    if (texcoords1) texcoords1->push_back( texcoord1 );
+                }
+
+                cursor += dx;
+            }
+            // OSG_NOTICE<<std::endl;
+        }
+    }
+
+    // pass the created vertex array to the points geometry object.
+    geometry->setVertexArray(vertices);
+
+    geometry->setColorArray(colors);
+    geometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+
+    geometry->setTexCoordArray(0,texcoords0);
+    if (texcoords1) geometry->setTexCoordArray(1,texcoords1);
+
+    for(i=0;i<noSteps-1;++i)
+    {
+        osg::DrawElementsUShort* elements = new osg::DrawElementsUShort(osg::PrimitiveSet::QUAD_STRIP);
+        for(j=0;j<noSteps;++j)
+        {
+            elements->push_back(j+(i+1)*noSteps);
+            elements->push_back(j+(i)*noSteps);
+        }
+        geometry->addPrimitiveSet(elements);
+    }
+
+    return geometry;
+}
+
+static void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits, osg::View *view, osg::Camera *cam, double radius, double collar, double crop, osg::Image* intensityMap, const osg::Matrixd& projectorMatrix)
+{
+    bool applyIntensityMapAsColours = true;
+
+    //int tex_width = 512;
+    //int tex_height = 512;
+    int tex_width = 1024;
+    int tex_height = 1024;
+
+    int camera_width = tex_width;
+    int camera_height = tex_height;
+
+    osg::TextureCubeMap* texture = new osg::TextureCubeMap;
+
+    texture->setTextureSize(tex_width, tex_height);
+    texture->setInternalFormat(GL_RGB);
+    texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+    texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+    texture->setWrap(osg::Texture::WRAP_S,osg::Texture::CLAMP_TO_EDGE);
+    texture->setWrap(osg::Texture::WRAP_T,osg::Texture::CLAMP_TO_EDGE);
+    texture->setWrap(osg::Texture::WRAP_R,osg::Texture::CLAMP_TO_EDGE);
+
+#if 0
+    osg::Camera::RenderTargetImplementation renderTargetImplementation = osg::Camera::SEPERATE_WINDOW;
+    GLenum buffer = GL_FRONT;
+#else
+    osg::Camera::RenderTargetImplementation renderTargetImplementation = osg::Camera::FRAME_BUFFER_OBJECT;
+    GLenum buffer = GL_FRONT;
+#endif
+
+    // front face
+    {
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        camera->setName("Front face camera");
+        camera->setGraphicsContext(gc);
+        camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
+        camera->setDrawBuffer(buffer);
+        camera->setReadBuffer(buffer);
+        camera->setAllowEventFocus(false);
+        // tell the camera to use OpenGL frame buffer object where supported.
+        camera->setRenderTargetImplementation(renderTargetImplementation);
+
+        // attach the texture and use it as the color buffer.
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_Y);
+
+        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd());
+    }
+
+
+    // top face
+    {
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        camera->setName("Top face camera");
+        camera->setGraphicsContext(gc);
+        camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
+        camera->setDrawBuffer(buffer);
+        camera->setReadBuffer(buffer);
+        camera->setAllowEventFocus(false);
+
+        // tell the camera to use OpenGL frame buffer object where supported.
+        camera->setRenderTargetImplementation(renderTargetImplementation);
+
+        // attach the texture and use it as the color buffer.
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_Z);
+
+        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(-90.0f), 1.0,0.0,0.0));
+    }
+
+    // left face
+    {
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        camera->setName("Left face camera");
+        camera->setGraphicsContext(gc);
+        camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
+        camera->setDrawBuffer(buffer);
+        camera->setReadBuffer(buffer);
+        camera->setAllowEventFocus(false);
+
+        // tell the camera to use OpenGL frame buffer object where supported.
+        camera->setRenderTargetImplementation(renderTargetImplementation);
+
+        // attach the texture and use it as the color buffer.
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_X);
+
+        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,1.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,0.0,1.0));
+    }
+
+    // right face
+    {
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        camera->setName("Right face camera");
+        camera->setGraphicsContext(gc);
+        camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
+        camera->setDrawBuffer(buffer);
+        camera->setReadBuffer(buffer);
+        camera->setAllowEventFocus(false);
+
+        // tell the camera to use OpenGL frame buffer object where supported.
+        camera->setRenderTargetImplementation(renderTargetImplementation);
+
+        // attach the texture and use it as the color buffer.
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_X);
+
+        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,1.0,0.0 ) * osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,0.0,1.0));
+    }
+
+    // bottom face
+    {
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        camera->setGraphicsContext(gc);
+        camera->setName("Bottom face camera");
+        camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
+        camera->setDrawBuffer(buffer);
+        camera->setReadBuffer(buffer);
+        camera->setAllowEventFocus(false);
+
+        // tell the camera to use OpenGL frame buffer object where supported.
+        camera->setRenderTargetImplementation(renderTargetImplementation);
+
+        // attach the texture and use it as the color buffer.
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_Z);
+
+        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(90.0f), 1.0,0.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(180.0f), 0.0,0.0,1.0));
+    }
+
+    // back face
+    {
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        camera->setName("Back face camera");
+        camera->setGraphicsContext(gc);
+        camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
+        camera->setDrawBuffer(buffer);
+        camera->setReadBuffer(buffer);
+        camera->setAllowEventFocus(false);
+
+        // tell the camera to use OpenGL frame buffer object where supported.
+        camera->setRenderTargetImplementation(renderTargetImplementation);
+
+        // attach the texture and use it as the color buffer.
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_Y);
+
+        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(180.0f), 1.0,0.0,0.0));
+    }
+
+    //view->getCamera()->setProjectionMatrixAsPerspective(90.0f, 1.0, 1, 1000.0);
+    cam->setProjectionMatrixAsPerspective(90.0f, 1.0, 1, 1000.0);
+
+    // distortion correction set up.
+    {
+        osg::Geode* geode = new osg::Geode();
+        geode->addDrawable(create3DSphericalDisplayDistortionMesh(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(traits->width,0.0f,0.0f), osg::Vec3(0.0f,traits->height,0.0f), radius, collar, applyIntensityMapAsColours ? intensityMap : 0, projectorMatrix));
+
+        // new we need to add the texture to the mesh, we do so by creating a
+        // StateSet to contain the Texture StateAttribute.
+        osg::StateSet* stateset = geode->getOrCreateStateSet();
+        stateset->setTextureAttributeAndModes(0, texture,osg::StateAttribute::ON);
+        stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+
+        if (!applyIntensityMapAsColours && intensityMap)
+        {
+            stateset->setTextureAttributeAndModes(1, new osg::Texture2D(intensityMap), osg::StateAttribute::ON);
+        }
+
+        // mikewoz: we pass the pre-made camera here:
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        //osg::ref_ptr<osg::Camera> camera = cam;
+
+        camera->setGraphicsContext(gc);
+        camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
+        camera->setClearColor( osg::Vec4(0.0,0.0,0.0,1.0) );
+        camera->setViewport(new osg::Viewport(0, 0, traits->width, traits->height));
+        GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+        camera->setDrawBuffer(buffer);
+        camera->setReadBuffer(buffer);
+        camera->setReferenceFrame(osg::Camera::ABSOLUTE_RF);
+        camera->setAllowEventFocus(false);
+        camera->setInheritanceMask(camera->getInheritanceMask() & ~osg::CullSettings::CLEAR_COLOR & ~osg::CullSettings::COMPUTE_NEAR_FAR_MODE);
+        //camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+
+        //int crop = 125;
+        //int crop = 132;
+        //int crop = 50;
+        //int crop = 0;
+        double aspect = traits->width / traits->height;
+        camera->setProjectionMatrixAsOrtho2D( crop*aspect, traits->width-(crop*aspect), crop, traits->height-crop);
+        //camera->setProjectionMatrixAsOrtho2D(0,traits->width,0,traits->height);
+
+
+        camera->setViewMatrix(osg::Matrix::identity());
+
+        // add subgraph to render
+        camera->addChild(geode);
+
+        camera->setName("DistortionCorrectionCamera");
+
+        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd(), false);
+    }
+
+    //view->getCamera()->setNearFarRatio(0.0001f);
+    cam->setNearFarRatio(0.0001f);
+}
+
+
+
+static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Camera *cam, osg::GraphicsContext::Traits *traits, osg::GraphicsContext *gc)
+//static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Camera *cam, int screenWidth, int screenHeight, int screenNum)
 {
 	TiXmlElement *child = 0;
 	std::string tag="", val="";
 	float v[4];
+
+    bool spherical = false;
 
     osg::Vec3 eye = osg::Vec3(0,0,0);
 	osg::Vec3 lookat = osg::Y_AXIS;
@@ -96,8 +461,9 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
     }
     else std::cout << "    Loading camera" << std::endl;
 
-	// get all properties of the camera:
-	for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
+
+    // FIRST PASS: parse generic parameters, and check if spherical cam
+    for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
 	{
 		// get tag and value:
 		if (child->FirstChild())
@@ -106,72 +472,147 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
 			val = child->FirstChild()->Value();
 		} else continue;
         
-
-		// now update camera parameters:
 		if (tag=="clearColor")
 		{
 			if (sscanf (val.c_str(),"%f %f %f %f",&v[0],&v[1],&v[2],&v[3]))
 				cam->setClearColor( osg::Vec4(v[0],v[1],v[2],v[3]) );
-		}
-		else if (tag=="eye")
-		{
-			if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
-				eye = osg::Vec3(v[0],v[1],v[2]);
-		}
-		else if (tag=="lookat")
-		{
-			if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
-				lookat = osg::Vec3(v[0],v[1],v[2]);
-		}
-		else if (tag=="up")
-		{
-			if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
-				up = osg::Vec3(v[0],v[1],v[2]);
-		}
-        
+        } 
 		else if (tag=="viewport")
 		{
 			if (sscanf(val.c_str(),"%f%% %f%% %f%% %f%%",&v[0],&v[1],&v[2],&v[3])==4)
 			{
-			    cam->setViewport( (int) (v[0]/100*screenWidth/100), (int) (v[1]/100*screenHeight), (int) (v[2]/100*screenWidth), (int) (v[3]/100*screenHeight) );
+                //cam->setViewport( (int) (v[0]/100*screenWidth/100), (int) (v[1]/100*screenHeight), (int) (v[2]/100*screenWidth), (int) (v[3]/100*screenHeight) );
+                cam->setViewport( (int) (v[0]/100*traits->width/100), (int) (v[1]/100*traits->height), (int) (v[2]/100*traits->width), (int) (v[3]/100*traits->height) );
 			}
 			else if (sscanf(val.c_str(),"%f %f %f %f",&v[0],&v[1],&v[2],&v[3])==4)
 			{
-			    view->getCamera()->setViewport( v[0],v[1],v[2],v[3] );
+                //view->getCamera()->setViewport( v[0],v[1],v[2],v[3] );
+                cam->setViewport( v[0],v[1],v[2],v[3] );
 			}
 			else {
 			    std::cout << "Bad viewport values: " << val << ". Need four values <x y width height>, either as pixel values of percentages of the window size" << std::endl;
 			}
 
+			const osg::Viewport *viewport = cam->getViewport();
+			if (viewport)
+			    std::cout << "     Camera viewport:  pos=(" << viewport->x() << "," << viewport->y() << ") size=" << viewport->width() << "x" << viewport->height() << std::endl;
+			else
+			    std::cout << "     Camera viewport:  INVALID" << std::endl;
+
 		}
-	    else if (tag == "perspective")
+        else if (tag=="spherical")
+        {
+            std::cout << "   (spherical camera)" << std::endl;
+            spherical = true;
+        }
+    }
+
+    
+    // SECOND PASS: different options depending on spherical vs planar camera:
+	
+    if (spherical)
+    {
+        float radius = 1.0;
+        float collar = 0.0;
+        float crop = 0.0;
+        for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
 	    {
-	        float fovy, aspectRatio, zNear, zFar;
-	        if (sscanf(val.c_str(), "%f %f %f %f", &fovy, &aspectRatio, &zNear, &zFar))
-	        {
-	            //std::cout << "setting perspective of " << fovy << "deg, aspect: " << aspectRatio << std::endl;
-	            cam->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
-	        }
-	    }
-		else if (tag=="frustum")
-		{
-            frustum frust;
-            if (sscanf (val.c_str(),"%f %f %f %f %f %f",&frust.left,&frust.right,&frust.bottom,&frust.top,&frust.near,&frust.far))
+		    if (child->FirstChild())
+		    {
+		    	tag = child->Value();
+	    		val = child->FirstChild()->Value();
+	    	} else continue;
+        
+		    if (tag=="radius")
             {
-                cam->setProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
-		    }
+                sscanf(val.c_str(), "%f", &radius);
+            }
+            else if (tag=="collar")
+            {
+                sscanf(val.c_str(), "%f", &collar);
+            }
+            else if (tag=="crop")
+            {
+                sscanf(val.c_str(), "%f", &crop);
+            }
         }
 
-		else
-		{
-			std::cout << "Unknown parameter in configuration file: " << tag << std::endl;
-		}
-	}
+        // TODO: read image paths from config for intensity map
+        osg::Image *intensityMap = 0;
+        /*
+        osg::Vec3d center(0.0,0.0,0.0);
+        osg::Vec3d eye(0.0,0.0,0.0);
+        double distance = sqrt(radius*radius - collar*collar);
+        bool centerProjection = false;
+        osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
+        projector = osg::Vec3d(0.0, 0.0, -2.5);
+        */
+        
+        osg::Matrixd projMatrix = osg::Matrixd::identity();
+        
+        std::cout << "creating spherical display with radiux="<<radius<<", collar="<<collar<<", crop="<<crop<<std::endl;
+
+        //view->setUpViewFor3DSphericalDisplay(radius, collar, screenNum, intensityMap, projMatrix);
+        makeDomeView(gc, traits, view, cam, radius, collar, crop, intensityMap, projMatrix);
+    }
+
+    // planar:
+    else 
+    {
+        for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
+	    {
+		    if (child->FirstChild())
+		    {
+		    	tag = child->Value();
+	    		val = child->FirstChild()->Value();
+	    	} else continue;
+        
+		    if (tag=="eye")
+		    {
+			    if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
+				    eye = osg::Vec3(v[0],v[1],v[2]);
+		    }
+		    else if (tag=="lookat")
+		    {
+			    if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
+				    lookat = osg::Vec3(v[0],v[1],v[2]);
+		    }
+    		else if (tag=="up")
+	    	{
+			    if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
+				    up = osg::Vec3(v[0],v[1],v[2]);
+		    }
+       	    else if (tag == "perspective")
+	        {
+	            float fovy, aspectRatio, zNear, zFar;
+	            if (sscanf(val.c_str(), "%f %f %f %f", &fovy, &aspectRatio, &zNear, &zFar))
+	            {
+	                //std::cout << "setting perspective of " << fovy << "deg, aspect: " << aspectRatio << std::endl;
+	                cam->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+	            }
+	        }
+	    	else if (tag=="frustum")
+		    {
+                frustum frust;
+                if (sscanf (val.c_str(),"%f %f %f %f %f %f",&frust.left,&frust.right,&frust.bottom,&frust.top,&frust.near,&frust.far))
+                {
+                    cam->setProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
+		        }   
+            }
+
+		    else
+		    {
+			    std::cout << "Unknown parameter in configuration file: " << tag << std::endl;
+		    }
+	    }
+
+        //view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
+    }
+
 
 	//cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
     //cam->setViewMatrixAsLookAt(eye, lookat, up);
-
 
     spin::ViewerManipulator *manipulator = new spin::ViewerManipulator();
     manipulator->setHomePosition( eye, lookat, up, false );
@@ -187,7 +628,11 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
 	viewMatrix *= osg::Matrixd::rotate(osg::PI/2, X_AXIS);
 	viewer.addSlave(cam->camera.get(), cam->pMatrix*cam->tMatrix, cam->rMatrix*viewMatrix);
 */
-        
+
+    GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+    cam->setDrawBuffer(buffer);
+    cam->setReadBuffer(buffer);
+
 }
 
 
@@ -357,19 +802,18 @@ static void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &vie
 	for ( n = XMLnode->FirstChildElement("camera"); n; n = n->NextSiblingElement("camera") )
 	{
 	    osg::Camera *cam;
-        if (firstCamera)
-        {
-            cam = view->getCamera();
-            firstCamera = false;
-        }
-        else
-        {
-            cam = new osg::Camera();
-            view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
-        }
-
-        if (gc.valid()) cam->setGraphicsContext(gc.get());
-        else std::cout << "ERROR: GraphicsContext not valid. Bad configuration file?" << std::endl;
+	     if (firstCamera)
+	     {
+	         cam = view->getCamera();
+	         firstCamera = false;
+	     }
+	     else
+	     {
+	         cam = new osg::Camera();
+	         view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
+	     }
+	     if (gc.valid()) cam->setGraphicsContext(gc.get());
+	     else std::cout << "ERROR: GraphicsContext not valid. Bad configuration file?" << std::endl;
 
         // Projection matrix aspect fix (can be overridden using either the
         // frustum or perspective configuration values in config file)
@@ -385,11 +829,14 @@ static void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &vie
             }
         }
 
-        loadXMLcamera( n, view, cam, traits->width, traits->height );
+        //loadXMLcamera( n, view, cam, traits->width, traits->height, traits->screenNum);
+        loadXMLcamera( n, view, cam, traits, gc);
 
+        /*
         GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
         cam->setDrawBuffer(buffer);
         cam->setReadBuffer(buffer);
+        */
 	}
 
 	view->setLightingMode(osg::View::SKY_LIGHT);
@@ -529,7 +976,7 @@ int run(int argc, char **argv)
 
 	if (camConfig.size())
 	{
-		std::cout << "Found config file (" << camConfig << "). Loading..." << std::endl;
+		std::cout << "Loading config file (" << camConfig << ")..." << std::endl;
 		
 		TiXmlDocument doc( camConfig.c_str() );
 
