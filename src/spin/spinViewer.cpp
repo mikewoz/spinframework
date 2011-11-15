@@ -91,12 +91,14 @@ static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& or
     //bool centerProjection = true;
     bool centerProjection = false;
 
-    osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
-
+    //osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
     //projector = osg::Vec3d(0.0, 0.0, -2.5);
-
-    //std::cout <<"create3DSphericalDisplayDistortionMesh : Projector position = "<<projector<<std::endl;
-    std::cout <<"create3DSphericalDisplayDistortionMesh : distance = "<<distance<<std::endl;
+    
+    //mikewoz:
+    //osg::Vec3 heightVector = osg::Vec3(
+    //    heightVector_.x() * 0.6666,
+    //    heightVector_.y() * 0.6666,
+    //    heightVector_.z() * 0.6666);
 
 
     // create the quad to visualize.
@@ -125,9 +127,12 @@ static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& or
 
     osg::Vec3d screenCenter = origin + widthVector*0.5f + heightVector*0.5f;
     float screenRadius = heightVector.length() * 0.5f;
+    //float screenRadius = heightVector.length() * 0.75f;
+    
+    //std::cout <<"create3DSphericalDisplayDistortionMesh : Projector position = "<<projector<<std::endl;
+    std::cout <<"create3DSphericalDisplayDistortionMesh : distance = "<<distance<< " size="<<width<<"x"<<height<<", center="<<screenCenter.x()<<","<<screenCenter.y()<<","<<screenCenter.z()<<", radius="<<screenRadius<<std::endl;
 
     int i,j;
-
     if (centerProjection)
     {
         for(i=0;i<noSteps;++i)
@@ -245,6 +250,8 @@ static void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits 
     //int tex_height = 512;
     int tex_width = 1024;
     int tex_height = 1024;
+    //int tex_width = 2048;
+    //int tex_height = 2048;
 
     int camera_width = tex_width;
     int camera_height = tex_height;
@@ -476,8 +483,8 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
 		{
 			if (sscanf (val.c_str(),"%f %f %f %f",&v[0],&v[1],&v[2],&v[3]))
 				cam->setClearColor( osg::Vec4(v[0],v[1],v[2],v[3]) );
-        } 
-		else if (tag=="viewport")
+        }
+    	else if (tag=="viewport")
 		{
 			if (sscanf(val.c_str(),"%f%% %f%% %f%% %f%%",&v[0],&v[1],&v[2],&v[3])==4)
 			{
@@ -515,6 +522,8 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
         float radius = 1.0;
         float collar = 0.0;
         float crop = 0.0;
+        float near = 1.0;
+        float far = 1000.0; 
         for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
 	    {
 		    if (child->FirstChild())
@@ -535,25 +544,33 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
             {
                 sscanf(val.c_str(), "%f", &crop);
             }
+            else if (tag=="clipping")
+            {
+                sscanf(val.c_str(), "%f %f", &near, &far);
+                std::cout << "got clipping for spherical cam: " << near << " " << far << std::endl;
+            }
+            else
+            {
+                std::cout << "WARNING: unrecognized option for spherical camera: " << tag << " " << val << std::endl;
+            }
         }
 
         // TODO: read image paths from config for intensity map
         osg::Image *intensityMap = 0;
-        /*
-        osg::Vec3d center(0.0,0.0,0.0);
-        osg::Vec3d eye(0.0,0.0,0.0);
-        double distance = sqrt(radius*radius - collar*collar);
-        bool centerProjection = false;
-        osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
-        projector = osg::Vec3d(0.0, 0.0, -2.5);
-        */
         
         osg::Matrixd projMatrix = osg::Matrixd::identity();
-        
-        std::cout << "creating spherical display with radiux="<<radius<<", collar="<<collar<<", crop="<<crop<<std::endl;
+        //osg::Matrixd projMatrix = osg::Matrixd::translate(osg::Vec3(0,0,1.0));
+ 
+        std::cout << "creating spherical display with radius="<<radius<<", collar="<<collar<<", crop="<<crop<<std::endl;
 
         //view->setUpViewFor3DSphericalDisplay(radius, collar, screenNum, intensityMap, projMatrix);
         makeDomeView(gc, traits, view, cam, radius, collar, crop, intensityMap, projMatrix);
+
+        double fovy, aspectRatio, zNear, zFar;
+        cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+        cam->getProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+        cam->setProjectionMatrixAsPerspective(fovy, aspectRatio, near, far);
+
     }
 
     // planar:
@@ -689,7 +706,7 @@ static void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &vie
     // percentage
 	unsigned int screenWidth, screenHeight;
 	wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(si.screenNum), screenWidth, screenHeight);
-	//std::cout << "Resolution for screen " << si.screenNum << " is: " << screenWidth << "x" << screenHeight << std::endl;
+	std::cout << "Resolution for screen " << si.screenNum << " is: " << screenWidth << "x" << screenHeight << std::endl;
 
     /*
 	if (n = XMLnode->FirstChildElement("fullscreen"))
@@ -877,6 +894,9 @@ int run(int argc, char **argv)
 	int width=640;
 	int height=480;
 	int screen=-1;
+
+    double nearClipping = -1;
+    double farClipping = -1;
 	
 	std::string camConfig;
 	std::string sceneID = spin.getSceneID();
@@ -900,7 +920,8 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--hide-cursor", "Hide the mouse cursor");
 	arguments.getApplicationUsage()->addCommandLineOption("--config <filename>", "Provide a configuration file to customize the setup of multiple windows/cameras.");
 	arguments.getApplicationUsage()->addCommandLineOption("--window <x y w h>", "Set the position (x,y) and size (w,h) of the viewer window (Default: 50 50 640 480)");
-	arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
+	arguments.getApplicationUsage()->addCommandLineOption("--clipping <near far>", "Manually specify fixed clipping planes (Default: clipping planes will be recomputed for every frame)");
+    arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
 	arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-baed camera controls for this user. This is helpful when using a mouse picker.");
 	arguments.getApplicationUsage()->addCommandLineOption("--enable-mouse-picker", "Enable the mouse picker, and send events to the server");
@@ -926,7 +947,8 @@ int run(int argc, char **argv)
 		frust.far = 10000.0;
 		frust.valid = true;
 	}
-	if (arguments.read("--fullscreen")) fullscreen=true;
+	while (arguments.read("--clipping",nearClipping,farClipping)) {}
+    if (arguments.read("--fullscreen")) fullscreen=true;
     if (arguments.read("--hide-cursor")) hideCursor=true;
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
@@ -1063,6 +1085,24 @@ int run(int argc, char **argv)
 
         view->setCameraManipulator(new ViewerManipulator());
     }
+
+    // *************************************************************************
+    // disable OSG's auto computation of near/far clipping planes, and replace
+    // the with our own:
+    if ((nearClipping>=0) && (farClipping>nearClipping))
+    {
+        osgViewer::Viewer::Cameras cameras;
+        viewer.getCameras(cameras);
+        for (osgViewer::Viewer::Cameras::iterator iter = cameras.begin(); iter != cameras.end(); ++iter)
+        {
+            (*iter)->setNearFarRatio(0.0001f);
+            double fovy, aspectRatio, zNear, zFar;
+            (*iter)->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            (*iter)->getProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+            (*iter)->setProjectionMatrixAsPerspective(fovy, aspectRatio, nearClipping, farClipping);
+        }
+    }
+
 
     // *************************************************************************
     // create a camera manipulator
