@@ -457,8 +457,11 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
 
     bool spherical = false;
 
-    osg::Vec3 eye = osg::Vec3(0,0,0);
-	osg::Vec3 lookat = osg::Y_AXIS;
+    //osg::Vec3 eye = osg::Vec3(0,0,0);
+	//osg::Vec3 lookat = osg::Y_AXIS;
+	//osg::Vec3 up = osg::Z_AXIS;
+    osg::Vec3 eye = osg::Vec3(0,-0.00000001,0);
+	osg::Vec3 lookat = osg::Vec3(0,0,0);
 	osg::Vec3 up = osg::Z_AXIS;
 
     if (XMLnode->Attribute("id"))
