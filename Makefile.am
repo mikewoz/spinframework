@@ -67,3 +67,8 @@ htmldoc:
 # 	rm -rf html
 # endif 
 
+# pkg-config file:
+DISTCLEANFILES = spin.pc
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = spin-@SPIN_API_VERSION@.pc
+

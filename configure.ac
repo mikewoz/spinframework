@@ -2,7 +2,64 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT(SPINFRAMEWORK, [0.3.3], [http://github.com/mikewoz/spinframework], [spinframework], [http://www.spinframework.org])
+
+# spin package version number, (as distinct from shared library version)
+# An odd micro number indicates in-progress development from Git
+# An even micro number indicates a released version
+#
+# Making a point release:
+# - increase spin_micro_version to the next even number
+# - increase spin_interface_age to the next even number
+#   UNLESS there was an API addition/deprecation, in which case
+#   - set spin_interface_age to 0
+# After the release:
+# - increase spin_micro_version to the next odd number
+# - increase spin_interface_version to the next odd number
+m4_define([spin_major_version], [0])
+m4_define([spin_minor_version], [3])
+m4_define([spin_micro_version], [3])
+
+m4_define([spin_release_status],
+          [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
+                 [m4_if(m4_eval(spin_minor_version % 2), [1], [snapshot],
+                                                                 [release])])])
+
+m4_define([spin_version], [spin_major_version.spin_minor_version.spin_micro_version])
+
+# change this only when breaking the API
+m4_define([spin_api_version], [0.3])
+
+# increase the interface age by 1 for each release; if the API changes,
+# set to 0. interface_age and binary_age are used to create the soname
+# of the shared object:
+#
+#  (<minor> * 100 + <micro>) - <interface_age>
+#
+# this allows using the same soname for different micro-releases in case
+# no API was added or deprecated. for instance:
+#
+#   spin 1.2.0  -> 100 * 2 + 0  = 200, interface age = 0 -> 200
+#   spin 1.2.2  -> 100 * 2 + 2  = 202, interface age = 2 -> 200
+#   spin 1.2.4  -> 100 * 2 + 4  = 204, interface age = 4 -> 200
+#   [ API addition, deprecation ]
+#   spin 1.2.6  -> 100 * 2 + 6  = 206, interface age = 0 -> 206
+#   spin 1.2.8  -> 100 * 2 + 8  = 208, interface age = 2 -> 206
+#   spin 1.2.10 -> 100 * 2 + 10 = 210, interface age = 4 -> 206
+#   ...
+#
+m4_define([spin_interface_age], [0])
+m4_define([spin_binary_age], [m4_eval(100 * spin_minor_version + spin_micro_version)])
+
+# change this only when breaking the API
+m4_define([spin_api_version], [0.3])
+
+AC_PREREQ([2.63])
+AC_INIT(SPINFRAMEWORK,
+        [spin_version],
+        [http://www.spinframework.org],
+        [spinframework],
+        [http://github.com/mikewoz/spinframework/issues])
+
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -10,7 +67,23 @@ AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST # fills $host variable
 
+AC_SUBST([SPIN_MAJOR_VERSION],  [spin_major_version])
+AC_SUBST([SPIN_MINOR_VERSION],  [spin_minor_version])
+AC_SUBST([SPIN_MICRO_VERSION],  [spin_micro_version])
+AC_SUBST([SPIN_VERSION],        [spin_version])
+AC_SUBST([SPIN_API_VERSION],    [spin_api_version])
+AC_SUBST([SPIN_API_VERSION_AM], [$SPIN_MAJOR_VERSION\_0])
+AC_SUBST([SPIN_RELEASE_STATUS], [spin_release_status])
 
+m4_define([lt_current],  [m4_eval(100 * spin_minor_version + spin_micro_version - spin_interface_age)])
+m4_define([lt_revision], [spin_interface_age])
+m4_define([lt_age],      [m4_eval(spin_binary_age - spin_interface_age)])
+SPIN_LT_CURRENT=lt_current
+SPIN_LT_REV=lt_revision
+SPIN_LT_AGE=lt_age
+SPIN_LT_VERSION="$SPIN_LT_CURRENT:$SPIN_LT_REV:$SPIN_LT_AGE"
+AC_SUBST([SPIN_LT_VERSION], "$SPIN_LT_VERSION")
+SPIN_LT_LDFLAGS="-version-info $SPIN_LT_VERSION"
 
 # Checks for programs.
 AC_PROG_CXX
@@ -206,6 +279,7 @@ AC_CONFIG_FILES([
         src/Resources/scripts/Makefile
         src/editor/Makefile
         tests/Makefile
+        spin-${SPIN_API_VERSION}.pc:spin.pc.in
         ])
 
 AC_OUTPUT
