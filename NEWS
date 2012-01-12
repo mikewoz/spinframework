@@ -1,61 +1,65 @@
-2011-0?-?? : spinframework 0.3.3
-    
-    This release is in the development series 0.3.x that has an unstable API. 
+SPIN Framework release notes
+============================
 
-    New features:
-    * 
+2011-0?-?? : spinframework 0.3.4
+--------------------------------
+This release is in the development series 0.3.x that has an unstable API. 
 
-    Bugs fixed:
-    * 
+New features:
+* 
+
+Bugs fixed:
+* 
 
 
 2010-07-22 : spinframework 0.3.2
-    
-    This release is in the development series 0.3.x that has an unstable API. It introduces
-    many bug fixes and new features. We changed the UDP multicast group to 226.0.0.1 for the 
-    info and scene message channels. We fixed a lot of bugs regarding the shared video texture
-    using the Scenic milhouse video streaming utility. 
+--------------------------------
+This release is in the development series 0.3.x that has an unstable API. It introduces
+many bug fixes and new features. We changed the UDP multicast group to 226.0.0.1 for the 
+info and scene message channels. We fixed a lot of bugs regarding the shared video texture
+using the Scenic milhouse video streaming utility. 
 
-    New features:
-    * Added a TCP channel for important messages to the spinserver
-    * Renamed spinserver and spinviewer to lowercase
-    * Implemented the --version option in spinserver and spinviewer
-    * Created man pages for spinserver and spinviewer
-    * Introducing the server side Python scripting
-    * big refactoring of spinContext
-    * updated multicast group to 226.0.0.1
-    * created RELEASE, AUTHORS and NEWS files
-    * using POSIX/GNU-style options for spinserver and spinviewer
-    * Using /SPIN/__user__ for user subscription
-    * Using left-hand coordinates for both rotations and translations
-    * don't need to configure with --enable-scenic, if it's detected it will be used 
+New features:
+* Added a TCP channel for important messages to the spinserver
+* Renamed spinserver and spinviewer to lowercase
+* Implemented the --version option in spinserver and spinviewer
+* Created man pages for spinserver and spinviewer
+* Introducing the server side Python scripting
+* big refactoring of spinContext
+* updated multicast group to 226.0.0.1
+* created RELEASE, AUTHORS and NEWS files
+* using POSIX/GNU-style options for spinserver and spinviewer
+* Using /SPIN/__user__ for user subscription
+* Using left-hand coordinates for both rotations and translations
+* don't need to configure with --enable-scenic, if it's detected it will be used 
 
-    Bugs fixed:
-    * fixed sync signal to be double float in ms
-    * updates to autoconf for Ubuntu Lucid
-    * fixed `make dist`
-    * updated glut m4
-    * made spin context functions non global
-    * got rid of -Wstrict-prototypes in python cflags
-    * comment out fmod
-    * added -Wfatal-errors to flags
-    * don't use using namespace std
-    * moved python scripts into Resources directory
-    * fixed rm rule in osgwrappers
-    * fixed spinviewer cleanup problem by using a joinable thread rather than a detached thread
-    * fixed the way that statesets are cleared (clearStates) message 
-    * added more aggressive interrupt handler 
-    * #12 Removed the src/deprecated directory from the trunk
-    * added non-blocking keyboard input to example so that ctrl-c works 
-    * fixed memory leaks in shared video texture 
-    * fixed thread scheduling issue in shared video texture 
+Bugs fixed:
+* fixed sync signal to be double float in ms
+* updates to autoconf for Ubuntu Lucid
+* fixed `make dist`
+* updated glut m4
+* made spin context functions non global
+* got rid of -Wstrict-prototypes in python cflags
+* comment out fmod
+* added -Wfatal-errors to flags
+* don't use using namespace std
+* moved python scripts into Resources directory
+* fixed rm rule in osgwrappers
+* fixed spinviewer cleanup problem by using a joinable thread rather than a detached thread
+* fixed the way that statesets are cleared (clearStates) message 
+* added more aggressive interrupt handler 
+* #12 Removed the src/deprecated directory from the trunk
+* added non-blocking keyboard input to example so that ctrl-c works 
+* fixed memory leaks in shared video texture 
+* fixed thread scheduling issue in shared video texture 
 
 
-spinframework 0.3.1 
+spinframework 0.3.1
+-------------------
+TODO: Fill the dates and info for this release
 
-    * TODO: Fill the dates and info for this release
 
 spinframework 0.3.0 
-
-    * TODO: Fill the dates and info for this release
+-------------------
+TODO: Fill the dates and info for this release
 
