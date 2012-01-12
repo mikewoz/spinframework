@@ -29,6 +29,7 @@ src/.deps/*
 src/config.h
 src/config.h.in
 src/stamp-h1
+spin-*.pc
 tests/.deps/*
 *.lo
 *.la

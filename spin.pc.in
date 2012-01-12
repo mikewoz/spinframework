@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: spin
+Description: Spatial Interaction Framework
+URL: @PACKAGE_URL@
+Version: @PACKAGE_VERSION@
+Requires.private: liblo >= 0.26
+Libs: -L${libdir} -lspin-@SPIN_API_VERSION@
+Cflags: -I${includedir}/spin-@SPIN_API_VERSION@
