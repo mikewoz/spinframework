@@ -79,7 +79,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     spinUtil.cpp \
     introspect_helpers.cpp
 
-libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spinFramework
+libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
 libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
