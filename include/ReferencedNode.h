@@ -51,6 +51,9 @@
 #include "MediaManager.h"
 
 #include <osg/Referenced>
+#ifndef GL_GLEXT_LEGACY
+#define GL_GLEXT_LEGACY // To avoid glext error
+#endif
 #include <osg/Group>
 #include <osg/Node>
 #include <osg/observer_ptr>
