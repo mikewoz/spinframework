@@ -50,9 +50,6 @@ m4_define([spin_api_version], [0.3])
 m4_define([spin_interface_age], [0])
 m4_define([spin_binary_age], [m4_eval(100 * spin_minor_version + spin_micro_version)])
 
-# change this only when breaking the API
-m4_define([spin_api_version], [0.3])
-
 AC_PREREQ([2.63])
 AC_INIT(SPINFRAMEWORK,
         [spin_version],
