@@ -156,13 +156,13 @@ install-exec-hook:
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
+spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
+spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
+spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS)
 
 ###############################################################################
 # CUSTOM targets:
