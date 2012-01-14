@@ -17,7 +17,7 @@ AC_PREREQ([2.61])
 # - increase spin_interface_version to the next odd number
 m4_define([spin_major_version], [0])
 m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [3])
+m4_define([spin_micro_version], [4])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
