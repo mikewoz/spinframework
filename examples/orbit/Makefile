@@ -4,10 +4,11 @@ all: $(NAME)
 
 ###################################################################
 
-CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags)
-LDFLAGS +=  -llo -lSPIN $(shell python-config --libs)
+DEPS = cppintrospection-3.0
+CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags) `pkg-config --cflags $(DEPS)`
+LDFLAGS +=  -llo -lSPIN $(shell python-config --libs) `pkg-config --libs $(DEPS)`
 LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
-		-losgIntrospection -losgManipulator -losgText -losgUtil \
+		-losgManipulator -losgText -losgUtil \
 		-losgParticle -losgViewer
 
 ifeq ($(shell uname -s),Darwin)
