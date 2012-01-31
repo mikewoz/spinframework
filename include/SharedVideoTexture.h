@@ -103,6 +103,7 @@ public:
     const char* getPath() const { return textureID.c_str(); }
         
     std::vector<lo_message> getState () const;
+    void debug();
     
 #ifdef WITH_SHARED_VIDEO
     void updateCallback();

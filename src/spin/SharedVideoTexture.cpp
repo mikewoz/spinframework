@@ -163,6 +163,18 @@ std::vector<lo_message> SharedVideoTexture::getState () const
     return ret;
 }
 
+void SharedVideoTexture::debug()
+{
+	ReferencedStateSet::debug();
+	std::cout << "   ---------" << std::endl;
+	std::cout << "   Type: SharedVideoTexture" << std::endl;
+	std::cout << "   Texture ID: " << getTextureID() << std::endl;
+	std::cout << "   Path: " << getPath() << std::endl;
+	std::cout << "   Render bin: " << getRenderBin() << std::endl;
+	std::cout << "   width/height: " << width << "x" << height << std::endl;
+	std::cout << "   Killed: " << killed_ << std::endl;
+	std::cout << "   Texture ID: " << textureID << std::endl;
+}
 
 // *****************************************************************************
 // *****************************************************************************
