@@ -48,6 +48,11 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "Just like a ReferencedNode, each subclass of ReferencedStateSet must override the getState() method to pass it's current state. ");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "");
 	I_Method0(void, updateCallback,
 	          Properties::VIRTUAL,
 	          __void__updateCallback,
@@ -83,6 +88,19 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          __int__getRenderBin,
 	          "",
 	          "");
+	I_Method1(void, setEnableRenderBin, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setEnableRenderBin__int,
+	          "",
+	          "");
+	I_Method0(int, getEnableRenderBin,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnableRenderBin,
+	          "",
+	          "");
+	I_SimpleProperty(int, EnableRenderBin, 
+	                 __int__getEnableRenderBin, 
+	                 __void__setEnableRenderBin__int);
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 0);

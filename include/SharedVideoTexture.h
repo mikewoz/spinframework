@@ -121,6 +121,8 @@ public:
      */
     void setRenderBin (int i);
     int getRenderBin() const { return _renderBin; }
+    void setEnableRenderBin (int i);
+    int getEnableRenderBin () const { return enableRenderBin_ ? 1 : 0; }
 
 private:
     
@@ -144,6 +146,7 @@ private:
 #endif
         
     int  _renderBin;
+    bool enableRenderBin_;
 };
 
 /*

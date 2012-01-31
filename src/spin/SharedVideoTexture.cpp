@@ -53,16 +53,17 @@ static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
 
 using namespace std;
 
-
 namespace spin
 {
-
 
 // ===================================================================
 // constructor:
 //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
 SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
-    ReferencedStateSet(s, initID), killed_(true)
+    ReferencedStateSet(s, initID),
+    killed_(true),
+    _renderBin(11),
+    enableRenderBin_(false)
 {
 	classType = "SharedVideoTexture";
 	
@@ -97,8 +98,6 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 	// enable blending:
     this->setMode(GL_BLEND, osg::StateAttribute::ON);
     this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-    // disable depth test (FIXME)
-    this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
     // keep a timer for reload attempts:
     lastTick = 0;
@@ -108,6 +107,17 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     // set initial textureID:
     //setTextureID(this->id->s_name);
 
+}
+
+void SharedVideoTexture::setEnableRenderBin (int i)
+{
+    this->enableRenderBin_ = i != 0;
+
+    if (getEnableRenderBin())
+        this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+    else
+        this->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+	BROADCAST(this, "si", "setEnableRenderBin", getEnableRenderBin());
 }
 
 void SharedVideoTexture::setRenderBin (int i)
@@ -131,12 +141,12 @@ SharedVideoTexture::~SharedVideoTexture()
 // ===================================================================
 void SharedVideoTexture::setTextureID (const char* newID)
 {
-
     // only do this if the id has changed:
-    if (textureID == std::string(newID)) return;
+    if (textureID == std::string(newID))
+        return;
 
     textureID = std::string(newID);
-    this->setName("SharedVideoTexture("+textureID+")");
+    this->setName("SharedVideoTexture(" + textureID + ")");
 
     if (!sceneManager->isGraphical())
     {
@@ -158,6 +168,10 @@ std::vector<lo_message> SharedVideoTexture::getState () const
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setEnableRenderBin", getEnableRenderBin());
 	ret.push_back(msg);
 
     return ret;
@@ -186,11 +200,12 @@ void SharedVideoTexture::debug()
 
 void SharedVideoTexture::updateCallback()
 {
-    if (!sceneManager->isGraphical()) return;
+    if (! sceneManager->isGraphical())
+        return;
 
     // do update here
     // FIXME: killed should be protected
-    if (not killed_)
+    if (! killed_)
     {
         if (img.valid())
         {	
@@ -216,7 +231,7 @@ void SharedVideoTexture::updateCallback()
         //img->setOrigin(osg::Image::TOP_LEFT); 
         textureUploadedCondition_.notify_one();
     } 
-    else if (not textureID.empty()) 
+    else if (! textureID.empty()) 
     {
         // if the shared memory has not been set, we will recheck
         // every 5 seconds or so
