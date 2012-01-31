@@ -2,7 +2,7 @@
 set -o verbose
 SCENEID=aalex
 PORT=54324
-SENDPREFIX="osc-send osc.udp://localhost:${PORT} /SPIN/${SCENEID}"
+SENDPREFIX="osc-send osc.udp://127.0.0.1:${PORT} /SPIN/${SCENEID}"
  ,s debug
 
 ${SENDPREFIX} ,sss createNode shape0 ShapeNode
