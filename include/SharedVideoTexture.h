@@ -114,6 +114,12 @@ public:
     void stop();
 #endif
         
+    /**
+     * Set the render bin for this texture. The higher the number, the later it
+     * gets processed (ie, it appears on top). Default renderBin = 11
+     */
+    void setRenderBin (int i);
+    int getRenderBin() const { return _renderBin; }
 
 private:
     
@@ -136,6 +142,7 @@ private:
     SharedVideoBuffer *sharedBuffer;
 #endif
         
+    int  _renderBin;
 };
 
 /*

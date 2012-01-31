@@ -97,6 +97,8 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 	// enable blending:
     this->setMode(GL_BLEND, osg::StateAttribute::ON);
     this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+    // disable depth test (FIXME)
+    this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
     // keep a timer for reload attempts:
     lastTick = 0;
@@ -106,6 +108,14 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     // set initial textureID:
     //setTextureID(this->id->s_name);
 
+}
+
+void SharedVideoTexture::setRenderBin (int i)
+{
+	_renderBin = i;
+	this->setRenderBinDetails( (int)_renderBin, "RenderBin");
+
+	BROADCAST(this, "si", "setRenderBin", getRenderBin());
 }
 
 // ===================================================================
@@ -145,6 +155,10 @@ std::vector<lo_message> SharedVideoTexture::getState () const
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setTextureID", getTextureID());
     ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
+	ret.push_back(msg);
 
     return ret;
 }
