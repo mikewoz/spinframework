@@ -191,6 +191,11 @@ if test "x${ax_cv_boost_thread}" = "xno" ; then
     AC_MSG_ERROR([missing package: libboost-thread-dev])
 fi
 
+AX_BOOST_PROGRAM_OPTIONS
+if test "x${ax_cv_boost_program_options}" = "xno" ; then
+    AC_MSG_ERROR([missing package: libboost-program-options-dev])
+fi
+
 #AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), -l$PYTHON_LIB)
 
 AX_BOOST_PYTHON

@@ -29,6 +29,7 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(PYTHON_LDFLAGS) \
     -l$(BOOST_PYTHON_LIB) \
     $(BOOST_THREAD_LIB) \
+    $(BOOST_PROGRAM_OPTIONS_LIB) \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
@@ -156,13 +157,16 @@ install-exec-hook:
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS)
+spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS)
+spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS)
+spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+
 
 ###############################################################################
 # CUSTOM targets:

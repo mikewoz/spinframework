@@ -1,0 +1,12 @@
+#!/usr/bin/env lunch
+import os
+pwd = os.getcwd()
+
+add_command("spinserver --scene-id aalex")
+add_command("milhouse -s --address localhost --videoport 14000 --videosource videotestsrc --width 320 --height 240")
+add_command("milhouse -r --address localhost --videoport 14000 --videosink sharedvideosink --shared-video-id scenic_tex0 --width 320 --height 240 --text-overlay scenic_tex0 --flip-video vertical-flip")
+add_command("milhouse -s --address localhost --videoport 14010 --videosource videotestsrc --width 320 --height 240")
+add_command("milhouse -r --address localhost --videoport 14010 --videosink sharedvideosink --shared-video-id scenic_tex1 --width 320 --height 240 --text-overlay scenic_tex1 --flip-video vertical-flip")
+add_command("spinviewer --scene-id aalex") #, sleep_after=5.0)
+add_command(os.path.join(os.getcwd(), "osc.sh"), respawn=False)
+
