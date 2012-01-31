@@ -94,6 +94,9 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 
     // turn off lighting 
     this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	// enable blending:
+    this->setMode(GL_BLEND, osg::StateAttribute::ON);
+    this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
     // keep a timer for reload attempts:
     lastTick = 0;
