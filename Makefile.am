@@ -5,6 +5,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 # Order of compilation really matters:
 SUBDIRS = \
+    completion \
     src \
     tests
 

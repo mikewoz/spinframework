@@ -1,0 +1,22 @@
+have spinserver &&
+_spinserver()
+{
+        local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev="${COMP_WORDS[COMP_CWORD-1]}"
+        
+        if [[ "$cur" == -* ]]; then
+            COMPREPLY=($(compgen -W "$(spinserver --help | awk '/--/ { sub(/^.*--/, "--");sub(/[ =].*$/,"");print }')" -- $cur ) )
+        else
+            case "$prev" in
+            --scene-id ) COMPREPLY=($(compgen -W "default" -- $cur ) ) ;;
+            --recv-tcp-msg ) COMPREPLY=($(compgen -W "54322" -- $cur ) ) ;;
+            --ttl ) COMPREPLY=($(compgen -W "1 2 3" -- $cur ) ) ;;
+            *) ;;
+            esac
+        fi
+}
+complete -F _spinserver spinserver
+

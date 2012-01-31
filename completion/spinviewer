@@ -1,0 +1,22 @@
+have spinviewer &&
+_spinviewer()
+{
+        local cur prev
+
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        prev="${COMP_WORDS[COMP_CWORD-1]}"
+        
+        if [[ "$cur" == -* ]]; then
+            COMPREPLY=($(compgen -W "$(spinviewer --help | awk '/--/ { sub(/^.*--/, "--");sub(/[ =].*$/,"");print }')" -- $cur ) )
+        else
+            case "$prev" in
+            --framerate ) COMPREPLY=($(compgen -W "24 25 30 60" -- $cur ) ) ;;
+            --ttl ) COMPREPLY=($(compgen -W "1 2 3" -- $cur ) ) ;;
+            --user-id ) COMPREPLY=($(compgen -W "$(hostname)" -- $cur ) ) ;;
+            *) ;;
+            esac
+        fi
+}
+complete -F _spinviewer spinviewer
+

@@ -282,6 +282,7 @@ AC_CONFIG_FILES([
         src/editor/Makefile
         tests/Makefile
         spin-${SPIN_API_VERSION}.pc:spin.pc.in
+        completion/Makefile
         ])
 
 AC_OUTPUT
