@@ -26,6 +26,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1C072ACB14D9F6A5003D669E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C072AC914D9F6A5003D669E /* MainMenu.xib */; };
 		1C386CB014BD3DF60065851F /* AnimationNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8614BD3DF60065851F /* AnimationNode.cpp */; };
 		1C386CB114BD3DF60065851F /* AttractorNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8714BD3DF60065851F /* AttractorNode.cpp */; };
 		1C386CB214BD3DF60065851F /* ConstraintsNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8814BD3DF60065851F /* ConstraintsNode.cpp */; };
@@ -442,7 +443,6 @@
 		1CCCA0D714BE31AC00DCA0B7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D614BE31AC00DCA0B7 /* main.mm */; };
 		1CCCA0DB14BE31AC00DCA0B7 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D914BE31AC00DCA0B7 /* Credits.rtf */; };
 		1CCCA0E714BE334D00DCA0B7 /* ViewerCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0E614BE334D00DCA0B7 /* ViewerCocoa.mm */; };
-		1CCCA0EA14BE34BA00DCA0B7 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0E814BE34BA00DCA0B7 /* MainMenu.nib */; };
 		1CCCA0ED14BE34D000DCA0B7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0EB14BE34D000DCA0B7 /* Localizable.strings */; };
 		1CCCA0EF14BE353100DCA0B7 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CCCA0EE14BE353100DCA0B7 /* OpenGL.framework */; };
 		1CCCA0F014BE353500DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
@@ -892,6 +892,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1C072ACA14D9F6A5003D669E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1C14F41A14C3A3D4008889AE /* OpenThreads.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenThreads.framework; path = usr/local/lib/OpenThreads.framework; sourceTree = SDKROOT; };
 		1C386C7D14BD3CBD0065851F /* libSPIN.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSPIN.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C386C8614BD3DF60065851F /* AnimationNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnimationNode.cpp; path = ../src/spin/AnimationNode.cpp; sourceTree = SOURCE_ROOT; };
@@ -1173,7 +1174,6 @@
 		1CCCA0DA14BE31AC00DCA0B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		1CCCA0E514BE334D00DCA0B7 /* ViewerCocoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewerCocoa.h; sourceTree = "<group>"; };
 		1CCCA0E614BE334D00DCA0B7 /* ViewerCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewerCocoa.mm; sourceTree = "<group>"; };
-		1CCCA0E914BE34BA00DCA0B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1CCCA0EC14BE34D000DCA0B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1CCCA0EE14BE353100DCA0B7 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		1CCCA0F114BE361B00DCA0B7 /* spin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spin.icns; path = ../src/Resources/images/spin.icns; sourceTree = "<group>"; };
@@ -1831,7 +1831,7 @@
 		1CCCA0D014BE31AB00DCA0B7 /* spinviewerUI */ = {
 			isa = PBXGroup;
 			children = (
-				1CCCA0E814BE34BA00DCA0B7 /* MainMenu.nib */,
+				1C072AC914D9F6A5003D669E /* MainMenu.xib */,
 				1C70F33114C3C69C0054B0A1 /* osgPlugins.h */,
 				1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */,
 				1CCCA0E514BE334D00DCA0B7 /* ViewerCocoa.h */,
@@ -2111,7 +2111,6 @@
 			files = (
 				1CCCA0D514BE31AC00DCA0B7 /* InfoPlist.strings in Resources */,
 				1CCCA0DB14BE31AC00DCA0B7 /* Credits.rtf in Resources */,
-				1CCCA0EA14BE34BA00DCA0B7 /* MainMenu.nib in Resources */,
 				1CCCA0ED14BE34D000DCA0B7 /* Localizable.strings in Resources */,
 				1CCCA0F414BE36CF00DCA0B7 /* spinViewer.icns in Resources */,
 				1C875FE314C9BE3200A46EBC /* icon_3Dsphere.xpm in Resources */,
@@ -2146,6 +2145,7 @@
 				1C90C15A14CBB35000C929AE /* icon_fullscreen.png in Resources */,
 				1C90C16314CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png in Resources */,
 				1CE3AD2014CFDB15007E722D /* osgdb_ffmpeg.so in Resources */,
+				1C072ACB14D9F6A5003D669E /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2369,6 +2369,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		1C072AC914D9F6A5003D669E /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1C072ACA14D9F6A5003D669E /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
 		1CA24DFB14BE2D3D007A9C31 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -2407,14 +2415,6 @@
 				1CCCA0DA14BE31AC00DCA0B7 /* en */,
 			);
 			name = Credits.rtf;
-			sourceTree = "<group>";
-		};
-		1CCCA0E814BE34BA00DCA0B7 /* MainMenu.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				1CCCA0E914BE34BA00DCA0B7 /* en */,
-			);
-			name = MainMenu.nib;
 			sourceTree = "<group>";
 		};
 		1CCCA0EB14BE34D000DCA0B7 /* Localizable.strings */ = {
