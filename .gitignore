@@ -34,10 +34,14 @@ tests/.deps/*
 *.la
 .deps
 .libs
+.DS_Store
+Xcode/spinframework.xcodeproj/xcuserdata
+Xcode/spinframework.xcodeproj/xcuserdata/*
 # ---------- specific files: -------
 include/config.h
 include/config.h.in
 include/stamp-h1
+examples/spacenavigator/spacenavigator
 src/spin/spindocgenerator
 src/spin/spinserver
 src/spin/spinviewer

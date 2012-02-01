@@ -157,8 +157,17 @@ void RayNode::drawRay()
 			rayGeom->setVertexArray(vertices);
 			rayGeom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, vertices->size()));
 
+            
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
+            osgUtil::SmoothingVisitor::smooth(*rayGeom, osg::PI);
+#else
 			osgUtil::SmoothingVisitor::smooth(*rayGeom);
-
+#endif
+#else
+			osgUtil::SmoothingVisitor::smooth(*rayGeom);
+#endif
+            
 			rayGeode->addDrawable(rayGeom);
         }
         else
@@ -176,6 +185,11 @@ void RayNode::drawRay()
 
         if (rayGeode.valid())
         {
+            osg::StateSet *ss = rayGeode->getOrCreateStateSet();
+            
+            // disable lighting
+            ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+            
         	getAttachmentNode()->addChild(rayGeode.get());
             rayGeode->setName(string(id->s_name) + ".rayGeode");
             osgUtil::Optimizer optimizer;

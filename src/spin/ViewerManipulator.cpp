@@ -298,7 +298,10 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 		}
 	}
 	
-	if (this->picker)
+    
+    if ((modkeyMask==GUIEventAdapter::MODKEY_LEFT_SHIFT) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_SHIFT) )
+    
+        //if (this->picker)
 	{
 		// This is how the Picker works:
 		//

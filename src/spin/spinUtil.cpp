@@ -46,11 +46,14 @@
 #include <sys/utsname.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
+#include <pwd.h>
+#include <unistd.h>
 
 #include <osgDB/ReadFile>
 #include <osgDB/FileNameUtils>
 #include <osgDB/FileUtils>
 #include "spinUtil.h"
+
 
 namespace spin
 {
@@ -148,6 +151,13 @@ std::string stringify(float x)
 	std::ostringstream o;
 	if (!(o << x)) return "";
 	return o.str();
+}
+
+std::string stringify(int x)
+{
+    std::ostringstream o;
+    if (!(o << x)) return "";
+    return o.str();
 }
 
 std::string leadingSpaces(int n)
@@ -277,12 +287,29 @@ std::string getRelativePath(const std::string &path)
 std::string getAbsolutePath(const std::string &path)
 {
 	using std::string;
-
+    
 	// TODO: also deal with: ./ ../
 	
 	if (path.substr(0,1) == string("~")) // look for "~"
 	{
-		return getenv("HOME") + path.substr(1);
+        std::string homePath;
+        
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd)
+        {
+            homePath = pwd->pw_dir;
+        }
+        else
+        {
+            // try the $HOME environment variable
+            homePath = getenv("HOME");
+        }
+        
+        // fall back to current directory:
+        if (homePath.empty()) homePath = "./";
+        
+		return homePath + path.substr(1);    
+        
 	} else return path;
 }
 
@@ -317,6 +344,30 @@ bool isVideoPath(const std::string &path)
 	
 	return false;
 }
+
+bool isImagePath(const std::string &path)
+{
+    using std::string;
+    string extension = osgDB::getLowerCaseFileExtension(path);
+    if  ((extension=="jpg") ||
+         (extension=="jpeg") ||
+         (extension=="gif") ||
+         (extension=="png") ||
+         (extension=="tif") ||
+         (extension=="tiff") ||
+         (extension=="bmp") ||
+         (extension=="rgb") ||
+         (extension=="tga") ||
+         (extension=="pic") ||
+         (extension=="dds") ||
+         (extension=="sgi"))
+    {
+        return true;
+    }
+    
+    return false;
+}
+    
 
 /**
  * This checks the file/path name to see there is encoded path information, and

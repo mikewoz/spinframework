@@ -259,6 +259,7 @@ void TextNode::drawText()
 		//textLabel->setFontResolution(40,40);
 		textLabel->setFontResolution(80,80);
 		textLabel->setColor( _color );
+        
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(2,9,7)
 		textLabel->setBoundingBoxColor(_bgColor);

@@ -49,12 +49,14 @@
 #include <osgDB/Registry>
 #include <cppintrospection/Type>
 #include <cppintrospection/Value>
-
 #include <osgUtil/Optimizer>
+#include <osg/Version>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
+#ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
+#endif
 
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
@@ -101,12 +103,12 @@ spinBaseContext::spinBaseContext() :
     lo_tcpRxServer_(NULL),
     pthreadID(0),
     doDiscovery_(true),
-    autoPorts_(true)
+    autoPorts_(true),
+    running(false)
 {
     using namespace spin_defaults;
+    
     signalStop = true;
-    running = false;
-
     signal(SIGINT, sigHandler);
 
     // set default addresses (can be overridden):
@@ -167,12 +169,13 @@ void spinBaseContext::debugPrint()
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+    std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC
     std::cout << "  SpatOSC version:\t\t"<< SPATOSC_VERSION << " (enabled=" << spinApp::Instance().hasAudioRenderer << ")" << std::endl;
 #else
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
-    std::cout << "  My IP:\t\t\t" << getMyIPaddress() << std::endl;
+    std::cout << "  My IP address:\t\t" << getMyIPaddress() << std::endl;
     if (doDiscovery_)
     {
         std::cout << "  Auto discovery address:\t" << lo_address_get_url(lo_infoAddr);
@@ -335,7 +338,7 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
     //pthread_join(pthreadID, NULL); // if not DETACHED thread
 
     // wait until the thread gets into it's loop before returning:
-    while (! running)
+    while (! running )
         usleep(10);
 
     return true;

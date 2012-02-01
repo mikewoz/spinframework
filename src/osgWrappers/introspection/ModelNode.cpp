@@ -94,10 +94,20 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setKeyframe__int__float,
 	          "",
-	          "Render bins allow you to control drawing order, and manage Z-fighting. The higher the number, the later it gets processed (ie, appears on top). Default renderBin = 11 ");
+	          "Control the keyframe of a particular animation saved within the model (there can be several animations, hence the required index number) ");
 	I_Method1(float, getKeyframe, IN, int, index,
 	          Properties::NON_VIRTUAL,
 	          __float__getKeyframe__int,
+	          "",
+	          "");
+	I_Method2(void, setPlaying, IN, int, index, IN, int, playState,
+	          Properties::NON_VIRTUAL,
+	          __void__setPlaying__int__int,
+	          "",
+	          "Set the playing state of a particular animation (paused by default) ");
+	I_Method1(float, getPlaying, IN, int, index,
+	          Properties::NON_VIRTUAL,
+	          __float__getPlaying__int,
 	          "",
 	          "");
 	I_Method2(void, setStateSet, IN, int, index, IN, const char *, replacement,

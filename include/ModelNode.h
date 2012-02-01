@@ -130,13 +130,19 @@ public:
     int getRenderBin() const { return _renderBin; }
 
     /**
-     * Render bins allow you to control drawing order, and manage Z-fighting.
-     * The higher the number, the later it gets processed (ie, appears on top).
-     * Default renderBin = 11
+     * Control the keyframe of a particular animation saved within the model
+     * (there can be several animations, hence the required index number)
      */
     void setKeyframe (int index, float keyframe);
     float getKeyframe(int index) const { return _keyframe[index]; }
 
+    /**
+     * Set the playing state of a particular animation (paused by default)
+     */
+    void setPlaying (int index, int playState);
+    float getPlaying(int index) const { return _playState[index]; }
+
+    
     /**
      * For statesets embedded in the model, it is possible to swap with some
      * other (already existing) stateset.
@@ -176,6 +182,7 @@ private:
     osg::ref_ptr<osg::PositionAttitudeTransform> _centroid;
 
     // animation stuff for gfx:
+    int _playState[MODELNODE_NUM_ANIM_CONTROLS]; // 0=paused, 1=playing
     float _keyframe[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
     animationModeType animationMode[MODELNODE_NUM_ANIM_CONTROLS]; // type of animation (switch vs. sequence vs. ??)
     osg::ref_ptr<osg::Switch> switcher[MODELNODE_NUM_ANIM_CONTROLS];

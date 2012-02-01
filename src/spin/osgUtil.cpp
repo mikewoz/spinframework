@@ -313,7 +313,7 @@ osg::Geode* createGrid(int radius, osg::Vec4 color)
 	// create the normals
 	//gridLines->setNormalArray(normals);
 	//gridLines->setNormalBinding(osg::Geometry::BIND_OVERALL);
-	osgUtil::SmoothingVisitor::smooth(*gridLines);
+	osgUtil::SmoothingVisitor::smooth_old(*gridLines);
 	
 	gridGeode->addDrawable(gridLines);
 	
@@ -476,7 +476,7 @@ osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 	osg::Geode* triGeode = new osg::Geode();
 	osg::Geometry* triFan = new osg::Geometry();
 	osg::Vec3Array* normals = new osg::Vec3Array;
-	osg::Vec3 myCoords[grain + 2];
+	osg::Vec3* myCoords = new osg::Vec3[grain + 2];
 	osg::Vec4Array* colors = new osg::Vec4Array;
 
 	// tip

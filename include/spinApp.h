@@ -42,8 +42,13 @@
 #ifndef __spinApp_H
 #define __spinApp_H
 
+#ifndef DISABLE_PYTHON
 //#include "Python.h"
+//#include <Python.h>
 #include <boost/python.hpp>
+
+#endif
+
 #include <osg/Timer>
 #include <lo/lo_types.h>
 #include <osg/ref_ptr>
@@ -99,7 +104,7 @@ class spinApp
         /**
          * This sends a variable length message.
          *
-         * IMPORTANT: the list must be terminated with LO_ARGS_END, or this call
+         * IMPORTANT: the list must be terminated with SPIN_ARGS_END, or this call
          * will fail.  This is used to do simple error checking on the sizes of
          * parameters passed.
          */
@@ -139,8 +144,11 @@ class spinApp
          * Returns a string containing the most recent Python exception, if any.
          */
         std::string getCurrentPyException();
+    
+#ifndef DISABLE_PYTHON
         boost::python::object _pyMainModule;
         boost::python::object _pyNamespace;
+#endif
         bool _pyInitialized;
 
         osg::ref_ptr<UserNode> userNode;
@@ -197,7 +205,7 @@ class spinApp
             for (std::vector<lo_address>::iterator addrIter=spinApp::Instance().getContext()->lo_txAddrs_.begin(); addrIter != spinApp::Instance().getContext()->lo_txAddrs_.end(); ++addrIter) \
             lo_send((*addrIter), \
             ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
-            types, ##__VA_ARGS__, LO_ARGS_END)
+            types, ##__VA_ARGS__, SPIN_ARGS_END)
 
 #define SCENE_LO_MSG(msg) \
     if (spinApp::Instance().getContext() && \
@@ -223,7 +231,7 @@ class spinApp
             lo_send((*addrIter), \
             ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
             std::string(pNode->id->s_name)).c_str(), \
-            types, ##__VA_ARGS__, LO_ARGS_END)
+            types, ##__VA_ARGS__, SPIN_ARGS_END)
 
 #define NODE_LO_MSG(s, pNode, msg) \
     if (spinApp::Instance().getContext() && \
@@ -245,7 +253,7 @@ class spinApp
         (spinApp::Instance().getContext()->isServer()) ) \
             lo_send(spinApp::Instance().getContext()->lo_txAddr, \
             ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
-            types, ##__VA_ARGS__, LO_ARGS_END)
+            types, ##__VA_ARGS__, SPIN_ARGS_END)
 
 #define SCENE_MSG_TCP(types, addr, ...) \
     if (spinApp::Instance().getContext() && \
@@ -253,7 +261,7 @@ class spinApp
         (spinApp::Instance().getContext()->isServer()) ) \
         lo_send((addr), \
             ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
-            types, ##__VA_ARGS__, LO_ARGS_END)
+            types, ##__VA_ARGS__, SPIN_ARGS_END)
 
 #define SCENE_LO_MSG(msg) \
     if (spinApp::Instance().getContext() && \
@@ -277,7 +285,7 @@ class spinApp
         lo_send(spinApp::Instance().getContext()->lo_txAddr, \
             ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
             std::string(pNode->id->s_name)).c_str(), \
-            types, ##__VA_ARGS__, LO_ARGS_END)
+            types, ##__VA_ARGS__, SPIN_ARGS_END)
 
 #define NODE_LO_MSG(s, pNode, msg) \
     if (spinApp::Instance().getContext() && \

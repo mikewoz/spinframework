@@ -57,7 +57,7 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	          Properties::NON_VIRTUAL,
 	          __void__InfoMessage__C5_std_string_R1__C5_char_P1__...,
 	          "",
-	          "This sends a variable length message.IMPORTANT: the list must be terminated with LO_ARGS_END, or this call will fail. This is used to do simple error checking on the sizes of parameters passed. ");
+	          "This sends a variable length message.IMPORTANT: the list must be terminated with SPIN_ARGS_END, or this call will fail. This is used to do simple error checking on the sizes of parameters passed. ");
 	I_Method3(void, spin::InfoMessage, IN, const std::string &, OSCpath, IN, const char *, types, IN, va_list, ap,
 	          Properties::NON_VIRTUAL,
 	          __void__InfoMessage__C5_std_string_R1__C5_char_P1__va_list,

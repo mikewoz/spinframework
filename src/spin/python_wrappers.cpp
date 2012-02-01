@@ -39,6 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#ifndef DISABLE_PYTHON
+
 #include <boost/utility.hpp>
 #include <boost/python.hpp>
 #include <boost/python/raw_function.hpp>
@@ -400,3 +402,4 @@ BOOST_PYTHON_MODULE(libSPINPyWrap)
 
 } // end of namespace spin
 
+#endif

@@ -59,7 +59,7 @@ namespace osg {
 #define OSG_NUM_LIGHTS 8
 
 // set the following DEBUG flag to 1 for more verbose print statements:
-#define DEBUG 0
+//#define DEBUG 0
 
 #define NULL_SYMBOL gensym("NULL")
 #define WORLD_SYMBOL gensym("world")
@@ -123,6 +123,7 @@ template <typename T> bool fromString(T &aValue, const std::string &aStr)
 */
 
 std::string stringify(float x);
+std::string stringify(int x);
 
 std::string leadingSpaces(int n);
 
@@ -141,6 +142,7 @@ std::string getRelativePath(const std::string &path);
 std::string getAbsolutePath(const std::string &path);
 
 bool isVideoPath(const std::string &path);
+bool isImagePath(const std::string &path);
 
 std::string getSpinPath(const std::string &path);
 

@@ -101,6 +101,9 @@ namespace spin
 //SceneManager::SceneManager(const std::string &id)
 SceneManager::SceneManager(std::string id)
 {
+    std::cout << "creating sceneManager with id: " << id << std::endl;
+    std::cout << std::flush;
+    
 	resourcesPath = "../Resources";
 
 	this->sceneID = id;
@@ -112,7 +115,11 @@ SceneManager::SceneManager(std::string id)
     stateMap.clear();
 
     // Set resourcesPath:
+#ifdef OSX_COCOA
+    resourcesPath = "../Resources";
+#else
     std::string currentDir = getenv("PWD");
+    //std::string currentDir = get_current_dir_name(); // requires #include <unistd.h>
     if ((currentDir.length() > 8) && (currentDir.substr(currentDir.length() - 9)) == std::string("/src/spin"))
     {
         resourcesPath = "../Resources";
@@ -122,7 +129,7 @@ SceneManager::SceneManager(std::string id)
         // FIXME: this path should be replaced by PACKAGE_DATA/PACKAGE_NAME, not hard-coded
         resourcesPath = "/usr/local/share/spinFramework";
     }
-    //resourcesPath = "../Resources";
+#endif
 
     // get user defined env variable OSG_FILE_PATH
     osgDB::Registry::instance()->initDataFilePathList();

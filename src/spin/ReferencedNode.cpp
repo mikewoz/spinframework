@@ -547,6 +547,8 @@ std::string ReferencedNode::getID() const
 bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
                                     double freq, const std::string& params )
 {
+#ifndef DISABLE_PYTHON
+    
    // do we already have a script with the same label?
     CronScriptList::iterator it;
     it = _cronScriptList.find(std::string(label));
@@ -632,10 +634,16 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
         return false;
     }
     return true;
+    
+#else
+    std::cout << "Python interpreter is disabled. Could not addCronScript to " << nodeType << ": " << id->s_name << std::endl;
+    return false;
+#endif
 }
 
 bool ReferencedNode::callCronScripts()
 {
+#ifndef DISABLE_PYTHON
     if (_cronScriptList.empty())
         return false;
     spinApp &spin = spinApp::Instance();
@@ -679,6 +687,9 @@ bool ReferencedNode::callCronScripts()
         return false;
     }
     return true;
+#else
+    return false;
+#endif
 }
 
 bool ReferencedNode::enableCronScript( const char* label, int enable )
@@ -719,6 +730,8 @@ bool ReferencedNode::removeCronScript( const char* label )
 bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, const std::string& eventName,
                                      const std::string& scriptPath, const std::string& params )
 {
+#ifndef DISABLE_PYTHON
+
     // do we already have a script with the same label?
     EventScriptList::iterator it;
     it = _eventScriptList.find( std::string(label) );
@@ -799,11 +812,17 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     }
 
     return true;
+    
+#else
+    std::cout << "Python interpreter is disabled. Could not addEventScript to " << nodeType << ": " << id->s_name << std::endl;
+    return false;
+#endif
 }
 
 bool ReferencedNode::callEventScript( const std::string& eventName,
                                       cppintrospection::ValueList& args )
 {
+#ifndef DISABLE_PYTHON
     if (_eventScriptList.empty())
         return false;
     spinApp &spin = spinApp::Instance();
@@ -888,6 +907,10 @@ bool ReferencedNode::callEventScript( const std::string& eventName,
         }
     }
     return eventScriptCalled;
+    
+#else
+    return false;
+#endif
 }
 
 bool ReferencedNode::enableEventScript(const char* label, int enable)

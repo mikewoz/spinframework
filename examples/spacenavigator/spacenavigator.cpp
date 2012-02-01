@@ -22,7 +22,7 @@ pthread_mutex_t spacenavMutex;
 
 // scalars when using setVelocity and setSpin:
 #define VELOCITY_SCALAR 0.005
-#define SPIN_SCALAR 0.01
+#define SPIN_SCALAR 0.05
 
 
 lo_address txAddr;
@@ -140,7 +140,7 @@ void spacenavCallback(io_connect_t connection, natural_t messageType, void *mess
                     	//lo_send(txAddr, "/SPIN/default/posture??",
                     	lo_send(txAddr, std::string("/SPIN/default/"+userID).c_str(),
                     			"sfff", "setVelocity",
-                    			dX*speedScaleValue, dY*speedScaleValue, dZ*speedScaleValue,
+                    			2*dX*speedScaleValue, 2*dY*speedScaleValue, dZ*speedScaleValue,
                     			/*
                     			(float)  VELOCITY_SCALAR*state->axis[0],
                     			(float)  VELOCITY_SCALAR*state->axis[2],

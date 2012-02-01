@@ -47,6 +47,7 @@
 #include <osgDB/ReadFile>
 #include <osg/Timer>
 
+
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinServerContext.h"
@@ -61,6 +62,8 @@ int main(int argc, char **argv)
 	using namespace spin;
 	spinServerContext server;
 
+    
+    
 	// *************************************************************************
 	// ARGUMENTS::
 

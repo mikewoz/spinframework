@@ -54,19 +54,29 @@
 #include <osg/Group>
 #include <osg/Node>
 #include <osg/observer_ptr>
+#ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
+#endif
 #include <cppintrospection/Value>
+
+#ifdef DISABLE_PYTHON
+namespace boost { namespace python { class object {void run(){}}; }}
+#endif
 
 namespace spin
 {
 
 class SceneManager;
 
+
+    
 /**
  * Python script that is ran periodically.
  */
 typedef struct {
+    #ifndef DISABLE_PYTHON_
     boost::python::object run;
+    #endif
     double freq;
     double lastRun;
     bool enabled;
@@ -81,7 +91,9 @@ typedef struct {
  * Python script that is ran when some event happens.
  */
 typedef struct {
+    #ifndef DISABLE_PYTHON_
     boost::python::object run;
+    #endif
     std::string eventName;
     bool enabled;
     bool serverSide;
@@ -288,7 +300,9 @@ public:
  protected:
 
     std::string _scriptFile;
+    #ifndef DISABLE_PYTHON
     boost::python::object _scriptRun;
+#endif
     EventScriptList _eventScriptList;
     CronScriptList _cronScriptList;
 

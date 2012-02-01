@@ -93,7 +93,7 @@ static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& or
 
     osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
 
-    //projector = osg::Vec3d(0.0, 0.0, -2.5);
+    // projector = osg::Vec3d(0.0, 0.0, -2.5);
 
     //std::cout <<"create3DSphericalDisplayDistortionMesh : Projector position = "<<projector<<std::endl;
     std::cout <<"create3DSphericalDisplayDistortionMesh : distance = "<<distance<<std::endl;
@@ -936,8 +936,14 @@ int run(int argc, char **argv)
 
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
-	osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
-
+    osg::setNotifyLevel(osg::DEBUG_FP);
+    //std::cout << "DYLD_LIBRARY_PATH= " << getenv("DYLD_LIBRARY_PATH") << std::endl;
+    //std::cout << "OSG_LIBRARY_PATH=  " << getenv("OSG_LIBRARY_PATH") << std::endl;
+	//setenv("OSG_PLUGIN_EXTENSION", ".so", 1);
+    osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
+    
+    osg::setNotifyLevel(osg::FATAL);
+    
 	// *************************************************************************
 	// construct the viewer:
 	// (note, this constructor gets rid of some additional args)
@@ -1190,7 +1196,6 @@ int run(int argc, char **argv)
 	// program loop:
 	while(not viewer.done())
 	{
-		//std::cout << "frame: " << view->getFrameStamp()->getSimulationTime() << std::endl;
 		
 		if (spinListener.isRunning())
 		{

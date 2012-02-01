@@ -44,13 +44,15 @@
 #include <pthread.h>
 #include <signal.h>
 
-
+#include <osg/Version>
 #include <osgDB/Registry>
 #include <cppintrospection/Type>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
+#ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
+#endif
 
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
@@ -77,12 +79,20 @@ namespace spin
 
 spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
 {
-
+/*
 #ifdef __Darwin
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
     setenv("DYLD_LIBRARY_PATH", "@executable_path/../libs", 1);
 #endif
-
+*/
+  
+    
+    osgDB::FilePathList osgLibPaths;
+    osgLibPaths.push_back("/usr/local/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/opt/local/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgDB::Registry::instance()->setLibraryFilePathList(osgLibPaths);
+ 
+    
     // Load the SPIN library:
     /*
     osgDB::Registry *reg = osgDB::Registry::instance();
@@ -242,8 +252,9 @@ void spinApp::destroyScene()
 
 bool spinApp::initPython()
 {
-
     _pyInitialized = false;
+
+#ifndef DISABLE_PYTHON
 
     try {
         Py_Initialize();
@@ -277,11 +288,16 @@ bool spinApp::initPython()
     }
 
     _pyInitialized = true;
-    return true;
 
+#endif
+    
+    return _pyInitialized;
+    
 }
-bool spinApp::execPython( const std::string& cmd ) {
-
+bool spinApp::execPython( const std::string& cmd )
+{
+#ifndef DISABLE_PYTHON
+    
     if (!_pyInitialized) return false;
 
     try {
@@ -302,10 +318,15 @@ bool spinApp::execPython( const std::string& cmd ) {
     }
 
     return true;
+    
+#else
+    return false;
+#endif
 }
 
 std::string spinApp::getCurrentPyException()
 {
+#ifndef DISABLE_PYTHON
   using namespace boost::python;
   namespace py = boost::python;
   printf("currentException...\n");
@@ -325,6 +346,9 @@ std::string spinApp::getCurrentPyException()
     object formatted(str("\n").join(formatted_list));
     return extract<std::string>(formatted);
   }
+#else
+    return "Python interpreter disabled";
+#endif
 }
 
 

@@ -100,9 +100,9 @@ void spinServerContext::debugPrint()
     std::cout << std::endl;
 
     if (autoCleanup_)
-        std::cout << "  Auto-clean inactive users:\tENABLED" << std::endl;
+        std::cout << "  Auto-clean users:\t\tENABLED" << std::endl;
     else
-        std::cout << "  Auto-clean inactive users:\tDISABLED" << std::endl;
+        std::cout << "  Auto-clean users:\t\tDISABLED" << std::endl;
 
     if (tcpClientAddrs_.size())
     {
@@ -251,12 +251,14 @@ void *spinServerContext::spinServerThread(void *arg)
     context->createServers();
     spin.createScene();
 
+#ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
     std::string cmd = "sys.path.append('" + spin.sceneManager->resourcesPath + "/scripts')";
 
     spin.execPython(cmd);
     spin.execPython("import spin");
+#endif
 
     // create log filename based on datetime:
     time_t t = time(NULL);

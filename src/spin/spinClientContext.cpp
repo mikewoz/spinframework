@@ -240,23 +240,27 @@ void *spinClientContext::spinClientThread(void *arg)
     context->createServers();
     spin.createScene();
 
+#ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
     std::string cmd = "sys.path.append('" + spin.sceneManager->resourcesPath + "/scripts')";
-
+    
     spin.execPython(cmd);
     spin.execPython("import spin");
-
+#endif
+    
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
 
-
+    
     context->running = true;
 
     // registerUser needs the context to be running (since it sends messages)
     spin.registerUser();
 
+
     context->debugPrint();
+    
 
     // TIMEOUT in liblo was 10; We set it to zero, and sleep only if there are
     // no received messages. ie, if there are messages, we eat them as fast as

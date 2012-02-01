@@ -238,6 +238,25 @@ void ModelNode::setRenderBin (int i)
 	BROADCAST(this, "si", "setRenderBin", _renderBin);
 }
 
+void ModelNode::setPlaying (int index, int playstate)
+{
+    _playState[index] = playstate;
+    
+    if (sequencer[index].valid())
+    {
+        osg::Sequence::SequenceMode mode = sequencer[index]->getMode();
+        std:cout << "about to set mode to "<<_playState[index] << ", old="<<mode<<std::endl;
+        
+        sequencer[index]->setMode((osg::Sequence::SequenceMode)_playState[index]);
+        
+    
+        std::cout << "osgSequence mode: " << sequencer[index]->getMode() << ", duration: " << sequencer[index]->getNumFrames()<< ", speed: " << sequencer[index]->getSpeed() << ", lastFrameTime: " << sequencer[index]->getLastFrameTime() <<std::endl;
+    }
+    else std::cout << "Warning: Model '" << this->getID() << "' has no Sequence for index " << index << std::endl;
+    
+    BROADCAST(this, "sii", "setPlaying", index, _playState[index]);
+}
+    
 void ModelNode::setKeyframe (int index, float keyframe)
 {
 	_keyframe[index] = keyframe;
@@ -406,7 +425,7 @@ void ModelNode::drawModel()
 				switcher[i] = searchVisitor.getSwitchNode();
 				if (switcher[i].valid())
 				{
-					std::cout << "found OSG_Switch0" << i << " with " << switcher[i]->getNumChildren() << " frames" << std::endl;
+					std::cout << "found OSG_Switch" << buf << " with " << switcher[i]->getNumChildren() << " frames" << std::endl;
 					animationMode[i] = SWITCH;
 					// initialize so only first frame is visible:
 					switcher[i]->setValue(0, true);
@@ -419,10 +438,12 @@ void ModelNode::drawModel()
 				sequencer[i] = searchVisitor.getSequenceNode();
 				if (sequencer[i].valid())
 				{
-					std::cout << "found OSG_Sequence0" << i << " with " << sequencer[i]->getNumChildren() << " frames" << std::endl;
+					std::cout << "found OSG_Sequence" << buf << " with " << sequencer[i]->getNumChildren() << " frames" << std::endl;
+                    sequencer[i]->setDataVariance(osg::Object::DYNAMIC);
 					animationMode[i] = SEQUENCE;
 					sequencer[i]->setValue(0);
-					sequencer[i]->setMode(osg::Sequence::PAUSE);
+                    //sequencer[i]->setMode(osg::Sequence::PAUSE);
+                    //sequencer[i]->setMode(osg::Sequence::START);
 				}
 
 			}
@@ -681,6 +702,10 @@ std::vector<lo_message> ModelNode::getState () const
 	{
 		if (switcher[i].valid() || sequencer[i].valid())
 		{
+            msg = lo_message_new();
+			lo_message_add(msg, "sii", "setPlaying", i, _playState[i]);
+			ret.push_back(msg);
+
 			msg = lo_message_new();
 			lo_message_add(msg, "sif", "setKeyframe", i, _keyframe[i]);
 			ret.push_back(msg);
