@@ -81,6 +81,13 @@ Installation notes on Ubuntu Lucid GNU/Linux
 * download and compile cppintrospection version 3.0
 * download and compile spinframework
 
+Add the following in your ~/.bashrc file, so that you can run OSG applications, including SPIN.::
+
+  PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH
+  export PKG_CONFIG_PATH # ugliest hack
+  LD_LIBRARY_PATH="/usr/local/lib:/usr/local/lib64"
+  export LD_LIBRARY_PATH
+
 
 Linking to SPIN
 ---------------
