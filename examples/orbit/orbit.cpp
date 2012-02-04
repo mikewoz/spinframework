@@ -13,7 +13,9 @@
 
 int main(int argc, char **argv)
 {
-	spinClientContext spinListener;
+    using namespace spin;
+    
+    spinClientContext spinListener;
 	spinApp &spin = spinApp::Instance();
 
 	if (!spinListener.start())

@@ -13,21 +13,23 @@ AM_CPPFLAGS = \
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
-#lib_LTLIBRARIES = libSPIN.la libSPINPyWrap.la
-lib_LTLIBRARIES = libSPIN.la
+lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
 python_LTLIBRARIES = libSPINPyWrap.la
 
-libSPIN_la_LIBADD = \
+libspin_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
     $(top_builddir)/src/tinyxml/libtinyxml.la
 
-libSPIN_la_LDFLAGS = \
+libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
+    -export-dynamic \
+    -version-info $(SPIN_LT_VERSION) \
     $(BOOST_FILESYSTEM_LIB) \
     $(BOOST_LDFLAGS) \
     $(CPPINTROSPECTION_LIBS) \
     $(PYTHON_LDFLAGS) \
     -l$(BOOST_PYTHON_LIB) \
     $(BOOST_THREAD_LIB) \
+    $(BOOST_PROGRAM_OPTIONS_LIB) \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
@@ -35,7 +37,7 @@ libSPIN_la_LDFLAGS = \
     $(SPATOSC_LIBS)
 
 # please keep those in alphabetical order:
-libSPIN_la_SOURCES = \
+libspin_@SPIN_API_VERSION@_la_SOURCES = \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
     DSPNode.cpp \
@@ -78,14 +80,16 @@ libSPIN_la_SOURCES = \
     spinUtil.cpp \
     introspect_helpers.cpp
 
-libSPIN_la_includedir = $(includedir)/spinFramework
-libSPIN_la_include_HEADERS = \
+libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
+libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
     $(top_srcdir)/include/config.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
     $(top_srcdir)/include/DSPNode.h \
+    $(top_srcdir)/include/EventHandler.h \
+    $(top_srcdir)/include/EventTypes.h \
     $(top_srcdir)/include/Fog.h \
     $(top_srcdir)/include/GridNode.h \
     $(top_srcdir)/include/GroupNode.h \
@@ -125,7 +129,6 @@ libSPIN_la_include_HEADERS = \
     $(top_srcdir)/include/SwitchNode.h \
     $(top_srcdir)/include/TextNode.h \
     $(top_srcdir)/include/UserNode.h \
-    $(top_srcdir)/include/util.h \
     $(top_srcdir)/include/VideoTexture.h \
     $(top_srcdir)/include/ViewerManipulator.h \
     $(top_srcdir)/src/tinyxml/tinystr.h \
@@ -135,7 +138,7 @@ libSPIN_la_include_HEADERS = \
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 #libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libSPIN.la \
+libSPINPyWrap_la_LIBADD = libspin_@SPIN_API_VERSION@.la \
 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
@@ -154,13 +157,16 @@ install-exec-hook:
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
+spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
+spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS)
+spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+
 
 ###############################################################################
 # CUSTOM targets:
@@ -170,7 +176,7 @@ spindocgenerator_LDADD = libSPIN.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSP
 
 #OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer cppintrospection
 
-# WARNING: the .app generation script pulls some libs (eg, libSPIN) from /usr/local
+# WARNING: the .app generation script pulls some libs (eg, libspin_@SPIN_API_VERSION@) from /usr/local
 # so you must do a 'make install' before this will work (TODO: fix this)
 
 spinviewer.app: spinviewer$(EXEEXT)

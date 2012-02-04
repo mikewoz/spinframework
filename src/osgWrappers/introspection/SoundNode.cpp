@@ -58,11 +58,19 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          __void__setOrientationQuat__float__float__float__float,
 	          "",
 	          "Set the orientation offset as a quaternion ");
+	I_Method1(void, setRadius, IN, float, f,
+	          Properties::VIRTUAL,
+	          __void__setRadius__float,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(float, Radius, 
+	                 0, 
+	                 __void__setRadius__float);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
