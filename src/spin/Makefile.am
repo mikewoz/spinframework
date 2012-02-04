@@ -43,6 +43,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     DSPNode.cpp \
     EventHandler.cpp \
     Fog.cpp \
+    GeometryNode.cpp \
     GridNode.cpp \
     ReferencedNode.cpp \
     SceneManager.cpp \
@@ -91,6 +92,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/EventHandler.h \
     $(top_srcdir)/include/EventTypes.h \
     $(top_srcdir)/include/Fog.h \
+    $(top_srcdir)/include/GeometryNode.h \
     $(top_srcdir)/include/GridNode.h \
     $(top_srcdir)/include/GroupNode.h \
     $(top_srcdir)/include/ImageTexture.h \
