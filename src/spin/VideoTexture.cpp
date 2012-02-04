@@ -68,7 +68,7 @@ VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedSta
 	
 	_index = 0.0;
 	_loop = true;
-	_play = false;
+	_play = true;
 	_framerate = 24;
 
 	/*
@@ -159,9 +159,9 @@ void VideoTexture::setPath (const char* newPath)
 		vidTexture->setResizeNonPowerOfTwoHint(false);
 		vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
 		//vidTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-		//vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
-		vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-		vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+		vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
+		vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+		vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
 
 	
 		// Check if _path is a directory. If so, load all contained image
