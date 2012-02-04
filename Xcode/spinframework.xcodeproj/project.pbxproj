@@ -27,6 +27,10 @@
 
 /* Begin PBXBuildFile section */
 		1C072ACB14D9F6A5003D669E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C072AC914D9F6A5003D669E /* MainMenu.xib */; };
+		1C34AE4514DB32A8001DF418 /* GeometryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C34AE4414DB32A8001DF418 /* GeometryNode.h */; };
+		1C34AE4714DB32BE001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */; };
+		1C34AE4914DB4A3B001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */; };
+		1C34AE4B14DC4EC8001DF418 /* libjasper.1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C34AE4A14DC4EC8001DF418 /* libjasper.1.0.0.dylib */; };
 		1C386CB014BD3DF60065851F /* AnimationNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8614BD3DF60065851F /* AnimationNode.cpp */; };
 		1C386CB114BD3DF60065851F /* AttractorNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8714BD3DF60065851F /* AttractorNode.cpp */; };
 		1C386CB214BD3DF60065851F /* ConstraintsNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8814BD3DF60065851F /* ConstraintsNode.cpp */; };
@@ -646,6 +650,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				1C34AE4B14DC4EC8001DF418 /* libjasper.1.0.0.dylib in CopyFiles */,
 				1C70F2CE14C3A5B90054B0A1 /* osgdb_3dc.so in CopyFiles */,
 				1C70F2CF14C3A5B90054B0A1 /* osgdb_3ds.so in CopyFiles */,
 				1C70F2D014C3A5B90054B0A1 /* osgdb_ac.so in CopyFiles */,
@@ -894,6 +899,10 @@
 /* Begin PBXFileReference section */
 		1C072ACA14D9F6A5003D669E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1C14F41A14C3A3D4008889AE /* OpenThreads.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenThreads.framework; path = usr/local/lib/OpenThreads.framework; sourceTree = SDKROOT; };
+		1C34AE4414DB32A8001DF418 /* GeometryNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeometryNode.h; path = ../include/GeometryNode.h; sourceTree = "<group>"; };
+		1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/spin/GeometryNode.cpp; sourceTree = "<group>"; };
+		1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/osgWrappers/introspection/GeometryNode.cpp; sourceTree = "<group>"; };
+		1C34AE4A14DC4EC8001DF418 /* libjasper.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libjasper.1.0.0.dylib; path = /opt/local/lib/libjasper.1.0.0.dylib; sourceTree = "<absolute>"; };
 		1C386C7D14BD3CBD0065851F /* libSPIN.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSPIN.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C386C8614BD3DF60065851F /* AnimationNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnimationNode.cpp; path = ../src/spin/AnimationNode.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C8714BD3DF60065851F /* AttractorNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AttractorNode.cpp; path = ../src/spin/AttractorNode.cpp; sourceTree = SOURCE_ROOT; };
@@ -1432,6 +1441,7 @@
 				1C386C8A14BD3DF60065851F /* DSPNode.cpp */,
 				1C386C8B14BD3DF60065851F /* EventHandler.cpp */,
 				1C386C8C14BD3DF60065851F /* Fog.cpp */,
+				1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */,
 				1C386C8D14BD3DF60065851F /* GridNode.cpp */,
 				1C386C8E14BD3DF60065851F /* GroupNode.cpp */,
 				1C386C8F14BD3DF60065851F /* ImageTexture.cpp */,
@@ -1484,6 +1494,7 @@
 				1CA24D7814BE2891007A9C31 /* EventHandler.h */,
 				1CA24D7914BE2891007A9C31 /* EventTypes.h */,
 				1CA24D7A14BE2892007A9C31 /* Fog.h */,
+				1C34AE4414DB32A8001DF418 /* GeometryNode.h */,
 				1CA24D7B14BE2892007A9C31 /* GridNode.h */,
 				1CA24D7C14BE2892007A9C31 /* GroupNode.h */,
 				1CA24D7D14BE2892007A9C31 /* ImageTexture.h */,
@@ -1541,6 +1552,7 @@
 				1CA24D3D14BE2875007A9C31 /* Contour.cpp */,
 				1CA24D3E14BE2875007A9C31 /* DSPNode.cpp */,
 				1CA24D3F14BE2875007A9C31 /* Fog.cpp */,
+				1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */,
 				1CA24D4014BE2875007A9C31 /* GridNode.cpp */,
 				1CA24D4114BE2875007A9C31 /* GroupNode.cpp */,
 				1CA24D4214BE2875007A9C31 /* ImageTexture.cpp */,
@@ -1699,6 +1711,7 @@
 				1CA24C5114BE57300023DD8B /* osg */,
 				1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */,
 				1CA24C2714BE514E0023DD8B /* liblo.7.dylib */,
+				1C34AE4A14DC4EC8001DF418 /* libjasper.1.0.0.dylib */,
 				1C9C082414CFE988006ABC85 /* libfreenect.0.0.1.dylib */,
 				1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */,
 				1C94DE9D14BF929F006394AD /* Python */,
@@ -1916,6 +1929,7 @@
 				1CA24DE114BE28BD007A9C31 /* tinystr.h in Headers */,
 				1CA24DE214BE28BD007A9C31 /* tinyxml.h in Headers */,
 				1C90C16B14CCBDE200C929AE /* KinectCloud.h in Headers */,
+				1C34AE4514DB32A8001DF418 /* GeometryNode.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2163,7 +2177,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"libOpenThreads.*|libosg.*dylib\"\n  for x in `otool -L ${i}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${i}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone";
 		};
 		1C87601C14CA023600A46EBC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2202,7 +2216,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\necho \"----------------------------------------\"\necho \"-- FIXING RPATH IN $LIB:\"\nfor i in `otool -L ${LIBPATH}/${LIB}`\ndo\nif [[ $i =~ $REGEX ]]\nthen\nfile=`basename ${i}`\ncmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\necho \"$cmd\"\n`${cmd}`\nfi\ndone\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ninstall_name_tool -change libusb-1.0.0.dylib $REL_PATH/libusb-1.0.0 $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"libOpenThreads.*|libosg.*dylib\"\n  for x in `otool -L ${i}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${i}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\n  install_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n  install_name_tool -change libusb-1.0.0.dylib $REL_PATH/libusb-1.0.0 $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`                          \nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone\n\n# special libs from Macports needed by plugins (jasper, ffmpeg, etc):\ninstall_name_tool -change /opt/local/lib/libjasper.1.dylib @rpath/libjasper.1.0.0.dylib ${PLUGINPATH}/osgdb_jp2.so\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2288,6 +2302,8 @@
 				1CA24DE714BE28BD007A9C31 /* xmltest.cpp in Sources */,
 				1C90C16914CCBDB500C929AE /* KinectCloud.cpp in Sources */,
 				1C90C18B14CD441800C929AE /* KinectCloud.cpp in Sources */,
+				1C34AE4714DB32BE001DF418 /* GeometryNode.cpp in Sources */,
+				1C34AE4914DB4A3B001DF418 /* GeometryNode.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -425,7 +425,8 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
 
     
     
-    // TEST:
+    // TEST (for plugins):
+    /*
     osg::setNotifyLevel(osg::DEBUG_FP);
     osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFile("/Users/mikewoz/src/3D_MODELS/cow/cow.osg");
     if (argScene.valid()) {
@@ -433,6 +434,7 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
         spin::spinApp::Instance().sceneManager->worldNode->addChild(argScene.get());
     }
     osg::setNotifyLevel(osg::FATAL);
+    */
     // END TEST
     
     theViewer->setSceneData(spin::spinApp::Instance().sceneManager->rootNode.get());
@@ -664,6 +666,7 @@ A -respondsToSelector: check has been used to provide compatibility with previou
 
 - (void) mouseDown:(NSEvent*)the_event
 {
+    /*
     // Because many Mac users have only a 1-button mouse, we should provide ways
     // to access the button 2 and 3 actions of osgViewer.
     // I will use the Ctrl modifer to represent right-clicking
@@ -686,6 +689,19 @@ A -respondsToSelector: check has been used to provide compatibility with previou
     {
         [self doLeftMouseButtonDown:the_event];
     }
+*/ 
+
+    
+    if ([the_event modifierFlags] & NSAlternateKeyMask)
+    {
+        [self startDragAndDropAsSource:the_event];
+    }
+    else
+    {
+        [self doLeftMouseButtonDown:the_event];
+    }
+    
+
 }
 
 - (void) mouseDragged:(NSEvent*)the_event
@@ -701,6 +717,7 @@ A -respondsToSelector: check has been used to provide compatibility with previou
 
 - (void) mouseUp:(NSEvent*)the_event
 {
+    /*
     // Because many Mac users have only a 1-button mouse, we should provide ways
     // to access the button 2 and 3 actions of osgViewer.
     // I will use the Ctrl modifer to represent right-clicking
@@ -716,6 +733,7 @@ A -respondsToSelector: check has been used to provide compatibility with previou
         [self doMiddleMouseButtonUp:the_event];
     }
     else
+     */
     {
         [self doLeftMouseButtonUp:the_event];
     }
@@ -972,16 +990,79 @@ A -respondsToSelector: check has been used to provide compatibility with previou
     return YES;
 }
 
+
+static bool keyState_Ctrl  = false;
+static bool keyState_Shift = false;
+static bool keyState_Alt   = false;
+static bool keyState_Super = false;
+
+- (void)flagsChanged:(NSEvent *)theEvent
+{
+    // CTRL KEY
+    if (([theEvent modifierFlags] & NSControlKeyMask) && !keyState_Ctrl)
+    {
+        keyState_Ctrl = true;
+        theViewer->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Control_L);
+    }
+    else if (!([theEvent modifierFlags] & NSControlKeyMask) && keyState_Ctrl)
+    {
+        keyState_Ctrl = false;
+        theViewer->getEventQueue()->keyRelease(osgGA::GUIEventAdapter::KEY_Control_L);
+    }
+    
+    // SHIFT KEY:
+    if (([theEvent modifierFlags] & NSShiftKeyMask) && !keyState_Shift)
+    {
+        keyState_Shift = true;
+        theViewer->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Shift_L);
+    }
+    else if (!([theEvent modifierFlags] & NSShiftKeyMask) && keyState_Shift)
+    {
+        keyState_Shift = false;
+        theViewer->getEventQueue()->keyRelease(osgGA::GUIEventAdapter::KEY_Shift_L);
+    }
+
+    // ALT KEY:
+    if (([theEvent modifierFlags] & NSAlternateKeyMask) && !keyState_Alt)
+    {
+        keyState_Alt = true;
+        theViewer->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Alt_L);
+    }
+    else if (!([theEvent modifierFlags] & NSAlternateKeyMask) && keyState_Alt)
+    {
+        keyState_Alt = false;
+        theViewer->getEventQueue()->keyRelease(osgGA::GUIEventAdapter::KEY_Alt_L);
+    }
+
+    // COMMAND KEY
+    if (([theEvent modifierFlags] & NSCommandKeyMask) && !keyState_Super)
+    {
+        keyState_Super = true;
+        theViewer->getEventQueue()->keyPress(osgGA::GUIEventAdapter::KEY_Super_L);
+    }
+    else if (!([theEvent modifierFlags] & NSCommandKeyMask) && keyState_Super)
+    {
+        keyState_Super = false;
+        theViewer->getEventQueue()->keyRelease(osgGA::GUIEventAdapter::KEY_Super_L);
+    }
+   
+    //[self setNeedsDisplay:YES];
+}
+
+
+
 - (void) keyDown:(NSEvent*)the_event
 {
+    
     // Do you want characters or charactersIgnoringModifiers?
     NSString* event_characters = [the_event characters];
 //    NSString* event_characters = [the_event charactersIgnoringModifiers];
 
     unichar unicode_character = [event_characters characterAtIndex:0];
-//    NSLog(@"unicode_character: %d", unicode_character);
+    //NSLog(@"unicode_character: %d", unicode_character);
+    
     theViewer->getEventQueue()->keyPress(static_cast<osgGA::GUIEventAdapter::KeySymbol>(unicode_character));
-
+    
     [self setNeedsDisplay:YES];
 }
 
@@ -991,7 +1072,10 @@ A -respondsToSelector: check has been used to provide compatibility with previou
     NSString* event_characters = [the_event characters];
 //    NSString* event_characters = [the_event charactersIgnoringModifiers];
     unichar unicode_character = [event_characters characterAtIndex:0];
+    
     theViewer->getEventQueue()->keyRelease(static_cast<osgGA::GUIEventAdapter::KeySymbol>(unicode_character));
+
+    
     [self setNeedsDisplay:YES];
 }
 

@@ -235,7 +235,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 
 #if 0
-	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
+	if (1) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
 	{
 		switch(ea.getEventType())
 		{
@@ -261,7 +261,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 			std::cout << " " << selectedNodes[j]->s_name;
 		}
 		std::cout << std::endl;
-	}
+    }
 #endif
 
 

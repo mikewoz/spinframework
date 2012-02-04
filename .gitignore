@@ -36,7 +36,7 @@ tests/.deps/*
 .libs
 .DS_Store
 Xcode/spinframework.xcodeproj/xcuserdata
-Xcode/spinframework.xcodeproj/xcuserdata/*
+Xcode/spinframework.xcodeproj/project.xcworkspace/xcuserdata
 # ---------- specific files: -------
 include/config.h
 include/config.h.in
