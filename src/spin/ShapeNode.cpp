@@ -71,13 +71,14 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);	
 
-	shape = NONE; //"NULL";
+	shape = BOX;
 	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
 	stateset = gensym("NULL");
 	renderBin = 11;
 	lightingEnabled = true;
 
+    drawShape();
 }
 
 // ===================================================================
