@@ -13,8 +13,8 @@ AM_CPPFLAGS = \
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
-lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
-python_LTLIBRARIES = libSPINPyWrap.la
+# lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
+# python_LTLIBRARIES = libSPINPyWrap.la
 
 libspin_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
@@ -138,23 +138,22 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
 
 # $(top_srcdir)/include/videoSize.h
 
-libSPINPyWrap_la_SOURCES = python_wrappers.cpp
-#libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libspin_@SPIN_API_VERSION@.la \
-	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
-
-libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+# libSPINPyWrap_la_SOURCES = python_wrappers.cpp
+# #libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
+# libSPINPyWrap_la_LIBADD = libspin_@SPIN_API_VERSION@.la \
+# 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
+# 
+# libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
 
 # On OSX, we need the python module to have a .so extension, but the -shrext option
 # doesn't work with glibtool, so we make a symbolic link in an install hook instead.
 # On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
 # do this only for OSX?
-install-exec-hook:
-	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+# install-exec-hook:
+# 	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
 
 #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
-
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
@@ -232,3 +231,4 @@ spinviewer.app: spinviewer$(EXEEXT)
 doc:
 	./spindocgenerator
 	-cp *.html ../../doxygen/html
+

@@ -158,20 +158,20 @@ AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
 # Check for Python:
-AM_PATH_PYTHON
+dnl AM_PATH_PYTHON
 
-PYTHON_CPPFLAGS="`python-config --cflags`"
-PYTHON_CPPFLAGS=${PYTHON_CPPFLAGS//"-Wstrict-prototypes"/}
-PYTHON_LDFLAGS="`python-config --ldflags`"
-AC_SUBST(PYTHON_CPPFLAGS)
-AC_SUBST(PYTHON_LDFLAGS)
+dnl PYTHON_CPPFLAGS="`python-config --cflags`"
+dnl PYTHON_CPPFLAGS=${PYTHON_CPPFLAGS//"-Wstrict-prototypes"/}
+dnl PYTHON_LDFLAGS="`python-config --ldflags`"
+dnl AC_SUBST(PYTHON_CPPFLAGS)
+dnl AC_SUBST(PYTHON_LDFLAGS)
 
-# manually set pythondir (where site-packages is located)
-# and pyexecdir for OSX
-case "$host" in *-darwin* | *-macos10*)
-  pythondir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
-  pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
-esac
+dnl # manually set pythondir (where site-packages is located)
+dnl # and pyexecdir for OSX
+dnl case "$host" in *-darwin* | *-macos10*)
+dnl   pythondir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+dnl   pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+dnl esac
 
 # Check for boost:
 AX_BOOST_BASE([1.35])
@@ -198,10 +198,13 @@ fi
 
 #AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), -l$PYTHON_LIB)
 
-AX_BOOST_PYTHON
-if test -z "$BOOST_PYTHON_LIB" ; then
-    AC_MSG_ERROR([missing package. libboost-python-dev.])
-fi
+AC_DEFINE([DISABLE_PYTHON],[1],[Python packaging is pretty bad])
+AC_MSG_NOTICE([Python support is disabled])
+
+dnl AX_BOOST_PYTHON
+dnl if test -z "$BOOST_PYTHON_LIB" ; then
+dnl     AC_MSG_ERROR([missing package. libboost-python-dev.])
+dnl fi
 
 PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
 
@@ -251,20 +254,20 @@ if test "x$with_editor" = xyes; then
     fi
 fi
 
-AC_MSG_NOTICE([============================================])
-#AS_IF([test "x$with_scenic" = "xyes"], AC_MSG_NOTICE([Using scenic]), AC_MSG_NOTICE([Not using scenic]))
-AC_MSG_NOTICE([PYTHON_LIB:          ${PYTHON_LIB}])
-AC_MSG_NOTICE([PYTHON_INCLUDE_DIR:  ${PYTHON_INCLUDE_DIR}])
-AC_MSG_NOTICE([PYTHON_CPPFLAGS:     ${PYTHON_CPPFLAGS}])
-AC_MSG_NOTICE([PYTHON_LDFLAGS:      ${PYTHON_LDFLAGS}])
-AC_MSG_NOTICE([BOOST_LDFLAGS:       ${BOOST_LDFLAGS}])
-AC_MSG_NOTICE([BOOST_CPPFLAGS:      ${BOOST_CPPFLAGS}])
-AC_MSG_NOTICE([BOOST_PYTHON_LIB:    ${BOOST_PYTHON_LIB}])
-AC_MSG_NOTICE([WX_CPPFLAGS:         ${WX_CPPFLAGS}])
-AC_MSG_NOTICE([WX_LIBS:             ${WX_LIBS}])
-AC_MSG_NOTICE([pythondir:           ${pythondir}])
-AC_MSG_NOTICE([pythonexecdir:       ${pyexecdir}])
-AC_MSG_NOTICE([============================================])
+dnl AC_MSG_NOTICE([============================================])
+dnl #AS_IF([test "x$with_scenic" = "xyes"], AC_MSG_NOTICE([Using scenic]), AC_MSG_NOTICE([Not using scenic]))
+dnl AC_MSG_NOTICE([PYTHON_LIB:          ${PYTHON_LIB}])
+dnl AC_MSG_NOTICE([PYTHON_INCLUDE_DIR:  ${PYTHON_INCLUDE_DIR}])
+dnl AC_MSG_NOTICE([PYTHON_CPPFLAGS:     ${PYTHON_CPPFLAGS}])
+dnl AC_MSG_NOTICE([PYTHON_LDFLAGS:      ${PYTHON_LDFLAGS}])
+dnl AC_MSG_NOTICE([BOOST_LDFLAGS:       ${BOOST_LDFLAGS}])
+dnl AC_MSG_NOTICE([BOOST_CPPFLAGS:      ${BOOST_CPPFLAGS}])
+dnl AC_MSG_NOTICE([BOOST_PYTHON_LIB:    ${BOOST_PYTHON_LIB}])
+dnl AC_MSG_NOTICE([WX_CPPFLAGS:         ${WX_CPPFLAGS}])
+dnl AC_MSG_NOTICE([WX_LIBS:             ${WX_LIBS}])
+dnl AC_MSG_NOTICE([pythondir:           ${pythondir}])
+dnl AC_MSG_NOTICE([pythonexecdir:       ${pyexecdir}])
+dnl AC_MSG_NOTICE([============================================])
 
 AC_CONFIG_FILES([
         Makefile 
@@ -286,3 +289,4 @@ AC_CONFIG_FILES([
         ])
 
 AC_OUTPUT
+
