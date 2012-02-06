@@ -13,7 +13,7 @@ AM_CPPFLAGS = \
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
-# lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
+lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
 # python_LTLIBRARIES = libSPINPyWrap.la
 
 libspin_@SPIN_API_VERSION@_la_LIBADD = \
