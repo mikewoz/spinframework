@@ -58,6 +58,7 @@
 #include <osg/Node>
 #include <osg/observer_ptr>
 #ifndef DISABLE_PYTHON
+#error Python MUST be disabled
 #include <boost/python.hpp>
 #endif
 #include <cppintrospection/Value>

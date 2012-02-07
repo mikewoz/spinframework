@@ -43,15 +43,17 @@
 #define __spinApp_H
 
 #ifndef DISABLE_PYTHON
+#error Python MUST be disabled
 //#include "Python.h"
 //#include <Python.h>
-#include <boost/python.hpp>
+//#include <boost/python.hpp>
 
 #endif
 
 #include <osg/Timer>
 #include <lo/lo_types.h>
 #include <osg/ref_ptr>
+#include <stdarg.h> // va_list
 
 #include "config.h"
 #include "spinUtil.h"

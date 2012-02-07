@@ -133,6 +133,7 @@ case "$host" in *-darwin* | *-macos10*)
 esac
 
 # CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
+CXXFLAGS+=" -DDISABLE_PYTHON"
 # LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.
