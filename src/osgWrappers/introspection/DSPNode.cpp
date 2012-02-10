@@ -90,18 +90,23 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
 	I_Method1(void, setRolloff, IN, const char *, newvalue,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setRolloff__C5_char_P1,
 	          "",
 	          "");
 	I_Method1(void, setSpread, IN, float, newvalue,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setSpread__float,
 	          "",
 	          "");
 	I_Method1(void, setLength, IN, float, newvalue,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setLength__float,
+	          "",
+	          "");
+	I_Method1(void, setRadius, IN, float, newvalue,
+	          Properties::VIRTUAL,
+	          __void__setRadius__float,
 	          "",
 	          "");
 	I_Method4(void, setDirectivityColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
@@ -142,6 +147,11 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_Method0(float, getLength,
 	          Properties::NON_VIRTUAL,
 	          __float__getLength,
+	          "",
+	          "");
+	I_Method0(float, getRadius,
+	          Properties::NON_VIRTUAL,
+	          __float__getRadius,
 	          "",
 	          "");
 	I_Method0(osg::Vec4, getDirectivityColor,
@@ -210,6 +220,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_SimpleProperty(const char *, Plugin, 
 	                 __C5_char_P1__getPlugin, 
 	                 __void__setPlugin__C5_char_P1);
+	I_SimpleProperty(float, Radius, 
+	                 __float__getRadius, 
+	                 __void__setRadius__float);
 	I_SimpleProperty(const char *, Rolloff, 
 	                 __C5_char_P1__getRolloff, 
 	                 __void__setRolloff__C5_char_P1);

@@ -1,5 +1,7 @@
 Release-critical for 0.4
 ------------------------
+ * choose between renderBin and depth test for sharevideotexture
+ * delete sharedvideonode
  * write some unit/system tests
  * Write some network tests
  * clean up the copyright header for each file

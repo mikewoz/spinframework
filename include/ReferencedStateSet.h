@@ -45,6 +45,9 @@
 #include "spinUtil.h"
 #include "libloUtil.h"
 
+#ifndef GL_GLEXT_LEGACY
+#define GL_GLEXT_LEGACY // To avoid glext error
+#endif
 #include <osg/StateSet>
 
 namespace spin

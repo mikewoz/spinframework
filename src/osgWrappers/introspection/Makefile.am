@@ -10,6 +10,7 @@ libSPINwrappers_la_SOURCES = \
     Contour.cpp \
     DSPNode.cpp \
     Fog.cpp \
+    GeometryNode.cpp \
     GridNode.cpp \
     GroupNode.cpp \
     ImageTexture.cpp \

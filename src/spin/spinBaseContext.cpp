@@ -240,11 +240,11 @@ int spinBaseContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     // set up SpatOSC:
     std::string translatorID, translatorType, translatorAddr, translatorPort;
     int translatorCount = 0;
-    while (arguments->read("--spatosc", translatorType, translatorAddr, translatorPort))
+    while (arguments->read("--spatosc", translatorType, translatorAddr))
     {
         #ifdef WITH_SPATOSC
         translatorID = "translator"+stringify(translatorCount++);
-        spinApp::Instance().audioScene->addTranslator(translatorID, translatorType, translatorAddr, translatorPort);
+        spinApp::Instance().audioScene->addTranslator(translatorID, translatorType, translatorAddr);
         spinApp::Instance().hasAudioRenderer = true;
         #else
         std::cout << "WARNING: commandline option --spatosc not accepted. This version of SPIN was not built with support for SpatOSC." << std::endl;
@@ -869,6 +869,32 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             pthread_mutex_unlock(&sceneMutex); 
         }
         SCENE_MSG("ss", "optimize", (char*)argv[1]);
+    }
+    else if (theMethod == "spatosc")
+    {
+#ifdef WITH_SPATOSC
+        if (spinApp::Instance().hasAudioRenderer)
+        {
+            if ((argc==4) && (std::string((char*)argv[1])=="setDefaultDistanceFactor"))
+            {
+                double factor = (double) lo_hires_val((lo_type)types[2], argv[2]);
+                bool updateExisting = (bool) lo_hires_val((lo_type)types[3], argv[3]);
+                spin.audioScene->setDefaultDistanceFactor(factor, updateExisting);
+            }
+            if ((argc==4) && (std::string((char*)argv[1])=="setDefaultDopplerFactor"))
+            {
+                double factor = (double) lo_hires_val((lo_type)types[2], argv[2]);
+                bool updateExisting = (bool) lo_hires_val((lo_type)types[3], argv[3]);
+                spin.audioScene->setDefaultDopplerFactor(factor, updateExisting);
+            }
+            if ((argc==4) && (std::string((char*)argv[1])=="setDefaultRolloffFactor"))
+            {
+                double factor = (double) lo_hires_val((lo_type)types[2], argv[2]);
+                bool updateExisting = (bool) lo_hires_val((lo_type)types[3], argv[3]);
+                spin.audioScene->setDefaultRolloffFactor(factor, updateExisting);
+            }
+        }
+#endif
     }
     else
     {

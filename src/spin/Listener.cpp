@@ -67,7 +67,7 @@ Listener::Listener (SceneManager *sceneManager, char *initID) : DSPNode(sceneMan
 	{
         spatOSCListener = spinApp::Instance().audioScene->createListener(std::string(id->s_name));
         std::cout << "Created SpatOSC Listener:" << std::endl;
-        spinApp::Instance().audioScene->debugPrint();
+        //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
 }
@@ -81,7 +81,7 @@ Listener::~Listener()
 	{
 	    spinApp::Instance().audioScene->deleteNode(spatOSCListener);
         std::cout << "Deleted SpatOSC Listener:" << std::endl;
-        spinApp::Instance().audioScene->debugPrint();
+        //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
     

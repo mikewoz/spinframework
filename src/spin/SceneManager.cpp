@@ -552,7 +552,7 @@ void SceneManager::debugSceneGraph()
     std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
     std::cout << "-- SCENE GRAPH:" << std::endl;
     DebugVisitor ev;
-    ev.apply(*(this->rootNode.get()));
+    ev.apply(*(this->worldNode.get()));
 }
 
 void SceneManager::debug()

@@ -5,6 +5,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 # Order of compilation really matters:
 SUBDIRS = \
+    completion \
     src \
     tests
 
@@ -66,4 +67,9 @@ htmldoc:
 # 	rm -rf $(top_builddir)/man
 # 	rm -rf html
 # endif 
+
+# pkg-config file:
+DISTCLEANFILES = spin.pc
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = spin-@SPIN_API_VERSION@.pc
 

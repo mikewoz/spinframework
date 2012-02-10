@@ -75,6 +75,7 @@ class SoundNode : public DSPNode
         virtual void setTranslation (float x, float y, float z);
         virtual void setOrientation (float p, float r, float y);
         virtual void setOrientationQuat (float x, float y, float z, float w);
+        virtual void setRadius (float f);
 
         /**
          * For each subclass of ReferencedNode, we override the getState()

@@ -1,15 +1,14 @@
-NAME=orbit
+NAME=kinectViewer
 
 all: $(NAME)
 
 ###################################################################
 
-DEPS = cppintrospection-3.0
-CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags) `pkg-config --cflags $(DEPS)`
-LDFLAGS +=  -llo -lSPIN $(shell python-config --libs) `pkg-config --libs $(DEPS)`
+DEPS = cppintrospection-3.0 spin-0.3
+CPPFLAGS += -g -I../../include -I../../src/tinyxml -I/usr/local/include/libfreenect -I/usr/include/boost $(shell python-config --cflags) `pkg-config --cflags $(DEPS)`
+LDFLAGS += -lfreenect -llo $(shell python-config --libs) `pkg-config --libs $(DEPS)`
 LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
-		-losgManipulator -losgText -losgUtil \
-		-losgParticle -losgViewer
+		-losgManipulator -losgText -losgUtil -losgSim -losgParticle -losgViewer
 
 ifeq ($(shell uname -s),Darwin)
   CPPFLAGS += -I/opt/local/include

@@ -61,7 +61,7 @@ SoundNode::SoundNode (SceneManager *sceneManager, char *initID) : DSPNode(sceneM
 	{
 	    spatOSCSource = spinApp::Instance().audioScene->createSoundSource(std::string(id->s_name));
         std::cout << "Created SpatOSC Source:" << std::endl;
-        spinApp::Instance().audioScene->debugPrint();
+        //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
 }
@@ -75,7 +75,7 @@ SoundNode::~SoundNode()
 	{
 	    spinApp::Instance().audioScene->deleteNode(spatOSCSource);
         std::cout << "Deleted SpatOSC Source:" << std::endl;
-        spinApp::Instance().audioScene->debugPrint();
+        //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
     
@@ -161,6 +161,17 @@ void SoundNode::setOrientationQuat (float x, float y, float z, float w)
         this->_globalMatrix = getGlobalMatrix();
         osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
+    }
+#endif
+}
+
+void SoundNode::setRadius (float f)
+{
+    DSPNode::setRadius(f);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCSource->setRadius(this->getRadius());
     }
 #endif
 }
