@@ -23,18 +23,21 @@ libspin_@SPIN_API_VERSION@_la_LIBADD = \
 libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     -export-dynamic \
     -version-info $(SPIN_LT_VERSION) \
-    $(BOOST_FILESYSTEM_LIB) \
+    $(BOOST_SYSTEM_LIBS) \
+    $(BOOST_FILESYSTEM_LIBS) \
+    $(BOOST_PROGRAM_OPTIONS_LIBS) \
+    $(BOOST_PYTHON_LIBS) \
     $(BOOST_LDFLAGS) \
     $(CPPINTROSPECTION_LIBS) \
     $(PYTHON_LDFLAGS) \
-    $(BOOST_PYTHON_LIBS) \
-    $(BOOST_THREAD_LIBS) \
-    $(BOOST_PROGRAM_OPTIONS_LIBS) \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHAREDVIDEO_LIBS) \
     $(SPATOSC_LIBS)
+
+    
+#	$(BOOST_THREAD_LIBS) 
 
 # please keep those in alphabetical order:
 libspin_@SPIN_API_VERSION@_la_SOURCES = \
@@ -159,15 +162,15 @@ install-exec-hook:
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIB)
+spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
 
 ###############################################################################
