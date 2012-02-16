@@ -364,6 +364,16 @@ void SharedVideoTexture::stop()
     std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
 }
 
+#else
+ 
+void SharedVideoTexture::updateCallback() {}
+
+void SharedVideoTexture::consumeFrame() {}
+void SharedVideoTexture::signalKilled() {}
+
+void SharedVideoTexture::start() {}
+void SharedVideoTexture::stop() {}
+    
 #endif
 
 } // end of namespace spin

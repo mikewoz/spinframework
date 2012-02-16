@@ -105,7 +105,7 @@ public:
     std::vector<lo_message> getState () const;
     void debug();
     
-#ifdef WITH_SHARED_VIDEO
+    //#ifdef WITH_SHARED_VIDEO
     void updateCallback();
     
     void consumeFrame();
@@ -113,7 +113,7 @@ public:
 
     void start();
     void stop();
-#endif
+    //#endif
         
     /**
      * Set the render bin for this texture. The higher the number, the later it
