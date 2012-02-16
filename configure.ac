@@ -173,35 +173,21 @@ case "$host" in *-darwin* | *-macos10*)
   pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 esac
 
-# Check for boost:
-AX_BOOST_BASE([1.35])
 
-AX_BOOST_REGEX
-if test "x${ax_cv_boost_regex}" = "xno" ; then
-    AC_MSG_ERROR([missing package: libboost-regex-dev])
-fi
+BOOST_REQUIRE([1.35])
+BOOST_REGEX
+BOOST_FILESYSTEM([mt])
+#BOOST_THREAD
+BOOST_PROGRAM_OPTIONS
+BOOST_PYTHON
 
-AX_BOOST_FILESYSTEM
-if test "x${ax_cv_boost_filesystem}" = "xno" ; then
-        AC_MSG_ERROR([missing package: libboost-filesystem-dev])
-fi
+#AC_MSG_NOTICE([BOOST_LDFLAGS:        ${BOOST_LDFLAGS}])
+AC_MSG_NOTICE([BOOST_CPPFLAGS:       ${BOOST_CPPFLAGS}])
+AC_MSG_NOTICE([BOOST_PYTHON_LIBS:    ${BOOST_PYTHON_LIBS}])
+AC_MSG_NOTICE([BOOST_PYTHON_LDFLAGS: ${BOOST_PYTHON_LDFLAGS}])
 
-AX_BOOST_THREAD
-if test "x${ax_cv_boost_thread}" = "xno" ; then
-    AC_MSG_ERROR([missing package: libboost-thread-dev])
-fi
 
-AX_BOOST_PROGRAM_OPTIONS
-if test "x${ax_cv_boost_program_options}" = "xno" ; then
-    AC_MSG_ERROR([missing package: libboost-program-options-dev])
-fi
 
-#AC_CHECK_LIB(boost_python-mt, main, AC_MSG_NOTICE([boost_python? yep]), AC_MSG_NOTICE([boost_python? nada]), -l$PYTHON_LIB)
-
-AX_BOOST_PYTHON
-if test -z "$BOOST_PYTHON_LIB" ; then
-    AC_MSG_ERROR([missing package. libboost-python-dev.])
-fi
 
 PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
 
@@ -257,9 +243,6 @@ AC_MSG_NOTICE([PYTHON_LIB:          ${PYTHON_LIB}])
 AC_MSG_NOTICE([PYTHON_INCLUDE_DIR:  ${PYTHON_INCLUDE_DIR}])
 AC_MSG_NOTICE([PYTHON_CPPFLAGS:     ${PYTHON_CPPFLAGS}])
 AC_MSG_NOTICE([PYTHON_LDFLAGS:      ${PYTHON_LDFLAGS}])
-AC_MSG_NOTICE([BOOST_LDFLAGS:       ${BOOST_LDFLAGS}])
-AC_MSG_NOTICE([BOOST_CPPFLAGS:      ${BOOST_CPPFLAGS}])
-AC_MSG_NOTICE([BOOST_PYTHON_LIB:    ${BOOST_PYTHON_LIB}])
 AC_MSG_NOTICE([WX_CPPFLAGS:         ${WX_CPPFLAGS}])
 AC_MSG_NOTICE([WX_LIBS:             ${WX_LIBS}])
 AC_MSG_NOTICE([pythondir:           ${pythondir}])
