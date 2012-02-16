@@ -57,3 +57,5 @@ latex
 tests/check_it_works
 tests/stats
 xml/
+!prototypes/web-server/Makefile
+prototypes/web-server/main
