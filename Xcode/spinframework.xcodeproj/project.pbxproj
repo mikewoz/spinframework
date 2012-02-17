@@ -414,7 +414,6 @@
 		1CA24DC214BE2892007A9C31 /* ReporterNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8E14BE2892007A9C31 /* ReporterNode.h */; };
 		1CA24DC314BE2892007A9C31 /* SceneManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8F14BE2892007A9C31 /* SceneManager.h */; };
 		1CA24DC414BE2892007A9C31 /* ShapeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9014BE2892007A9C31 /* ShapeNode.h */; };
-		1CA24DC514BE2892007A9C31 /* SharedVideoNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9114BE2892007A9C31 /* SharedVideoNode.h */; };
 		1CA24DC614BE2892007A9C31 /* SharedVideoTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9214BE2892007A9C31 /* SharedVideoTexture.h */; };
 		1CA24DC714BE2892007A9C31 /* SoundConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9314BE2892007A9C31 /* SoundConnection.h */; };
 		1CA24DC814BE2892007A9C31 /* SoundNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9414BE2892007A9C31 /* SoundNode.h */; };
@@ -1160,7 +1159,6 @@
 		1CA24D8E14BE2892007A9C31 /* ReporterNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReporterNode.h; path = ../include/ReporterNode.h; sourceTree = "<group>"; };
 		1CA24D8F14BE2892007A9C31 /* SceneManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SceneManager.h; path = ../include/SceneManager.h; sourceTree = "<group>"; };
 		1CA24D9014BE2892007A9C31 /* ShapeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShapeNode.h; path = ../include/ShapeNode.h; sourceTree = "<group>"; };
-		1CA24D9114BE2892007A9C31 /* SharedVideoNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SharedVideoNode.h; path = ../include/SharedVideoNode.h; sourceTree = "<group>"; };
 		1CA24D9214BE2892007A9C31 /* SharedVideoTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SharedVideoTexture.h; path = ../include/SharedVideoTexture.h; sourceTree = "<group>"; };
 		1CA24D9314BE2892007A9C31 /* SoundConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundConnection.h; path = ../include/SoundConnection.h; sourceTree = "<group>"; };
 		1CA24D9414BE2892007A9C31 /* SoundNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundNode.h; path = ../include/SoundNode.h; sourceTree = "<group>"; };
@@ -1572,7 +1570,6 @@
 				1CA24D8E14BE2892007A9C31 /* ReporterNode.h */,
 				1CA24D8F14BE2892007A9C31 /* SceneManager.h */,
 				1CA24D9014BE2892007A9C31 /* ShapeNode.h */,
-				1CA24D9114BE2892007A9C31 /* SharedVideoNode.h */,
 				1CA24D9214BE2892007A9C31 /* SharedVideoTexture.h */,
 				1CA24D9314BE2892007A9C31 /* SoundConnection.h */,
 				1CA24D9414BE2892007A9C31 /* SoundNode.h */,
@@ -1962,7 +1959,6 @@
 				1CA24DC214BE2892007A9C31 /* ReporterNode.h in Headers */,
 				1CA24DC314BE2892007A9C31 /* SceneManager.h in Headers */,
 				1CA24DC414BE2892007A9C31 /* ShapeNode.h in Headers */,
-				1CA24DC514BE2892007A9C31 /* SharedVideoNode.h in Headers */,
 				1CA24DC614BE2892007A9C31 /* SharedVideoTexture.h in Headers */,
 				1CA24DC714BE2892007A9C31 /* SoundConnection.h in Headers */,
 				1CA24DC814BE2892007A9C31 /* SoundNode.h in Headers */,
@@ -1992,6 +1988,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
+
+/* Begin PBXLegacyTarget section */
+		1CB6CD0614EDD20900A29B1C /* libspin-0.3 */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 1CB6CD0714EDD20900A29B1C /* Build configuration list for PBXLegacyTarget "libspin-0.3" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			dependencies = (
+			);
+			name = "libspin-0.3";
+			passBuildSettingsInEnvironment = 1;
+			productName = "libspin-0.3";
+		};
+/* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
 		1C386C7C14BD3CBD0065851F /* libSPIN */ = {
@@ -2129,6 +2141,7 @@
 				1CCCA0CC14BE31AB00DCA0B7 /* spinviewerUI */,
 				1C90C17714CCF7E800C929AE /* buildWrappers */,
 				1C90C18C14CDCC3100C929AE /* ALL */,
+				1CB6CD0614EDD20900A29B1C /* libspin-0.3 */,
 			);
 		};
 /* End PBXProject section */
@@ -2759,6 +2772,43 @@
 			};
 			name = Release;
 		};
+		1CB6CD0814EDD20900A29B1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				DEBUGGING_SYMBOLS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1CB6CD0914EDD20900A29B1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		1CCCA0C714BE315500DCA0B7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2893,6 +2943,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		1CB6CD0714EDD20900A29B1C /* Build configuration list for PBXLegacyTarget "libspin-0.3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CB6CD0814EDD20900A29B1C /* Debug */,
+				1CB6CD0914EDD20900A29B1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		1CCCA0C614BE315500DCA0B7 /* Build configuration list for PBXNativeTarget "spinviewer" */ = {
 			isa = XCConfigurationList;

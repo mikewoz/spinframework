@@ -41,6 +41,7 @@
 
 #include <string>
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 #include <osgViewer/CompositeViewer>
 #include <osg/ArgumentParser>
@@ -61,11 +62,48 @@ int main(int argc, char **argv)
 {
 	using namespace spin;
 	spinServerContext server;
+    
+	// *************************************************************************
+    // If no command line arguments were passed, check if there is an args file
+    // at ~/.spinFramework/args and override argc and argv with those:
+    std::vector<char*> newArgs;
+    if (argc == 1)
+    {
+        try
+        {
+            using namespace boost::filesystem;
+            
+            if (exists(SPIN_DIRECTORY+"/args"))
+            {
+                std::stringstream ss;
+                ss << std::ifstream( (SPIN_DIRECTORY+"/args").c_str() ).rdbuf();
 
+                // executable path is always the first argument:
+                newArgs.push_back(argv[0]);
+                
+                std::string token;
+                while (ss >> token)
+                {
+                    char *arg = new char[token.size() + 1];
+                    copy(token.begin(), token.end(), arg);
+                    arg[token.size()] = '\0';
+                    newArgs.push_back(arg);
+                }
+                newArgs.push_back(0); // needs to end with a null item
+                
+                argc = (int)newArgs.size()-1;
+                argv = &newArgs[0];
+            }
+        }
+        catch ( const boost::filesystem::filesystem_error& e )
+        {
+            std::cout << "Warning: cannot read arguments from " << SPIN_DIRECTORY+"/args. Reason: " << e.what() << std::endl;
+        }
+    }
     
     
 	// *************************************************************************
-	// ARGUMENTS::
+	// PARSE ARGUMENTS::
 
 	osg::ArgumentParser arguments(&argc,argv);
 	

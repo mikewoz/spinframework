@@ -51,10 +51,8 @@ namespace osg {
     class Object;
 }
 
-
 // *****************************************************************************
 // GLOBAL DEFINITIONS:
-
 
 #define OSG_NUM_LIGHTS 8
 
@@ -64,7 +62,7 @@ namespace osg {
 #define NULL_SYMBOL gensym("NULL")
 #define WORLD_SYMBOL gensym("world")
 
-#define SPIN_DIRECTORY getAbsolutePath("~/.spinFramework")
+#define SPIN_DIRECTORY spin::getAbsolutePath("~/.spinFramework")
 
 // *****************************************************************************
 // NODE MASKS:
@@ -178,5 +176,8 @@ EXTERN void *copybytes(void *src, size_t nbytes);
 EXTERN void freebytes(void *x, size_t nbytes);
 
 } // end of namespace spin
+
+
+
 
 #endif
