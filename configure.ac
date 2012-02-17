@@ -133,7 +133,7 @@ case "$host" in *-darwin* | *-macos10*)
 esac
 
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
-# LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
+LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
