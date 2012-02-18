@@ -396,8 +396,31 @@ std::string getSpinPath(const std::string &path)
 
 	return filename;
 }
-	
-
+    
+std::vector<char*> getUserArgs() 
+{
+    std::vector<char*> args;
+    
+    std::string path = SPIN_DIRECTORY + "/args";
+    if (fileExists(path))
+    {
+        std::stringstream ss;
+        ss << std::ifstream( path.c_str() ).rdbuf();
+        
+        std::string token;
+        while (ss >> token)
+        {
+            char *arg = new char[token.size() + 1];
+            copy(token.begin(), token.end(), arg);
+            arg[token.size()] = '\0';
+            args.push_back(arg);
+        }
+    }
+    
+    args.push_back(0); // needs to end with a null item
+    return args;
+}
+    
 // *****************************************************************************
 // gensym stuff
 

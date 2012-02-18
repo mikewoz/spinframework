@@ -30,13 +30,8 @@
 		1C25F51014E57C84007F97E5 /* PointCloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C25F50F14E57C84007F97E5 /* PointCloud.cpp */; };
 		1C25F51314E57CD2007F97E5 /* PointCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C25F51214E57CD2007F97E5 /* PointCloud.h */; };
 		1C25F51514E58AC6007F97E5 /* PointCloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C25F51414E58AC6007F97E5 /* PointCloud.cpp */; };
-		1C25F53814E5A933007F97E5 /* libpcl_common.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51714E59373007F97E5 /* libpcl_common.1.4.0.dylib */; };
-		1C25F53914E5A93F007F97E5 /* libpcl_io.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51A14E59373007F97E5 /* libpcl_io.1.4.0.dylib */; };
-		1C25F53B14E5A9DC007F97E5 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F53A14E5A9DC007F97E5 /* libboost_system-mt.dylib */; };
-		1C25F53C14E5A9FA007F97E5 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F53A14E5A9DC007F97E5 /* libboost_system-mt.dylib */; };
-		1C25F53D14E5A9FB007F97E5 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F53A14E5A9DC007F97E5 /* libboost_system-mt.dylib */; };
-		1C25F53E14E5A9FB007F97E5 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F53A14E5A9DC007F97E5 /* libboost_system-mt.dylib */; };
-		1C25F53F14E5A9FC007F97E5 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F53A14E5A9DC007F97E5 /* libboost_system-mt.dylib */; };
+		1C25F53814E5A933007F97E5 /* libpcl_common.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51714E59373007F97E5 /* libpcl_common.1.4.0.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
+		1C25F53914E5A93F007F97E5 /* libpcl_io.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51A14E59373007F97E5 /* libpcl_io.1.4.0.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1C34AE4514DB32A8001DF418 /* GeometryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C34AE4414DB32A8001DF418 /* GeometryNode.h */; };
 		1C34AE4714DB32BE001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */; };
 		1C34AE4914DB4A3B001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */; };
@@ -166,6 +161,15 @@
 		1C70F31914C3A5B90054B0A1 /* osgdb_x.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3014C0D397006394AD /* osgdb_x.so */; };
 		1C70F31A14C3A5B90054B0A1 /* osgdb_zip.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3114C0D397006394AD /* osgdb_zip.so */; };
 		1C70F33414C3C7540054B0A1 /* osgPlugins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */; };
+		1C7267A614EEF3AF00E3FFAE /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
+		1C7267A714EEF3B000E3FFAE /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
+		1C7267A814EEF3B000E3FFAE /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
+		1C7267A914EEF3B100E3FFAE /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
+		1C7267AA14EEF3B100E3FFAE /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
+		1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
+		1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
+		1C7267AD14EEF4A800E3FFAE /* libboost_system.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
+		1C7267AE14EEF4B300E3FFAE /* libboost_system.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
 		1C875F3B14C8EF4200A46EBC /* liblo.7.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; };
 		1C875F3C14C8EF4200A46EBC /* libcppintrospection-3.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C875F3F14C8EF4200A46EBC /* libboost_python.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
@@ -324,10 +328,8 @@
 		1C94DEB314BFBAA0006394AD /* liblo.7.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; };
 		1C94DEBC14BFEBAB006394AD /* libboost_python.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
 		1C94DEC214BFEC2D006394AD /* libboost_python.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
-		1C94DEC414BFEC2E006394AD /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
 		1C94DEC514BFEC2E006394AD /* libboost_python.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
 		1C94DEC814BFEC2E006394AD /* libboost_python.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
-		1C94DECA14BFEC2F006394AD /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
 		1C94DECB14BFEC2F006394AD /* libboost_python.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
 		1C94DECE14BFED32006394AD /* libboost_python.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
 		1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
@@ -745,7 +747,9 @@
 				1C9C082A14CFEA1B006ABC85 /* libfreenect.0.0.1.dylib in CopyFiles */,
 				1C34AE5414DCFBA1001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */,
 				1C875F3B14C8EF4200A46EBC /* liblo.7.dylib in CopyFiles */,
+				1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C875F3C14C8EF4200A46EBC /* libcppintrospection-3.0.0.dylib in CopyFiles */,
+				1C7267AD14EEF4A800E3FFAE /* libboost_system.dylib in CopyFiles */,
 				1C87602414CA6EEE00A46EBC /* libboost_filesystem.dylib in CopyFiles */,
 				1C875F3F14C8EF4200A46EBC /* libboost_python.dylib in CopyFiles */,
 				1CE3AD3414CFE1EA007E722D /* libOpenThreads.12.dylib in CopyFiles */,
@@ -863,9 +867,11 @@
 				1C94DEDF14C0BEF6006394AD /* libSPIN.dylib in CopyFiles */,
 				1C94DED514C00548006394AD /* libcppintrospection-3.0.0.dylib in CopyFiles */,
 				1C34AE5514DCFBA9001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */,
+				1C7267AE14EEF4B300E3FFAE /* libboost_system.dylib in CopyFiles */,
 				1C87602514CA6EFB00A46EBC /* libboost_filesystem.dylib in CopyFiles */,
 				1C94DECE14BFED32006394AD /* libboost_python.dylib in CopyFiles */,
 				1C9C082B14CFEA24006ABC85 /* libfreenect.0.0.1.dylib in CopyFiles */,
+				1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C94DEB314BFBAA0006394AD /* liblo.7.dylib in CopyFiles */,
 				1CE3AD2314CFE1E1007E722D /* libOpenThreads.12.dylib in CopyFiles */,
 				1CE3AD2414CFE1E1007E722D /* libosg.66.dylib in CopyFiles */,
@@ -920,7 +926,6 @@
 		1C25F52314E59374007F97E5 /* libpcl_segmentation.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_segmentation.1.4.0.dylib; path = /usr/local/lib/libpcl_segmentation.1.4.0.dylib; sourceTree = "<absolute>"; };
 		1C25F52414E59374007F97E5 /* libpcl_surface.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_surface.1.4.0.dylib; path = /usr/local/lib/libpcl_surface.1.4.0.dylib; sourceTree = "<absolute>"; };
 		1C25F52514E59374007F97E5 /* libpcl_visualization.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_visualization.1.4.0.dylib; path = /usr/local/lib/libpcl_visualization.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F53A14E5A9DC007F97E5 /* libboost_system-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_system-mt.dylib"; path = "/opt/local/lib/libboost_system-mt.dylib"; sourceTree = "<absolute>"; };
 		1C34AE4414DB32A8001DF418 /* GeometryNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeometryNode.h; path = ../include/GeometryNode.h; sourceTree = "<group>"; };
 		1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/spin/GeometryNode.cpp; sourceTree = "<group>"; };
 		1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/osgWrappers/introspection/GeometryNode.cpp; sourceTree = "<group>"; };
@@ -1249,7 +1254,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C25F53B14E5A9DC007F97E5 /* libboost_system-mt.dylib in Frameworks */,
 				1C9C082514CFE988006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1CE3ACD414CF7C72007E722D /* libOpenThreads.12.dylib in Frameworks */,
 				1CE3ACC314CF7C1D007E722D /* libosg.66.dylib in Frameworks */,
@@ -1276,6 +1280,7 @@
 				1C9C083014D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C25F53814E5A933007F97E5 /* libpcl_common.1.4.0.dylib in Frameworks */,
 				1C25F53914E5A93F007F97E5 /* libpcl_io.1.4.0.dylib in Frameworks */,
+				1C7267A614EEF3AF00E3FFAE /* libboost_system.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1287,6 +1292,7 @@
 				1C57789614BD702A00632E46 /* libSPIN.dylib in Frameworks */,
 				1C94DEC214BFEC2D006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED114C00250006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
+				1C7267A714EEF3B000E3FFAE /* libboost_system.dylib in Frameworks */,
 				1C87602214CA6ED000A46EBC /* libboost_filesystem.dylib in Frameworks */,
 				1CE3ACD514CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */,
 				1CE3ACD614CF7CAF007E722D /* libosg.66.dylib in Frameworks */,
@@ -1308,7 +1314,6 @@
 				1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */,
 				1C9C082614CFE9BF006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082F14D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
-				1C25F53C14E5A9FA007F97E5 /* libboost_system-mt.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1320,7 +1325,6 @@
 				1CA24DF714BE2D3C007A9C31 /* Cocoa.framework in Frameworks */,
 				1CA24C9114BE5AAA0023DD8B /* liblo.7.dylib in Frameworks */,
 				1C87601F14CA6E8E00A46EBC /* libboost_filesystem.dylib in Frameworks */,
-				1C94DEC414BFEC2E006394AD /* libboost_system.dylib in Frameworks */,
 				1C94DEC514BFEC2E006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1CE3ACE614CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */,
@@ -1343,7 +1347,7 @@
 				1C9C082714CFE9BF006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082E14D07661006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */,
-				1C25F53D14E5A9FB007F97E5 /* libboost_system-mt.dylib in Frameworks */,
+				1C7267A814EEF3B000E3FFAE /* libboost_system.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1355,6 +1359,7 @@
 				1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1C94DEC814BFEC2E006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED314C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
+				1C7267A914EEF3B100E3FFAE /* libboost_system.dylib in Frameworks */,
 				1C87602114CA6ED000A46EBC /* libboost_filesystem.dylib in Frameworks */,
 				1CE3ACF714CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */,
 				1CE3ACF814CF7CB0007E722D /* libosg.66.dylib in Frameworks */,
@@ -1376,7 +1381,6 @@
 				1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */,
 				1C9C082814CFE9C0006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082D14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
-				1C25F53E14E5A9FB007F97E5 /* libboost_system-mt.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1388,7 +1392,6 @@
 				1CCCA0F014BE353500DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1CCCA0EF14BE353100DCA0B7 /* OpenGL.framework in Frameworks */,
 				1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */,
-				1C94DECA14BFEC2F006394AD /* libboost_system.dylib in Frameworks */,
 				1C94DECB14BFEC2F006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED414C00252006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1C87602014CA6ECF00A46EBC /* libboost_filesystem.dylib in Frameworks */,
@@ -1412,7 +1415,7 @@
 				1C9C082914CFE9C0006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082C14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */,
-				1C25F53F14E5A9FC007F97E5 /* libboost_system-mt.dylib in Frameworks */,
+				1C7267AA14EEF3B100E3FFAE /* libboost_system.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1771,7 +1774,6 @@
 				1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */,
 				1C87601E14CA6E8C00A46EBC /* libboost_filesystem.dylib */,
 				1C94DEBE14BFEC07006394AD /* libboost_system.dylib */,
-				1C25F53A14E5A9DC007F97E5 /* libboost_system-mt.dylib */,
 				1C94DEB914BFEBAA006394AD /* libboost_python.dylib */,
 				1C9EE82F14BE2725000976A6 /* AppKit.framework */,
 				1C9EE83014BE2725000976A6 /* CoreData.framework */,
@@ -2261,7 +2263,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libpcl_common.1.4.dylib libpcl_io.1.4.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone";
 		};
 		1C90C18214CCF82E00C929AE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2551,7 +2553,7 @@
 					/opt/local/Library/Python.framework/Versions/2.6/config,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
 					"-DOSX_COCOA",
@@ -2594,7 +2596,7 @@
 					/opt/local/Library/Python.framework/Versions/2.6/config,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
 					"-DOSX_COCOA",
@@ -2951,6 +2953,7 @@
 				1CB6CD0914EDD20900A29B1C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1CCCA0C614BE315500DCA0B7 /* Build configuration list for PBXNativeTarget "spinviewer" */ = {
 			isa = XCConfigurationList;

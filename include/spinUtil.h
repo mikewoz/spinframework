@@ -143,6 +143,7 @@ bool isVideoPath(const std::string &path);
 bool isImagePath(const std::string &path);
 
 std::string getSpinPath(const std::string &path);
+std::vector<char*> getUserArgs();
 
 // *****************************************************************************
 // gensym stuff (from m_pd.h)

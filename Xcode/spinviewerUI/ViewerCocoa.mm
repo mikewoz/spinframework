@@ -134,10 +134,16 @@
 
 // stuff needed for SPIN:
 
-#include "config.h"
-//#include <Python.h>
-#include <boost/algorithm/string.hpp>
+//#include <string>
+//#include <iostream>
+//#include <boost/filesystem.hpp>
+//#include <boost/filesystem/operations.hpp>
+//#include <boost/filesystem/exception.hpp>
+//#include <boost/algorithm/string.hpp>
 //#include <boost/python.hpp>
+//#include <Python.h>
+#include "config.h"
+
 #include "ViewerManipulator.h"
 #include "spinUtil.h"
 #include "spinApp.h"
@@ -399,6 +405,30 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     theViewer->getEventQueue()->getCurrentEventState()->setMouseYOrientation(osgGA::GUIEventAdapter::Y_INCREASING_UPWARDS);
     
     theViewer->addEventHandler(new osgViewer::WindowSizeHandler);
+    
+    
+    
+	// *************************************************************************
+    // If no command line arguments were passed, check if there is an args file
+    // at ~/.spinFramework/args and override argc and argv with those:
+    int argc;
+    char **argv;
+    std::vector<char*> newArgs = spin::getUserArgs();
+    if (newArgs.size() > 1)
+    {
+        // need first arg (command name):
+        newArgs.insert(newArgs.begin(), "fake");
+        argc = (int)newArgs.size()-1;
+        argv = &newArgs[0];
+
+        // PARSE ARGUMENTS::
+        osg::ArgumentParser arguments(&argc,argv);
+        if (!spinListener.parseCommandLineOptions(&arguments))
+            std::cout << "spinListener: error parsing arguments" << std::endl;
+            
+        arguments.reportRemainingOptionsAsUnrecognized();
+        if (arguments.errors()) arguments.writeErrorMessages(std::cout);
+    }
     
     
     std::cout << "In initOSGViewer. about to start scene: " << spin::spinApp::Instance().getSceneID() << ", spin instance: " << &spin::spinApp::Instance() << std::endl;
