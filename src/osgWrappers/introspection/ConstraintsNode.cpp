@@ -47,42 +47,42 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setTarget__C5_char_P1,
 	          "",
-	          "");
+	          "Sets a target whose properties can be used to limit movement of this node, depending on the type on constraint selected. (this should be a model node or shape node, or a group node ideally not too complex, because large amounts of triangles will lead to excessive calculations) ");
 	I_Method0(const char *, getTarget,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getTarget,
 	          "",
-	          "");
+	          "t_symbol which indicates the target ID on which the constraints are based (Note: The target could also be a group node).  ");
 	I_Method1(void, setConstraintMode, IN, spin::ConstraintsNode::constraintMode, m,
 	          Properties::NON_VIRTUAL,
 	          __void__setConstraintMode__C5raintMode,
 	          "",
-	          "");
+	          "Sets the node's constraint mode, based on the types in constrainMode enum (see enum for details) ");
 	I_Method0(int, getConstraintMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getConstraintMode,
 	          "",
-	          "");
+	          "int which is converted to the type of constraint currently set on the node (drawn from constraintMode enum)  ");
 	I_Method3(void, setCubeSize, IN, float, xScale, IN, float, yScale, IN, float, zScale,
 	          Properties::NON_VIRTUAL,
 	          __void__setCubeSize__float__float__float,
 	          "",
-	          "");
+	          "Sets the size of the imaginary cube beyond which the constrained node cannot pass, when constraint type BASIC is set. ");
 	I_Method3(void, setCubeOffset, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setCubeOffset__float__float__float,
 	          "",
-	          "");
+	          "Sets the center of the BASIC constraint cube with respect to the local coordinate system (either the parent object or the world grid). ");
 	I_Method0(osg::Vec3, getCubeSize,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getCubeSize,
 	          "",
-	          "");
+	          "Vec3 indicating the size of the cubic BASIC constraint  ");
 	I_Method0(osg::Vec3, getCubeOffset,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getCubeOffset,
 	          "",
-	          "");
+	          "Vec indicating the offset of the cubic BASIC constraint from its local coordinate system.  ");
 	I_Method3(void, setTranslation, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setTranslation__float__float__float,

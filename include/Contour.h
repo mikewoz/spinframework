@@ -52,18 +52,25 @@ namespace osg {
 namespace spin
 {
 
-enum ContourTypeEnum { THIN, CUBIC, CYLINDRICAL };
-enum trackingModeEnum { POSITION, FULL6DOF };
+enum ContourTypeEnum { THIN,
+						CUBIC,
+						CYLINDRICAL
+					};
+
+enum trackingModeEnum { POSITION,
+						FULL6DOF
+						};
 
 /**
  * \brief Represents a sequence of connected points in 3D space
  * 
- * The contour holds a number of vertices up the limit specified by _maxVertices.
+ * The contour holds a number of vertices up the limit specified by _maxVertices
  * New values are added to the front of the vectorArray, and once it is filled,
  * we pop the last element off the end.
  * 
  * An index controls the point on which a child node is attached to the contour.
  */
+
 class Contour : public ReferencedNode
 {
 

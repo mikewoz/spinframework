@@ -76,57 +76,108 @@ public:
     virtual ~ConstraintsNode();
     
     /**
-     * The following constraints are available:
-     *
-     * BASIC:
-     * The node is just constrained within a cubic volume. Important note: the
-     * BASIC constraint is always maintained, even if another mode is chosen.
-     *
-     * DROP:
-     * The node sits on the surface of the target subgraph (ie, follows local
-     * Z-axis down until it finds an intersection with the target surface)
-     *
-     * COLLIDE:
-     * A form of collision detection, where the node is blocked (and slides
-     * along) the target's surface. Note: sliding only works when the target is
-     * locally convex. Concavities are not checked, and may position the node
-     * on the other side of the target's surface. Use STICK instead for
-     * non-convex geometries.
-     *
-     * BOUNCE:
-     * A form of collision detection, where the node reflects off the parent's
-     * surface, and travels in the reflected direction (ie, the orientation of
-     * the node is changed). Note: this only works when node is moved using the
-     * "translate" command.
-     *
-     * STICK:
-     * Equivalent to COLLIDE, but without sliding.
-     *
-     * COLLIDE_THRU:
-     * A fake constraint, which can be used to simply report when a collision 
-     * occurs. The event reported is the same as that for COLLIDE.
+     * Enumerator containing all of the constraint modes available
      */
-    enum constraintMode {   BASIC,
-                            DROP,
-                            COLLIDE,
-                            BOUNCE,
-                            STICK,
-                            COLLIDE_THRU
+    enum constraintMode {   BASIC,			/*!< The node is just constrained
+											within a cubic volume. Important
+											note: the BASIC constraint is always
+											maintained, even if another mode is
+											chosen.
+    										*/
+    										
+                            DROP,			/*!< The node sits on the surface of
+											the target subgraph (ie, follows
+											local Z-axis down until it finds an
+											intersection with the target
+											surface) */
+                            				
+                            COLLIDE,		/*!< A form of collision detection,
+											where the node is blocked (and
+											slides along) the target's surface.
+											Note: sliding only works when the
+											target is locally convex.
+											Concavities are not checked, and may
+											position the node on the other side
+											of the target's surface. Use STICK
+											instead for non-convex geometries.
+											*/
+                            				
+                            BOUNCE,			/*!< A form of collision detection,
+											where the node reflects off the
+											parent's surface, and travels in the
+											reflected direction (ie, the
+											orientation of the node is changed).
+											Note: this only works when node is
+											moved using the "translate" command.
+											*/
+                            				  
+                            STICK,			/*!< Equivalent to COLLIDE, but
+											without sliding. */
+                            
+                            COLLIDE_THRU	/*!< A fake constraint, which can be
+											used to simply report when a
+											collision occurs. The event reported
+											is the same as that for COLLIDE. */
                         };
 
         
     virtual void callbackUpdate();
     
+    /**
+     * Sets a target whose properties can be used to limit movement of this
+     * node, depending on the type on constraint selected. (this should be a
+     * model node or shape node, or a group node ideally not too complex,
+     * because large amounts of triangles will lead to excessive calculations)
+     */
+
     void setTarget(const char *id);
+
+    /**
+     * @return t_symbol which indicates the target ID on which the constraints
+     * are based (Note: The target could also be a group node).
+     */
+
     const char *getTarget() const { return _target->s_name; }
     
+    /**
+     * Sets the node's constraint mode, based on the types in constrainMode
+     * enum (see enum for details)
+     */
+
     void setConstraintMode(constraintMode m);
+
+    /**
+     * @return int which is converted to the type of constraint currently
+     * set on the node (drawn from constraintMode enum)
+     */
+
     int getConstraintMode() const { return (int)_mode; };
     
+    /**
+     * Sets the size of the imaginary cube beyond which the constrained node
+     * cannot pass, when constraint type BASIC is set.
+     */
+
     void setCubeSize(float xScale, float yScale, float zScale);
+
+    /**
+     * Sets the center of the BASIC constraint cube with respect to the local
+     * coordinate system (either the parent object or the world grid).
+     */
+
     void setCubeOffset(float x, float y, float z);
 
+    /**
+     * @return Vec3 indicating the size of the cubic BASIC constraint
+     */
+
     osg::Vec3 getCubeSize() const { return _cubeSize; }
+
+    /**
+     * @return Vec indicating the offset of the cubic BASIC constraint from its
+     * local coordinate system.
+     */
+
     osg::Vec3 getCubeOffset() const { return _cubeOffset; }
 
     virtual void setTranslation (float x, float y, float z);
