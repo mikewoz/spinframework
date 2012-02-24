@@ -71,7 +71,7 @@ class PointerNodeActionAdapter : public osgGA::GUIActionAdapter
 
 /**
  * \brief An interaction node that reports intersections with other nodes in the
- *        scene
+ *        scene (test)
  * 
  * This node must be attached to an RayNode node, and reports a list of all nodes
  * with which the ray is intersecting (in order of closest to furthest). There
