@@ -48,7 +48,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Menu3D)
 	          Properties::NON_VIRTUAL,
 	          __void__addItem__C5_char_P1,
 	          "",
-	          "Add an item (TextNode) to the list ");
+	          "Add an item (TextNode) to the list (server-side only) ");
 	I_Method1(void, removeItem, IN, int, itemIndex,
 	          Properties::NON_VIRTUAL,
 	          __void__removeItem__int,

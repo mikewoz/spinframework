@@ -24,7 +24,7 @@
 
 BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	I_DeclaringFile("PointerNode.h");
-	I_BaseType(spin::ReferencedNode);
+	I_BaseType(spin::RayNode);
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____PointerNode__SceneManager_P1__char_P1,
 	               "",
@@ -49,9 +49,9 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          __ReferencedNode_P1__getNodeFromIntersections,
 	          "",
 	          "");
-	I_Method1(void, setType, IN, char *, s,
+	I_Method1(void, setType, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
-	          __void__setType__char_P1,
+	          __void__setType__C5_char_P1,
 	          "",
 	          "");
 	I_Method1(void, highlight, IN, int, b,
@@ -83,17 +83,17 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          Properties::NON_VIRTUAL,
 	          __void__grab__int,
 	          "",
-	          "");
-	I_Method1(void, pull, IN, float, f,
+	          "The grab method selects the closest intersected node and temporarily attaches it to the pointer, allowing it to inherit any translation or rotation offsets.Notes: Only nodes derived from GroupNode can be grabbed.If no node is intersected, the grab won't do anything.The node is re-attached to it's original parent when released, so don't delete the parent in the meantime  param b A boolean grab indicator (1 to grab, 0 to release)  ");
+	I_Method1(void, slide, IN, float, f,
 	          Properties::NON_VIRTUAL,
-	          __void__pull__float,
+	          __void__slide__float,
 	          "",
-	          "");
+	          "Slides the currently grabbed node (if there is one) along the pointer axis (ie, increasing or decreasing the distance). param f The amount by which to slide (positive values slide the attached node AWAY from the pointer  ");
 	I_Method0(int, getGrab,
 	          Properties::NON_VIRTUAL,
 	          __int__getGrab,
 	          "",
-	          "");
+	          "Whether there is a valid node that is currently 'grabbed'  ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -114,9 +114,9 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_SimpleProperty(char *, Type, 
-	                 0, 
-	                 __void__setType__char_P1);
+	I_SimpleProperty(const char *, Type, 
+	                 __C5_char_P1__getType, 
+	                 __void__setType__C5_char_P1);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::PointerNodeActionAdapter)

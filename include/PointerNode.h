@@ -46,7 +46,8 @@
 #include <osgManipulator/Dragger> // for PointerInf
 #include <osgManipulator/Selection> // for Selection (typedef)
 #include <osgUtil/LineSegmentIntersector>
-#include "ReferencedNode.h"
+#include "RayNode.h"
+
 
 namespace osgGA {
     class GUIEventAdapter;
@@ -68,7 +69,7 @@ class PointerNodeActionAdapter : public osgGA::GUIActionAdapter
     void requestContinuousUpdate(bool){};
     void requestWarpPointer(float,float) {};
 };
-
+  
 /**
  * \brief An interaction node that reports intersections with other nodes in the
  *        scene
@@ -79,7 +80,7 @@ class PointerNodeActionAdapter : public osgGA::GUIActionAdapter
  * moved around.
  */
 
-class PointerNode : public ReferencedNode
+class PointerNode : public RayNode
 {
 
     public:
@@ -95,7 +96,7 @@ class PointerNode : public ReferencedNode
         ReferencedNode *getNodeFromIntersections();
         //void computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T);
 
-        void setType (char *s);
+        void setType (const char *s);
         void highlight (int b);
         void manipulate (int b);
 
@@ -103,9 +104,33 @@ class PointerNode : public ReferencedNode
         int getHighlight() const { return (int) dragger.valid(); }
         int getManipulate() const { return (int) doManipulation; }
 
-        // grab stuff:
+        /**
+         * The grab method selects the closest intersected node and temporarily
+         * attaches it to the pointer, allowing it to inherit any translation or
+         * rotation offsets.
+         *
+         * Notes:
+         * - Only nodes derived from GroupNode can be grabbed.
+         * - If no node is intersected, the grab won't do anything.
+         * - The node is re-attached to it's original parent when released, so
+         * don't delete the parent in the meantime
+         * 
+         * @param b A boolean grab indicator (1 to grab, 0 to release)
+         */
         void grab (int b);
-        void pull (float f);
+    
+        /**
+         * Slides the currently grabbed node (if there is one) along the pointer
+         * axis (ie, increasing or decreasing the distance).
+         *
+         * @param f The amount by which to slide (positive values slide the 
+         * attached node AWAY from the pointer
+         */
+        void slide (float f);
+         
+        /**
+         * @return Whether there is a valid node that is currently 'grabbed'
+         */
         int getGrab() const { return (int) grabbedNode.valid(); }
 
         /**
@@ -114,12 +139,6 @@ class PointerNode : public ReferencedNode
          */
         virtual std::vector<lo_message> getState() const;
 
-        /**
-         * We must include a stateDump() method that simply invokes the base class
-         * method. Simple C++ inheritance is not enough, because osg::Introspection
-         * won't see it.
-         */
-        //virtual void stateDump() { ReferencedNode::stateDump(); };
 
     private:
 

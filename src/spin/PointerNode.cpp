@@ -67,7 +67,7 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : RayNode(sceneManager, initID)
 {
     this->setName(string(id->s_name) + ".PointerNode");
     nodeType = "PointerNode";
@@ -81,7 +81,7 @@ PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : Referenced
     cmdMgr = new osgManipulator::CommandManager;
 
     selection = new osgManipulator::Selection;
-    selection->setName("asManipulator.selection");
+    selection->setName("PointerNode.selection");
 
 
     ea = new osgGA::GUIEventAdapter();
@@ -109,19 +109,16 @@ PointerNode::~PointerNode()
 void PointerNode::callbackUpdate()
 {
 
-    ReferencedNode::callbackUpdate();
+    RayNode::callbackUpdate();
 
     int i;
 
-    // get parentNode:
-    osg::ref_ptr<RayNode> parentNode = dynamic_cast<RayNode*>(this->parent->s_thing);
 
-    if (!parentNode.valid())
-    {
-        //std::cout << "Error: PointerNode [" << this->id->s_name << "] must be attached to an RayNode node." << std::endl;
-        return;
-    }
-
+    // TODO: It's too much work to perform an intersection traversal on all
+    // objects in the scenegraph. We should add a way to limit this to only
+    // nodes with a certain nodemask so that the user can optimize and choose
+    // which parts of the scene should be included / excluded.
+    
     //osg::Timer_t startTick = osg::Timer::instance()->tick();
 
     // get line segment start and end points:
@@ -133,7 +130,7 @@ void PointerNode::callbackUpdate()
 
 
     osg::Vec3 start = myMatrix.getTrans();
-    osg::Vec3 end = start + ( myMatrix.getRotate() * osg::Vec3(0.0,parentNode->getLength(),0.0) );
+    osg::Vec3 end = start + ( myMatrix.getRotate() * osg::Vec3(0.0,this->getLength(),0.0) );
 
 
 
@@ -365,7 +362,7 @@ void PointerNode::enableDragger()
 
     pthread_mutex_lock(&sceneMutex);
 
-    dragger->setName("asManipulator.dragger");
+    dragger->setName("PointerNode.dragger");
     dragger->setNodeMask(GEOMETRIC_NODE_MASK); // make sure intersector sees it
 
     targetNode->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
@@ -409,7 +406,7 @@ ReferencedNode *PointerNode::getNodeFromIntersections()
         //if (t->nodeType == "GroupNode")
         if (t)
         {
-            return t; // return first basicNode encountered
+            return t; // return first GroupNode encountered
         }
         t = dynamic_cast<ReferencedNode*>(t->parent->s_thing);
     }
@@ -456,9 +453,9 @@ void PointerNode::computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec
 
 // *****************************************************************************
 
-void PointerNode::setType (char *s)
+void PointerNode::setType (const char *s)
 {
-    this->draggerType = s;
+    this->draggerType = std::string(s);
 
     BROADCAST(this, "ss", "setType", this->getType());
 }
@@ -565,11 +562,6 @@ void PointerNode::manipulate (int b)
 
 
 
-/* For grabbing, we take the first intersected node, and temporarily attach it
- * to the pointer, allowing it to inherit any translation or rotation offsets.
- * We need to send another message to return it to it's previous parent once it
- * is "ungrabbed".
- */
 void PointerNode::grab (int b)
 {
     // return if this spinContext is a slave
@@ -638,13 +630,8 @@ void PointerNode::grab (int b)
         std::cout << "Attaching node [" << grabbedNode->id->s_name << "] to pointer with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
 
         // attach node to this pointer:
-
-        pthread_mutex_lock(&sceneMutex);
-
-            grabbedNode->newParent = this->id;
-            grabbedNode->attach();
-
-        pthread_mutex_unlock(&sceneMutex);
+        grabbedNode->newParent = this->id;
+        grabbedNode->attach(); // this method locks the sceneMutex
 
 
         // now apply the offset:
@@ -681,13 +668,8 @@ void PointerNode::grab (int b)
 
 
         // re-attach node to it's old parent:
-
-        pthread_mutex_lock(&sceneMutex);
-
         grabbedNode->newParent = previousParent;
-        grabbedNode->attach();
-
-        pthread_mutex_unlock(&sceneMutex);
+        grabbedNode->attach(); // this method locks the sceneMutex
 
         std::cout << "Re-attaching node [" << grabbedNode->id->s_name << "] to old parent [" << previousParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
 
@@ -705,7 +687,7 @@ void PointerNode::grab (int b)
 }
 
 
-void PointerNode::pull (float f)
+void PointerNode::slide (float f)
 {
     if (grabbedNode.valid())
     {
