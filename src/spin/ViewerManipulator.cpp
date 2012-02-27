@@ -300,8 +300,6 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 	
     
     if ((modkeyMask==GUIEventAdapter::MODKEY_LEFT_SHIFT) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_SHIFT) )
-    
-        //if (this->picker)
 	{
 		// This is how the Picker works:
 		//
@@ -468,9 +466,15 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 	} // end picker
 	
 	
-	
+    if ((modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_CTRL) )
+	{
+        // the CTRL button is reserved for osgManipulator draggers, so don't
+        // move the viewer!
+        
+    }
+        
     // scene event processing (eg, camera motion):
-	if ( this->mover && selectedNodes.empty() )
+	else if ( this->mover && selectedNodes.empty() )
 	{
 		float movScalar = 10.0;
 		float rotScalar = 30.0;
@@ -527,7 +531,10 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				    }
 				}
 			
-			    else if ( (modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_CTRL) )
+                // velocity based motion (currently disabled, because CTRL key
+                // is now used by osgManipulator draggers). TODO: bring this
+                // feature back??
+			    else if (0) // ( (modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_CTRL) )
 			    	
 			    {
 			    	int dXsign, dYsign;

@@ -41,6 +41,16 @@
 
 #include <osg/ComputeBoundsVisitor>
 #include <osgGA/GUIEventAdapter>
+
+#include <osgManipulator/TabBoxDragger>
+#include <osgManipulator/TabBoxTrackballDragger>
+#include <osgManipulator/TabPlaneDragger>
+#include <osgManipulator/TabPlaneTrackballDragger>
+#include <osgManipulator/TrackballDragger>
+#include <osgManipulator/Translate1DDragger>
+#include <osgManipulator/Translate2DDragger>
+#include <osgManipulator/TranslateAxisDragger>
+
 #include "GroupNode.h"
 #include "SceneManager.h"
 #include "spinApp.h"
@@ -72,11 +82,15 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
     //mainTransform->setPosition(osg::Vec3(0.0,0.0,0.0));
     this->addChild(mainTransform.get());
 
+    manipulatorTransform = new osg::MatrixTransform();
+    manipulatorTransform->setName(string(id->s_name) + ".manipulatorTransform");
+    mainTransform->addChild(manipulatorTransform.get());
+    
 
     clipNode = new osg::ClipNode();
     clipNode->setCullingActive(false);
     clipNode->setName(string(id->s_name) + ".clipNode");
-    mainTransform->addChild(clipNode.get());
+    manipulatorTransform->addChild(clipNode.get());
 
     _velocity = osg::Vec3(0.0,0.0,0.0);
     _velocityMode = GroupNode::TRANSLATE;
@@ -317,7 +331,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 {
                     this->owner = user.get();
                     //std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
-                    BROADCAST(this, "ss", "owner", owner->id->s_name);
+                    BROADCAST(this, "ss", "setOwner", owner->id->s_name);
                     BROADCAST(this, "ssi", "select", userString, 1);
                 }
                 break;
@@ -330,7 +344,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 {
                     //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
                     this->owner = NULL;
-                    BROADCAST(this, "ss", "owner", "NULL");
+                    BROADCAST(this, "ss", "setOwner", "NULL");
                     BROADCAST(this, "ssi", "select", userString, 0);
                }
                 break;
@@ -339,11 +353,33 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 break;
         }
 
-
     }
-
 }
 
+void GroupNode::setLock(const char* userString, int lock)
+{
+    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+    if (!user.valid()) return;
+
+    if (lock)
+    {
+        if (owner.valid())
+        {
+            this->owner = user.get();
+            //std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
+            BROADCAST(this, "ss", "setOwner", owner->id->s_name);
+        }
+    }
+    else
+    {
+        if (this->owner == user)
+        {
+            //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
+            this->owner = NULL;
+            BROADCAST(this, "ss", "setOwner", "NULL");
+        }
+    }
+}
 
 void GroupNode::debug()
 {
@@ -553,6 +589,157 @@ void GroupNode::rotate (float p, float r, float y)
     this->setOrientation(_orientation.x()+p, _orientation.y()+r, _orientation.z()+y);
 }
 
+// *****************************************************************************
+
+    
+osgManipulator::Dragger* createDragger(const std::string& name)
+{
+    osgManipulator::Dragger* dragger = 0;
+    if ("TabPlaneDragger" == name)
+    {
+        osgManipulator::TabPlaneDragger* d = new osgManipulator::TabPlaneDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    else if ("TabPlaneTrackballDragger" == name)
+    {
+        osgManipulator::TabPlaneTrackballDragger* d = new osgManipulator::TabPlaneTrackballDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    else if ("TabBoxTrackballDragger" == name)
+    {
+        osgManipulator::TabBoxTrackballDragger* d = new osgManipulator::TabBoxTrackballDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    else if ("TrackballDragger" == name)
+    {
+        osgManipulator::TrackballDragger* d = new osgManipulator::TrackballDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    else if ("Translate1DDragger" == name)
+    {
+        osgManipulator::Translate1DDragger* d = new osgManipulator::Translate1DDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    else if ("Translate2DDragger" == name)
+    {
+        osgManipulator::Translate2DDragger* d = new osgManipulator::Translate2DDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    else if ("TranslateAxisDragger" == name)
+    {
+        osgManipulator::TranslateAxisDragger* d = new osgManipulator::TranslateAxisDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    else if ("TabBoxDragger" == name)
+    {
+        osgManipulator::TabBoxDragger* d = new osgManipulator::TabBoxDragger();
+        d->setupDefaultGeometry();
+        dragger = d;
+    }
+    
+    if (dragger)
+    {
+        // turn off lighing on dragger
+        osg::StateSet *ss = dragger->getOrCreateStateSet();
+        ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    }
+    
+    return dragger;
+}
+
+    
+void GroupNode::setManipulator(const char *manipulatorType)
+{
+    
+    if (this->owner.valid()) return;
+    
+    _manipulatorType = std::string(manipulatorType);
+    BROADCAST(this, "ss", "setManipulator", getManipulator());
+
+    // only do the dragger stuff on the viewer side:
+    if ( !spinApp::Instance().getContext()->isServer() )
+    {
+    
+        if (dragger.valid())
+        {            
+            // Apply the transform of the matrixTransform (updated by the
+            // dragger) to the mainTransform, but, we need to do this with
+            // setTranslation, setOrientation, and setScale calls so that the 
+            // server finally gets notified:
+            
+            osg::Matrix m = manipulatorTransform->getMatrix();
+            //if (!osg::Matrix::invert(m)) std::cout << "couldn't invert matrix" <<std::endl;
+            osg::Vec3 t = mainTransform->getPosition() + m.getTrans();
+            osg::Quat q = mainTransform->getAttitude() * m.getRotate();
+            osg::Vec3 s = osg::Vec3(mainTransform->getScale().x() * m.getScale().x(),
+                                    mainTransform->getScale().y() * m.getScale().y(),
+                                    mainTransform->getScale().z() * m.getScale().z());
+            
+            /*
+            osg::PositionAttitudeTransform *pat = manipulatorTransform->asPositionAttitudeTransform();
+            if (!pat)
+                std::cout << "error: can't get PAT from manipulatorTransform" << std::endl;
+            
+            osg::Vec3 t = mainTransform->getPosition() + pat->getPosition();
+            osg::Quat q = mainTransform->getAttitude() * pat->getAttitude();
+            osg::Vec3 s = osg::Vec3(mainTransform->getScale().x() * pat->getScale().x(),
+                                    mainTransform->getScale().y() * pat->getScale().y(),
+                                    mainTransform->getScale().z() * pat->getScale().z());
+        */
+            
+            // unlock the node:
+            spinApp::Instance().NodeMessage(this->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 0, SPIN_ARGS_END);
+            
+            spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setTranslation", t.x(), t.y(), t.z(), SPIN_ARGS_END);
+            spinApp::Instance().NodeMessage(this->getID().c_str(), "sffff", "setOrientationQuat", q.x(), q.y(), q.z(), q.w(), SPIN_ARGS_END);
+            spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setScale", s.x(), s.y(), s.z(), SPIN_ARGS_END);
+
+            
+            // return the manipulatorTransform to an identity matrix, and remove
+            // the dragger:
+            manipulatorTransform->setMatrix(osg::Matrix::identity());
+            mainTransform->removeChild(dragger.get());
+            dragger = 0;
+
+        }
+        
+        dragger = createDragger(manipulatorType);
+        if (dragger.valid())
+        {
+            // tell server that this viewer's UserNode is now the owner:
+            spinApp::Instance().NodeMessage(this->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 1, SPIN_ARGS_END);
+            
+            mainTransform->addChild(dragger.get());
+            
+            float scale = this->getBound().radius() * 1.6;
+            dragger->setMatrix(osg::Matrix::scale(scale, scale, scale) *
+                               osg::Matrix::translate(this->getBound().center()));
+            
+            dragger->addTransformUpdating(manipulatorTransform.get());
+            
+            // we want the dragger to handle it's own events automatically
+            dragger->setHandleEvents(true);
+            
+            // if we don't set an activation key or mod mask then any mouse click on
+            // the dragger will activate it, however if do define either of ActivationModKeyMask or
+            // and ActivationKeyEvent then you'll have to press either than mod key or the specified key to
+            // be able to activate the dragger when you mouse click on it.  Please note the follow allows
+            // activation if either the ctrl key or the 'a' key is pressed and held down.
+            dragger->setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
+            dragger->setActivationKeyEvent('a');
+        }
+    }
+}
+    
+    
+    
 // *****************************************************************************
 
 osg::Matrix GroupNode::getGlobalMatrix()

@@ -48,9 +48,10 @@
 
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
+#include <osg/MatrixTransform>
 #include <osg/Timer>
 #include <osg/ClipNode>
-
+#include <osgManipulator/Dragger>
 #include <vector>
 
 namespace spin
@@ -100,7 +101,8 @@ public:
 
     void mouseEvent (int event, int keyMask, int buttonMask, float x, float y);
     void event (int event, const char* userString, float eData1, float eData2, float x, float y, float z);
-
+    void setLock(const char* userString, int lock);
+    
     virtual void debug();
     
     void setReportMode(globalsReportMode mode);
@@ -185,6 +187,10 @@ public:
     virtual void rotate (float pitch, float roll, float yaw);
 
 
+    virtual void setManipulator(const char *manipulatorType);
+    const char* getManipulator() const { return _manipulatorType.c_str(); }
+    
+    
     int getReportMode() const { return (int) _reportMode; };
     int getInteractionMode() const { return (int) _interactionMode; };
     osg::Vec3 getClipping() const { return _clipping; };
@@ -236,7 +242,9 @@ protected:
     osg::ref_ptr<UserNode> owner;
 
     osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
-
+    osg::ref_ptr<osg::MatrixTransform> manipulatorTransform;
+    
+    osg::ref_ptr<osgManipulator::Dragger> dragger;
     
     interactionMode _interactionMode;
     std::vector<osg::Vec4> _trajectory;
@@ -256,6 +264,8 @@ protected:
     velocityMode _velocityMode;
     osg::Vec3 _spin;
     float _damping;
+    
+    std::string _manipulatorType;
     
 private:
 

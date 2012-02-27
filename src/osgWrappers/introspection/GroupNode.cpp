@@ -70,6 +70,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__event__int__C5_char_P1__float__float__float__float__float,
 	          "",
 	          "");
+	I_Method2(void, setLock, IN, const char *, userString, IN, int, lock,
+	          Properties::NON_VIRTUAL,
+	          __void__setLock__C5_char_P1__int,
+	          "",
+	          "");
 	I_Method0(void, debug,
 	          Properties::VIRTUAL,
 	          __void__debug,
@@ -145,6 +150,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__rotate__float__float__float,
 	          "",
 	          "The rotate command adds a relative rotation to the node's current orientation. ");
+	I_Method1(void, setManipulator, IN, const char *, manipulatorType,
+	          Properties::VIRTUAL,
+	          __void__setManipulator__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(const char *, getManipulator,
+	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getManipulator,
+	          "",
+	          "");
 	I_Method0(int, getReportMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getReportMode,
@@ -230,6 +245,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_SimpleProperty(int, InteractionMode, 
 	                 __int__getInteractionMode, 
 	                 0);
+	I_SimpleProperty(const char *, Manipulator, 
+	                 __C5_char_P1__getManipulator, 
+	                 __void__setManipulator__C5_char_P1);
 	I_SimpleProperty(osg::Vec3, Orientation, 
 	                 __osg_Vec3__getOrientation, 
 	                 0);
