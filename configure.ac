@@ -17,7 +17,7 @@ AC_PREREQ([2.61])
 # - increase spin_interface_version to the next odd number
 m4_define([spin_major_version], [0])
 m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [5])
+m4_define([spin_micro_version], [9])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -133,7 +133,7 @@ case "$host" in *-darwin* | *-macos10*)
 esac
 
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
-# LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
+LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
