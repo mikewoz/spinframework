@@ -140,6 +140,9 @@ void VideoTexture::setPath (const char* newPath)
 	if (_path == std::string(newPath)) return;
 
 	_path = std::string(newPath);
+
+	//debug
+	//osg::setNotifyLevel(osg::DEBUG_FP);
 	
 	if (sceneManager->isGraphical())
 	{
@@ -262,6 +265,8 @@ void VideoTexture::setPath (const char* newPath)
 		}
 
 	}
+
+	//osg::setNotifyLevel(osg::FATAL);
 
 	BROADCAST(this, "ss", "setPath", getPath());
 }

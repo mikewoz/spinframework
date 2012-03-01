@@ -105,7 +105,9 @@ void ImageTexture::setPath (const char* newPath)
 
 		std::cout << "Loading image: " << fullPath << std::endl;
 
+		//osg::setNotifyLevel(osg::DEBUG_FP);
 		osg::ref_ptr<osg::Image> test = osgDB::readImageFile(fullPath);
+		//osg::setNotifyLevel(osg::FATAL);
 		
 		if (test.valid())
 		{
