@@ -43,9 +43,9 @@ BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	          __void__updateTransforms,
 	          "",
 	          "");
-	I_Method1(osg::Quat, getOrientation, IN, int, index,
+	I_Method1(osg::Quat, getOrientation, IN, float, index,
 	          Properties::NON_VIRTUAL,
-	          __osg_Quat__getOrientation__int,
+	          __osg_Quat__getOrientation__float,
 	          "",
 	          "");
 	I_Method1(osg::Vec3, getTranslation, IN, float, index,
@@ -53,9 +53,9 @@ BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	          __osg_Vec3__getTranslation__float,
 	          "",
 	          "");
-	I_Method1(void, setCurrentIndex, IN, float, newValue,
+	I_Method1(void, setIndex, IN, float, newValue,
 	          Properties::NON_VIRTUAL,
-	          __void__setCurrentIndex__float,
+	          __void__setIndex__float,
 	          "",
 	          "");
 	I_Method0(void, prev,
@@ -143,6 +143,16 @@ BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	          __osg_Vec4__getColor,
 	          "",
 	          "");
+	I_Method1(void, setLighting, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setLighting__int,
+	          "",
+	          "Set whether the contour is influenced by lighting ");
+	I_Method0(int, getLighting,
+	          Properties::NON_VIRTUAL,
+	          __int__getLighting,
+	          "",
+	          "");
 	I_Method0(void, draw,
 	          Properties::NON_VIRTUAL,
 	          __void__draw,
@@ -158,7 +168,13 @@ BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	                 0);
 	I_SimpleProperty(float, CurrentIndex, 
 	                 __float__getCurrentIndex, 
-	                 __void__setCurrentIndex__float);
+	                 0);
+	I_SimpleProperty(float, Index, 
+	                 0, 
+	                 __void__setIndex__float);
+	I_SimpleProperty(int, Lighting, 
+	                 __int__getLighting, 
+	                 __void__setLighting__int);
 	I_SimpleProperty(float, LineType, 
 	                 __float__getLineType, 
 	                 0);
