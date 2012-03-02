@@ -48,6 +48,7 @@ namespace osg {
 }
 
 #include "ReferencedNode.h"
+//#include "GroupNode.h"
 
 namespace spin
 {
@@ -85,10 +86,10 @@ public:
     virtual void callbackUpdate();
     
     void updateTransforms();
-    osg::Quat getOrientation(int index) const;
+    osg::Quat getOrientation(float index) const;
     osg::Vec3 getTranslation(float index) const;
     
-    void setCurrentIndex (float newValue);
+    void setIndex (float newValue);
     void prev();
     void next();
 
@@ -115,7 +116,11 @@ public:
     float getLineType() const { return (int) _lineType; }
     osg::Vec4 getColor() const { return _color;  }
     
-    
+    /**
+     * Set whether the contour is influenced by lighting
+     */
+    void setLighting(int i);
+    int getLighting() const { return (int)_lightingEnabled; }
     
     void draw();
     
@@ -150,6 +155,7 @@ private:
 
     
     osg::Vec4 _color;
+    bool _lightingEnabled;
     
     ContourTypeEnum _lineType;
     float _thickness;
