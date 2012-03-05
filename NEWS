@@ -1,15 +1,32 @@
 SPIN Framework release notes
 ============================
 
-201?-0?-?? : spinframework 0.3.6
---------------------------------
+2012-03-05 : spinframework 0.3.10
+---------------------------------
 This release is in the development series 0.3.x that has an unstable API. 
 
 New features:
-* (none)
+
+* added option of reading command line args from file: ~/.spinFramework/args
+* added initial PointCloud node
+* added GeometryNode
+* xcode project
+* SharedVideoTexture: allow set/get renderbin
 
 Bugs fixed:
-* (none)
+
+* fixed boost linking for spinserver and spinviewer app
+* added missing boost libraries to Makefile.am
+* fixed texture loading for Ubuntu using OSG 3.0.1 from package (by specifying the correct plugin path)
+* added /usr/local/lib and /usr/local/lib64 to LDFLAGS to test on Ubuntu Precise
+* switched to new boost.m4 script
+* changed ifdefs in sharedvideonode to prevent errors if wrappers are generated in linux
+* set video textures to play by default
+* set OSG-specific library path in one_step_build.sh
+* delete SharedVideoNode
+* add Makefile.am for completion dir
+* fixed orbit example's Makefile
+* added boost-program-options library, since the newest python 2.6 on Lucid uses an updated libutil, which requires boost-program-options
 
 
 2012-01-13 : spinframework 0.3.4
@@ -17,6 +34,7 @@ Bugs fixed:
 This release is in the development series 0.3.x that has an unstable API. 
 
 New features:
+
 * Enclose everything in the spin namespace
 * four-screen cube
 * dome distorsion to camera config files
@@ -38,6 +56,7 @@ New features:
 * added bounce and collide events for ConstraintsNode
 
 Bugs fixed:
+
 * TIMECODE CHANGE: now using double precision milliseconds
 * fixed bug when compiling spin without spatosc
 * fixed autoconf macro for python so that it detects python 2.7 properly (Natty)
@@ -69,6 +88,7 @@ info and scene message channels. We fixed a lot of bugs regarding the shared vid
 using the Scenic milhouse video streaming utility. 
 
 New features:
+
 * Added a TCP channel for important messages to the spinserver
 * Renamed spinserver and spinviewer to lowercase
 * Implemented the --version option in spinserver and spinviewer
@@ -83,6 +103,7 @@ New features:
 * don't need to configure with --enable-scenic, if it's detected it will be used 
 
 Bugs fixed:
+
 * fixed sync signal to be double float in ms
 * updates to autoconf for Ubuntu Lucid
 * fixed `make dist`

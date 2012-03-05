@@ -153,6 +153,9 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 # doesn't work with glibtool, so we make a symbolic link in an install hook instead.
 # On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
 # do this only for OSX?
+install-exec-hook:
+	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+
 #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
 
 
