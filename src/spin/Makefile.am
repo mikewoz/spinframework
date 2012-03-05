@@ -14,13 +14,13 @@ AM_CPPFLAGS = \
 
 # use lib_LTLIBRARIES to build a shared lib:
 lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
-python_LTLIBRARIES = libSPINPyWrap.la
+python_LTLIBRARIES = libpyspin.la
 
-libspin_@SPIN_API_VERSION@_la_LIBADD = \
+libpyspin_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
     $(top_builddir)/src/tinyxml/libtinyxml.la
 
-libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
+libpyspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     -export-dynamic \
     -version-info $(SPIN_LT_VERSION) \
     $(BOOST_SYSTEM_LIBS) \
@@ -30,17 +30,15 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(BOOST_LDFLAGS) \
     $(CPPINTROSPECTION_LIBS) \
     $(PYTHON_LDFLAGS) \
+ 	$(BOOST_THREADS_LIBS) \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHAREDVIDEO_LIBS) \
     $(SPATOSC_LIBS)
 
-    
-#	$(BOOST_THREAD_LIBS) 
-
 # please keep those in alphabetical order:
-libspin_@SPIN_API_VERSION@_la_SOURCES = \
+libpyspin_@SPIN_API_VERSION@_la_SOURCES = \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
     DSPNode.cpp \
@@ -84,8 +82,8 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     spinUtil.cpp \
     introspect_helpers.cpp
 
-libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
-libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
+libpyspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
+libpyspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
     $(top_srcdir)/include/config.h \
@@ -141,33 +139,32 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
 
 # $(top_srcdir)/include/videoSize.h
 
-libSPINPyWrap_la_SOURCES = python_wrappers.cpp
-#libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libspin_@SPIN_API_VERSION@.la \
+pyspin_la_SOURCES = python_wrappers.cpp
+#pyspin_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
+pyspin_la_LIBADD = libspin_@SPIN_API_VERSION@.la \
 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
-libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+spindir = `python -c 'from distutils import sysconfig; sysconfig.get_python_lib(plat_specific=True, standard_lib=False, prefix="@PYTHON_PREFIX@")'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
 
-# On OSX, we need the python module to have a .so extension, but the -shrext option
-# doesn't work with glibtool, so we make a symbolic link in an install hook instead.
-# On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
-# do this only for OSX?
+# On OSX, we need the python module to have a .so extension, but the
+# -shrext option doesn't work with glibtool, so we make a symbolic link
+# in an install hook instead.
+# On Linux, this will fail because the .dylip doesn't exist. Is there
+# any way we can do this only for OSX?
+
 install-exec-hook:
-	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+	cd $(spindir) && $(LN_S) -f spin.dylib spin.so
 
 #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
-
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
 spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
 
-
 spinviewer_SOURCES = spinViewer.cpp
 spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
-
 
 spindocgenerator_SOURCES = docGenerator.cpp
 spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
@@ -234,3 +231,4 @@ spinviewer.app: spinviewer$(EXEEXT)
 doc:
 	./spindocgenerator
 	-cp *.html ../../doxygen/html
+
