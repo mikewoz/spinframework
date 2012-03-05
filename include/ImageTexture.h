@@ -42,14 +42,20 @@
 #ifndef __ImageTexture_H
 #define __ImageTexture_H
 
-#include "SceneManager.h"
+class SceneManager;
 
-#include <osg/ImageStream>
-#include <osg/ImageSequence>
-#include <osg/TextureRectangle>
-#include <osg/Texture2D>
-#include <osg/Timer>
+namespace osg {
+    class Image;
+}
 
+#include <string>
+#include <lo/lo_types.h>
+#include <vector>
+#include <osg/ref_ptr>
+#include "ReferencedStateSet.h"
+
+namespace spin
+{
 
 /**
  * \brief A texture state that holds a static image
@@ -60,51 +66,52 @@ class ImageTexture : public ReferencedStateSet
 
 public:
 
-	ImageTexture(SceneManager *sceneManager, const char *initID);
-	~ImageTexture();
+    ImageTexture(SceneManager *sceneManager, const char *initID);
+    ~ImageTexture();
 
-	virtual void debug();
-	
-	/**
-	 * Returns whether there is a currently valid image texture
-	 */
-	bool isValid() { return (_image.valid()); }
+    virtual void debug();
+    
+    /**
+     * Returns whether there is a currently valid image texture
+     */
+    bool isValid() const;
 
-	/**
-	 * Creates a texture from a path on disk.
-	 */
-	void setPath (const char* newPath);
-	const char *getPath() { return _path.c_str(); }
+    /**
+     * Creates a texture from a path on disk.
+     */
+    void setPath (const char* newPath);
+    const char *getPath() const { return _path.c_str(); }
 
-	/**
-	 * Set whether the texture is influenced by lighting
-	 */
-	void setLighting(int i);
-	int getLighting() { return (int)_lightingEnabled; }
+    /**
+     * Set whether the texture is influenced by lighting
+     */
+    void setLighting(int i);
+    int getLighting() const { return (int)_lightingEnabled; }
 
-	/**
-	 * Set the render bin for this texture. The higher the number, the later it
-	 * gets processed (ie, it appears on top). Default renderBin = 11
-	 */
-	void setRenderBin (int i);
-	int getRenderBin() { return _renderBin; }
+    /**
+     * Set the render bin for this texture. The higher the number, the later it
+     * gets processed (ie, it appears on top). Default renderBin = 11
+     */
+    void setRenderBin (int i);
+    int getRenderBin() const { return _renderBin; }
 
 
 
-	// must reimplement
-	virtual std::vector<lo_message> getState();
+    // must reimplement
+    virtual std::vector<lo_message> getState() const;
 
-	
+    
 private:
-	
-	osg::ref_ptr<osg::Image> _image;
+    
+    osg::ref_ptr<osg::Image> _image;
 
-	std::string _path;
+    std::string _path;
 
-	bool _lightingEnabled;
-	int  _renderBin;
-	bool _useTextureRectangle;
+    bool _lightingEnabled;
+    int  _renderBin;
+    bool _useTextureRectangle;
 };
 
+} // end of namespace spin
 
 #endif

@@ -44,11 +44,13 @@
 
 #include <osg/Node>
 #include <osg/Group>
+#include <osg/ClearNode>
 #include <osg/Geode>
 
 #include <osgDB/SharedStateManager>
-#include <osgIntrospection/Value>
+#include <cppintrospection/Value>
 
+#include "config.h"
 #include "ReferencedNode.h"
 #include "ReferencedStateSet.h"
 
@@ -56,6 +58,9 @@
 
 #include "lo/lo.h"
 #include "tinyxml.h"
+
+namespace spin
+{
 
 typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
 typedef std::map< std::string, nodeListType > nodeMapType;
@@ -83,10 +88,15 @@ class spinLog;
 class SceneManager
 {
     public:
-        SceneManager(const std::string &id);
+        //SceneManager(const std::string &id);
+        SceneManager(std::string id);
         ~SceneManager();
 
         void init();
+        void debugContext();
+        void debugNodes();
+        void debugStateSets();
+        void debugSceneGraph();
         void debug();
 
         void setGraphical(bool b) { graphicalMode = b; }
@@ -101,6 +111,8 @@ class SceneManager
         void sendNodeList(std::string type, lo_address txAddr = 0);
         void sendConnectionList(lo_address txAddr = 0);
 
+        std::vector<std::string> getAllNodeTypes();
+
         ReferencedNode *createNode(std::string id, std::string type);
         ReferencedNode *createNode(const char *id, const char *type);
         ReferencedNode *getNode(std::string id);
@@ -112,6 +124,10 @@ class SceneManager
         ReferencedStateSet* createStateSet(const char *id, const char *type);
         ReferencedStateSet* createStateSet(const char *fname);
 
+        std::vector<t_symbol*> findNodes(const char *pattern);
+        //nodeListType findNodes(const char *pattern);
+        //ReferencedStateSetList findStateSet(const char *pattern);
+            
         std::vector<SoundConnection*> getConnections();
 
         /**
@@ -139,14 +155,14 @@ class SceneManager
          */
         void doDelete(ReferencedNode *n);
 
-		/**
+        /**
          * The doDelete method performs all of the necessary steps to delete a
          * stateset. It is similar to the doDelete method for a note: it calls
-		 * the node's removeFromScene() method, releases resources (eg, videos),
-		 * removes it from the stateMap list, etc.
+         * the node's removeFromScene() method, releases resources (eg, videos),
+         * removes it from the stateMap list, etc.
          */
-		void doDelete(ReferencedStateSet *n);
-		
+        void doDelete(ReferencedStateSet *n);
+        
         /**
          * Clears scene elements that are not part of any user's subgraphs
          */
@@ -171,20 +187,15 @@ class SceneManager
          */
         void update();
 
-
-
-
         osg::Matrix getWorldCoords(t_symbol *id);
 
         void exportScene (const char *nodeID, const char *filename);
 
-
         std::string sceneID;
 
         osg::ref_ptr<osg::Group> rootNode;
-        osg::ref_ptr<osg::Group> worldNode;
+        osg::ref_ptr<osg::ClearNode> worldNode;
         osg::ref_ptr<osg::Geode> gridGeode;
-
 
         /**
          * The scene manager can operate in graphical mode or non-graphical.
@@ -204,10 +215,13 @@ class SceneManager
         std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
 
         std::string getConnectionsAsXML();
+        std::vector<t_symbol*> getSavableStateSets(ReferencedNode *n, bool withUsers);
+
         bool saveXML(const char *filename, bool withUsers = false);
         bool saveUsers(const char *s);
 
         bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
+        bool createStateSetFromXML(TiXmlElement *XMLnode);
         bool createConnectionsFromXML(TiXmlElement *XMLnode);
         bool loadXML(const char *filename);
 
@@ -215,7 +229,7 @@ class SceneManager
 
         MediaManager *mediaManager;
 
-        osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
+        //osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
         /**
          * The refreshAll method results in a broadcast of all nodelists so that
@@ -231,6 +245,7 @@ class SceneManager
          */
         void refreshSubscribers(const std::map<std::string, lo_address> &clients);
 
+
     private:
 
         static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
@@ -239,10 +254,40 @@ class SceneManager
         ReferencedStateSetMap stateMap;
 };
 
+/**
+ * \namespace introspector
+ * \brief Function that deal with cppintrospection-wrapped namespaces, classes and methods from SPIN.
+ */
+namespace introspector
+{
+    /**
+     * Prepends "spin::" to a type name.
+     */
+    std::string prependNamespace(const std::string &name);
+    /**
+     * Prepends "spin::" to a type name and returns its cppintrospection::Type.
+     */
+    const cppintrospection::Type& getType(const std::string &name);
+
+    /**
+     * Recursive function to invoke a method for a particular class, that will try
+     * all base classes as well
+     * 
+     * This OSC callback functions need to be valid C function pointers, so it's
+     * declared here as a function, not a method):
+     */
+    int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs);
+
+#if 0
+    /**
+     * Removes "spin::" from a type name.
+     */
+    std::string removeNamespace(const std::string &name);
+#endif
+
+} // end of namespace introspector
 
 
-
-
-int invokeMethod(const osgIntrospection::Value classInstance, const osgIntrospection::Type &classType, std::string method, osgIntrospection::ValueList theArgs);
+} // end of namespace spin
 
 #endif

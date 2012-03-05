@@ -45,19 +45,41 @@
 
 #include <string>
 
+#include "config.h"
 #include "spinUtil.h"
 #include "libloUtil.h"
 #include "MediaManager.h"
 
+#include <osg/Referenced>
+#ifndef GL_GLEXT_LEGACY
+#define GL_GLEXT_LEGACY // To avoid glext error
+#endif
 #include <osg/Group>
 #include <osg/Node>
+#include <osg/observer_ptr>
+#ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
+#endif
+#include <cppintrospection/Value>
 
-// forward declaration of SceneManager
+#ifdef DISABLE_PYTHON
+namespace boost { namespace python { class object {void run(){}}; }}
+#endif
+
+namespace spin
+{
+
 class SceneManager;
 
+
+    
+/**
+ * Python script that is ran periodically.
+ */
 typedef struct {
+    #ifndef DISABLE_PYTHON_
     boost::python::object run;
+    #endif
     double freq;
     double lastRun;
     bool enabled;
@@ -68,8 +90,13 @@ typedef struct {
     std::string pyModule;
 } CronScript;
 
+/**
+ * Python script that is ran when some event happens.
+ */
 typedef struct {
+    #ifndef DISABLE_PYTHON_
     boost::python::object run;
+    #endif
     std::string eventName;
     bool enabled;
     bool serverSide;
@@ -85,9 +112,8 @@ typedef std::map< const std::string, EventScript* > EventScriptList;
 typedef std::map< std::string, std::string > stringParamType;
 typedef std::map< std::string, float > floatParamType;
 
-
 /**
- * \brief The base class for all SPIN-related scene graph nodes
+ * \brief The base class for all SPIN scene graph nodes.
  *
  * Any node that is to be attached to the scene graph needs to be extended from
  * the ReferencedNode class. By doing so, the OSC networking interface is created
@@ -96,17 +122,12 @@ typedef std::map< std::string, float > floatParamType;
  */
 class ReferencedNode : virtual public osg::Group
 {
-
 public:
-
-
-    // ***********************************************************
-    // methods:
-
     ReferencedNode(SceneManager *sceneManager, char *initID);
     ~ReferencedNode();
 
     void registerNode(SceneManager *s);
+    //void registerNode(std::string sceneID);
 
     /**
      * For nodes that require regular programmatic control, there is a callback
@@ -144,18 +165,15 @@ public:
      * function MUST be overridden, and extra nodes must be manually pushed onto
      * currentNodePath.
      */
-    virtual void updateNodePath();
+    virtual void updateNodePath(bool updateChildren = true);
 
     int setAttachmentNode(osg::Group *n);
-
 
     /**
      * An internal method that keeps track of the nodepath (for efficient
      * computation of global position, etc.
      */
     void updateChildNodePaths();
-
-
 
     /**
      * This method schedules a change in parent for this node. The setParent()
@@ -171,7 +189,7 @@ public:
     /**
      * Returns the current parent name (string)
      */
-    char *getParent() { return parent->s_name; }
+    char *getParent() const { return parent->s_name; }
 
     /**
      * Returns the current parent as an osg::Group
@@ -189,14 +207,17 @@ public:
      */
     virtual void setContext (const char *newvalue);
 
+    void setAlpha (float alpha);
+    float getAlpha() const { return subgraphAlpha_; }
+
     /**
      * Returns the current host
      */
-    const char *getContext() { return contextString.c_str(); }
-    std::string getContextString() { return contextString; }
+    const char *getContext() const { return contextString.c_str(); }
+    std::string getContextString() const { return contextString; }
 
-    void setParam (const char *paramName, const char *paramValue);
-    void setParam (const char *paramName, float paramValue);
+    virtual void setParam (const char *paramName, const char *paramValue);
+    virtual void setParam (const char *paramName, float paramValue);
 
     /**
      * subclasses of ReferencedNode may contain complicated subgraphs, and any
@@ -205,7 +226,7 @@ public:
      * local coordinate system of this node (according to the subgraph). This
      * function returns a pointer to this node.
      */
-    osg::Group *getAttachmentNode() { return attachmentNode; }
+    osg::Group *getAttachmentNode() const { return attachmentNode; }
 
     /**
      * Debug print (to log/console)
@@ -216,22 +237,21 @@ public:
      * For each subclass of ReferencedNode, we override the getState() method to
      * fill the vector with the correct set of methods for this particular node.
      */
-    virtual std::vector<lo_message> getState();
+    virtual std::vector<lo_message> getState() const;
 
     /**
-     * StateDump() is a request to broadcast the node state via SceneManager.
+     * Request to broadcast the node state via SceneManager.
      */
     virtual void stateDump();
     
     /**
-     * StateDump() is a request to send the node state to one address
+     * Request to send the node state to one address
      */
     virtual void stateDump(lo_address addr);
 
-
     // ***********************************************************
     // data:
-
+    // FIXME: Please make data members private.
 
     t_symbol *id;
     std::string nodeType;
@@ -245,7 +265,6 @@ public:
 
     bool scheduleForDeletion;
 
-
     // debug
 
     bool textFlag;
@@ -253,14 +272,11 @@ public:
     stringParamType stringParams;
     floatParamType floatParams;
 
-
-
+    float subgraphAlpha_;
 
     osg::NodePath currentNodePath;
 
     std::vector<ReferencedNode*> children;
-
-
 
     //osg::ref_ptr<osg::Geode> textGeode;
 
@@ -280,14 +296,16 @@ public:
     bool addEventScript( bool serverSide, const std::string& label, const std::string& eventName,
                          const std::string& scriptPath,  const std::string& params );
     bool callEventScript( const std::string& eventName,
-                          osgIntrospection::ValueList& args );
+                          cppintrospection::ValueList& args );
     bool enableEventScript( const char* label, int enable );
     bool removeEventScript( const char* label );
 
  protected:
 
     std::string _scriptFile;
+    #ifndef DISABLE_PYTHON
     boost::python::object _scriptRun;
+#endif
     EventScriptList _eventScriptList;
     CronScriptList _cronScriptList;
 
@@ -298,7 +316,7 @@ public:
      * It used to be that we wanted to keep a list of all child ReferencedNode
      * nodes that are attached. Was this so that we could differentiate SPIN
      * nodes from other scene graph node? That seems silly, since one can always
-     * try a dynamic_cast or use osgIntrospection
+     * try a dynamic_cast or use cppintrospection
      */
     ReferencedNode *as_getChild(ReferencedNode *child);
     /**
@@ -318,7 +336,6 @@ public:
      */
     bool legalParent (t_symbol *newParent);
 
-
     /**
      * The node that children get attached to:
      * We keep it private to force the use of setAttachmentNode(), which results
@@ -328,26 +345,39 @@ public:
 
 };
 
+/**
+ * FIXME: Please document this.
+ */
+class ReferencedNode_data : public osg::Referenced
+{
+    public:
+        ReferencedNode_data(ReferencedNode *n) { node_ = n; }
+        //~ReferencedNode_data();
+        void update()
+        {
+            if (node_.valid())
+                node_->callbackUpdate();
+        }
+    private:
+        osg::observer_ptr<ReferencedNode> node_;
+};
 
-
+/**
+ * FIXME: Please document this.
+ */
 class ReferencedNode_callback : public osg::NodeCallback
 {
-
     public:
-
         virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
         {
-            osg::ref_ptr<ReferencedNode> thisNode = dynamic_cast<ReferencedNode*> (node->getUserData());
-
-            if (thisNode != NULL)
-            {
-                //std::cout << "in ReferencedNode_callback for node: " << thisNode->id->s_name << std::endl;
-                thisNode->callbackUpdate();
-            }
-
+            osg::ref_ptr<ReferencedNode_data> data = dynamic_cast<ReferencedNode_data*> (node->getUserData());
+            if (data != NULL)
+                data->update();
             traverse(node, nv);
         }
 };
 
+} // end of namespace spin
 
 #endif
+

@@ -42,12 +42,14 @@
 #ifndef __SoundSpace_H
 #define __SoundSpace_H
 
+#ifdef AS_GRAPHICAL
+#include <osgUtil/IntersectVisitor>
+#endif
 
 #include "DSPNode.h"
 
-#include <osgUtil/IntersectVisitor>
-
-class DSPNode;
+namespace spin
+{
 
 /**
  * \brief Represents an acoustic enclosure or volume in space.
@@ -57,37 +59,39 @@ class DSPNode;
  */
 class SoundSpace : public DSPNode
 {
-	
+    
   public:
-		
-		SoundSpace(SceneManager *sceneManager, char *initID);
-		virtual ~SoundSpace();
+        
+        SoundSpace(SceneManager *sceneManager, char *initID);
+        virtual ~SoundSpace();
 
 
-		void setAbsorption (t_floatarg newval);
-		void setFilterCoef (t_floatarg newval);
-		void setTransition (t_floatarg newval);
-		t_float absorption;
-		t_float filterCoef;
-		t_float transition;
-		
-		/**
-		 * For each subclass of ReferencedNode, we override the getState() method to
-		 * fill the vector with the correct set of methods for this particular node
-		 */
-		virtual std::vector<lo_message> getState();
-		
-		/**
-		 * We must include a stateDump() method that simply invokes the base class
-		 * method. Simple C++ inheritance is not enough, because osg::Introspection
-		 * won't see it.
-		 */
-		//virtual void stateDump() { ReferencedNode::stateDump(); };
+        void setAbsorption (t_floatarg newval);
+        void setFilterCoef (t_floatarg newval);
+        void setTransition (t_floatarg newval);
+        t_float absorption;
+        t_float filterCoef;
+        t_float transition;
+        
+        /**
+         * For each subclass of ReferencedNode, we override the getState() method to
+         * fill the vector with the correct set of methods for this particular node
+         */
+        virtual std::vector<lo_message> getState() const;
+        
+        /**
+         * We must include a stateDump() method that simply invokes the base class
+         * method. Simple C++ inheritance is not enough, because osg::Introspection
+         * won't see it.
+         */
+        //virtual void stateDump() { ReferencedNode::stateDump(); };
 
 #ifdef AS_GRAPHICAL
-		osgUtil::IntersectVisitor soundSpaceIntersectVisitor;
+        osgUtil::IntersectVisitor soundSpaceIntersectVisitor;
 #endif
-	
+    
 };
+
+} // end of namespace spin
 
 #endif

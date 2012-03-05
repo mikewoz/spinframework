@@ -50,25 +50,28 @@
 #include <iostream>
 #include <fstream>
 
-#include <osgIntrospection/Value>
-#include <osgIntrospection/Type>
-#include <osgIntrospection/Reflection>
-#include <osgIntrospection/MethodInfo>
-#include <osgIntrospection/PropertyInfo>
-#include <osgIntrospection/variant_cast>
+#include <cppintrospection/Value>
+#include <cppintrospection/Type>
+#include <cppintrospection/Reflection>
+#include <cppintrospection/MethodInfo>
+#include <cppintrospection/PropertyInfo>
+#include <cppintrospection/variant_cast>
 
-#include <osgIntrospection/Exceptions>
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/Exceptions>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
-using namespace osgIntrospection;
+using namespace cppintrospection;
 using namespace std;
 
 
 #define OUTPUT_FILE "oscprotocol.html"
 #define DEBUG 0
+
+namespace docgenerator
+{
 
 
 static bool IsGoodParam(const ParameterInfo& param)
@@ -117,7 +120,7 @@ static bool IsGoodMethod(const MethodInfo& method)
 }
 	
 
-static void GenerateHTML(const osgIntrospection::Type &classType, ofstream& output)
+static void GenerateHTML(const cppintrospection::Type &classType, ofstream& output)
 {
 
 	
@@ -239,11 +242,12 @@ static void GenerateHTML(const osgIntrospection::Type &classType, ofstream& outp
 }
 
 
-
+} // end of namespace docgenerator
 
 
 int main()
 {
+	using namespace docgenerator;
 	//std::ostringstream output("");
 	
 	ofstream output(OUTPUT_FILE);
@@ -253,8 +257,8 @@ int main()
 		return 1;
 	}
 	
-	const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-	const osgIntrospection::Type &ReferencedStateSetType = osgIntrospection::Reflection::getType("ReferencedStateSet");
+	const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
+	const cppintrospection::Type &ReferencedStateSetType = cppintrospection::Reflection::getType("spin::ReferencedStateSet");
 	
 	output << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
 	output << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;charset=UTF-8\">\n";
@@ -281,13 +285,13 @@ int main()
 		   << "Below is the complete list of accepted OSC messages for the "
 		   << "following nodes:</p>\n";
 		   
-	const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-	osgIntrospection::TypeMap::const_iterator it;
+	const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
+	cppintrospection::TypeMap::const_iterator it;
 	
 	output << "<ul>\n";
 	for (it=allTypes.begin(); it!=allTypes.end(); it++)
 	{
-		const osgIntrospection::Type *classType = ((*it).second);
+		const cppintrospection::Type *classType = ((*it).second);
 		
 		if (classType->isDefined())
 		{
@@ -306,7 +310,7 @@ int main()
 	output << "<ul>\n";
 	for (it=allTypes.begin(); it!=allTypes.end(); it++)
 	{
-		const osgIntrospection::Type *classType = ((*it).second);
+		const cppintrospection::Type *classType = ((*it).second);
 		
 		if (classType->isDefined())
 		{
@@ -323,7 +327,7 @@ int main()
 	
 	for (it=allTypes.begin(); it!=allTypes.end(); it++)
 	{
-		const osgIntrospection::Type *classType = ((*it).second);
+		const cppintrospection::Type *classType = ((*it).second);
 		
 		if (classType->isDefined())
 		{

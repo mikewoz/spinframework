@@ -41,11 +41,13 @@
 
 #include <string>
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 #include <osgViewer/CompositeViewer>
 #include <osg/ArgumentParser>
 #include <osgDB/ReadFile>
 #include <osg/Timer>
+
 
 #include "SceneManager.h"
 #include "spinApp.h"
@@ -58,73 +60,71 @@
 // *****************************************************************************
 int main(int argc, char **argv)
 {
-	spinServerContext *server = new spinServerContext();
-
+	using namespace spin;
+	spinServerContext server;
+    
 	// *************************************************************************
-	// ARGUMENTS::
+    // If no command line arguments were passed, check if there is an args file
+    // at ~/.spinFramework/args and override argc and argv with those:
+    std::vector<char*> newArgs;
+    if (argc == 1)
+    {
+        try
+        {
+            using namespace boost::filesystem;
+            
+            if (exists(SPIN_DIRECTORY+"/args"))
+            {
+                std::stringstream ss;
+                ss << std::ifstream( (SPIN_DIRECTORY+"/args").c_str() ).rdbuf();
+
+                // executable path is always the first argument:
+                newArgs.push_back(argv[0]);
+                
+                std::string token;
+                while (ss >> token)
+                {
+                    char *arg = new char[token.size() + 1];
+                    copy(token.begin(), token.end(), arg);
+                    arg[token.size()] = '\0';
+                    newArgs.push_back(arg);
+                }
+                newArgs.push_back(0); // needs to end with a null item
+                
+                argc = (int)newArgs.size()-1;
+                argv = &newArgs[0];
+            }
+        }
+        catch ( const boost::filesystem::filesystem_error& e )
+        {
+            std::cout << "Warning: cannot read arguments from " << SPIN_DIRECTORY+"/args. Reason: " << e.what() << std::endl;
+        }
+    }
+    
+    
+	// *************************************************************************
+	// PARSE ARGUMENTS::
 
 	osg::ArgumentParser arguments(&argc,argv);
-
-	std::string sceneID = spinApp::Instance().getSceneID();
-
-	std::string txHost = lo_address_get_hostname(server->lo_txAddr);
-	std::string txPort = lo_address_get_port(server->lo_txAddr);
-	std::string rxHost = lo_address_get_hostname(server->lo_rxAddr);
-	std::string rxPort = lo_address_get_port(server->lo_rxAddr);
-	std::string syncPort = lo_address_get_port(server->lo_rxAddr);
-
-	// set up the usage document, which a user can acess with -h or --help
+	
+    // set up the usage document, which a user can acess with -h or --help
 	arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" is a server for the SPIN Framework.");
 	arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] <scene-to-load.xml>");
-	arguments.getApplicationUsage()->addCommandLineOption("-h or --help", "Display this information");
-	arguments.getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
+    
+    // add generic spin arguments (for address/port setup, scene-id, etc) 
+    server.addCommandLineOptions(&arguments);
 
-	arguments.getApplicationUsage()->addCommandLineOption("--scene-id <uniqueID>", "Specify a unique ID for this scene (Default: the local host name)"); 
-    //FIXME: Printing current local host in help is no good for the man page generation
-    //'" + sceneID + "')");
-	arguments.getApplicationUsage()->addCommandLineOption("--tx-addr <hostname> <port>", "Set the transmission address where the server sends updates to (Default: " + txHost + " " + txPort + ")");
-	arguments.getApplicationUsage()->addCommandLineOption("--rx-addr <hostname> <port>", "Set the receiving address for incoming OSC messages (Default: <local host name> " + rxPort + ")");
-    // FIXME: rxHost (see comment above)
-	arguments.getApplicationUsage()->addCommandLineOption("--sync-port <port>", "Set the port on which we send the sync timecode (Default: " + syncPort + ")");
-
+    // arguments specific to spinserver:
+    arguments.getApplicationUsage()->addCommandLineOption("--disable-discovery", "Disable multicast discovery services.");
 
 	// PARSE ARGS:
 
-	// if user request help or version write it out to cout and quit.
-	if (arguments.read("-h") || arguments.read("--help"))
-	{
-		arguments.getApplicationUsage()->write(std::cout);
-		return 0;
-	}
-    if (arguments.read("--version"))
-    {
-        std::cout << VERSION << std::endl;
+    // parse generic args:
+    if (!server.parseCommandLineOptions(&arguments))
         return 0;
-    }
-    // otherwise, try to start the server:
-	osg::ArgumentParser::Parameter param_spinID(sceneID);
-	arguments.read("--scene-id", param_spinID);
-	spinApp::Instance().setSceneID(sceneID);
 
-	while (arguments.read("--tx-addr", txHost, txPort)) {
-		server->lo_txAddr = lo_address_new(txHost.c_str(), txPort.c_str());
-	}
-	while (arguments.read("--rx-addr", rxHost, rxPort)) {
-		server->lo_rxAddr = lo_address_new(rxHost.c_str(), rxPort.c_str());
-	}
-	while (arguments.read("--sync-port", syncPort)) {
-		server->lo_syncAddr = lo_address_new(txHost.c_str(), syncPort.c_str());
-	}
-
-	
 	// any option left unread are converted into errors to write out later
 	arguments.reportRemainingOptionsAsUnrecognized();
-
-	
-	// *************************************************************************
-	// start spin:
-
-	server->start();
 
 	
 	// *************************************************************************
@@ -149,21 +149,32 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	
+	// *************************************************************************
+	// start spin:
+	server.start();
+
+	// *************************************************************************
 	// send a userRefresh message:
     SCENE_MSG("s", "userRefresh");
 	
 	// *************************************************************************
 	// loop:
-	
-	while (server->isRunning())
-	{
-		sleep(1);
-		// loop until a quit message is received (TODO)
-	}
+    std::cout << "\nspinserver is READY" << std::endl;
+    try {	
+        while (server.isRunning())
+        {
+            sleep(1);
+            // loop until a quit message is received (TODO)
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Got exception " << e.what() << std::endl;
+        return 1;
+    }
 
-	usleep(100);
-	std::cout << "spinserver exited normally." << std::endl;
-	
-	return 0;
+    usleep(100);
+    std::cout << "spinserver exited normally." << std::endl;
+
+    return 0;
 }

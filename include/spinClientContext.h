@@ -44,6 +44,9 @@
 
 #include "spinBaseContext.h"
 
+namespace spin
+{
+
 
 /**
  * \brief A client-side spinContext for listening to a remote server
@@ -54,17 +57,39 @@ class spinClientContext : public spinBaseContext
 {
     public:
 
-		spinClientContext();
-		~spinClientContext();
+        spinClientContext();
+        ~spinClientContext();
 
-		bool start();
+        bool start();
+        void debugPrint();
+        void addCommandLineOptions(osg::ArgumentParser *arguments);
+        int parseCommandLineOptions(osg::ArgumentParser *arguments);
+        
         lo_server lo_syncServ;
 
+        int pollUpdates();
+
+    //protected:
+        /**
+         * Register the client's ip and port for reliable communication with the server
+         */
+        void subscribe();
+        
+
     private:
-        // address to which messages can be sent over TCP
-        lo_address lo_serverTCPAddr;
+
         // false once we've subscribed to a server in TCP
         bool doSubscribe_; 
+        // address to which messages can be sent over TCP
+        lo_address lo_serverTCPAddr;
+
+        std::vector<InfoMessage*> serverList;
+        
+        // we need to store the TCP address so that the user can override
+        // it manually. By default, this is filled with getMyIPaddress(),
+        // but this may be wrong if transmitting across subnets.
+        std::string recv_tcp_addr;
+
         /**
          * The spinClientThread is a simple thread that starts a sceneManager and
          * listens to incoming SPIN messages. It does NOT re-transmit those messages,
@@ -78,7 +103,7 @@ class spinClientContext : public spinBaseContext
          * The sceneCallback is used for to listen to userRefresh messages.
          * If this client is running before the server comes up, the server will
          * send a userRefresh message, and this client can re-send his user info
-		 */
+         */
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
         /**
@@ -99,7 +124,11 @@ class spinClientContext : public spinBaseContext
          */
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-        // register my ip and port for reliable communication with the server
-        void subscribe();
+
 };
+
+
+} // end of namespace spin
+
+
 #endif

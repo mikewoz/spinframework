@@ -42,14 +42,16 @@
 #ifndef __VideoTexture_H
 #define __VideoTexture_H
 
-#include "SceneManager.h"
+#include "ReferencedStateSet.h"
 
-#include <osg/ImageStream>
-#include <osg/ImageSequence>
-#include <osg/TextureRectangle>
-#include <osg/Texture2D>
-#include <osg/Timer>
+namespace osg {
+    class ImageStream;
+}
 
+namespace spin
+{
+	
+class SceneManager;
 
 /**
  * \brief A video texture node that allows dynamic textures to be applied
@@ -62,81 +64,84 @@ class VideoTexture : public ReferencedStateSet
 
 public:
 
-	VideoTexture(SceneManager *sceneManager, const char *initID);
-	~VideoTexture();
+    VideoTexture(SceneManager *sceneManager, const char *initID);
+    ~VideoTexture();
 
-	//virtual void updateCallback();
-	
-	virtual void debug();
-	
-	/**
-	 * Creates a video from a path on disk. This can either be a single movie
-	 * file (ie, a format that OSG knows how to read), or a folder name that
-	 * contains a sequence of images to stitch into a video.
-	 */
-	void setPath (const char* newPath);
-	const char *getPath() { return _path.c_str(); }
+    //virtual void updateCallback();
+    
+    virtual void debug();
+    
+    /**
+     * Creates a video from a path on disk. This can either be a single movie
+     * file (ie, a format that OSG knows how to read), or a folder name that
+     * contains a sequence of images to stitch into a video.
+     */
+    void setPath (const char* newPath);
+    const char *getPath() const { return _path.c_str(); }
 
-	/**
-	 * Enable (1) or disable (0) looping of the video
-	 */
-	void setLoop (int i);
-	int getLoop() { return (int)_loop; }
+    /**
+     * Enable (1) or disable (0) looping of the video
+     */
+    void setLoop (int i);
+    int getLoop() const { return (int)_loop; }
 
-	/**
-	 * Normalized seek to a part of the video. ie, index in range [0,1]
-	 */
-	void setIndex (float f);
-	float getIndex() { return _index; }
+    /**
+     * Normalized seek to a part of the video. ie, index in range [0,1]
+     */
+    void setIndex (float f);
+    float getIndex() const { return _index; }
 
-	/**
-	 * Only for image sequences; tells OSG how fast to play the sequence
-	 */
-	void setFrameRate (float f);
-	float getFrameRate() { return _framerate; }
-	
-	/**
-	 * Play (1) or Pause (0) the video
-	 */
-	void setPlay (int i);
-	int getPlay() { return (int)_play; }
+    /**
+     * Only for image sequences; tells OSG how fast to play the sequence
+     */
+    void setFrameRate (float f);
+    float getFrameRate() const { return _framerate; }
+    
+    /**
+     * Play (1) or Pause (0) the video
+     */
+    void setPlay (int i);
+    int getPlay() const { return (int)_play; }
 
-	
-	/**
-	 * Seek to beginning of video (quivalent to setIndex(0);
-	 */
-	void rewind();
-	
-	
-	void flipHorizontal();
-	void flipVertical();
-	
-	
-	/**
-	 * Returns whether there is a currently valid video
-	 */
-	bool isValid() { return (_imageStream.valid()); }
-	//bool isValid() { return (_imageStream.valid() || _imageSequence.valid()); }
+    
+    /**
+     * Seek to beginning of video (quivalent to setIndex(0);
+     */
+    void rewind();
+    
+    
+    void flipHorizontal();
+    void flipVertical();
+    
+    
+    /**
+     * Returns whether there is a currently valid video
+     */
+    bool isValid() { return (_imageStream.valid()); }
+    //bool isValid() { return (_imageStream.valid() || _imageSequence.valid()); }
 
-	// must reimplement
-	virtual std::vector<lo_message> getState();
+    // must reimplement
+    virtual std::vector<lo_message> getState() const;
 
-	
+    
 private:
 
-	std::string _path;
+    std::string _path;
 
-	bool _flip, _loop, _play;
-	
-	float _framerate;
-	float _index;
-	
-	bool _useTextureRectangle;
-	bool _isSequence;
-	
-	osg::ref_ptr<osg::ImageStream> _imageStream;
-	//osg::ref_ptr<osg::ImageSequence> _imageSequence;
+    bool _flip, _loop, _play;
+    
+    float _framerate;
+    float _index;
+    
+    bool _useTextureRectangle;
+    bool _isSequence;
+    
+    osg::ref_ptr<osg::ImageStream> _imageStream;
+    //osg::ref_ptr<osg::ImageSequence> _imageSequence;
 };
 
 
-#endif
+} // end of namespace spin
+
+#endif // include guard
+

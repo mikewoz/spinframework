@@ -48,6 +48,9 @@
 
 #include "osgUtil.h"
 
+namespace spin
+{
+
 /**
  * Returns an absolute angle difference between v1 and v2 (with no notion of
  * which is ahead or behind the other). Returned angle is from 0 to PI
@@ -71,7 +74,7 @@ double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
 	// Here we make sure that the angle is not a -1.#IND0000000 number, which means indefinite
 	if (isnan(angle))  //__isnand(x)
 		return 0;
-		
+
 	// Return the angle in radians
 	return( angle );
 }
@@ -102,6 +105,7 @@ double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2, int nullAxis)
 
 	// angle will be from -90 to 270 for some reason, so convert to -PI,PI
 	if (angle>osg::PI) angle -= 2 * osg::PI;
+	if (angle<-osg::PI) angle += 2 * osg::PI;
 	
 	return(angle);
 }
@@ -205,7 +209,24 @@ osg::Vec3 QuatToEuler(osg::Quat q)
 	yaw = atan2( 2* (q.x()*q.y() + q.z()*q.w()) , 1 - (2* (q.y()*q.y() + q.z()*q.z())) );
 	pitch =  atan2( 2* (q.x()*q.w() + q.y()*q.z()) , 1 - (2* (q.z()*q.z() + q.w()*q.w())) );
 	
-	return osg::Vec3(osg::PI-pitch,-roll,yaw);
+	// ignore isnan:
+	if (isnan(roll)) roll = 0.0;
+	if (isnan(yaw)) yaw = 0.0;
+	if (isnan(pitch)) pitch = 0.0;
+
+	// correct to OSG's coordinate system:
+	pitch = osg::PI-pitch;
+	roll = -roll;
+
+	// ensure in range of [-PI,PI]
+	if (roll>osg::PI) roll -= 2 * osg::PI;
+	else if (roll<-osg::PI) roll += 2 * osg::PI;
+	if (yaw>osg::PI) yaw -= 2 * osg::PI;
+	else if (yaw<-osg::PI) yaw += 2 * osg::PI;
+	if (pitch>osg::PI) pitch -= 2 * osg::PI;
+	else if (pitch<-osg::PI) pitch += 2 * osg::PI;
+
+	return osg::Vec3(pitch,roll,yaw);
 }
 
 osg::Vec3 QuatToEuler_old(osg::Quat q)
@@ -292,7 +313,7 @@ osg::Geode* createGrid(int radius, osg::Vec4 color)
 	// create the normals
 	//gridLines->setNormalArray(normals);
 	//gridLines->setNormalBinding(osg::Geometry::BIND_OVERALL);
-	osgUtil::SmoothingVisitor::smooth(*gridLines);
+	osgUtil::SmoothingVisitor::smooth_old(*gridLines);
 	
 	gridGeode->addDrawable(gridLines);
 	
@@ -367,7 +388,7 @@ osg::Geode* createHollowSphere(float radius, osg::Vec4 color)
 
 
 
-osg::Geode* createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color)
+osg::Geode* createWireframeRolloff(int /*rolloff*/, float /*distortion*/, float /*scale*/, osg::Vec4 /*color*/)
 {
 	//int samples = 30; // the number of times we sample the rolloff table
 	//int resolution = 10; // level of detail
@@ -455,7 +476,7 @@ osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 	osg::Geode* triGeode = new osg::Geode();
 	osg::Geometry* triFan = new osg::Geometry();
 	osg::Vec3Array* normals = new osg::Vec3Array;
-	osg::Vec3 myCoords[grain + 2];
+	osg::Vec3* myCoords = new osg::Vec3[grain + 2];
 	osg::Vec4Array* colors = new osg::Vec4Array;
 
 	// tip
@@ -497,4 +518,7 @@ osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 	return triGeode;
 
 }
+
+} // end of namespace spin
+
 

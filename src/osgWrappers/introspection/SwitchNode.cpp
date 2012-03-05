@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <SceneManager.h>
 #include <SwitchNode.h>
@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(SwitchNode)
+BEGIN_OBJECT_REFLECTOR(spin::SwitchNode)
 	I_DeclaringFile("SwitchNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____SwitchNode__SceneManager_P1__char_P1,
 	               "",
 	               "");

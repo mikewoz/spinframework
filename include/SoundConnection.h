@@ -43,12 +43,17 @@
 #ifndef __SoundConnection_H
 #define __SoundConnection_H
 
-#include "DSPNode.h"
-#include "SceneManager.h"
+#include <osg/Node>
+#include <lo/lo_types.h> // for lo_message
+#include "spinUtil.h" // for t_symbol
+
+namespace spin
+{
+
+class SceneManager;
+class DSPNode;
 
 enum connectionType { NORMAL, NODE_TO_SPACE, SPACE_TO_NODE };
-
-class DSPNode;
 
 /**
  * \brief An explicit connection between two sound elements (ie, subclassed from
@@ -62,52 +67,54 @@ class DSPNode;
 class SoundConnection : virtual public osg::Node
 {
  
-	public:
-		SoundConnection(SceneManager *s, osg::ref_ptr<DSPNode> src, osg::ref_ptr<DSPNode> snk);
-		~SoundConnection();
+    public:
+        SoundConnection(SceneManager *s, osg::ref_ptr<DSPNode> src, osg::ref_ptr<DSPNode> snk);
+        ~SoundConnection();
 
-		t_symbol *id;
-		
-		
-		void setThru (int newvalue);
-		void setDistanceEffect (float newvalue);
-		void setRolloffEffect (float newvalue);
-		void setDopplerEffect (float newvalue);
-		void setDiffractionEffect (float newvalue);
-		
-		int   getThru() { return (int) thru; };
-		float getDistanceEffect() { return distanceEffect; };
-		float getRolloffEffect() { return rolloffEffect; };
-		float getDopplerEffect() { return dopplerEffect; };
-		float getDiffractionEffect() { return diffractionEffect; };
+        t_symbol *id;
+        
+        
+        void setThru (int newvalue);
+        void setDistanceEffect (float newvalue);
+        void setRolloffEffect (float newvalue);
+        void setDopplerEffect (float newvalue);
+        void setDiffractionEffect (float newvalue);
+        
+        int   getThru() const { return (int) thru; };
+        float getDistanceEffect() const { return distanceEffect; };
+        float getRolloffEffect() const { return rolloffEffect; };
+        float getDopplerEffect() const { return dopplerEffect; };
+        float getDiffractionEffect() const { return diffractionEffect; };
 
-		
-		void debug();
-		virtual std::vector<lo_message> getState();
-		virtual void stateDump();
-		virtual void stateDump(lo_address addr);
-		
-		// ************
-	
-		
-		// These are pointers to the nodes for this connection:
-		//osg::ref_ptr<DSPNode> source, sink;
-		DSPNode *source, *sink;
-	
-		
-	private:
-		
-		// The modifiable parameters of the connection (allows for bending the rules
-		// of physical modelling):
-		bool thru;
-		float distanceEffect;
-		float rolloffEffect;
-		float dopplerEffect;
-		float diffractionEffect;
-		
-		
-		SceneManager *sceneManager;
+        
+        void debug();
+        virtual std::vector<lo_message> getState() const;
+        virtual void stateDump();
+        virtual void stateDump(lo_address addr);
+        
+        // ************
+    
+        
+        // These are pointers to the nodes for this connection:
+        //osg::ref_ptr<DSPNode> source, sink;
+        DSPNode *source, *sink;
+    
+        
+    private:
+        
+        // The modifiable parameters of the connection (allows for bending the rules
+        // of physical modelling):
+        bool thru;
+        float distanceEffect;
+        float rolloffEffect;
+        float dopplerEffect;
+        float diffractionEffect;
+        
+        
+        SceneManager *sceneManager;
 
 };
+
+} // end of namespace spin
 
 #endif

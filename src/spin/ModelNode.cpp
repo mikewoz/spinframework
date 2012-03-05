@@ -47,6 +47,9 @@
 #include <osg/Group>
 #include <osg/Billboard>
 #include <osg/AutoTransform>
+#include <osg/MatrixTransform>
+#include <osg/Switch>
+#include <osg/Sequence>
 
 //#include <osgFX/Scribe>
 //#include <osgFX/Cartoon>
@@ -68,12 +71,12 @@
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
-
-
 using namespace std;
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
 
 // ===================================================================
 // constructor:
@@ -82,7 +85,19 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	this->setName(string(id->s_name) + ".ModelNode");
 	nodeType = "ModelNode";
 
-	_registerStates = false;
+    // Save a pointer to the current attachmentNode (we will attach the loaded
+    // 3D mesh there:
+    _modelAttachmentNode = this->getAttachmentNode();
+    
+    // Now, add a new 'centroid' node, and make that the new attachmentNode.
+    // Children of this node will be attached there, and an offset will be added
+    // depending whether _attachCentroid is enabled or not:
+    _centroid = new osg::PositionAttitudeTransform();
+    this->getAttachmentNode()->addChild(_centroid.get());
+    this->setAttachmentNode(_centroid.get());
+
+    _attachCentroid = false;
+    _registerStates = false;
 	_statesetList.clear();
     _renderBin = 10;
 
@@ -96,6 +111,27 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 ModelNode::~ModelNode()
 {
 	//std::cout << "Destroying ModelNode: " << this->id->s_name << std::endl;
+}
+
+
+void ModelNode::updateNodePath(bool updateChildren)
+{
+	// call GroupNode's method, which will update all the way from the root, and
+	// we just need to add the centroid node:
+	GroupNode::updateNodePath(false);
+	currentNodePath.push_back(_centroid.get());
+
+    /*
+    osg::NodePath::iterator iter;
+    std::cout << "nodepath for " << id->s_name << ":" << std::endl;
+    for (iter = currentNodePath.begin(); iter!=currentNodePath.end(); iter++)
+    {
+        std::cout << " > " << (*iter)->getName() << std::endl;
+    }
+    */
+    
+	// now update NodePaths for all children:
+	updateChildNodePaths();
 }
 
 
@@ -126,6 +162,62 @@ void ModelNode::setModelFromFile (const char* filename)
 	BROADCAST(this, "ss", "setModelFromFile", getModelFromFile());
 }
 
+void ModelNode::setAttachCentroid (int i)
+{
+    _attachCentroid = (bool)i;
+
+    // TODO: bound may change dynamically (eg, animations, switch nodes, etc)
+    // so this should be done in the update callback whenever bound is made 
+    // dirty(). Can we check for that?
+    
+    if (model.valid() && _attachCentroid)
+    {	
+        osg::BoundingSphere bound = model->computeBound();
+        _centroid->setPosition(bound.center());
+        osg::Vec3 c = bound.center();
+        std::cout << "setting centroid for model: " <<c.x()<<","<<c.y()<< ","<<c.z() << std::endl;
+    }
+    else
+    {
+        std::cout << "setting centroid for model: 0,0,0" << std::endl;
+        _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
+    }
+    		
+    BROADCAST(this, "si", "setAttachCentroid", getAttachCentroid());
+}
+
+void ModelNode::makeCentered()
+{
+    if (model.valid())
+    {
+        osg::BoundingSphere bound = _modelAttachmentNode->computeBound();
+
+        std::cout << "centering the model to centroid: ("<<bound.center().x()<<","<<bound.center().y()<<","<<bound.center().z()<<") length="<< bound.center().length() << std::endl;
+
+        if (bound.center().length() > 0.00001)
+        {
+            _modelAttachmentNode->removeChild(model.get());
+
+            osg::PositionAttitudeTransform *mpat = new osg::PositionAttitudeTransform();
+            mpat->setPosition(-bound.center());
+
+            mpat->addChild(model.get());
+            _modelAttachmentNode->addChild(mpat);
+
+            //mpat->addChild(model.get());
+            //_modelAttachmentNode->replaceChild(model.get(), mpat);
+        }
+
+        _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
+
+        bound = _modelAttachmentNode->computeBound();
+        std::cout << "new centroid: ("<<bound.center().x()<<","<<bound.center().y()<<","<<bound.center().z()<<") length="<< bound.center().length() << std::endl;
+
+    }
+
+
+}
+
 void ModelNode::setStateRegistration (int i)
 {
 	_registerStates = (bool)i;
@@ -146,6 +238,25 @@ void ModelNode::setRenderBin (int i)
 	BROADCAST(this, "si", "setRenderBin", _renderBin);
 }
 
+void ModelNode::setPlaying (int index, int playstate)
+{
+    _playState[index] = playstate;
+    
+    if (sequencer[index].valid())
+    {
+        osg::Sequence::SequenceMode mode = sequencer[index]->getMode();
+        std:cout << "about to set mode to "<<_playState[index] << ", old="<<mode<<std::endl;
+        
+        sequencer[index]->setMode((osg::Sequence::SequenceMode)_playState[index]);
+        
+    
+        std::cout << "osgSequence mode: " << sequencer[index]->getMode() << ", duration: " << sequencer[index]->getNumFrames()<< ", speed: " << sequencer[index]->getSpeed() << ", lastFrameTime: " << sequencer[index]->getLastFrameTime() <<std::endl;
+    }
+    else std::cout << "Warning: Model '" << this->getID() << "' has no Sequence for index " << index << std::endl;
+    
+    BROADCAST(this, "sii", "setPlaying", index, _playState[index]);
+}
+    
 void ModelNode::setKeyframe (int index, float keyframe)
 {
 	_keyframe[index] = keyframe;
@@ -169,7 +280,7 @@ void ModelNode::setStateSet (int i, const char *replacement)
 {
 	osg::ref_ptr<ReferencedStateSet> ssOrig, ssReplacement;
 
-	if ( i < _statesetList.size() )
+	if ( i < (int)_statesetList.size() )
 	{
 		ssOrig = dynamic_cast<ReferencedStateSet*>(_statesetList[i]->s_thing);
 	}
@@ -219,6 +330,22 @@ void ModelNode::setStateSet (int i, const char *replacement)
 	}
 }
 
+void ModelNode::setLighting(int i)
+{
+
+    if (_lightingOverride==(bool)i) return;
+    _lightingOverride = (bool)i;
+
+    if (model.valid())// && !stateset->s_thing)
+    {
+        osg::StateSet *ss = model->getOrCreateStateSet();
+        if (_lightingOverride) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+        else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    }
+
+    BROADCAST(this, "si", "setLighting", getLighting());
+
+}
 
 // ===================================================================
 // ===================================================================
@@ -226,21 +353,21 @@ void ModelNode::setStateSet (int i, const char *replacement)
 void ModelNode::drawModel()
 {
 	int i,j;
-	
-	pthread_mutex_lock(&sceneMutex);
 
+	pthread_mutex_lock(&sceneMutex);
+	
 	if (model.valid())
 	{
 
-		this->getAttachmentNode()->removeChild(model.get());
-		model = NULL;
-		
+        _modelAttachmentNode->removeChild(model.get());
+            
+        model = NULL;
+        _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
 		_statesetList.clear();
-		
 		_ssDrawableList.clear();
 		_ssNodeList.clear();
 
-		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+		//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 		
 		
 		for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
@@ -264,9 +391,6 @@ void ModelNode::drawModel()
 		if (model.valid())
 		{
 			
-			if (sceneManager->sharedStateManager.valid())
-				sceneManager->sharedStateManager->share(model.get());
-		
 			
 			// *****************************************************************
 			
@@ -301,7 +425,7 @@ void ModelNode::drawModel()
 				switcher[i] = searchVisitor.getSwitchNode();
 				if (switcher[i].valid())
 				{
-					std::cout << "found OSG_Switch0" << i << " with " << switcher[i]->getNumChildren() << " frames" << std::endl;
+					std::cout << "found OSG_Switch" << buf << " with " << switcher[i]->getNumChildren() << " frames" << std::endl;
 					animationMode[i] = SWITCH;
 					// initialize so only first frame is visible:
 					switcher[i]->setValue(0, true);
@@ -314,10 +438,12 @@ void ModelNode::drawModel()
 				sequencer[i] = searchVisitor.getSequenceNode();
 				if (sequencer[i].valid())
 				{
-					std::cout << "found OSG_Sequence0" << i << " with " << sequencer[i]->getNumChildren() << " frames" << std::endl;
+					std::cout << "found OSG_Sequence" << buf << " with " << sequencer[i]->getNumChildren() << " frames" << std::endl;
+                    sequencer[i]->setDataVariance(osg::Object::DYNAMIC);
 					animationMode[i] = SEQUENCE;
 					sequencer[i]->setValue(0);
-					sequencer[i]->setMode(osg::Sequence::PAUSE);
+                    //sequencer[i]->setMode(osg::Sequence::PAUSE);
+                    //sequencer[i]->setMode(osg::Sequence::START);
 				}
 
 			}
@@ -325,8 +451,32 @@ void ModelNode::drawModel()
 			// *****************************************************************
 			// search for special "billboard" nodes
 
+			//optimizer.optimize(model.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
+			//optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
 			optimizer.optimize(model.get());
-			model->setName(string(id->s_name) + ".model['" + modelPath + "']");
+			/*
+            optimizer.optimize(model.get(),
+                osgUtil::Optimizer::FLATTEN_STATIC_TRANSFORMS |
+                osgUtil::Optimizer::REMOVE_REDUNDANT_NODES |
+                osgUtil::Optimizer::REMOVE_LOADED_PROXY_NODES |
+                osgUtil::Optimizer::COMBINE_ADJACENT_LODS |
+                osgUtil::Optimizer::SHARE_DUPLICATE_STATE |
+                osgUtil::Optimizer::MERGE_GEOMETRY |
+                osgUtil::Optimizer::CHECK_GEOMETRY |
+                osgUtil::Optimizer::SPATIALIZE_GROUPS | 
+                osgUtil::Optimizer::COPY_SHARED_NODES | 
+                osgUtil::Optimizer::TRISTRIP_GEOMETRY |
+                osgUtil::Optimizer::TESSELLATE_GEOMETRY |
+                osgUtil::Optimizer::OPTIMIZE_TEXTURE_SETTINGS |
+                osgUtil::Optimizer::MERGE_GEODES |
+                osgUtil::Optimizer::FLATTEN_BILLBOARDS |
+                //osgUtil::Optimizer::TEXTURE_ATLAS_BUILDER |
+                osgUtil::Optimizer::STATIC_OBJECT_DETECTION |
+                osgUtil::Optimizer::FLATTEN_STATIC_TRANSFORMS_DUPLICATING_SHARED_SUBGRAPHS 
+			);
+            */
+
+            model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 			StateSetList statesets;
 			TextureStateSetFinder f(statesets);
@@ -485,14 +635,16 @@ void ModelNode::drawModel()
 			
 			// *****************************************************************
 
-			this->getAttachmentNode()->addChild(model.get());
+			_modelAttachmentNode->addChild(model.get());
 
 			std::cout << "Created model " << modelPath << std::endl;
 			osg::BoundingSphere bound = model->computeBound();
 			osg::Vec3 c = bound.center();
 			std::cout << "  center=" <<c.x()<<","<<c.y()<< ","<<c.z()<< "  radius=" << bound.radius() << "  numTextures=" << statesets.size() << std::endl;
 
-
+            if (_attachCentroid)
+                _centroid->setPosition(c);
+            
 			//osg::StateSet *modelStateSet = new osg::StateSet();
 			//modelStateSet->setMode(GL_CULL_FACE,osg::StateAttribute::OFF);
 			//model->setStateSet(modelStateSet);
@@ -503,7 +655,11 @@ void ModelNode::drawModel()
             // Should we override our _renderBin value using ss->getBinNumber(),
             // or shoudld we apply our currently stored _renderBin to the model?
 			ss->setRenderBinDetails( (int)_renderBin, "RenderBin");
-			
+
+			/*
+			if (sceneManager->sharedStateManager.valid())
+				sceneManager->sharedStateManager->share(model.get());
+			*/
 			
 		} else {
 			std::cout << "ERROR [ModelNode::drawModel]: Could not find \"" << modelPath << "\". Make sure file exists, and that it is a valid 3D model." << std::endl;
@@ -513,7 +669,7 @@ void ModelNode::drawModel()
 	pthread_mutex_unlock(&sceneMutex);
 }
 
-std::vector<lo_message> ModelNode::getState ()
+std::vector<lo_message> ModelNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();
@@ -531,6 +687,14 @@ std::vector<lo_message> ModelNode::getState ()
 	ret.push_back(msg);
 
 	msg = lo_message_new();
+	lo_message_add(msg, "si", "setAttachCentroid", getAttachCentroid());
+	ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setLighting", getLighting());
+    ret.push_back(msg);
+    
+	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 	
@@ -538,6 +702,10 @@ std::vector<lo_message> ModelNode::getState ()
 	{
 		if (switcher[i].valid() || sequencer[i].valid())
 		{
+            msg = lo_message_new();
+			lo_message_add(msg, "sii", "setPlaying", i, _playState[i]);
+			ret.push_back(msg);
+
 			msg = lo_message_new();
 			lo_message_add(msg, "sif", "setKeyframe", i, _keyframe[i]);
 			ret.push_back(msg);
@@ -557,3 +725,6 @@ std::vector<lo_message> ModelNode::getState ()
 
 	return ret;
 }
+
+} // end of namespace spin
+

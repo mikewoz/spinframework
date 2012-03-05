@@ -40,6 +40,10 @@
 // -----------------------------------------------------------------------------
 
 #include <osg/StateSet>
+#include <osg/ImageStream>
+#include <osg/ImageSequence>
+#include <osg/TextureRectangle>
+#include <osg/Texture2D>
 #include <osg/StateAttribute>
 #include <osgDB/ReadFile>
 #include <osgDB/FileUtils>
@@ -47,13 +51,12 @@
 
 #include <iostream>
 #include "spinApp.h"
+#include "SceneManager.h"
 #include "spinBaseContext.h"
 #include "VideoTexture.h"
 
-
-
-using namespace std;
-
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -137,6 +140,9 @@ void VideoTexture::setPath (const char* newPath)
 	if (_path == std::string(newPath)) return;
 
 	_path = std::string(newPath);
+
+	//debug
+	//osg::setNotifyLevel(osg::DEBUG_FP);
 	
 	if (sceneManager->isGraphical())
 	{
@@ -156,9 +162,9 @@ void VideoTexture::setPath (const char* newPath)
 		vidTexture->setResizeNonPowerOfTwoHint(false);
 		vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
 		//vidTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-		//vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
-		vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-		vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+		vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
+		vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+		vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
 
 	
 		// Check if _path is a directory. If so, load all contained image
@@ -254,10 +260,13 @@ void VideoTexture::setPath (const char* newPath)
 		
 			// apply current play/loop state, overriding OSG defaults:
 			if (_play) _imageStream->play();
+			else _imageStream->pause();
 			if (!_loop) _imageStream->setLoopingMode( osg::ImageStream::NO_LOOPING );
 		}
 
 	}
+
+	//osg::setNotifyLevel(osg::FATAL);
 
 	BROADCAST(this, "ss", "setPath", getPath());
 }
@@ -284,8 +293,9 @@ void VideoTexture::setIndex (float f)
 	
 	if (_imageStream.valid())
 	{
-		//std::cout << "seeking to " << (double) (f * _imageStream->getLength()) << std::endl;
-		_imageStream->seek((double) (f * _imageStream->getLength()));
+		double seekIndex = (double) (f * _imageStream->getLength());
+		std::cout << "seeking to " << seekIndex << std::endl;
+		_imageStream->seek(seekIndex);
 	}
 	
 	BROADCAST(this, "sf", "setIndex", getIndex());
@@ -305,7 +315,7 @@ void VideoTexture::setPlay (int i)
 {
 	if (_play != (int)i)
 	{
-		_play = i;
+		_play = (bool)i;
 		
 		if (_imageStream.valid())
 		{
@@ -349,7 +359,7 @@ void VideoTexture::flipVertical()
 
 
 // *****************************************************************************
-std::vector<lo_message> VideoTexture::getState ()
+std::vector<lo_message> VideoTexture::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedStateSet::getState();
@@ -378,4 +388,6 @@ std::vector<lo_message> VideoTexture::getState ()
 
 	return ret;
 }
+
+} // end of namespace spin
 

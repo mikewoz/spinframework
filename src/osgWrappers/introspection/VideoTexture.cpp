@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <SceneManager.h>
 #include <VideoTexture.h>
@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(VideoTexture)
+BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	I_DeclaringFile("VideoTexture.h");
-	I_BaseType(ReferencedStateSet);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, const char *, initID,
+	I_BaseType(spin::ReferencedStateSet);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____VideoTexture__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");

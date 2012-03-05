@@ -43,20 +43,20 @@
 
 #include "osgUtil.h"
 #include "AnimationNode.h"
-#include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "MediaManager.h"
 
+namespace spin
+{
 
-
-using namespace std;
+class SceneManager;
 
 // *****************************************************************************
 // constructor:
 AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
-    this->setName(string(id->s_name) + ".AnimationNode");
+    this->setName(std::string(id->s_name) + ".AnimationNode");
     nodeType = "AnimationNode";
 
     _updateRate = 15; // hz
@@ -289,7 +289,7 @@ void AnimationNode::controlPoint (double timestamp, float x, float y, float z, f
 }
 
 // *****************************************************************************
-std::vector<lo_message> AnimationNode::getState ()
+std::vector<lo_message> AnimationNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = GroupNode::getState();
@@ -328,3 +328,6 @@ std::vector<lo_message> AnimationNode::getState ()
 
     return ret;
 }
+
+} // end of namespace spin
+

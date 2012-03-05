@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <GroupNode.h>
 #include <SceneManager.h>
@@ -21,32 +21,32 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(GroupNode::interactionMode)
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::interactionMode)
 	I_DeclaringFile("GroupNode.h");
-	I_EnumLabel(GroupNode::STATIC);
-	I_EnumLabel(GroupNode::SELECT);
-	I_EnumLabel(GroupNode::DRAG);
-	I_EnumLabel(GroupNode::THROW);
-	I_EnumLabel(GroupNode::DRAW);
+	I_EnumLabel(spin::GroupNode::STATIC);
+	I_EnumLabel(spin::GroupNode::SELECT);
+	I_EnumLabel(spin::GroupNode::DRAG);
+	I_EnumLabel(spin::GroupNode::THROW);
+	I_EnumLabel(spin::GroupNode::DRAW);
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(GroupNode::globalsReportMode)
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::globalsReportMode)
 	I_DeclaringFile("GroupNode.h");
-	I_EnumLabel(GroupNode::NONE);
-	I_EnumLabel(GroupNode::GLOBAL_6DOF);
-	I_EnumLabel(GroupNode::GLOBAL_ALL);
+	I_EnumLabel(spin::GroupNode::NONE);
+	I_EnumLabel(spin::GroupNode::GLOBAL_6DOF);
+	I_EnumLabel(spin::GroupNode::GLOBAL_ALL);
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(GroupNode::velocityMode)
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::velocityMode)
 	I_DeclaringFile("GroupNode.h");
-	I_EnumLabel(GroupNode::TRANSLATE);
-	I_EnumLabel(GroupNode::MOVE);
+	I_EnumLabel(spin::GroupNode::TRANSLATE);
+	I_EnumLabel(spin::GroupNode::MOVE);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(GroupNode)
+BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_DeclaringFile("GroupNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____GroupNode__SceneManager_P1__char_P1,
 	               "",
 	               " param initID will be converted into a t_symbol  ");
@@ -55,11 +55,11 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	          __void__callbackUpdate,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
-	I_Method0(void, updateNodePath,
-	          Properties::VIRTUAL,
-	          __void__updateNodePath,
-	          "",
-	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
+	                      Properties::VIRTUAL,
+	                      __void__updateNodePath__bool,
+	                      "",
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
 	I_Method5(void, mouseEvent, IN, int, event, IN, int, keyMask, IN, int, buttonMask, IN, float, x, IN, float, y,
 	          Properties::NON_VIRTUAL,
 	          __void__mouseEvent__int__int__int__float__float,
@@ -75,12 +75,12 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	          __void__debug,
 	          "",
 	          "Debug print (to log/console) ");
-	I_Method1(void, setReportMode, IN, GroupNode::globalsReportMode, mode,
+	I_Method1(void, setReportMode, IN, spin::GroupNode::globalsReportMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setReportMode__globalsReportMode,
 	          "",
 	          "");
-	I_Method1(void, setInteractionMode, IN, GroupNode::interactionMode, mode,
+	I_Method1(void, setInteractionMode, IN, spin::GroupNode::interactionMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setInteractionMode__interactionMode,
 	          "",
@@ -115,7 +115,7 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	          __void__setVelocity__float__float__float,
 	          "",
 	          "A translational velocity (m/s). This is computed in the callbackUpdate() function. ");
-	I_Method1(void, setVelocityMode, IN, GroupNode::velocityMode, mode,
+	I_Method1(void, setVelocityMode, IN, spin::GroupNode::velocityMode, mode,
 	          Properties::VIRTUAL,
 	          __void__setVelocityMode__velocityMode,
 	          "",
@@ -227,15 +227,15 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	I_SimpleProperty(osg::Matrix, GlobalMatrix, 
 	                 __osg_Matrix__getGlobalMatrix, 
 	                 0);
-	I_SimpleProperty(GroupNode::interactionMode, InteractionMode, 
-	                 0, 
-	                 __void__setInteractionMode__interactionMode);
+	I_SimpleProperty(int, InteractionMode, 
+	                 __int__getInteractionMode, 
+	                 0);
 	I_SimpleProperty(osg::Vec3, Orientation, 
 	                 __osg_Vec3__getOrientation, 
 	                 0);
-	I_SimpleProperty(GroupNode::globalsReportMode, ReportMode, 
-	                 0, 
-	                 __void__setReportMode__globalsReportMode);
+	I_SimpleProperty(int, ReportMode, 
+	                 __int__getReportMode, 
+	                 0);
 	I_SimpleProperty(osg::Vec3, Scale, 
 	                 __osg_Vec3__getScale, 
 	                 0);
@@ -248,10 +248,8 @@ BEGIN_OBJECT_REFLECTOR(GroupNode)
 	I_SimpleProperty(osg::Vec3, Velocity, 
 	                 __osg_Vec3__getVelocity, 
 	                 0);
-	I_SimpleProperty(GroupNode::velocityMode, VelocityMode, 
-	                 0, 
-	                 __void__setVelocityMode__velocityMode);
-	I_PublicMemberProperty(osg::ref_ptr< osg::PositionAttitudeTransform >, mainTransform);
-	I_PublicMemberProperty(osg::ref_ptr< UserNode >, owner);
+	I_SimpleProperty(int, VelocityMode, 
+	                 __int__getVelocityMode, 
+	                 0);
 END_REFLECTOR
 

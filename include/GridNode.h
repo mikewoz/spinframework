@@ -42,56 +42,59 @@
 #ifndef GridNode_H_
 #define GridNode_H_
 
-#include <osg/Geode>
-
-
+#include <osg/Vec4>
 #include "ReferencedNode.h"
+
+namespace osg {
+    class Geode;
+}
+
+namespace spin
+{
 
 /**
  * \brief Draws a tiled grid, which is useful for debugging and measurements
  */
 class GridNode : public ReferencedNode
 {
-
 public:
+    GridNode(SceneManager *sceneManager, char *initID);
+    virtual ~GridNode();
 
-	GridNode(SceneManager *sceneManager, char *initID);
-	virtual ~GridNode();
+    /**
+     * The grid size is measured in meters, and defines how far out from the
+     * center the grid is drawn (ie, half width).
+     */
+    void setSize        (int _size);
 
-	/**
-	 * The grid size is measured in meters, and defines how far out from the
-	 * center the grid is drawn (ie, half width).
-	 */
-	void setSize		(int _size);
+    /**
+     * Grid line color
+     */
+    void setColor        (float red, float green, float blue, float alpha);
 
-	/**
-	 * Grid line color
-	 */
-	void setColor		(float red, float green, float blue, float alpha);
-
-	int getSize() { return (int) this->_size; }
-	osg::Vec4 getColor() { return this->_color;  };
+    int getSize() const { return (int) this->_size; }
+    osg::Vec4 getColor() const { return this->_color;  };
 
 
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState();
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
 
 private:
 
-	void drawGrid();
+    void drawGrid();
 
-	osg::ref_ptr<osg::Geode> gridGeode;
+    osg::ref_ptr<osg::Geode> gridGeode;
 
-	int _size;
-	float _thickness;
-	osg::Vec4 _color;
-
+    int _size;
+    float _thickness;
+    osg::Vec4 _color;
 };
 
 
+} // end of namespace spin
 
 #endif

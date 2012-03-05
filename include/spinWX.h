@@ -44,9 +44,7 @@
 
 // For compilers that support precompilation, includes <wx/wx.h>.
 #include <wx/wxprec.h>
-
 #include <wx/cmdline.h>
-
 
 #ifdef __BORLANDC__
     #pragma hdrstop
@@ -58,21 +56,19 @@
     #include <wx/wx.h>
 #endif
 
-
-
 #include <wx/app.h>
 
+namespace spin
+{
 
 class spinWX : public wxApp
 {
     public:
         virtual bool OnInit();
-		virtual void OnInitCmdLine(wxCmdLineParser& parser);
-		virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
-
-	private:
-		int startMode;
-
+        virtual void OnInitCmdLine(wxCmdLineParser& parser);
+        virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+    private:
+        int startMode;
 };
 
 static const wxCmdLineEntryDesc g_cmdLineDesc [] =
@@ -83,6 +79,6 @@ static const wxCmdLineEntryDesc g_cmdLineDesc [] =
      { wxCMD_LINE_NONE }
 };
 
-
+} // end of namespace spin
 
 #endif

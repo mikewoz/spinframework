@@ -42,13 +42,22 @@
 #ifndef __DSPNode_H
 #define __DSPNode_H
 
-#include <osg/Referenced>
-
-#include "ReferencedNode.h"
+#include <vector>
+#include <lo/lo_types.h>
 #include "GroupNode.h"
-#include "SoundConnection.h"
+#include "osgUtil.h"
+
+
+namespace osg {
+    class Geode;
+    class PositionAttitudeTransform;
+}
+
+namespace spin
+{
 
 class SoundConnection;
+class SceneManager;
 
 /**
  * \brief The base class for 3D audio nodes
@@ -65,76 +74,143 @@ class DSPNode : public GroupNode
 {
 
 public:
-		
-		DSPNode (SceneManager *sceneManager, char *initID);
-		virtual ~DSPNode();
-		
-		//virtual void callbackUpdate();
-		
-		SoundConnection *getConnection(DSPNode *snk);
-		SoundConnection *getConnection(const char *snk);
+        
+        DSPNode (SceneManager *sceneManager, char *initID);
+        virtual ~DSPNode();
+        
+        virtual void callbackUpdate();
+        
+        SoundConnection *getConnection(DSPNode *snk);
+        SoundConnection *getConnection(const char *snk);
 
-		
+        
 
-		void connect(DSPNode *snk);
-		void connect(const char *snk);
-		void connectSource(const char *src);
+        void connect(DSPNode *snk);
+        void connect(const char *snk);
+        void connectSource(const char *src);
 
-		void disconnect(const char *snk);
-		void setActive (int i);
-		void setPlugin (const char *filename);
-		
-		// for sending messages to the connections of this (source) node:
-		//virtual void connectionMsg (char *snkName, char *method, float value);
+        void disconnect(const char *snk);
+        void setActive (int i);
+        void setPlugin (const char *filename);
+        
+        // for sending messages to the connections of this (source) node:
+        //virtual void connectionMsg (char *snkName, char *method, float value);
 
-		
-		int getActive() { return (int)active; }
-		const char* getPlugin() { return plugin.c_str(); }
-		
-		/**
-		 * We maintian 2 lists of all SoundConnection for this node (it is
-		 * redundant, but useful to have both forward and backward connection
-		 * pointers).
-		 */
-		std::vector<SoundConnection*> connectTO;
-		/**
-		 * We maintian 2 lists of all SoundConnection for this node (it is
-		 * redundant, but useful to have both forward and backward connection
-		 * pointers).
-		 */
-		std::vector<SoundConnection*> connectFROM;
-		
-		/**
-		 * For each subclass of ReferencedNode, we override the getState() method to
-		 * fill the vector with the correct set of methods for this particular node
-		 */
-		virtual std::vector<lo_message> getState();
-		
-		/**
-		 * We must include a stateDump() method that simply invokes the base class
-		 * method. Simple C++ inheritance is not enough, because osg::Introspection
-		 * won't see it.
-		 */
-		//virtual void stateDump() { ReferencedNode::stateDump(); };
-		
-		
+        
+        int getActive() const { return (int)active; }
+        const char* getPlugin() const { return plugin.c_str(); }
+        
+        /**
+         * We maintian 2 lists of all SoundConnection for this node (it is
+         * redundant, but useful to have both forward and backward connection
+         * pointers).
+         */
+        std::vector<SoundConnection*> connectTO;
+        /**
+         * We maintian 2 lists of all SoundConnection for this node (it is
+         * redundant, but useful to have both forward and backward connection
+         * pointers).
+         */
+        std::vector<SoundConnection*> connectFROM;
+        
+        /**
+         * For each subclass of ReferencedNode, we override the getState()
+         * method to fill the vector with the correct set of methods for this
+         * particular node
+         */
+        virtual std::vector<lo_message> getState() const;
+
+
+        // SET methods:
+        virtual void setRolloff (const char *newvalue);
+        virtual void setSpread (float newvalue);
+        virtual void setLength (float newvalue);
+        virtual void setRadius (float newvalue);
+
+        void setDirectivityColor(float r, float g, float b, float a);
+
+        void setVUmeterFlag (float newFlag);
+        void setDirectivityFlag (float newFlag);
+        void setLaserFlag (float newFlag);
+
+        //
+        void setIntensity(float newvalue);
+        
+        // GET methods:
+        const char* getRolloff() const { return _rolloff.c_str(); }
+        float getSpread() const { return _spread; }
+        float getLength() const { return _length; }
+        float getRadius() const { return _radius; }
+
+        osg::Vec4 getDirectivityColor() const { return directivityColor; }
+
+        float getVUmeterFlag() const { return VUmeterFlag; }
+        float getDirectivityFlag() const { return directivityFlag; }
+        float getLaserFlag() const { return laserFlag; }
+
+        void updateVUmeter();
+        void updateLaser();
+
+        
+        // DRAW methods:
+        void drawVUmeter();
+        void drawDirectivity();
+        void drawLaser();
+        
 private:
-	
-		bool active;
-		
-		/**
-		 * dsp name (this is the name of a pd abstraction that handles the dsp):
-		 */
-		std::string plugin;
-		
-		/**
-		 * This node should always broadcast global position and orientation 
-		 * so that any audio spatializer software listening to messages can use
-		 * the data without needing to understand and maintain a scene graph.
-		 */
-		osg::Matrix _globalMatrix;
+    
+        bool active;
+        
+        /**
+         * dsp name (this is the name of a pd abstraction that handles the dsp):
+         */
+        std::string plugin;
+        
+        /**
+         * This node should always broadcast global position and orientation 
+         * so that any audio spatializer software listening to messages can use
+         * the data without needing to understand and maintain a scene graph.
+         */
+        //osg::Matrix _globalMatrix;
+
+        // TODO: move all graphical items (VUMeter, directivity, laser) into
+        // separate node class, and attach as a subgraph, only when needed.
+
+        float currentSoundIntensity;
+        osg::Vec3 currentSoundColor;
+
+
+        std::string _rolloff; // we keep a reference name for the rolloff (directivity) table
+        float _spread; // propagation cone for source
+        float _length; // the length of the laser and cone
+
+        float _radius; // the radius 
+
+        // TODO: add toggle for PRE/POST
+
+        // flags with continuous values (can be used for alpha, etc):
+        float VUmeterFlag;
+        float directivityFlag;
+        float laserFlag;
+
+
+        // The following methods and parameters are for drawing aspects of the
+        // soundNode using OSG (eg, directivity pattern, laser, etc)
+
+        // directivity patterns:
+        osg::ref_ptr<osg::Geode> directivityGeode;
+        osg::Vec4 directivityColor;
+
+        // laser beams:
+        osg::ref_ptr<osg::Geode> laserGeode;
+
+        // VU meter:
+        osg::ref_ptr<osg::PositionAttitudeTransform> VUmeterTransform;
+
+
 
 };
 
+} // end of namespace spin
 
 #endif

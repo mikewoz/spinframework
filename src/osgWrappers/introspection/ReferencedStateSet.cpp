@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <ReferencedStateSet.h>
 #include <SceneManager.h>
@@ -21,9 +21,9 @@
 #undef OUT
 #endif
 
-BEGIN_ABSTRACT_OBJECT_REFLECTOR(ReferencedStateSet)
+BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	I_DeclaringFile("ReferencedStateSet.h");
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, const char *, initID,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____ReferencedStateSet__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
@@ -73,15 +73,19 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(ReferencedStateSet)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_PublicMemberProperty(SceneManager *, sceneManager);
-	I_PublicMemberProperty(t_symbol *, id);
+	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
+	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(std::string, classType);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(ReferencedStateSet_callback)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet_callback)
 	I_DeclaringFile("ReferencedStateSet.h");
 	I_Constructor0(____ReferencedStateSet_callback,
 	               "",
 	               "");
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >, spin::stateListType)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >)
 

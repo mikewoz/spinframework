@@ -46,6 +46,9 @@
 #include "spinBaseContext.h"
 #include <iostream>
 
+namespace spin
+{
+
 // *****************************************************************************
 // constructors:
 
@@ -73,9 +76,19 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	
 	// register with OSC parser:
     std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
-	lo_server_add_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), 
+    std::vector<lo_server>::iterator it;
+    for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
+    {
+    	lo_server_add_method((*it), oscPattern.c_str(),
             NULL, spinBaseContext::connectionCallback, (void*)this);
+    }
 
+	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+	                     oscPattern.c_str(),
+	                     NULL,
+	                     spinBaseContext::connectionCallback,
+	                     (void*)this);
+	
 	// store pointer to sceneManager
 	sceneManager = s;
 	
@@ -99,7 +112,13 @@ SoundConnection::~SoundConnection()
 	SCENE_MSG("ss", "deleteNode", id->s_name);
 
     std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
-	lo_server_del_method(spinApp::Instance().getContext()->lo_rxServ_, oscPattern.c_str(), NULL);
+    std::vector<lo_server>::iterator it;
+    for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
+    {
+    	lo_server_del_method((*it), oscPattern.c_str(), NULL);
+    }
+
+	lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
 	
 	//id->s_thing = 0;
 
@@ -407,7 +426,7 @@ void SoundConnection::debug()
 	std::cout << "****************************************" << std::endl;
 	std::cout << "********** CONNECTION  DEBUG: **********" << std::endl;
 	
-	std::cout << "\nSoundConnection [" << this->id << "]:" << std::endl;
+	std::cout << "\nSoundConnection [" << this->id->s_name << "]:" << std::endl;
 	
     std::vector<lo_message> nodeState = this->getState();
     std::vector<lo_message>::iterator nodeStateIterator;
@@ -440,7 +459,7 @@ void SoundConnection::debug()
  * are always send with respect to the source node of the connection.
  * 
  */
-std::vector<lo_message> SoundConnection::getState ()
+std::vector<lo_message> SoundConnection::getState () const
 {
 	std::vector<lo_message> ret;
 	lo_message msg;
@@ -500,3 +519,6 @@ void SoundConnection::stateDump (lo_address addr)
 {
     spinApp::Instance().NodeBundle(this->id, this->getState(), addr);
 }
+
+} // end of namespace spin
+

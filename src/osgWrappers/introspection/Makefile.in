@@ -15,23 +15,6 @@
 
 @SET_MAKE@
 
-#BUILT_SOURCES = \
-#        ReferencedNode.cpp ReferencedStateSet.cpp \
-#        UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
-#        GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
-#        ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
-#        AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
-#        DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-#        ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
-#CLEANFILES=$(BUILT_SOURCES)
-#%.cpp: %.h
-
-#FIXME: These depend on the headers, and more specifically, each generated wrapper should only depend on one header
-#$(BUILT_SOURCES):
-#	-rm -f $(top_srcdir)/include/*.h~
-#	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -
-#	cd $(top_srcdir) && src/genwrapper/genwrapper -v QUIET -c genwrapper.conf doxygen . && cd -
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -55,19 +38,15 @@ subdir = src/osgWrappers/introspection
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
-	$(top_srcdir)/m4/ax_boost_base.m4 \
-	$(top_srcdir)/m4/ax_boost_filesystem.m4 \
-	$(top_srcdir)/m4/ax_boost_python.m4 \
-	$(top_srcdir)/m4/ax_boost_regex.m4 \
-	$(top_srcdir)/m4/ax_boost_thread.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
 	$(top_srcdir)/m4/ax_check_glu.m4 \
 	$(top_srcdir)/m4/ax_check_glut.m4 \
 	$(top_srcdir)/m4/ax_lang_compiler_ms.m4 \
-	$(top_srcdir)/m4/ax_python.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/m4/pkg.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/pkg.m4 $(top_srcdir)/m4/wxwin.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -76,26 +55,30 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libSPINwrappers_la_LIBADD =
-am_libSPINwrappers_la_OBJECTS = libSPINwrappers_la-ReferencedNode.lo \
-	libSPINwrappers_la-ReferencedStateSet.lo \
-	libSPINwrappers_la-UserNode.lo libSPINwrappers_la-GroupNode.lo \
-	libSPINwrappers_la-ShapeNode.lo \
-	libSPINwrappers_la-ModelNode.lo libSPINwrappers_la-GridNode.lo \
-	libSPINwrappers_la-LightSource.lo \
-	libSPINwrappers_la-RayNode.lo libSPINwrappers_la-Contour.lo \
+am_libSPINwrappers_la_OBJECTS = libSPINwrappers_la-AnimationNode.lo \
+	libSPINwrappers_la-AttractorNode.lo \
 	libSPINwrappers_la-ConstraintsNode.lo \
-	libSPINwrappers_la-PointerNode.lo \
+	libSPINwrappers_la-Contour.lo libSPINwrappers_la-DSPNode.lo \
+	libSPINwrappers_la-Fog.lo libSPINwrappers_la-GeometryNode.lo \
+	libSPINwrappers_la-GridNode.lo libSPINwrappers_la-GroupNode.lo \
+	libSPINwrappers_la-ImageTexture.lo \
+	libSPINwrappers_la-LightSource.lo \
+	libSPINwrappers_la-Listener.lo \
 	libSPINwrappers_la-MeasurementNode.lo \
-	libSPINwrappers_la-AnimationNode.lo \
-	libSPINwrappers_la-SwitchNode.lo \
-	libSPINwrappers_la-TextNode.lo libSPINwrappers_la-DSPNode.lo \
+	libSPINwrappers_la-Menu3D.lo libSPINwrappers_la-ModelNode.lo \
+	libSPINwrappers_la-PointerNode.lo \
+	libSPINwrappers_la-RayNode.lo \
+	libSPINwrappers_la-ReferencedNode.lo \
+	libSPINwrappers_la-ReferencedStateSet.lo \
+	libSPINwrappers_la-ReporterNode.lo \
+	libSPINwrappers_la-ShapeNode.lo \
+	libSPINwrappers_la-SharedVideoTexture.lo \
+	libSPINwrappers_la-SoundConnection.lo \
 	libSPINwrappers_la-SoundNode.lo \
 	libSPINwrappers_la-SoundSpace.lo \
-	libSPINwrappers_la-Listener.lo \
-	libSPINwrappers_la-SoundConnection.lo \
-	libSPINwrappers_la-ImageTexture.lo \
-	libSPINwrappers_la-VideoTexture.lo \
-	libSPINwrappers_la-SharedVideoTexture.lo
+	libSPINwrappers_la-SwitchNode.lo \
+	libSPINwrappers_la-TextNode.lo libSPINwrappers_la-UserNode.lo \
+	libSPINwrappers_la-VideoTexture.lo
 libSPINwrappers_la_OBJECTS = $(am_libSPINwrappers_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -123,16 +106,31 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
-BOOST_FILESYSTEM_LIB = @BOOST_FILESYSTEM_LIB@
-BOOST_LDFLAGS = @BOOST_LDFLAGS@
-BOOST_PYTHON_LIB = @BOOST_PYTHON_LIB@
-BOOST_REGEX_LIB = @BOOST_REGEX_LIB@
-BOOST_THREAD_LIB = @BOOST_THREAD_LIB@
+BOOST_FILESYSTEM_LDFLAGS = @BOOST_FILESYSTEM_LDFLAGS@
+BOOST_FILESYSTEM_LDPATH = @BOOST_FILESYSTEM_LDPATH@
+BOOST_FILESYSTEM_LIBS = @BOOST_FILESYSTEM_LIBS@
+BOOST_LDPATH = @BOOST_LDPATH@
+BOOST_PROGRAM_OPTIONS_LDFLAGS = @BOOST_PROGRAM_OPTIONS_LDFLAGS@
+BOOST_PROGRAM_OPTIONS_LDPATH = @BOOST_PROGRAM_OPTIONS_LDPATH@
+BOOST_PROGRAM_OPTIONS_LIBS = @BOOST_PROGRAM_OPTIONS_LIBS@
+BOOST_PYTHON_CPPFLAGS = @BOOST_PYTHON_CPPFLAGS@
+BOOST_PYTHON_LDFLAGS = @BOOST_PYTHON_LDFLAGS@
+BOOST_PYTHON_LDPATH = @BOOST_PYTHON_LDPATH@
+BOOST_PYTHON_LIBS = @BOOST_PYTHON_LIBS@
+BOOST_REGEX_LDFLAGS = @BOOST_REGEX_LDFLAGS@
+BOOST_REGEX_LDPATH = @BOOST_REGEX_LDPATH@
+BOOST_REGEX_LIBS = @BOOST_REGEX_LIBS@
+BOOST_ROOT = @BOOST_ROOT@
+BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
+BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
+BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CPPINTROSPECTION_CFLAGS = @CPPINTROSPECTION_CFLAGS@
+CPPINTROSPECTION_LIBS = @CPPINTROSPECTION_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -140,6 +138,8 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTCHECK_CONFIGURE_FLAGS = @DISTCHECK_CONFIGURE_FLAGS@
+DOXYGEN = @DOXYGEN@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -163,7 +163,8 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
-LIBLO_LDFLAGS = @LIBLO_LDFLAGS@
+LIBLO_CFLAGS = @LIBLO_CFLAGS@
+LIBLO_LIBS = @LIBLO_LIBS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -178,7 +179,10 @@ NM = @NM@
 NMEDIT = @NMEDIT@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
-OSGINTROSPECTION_LIB = @OSGINTROSPECTION_LIB@
+OPENTHREADS_CFLAGS = @OPENTHREADS_CFLAGS@
+OPENTHREADS_LIBS = @OPENTHREADS_LIBS@
+OSG_CFLAGS = @OSG_CFLAGS@
+OSG_LIBS = @OSG_LIBS@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
@@ -194,22 +198,40 @@ PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 PYTHON = @PYTHON@
-PYTHON_BIN = @PYTHON_BIN@
 PYTHON_CPPFLAGS = @PYTHON_CPPFLAGS@
 PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
-PYTHON_INCLUDE_DIR = @PYTHON_INCLUDE_DIR@
 PYTHON_LDFLAGS = @PYTHON_LDFLAGS@
-PYTHON_LIB = @PYTHON_LIB@
 PYTHON_PLATFORM = @PYTHON_PLATFORM@
 PYTHON_PREFIX = @PYTHON_PREFIX@
 PYTHON_VERSION = @PYTHON_VERSION@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
-SHARED_VIDEO_LIB = @SHARED_VIDEO_LIB@
+SHAREDVIDEO_CFLAGS = @SHAREDVIDEO_CFLAGS@
+SHAREDVIDEO_LIBS = @SHAREDVIDEO_LIBS@
 SHELL = @SHELL@
+SPATOSC_CFLAGS = @SPATOSC_CFLAGS@
+SPATOSC_LIBS = @SPATOSC_LIBS@
+SPIN_API_VERSION = @SPIN_API_VERSION@
+SPIN_API_VERSION_AM = @SPIN_API_VERSION_AM@
+SPIN_LT_VERSION = @SPIN_LT_VERSION@
+SPIN_MAJOR_VERSION = @SPIN_MAJOR_VERSION@
+SPIN_MICRO_VERSION = @SPIN_MICRO_VERSION@
+SPIN_MINOR_VERSION = @SPIN_MINOR_VERSION@
+SPIN_RELEASE_STATUS = @SPIN_RELEASE_STATUS@
+SPIN_VERSION = @SPIN_VERSION@
 STRIP = @STRIP@
 VERSION = @VERSION@
+WX_CFLAGS = @WX_CFLAGS@
+WX_CFLAGS_ONLY = @WX_CFLAGS_ONLY@
+WX_CONFIG_PATH = @WX_CONFIG_PATH@
+WX_CPPFLAGS = @WX_CPPFLAGS@
+WX_CXXFLAGS = @WX_CXXFLAGS@
+WX_CXXFLAGS_ONLY = @WX_CXXFLAGS_ONLY@
+WX_LIBS = @WX_LIBS@
+WX_LIBS_STATIC = @WX_LIBS_STATIC@
+WX_RESCOMP = @WX_RESCOMP@
+WX_VERSION = @WX_VERSION@
 XMKMF = @XMKMF@
 XML_CFLAGS = @XML_CFLAGS@
 XML_LIBS = @XML_LIBS@
@@ -279,17 +301,49 @@ top_srcdir = @top_srcdir@
 # use noinst_LIBRARIES to create a library that won't be installed
 noinst_LTLIBRARIES = libSPINwrappers.la
 
-#libSPINwrappers_la_SOURCES = #$(BUILT_SOURCES)
+# please keep those in alphabetical order:
+# We only need to wrap the childs of ReferencedNode and ReferencedStateSet:
 libSPINwrappers_la_SOURCES = \
-	ReferencedNode.cpp ReferencedStateSet.cpp \
-    UserNode.cpp GroupNode.cpp ShapeNode.cpp ModelNode.cpp \
-    GridNode.cpp LightSource.cpp RayNode.cpp Contour.cpp \
-    ConstraintsNode.cpp PointerNode.cpp MeasurementNode.cpp \
-    AnimationNode.cpp SwitchNode.cpp TextNode.cpp \
-    DSPNode.cpp SoundNode.cpp SoundSpace.cpp Listener.cpp SoundConnection.cpp \
-    ImageTexture.cpp VideoTexture.cpp SharedVideoTexture.cpp 
+    AnimationNode.cpp \
+    AttractorNode.cpp \
+    ConstraintsNode.cpp \
+    Contour.cpp \
+    DSPNode.cpp \
+    Fog.cpp \
+    GeometryNode.cpp \
+    GridNode.cpp \
+    GroupNode.cpp \
+    ImageTexture.cpp \
+    LightSource.cpp \
+    Listener.cpp \
+    MeasurementNode.cpp \
+    Menu3D.cpp \
+    ModelNode.cpp \
+    PointerNode.cpp \
+    RayNode.cpp \
+    ReferencedNode.cpp \
+    ReferencedStateSet.cpp \
+    ReporterNode.cpp \
+    ShapeNode.cpp \
+    SharedVideoTexture.cpp \
+    SoundConnection.cpp \
+    SoundNode.cpp \
+    SoundSpace.cpp \
+    SwitchNode.cpp \
+    TextNode.cpp \
+    UserNode.cpp \
+    VideoTexture.cpp
 
-libSPINwrappers_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/src/tinyxml $(PYTHON_CPPFLAGS)
+libSPINwrappers_la_CPPFLAGS = \
+    $(BOOST_CPPFLAGS) \
+    $(CPPINTROSPECTION_CFLAGS) \
+    $(OPENTHREADS_CFLAGS) \
+    $(PYTHON_CPPFLAGS) \
+    $(SPATOSC_CFLAGS) \
+    -I$(top_srcdir)/include \
+    -I$(top_srcdir)/src/spin \
+    -I$(top_srcdir)/src/tinyxml
+
 all: all-am
 
 .SUFFIXES:
@@ -343,20 +397,25 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-AnimationNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-AttractorNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ConstraintsNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-Contour.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-DSPNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-Fog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-GeometryNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-GridNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-GroupNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ImageTexture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-LightSource.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-Listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-MeasurementNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-Menu3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ModelNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-PointerNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-RayNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ReferencedNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ReferencedStateSet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ReporterNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ShapeNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-SoundConnection.Plo@am__quote@
@@ -391,6 +450,125 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
+libSPINwrappers_la-AnimationNode.lo: AnimationNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-AnimationNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-AnimationNode.Tpo -c -o libSPINwrappers_la-AnimationNode.lo `test -f 'AnimationNode.cpp' || echo '$(srcdir)/'`AnimationNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-AnimationNode.Tpo $(DEPDIR)/libSPINwrappers_la-AnimationNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='AnimationNode.cpp' object='libSPINwrappers_la-AnimationNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-AnimationNode.lo `test -f 'AnimationNode.cpp' || echo '$(srcdir)/'`AnimationNode.cpp
+
+libSPINwrappers_la-AttractorNode.lo: AttractorNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-AttractorNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-AttractorNode.Tpo -c -o libSPINwrappers_la-AttractorNode.lo `test -f 'AttractorNode.cpp' || echo '$(srcdir)/'`AttractorNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-AttractorNode.Tpo $(DEPDIR)/libSPINwrappers_la-AttractorNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='AttractorNode.cpp' object='libSPINwrappers_la-AttractorNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-AttractorNode.lo `test -f 'AttractorNode.cpp' || echo '$(srcdir)/'`AttractorNode.cpp
+
+libSPINwrappers_la-ConstraintsNode.lo: ConstraintsNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ConstraintsNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ConstraintsNode.Tpo -c -o libSPINwrappers_la-ConstraintsNode.lo `test -f 'ConstraintsNode.cpp' || echo '$(srcdir)/'`ConstraintsNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ConstraintsNode.Tpo $(DEPDIR)/libSPINwrappers_la-ConstraintsNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConstraintsNode.cpp' object='libSPINwrappers_la-ConstraintsNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ConstraintsNode.lo `test -f 'ConstraintsNode.cpp' || echo '$(srcdir)/'`ConstraintsNode.cpp
+
+libSPINwrappers_la-Contour.lo: Contour.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-Contour.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-Contour.Tpo -c -o libSPINwrappers_la-Contour.lo `test -f 'Contour.cpp' || echo '$(srcdir)/'`Contour.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-Contour.Tpo $(DEPDIR)/libSPINwrappers_la-Contour.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Contour.cpp' object='libSPINwrappers_la-Contour.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-Contour.lo `test -f 'Contour.cpp' || echo '$(srcdir)/'`Contour.cpp
+
+libSPINwrappers_la-DSPNode.lo: DSPNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-DSPNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-DSPNode.Tpo -c -o libSPINwrappers_la-DSPNode.lo `test -f 'DSPNode.cpp' || echo '$(srcdir)/'`DSPNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-DSPNode.Tpo $(DEPDIR)/libSPINwrappers_la-DSPNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DSPNode.cpp' object='libSPINwrappers_la-DSPNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-DSPNode.lo `test -f 'DSPNode.cpp' || echo '$(srcdir)/'`DSPNode.cpp
+
+libSPINwrappers_la-Fog.lo: Fog.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-Fog.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-Fog.Tpo -c -o libSPINwrappers_la-Fog.lo `test -f 'Fog.cpp' || echo '$(srcdir)/'`Fog.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-Fog.Tpo $(DEPDIR)/libSPINwrappers_la-Fog.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Fog.cpp' object='libSPINwrappers_la-Fog.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-Fog.lo `test -f 'Fog.cpp' || echo '$(srcdir)/'`Fog.cpp
+
+libSPINwrappers_la-GeometryNode.lo: GeometryNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-GeometryNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-GeometryNode.Tpo -c -o libSPINwrappers_la-GeometryNode.lo `test -f 'GeometryNode.cpp' || echo '$(srcdir)/'`GeometryNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-GeometryNode.Tpo $(DEPDIR)/libSPINwrappers_la-GeometryNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='GeometryNode.cpp' object='libSPINwrappers_la-GeometryNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-GeometryNode.lo `test -f 'GeometryNode.cpp' || echo '$(srcdir)/'`GeometryNode.cpp
+
+libSPINwrappers_la-GridNode.lo: GridNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-GridNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-GridNode.Tpo -c -o libSPINwrappers_la-GridNode.lo `test -f 'GridNode.cpp' || echo '$(srcdir)/'`GridNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-GridNode.Tpo $(DEPDIR)/libSPINwrappers_la-GridNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='GridNode.cpp' object='libSPINwrappers_la-GridNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-GridNode.lo `test -f 'GridNode.cpp' || echo '$(srcdir)/'`GridNode.cpp
+
+libSPINwrappers_la-GroupNode.lo: GroupNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-GroupNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-GroupNode.Tpo -c -o libSPINwrappers_la-GroupNode.lo `test -f 'GroupNode.cpp' || echo '$(srcdir)/'`GroupNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-GroupNode.Tpo $(DEPDIR)/libSPINwrappers_la-GroupNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='GroupNode.cpp' object='libSPINwrappers_la-GroupNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-GroupNode.lo `test -f 'GroupNode.cpp' || echo '$(srcdir)/'`GroupNode.cpp
+
+libSPINwrappers_la-ImageTexture.lo: ImageTexture.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ImageTexture.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ImageTexture.Tpo -c -o libSPINwrappers_la-ImageTexture.lo `test -f 'ImageTexture.cpp' || echo '$(srcdir)/'`ImageTexture.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ImageTexture.Tpo $(DEPDIR)/libSPINwrappers_la-ImageTexture.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ImageTexture.cpp' object='libSPINwrappers_la-ImageTexture.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ImageTexture.lo `test -f 'ImageTexture.cpp' || echo '$(srcdir)/'`ImageTexture.cpp
+
+libSPINwrappers_la-LightSource.lo: LightSource.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-LightSource.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-LightSource.Tpo -c -o libSPINwrappers_la-LightSource.lo `test -f 'LightSource.cpp' || echo '$(srcdir)/'`LightSource.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-LightSource.Tpo $(DEPDIR)/libSPINwrappers_la-LightSource.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LightSource.cpp' object='libSPINwrappers_la-LightSource.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-LightSource.lo `test -f 'LightSource.cpp' || echo '$(srcdir)/'`LightSource.cpp
+
+libSPINwrappers_la-Listener.lo: Listener.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-Listener.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-Listener.Tpo -c -o libSPINwrappers_la-Listener.lo `test -f 'Listener.cpp' || echo '$(srcdir)/'`Listener.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-Listener.Tpo $(DEPDIR)/libSPINwrappers_la-Listener.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Listener.cpp' object='libSPINwrappers_la-Listener.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-Listener.lo `test -f 'Listener.cpp' || echo '$(srcdir)/'`Listener.cpp
+
+libSPINwrappers_la-MeasurementNode.lo: MeasurementNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-MeasurementNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-MeasurementNode.Tpo -c -o libSPINwrappers_la-MeasurementNode.lo `test -f 'MeasurementNode.cpp' || echo '$(srcdir)/'`MeasurementNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-MeasurementNode.Tpo $(DEPDIR)/libSPINwrappers_la-MeasurementNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MeasurementNode.cpp' object='libSPINwrappers_la-MeasurementNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-MeasurementNode.lo `test -f 'MeasurementNode.cpp' || echo '$(srcdir)/'`MeasurementNode.cpp
+
+libSPINwrappers_la-Menu3D.lo: Menu3D.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-Menu3D.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-Menu3D.Tpo -c -o libSPINwrappers_la-Menu3D.lo `test -f 'Menu3D.cpp' || echo '$(srcdir)/'`Menu3D.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-Menu3D.Tpo $(DEPDIR)/libSPINwrappers_la-Menu3D.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Menu3D.cpp' object='libSPINwrappers_la-Menu3D.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-Menu3D.lo `test -f 'Menu3D.cpp' || echo '$(srcdir)/'`Menu3D.cpp
+
+libSPINwrappers_la-ModelNode.lo: ModelNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ModelNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ModelNode.Tpo -c -o libSPINwrappers_la-ModelNode.lo `test -f 'ModelNode.cpp' || echo '$(srcdir)/'`ModelNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ModelNode.Tpo $(DEPDIR)/libSPINwrappers_la-ModelNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ModelNode.cpp' object='libSPINwrappers_la-ModelNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ModelNode.lo `test -f 'ModelNode.cpp' || echo '$(srcdir)/'`ModelNode.cpp
+
+libSPINwrappers_la-PointerNode.lo: PointerNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-PointerNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-PointerNode.Tpo -c -o libSPINwrappers_la-PointerNode.lo `test -f 'PointerNode.cpp' || echo '$(srcdir)/'`PointerNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-PointerNode.Tpo $(DEPDIR)/libSPINwrappers_la-PointerNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='PointerNode.cpp' object='libSPINwrappers_la-PointerNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-PointerNode.lo `test -f 'PointerNode.cpp' || echo '$(srcdir)/'`PointerNode.cpp
+
+libSPINwrappers_la-RayNode.lo: RayNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-RayNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-RayNode.Tpo -c -o libSPINwrappers_la-RayNode.lo `test -f 'RayNode.cpp' || echo '$(srcdir)/'`RayNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-RayNode.Tpo $(DEPDIR)/libSPINwrappers_la-RayNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RayNode.cpp' object='libSPINwrappers_la-RayNode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-RayNode.lo `test -f 'RayNode.cpp' || echo '$(srcdir)/'`RayNode.cpp
+
 libSPINwrappers_la-ReferencedNode.lo: ReferencedNode.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ReferencedNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ReferencedNode.Tpo -c -o libSPINwrappers_la-ReferencedNode.lo `test -f 'ReferencedNode.cpp' || echo '$(srcdir)/'`ReferencedNode.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ReferencedNode.Tpo $(DEPDIR)/libSPINwrappers_la-ReferencedNode.Plo
@@ -405,19 +583,12 @@ libSPINwrappers_la-ReferencedStateSet.lo: ReferencedStateSet.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ReferencedStateSet.lo `test -f 'ReferencedStateSet.cpp' || echo '$(srcdir)/'`ReferencedStateSet.cpp
 
-libSPINwrappers_la-UserNode.lo: UserNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-UserNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-UserNode.Tpo -c -o libSPINwrappers_la-UserNode.lo `test -f 'UserNode.cpp' || echo '$(srcdir)/'`UserNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-UserNode.Tpo $(DEPDIR)/libSPINwrappers_la-UserNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UserNode.cpp' object='libSPINwrappers_la-UserNode.lo' libtool=yes @AMDEPBACKSLASH@
+libSPINwrappers_la-ReporterNode.lo: ReporterNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ReporterNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ReporterNode.Tpo -c -o libSPINwrappers_la-ReporterNode.lo `test -f 'ReporterNode.cpp' || echo '$(srcdir)/'`ReporterNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ReporterNode.Tpo $(DEPDIR)/libSPINwrappers_la-ReporterNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReporterNode.cpp' object='libSPINwrappers_la-ReporterNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-UserNode.lo `test -f 'UserNode.cpp' || echo '$(srcdir)/'`UserNode.cpp
-
-libSPINwrappers_la-GroupNode.lo: GroupNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-GroupNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-GroupNode.Tpo -c -o libSPINwrappers_la-GroupNode.lo `test -f 'GroupNode.cpp' || echo '$(srcdir)/'`GroupNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-GroupNode.Tpo $(DEPDIR)/libSPINwrappers_la-GroupNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='GroupNode.cpp' object='libSPINwrappers_la-GroupNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-GroupNode.lo `test -f 'GroupNode.cpp' || echo '$(srcdir)/'`GroupNode.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ReporterNode.lo `test -f 'ReporterNode.cpp' || echo '$(srcdir)/'`ReporterNode.cpp
 
 libSPINwrappers_la-ShapeNode.lo: ShapeNode.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ShapeNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ShapeNode.Tpo -c -o libSPINwrappers_la-ShapeNode.lo `test -f 'ShapeNode.cpp' || echo '$(srcdir)/'`ShapeNode.cpp
@@ -426,89 +597,19 @@ libSPINwrappers_la-ShapeNode.lo: ShapeNode.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ShapeNode.lo `test -f 'ShapeNode.cpp' || echo '$(srcdir)/'`ShapeNode.cpp
 
-libSPINwrappers_la-ModelNode.lo: ModelNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ModelNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ModelNode.Tpo -c -o libSPINwrappers_la-ModelNode.lo `test -f 'ModelNode.cpp' || echo '$(srcdir)/'`ModelNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ModelNode.Tpo $(DEPDIR)/libSPINwrappers_la-ModelNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ModelNode.cpp' object='libSPINwrappers_la-ModelNode.lo' libtool=yes @AMDEPBACKSLASH@
+libSPINwrappers_la-SharedVideoTexture.lo: SharedVideoTexture.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-SharedVideoTexture.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Tpo -c -o libSPINwrappers_la-SharedVideoTexture.lo `test -f 'SharedVideoTexture.cpp' || echo '$(srcdir)/'`SharedVideoTexture.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Tpo $(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SharedVideoTexture.cpp' object='libSPINwrappers_la-SharedVideoTexture.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ModelNode.lo `test -f 'ModelNode.cpp' || echo '$(srcdir)/'`ModelNode.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-SharedVideoTexture.lo `test -f 'SharedVideoTexture.cpp' || echo '$(srcdir)/'`SharedVideoTexture.cpp
 
-libSPINwrappers_la-GridNode.lo: GridNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-GridNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-GridNode.Tpo -c -o libSPINwrappers_la-GridNode.lo `test -f 'GridNode.cpp' || echo '$(srcdir)/'`GridNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-GridNode.Tpo $(DEPDIR)/libSPINwrappers_la-GridNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='GridNode.cpp' object='libSPINwrappers_la-GridNode.lo' libtool=yes @AMDEPBACKSLASH@
+libSPINwrappers_la-SoundConnection.lo: SoundConnection.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-SoundConnection.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-SoundConnection.Tpo -c -o libSPINwrappers_la-SoundConnection.lo `test -f 'SoundConnection.cpp' || echo '$(srcdir)/'`SoundConnection.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-SoundConnection.Tpo $(DEPDIR)/libSPINwrappers_la-SoundConnection.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SoundConnection.cpp' object='libSPINwrappers_la-SoundConnection.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-GridNode.lo `test -f 'GridNode.cpp' || echo '$(srcdir)/'`GridNode.cpp
-
-libSPINwrappers_la-LightSource.lo: LightSource.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-LightSource.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-LightSource.Tpo -c -o libSPINwrappers_la-LightSource.lo `test -f 'LightSource.cpp' || echo '$(srcdir)/'`LightSource.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-LightSource.Tpo $(DEPDIR)/libSPINwrappers_la-LightSource.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='LightSource.cpp' object='libSPINwrappers_la-LightSource.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-LightSource.lo `test -f 'LightSource.cpp' || echo '$(srcdir)/'`LightSource.cpp
-
-libSPINwrappers_la-RayNode.lo: RayNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-RayNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-RayNode.Tpo -c -o libSPINwrappers_la-RayNode.lo `test -f 'RayNode.cpp' || echo '$(srcdir)/'`RayNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-RayNode.Tpo $(DEPDIR)/libSPINwrappers_la-RayNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RayNode.cpp' object='libSPINwrappers_la-RayNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-RayNode.lo `test -f 'RayNode.cpp' || echo '$(srcdir)/'`RayNode.cpp
-
-libSPINwrappers_la-Contour.lo: Contour.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-Contour.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-Contour.Tpo -c -o libSPINwrappers_la-Contour.lo `test -f 'Contour.cpp' || echo '$(srcdir)/'`Contour.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-Contour.Tpo $(DEPDIR)/libSPINwrappers_la-Contour.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Contour.cpp' object='libSPINwrappers_la-Contour.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-Contour.lo `test -f 'Contour.cpp' || echo '$(srcdir)/'`Contour.cpp
-
-libSPINwrappers_la-ConstraintsNode.lo: ConstraintsNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ConstraintsNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ConstraintsNode.Tpo -c -o libSPINwrappers_la-ConstraintsNode.lo `test -f 'ConstraintsNode.cpp' || echo '$(srcdir)/'`ConstraintsNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ConstraintsNode.Tpo $(DEPDIR)/libSPINwrappers_la-ConstraintsNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ConstraintsNode.cpp' object='libSPINwrappers_la-ConstraintsNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ConstraintsNode.lo `test -f 'ConstraintsNode.cpp' || echo '$(srcdir)/'`ConstraintsNode.cpp
-
-libSPINwrappers_la-PointerNode.lo: PointerNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-PointerNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-PointerNode.Tpo -c -o libSPINwrappers_la-PointerNode.lo `test -f 'PointerNode.cpp' || echo '$(srcdir)/'`PointerNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-PointerNode.Tpo $(DEPDIR)/libSPINwrappers_la-PointerNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='PointerNode.cpp' object='libSPINwrappers_la-PointerNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-PointerNode.lo `test -f 'PointerNode.cpp' || echo '$(srcdir)/'`PointerNode.cpp
-
-libSPINwrappers_la-MeasurementNode.lo: MeasurementNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-MeasurementNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-MeasurementNode.Tpo -c -o libSPINwrappers_la-MeasurementNode.lo `test -f 'MeasurementNode.cpp' || echo '$(srcdir)/'`MeasurementNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-MeasurementNode.Tpo $(DEPDIR)/libSPINwrappers_la-MeasurementNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='MeasurementNode.cpp' object='libSPINwrappers_la-MeasurementNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-MeasurementNode.lo `test -f 'MeasurementNode.cpp' || echo '$(srcdir)/'`MeasurementNode.cpp
-
-libSPINwrappers_la-AnimationNode.lo: AnimationNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-AnimationNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-AnimationNode.Tpo -c -o libSPINwrappers_la-AnimationNode.lo `test -f 'AnimationNode.cpp' || echo '$(srcdir)/'`AnimationNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-AnimationNode.Tpo $(DEPDIR)/libSPINwrappers_la-AnimationNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='AnimationNode.cpp' object='libSPINwrappers_la-AnimationNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-AnimationNode.lo `test -f 'AnimationNode.cpp' || echo '$(srcdir)/'`AnimationNode.cpp
-
-libSPINwrappers_la-SwitchNode.lo: SwitchNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-SwitchNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-SwitchNode.Tpo -c -o libSPINwrappers_la-SwitchNode.lo `test -f 'SwitchNode.cpp' || echo '$(srcdir)/'`SwitchNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-SwitchNode.Tpo $(DEPDIR)/libSPINwrappers_la-SwitchNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SwitchNode.cpp' object='libSPINwrappers_la-SwitchNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-SwitchNode.lo `test -f 'SwitchNode.cpp' || echo '$(srcdir)/'`SwitchNode.cpp
-
-libSPINwrappers_la-TextNode.lo: TextNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-TextNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-TextNode.Tpo -c -o libSPINwrappers_la-TextNode.lo `test -f 'TextNode.cpp' || echo '$(srcdir)/'`TextNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-TextNode.Tpo $(DEPDIR)/libSPINwrappers_la-TextNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TextNode.cpp' object='libSPINwrappers_la-TextNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-TextNode.lo `test -f 'TextNode.cpp' || echo '$(srcdir)/'`TextNode.cpp
-
-libSPINwrappers_la-DSPNode.lo: DSPNode.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-DSPNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-DSPNode.Tpo -c -o libSPINwrappers_la-DSPNode.lo `test -f 'DSPNode.cpp' || echo '$(srcdir)/'`DSPNode.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-DSPNode.Tpo $(DEPDIR)/libSPINwrappers_la-DSPNode.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DSPNode.cpp' object='libSPINwrappers_la-DSPNode.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-DSPNode.lo `test -f 'DSPNode.cpp' || echo '$(srcdir)/'`DSPNode.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-SoundConnection.lo `test -f 'SoundConnection.cpp' || echo '$(srcdir)/'`SoundConnection.cpp
 
 libSPINwrappers_la-SoundNode.lo: SoundNode.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-SoundNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-SoundNode.Tpo -c -o libSPINwrappers_la-SoundNode.lo `test -f 'SoundNode.cpp' || echo '$(srcdir)/'`SoundNode.cpp
@@ -524,26 +625,26 @@ libSPINwrappers_la-SoundSpace.lo: SoundSpace.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-SoundSpace.lo `test -f 'SoundSpace.cpp' || echo '$(srcdir)/'`SoundSpace.cpp
 
-libSPINwrappers_la-Listener.lo: Listener.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-Listener.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-Listener.Tpo -c -o libSPINwrappers_la-Listener.lo `test -f 'Listener.cpp' || echo '$(srcdir)/'`Listener.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-Listener.Tpo $(DEPDIR)/libSPINwrappers_la-Listener.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Listener.cpp' object='libSPINwrappers_la-Listener.lo' libtool=yes @AMDEPBACKSLASH@
+libSPINwrappers_la-SwitchNode.lo: SwitchNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-SwitchNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-SwitchNode.Tpo -c -o libSPINwrappers_la-SwitchNode.lo `test -f 'SwitchNode.cpp' || echo '$(srcdir)/'`SwitchNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-SwitchNode.Tpo $(DEPDIR)/libSPINwrappers_la-SwitchNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SwitchNode.cpp' object='libSPINwrappers_la-SwitchNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-Listener.lo `test -f 'Listener.cpp' || echo '$(srcdir)/'`Listener.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-SwitchNode.lo `test -f 'SwitchNode.cpp' || echo '$(srcdir)/'`SwitchNode.cpp
 
-libSPINwrappers_la-SoundConnection.lo: SoundConnection.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-SoundConnection.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-SoundConnection.Tpo -c -o libSPINwrappers_la-SoundConnection.lo `test -f 'SoundConnection.cpp' || echo '$(srcdir)/'`SoundConnection.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-SoundConnection.Tpo $(DEPDIR)/libSPINwrappers_la-SoundConnection.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SoundConnection.cpp' object='libSPINwrappers_la-SoundConnection.lo' libtool=yes @AMDEPBACKSLASH@
+libSPINwrappers_la-TextNode.lo: TextNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-TextNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-TextNode.Tpo -c -o libSPINwrappers_la-TextNode.lo `test -f 'TextNode.cpp' || echo '$(srcdir)/'`TextNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-TextNode.Tpo $(DEPDIR)/libSPINwrappers_la-TextNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='TextNode.cpp' object='libSPINwrappers_la-TextNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-SoundConnection.lo `test -f 'SoundConnection.cpp' || echo '$(srcdir)/'`SoundConnection.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-TextNode.lo `test -f 'TextNode.cpp' || echo '$(srcdir)/'`TextNode.cpp
 
-libSPINwrappers_la-ImageTexture.lo: ImageTexture.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ImageTexture.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ImageTexture.Tpo -c -o libSPINwrappers_la-ImageTexture.lo `test -f 'ImageTexture.cpp' || echo '$(srcdir)/'`ImageTexture.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ImageTexture.Tpo $(DEPDIR)/libSPINwrappers_la-ImageTexture.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ImageTexture.cpp' object='libSPINwrappers_la-ImageTexture.lo' libtool=yes @AMDEPBACKSLASH@
+libSPINwrappers_la-UserNode.lo: UserNode.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-UserNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-UserNode.Tpo -c -o libSPINwrappers_la-UserNode.lo `test -f 'UserNode.cpp' || echo '$(srcdir)/'`UserNode.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-UserNode.Tpo $(DEPDIR)/libSPINwrappers_la-UserNode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='UserNode.cpp' object='libSPINwrappers_la-UserNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ImageTexture.lo `test -f 'ImageTexture.cpp' || echo '$(srcdir)/'`ImageTexture.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-UserNode.lo `test -f 'UserNode.cpp' || echo '$(srcdir)/'`UserNode.cpp
 
 libSPINwrappers_la-VideoTexture.lo: VideoTexture.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-VideoTexture.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-VideoTexture.Tpo -c -o libSPINwrappers_la-VideoTexture.lo `test -f 'VideoTexture.cpp' || echo '$(srcdir)/'`VideoTexture.cpp
@@ -551,13 +652,6 @@ libSPINwrappers_la-VideoTexture.lo: VideoTexture.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='VideoTexture.cpp' object='libSPINwrappers_la-VideoTexture.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-VideoTexture.lo `test -f 'VideoTexture.cpp' || echo '$(srcdir)/'`VideoTexture.cpp
-
-libSPINwrappers_la-SharedVideoTexture.lo: SharedVideoTexture.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-SharedVideoTexture.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Tpo -c -o libSPINwrappers_la-SharedVideoTexture.lo `test -f 'SharedVideoTexture.cpp' || echo '$(srcdir)/'`SharedVideoTexture.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Tpo $(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SharedVideoTexture.cpp' object='libSPINwrappers_la-SharedVideoTexture.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-SharedVideoTexture.lo `test -f 'SharedVideoTexture.cpp' || echo '$(srcdir)/'`SharedVideoTexture.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -762,6 +856,13 @@ uninstall-am:
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
+
+# TODO: Could be nice to regenerate the wrapper every time a source file from src/spin changes:
+# FIXME: These depend on the headers, and more specifically, each generated wrapper should only depend on one header
+#$(BUILT_SOURCES):
+#	-rm -f $(top_srcdir)/include/*.h~
+#	cd $(top_srcdir) && src/genwrapper/genwrapper -d . doxygen | doxygen - && cd -
+#	cd $(top_srcdir) && src/genwrapper/genwrapper -v QUIET -c genwrapper.conf doxygen . && cd -
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -51,20 +51,18 @@ namespace osg {
     class Object;
 }
 
-
 // *****************************************************************************
 // GLOBAL DEFINITIONS:
-
 
 #define OSG_NUM_LIGHTS 8
 
 // set the following DEBUG flag to 1 for more verbose print statements:
-#define DEBUG 0
+//#define DEBUG 0
 
 #define NULL_SYMBOL gensym("NULL")
 #define WORLD_SYMBOL gensym("world")
 
-#define SPIN_DIRECTORY getAbsolutePath("~/.spinFramework")
+#define SPIN_DIRECTORY spin::getAbsolutePath("~/.spinFramework")
 
 // *****************************************************************************
 // NODE MASKS:
@@ -92,6 +90,9 @@ namespace osg {
 
 
 
+namespace spin
+{
+
 
 // *****************************************************************************
 // networking functions
@@ -99,27 +100,28 @@ namespace osg {
 std::string getHostname();
 std::string getMyIPaddress();
 std::string getMyBroadcastAddress();
-bool isMulticastAddress(std::string s);
-bool isBroadcastAddress(std::string s);
+bool isMulticastAddress(const std::string &s);
+bool isBroadcastAddress(const std::string &s);
 
 // *****************************************************************************
 // string handling functions
 
 template <class T> bool fromString(T& t, const std::string& s)
 {
-	std::istringstream iss(s);
-	return !(iss >> t).fail();
+    std::istringstream iss(s);
+    return !(iss >> t).fail();
 }
 
 /*
 template <typename T> bool fromString(T &aValue, const std::string &aStr)
 {
-	std::stringstream ss(aStr);
-	return ss >> aValue;
+    std::stringstream ss(aStr);
+    return ss >> aValue;
 }
 */
 
 std::string stringify(float x);
+std::string stringify(int x);
 
 std::string leadingSpaces(int n);
 
@@ -127,16 +129,20 @@ std::string leadingSpaces(int n);
 std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters = " ");
 std::vector<float> floatsFromString (std::string theString);
 
+bool wildcardMatch(const char *pat, const char *str);
+
+
 // *****************************************************************************
 // file helpers
 
 bool fileExists(const std::string& fileName);
-std::string getRelativePath(std::string path);
-std::string getAbsolutePath(std::string path);
+std::string getRelativePath(const std::string &path);
+std::string getAbsolutePath(const std::string &path);
 
-bool isVideoPath(std::string path);
+bool isVideoPath(const std::string &path);
+bool isImagePath(const std::string &path);
 
-std::string getSpinPath(std::string path);
+std::string getSpinPath(const std::string &path);
 
 // *****************************************************************************
 // gensym stuff (from m_pd.h)
@@ -157,7 +163,6 @@ typedef struct _symbol
     ReferencedType s_type;
 } t_symbol;
 
-
 typedef float t_float;
 typedef float t_floatarg;  
 
@@ -170,16 +175,9 @@ EXTERN void *getbytes(size_t nbytes);
 EXTERN void *copybytes(void *src, size_t nbytes);
 EXTERN void freebytes(void *x, size_t nbytes);
 
+} // end of namespace spin
 
 
-// *****************************************************************************
-// introspection helpers
-#include <osgIntrospection/Type>
-#include <osgIntrospection/MethodInfo>
 
-bool introspect_type_order(const osgIntrospection::Type *v1, const osgIntrospection::Type *v2);
-void introspect_print_method(const osgIntrospection::MethodInfo &mi);
-void introspect_print_type(const osgIntrospection::Type &type);
-void introspect_print_all_types();
 
 #endif

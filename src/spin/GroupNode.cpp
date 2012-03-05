@@ -39,10 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-
 #include <osg/ComputeBoundsVisitor>
 #include <osgGA/GUIEventAdapter>
-
 #include "GroupNode.h"
 #include "SceneManager.h"
 #include "spinApp.h"
@@ -51,12 +49,10 @@
 #include "UserNode.h"
 #include "spinApp.h"
 
-
-
 using namespace std;
 
-
-
+namespace spin
+{
 
 // ***********************************************************
 // constructor:
@@ -82,8 +78,6 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
     clipNode->setName(string(id->s_name) + ".clipNode");
     mainTransform->addChild(clipNode.get());
 
-
-
     _velocity = osg::Vec3(0.0,0.0,0.0);
     _velocityMode = GroupNode::TRANSLATE;
     _spin = osg::Vec3(0.0,0.0,0.0);
@@ -95,7 +89,6 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 
     // keep a timer for velocity calculation:
     lastTick = osg::Timer::instance()->tick();
-
 }
 
 // ***********************************************************
@@ -109,7 +102,6 @@ GroupNode::~GroupNode()
 
 void GroupNode::callbackUpdate()
 {
-
     ReferencedNode::callbackUpdate();
 
     //printf("GroupNode: damping = %f\n", _damping);
@@ -153,16 +145,15 @@ void GroupNode::callbackUpdate()
             }
             else _spin = osg::Vec3(0,0,0);
 
-
             lastTick = tick;
         }
     }
-
 }
 
-
-void GroupNode::updateNodePath()
+void GroupNode::updateNodePath(bool updateChildren)
 {
+	ReferencedNode::updateNodePath(false);
+	/*
     currentNodePath.clear();
     if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
     {
@@ -176,11 +167,12 @@ void GroupNode::updateNodePath()
     // here, the nodePath includes the base osg::group, PLUS the mainTransform
     // and clipNode
     currentNodePath.push_back(this);
+    */
     currentNodePath.push_back(mainTransform.get());
     currentNodePath.push_back(clipNode.get());
 
     // now update NodePaths for all children:
-    updateChildNodePaths();
+    if (updateChildren) updateChildNodePaths();
 
     /*
     osg::NodePath::iterator iter;
@@ -192,7 +184,6 @@ void GroupNode::updateNodePath()
     */
 
 }
-
 
 // *****************************************************************************
 
@@ -266,8 +257,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                     // if this node is owned by the event's user, then we apply the
                     // motion relative to the user's current position/orientation:
 
-                    osg::Matrix targMatrix = this->getGlobalMatrix();
-                    osg::Matrix userMatrix = user->getGlobalMatrix();
+                    const osg::Matrix targMatrix = this->getGlobalMatrix();
+                    const osg::Matrix userMatrix = user->getGlobalMatrix();
 
                     float distance = (targMatrix.getTrans() - userMatrix.getTrans()).length();
 
@@ -327,6 +318,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                     this->owner = user.get();
                     //std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
                     BROADCAST(this, "ss", "owner", owner->id->s_name);
+                    BROADCAST(this, "ssi", "select", userString, 1);
                 }
                 break;
 
@@ -339,7 +331,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                     //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
                     this->owner = NULL;
                     BROADCAST(this, "ss", "owner", "NULL");
-                }
+                    BROADCAST(this, "ssi", "select", userString, 0);
+               }
                 break;
             case(osgGA::GUIEventAdapter::DOUBLECLICK):
                 BROADCAST(this, "ss", "doubleclick", userString);
@@ -466,9 +459,9 @@ void GroupNode::setOrientation (float p, float r, float y)
     if (newOrientation != getOrientation())
     {
         _orientation = newOrientation;
-        osg::Quat q = osg::Quat( -osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-                                 -osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-                                 -osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
+        osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
+                                 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
+                                 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
         mainTransform->setAttitude(q);
         BROADCAST(this, "sfff", "setOrientation", p, r, y);
     }
@@ -573,7 +566,7 @@ osg::Matrix GroupNode::getGlobalMatrix()
     return _globalMatrix;
 }
 
-osg::Vec3 GroupNode::getCenter()
+osg::Vec3 GroupNode::getCenter() const
 {
     const osg::BoundingSphere& bs = this->getBound();
     //osg::BoundingSphere& bs = this->computeBound();
@@ -642,7 +635,7 @@ void GroupNode::stateDump ()
 // *****************************************************************************
 
 
-std::vector<lo_message> GroupNode::getState ()
+std::vector<lo_message> GroupNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedNode::getState();
@@ -696,4 +689,7 @@ std::vector<lo_message> GroupNode::getState ()
 
     return ret;
 }
+
+} // end of namespace spin
+
 

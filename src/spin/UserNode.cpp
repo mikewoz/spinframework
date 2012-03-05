@@ -44,13 +44,14 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
-using namespace std;
-
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
 UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
 {
+    using std::string;
     nodeType = "UserNode";
     this->setName(string(id->s_name) + ".UserNode");
 
@@ -58,6 +59,10 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
 
     setTranslation(0.0, -5.0, 0.5);
     setReportMode(GroupNode::GLOBAL_6DOF);
+
+	cameraAttachmentNode = new osg::Group();
+	cameraAttachmentNode->setName(string(id->s_name) + ".cameraAttachmentNode");
+	mainTransform->addChild(cameraAttachmentNode.get());
 
     ping_ = false;
 }
@@ -99,6 +104,7 @@ void UserNode::updateNodePath()
 
 void UserNode::setDescription (const char *newvalue)
 {
+    using std::string;
     description_ = string(newvalue);
     BROADCAST(this, "ss", "setDescription", getDescription());
 }
@@ -111,7 +117,7 @@ void UserNode::ping()
 
 // *****************************************************************************
 
-std::vector<lo_message> UserNode::getState ()
+std::vector<lo_message> UserNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ConstraintsNode::getState();
@@ -125,3 +131,5 @@ std::vector<lo_message> UserNode::getState ()
 
 	return ret;
 }
+
+} // end of namespace spin

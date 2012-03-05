@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <PointerNode.h>
 #include <ReferencedNode.h>
@@ -22,10 +22,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(PointerNode)
+BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	I_DeclaringFile("PointerNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____PointerNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -44,7 +44,7 @@ BEGIN_OBJECT_REFLECTOR(PointerNode)
 	          __void__disableDragger,
 	          "",
 	          "");
-	I_Method0(ReferencedNode *, getNodeFromIntersections,
+	I_Method0(spin::ReferencedNode *, getNodeFromIntersections,
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__getNodeFromIntersections,
 	          "",
@@ -108,7 +108,7 @@ BEGIN_OBJECT_REFLECTOR(PointerNode)
 	I_SimpleProperty(int, Manipulate, 
 	                 __int__getManipulate, 
 	                 0);
-	I_SimpleProperty(ReferencedNode *, NodeFromIntersections, 
+	I_SimpleProperty(spin::ReferencedNode *, NodeFromIntersections, 
 	                 __ReferencedNode_P1__getNodeFromIntersections, 
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
@@ -119,7 +119,7 @@ BEGIN_OBJECT_REFLECTOR(PointerNode)
 	                 __void__setType__char_P1);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(PointerNodeActionAdapter)
+BEGIN_VALUE_REFLECTOR(spin::PointerNodeActionAdapter)
 	I_DeclaringFile("PointerNode.h");
 	I_Constructor0(____PointerNodeActionAdapter,
 	               "",

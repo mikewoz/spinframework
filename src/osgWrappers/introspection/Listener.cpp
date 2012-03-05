@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <Listener.h>
 #include <SceneManager.h>
@@ -21,13 +21,18 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(Listener)
+BEGIN_OBJECT_REFLECTOR(spin::Listener)
 	I_DeclaringFile("Listener.h");
-	I_BaseType(SoundNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::DSPNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____Listener__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_Method0(void, callbackUpdate,
+	          Properties::VIRTUAL,
+	          __void__callbackUpdate,
+	          "",
+	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

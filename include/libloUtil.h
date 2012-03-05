@@ -42,9 +42,9 @@
 #ifndef LIBLOUTIL_H
 #define LIBLOUTIL_H
 
-#include "lo/lo.h"
-#include "stdlib.h"
-#include "string.h"
+#include <lo/lo.h>
+#include <cstdlib>
+#include <cstring>
 
 typedef struct _lo_method {
         const char        *path;

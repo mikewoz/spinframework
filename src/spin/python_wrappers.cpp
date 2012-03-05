@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#ifndef DISABLE_PYTHON
 
 #include <boost/utility.hpp>
 #include <boost/python.hpp>
@@ -51,53 +52,49 @@
 #include <boost/python/extract.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/dict.hpp>
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
 #include <string.h>
-
 #include <iostream>
 #include <sstream>
-
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
-
-#include <osgIntrospection/Reflection>
-#include <osgIntrospection/Type>
-#include <osgIntrospection/Value>
-#include <osgIntrospection/variant_cast>
-#include <osgIntrospection/Exceptions>
-#include <osgIntrospection/MethodInfo>
-#include <osgIntrospection/PropertyInfo>
-
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
-
-#include <osgIntrospection/ExtendedTypeInfo>
-#include <osgIntrospection/variant_cast>
-
-
+#include <cppintrospection/Reflection>
+#include <cppintrospection/Type>
+#include <cppintrospection/Value>
+#include <cppintrospection/variant_cast>
+#include <cppintrospection/Exceptions>
+#include <cppintrospection/MethodInfo>
+#include <cppintrospection/PropertyInfo>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
+#include <cppintrospection/ExtendedTypeInfo>
+#include <cppintrospection/variant_cast>
 #include "spinApp.h"
+#include "spinBaseContext.h"
 #include "SceneManager.h"
 
 using namespace boost::python;
 
-/******************************************************************************/
+namespace spin
+{
 
-class ValueWrapper {
-
+/**
+ * \brief Utility to wrap types for the Python wrapper.
+ */
+class ValueWrapper
+{
 public:
     ValueWrapper();
-    ValueWrapper(osgIntrospection::Value& v);
+    ValueWrapper(cppintrospection::Value& v);
     ValueWrapper(int v);
     ValueWrapper(float v);
     ValueWrapper(std::string& v);
     ValueWrapper(const std::string& v);
     ~ValueWrapper();
-
 
     int getInt();
     float getFloat();
@@ -105,69 +102,58 @@ public:
     boost::python::tuple getVector();
 
 protected:
-    osgIntrospection::Value _value;
+    cppintrospection::Value _value;
 };
-/******************************************************************************/
+
 ValueWrapper::ValueWrapper() {
-    _value = osgIntrospection::Value(0);
+    _value = cppintrospection::Value(0);
 }
-/******************************************************************************/
-ValueWrapper::ValueWrapper(osgIntrospection::Value& v) {
+
+ValueWrapper::ValueWrapper(cppintrospection::Value& v) {
     _value = v;
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(int v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(float v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(std::string& v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::ValueWrapper(const std::string& v) {
-    _value = osgIntrospection::Value(v);
+    _value = cppintrospection::Value(v);
 }
 
-/******************************************************************************/
 ValueWrapper::~ValueWrapper() {
 }
 
-
-/******************************************************************************/
-
-int ValueWrapper::getInt() {
-    int i = osgIntrospection::variant_cast<int>(_value);
+int ValueWrapper::getInt()
+{
+    int i = cppintrospection::variant_cast<int>(_value);
     return i;
 }
 
-/******************************************************************************/
-
-float ValueWrapper::getFloat() {
-    float i = osgIntrospection::variant_cast<float>(_value);
+float ValueWrapper::getFloat()
+{
+    float i = cppintrospection::variant_cast<float>(_value);
     return i;
 }
 
-/******************************************************************************/
-
-std::string ValueWrapper::getString() {
+std::string ValueWrapper::getString()
+{
     return _value.toString();
-
 }
-/******************************************************************************/
 
-boost::python::tuple ValueWrapper::getVector() {
-
+boost::python::tuple ValueWrapper::getVector()
+{
     try {
         osg::Vec2 v2;
-        v2 = osgIntrospection::variant_cast<osg::Vec2>(_value);
+        v2 = cppintrospection::variant_cast<osg::Vec2>(_value);
         return make_tuple( v2.x(), v2.y() );
     } catch (...) {
         // not it..
@@ -175,7 +161,7 @@ boost::python::tuple ValueWrapper::getVector() {
 
     try {
         osg::Vec3 v3;
-        v3 = osgIntrospection::variant_cast<osg::Vec3>(_value);
+        v3 = cppintrospection::variant_cast<osg::Vec3>(_value);
         return make_tuple( v3.x(), v3.y(), v3.z() );
     } catch (...) {
         // still not it
@@ -183,40 +169,25 @@ boost::python::tuple ValueWrapper::getVector() {
 
     try {
         osg::Vec4 v4;
-        v4 = osgIntrospection::variant_cast<osg::Vec4>(_value);
+        v4 = cppintrospection::variant_cast<osg::Vec4>(_value);
         return make_tuple( v4.x(), v4.y(), v4.z(), v4.w() );
     } catch (...) {
         // damn
     }
-
-
-
-
     return make_tuple(0);
-
-
 }
 
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-
-int invokeMethod(const osgIntrospection::Value classInstance,
-                 const osgIntrospection::Type &classType,
+int invokeMethod(const cppintrospection::Value classInstance,
+                 const cppintrospection::Type &classType,
                  const std::string& method,
-                 osgIntrospection::ValueList theArgs,
-                 osgIntrospection::Value &rval)
+                 cppintrospection::ValueList theArgs,
+                 cppintrospection::Value &rval)
 {
 
     // TODO: we should try to store this globally somewhere, so that we don't do
     // a lookup every time there is a message:
-
     /*
-    const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-
-
+    //const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("ReferencedNode");
     if ((classType==ReferencedNodeType) || (classType.isSubclassOf(ReferencedNodeType)))
     {
     */
@@ -226,7 +197,7 @@ int invokeMethod(const osgIntrospection::Value classInstance,
             // we can return:
             return 1;
         }
-        catch (osgIntrospection::Exception & ex)
+        catch (cppintrospection::Exception & ex)
         {
             //std::cerr << "catch exception: " << ex.what() << std::endl;
         }
@@ -238,28 +209,22 @@ int invokeMethod(const osgIntrospection::Value classInstance,
             if (invokeMethod(classInstance, classType.getBaseType(i), method, theArgs, rval)) return 1;
         }
    // }
-
     return 0;
 }
 
-/******************************************************************************/
-/******************************************************************************/
-
-bool pyextract( boost::python::object obj, double* d ) {
-
+bool pyextract( boost::python::object obj, double* d )
+{
     try {
         *d = boost::python::extract<double>( obj );
     } catch (...) {
         PyErr_Clear();
         return false;
     }
-
     return true;
 }
 
-
-bool pyextract( boost::python::object obj, float* d ) {
-
+bool pyextract( boost::python::object obj, float* d )
+{
     try {
         *d = boost::python::extract<float>( obj );
     } catch (...) {
@@ -270,135 +235,155 @@ bool pyextract( boost::python::object obj, float* d ) {
     return true;
 }
 
-bool pyextract( boost::python::object obj, int* d ) {
-
+bool pyextract( boost::python::object obj, int* d )
+{
     try {
         *d = boost::python::extract<int>( obj );
     } catch (...) {
         PyErr_Clear();
         return false;
     }
-
     return true;
 }
 
-bool pyextract( boost::python::object obj, char* d ) {
-
+std::string pyextract( boost::python::object obj )
+{
+    std::string s;
     try {
-        d = boost::python::extract<char*>( obj );
-        printf("got string [%s]\n", d);
+        s = boost::python::extract<std::string>( obj );
     } catch (...) {
         PyErr_Clear();
-        return false;
     }
-
-    return true;
+    return s;
 }
 
-
-
-
-/******************************************************************************/
 ValueWrapper SceneManagerCallback_script( const char* symName, const char* method,
                                           boost::python::list& argList, int cascadeEvents )
 {
-
     //int i;
     std::string    theMethod( method );
-    osgIntrospection::ValueList theArgs;
-
+    cppintrospection::ValueList theArgs;
     //printf("SceneManagerCallback_script: hi! %s, %s, [%s]\n", symName, types, args.c_str());
-
     t_symbol *s = gensym( symName );
 
     if (!s->s_thing)
     {
-        std::cout << "oscParser: Could not find referenced object named: " << symName << std::endl;
+        //std::cout << "oscParser: Could not find referenced object named: " << symName << std::endl;
         return ValueWrapper(0);
     }
 
     // get osgInrospection::Value from passed UserData by casting as the proper
     // referenced object pointer:
-
-    osgIntrospection::Value classInstance;
+    cppintrospection::Value classInstance;
     if (s->s_type == REFERENCED_STATESET)
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
+        classInstance = cppintrospection::Value(dynamic_cast<ReferencedStateSet*>(s->s_thing));
     else
-        classInstance = osgIntrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
-
-
+        classInstance = cppintrospection::Value(dynamic_cast<ReferencedNode*>(s->s_thing));
 
     // the getInstanceType() method however, gives us the real type being pointed at:
-    const osgIntrospection::Type &classType = classInstance.getInstanceType();
+    const cppintrospection::Type &classType = classInstance.getInstanceType();
 
-    if (!classType.isDefined())
+    if (! classType.isDefined())
     {
         std::cout << "ERROR: oscParser cound not process message '" << symName
-                  << ". osgIntrospection has no data for that node." << std::endl;
+                  << ". cppintrospection has no data for that node." << std::endl;
         return ValueWrapper(0);
     }
 
     size_t nbArgs = boost::python::len( argList );
-    double da; float fa; int ia; char* sa;
+    double da; float fa; int ia; std::string sa;
 
-    for ( size_t i = 0; i < nbArgs; i++ ) {
+    for ( size_t i = 0; i < nbArgs; i++ )
+    {
 
-        if ( pyextract( argList[i], &da ) ) theArgs.push_back( (double) da );
-        else if ( pyextract( argList[i], &fa ) ) theArgs.push_back( (float) fa );
-        else if ( pyextract( argList[i], &ia ) ) theArgs.push_back( (int) ia );
-        else if ( pyextract( argList[i], sa ) ) theArgs.push_back( (const char*) sa );
-        else printf( "could not cast argList[%i]\n", i );
+        if ( pyextract( argList[i], &da ) )
+            theArgs.push_back( (double) da );
+        else if ( pyextract( argList[i], &fa ) )
+            theArgs.push_back( (float) fa );
+        else if ( pyextract( argList[i], &ia ) )
+            theArgs.push_back( (int) ia );
+        else
+        {
+            sa = pyextract( argList[i] );
+            if (sa != "" )
+                theArgs.push_back( (const char*) sa.c_str() );
+        }
     }
 
     // invoke the method on the node, and if it doesn't work, then just forward
     // the message:
-
-    osgIntrospection::Value v;
-
+    cppintrospection::Value v;
     bool eventScriptCalled = false;
-    if (cascadeEvents) {
-        if (s->s_type == REFERENCED_NODE) {
+    if (cascadeEvents)
+    {
+        if (s->s_type == REFERENCED_NODE)
+        {
             //printf("calling eventscript...\n");
             eventScriptCalled = dynamic_cast<ReferencedNode*>(s->s_thing)->callEventScript( theMethod, theArgs );
         }
     }
 
-    if (eventScriptCalled) { // cascaded event script called successful, do not invokeMethod, return nothing to the python script
+    if (eventScriptCalled)
+    { // cascaded event script called successful, do not invokeMethod, return nothing to the python script
         return ValueWrapper(0);
-    } else { // no cascaded event assigned to theMethod or cascaded event script failed.  call invokeMethod and return result to python script
-        if (invokeMethod(classInstance, classType, theMethod, theArgs, v)) {
+    }
+    else
+    { // no cascaded event assigned to theMethod or cascaded event script failed.  call invokeMethod and return result to python script
+        if (invokeMethod(classInstance, classType, theMethod, theArgs, v))
+        {
             return ValueWrapper(v);
-        } else {
-            std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name
-                      << "], not forwarding the message" << std::endl;
+        }
+        else
+        {
+            if (spinApp::Instance().getContext()->isServer())
+            {
+                lo_message msg = lo_message_new();
+                lo_message_add_string(msg, theMethod.c_str());
+                for ( size_t i = 0; i < nbArgs; i++ )
+                {
+                    if ( pyextract( argList[i], &da ) ) lo_message_add_float(msg, (float) da );
+                    else if ( pyextract( argList[i], &fa ) ) lo_message_add_float(msg, (float) fa );
+                    else if ( pyextract( argList[i], &ia ) ) lo_message_add_float(msg, (float) ia );
+                    else
+                    {
+                        sa = pyextract( argList[i] );
+                        if (sa != "" ) lo_message_add_string(msg, (const char*) sa.c_str() );
+                    }
+                }
+                std::string path = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + s->s_name;
+                std::vector<lo_address>::iterator addrIter;
+                for (addrIter = spinApp::Instance().getContext()->lo_txAddrs_.begin(); addrIter != spinApp::Instance().getContext()->lo_txAddrs_.end(); ++addrIter)
+                {
+                    lo_send_message_from((*addrIter), spinApp::Instance().getContext()->lo_infoServ_, path.c_str(), msg);
+                }
+            }
         }
 
     }
     //pthread_mutex_unlock(&sceneMutex);
-
     return ValueWrapper(0);
 }
 
-
-/******************************************************************************/
-
-double time_s() {
+double time_s()
+{
     return osg::Timer::instance()->time_s();
 }
-double time_m() {
+double time_m()
+{
     return osg::Timer::instance()->time_m();
 }
-double time_u() {
+double time_u()
+{
     return osg::Timer::instance()->time_u();
 }
-double time_n() {
+double time_n()
+{
     return osg::Timer::instance()->time_n();
 }
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
+/**
+ * Please document this.
+ */
 BOOST_PYTHON_MODULE(libSPINPyWrap)
 {
     def("callback", &SceneManagerCallback_script);
@@ -413,8 +398,8 @@ BOOST_PYTHON_MODULE(libSPINPyWrap)
         .def("getString", &ValueWrapper::getString)  // Add a regular member function.
         .def("getVector", &ValueWrapper::getVector)
     ;
-
 }
 
+} // end of namespace spin
 
-/******************************************************************************/
+#endif

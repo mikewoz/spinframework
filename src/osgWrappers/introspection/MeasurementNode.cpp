@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <MeasurementNode.h>
 #include <SceneManager.h>
@@ -21,10 +21,17 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(MeasurementNode)
+BEGIN_ENUM_REFLECTOR(spin::MeasurementNode::reportMode)
 	I_DeclaringFile("MeasurementNode.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_EnumLabel(spin::MeasurementNode::REPORT_NONE);
+	I_EnumLabel(spin::MeasurementNode::REPORT_BASIC);
+	I_EnumLabel(spin::MeasurementNode::REPORT_ANGLES);
+END_REFLECTOR
+
+BEGIN_OBJECT_REFLECTOR(spin::MeasurementNode)
+	I_DeclaringFile("MeasurementNode.h");
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____MeasurementNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -32,17 +39,22 @@ BEGIN_OBJECT_REFLECTOR(MeasurementNode)
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate,
 	          "",
-	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
+	          "The update callback for MeasurementNode checks to see if the target's or the MeasurementNode's global matrix has changed (ie, whether it has been moved or not). If so, it updates the internal matrices, and calls sendMeasurements() ");
+	I_Method0(void, sendMeasurements,
+	          Properties::NON_VIRTUAL,
+	          __void__sendMeasurements,
+	          "",
+	          "sendMeasurements is where the actual computation takes place, and, depending on the reportMode, the measurements are sent out on the network ");
 	I_Method1(void, setTarget, IN, const char *, targetID,
 	          Properties::NON_VIRTUAL,
 	          __void__setTarget__C5_char_P1,
 	          "",
-	          "");
-	I_Method1(void, setReportingLevel, IN, int, level,
+	          "MeasurementNode requires a targetNode to be set, which defines which node in the scene is being measured. ");
+	I_Method1(void, setReportingLevel, IN, spin::MeasurementNode::reportMode, level,
 	          Properties::NON_VIRTUAL,
-	          __void__setReportingLevel__int,
+	          __void__setReportingLevel__reportMode,
 	          "",
-	          "");
+	          "This sets the level of reporting (choose a reportMode) ");
 	I_Method0(const char *, getTarget,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getTarget,
@@ -60,7 +72,7 @@ BEGIN_OBJECT_REFLECTOR(MeasurementNode)
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
 	I_SimpleProperty(int, ReportingLevel, 
 	                 __int__getReportingLevel, 
-	                 __void__setReportingLevel__int);
+	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

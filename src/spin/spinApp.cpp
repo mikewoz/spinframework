@@ -44,18 +44,21 @@
 #include <pthread.h>
 #include <signal.h>
 
-
+#include <osg/Version>
 #include <osgDB/Registry>
-#include <osgIntrospection/Type>
+#include <cppintrospection/Type>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/exception.hpp>
+#ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
+#endif
 
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
 #include "spinApp.h"
+#include "spinDefaults.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
 #include "SceneManager.h"
@@ -63,28 +66,47 @@
 #include "spinLog.h"
 #include "nodeVisitors.h"
 
+#ifdef WITH_SPATOSC
+#include <spatosc/scene.h>
+#endif
 
 #define UNUSED(x) ( (void)(x) )
 
 extern pthread_mutex_t sceneMutex;
 
-
-
-spinApp::spinApp() : userID_(getHostname())
+namespace spin
 {
-	
+
+spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(spin_defaults::SCENE_ID)
+{
+/*
 #ifdef __Darwin
     setenv("OSG_LIBRARY_PATH", "@executable_path/../PlugIns", 1);
-    //#define OSG_LIBRARY_PATH @executable_path/../PlugIns
+    setenv("DYLD_LIBRARY_PATH", "@executable_path/../libs", 1);
 #endif
+*/
+  
+   
+    osgDB::FilePathList osgLibPaths;
+    osgLibPaths.push_back("/opt/local/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/lib64/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/local/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/local/lib64/osgPlugins-"+std::string(osgGetVersion()));
+    osgDB::Registry::instance()->setLibraryFilePathList(osgLibPaths);
 
+
+ 
     // Load the SPIN library:
     /*
     osgDB::Registry *reg = osgDB::Registry::instance();
     if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN")))
     {
         std::cout << "Error: Could not load libSPIN" << std::endl;
+    } else {
+    	std::cout << "Successfully loaded libSPIN" << std::endl;
     }
+
     if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPINwrappers")))
     {
         std::cout << "Error: Could not load libSPINwrappers" << std::endl;
@@ -92,30 +114,41 @@ spinApp::spinApp() : userID_(getHostname())
     */
 
 
-    // Make sure that our OSG nodekit    is loaded (by checking for existance of
+    // Make sure that our OSG nodekit is loaded (by checking for existence of
     // the ReferencedNode node type):
     try
     {
-        /*
+    	/*
         std::cout << "[DEBUG] These are all possible types:" << std::endl;
-        const osgIntrospection::TypeMap &allTypes = osgIntrospection::Reflection::getTypes();
-        for (osgIntrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
+        const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
+        for (cppintrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
         {
             if ( ((*it).second)->isDefined() )
-            std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
+            {
+            	std::cout << ((*it).second)->getName() << " isAtomic?  " << ((*it).second)->isAtomic() << std::endl;
+            	//std::cout << ((*it).second)->getName() << " isDefined? " << ((*it).second)->isDefined() << std::endl;
+            }
         }
-        */
-        const osgIntrospection::Type &ReferencedNodeType = osgIntrospection::Reflection::getType("ReferencedNode");
-        UNUSED(ReferencedNodeType);
+		*/
+        const cppintrospection::Type &ReferencedNodeType = cppintrospection::Reflection::getType("spin::ReferencedNode");
+        //UNUSED(ReferencedNodeType);
+        if (!ReferencedNodeType.isDefined())
+        {
+            std::cout << "Introspection ERROR: Make sure that libSPIN exists and can be found." << std::endl;
+        	exit(1);
+        }
+        else {
+        	//std::cout << "Successfully loaded SPIN library" << std::endl;
+        }
     }
-    catch (osgIntrospection::Exception & ex)
+    catch (cppintrospection::Exception & ex)
     {
         std::cout << "ERROR: " << ex.what() << ". This is likely a dynamic library problem. Make sure that libSPIN exists and can be found." << std::endl;
         exit(1);
     }
 
 
-    sceneID = "default";
+    //sceneID = "default";
 
     // check if local user directory exists, otherwise make it:
     try
@@ -137,12 +170,25 @@ spinApp::spinApp() : userID_(getHostname())
     // timecode init:
     setSyncStart(0);
 
+#ifdef WITH_SPATOSC
+    audioScene = new spatosc::Scene();
+    audioScene->setVerbose(true);
+#endif
+
     _pyInitialized = false;
 }
 
 spinApp::~spinApp()
 {
-    delete sceneManager;
+	if (userNode.valid())
+	{
+		sceneManager->doDelete(userNode.get());
+		userNode = 0;
+	}
+#ifdef WITH_SPATOSC
+	delete audioScene;
+#endif
+	delete sceneManager;
     //spinBaseContext::signalStop = true;
 }
 
@@ -168,11 +214,15 @@ void spinApp::setContext(spinBaseContext *c)
 void spinApp::createScene()
 {
     if (context)
+    {
         sceneManager = new SceneManager(getSceneID());
+    }
     else
+    {
         std::cout << "ERROR. Cannot createScene because context has not been set in spinApp" << std::endl;
+        exit(1);
+    }
 }
-
 void spinApp::destroyScene()
 {
 	std::cout << "Cleaning up SceneManager..." << std::endl;
@@ -206,8 +256,9 @@ void spinApp::destroyScene()
 
 bool spinApp::initPython()
 {
-
     _pyInitialized = false;
+
+#ifndef DISABLE_PYTHON
 
     try {
         Py_Initialize();
@@ -217,7 +268,14 @@ bool spinApp::initPython()
         exec("import sys", _pyNamespace, _pyNamespace);
         //////////exec("sys.path.append('/home/lwi')", _pyNamespace, _pyNamespace);
         ///exec("sys.path.append('/usr/local/share/spinFramework/scripts')", _pyNamespace, _pyNamespace);
-        exec("sys.path.append('/usr/local/lib')", _pyNamespace, _pyNamespace);
+
+        //exec("sys.path.append('/usr/local/lib')", _pyNamespace, _pyNamespace);
+
+
+        exec(std::string("sys.path.append('" + sceneManager->resourcesPath+  "')").c_str(), _pyNamespace, _pyNamespace);
+
+        //exec("print sys.path", _pyNamespace, _pyNamespace);
+
         //exec("import spin", _pyNamespace, _pyNamespace);
         exec("import libSPINPyWrap", _pyNamespace, _pyNamespace);
 
@@ -234,11 +292,16 @@ bool spinApp::initPython()
     }
 
     _pyInitialized = true;
-    return true;
 
+#endif
+    
+    return _pyInitialized;
+    
 }
-bool spinApp::execPython( const std::string& cmd ) {
-
+bool spinApp::execPython( const std::string& cmd )
+{
+#ifndef DISABLE_PYTHON
+    
     if (!_pyInitialized) return false;
 
     try {
@@ -259,10 +322,15 @@ bool spinApp::execPython( const std::string& cmd ) {
     }
 
     return true;
+    
+#else
+    return false;
+#endif
 }
 
 std::string spinApp::getCurrentPyException()
 {
+#ifndef DISABLE_PYTHON
   using namespace boost::python;
   namespace py = boost::python;
   printf("currentException...\n");
@@ -282,6 +350,9 @@ std::string spinApp::getCurrentPyException()
     object formatted(str("\n").join(formatted_list));
     return extract<std::string>(formatted);
   }
+#else
+    return "Python interpreter disabled";
+#endif
 }
 
 
@@ -306,7 +377,6 @@ void spinApp::registerUser()
 
         SceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
 
-        std::cout << "  Registered user\t\t'" << userNode->id->s_name << "'" << std::endl;
     }
 
     if (!userNode.valid())
@@ -318,14 +388,14 @@ void spinApp::registerUser()
 // *****************************************************************************
 // A BUNCH OF MESSAGE SENDING UTILITIES:
 
-void spinApp::InfoMessage(std::string OSCpath, const char *types, ...)
+void spinApp::InfoMessage(const std::string &OSCpath, const char *types, ...)
 {
     va_list ap;
     va_start(ap, types);
     InfoMessage(OSCpath, types, ap);
 }
 
-void spinApp::InfoMessage(std::string OSCpath, const char *types, va_list ap)
+void spinApp::InfoMessage(const std::string &OSCpath, const char *types, va_list ap)
 {
     lo_message msg = lo_message_new();
     int err = lo_message_add_varargs(msg, types, ap);
@@ -338,11 +408,11 @@ void spinApp::InfoMessage(std::string OSCpath, const char *types, va_list ap)
     }
 }
 
-void spinApp::InfoMessage(std::string OSCpath, lo_message msg)
+void spinApp::InfoMessage(const std::string &OSCpath, lo_message msg)
 {
-    if (context)
+    if ((context) && (context->doDiscovery_))
     {
-        lo_send_message_from(context->lo_infoAddr, context->lo_infoServ, OSCpath.c_str(), msg);
+        lo_send_message_from(context->lo_infoAddr, context->lo_infoServ_, OSCpath.c_str(), msg);
 
         // Let's free the message after (not sure if this is necessary):
         lo_message_free(msg);
@@ -381,7 +451,10 @@ void spinApp::NodeMessage(const char *nodeId, lo_message msg)
         // the rxAddr of the spinServer (unicast)
         if ( !context->isServer() )
         {
-            lo_send_message(context->lo_txAddr, OSCpath.c_str(), msg);
+            std::vector<lo_address>::iterator addrIter;
+            for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+                lo_send_message((*addrIter), OSCpath.c_str(), msg);
+
         }
 
         // if, however, this process acts as a server, we can optimize and send
@@ -427,7 +500,9 @@ void spinApp::SceneMessage(lo_message msg)
         // the rxAddr of the spinServer (unicast)
         if ( !context->isServer() )
         {
-            lo_send_message(context->lo_txAddr, OSCpath.c_str(), msg);
+            std::vector<lo_address>::iterator addrIter;
+            for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+                lo_send_message((*addrIter), OSCpath.c_str(), msg);
         }
         else
         {
@@ -443,12 +518,13 @@ void spinApp::SceneMessage(lo_message msg)
     lo_message_free(msg);
 }
 
-
+/*
 void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
 {
     std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
     sendBundle(OSCpath, msgs);
 }
+*/
 
 
 void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_address addr)
@@ -457,12 +533,13 @@ void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_add
     sendBundle(OSCpath, msgs, addr);
 }
 
-
+/*
 void spinApp::SceneBundle(std::vector<lo_message> msgs)
 {
     std::string OSCpath = "/SPIN/" + sceneID;
     sendBundle(OSCpath, msgs);
 }
+*/
 
 void spinApp::SceneBundle(std::vector<lo_message> msgs, lo_address addr)
 {
@@ -471,22 +548,61 @@ void spinApp::SceneBundle(std::vector<lo_message> msgs, lo_address addr)
 }
 
 
-void spinApp::sendBundle(std::string OSCpath, std::vector<lo_message> msgs, lo_address txAddr)
+void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msgs, lo_address txAddr)
 {
-    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+    // If a txAddr is provided, it is probably a TCP request. Otherwise, txAddr
+    // will be 0, and we will send to all lo_txAddrs_ in the list.
+    std::vector<lo_address> addressesToSendTo;
+    if (txAddr == 0) addressesToSendTo = context->lo_txAddrs_;
+    else addressesToSendTo.push_back(txAddr);
 
-    std::vector<lo_message>::iterator iter = msgs.begin();
-    while (iter != msgs.end())
+/*
+	lo_address sendingAddress;
+	if (txAddr == 0) sendingAddress = context->lo_txAddr;
+	else sendingAddress = txAddr;
+*/
+
+    lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+    std::vector<lo_message>::iterator iter;
+    for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
     {
-        //lo_send_message_from(txAddr, txServ, OSCpath.c_str(), (*iter));
         lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
-        msgs.erase(iter); // iterator automatically advances after erase()
     }
 
-    if (txAddr == 0)
-        lo_send_bundle(context->lo_txAddr, b);
-    else
-        lo_send_bundle(txAddr, b);
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+    {
+
+        // TCP in liblo can't handle bundles
+        if (lo_address_get_protocol(*addrIter) == LO_TCP)
+        {
+            iter = msgs.begin();
+            while (iter != msgs.end())
+            {
+                lo_send_message((*addrIter), OSCpath.c_str(), (*iter));
+                ++iter;
+                //msgs.erase(iter); // iterator automatically advances after erase()
+            }
+        }
+        // if it's any UDP socket, then bundle the messages:
+        else
+        {
+            //std::cout << "sending bundle of " << msgs.size() << " to " << lo_address_get_url(txAddr) << ", for:  " << OSCpath << std::endl;
+/*
+            lo_bundle b = lo_bundle_new(LO_TT_IMMEDIATE);
+            for (iter = msgs.begin(); iter!=msgs.end(); ++iter)
+            //iter = msgs.begin();
+            //while (iter != msgs.end())
+            {
+                lo_bundle_add_message(b, OSCpath.c_str(), (*iter));
+                //msgs.erase(iter); // iterator automatically advances after erase()
+            }
+*/
+            lo_send_bundle((*addrIter), b);
+            //lo_bundle_free_messages(b);
+        }
+    }
     lo_bundle_free_messages(b);
 }
 
+} // end of namespace spin

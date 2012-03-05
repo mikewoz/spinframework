@@ -3,20 +3,23 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
-/* define if the Boost library is available */
+/* Defined if the requested minimum BOOST version is satisfied */
 #undef HAVE_BOOST
 
-/* define if the Boost::Filesystem library is available */
-#undef HAVE_BOOST_FILESYSTEM
+/* Define to 1 if you have <boost/filesystem/path.hpp> */
+#undef HAVE_BOOST_FILESYSTEM_PATH_HPP
 
-/* define if the Boost::Python library is available */
-#undef HAVE_BOOST_PYTHON
+/* Define to 1 if you have <boost/program_options.hpp> */
+#undef HAVE_BOOST_PROGRAM_OPTIONS_HPP
 
-/* define if the Boost::Regex library is available */
-#undef HAVE_BOOST_REGEX
+/* Define to 1 if you have <boost/python.hpp> */
+#undef HAVE_BOOST_PYTHON_HPP
 
-/* define if the Boost::Thread library is available */
-#undef HAVE_BOOST_THREAD
+/* Define to 1 if you have <boost/regex.hpp> */
+#undef HAVE_BOOST_REGEX_HPP
+
+/* Define to 1 if you have <boost/system/error_code.hpp> */
+#undef HAVE_BOOST_SYSTEM_ERROR_CODE_HPP
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -41,9 +44,6 @@
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
-
-/* Define to 1 if you have the `osg' library (-losg). */
-#undef HAVE_LIBOSG
 
 /* Define to 1 if you have the `memmove' function. */
 #undef HAVE_MEMMOVE
@@ -158,6 +158,10 @@
 /* A flag that compiles additional features for use with the shared_video
    library from Scenic */
 #undef WITH_SHARED_VIDEO
+
+/* Enables linking with the SpatOSC library so that compatible audio renderers
+   can be used for 3D sound spatialization */
+#undef WITH_SPATOSC
 
 /* Define to 1 if the X Window System is missing or not being used. */
 #undef X_DISPLAY_MISSING

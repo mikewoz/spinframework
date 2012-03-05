@@ -1,6 +1,114 @@
-FIXME: Fill the dates and info for each release.
+SPIN Framework release notes
+============================
 
-spinframework 0.3.1 
+201?-0?-?? : spinframework 0.3.6
+--------------------------------
+This release is in the development series 0.3.x that has an unstable API. 
+
+New features:
+* (none)
+
+Bugs fixed:
+* (none)
+
+
+2012-01-13 : spinframework 0.3.4
+--------------------------------
+This release is in the development series 0.3.x that has an unstable API. 
+
+New features:
+* Enclose everything in the spin namespace
+* four-screen cube
+* dome distorsion to camera config files
+* Library renamed to libspin-0.3
+* add pkg-config file
+* update spatosc arguments, since spatosc takes OSC urls (ie, osc.udp://host:port) instead of host and port arguments separately
+* changed spinserver's txAddr to a list of addresses, so we can use multiple UDP unicast connections instead of multicast (important on wacky networks that don't permit multicast)
+* big restructuring of command-line arguments, allowing for manual override of everything
+* added command-line options for specifying the TCP port for both the client and server contexts
+* added camconfig .xml files
+* added TTL for multicast packets, and updated some wrappers
+* use cppintrospection 3.0
+* document ShapeNode, TextureStateSetFinder, spinApp, PointerNodeActionAdapter, NodeSearcher, Fog
+* removed ^M characters
+* list all spin nodes at startup
+* add Menu3D and AttractorNode
+* add some features to TextNode
+* added ReporterNode
+* added bounce and collide events for ConstraintsNode
+
+Bugs fixed:
+* TIMECODE CHANGE: now using double precision milliseconds
+* fixed bug when compiling spin without spatosc
+* fixed autoconf macro for python so that it detects python 2.7 properly (Natty)
+* disallowed spinserver to start with automatic port if user manually specifies a port that is already taken. Instead, we quit with an error message
+* fixed nodelist sending to multiple clients (but only for UDP. Still need to fix TCPvi src/spin/spinApp.cpp )
+* fixed buffer accumulation bug with SharedVideoTexture (un-assigned textures were not updating, and thus, not eating frames)
+* using glibtool instead of libtool on OSX
+* fixed a few old osgIntrospection keyworkds
+* needed to set a function as an extern "C"
+* fixed memleak spinBaseContext
+* ignoring lighting for ShapeNodes with statesets
+* fixed test - not launching a listener
+* ensuring that QuatToEuler reports angles in range of -PI to PI
+* progress with signal handling for editor, and ported the TTL stuff from svn version of spin
+* more forward declaration
+* removed check for fmod
+* ViewerManipulator: fixed endless loop
+* fixed saving of statesets in xml, and moved towards proper .app bundles for OSX
+* Changed spinviewer to use pollUpdates() method, sharing a single thread with OSG
+* spinviewer::run should return 0
+* Use ports and addresses in spinDefaults. Update multicast group to 239.0.0.1
+
+
+2010-07-22 : spinframework 0.3.2
+--------------------------------
+This release is in the development series 0.3.x that has an unstable API. It introduces
+many bug fixes and new features. We changed the UDP multicast group to 226.0.0.1 for the 
+info and scene message channels. We fixed a lot of bugs regarding the shared video texture
+using the Scenic milhouse video streaming utility. 
+
+New features:
+* Added a TCP channel for important messages to the spinserver
+* Renamed spinserver and spinviewer to lowercase
+* Implemented the --version option in spinserver and spinviewer
+* Created man pages for spinserver and spinviewer
+* Introducing the server side Python scripting
+* big refactoring of spinContext
+* updated multicast group to 226.0.0.1
+* created RELEASE, AUTHORS and NEWS files
+* using POSIX/GNU-style options for spinserver and spinviewer
+* Using /SPIN/__user__ for user subscription
+* Using left-hand coordinates for both rotations and translations
+* don't need to configure with --enable-scenic, if it's detected it will be used 
+
+Bugs fixed:
+* fixed sync signal to be double float in ms
+* updates to autoconf for Ubuntu Lucid
+* fixed `make dist`
+* updated glut m4
+* made spin context functions non global
+* got rid of -Wstrict-prototypes in python cflags
+* comment out fmod
+* added -Wfatal-errors to flags
+* don't use using namespace std
+* moved python scripts into Resources directory
+* fixed rm rule in osgwrappers
+* fixed spinviewer cleanup problem by using a joinable thread rather than a detached thread
+* fixed the way that statesets are cleared (clearStates) message 
+* added more aggressive interrupt handler 
+* #12 Removed the src/deprecated directory from the trunk
+* added non-blocking keyboard input to example so that ctrl-c works 
+* fixed memory leaks in shared video texture 
+* fixed thread scheduling issue in shared video texture 
+
+
+spinframework 0.3.1
+-------------------
+TODO: Fill the dates and info for this release
+
 
 spinframework 0.3.0 
+-------------------
+TODO: Fill the dates and info for this release
 

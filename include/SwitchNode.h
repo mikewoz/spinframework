@@ -42,56 +42,62 @@
 #ifndef SwitchNode_H_
 #define SwitchNode_H_
 
-#include <osg/Switch>
+#include "GroupNode.h"
 
+namespace osg {
+    class Switch;
+}
 
-#include "ReferencedNode.h"
+namespace spin
+{
 
 /**
  * \brief Allows for selectively enabling/disabling child nodes
  *
  */
-class SwitchNode : public ReferencedNode
+class SwitchNode : public GroupNode
 {
 
 public:
 
-	SwitchNode(SceneManager *sceneManager, char *initID);
-	virtual ~SwitchNode();
+    SwitchNode(SceneManager *sceneManager, char *initID);
+    virtual ~SwitchNode();
 
-	/**
-	 * IMPORTANT:
-	 * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
-	 * and can also change their attachmentNode so that children are attached
-	 * anywhere in that subgraph. If that is the case, the updateNodePath()
-	 * function MUST be overridden, and extra nodes must be manually pushed onto
-	 * currentNodePath.
-	 */
-	virtual void updateNodePath();
+    /**
+     * IMPORTANT:
+     * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
+     * and can also change their attachmentNode so that children are attached
+     * anywhere in that subgraph. If that is the case, the updateNodePath()
+     * function MUST be overridden, and extra nodes must be manually pushed onto
+     * currentNodePath.
+     */
+    virtual void updateNodePath();
 
-	/**
-	 * This enables/disables a child of a certain id
-	 */
-	void setEnabled (const char* id, int enabled);
-	
+    /**
+     * This enables/disables a child of a certain id
+     */
+    void setEnabled (const char* id, int enabled);
+    
 
-	/**
-	 * Set all child noded to be either disabled or enabled
-	 */
-	void setAll(int enabled);
-	
+    /**
+     * Set all child noded to be either disabled or enabled
+     */
+    void setAll(int enabled);
+    
 
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState();
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
 private:
 
-	osg::ref_ptr<osg::Switch> switcher;
+    osg::ref_ptr<osg::Switch> switcher;
 };
 
+
+} // end of namespace spin
 
 
 #endif

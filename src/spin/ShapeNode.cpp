@@ -55,12 +55,12 @@
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
-
 using namespace std;
-
 
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
 
 // ===================================================================
 // constructor:
@@ -71,20 +71,21 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);	
 
-	shape = NONE; //"NULL";
+	shape = BOX;
 	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
 	stateset = gensym("NULL");
 	renderBin = 11;
 	lightingEnabled = true;
 
+    drawShape();
 }
 
 // ===================================================================
 // destructor
 ShapeNode::~ShapeNode()
 {
-	if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+	//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 }
 
 // ===================================================================
@@ -93,6 +94,7 @@ ShapeNode::~ShapeNode()
 
 void ShapeNode::setContext (const char *newvalue)
 {
+	if (this->contextString == string(newvalue)) return;
 	// need to redraw after setContext() is called:
 	ReferencedNode::setContext(newvalue);
 	drawShape();
@@ -185,10 +187,9 @@ void ShapeNode::updateStateSet()
 // ===================================================================
 void ShapeNode::setRenderBin (int i)
 {
+	if (renderBin == i) return;
+
 	renderBin = i;
-
-	//std::cout << "TODO: fix renderbin.  " << renderBin << std::endl;
-
 
 	if (shapeGeode.valid())
 	{
@@ -202,10 +203,10 @@ void ShapeNode::setRenderBin (int i)
 
 void ShapeNode::setLighting (int i)
 {
-
+	if (lightingEnabled==(bool)i) return;
 	lightingEnabled = (bool)i;
 
-	if (shapeGeode.valid())
+	if (shapeGeode.valid() && !stateset->s_thing)
 	{
 		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
 		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
@@ -350,8 +351,13 @@ void ShapeNode::drawShape()
 		ss->setMode( GL_BLEND, osg::StateAttribute::ON );
 		ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
-		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+		// if this shape has a stateset, then lighting is defined there.
+		// Otherwise, we have an internal lighting parameter for the shape:
+		if (!stateset->s_thing)
+		{
+			if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+			else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+		}
 		
 		this->getAttachmentNode()->addChild(shapeGeode.get());
 		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
@@ -379,7 +385,7 @@ void ShapeNode::drawTexture()
 	{
 		// remove current texture
 		//shapeGeode->setStateSet( new osg::StateSet() );
-		if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+		//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
 	}
 
 	else if (shapeGeode.valid())
@@ -487,9 +493,10 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 
 		//n->setStateSet( shapeStateSet );
 
+		/*
 		if (sceneManager->sharedStateManager.valid())
 				sceneManager->sharedStateManager->share(n);
-
+		*/
 	} else {
 		std::cout << "ERROR (setTexture): The file " << path << " is not a valid texture." << std::endl;
 	}
@@ -497,7 +504,7 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 
 }
 
-std::vector<lo_message> ShapeNode::getState ()
+std::vector<lo_message> ShapeNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = GroupNode::getState();
@@ -540,3 +547,6 @@ std::vector<lo_message> ShapeNode::getState ()
 
 	return ret;
 }
+
+} // end of namespace spin
+

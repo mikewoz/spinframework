@@ -42,7 +42,10 @@
 #ifndef __MediaManager_H
 #define __MediaManager_H
 
+#include <string>
 
+namespace spin
+{
 
 /**
  * \brief Provides an interface for finding media locations (models, textures,
@@ -55,33 +58,29 @@
  */
 class MediaManager
 {
-	
-	public:
-		
-		MediaManager(std::string dataPath);
-		~MediaManager();
-		
-		std::string getDataPath() { return dataPath; }
-		
-		std::string getImagePath(std::string s);
-		std::string getModelPath(std::string s);
-		std::string getSoundPath(std::string s);
-		
-		std::string getImagePath(int id);
-		std::string getModelPath(int id);
-		std::string getSoundPath(int id);
-		
-		std::string getImageName(int id);
-		std::string getModelName(int id);
-		std::string getSoundName(int id);
+    public:
+        
+        MediaManager(const std::string &dataPath);
+        ~MediaManager();
+        
+        std::string getDataPath() const { return dataPath; }
+        
+        std::string getImagePath(const std::string &s) const;
+        std::string getModelPath(const std::string &s) const;
+        std::string getSoundPath(const std::string &s) const;
+        
+        std::string getImagePath(int id) const;
+        std::string getModelPath(int id) const;
+        std::string getSoundPath(int id) const;
+        
+        std::string getImageName(int id) const;
+        std::string getModelName(int id) const;
+        std::string getSoundName(int id) const;
 
-
-	private:
-		std::string dataPath;
-		
-		
-		
+    private:
+        std::string dataPath;
 };
 
+} // end of namespace spin
 
 #endif /*MediaManager_H_*/

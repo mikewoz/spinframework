@@ -44,63 +44,64 @@
 
 #include <osg/Geode>
 
-
-#include "ReferencedNode.h"
+#include "GroupNode.h"
+namespace spin
+{
 
 /**
  * \brief Describes a ray (actually a line segment) in space.
  *
- * When attached to an GroupNode, the RayNode essentially points in the
- * direction of specified by it's parent, and is visible up to a certain length.
+ * The RayNode "points" in the direction specified by it's current orientation,
+ * and is visible up to a certain length.
  *
  * RayNode is used by PointerNode to report which nodes are being pointed at.
  */
-class RayNode : public ReferencedNode
+class RayNode : public GroupNode
 {
 
 public:
 
-	RayNode(SceneManager *sceneManager, char *initID);
-	virtual ~RayNode();
+    RayNode(SceneManager *sceneManager, char *initID);
+    virtual ~RayNode();
 
-	void setVisible		(int visibilityFlag);
-	void setLength		(float length);
-	void setThickness	(float thickness);
-	void setColor		(float red, float green, float blue, float alpha);
+    void setVisible        (int visibilityFlag);
+    void setLength        (float length);
+    void setThickness    (float thickness);
+    void setColor        (float red, float green, float blue, float alpha);
 
-	int getVisible() { return (int) this->visible; }
-	float getLength() { return this->length; };
-	float getThickness() { return this->thickness; };
-	osg::Vec4 getColor() { return this->color;  };
+    int getVisible() const { return (int) this->visible; }
+    float getLength() const { return this->length; };
+    float getThickness() const { return this->thickness; };
+    osg::Vec4 getColor() const { return this->color;  };
 
 
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState();
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
+    /**
+     * We must include a stateDump() method that simply invokes the base class
+     * method. Simple C++ inheritance is not enough, because osg::Introspection
+     * won't see it.
+     */
+    //virtual void stateDump() { ReferencedNode::stateDump(); };
 
 
 private:
 
-	void drawRay();
+    void drawRay();
 
-	osg::ref_ptr<osg::Geode> rayGeode;
+    osg::ref_ptr<osg::Geode> rayGeode;
 
-	bool visible;
-	float length;
-	float thickness;
-	osg::Vec4 color;
+    bool visible;
+    float length;
+    float thickness;
+    osg::Vec4 color;
 
 };
 
-
+} // end of namespace spin
 
 #endif

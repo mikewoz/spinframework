@@ -45,12 +45,12 @@
 #include "MediaManager.h"
 #include "spinUtil.h"
 
-using namespace std;
-
+namespace spin
+{
 
 // ***********************************************************
 // constructor
-MediaManager::MediaManager (string p)
+MediaManager::MediaManager (const std::string &p)
 {
 	this->dataPath = p;
 }
@@ -62,7 +62,7 @@ MediaManager::~MediaManager()
 }
 
 // ***********************************************************
-string MediaManager::getImagePath(string s)
+std::string MediaManager::getImagePath(const std::string &s) const
 {
 	/*
 	if (s=="NULL") return "";
@@ -70,13 +70,13 @@ string MediaManager::getImagePath(string s)
 	*/
 	
 	if (s=="NULL") return "";
-	else if (s.substr(0,1) == string("~")) // look for "~"
+	else if (s.substr(0,1) == std::string("~")) // look for "~"
 	{
 		return getenv("HOME") + s.substr(1);
 	} else return s;
 }
 
-string MediaManager::getModelPath(string s)
+std::string MediaManager::getModelPath(const std::string &s) const
 {
 	/*
 	if (s=="NULL") return "";
@@ -90,13 +90,14 @@ string MediaManager::getModelPath(string s)
 	}
 	*/
 	if (s=="NULL") return "";
-	else if (s.substr(0,1) == string("~")) // look for "~"
+	else if (s.substr(0,1) == std::string("~")) // look for "~"
 	{
 		return getenv("HOME") + s.substr(1);
 	} else return s;
 
 }
-string MediaManager::getSoundPath(string s)
+
+std::string MediaManager::getSoundPath(const std::string &s) const
 {
 	/*
 	if (s=="NULL") return "";
@@ -104,18 +105,21 @@ string MediaManager::getSoundPath(string s)
 	*/
 	
 	if (s=="NULL") return "";
-	else if (s.substr(0,1) == string("~")) // look for "~"
+	else if (s.substr(0,1) == std::string("~")) // look for "~"
 	{
 		return getenv("HOME") + s.substr(1);
 	} else return s;
 }
 
 // TODO: connect to database and get media given the id:
-string MediaManager::getImagePath(int id) { return ""; }
-string MediaManager::getModelPath(int id) { return ""; }
-string MediaManager::getSoundPath(int id) { return ""; }
+std::string MediaManager::getImagePath(int id) const { return ""; }
+std::string MediaManager::getModelPath(int id) const { return ""; }
+std::string MediaManager::getSoundPath(int id) const { return ""; }
 
-string MediaManager::getImageName(int id) { return "NULL"; }
-string MediaManager::getModelName(int id) { return "NULL"; }
-string MediaManager::getSoundName(int id) { return "NULL"; }
+std::string MediaManager::getImageName(int id) const { return "NULL"; }
+std::string MediaManager::getModelName(int id) const { return "NULL"; }
+std::string MediaManager::getSoundName(int id) const { return "NULL"; }
+
+} // end of namespace spin
+
 

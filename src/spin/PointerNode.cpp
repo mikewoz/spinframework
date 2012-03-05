@@ -39,6 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "PointerNode.h"
+
 #include <osgManipulator/CommandManager>
 #include <osgManipulator/TabBoxDragger>
 #include <osgManipulator/TabPlaneDragger>
@@ -49,8 +51,6 @@
 #include <osgManipulator/TranslateAxisDragger>
 #include <osgUtil/IntersectionVisitor>
 
-
-#include "PointerNode.h"
 #include "RayNode.h"
 #include "GroupNode.h"
 #include "SceneManager.h"
@@ -61,6 +61,9 @@
 using namespace std;
 
 extern pthread_mutex_t sceneMutex;
+
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -283,6 +286,17 @@ void PointerNode::callbackUpdate()
         {
             for (i=0; i<intersectList.size(); i++) lo_message_add_string(msg, (char*)intersectList[i]->s_name);
         } else lo_message_add_string(msg, "NULL");
+        
+        if (1)
+        {
+            std::cout << "PionterNode has new intersections:";
+            if (intersectList.size())
+            {
+                for (i=0; i<intersectList.size(); i++)
+                    std::cout << " " << (char*)intersectList[i]->s_name;
+            } else std::cout << " NULL";
+            std::cout << std::endl;
+        }
 
         //sceneManager->sendNodeMessage(this->id, msg);
         NODE_LO_MSG(sceneManager, this, msg);
@@ -386,11 +400,14 @@ ReferencedNode *PointerNode::getNodeFromIntersections()
 
     if (!intersectList.size()) return NULL;
 
+    // we look for the first item in the list that can be cast as a GroupNode
     ReferencedNode *t = dynamic_cast<ReferencedNode*>(intersectList[0]->s_thing); // intersectList stores t_symbols
 
     while (t)
     {
-        if (t->nodeType == "GroupNode")
+        GroupNode *g = dynamic_cast<GroupNode*>(t);
+        //if (t->nodeType == "GroupNode")
+        if (t)
         {
             return t; // return first basicNode encountered
         }
@@ -548,14 +565,15 @@ void PointerNode::manipulate (int b)
 
 
 
-/* For grabbing, we take the first intersected node, andtemporarily attach it to
- * the pointer, allowing it to inherit any translation or rotation offsets, and
- * then return it to it's previous parent once it is "ungrabbed".
+/* For grabbing, we take the first intersected node, and temporarily attach it
+ * to the pointer, allowing it to inherit any translation or rotation offsets.
+ * We need to send another message to return it to it's previous parent once it
+ * is "ungrabbed".
  */
 void PointerNode::grab (int b)
 {
     // return if this spinContext is a slave
-    if (not spinApp::Instance().getContext()->isServer()) 
+    if (!spinApp::Instance().getContext()->isServer()) 
         return;
 
     osg::Matrix srcMatrix, dstMatrix;
@@ -594,7 +612,7 @@ void PointerNode::grab (int b)
         osg::Vec3 dp = p2 - p1;
 
 
-        /*
+        
         osg::Vec3 iv = ( srcMatrix.getRotate() * (worldIntersectPt-p1) );
         std::cout << "p1=("<<p1.x()<<","<<p1.y()<<","<<p1.z()<< ")"<<std::endl;
         std::cout << "iv=("<<iv.x()<<","<<iv.y()<<","<<iv.z()<< ")"<<std::endl;
@@ -602,7 +620,7 @@ void PointerNode::grab (int b)
         std::cout << "localIntersectPt=("<<localIntersectPt.x()<<","<<localIntersectPt.y()<<","<<localIntersectPt.z()<< ")"<<std::endl;
         std::cout << "worldIntersectPt=("<<worldIntersectPt.x()<<","<<worldIntersectPt.y()<<","<<worldIntersectPt.z()<< ")"<<std::endl;
         std::cout << "world - p1 =     ("<<worldIntersectPt.x()-p1.x()<<","<<worldIntersectPt.y()-p1.y()<<","<<worldIntersectPt.z()-p1.z()<< ")"<<std::endl;
-        */
+        
 
         // ARGH. localIntersectPt is not correct!! TODO
         //osg::Vec3 T = osg::Vec3(-localIntersectPt.x(),dp.length(),-localIntersectPt.z());
@@ -671,7 +689,7 @@ void PointerNode::grab (int b)
 
         pthread_mutex_unlock(&sceneMutex);
 
-        //std::cout << "Re-attaching node [" << targetNode->id->s_name << "] to old parent [" << oldTargetParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
+        std::cout << "Re-attaching node [" << grabbedNode->id->s_name << "] to old parent [" << previousParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
 
         // now apply the offset:
         // (TODO: use sceneManager->invokeMethod)
@@ -702,7 +720,7 @@ void PointerNode::pull (float f)
 
 // *****************************************************************************
 
-std::vector<lo_message> PointerNode::getState ()
+std::vector<lo_message> PointerNode::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedNode::getState();
@@ -725,3 +743,6 @@ std::vector<lo_message> PointerNode::getState ()
 
     return ret;
 }
+
+} // end of namespace spin
+

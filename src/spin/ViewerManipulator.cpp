@@ -42,12 +42,16 @@
 #include "ViewerManipulator.h"
 #include <string>
 #include <vector>
+#include <osgViewer/View>
 #include "osgUtil.h"
 #include "spinUtil.h"
 #include "spinApp.h"
 #include "SceneManager.h"
 
-using namespace osgGA;
+//using namespace osgGA;
+
+namespace spin
+{
 
 //ViewerManipulator::ViewerManipulator(spinContext* s, UserNode *u)
 //ViewerManipulator::ViewerManipulator(UserNode *u)
@@ -58,7 +62,7 @@ ViewerManipulator::ViewerManipulator()
 	if (spin.userNode.valid())
 	{
 		this->user = spin.userNode->id;
-		setTrackNode(spin.userNode->getAttachmentNode());
+		setTrackNode(spin.userNode->getCameraAttachmentNode());
 	} else {
 		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
 	}
@@ -69,9 +73,12 @@ ViewerManipulator::ViewerManipulator()
 	
 	// set up user node tracker:
 	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
+	//setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER );
 	setRotationMode( osgGA::NodeTrackerManipulator::ELEVATION_AZIM );
-	setMinimumDistance( 0.0001 );
-	setHomePosition( osg::Vec3(0,-0.0001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+	//setMinimumDistance( 0.0001 );
+	setMinimumDistance( 0.0 );
+	setHomePosition( osg::Vec3(0,-0.00001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
+	//setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,0.0001,0), osg::Vec3(0,0,1), false );
 
 }
 
@@ -101,8 +108,10 @@ void ViewerManipulator::setRaw(bool b)
 	else std::cout << "  Raw mouse events:\tDisabled" << std::endl;
 }
 
-bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
+bool ViewerManipulator::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
+    using namespace osgGA;
+
 	if (ea.getEventType()==GUIEventAdapter::FRAME)
 	{
 		spinApp &spin = spinApp::Instance();
@@ -144,7 +153,7 @@ bool ViewerManipulator::handle(const GUIEventAdapter& ea, GUIActionAdapter& aa)
 }
 
 
-void ViewerManipulator::handleKeypress(const GUIEventAdapter& ea)
+void ViewerManipulator::handleKeypress(const osgGA::GUIEventAdapter& ea)
 {
 	if (ea.getKey()=='r')
 	{
@@ -200,8 +209,10 @@ std::vector<GroupNode*> ViewerManipulator::getNodesFromIntersections(osgUtil::Li
 }
 */
 
-void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter& ea)
+void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea)
 {
+    using namespace osgGA;
+
 	osg::ref_ptr<GroupNode> hitNode, drawNode;
 	
 	float dX = lastX - ea.getXnormalized();
@@ -223,7 +234,8 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	dX *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 	dXclick *= (float)ea.getWindowWidth()/ea.getWindowHeight();
 
-	if (0) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
+#if 0
+	if (1) // (ea.getEventType() != osgGA::GUIEventAdapter::MOVE)
 	{
 		switch(ea.getEventType())
 		{
@@ -249,10 +261,12 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 			std::cout << " " << selectedNodes[j]->s_name;
 		}
 		std::cout << std::endl;
-	}
+    }
+#endif
 
 
-	float scrollX, scrollY;
+	float scrollX = 0.0;
+    float scrollY = 0.0;
 	if (ea.getEventType()==osgGA::GUIEventAdapter::SCROLL)
 	{
 		scrollX = ea.getScrollingDeltaX();
@@ -284,7 +298,10 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 		}
 	}
 	
-	if (this->picker)
+    
+    if ((modkeyMask==GUIEventAdapter::MODKEY_LEFT_SHIFT) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_SHIFT) )
+    
+        //if (this->picker)
 	{
 		// This is how the Picker works:
 		//
@@ -310,11 +327,11 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 
 		// intersections are ordered from nearest to furthest, so we iterate and
 		// a return list of all nodes that can be cast as interactive SPIN nodes
-		osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+		osgUtil::LineSegmentIntersector::Intersections::const_iterator itr;
 		for (itr = intersections.begin(); itr != intersections.end(); ++itr)
 		{
 			// look down the nodePath for the first SPIN node:
-			for (unsigned i = (*itr).nodePath.size() - 1; i >= 0; i--)
+			for (int i = (*itr).nodePath.size() - 1; i >= 0; i--)
 			{
 				osg::ref_ptr<GroupNode> testNode = dynamic_cast<GroupNode*>((*itr).nodePath[i]);
 				if (testNode.valid())
@@ -570,13 +587,13 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const GUIEventAdapter
 	lastY = ea.getYnormalized();
 }
 
-void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint)
+void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint)
 {
 
 	switch (eventType)
 	{
 		// send MOVE events (eg, for drawing on nodes)
-		case(GUIEventAdapter::MOVE):
+		case(osgGA::GUIEventAdapter::MOVE):
 			sendEvent(hitNode->id->s_name,
 					  "sisfffff",
 					  "event",
@@ -593,7 +610,7 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 		// DRAG will only occur if someone clicks elsewhere
 		// and rolls onto this node, so we shouldn't send
 		// anything, should we?
-		case(GUIEventAdapter::DRAG):
+		case(osgGA::GUIEventAdapter::DRAG):
 			sendEvent(hitNode->id->s_name,
 					  "sisfffff",
 					  "event",
@@ -611,7 +628,7 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 		// node with the mouse button down, and releases.
 		// However, just to be safe, we'll also ensure that
 		// there is no selected node anymore:
-		case(GUIEventAdapter::RELEASE):
+		case(osgGA::GUIEventAdapter::RELEASE):
 			sendEvent(hitNode->id->s_name,
 					"sisfffff",
 					"event",
@@ -637,7 +654,7 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 		
 		// SCROLLING (with the mouse wheel) is cool. It
 		// could be used to scale for example.
-		case(GUIEventAdapter::SCROLL):
+		case(osgGA::GUIEventAdapter::SCROLL):
 			sendEvent(hitNode->id->s_name,
 					"sisfffff",
 					"event",
@@ -653,7 +670,7 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 		
 		// In the case of a PUSH, we both send the
 		// event, and set the selectedNode
-		case(GUIEventAdapter::PUSH):
+		case(osgGA::GUIEventAdapter::PUSH):
 			sendEvent(hitNode->id->s_name,
 					"sisfffff",
 					"event",
@@ -668,7 +685,7 @@ void ViewerManipulator::sendPick(osg::ref_ptr<GroupNode> hitNode, unsigned int e
 			//selectedNodes.push_back(hitNode->id);
 			break;
 
-		case(GUIEventAdapter::DOUBLECLICK):
+		case(osgGA::GUIEventAdapter::DOUBLECLICK):
 			sendEvent(hitNode->id->s_name,
 					"sisfffff",
 					"event",
@@ -704,3 +721,7 @@ void ViewerManipulator::sendEvent(const char *nodeId, const char *types, va_list
 	else 
 		std::cout << "ERROR (ViewerManipulator) - could not send message: " << err << std::endl;
 }
+
+} // end of namespace spin
+
+

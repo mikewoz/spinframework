@@ -44,6 +44,10 @@
 
 #include "spinBaseContext.h"
 #include <map>
+#include <string>
+
+namespace spin
+{
 
 /**
  * \brief A server-side spinContext for maintaining an instance of SPIN and
@@ -54,10 +58,13 @@
 class spinServerContext : public spinBaseContext
 {
     public:
-		spinServerContext();
-		~spinServerContext();
+        spinServerContext();
+        ~spinServerContext();
 
-		bool start();
+        bool start();
+        void debugPrint();
+        void addCommandLineOptions(osg::ArgumentParser *arguments);
+        int parseCommandLineOptions(osg::ArgumentParser *arguments);
 
         void refreshSubscribers();
 
@@ -66,6 +73,14 @@ class spinServerContext : public spinBaseContext
          */
         void startSyncThread();
 
+        /**
+         * A flag that decides if user nodes should be automatically cleaned up
+         * (ie, their entire subgraph deleted) if they stop sending ping
+         * messages. This is set by the --disable-auto-cleanup argument.
+         */
+        bool shouldAutoClean() { return autoCleanup_; }
+
+        
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
     private:
@@ -90,6 +105,8 @@ class spinServerContext : public spinBaseContext
          */
         static void *syncThread(void *arg);
 
+        bool autoCleanup_;
+
         /**
          * The server uses infoCallback to monitor /ping/user messages coming
          * from SPIN clients on the network. A series of timers are used to
@@ -105,4 +122,9 @@ class spinServerContext : public spinBaseContext
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
 };
+
+
+} // end of namespace spin
+
+
 #endif

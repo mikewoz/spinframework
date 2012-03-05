@@ -41,20 +41,21 @@
 
 #include <osg/StateSet>
 #include <osg/StateAttribute>
+#include <osg/TextureRectangle>
+#include <osg/Texture2D>
 #include <osgDB/ReadFile>
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
 
 #include <iostream>
 
+#include "SceneManager.h"
 #include "ImageTexture.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
-
-
-using namespace std;
-
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -104,7 +105,9 @@ void ImageTexture::setPath (const char* newPath)
 
 		std::cout << "Loading image: " << fullPath << std::endl;
 
+		//osg::setNotifyLevel(osg::DEBUG_FP);
 		osg::ref_ptr<osg::Image> test = osgDB::readImageFile(fullPath);
+		//osg::setNotifyLevel(osg::FATAL);
 		
 		if (test.valid())
 		{
@@ -122,9 +125,9 @@ void ImageTexture::setPath (const char* newPath)
 			tex->setResizeNonPowerOfTwoHint(false);
 			tex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
 			//tex->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-			//tex->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
-			tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-			tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+			tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
+			tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+			tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
 
 			// set the image:
 			tex->setImage(0,test.get());
@@ -180,7 +183,7 @@ void ImageTexture::setRenderBin (int i)
 }
 
 // *****************************************************************************
-std::vector<lo_message> ImageTexture::getState ()
+std::vector<lo_message> ImageTexture::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedStateSet::getState();
@@ -201,4 +204,8 @@ std::vector<lo_message> ImageTexture::getState ()
 	
 	return ret;
 }
+
+bool ImageTexture::isValid() const { return (_image.valid()); }
+
+} // end of namespace spin
 

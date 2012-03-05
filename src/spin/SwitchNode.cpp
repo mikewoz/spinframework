@@ -39,34 +39,42 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "SwitchNode.h"
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
 #include <osg/Geometry>
 #include <osgUtil/SmoothingVisitor>
+#include <osg/Switch>
+#include <lo/lo_types.h>
 
-#include "SwitchNode.h"
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-using namespace std;
-
 //extern SceneManager *sceneManager;
 
-
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
-SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
+    using std::string;
 	this->setName(string(id->s_name) + ".SwitchNode");
 	nodeType = "SwitchNode";
 
 	switcher = new osg::Switch();
 	switcher->setName(string(id->s_name) + ".switcher");
-	this->addChild(switcher.get());
+
+	std::cout << "creating switch node. attaching to " << this->getAttachmentNode()->getName() << std::endl;
+
+	// We inherit from GroupNode, so we must make sure to attach our osg Switch
+	// to the attachmentNode of GroupNode
+	this->getAttachmentNode()->addChild(switcher.get());
 	
+	// ... and then update the attachmentNode:
 	setAttachmentNode(switcher.get());
 }
 
@@ -79,18 +87,9 @@ SwitchNode::~SwitchNode()
 
 void SwitchNode::updateNodePath()
 {
-	currentNodePath.clear();
-	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
-	{
-		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
-		if (parentNode.valid())
-		{
-			currentNodePath = parentNode->currentNodePath;
-		}
-	}
-
-	// here, the nodePath includes the base osg::group, PLUS the textTransform
-	currentNodePath.push_back(this);
+	// call GroupNode's method, which will update all the way from the root, and
+	// we just need to add the Switch node:
+	GroupNode::updateNodePath(false);
 	currentNodePath.push_back(switcher.get());
 
 	// now update NodePaths for all children:
@@ -101,7 +100,7 @@ void SwitchNode::updateNodePath()
 // *****************************************************************************
 void SwitchNode::setEnabled (const char* id, int enabled)
 {
-	for (int i=0; i<switcher->getNumChildren(); i++)
+	for (unsigned int i=0; i<switcher->getNumChildren(); i++)
 	{
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
 		if (n.valid() && (n->id==gensym(id)))
@@ -121,7 +120,7 @@ void SwitchNode::setAll(int enabled)
 	else
 		switcher->setAllChildrenOff();
 	
-	for (int i=0; i<switcher->getNumChildren(); i++)
+	for (unsigned int i=0; i<switcher->getNumChildren(); i++)
 	{
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
 		if (n.valid())
@@ -133,13 +132,13 @@ void SwitchNode::setAll(int enabled)
 
 // *****************************************************************************
 
-std::vector<lo_message> SwitchNode::getState ()
+std::vector<lo_message> SwitchNode::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
-	for (int i=0; i<switcher->getNumChildren(); i++)
+	for (unsigned int i=0; i<switcher->getNumChildren(); i++)
 	{
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
 		if (n.valid())
@@ -149,6 +148,7 @@ std::vector<lo_message> SwitchNode::getState ()
 			ret.push_back(msg);
 		}
 	}
-
 	return ret;
 }
+
+} // end of namespace spin

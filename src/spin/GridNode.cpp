@@ -52,9 +52,10 @@
 
 using namespace std;
 
-
 extern pthread_mutex_t sceneMutex;
 
+namespace spin
+{
 
 // *****************************************************************************
 // constructor:
@@ -126,7 +127,7 @@ void GridNode::drawGrid()
 		osg::Geometry* gridLines = new osg::Geometry();
 		
 		osg::Vec3Array* normals = new osg::Vec3Array;
-		osg::Vec3 myCoords[numVertices];
+		osg::Vec3* myCoords = new osg::Vec3[numVertices];
 		osg::Vec4Array* colors = new osg::Vec4Array;
 		
 		for (i = 0; i <= _size; i++)
@@ -168,8 +169,19 @@ void GridNode::drawGrid()
 		// create the normals
 		//gridLines->setNormalArray(normals);
 		//gridLines->setNormalBinding(osg::Geometry::BIND_OVERALL);
-		osgUtil::SmoothingVisitor::smooth(*gridLines);
-		
+
+        
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
+        osgUtil::SmoothingVisitor::smooth(*gridLines, osg::PI);
+#else
+        osgUtil::SmoothingVisitor::smooth(*gridLines);
+#endif
+#else
+        osgUtil::SmoothingVisitor::smooth(*gridLines);
+#endif
+        
+        
 		gridGeode->addDrawable(gridLines);
 		
 		osgUtil::Optimizer optimizer;
@@ -192,7 +204,7 @@ void GridNode::drawGrid()
 
 // *****************************************************************************
 
-std::vector<lo_message> GridNode::getState ()
+std::vector<lo_message> GridNode::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = ReferencedNode::getState();
@@ -210,3 +222,6 @@ std::vector<lo_message> GridNode::getState ()
 
 	return ret;
 }
+
+} // end of namespace spin
+

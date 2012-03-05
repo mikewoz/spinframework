@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <ModelNode.h>
 #include <SceneManager.h>
@@ -21,20 +21,25 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(ModelNode::animationModeType)
+BEGIN_ENUM_REFLECTOR(spin::ModelNode::animationModeType)
 	I_DeclaringFile("ModelNode.h");
-	I_EnumLabel(ModelNode::OFF);
-	I_EnumLabel(ModelNode::SWITCH);
-	I_EnumLabel(ModelNode::SEQUENCE);
+	I_EnumLabel(spin::ModelNode::OFF);
+	I_EnumLabel(spin::ModelNode::SWITCH);
+	I_EnumLabel(spin::ModelNode::SEQUENCE);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(ModelNode)
+BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	I_DeclaringFile("ModelNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ModelNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
+	                      Properties::VIRTUAL,
+	                      __void__updateNodePath__bool,
+	                      "",
+	                      "We change our attachmentNode (add attachment to the centroid), so we MUST override updateNodePath(), and manually push the centroid transform onto the currentNodePath. ");
 	I_Method1(void, setContext, IN, const char *, newvalue,
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
@@ -50,6 +55,21 @@ BEGIN_OBJECT_REFLECTOR(ModelNode)
 	          __C5_char_P1__getModelFromFile,
 	          "",
 	          "");
+	I_Method1(void, setAttachCentroid, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setAttachCentroid__int,
+	          "",
+	          "If attachCentroid is enabled, then children will be attached to the centroid of the currently loaded model. If not then it will be attached to this ModelNode's local origin. ");
+	I_Method0(int, getAttachCentroid,
+	          Properties::NON_VIRTUAL,
+	          __int__getAttachCentroid,
+	          "",
+	          "");
+	I_Method0(void, makeCentered,
+	          Properties::NON_VIRTUAL,
+	          __void__makeCentered,
+	          "",
+	          "Translate the model so that the centroid is at the local (0,0,0) ");
 	I_Method1(void, setStateRegistration, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setStateRegistration__int,
@@ -74,10 +94,20 @@ BEGIN_OBJECT_REFLECTOR(ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setKeyframe__int__float,
 	          "",
-	          "Render bins allow you to control drawing order, and manage Z-fighting. The higher the number, the later it gets processed (ie, appears on top). Default renderBin = 11 ");
+	          "Control the keyframe of a particular animation saved within the model (there can be several animations, hence the required index number) ");
 	I_Method1(float, getKeyframe, IN, int, index,
 	          Properties::NON_VIRTUAL,
 	          __float__getKeyframe__int,
+	          "",
+	          "");
+	I_Method2(void, setPlaying, IN, int, index, IN, int, playState,
+	          Properties::NON_VIRTUAL,
+	          __void__setPlaying__int__int,
+	          "",
+	          "Set the playing state of a particular animation (paused by default) ");
+	I_Method1(float, getPlaying, IN, int, index,
+	          Properties::NON_VIRTUAL,
+	          __float__getPlaying__int,
 	          "",
 	          "");
 	I_Method2(void, setStateSet, IN, int, index, IN, const char *, replacement,
@@ -90,6 +120,19 @@ BEGIN_OBJECT_REFLECTOR(ModelNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_Method1(void, setLighting, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setLighting__int,
+	          "",
+	          "This lets you enable or disable the lighting for the entire model, BUT, really this should be done in individual statesets and can be overridden ");
+	I_Method0(int, getLighting,
+	          Properties::NON_VIRTUAL,
+	          __int__getLighting,
+	          "",
+	          "");
+	I_SimpleProperty(int, AttachCentroid, 
+	                 __int__getAttachCentroid, 
+	                 __void__setAttachCentroid__int);
 	I_SimpleProperty(const char *, Context, 
 	                 0, 
 	                 __void__setContext__C5_char_P1);
@@ -97,6 +140,9 @@ BEGIN_OBJECT_REFLECTOR(ModelNode)
 	                  __float__getKeyframe__int, 
 	                  __void__setKeyframe__int__float, 
 	                  0);
+	I_SimpleProperty(int, Lighting, 
+	                 __int__getLighting, 
+	                 __void__setLighting__int);
 	I_SimpleProperty(const char *, ModelFromFile, 
 	                 __C5_char_P1__getModelFromFile, 
 	                 __void__setModelFromFile__C5_char_P1);
@@ -109,5 +155,6 @@ BEGIN_OBJECT_REFLECTOR(ModelNode)
 	I_SimpleProperty(int, StateRegistration, 
 	                 __int__getStateRegistration, 
 	                 __void__setStateRegistration__int);
+	I_PublicMemberProperty(std::vector< spin::t_symbol * >, _statesetList);
 END_REFLECTOR
 

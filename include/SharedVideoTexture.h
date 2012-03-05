@@ -43,14 +43,13 @@
 #define __SharedVideoTexture_H
 
 #include "config.h"
-#include <osg/Image>
-#include <osg/Texture2D>
 #include <osg/Timer>
 
 #include "ReferencedStateSet.h"
 
-#ifdef WITH_SHARED_VIDEO		
-#include <scenic/sharedVideoBuffer.h>
+#ifdef WITH_SHARED_VIDEO        
+#include <shared-video-0.6/sharedVideoBuffer.h>
+//#include <sharedVideoBuffer.h>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/bind.hpp>
@@ -59,6 +58,16 @@
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #endif
 
+namespace osg {
+    class Texture2D;
+    class Image;
+}
+
+// forward declaration
+class SharedVideoBuffer;
+
+namespace spin
+{
 
 /**
  * \brief Allows sharing of a dynamc (video) GL texture from another process
@@ -78,74 +87,82 @@
  * ie, this node still has reduced funtionality on non-supported platforms.
  */
 
-// forward declaration
-class SharedVideoBuffer;
 
 class SharedVideoTexture : public ReferencedStateSet
 {
 
 public:
 
-	SharedVideoTexture(SceneManager *sceneManager, const char *initID);
-	~SharedVideoTexture();
+    SharedVideoTexture(SceneManager *sceneManager, const char *initID);
+    ~SharedVideoTexture();
 
-	void setTextureID(const char *id);
-	const char* getTextureID() { return textureID.c_str(); }
+    void setTextureID(const char *id);
+    const char* getTextureID() const { return textureID.c_str(); }
 
-	// hack to get SceneManager::createStateSet to work:
-	const char* getPath() { return textureID.c_str(); }
-		
-	std::vector<lo_message> getState ();
-	
-#ifdef WITH_SHARED_VIDEO
-	void updateCallback();
-	
-	void consumeFrame();
-	void signalKilled();
+    // hack to get SceneManager::createStateSet to work:
+    const char* getPath() const { return textureID.c_str(); }
+        
+    std::vector<lo_message> getState () const;
+    void debug();
+    
+    //#ifdef WITH_SHARED_VIDEO
+    void updateCallback();
+    
+    void consumeFrame();
+    void signalKilled();
 
-	void start();
-	void stop();
-#endif
-		
+    void start();
+    void stop();
+    //#endif
+        
+    /**
+     * Set the render bin for this texture. The higher the number, the later it
+     * gets processed (ie, it appears on top). Default renderBin = 11
+     */
+    void setRenderBin (int i);
+    int getRenderBin() const { return _renderBin; }
 
 private:
-	
-	std::string textureID;
-	
-	osg::ref_ptr<osg::Texture2D> tex;
-	osg::ref_ptr<osg::Image> img;
-	
-	int width, height;
-		
-	osg::Timer_t lastTick;
-		
-	bool killed_;
-	
+    
+    std::string textureID;
+    
+    osg::ref_ptr<osg::Texture2D> tex;
+    osg::ref_ptr<osg::Image> img;
+    
+    int width, height;
+        
+    osg::Timer_t lastTick;
+        
+    bool killed_;
+    
 
-#ifdef WITH_SHARED_VIDEO		
-	boost::thread worker_;
-	boost::mutex displayMutex_;
-	boost::condition_variable textureUploadedCondition_;
-	SharedVideoBuffer *sharedBuffer;
+#ifdef WITH_SHARED_VIDEO        
+    boost::thread worker_;
+    boost::mutex displayMutex_;
+    boost::condition_variable textureUploadedCondition_;
+    SharedVideoBuffer *sharedBuffer;
 #endif
-		
+        
+    int  _renderBin;
 };
 
 /*
 class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::Callback
 {
 
-	public:
-		virtual void operator()(osg::StateAttribute* attr, osg::NodeVisitor* nv)
-		{
-			osg::ref_ptr<SharedVideoTexture> thisAttr = dynamic_cast<SharedVideoTexture*> (attr->getUserData());
+    public:
+        virtual void operator()(osg::StateAttribute* attr, osg::NodeVisitor* nv)
+        {
+            osg::ref_ptr<SharedVideoTexture> thisAttr = dynamic_cast<SharedVideoTexture*> (attr->getUserData());
 
-			if (thisAttr != NULL)
-			{
-				thisAttr->updateCallback();
-			}
-		}
+            if (thisAttr != NULL)
+            {
+                thisAttr->updateCallback();
+            }
+        }
 };
 */
+
+} // end of namespace spin
 
 #endif

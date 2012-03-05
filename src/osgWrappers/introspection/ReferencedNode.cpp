@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <ReferencedNode.h>
 #include <SceneManager.h>
@@ -21,7 +21,7 @@
 #undef OUT
 #endif
 
-BEGIN_VALUE_REFLECTOR(CronScript)
+BEGIN_VALUE_REFLECTOR(spin::CronScript)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor0(____CronScript,
 	               "",
@@ -37,7 +37,7 @@ BEGIN_VALUE_REFLECTOR(CronScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(EventScript)
+BEGIN_VALUE_REFLECTOR(spin::EventScript)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor0(____EventScript,
 	               "",
@@ -52,13 +52,13 @@ BEGIN_VALUE_REFLECTOR(EventScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(ReferencedNode)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_DeclaringFile("ReferencedNode.h");
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ReferencedNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
-	I_Method1(void, registerNode, IN, SceneManager *, s,
+	I_Method1(void, registerNode, IN, spin::SceneManager *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__registerNode__SceneManager_P1,
 	          "",
@@ -78,11 +78,11 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __void__detach,
 	          "",
 	          "The detach() method is removes a node from the scene graph, depending on it's attachment position (specified by attachmentNode). ");
-	I_Method0(void, updateNodePath,
-	          Properties::VIRTUAL,
-	          __void__updateNodePath,
-	          "",
-	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
+	                      Properties::VIRTUAL,
+	                      __void__updateNodePath__bool,
+	                      "",
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
 	I_Method1(int, setAttachmentNode, IN, osg::Group *, n,
 	          Properties::NON_VIRTUAL,
 	          __int__setAttachmentNode__osg_Group_P1,
@@ -113,6 +113,16 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __void__setContext__C5_char_P1,
 	          "",
 	          "A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
+	I_Method1(void, setAlpha, IN, float, alpha,
+	          Properties::NON_VIRTUAL,
+	          __void__setAlpha__float,
+	          "",
+	          "");
+	I_Method0(float, getAlpha,
+	          Properties::NON_VIRTUAL,
+	          __float__getAlpha,
+	          "",
+	          "");
 	I_Method0(const char *, getContext,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getContext,
@@ -124,12 +134,12 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          "",
 	          "");
 	I_Method2(void, setParam, IN, const char *, paramName, IN, const char *, paramValue,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setParam__C5_char_P1__C5_char_P1,
 	          "",
 	          "");
 	I_Method2(void, setParam, IN, const char *, paramName, IN, float, paramValue,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setParam__C5_char_P1__float,
 	          "",
 	          "");
@@ -152,12 +162,12 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          Properties::VIRTUAL,
 	          __void__stateDump,
 	          "",
-	          "StateDump() is a request to broadcast the node state via SceneManager. ");
+	          "Request to broadcast the node state via SceneManager. ");
 	I_Method1(void, stateDump, IN, lo_address, addr,
 	          Properties::VIRTUAL,
 	          __void__stateDump__lo_address,
 	          "",
-	          "StateDump() is a request to send the node state to one address ");
+	          "Request to send the node state to one address ");
 	I_Method0(std::string, getID,
 	          Properties::NON_VIRTUAL,
 	          __std_string__getID,
@@ -188,9 +198,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __bool__addEventScript__bool__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1__C5_std_string_R1,
 	          "",
 	          "");
-	I_Method2(bool, callEventScript, IN, const std::string &, eventName, IN, osgIntrospection::ValueList &, args,
+	I_Method2(bool, callEventScript, IN, const std::string &, eventName, IN, cppintrospection::ValueList &, args,
 	          Properties::NON_VIRTUAL,
-	          __bool__callEventScript__C5_std_string_R1__osgIntrospection_ValueList_R1,
+	          __bool__callEventScript__C5_std_string_R1__cppintrospection_ValueList_R1,
 	          "",
 	          "");
 	I_Method2(bool, enableEventScript, IN, const char *, label, IN, int, enable,
@@ -203,6 +213,9 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	          __bool__removeEventScript__C5_char_P1,
 	          "",
 	          "");
+	I_SimpleProperty(float, Alpha, 
+	                 __float__getAlpha, 
+	                 __void__setAlpha__float);
 	I_SimpleProperty(osg::Group *, AttachmentNode, 
 	                 __osg_Group_P1__getAttachmentNode, 
 	                 __int__setAttachmentNode__osg_Group_P1);
@@ -221,27 +234,58 @@ BEGIN_VALUE_REFLECTOR(ReferencedNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_PublicMemberProperty(t_symbol *, id);
+	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(std::string, nodeType);
 	I_PublicMemberProperty(std::string, contextString);
 	I_PublicMemberProperty(int, pd_mail_id);
 	I_PublicMemberProperty(lo_method, oscHandler);
-	I_PublicMemberProperty(t_symbol *, parent);
-	I_PublicMemberProperty(t_symbol *, newParent);
+	I_PublicMemberProperty(spin::t_symbol *, parent);
+	I_PublicMemberProperty(spin::t_symbol *, newParent);
 	I_PublicMemberProperty(bool, scheduleForDeletion);
 	I_PublicMemberProperty(bool, textFlag);
-	I_PublicMemberProperty(stringParamType, stringParams);
-	I_PublicMemberProperty(floatParamType, floatParams);
+	I_PublicMemberProperty(spin::stringParamType, stringParams);
+	I_PublicMemberProperty(spin::floatParamType, floatParams);
+	I_PublicMemberProperty(float, subgraphAlpha_);
 	I_PublicMemberProperty(osg::NodePath, currentNodePath);
-	I_PublicMemberProperty(std::vector< ReferencedNode * >, children);
-	I_PublicMemberProperty(SceneManager *, sceneManager);
-	I_PublicMemberProperty(MediaManager *, mediaManager);
+	I_PublicMemberProperty(std::vector< spin::ReferencedNode * >, children);
+	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
+	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(ReferencedNode_callback)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_callback)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor0(____ReferencedNode_callback,
 	               "",
 	               "");
 END_REFLECTOR
+
+BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_data)
+	I_DeclaringFile("ReferencedNode.h");
+	I_Constructor1(IN, spin::ReferencedNode *, n,
+	               Properties::NON_EXPLICIT,
+	               ____ReferencedNode_data__ReferencedNode_P1,
+	               "",
+	               "");
+	I_Method0(void, update,
+	          Properties::NON_VIRTUAL,
+	          __void__update,
+	          "",
+	          "");
+END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::map< const std::string COMMA  spin::CronScript * >, spin::CronScriptList)
+
+TYPE_NAME_ALIAS(std::map< const std::string COMMA  spin::EventScript * >, spin::EventScriptList)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  std::string >, spin::stringParamType)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  float >, spin::floatParamType)
+
+STD_MAP_REFLECTOR(std::map< const std::string COMMA  spin::CronScript * >)
+
+STD_MAP_REFLECTOR(std::map< const std::string COMMA  spin::EventScript * >)
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  float >)
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  std::string >)
 

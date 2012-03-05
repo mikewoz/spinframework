@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <Contour.h>
 #include <SceneManager.h>
@@ -21,10 +21,10 @@
 #undef OUT
 #endif
 
-BEGIN_OBJECT_REFLECTOR(Contour)
+BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	I_DeclaringFile("Contour.h");
-	I_BaseType(ReferencedNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::ReferencedNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____Contour__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -177,5 +177,18 @@ BEGIN_OBJECT_REFLECTOR(Contour)
 	I_SimpleProperty(int, Visible, 
 	                 __int__getVisible, 
 	                 __void__setVisible__int);
+END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::ContourTypeEnum)
+	I_DeclaringFile("Contour.h");
+	I_EnumLabel(spin::THIN);
+	I_EnumLabel(spin::CUBIC);
+	I_EnumLabel(spin::CYLINDRICAL);
+END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::trackingModeEnum)
+	I_DeclaringFile("Contour.h");
+	I_EnumLabel(spin::POSITION);
+	I_EnumLabel(spin::FULL6DOF);
 END_REFLECTOR
 

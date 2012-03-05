@@ -5,10 +5,10 @@
 //
 // ***************************************************************************
 
-#include <osgIntrospection/ReflectionMacros>
-#include <osgIntrospection/TypedMethodInfo>
-#include <osgIntrospection/StaticMethodInfo>
-#include <osgIntrospection/Attributes>
+#include <cppintrospection/ReflectionMacros>
+#include <cppintrospection/TypedMethodInfo>
+#include <cppintrospection/StaticMethodInfo>
+#include <cppintrospection/Attributes>
 
 #include <ConstraintsNode.h>
 #include <SceneManager.h>
@@ -21,18 +21,20 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(ConstraintsNode::constraintMode)
+BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::constraintMode)
 	I_DeclaringFile("ConstraintsNode.h");
-	I_EnumLabel(ConstraintsNode::BASIC);
-	I_EnumLabel(ConstraintsNode::DROP);
-	I_EnumLabel(ConstraintsNode::COLLIDE);
-	I_EnumLabel(ConstraintsNode::BOUNCE);
+	I_EnumLabel(spin::ConstraintsNode::BASIC);
+	I_EnumLabel(spin::ConstraintsNode::DROP);
+	I_EnumLabel(spin::ConstraintsNode::COLLIDE);
+	I_EnumLabel(spin::ConstraintsNode::BOUNCE);
+	I_EnumLabel(spin::ConstraintsNode::STICK);
+	I_EnumLabel(spin::ConstraintsNode::COLLIDE_THRU);
 END_REFLECTOR
 
-BEGIN_OBJECT_REFLECTOR(ConstraintsNode)
+BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	I_DeclaringFile("ConstraintsNode.h");
-	I_BaseType(GroupNode);
-	I_Constructor2(IN, SceneManager *, sceneManager, IN, char *, initID,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ConstraintsNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
@@ -51,7 +53,7 @@ BEGIN_OBJECT_REFLECTOR(ConstraintsNode)
 	          __C5_char_P1__getTarget,
 	          "",
 	          "");
-	I_Method1(void, setConstraintMode, IN, ConstraintsNode::constraintMode, m,
+	I_Method1(void, setConstraintMode, IN, spin::ConstraintsNode::constraintMode, m,
 	          Properties::NON_VIRTUAL,
 	          __void__setConstraintMode__C5raintMode,
 	          "",

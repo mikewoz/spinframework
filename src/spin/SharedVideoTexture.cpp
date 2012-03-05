@@ -41,6 +41,8 @@
 
 #include "config.h"
 
+#include <osg/Texture2D>
+#include <osg/Image>
 #include <iostream>
 #include "SharedVideoTexture.h"
 #include "SceneManager.h"
@@ -51,6 +53,9 @@ static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
 
 using namespace std;
 
+
+namespace spin
+{
 
 
 // ===================================================================
@@ -89,6 +94,11 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 
     // turn off lighting 
     this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	// enable blending:
+    this->setMode(GL_BLEND, osg::StateAttribute::ON);
+    this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+    // disable depth test (FIXME)
+    this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
     // keep a timer for reload attempts:
     lastTick = 0;
@@ -98,6 +108,14 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     // set initial textureID:
     //setTextureID(this->id->s_name);
 
+}
+
+void SharedVideoTexture::setRenderBin (int i)
+{
+	_renderBin = i;
+	this->setRenderBinDetails( (int)_renderBin, "RenderBin");
+
+	BROADCAST(this, "si", "setRenderBin", getRenderBin());
 }
 
 // ===================================================================
@@ -127,7 +145,7 @@ void SharedVideoTexture::setTextureID (const char* newID)
 }
 
 // *****************************************************************************
-std::vector<lo_message> SharedVideoTexture::getState ()
+std::vector<lo_message> SharedVideoTexture::getState () const
 {
     // inherit state from base class
     std::vector<lo_message> ret = ReferencedStateSet::getState();
@@ -138,9 +156,25 @@ std::vector<lo_message> SharedVideoTexture::getState ()
     lo_message_add(msg, "ss", "setTextureID", getTextureID());
     ret.push_back(msg);
 
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
+	ret.push_back(msg);
+
     return ret;
 }
 
+void SharedVideoTexture::debug()
+{
+	ReferencedStateSet::debug();
+	std::cout << "   ---------" << std::endl;
+	std::cout << "   Type: SharedVideoTexture" << std::endl;
+	std::cout << "   Texture ID: " << getTextureID() << std::endl;
+	std::cout << "   Path: " << getPath() << std::endl;
+	std::cout << "   Render bin: " << getRenderBin() << std::endl;
+	std::cout << "   width/height: " << width << "x" << height << std::endl;
+	std::cout << "   Killed: " << killed_ << std::endl;
+	std::cout << "   Texture ID: " << textureID << std::endl;
+}
 
 // *****************************************************************************
 // *****************************************************************************
@@ -152,6 +186,8 @@ std::vector<lo_message> SharedVideoTexture::getState ()
 
 void SharedVideoTexture::updateCallback()
 {
+    if (!sceneManager->isGraphical()) return;
+
     // do update here
     // FIXME: killed should be protected
     if (not killed_)
@@ -195,8 +231,8 @@ void SharedVideoTexture::updateCallback()
             lastTick = osg::Timer::instance()->tick();
         }
     }
-    else
-        std::cerr << "texture id is empty and we're killed" << std::endl;
+    //else
+    //    std::cerr << "texture id is empty and we're killed" << std::endl;
 }
 
 
@@ -328,4 +364,17 @@ void SharedVideoTexture::stop()
     std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
 }
 
+#else
+ 
+void SharedVideoTexture::updateCallback() {}
+
+void SharedVideoTexture::consumeFrame() {}
+void SharedVideoTexture::signalKilled() {}
+
+void SharedVideoTexture::start() {}
+void SharedVideoTexture::stop() {}
+    
 #endif
+
+} // end of namespace spin
+

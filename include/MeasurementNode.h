@@ -44,56 +44,94 @@
 
 #include "ReferencedNode.h"
 
+namespace spin
+{
+
 /**
- * \brief A node that can be used to measure relations to another node.
+ * \brief Reports geometric measurements in relation to another node
  * 
  * 
  * A targetNode must be specified, and then measurements (such as distance,
- * incidence of orientation, etc.) are computed in the callback and can be
- * reported with different levels of detail.
+ * relative orientation, etc.) are computed and broadcasted.
+ *
+ * The following items are measured:
+ *
+ * distance        the distance to the target
+ * direction    the absolute direction (angle) on the XY plane
+ * incidence    the angle difference between the measurement node's current orientation to that which would point at the target
+ * eulers        the angle difference separated into pitch, roll, and yaw components (NOTE: possible inaccuracies due to gimbal lock)
+ * quaternion    the rotation required to point at the target
+ *
+ * Other notes:
+ *
+ * - all angles are reported in radians
+ * - the reportMode must be set to enable some measurements
+ *
  */
 class MeasurementNode : public ReferencedNode
 {
 
 public:
 
-	MeasurementNode(SceneManager *sceneManager, char *initID);
-	virtual ~MeasurementNode();
-	
-	virtual void callbackUpdate();
+    MeasurementNode(SceneManager *sceneManager, char *initID);
+    virtual ~MeasurementNode();
+    
+    /**
+     * Level of reporting that is sent (see setReportingLevel for more details)
+     *
+     * REPORT_NONE        sends no measurements
+     *
+     * REPORT_BASIC        sends distance, absolute direction, and incidence of orientation
+     *
+     * REPORT_ANGLES    sends above info, plus rotation information to target with respect to the MeasurementNode's current position and orientation (available as either euler angles or quaternion)
+     *
+     */
+    enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES };
 
-	void setTarget (const char *targetID);
-	void setReportingLevel (int level);
-	
-	const char* getTarget() { return this->targetName->s_name; }
-	int getReportingLevel() { return this->reportingLevel; }
-	
-	
-	/**
-	 * For each subclass of ReferencedNode, we override the getState() method to
-	 * fill the vector with the correct set of methods for this particular node
-	 */
-	virtual std::vector<lo_message> getState();
-	
-	/**
-	 * We must include a stateDump() method that simply invokes the base class
-	 * method. Simple C++ inheritance is not enough, because osg::Introspection
-	 * won't see it.
-	 */
-	//virtual void stateDump() { ReferencedNode::stateDump(); };
-	
-	
+    /**
+     * The update callback for MeasurementNode checks to see if the target's or
+     * the MeasurementNode's global matrix has changed (ie, whether it has been
+     * moved or not). If so, it updates the internal matrices, and calls
+     * sendMeasurements()
+     */
+    virtual void callbackUpdate();
+
+    /**
+     * sendMeasurements is where the actual computation takes place, and,
+     * depending on the reportMode, the measurements are sent out on the network
+     */
+    void sendMeasurements();
+
+    /**
+     * MeasurementNode requires a targetNode to be set, which defines which node
+     * in the scene is being measured.
+     */
+    void setTarget (const char *targetID);
+
+    /**
+     * This sets the level of reporting (choose a reportMode)
+     */
+    void setReportingLevel (reportMode level);
+    
+
+    const char* getTarget() const { return this->targetName_->s_name; }
+    int getReportingLevel() const { return (int) this->reportingLevel_; }
+    
+    
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
+    
 private:
-	
-	//osg::ref_ptr<ReferencedNode> targetNode;
-	t_symbol *targetName;
-	int reportingLevel;
-	
-	
-	osg::Matrix thisMatrix, targetMatrix;
-	
+    
+    t_symbol *targetName_;
+    reportMode reportingLevel_;
+    
+    osg::Matrix thisMatrix_, targetMatrix_;
 };
 
-
+} // end of namespace spin
 
 #endif

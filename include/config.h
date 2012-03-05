@@ -4,20 +4,23 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
 
-/* define if the Boost library is available */
-#define HAVE_BOOST /**/
+/* Defined if the requested minimum BOOST version is satisfied */
+#define HAVE_BOOST 1
 
-/* define if the Boost::Filesystem library is available */
-#define HAVE_BOOST_FILESYSTEM /**/
+/* Define to 1 if you have <boost/filesystem/path.hpp> */
+#define HAVE_BOOST_FILESYSTEM_PATH_HPP 1
 
-/* define if the Boost::Python library is available */
-#define HAVE_BOOST_PYTHON /**/
+/* Define to 1 if you have <boost/program_options.hpp> */
+#define HAVE_BOOST_PROGRAM_OPTIONS_HPP 1
 
-/* define if the Boost::Regex library is available */
-#define HAVE_BOOST_REGEX /**/
+/* Define to 1 if you have <boost/python.hpp> */
+#define HAVE_BOOST_PYTHON_HPP 1
 
-/* define if the Boost::Thread library is available */
-#define HAVE_BOOST_THREAD /**/
+/* Define to 1 if you have <boost/regex.hpp> */
+#define HAVE_BOOST_REGEX_HPP 1
+
+/* Define to 1 if you have <boost/system/error_code.hpp> */
+#define HAVE_BOOST_SYSTEM_ERROR_CODE_HPP 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -42,9 +45,6 @@
 
 /* Define to 1 if you have the `m' library (-lm). */
 #define HAVE_LIBM 1
-
-/* Define to 1 if you have the `osg' library (-losg). */
-#define HAVE_LIBOSG 1
 
 /* Define to 1 if you have the `memmove' function. */
 #define HAVE_MEMMOVE 1
@@ -129,22 +129,22 @@
 #define PACKAGE "spinframework"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "https://sourceforge.net/apps/trac/spinframework/"
+#define PACKAGE_BUGREPORT "http://www.spinframework.org"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "SPINFramework"
+#define PACKAGE_NAME "SPINFRAMEWORK"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "SPINFramework 0.3.2"
+#define PACKAGE_STRING "SPINFRAMEWORK 0.3.9"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "spinframework"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL ""
+#define PACKAGE_URL "http://github.com/mikewoz/spinframework/issues"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.3.2"
+#define PACKAGE_VERSION "0.3.9"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -154,11 +154,15 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.3.2"
+#define VERSION "0.3.9"
 
 /* A flag that compiles additional features for use with the shared_video
    library from Scenic */
 #define WITH_SHARED_VIDEO /**/
+
+/* Enables linking with the SpatOSC library so that compatible audio renderers
+   can be used for 3D sound spatialization */
+#define WITH_SPATOSC 1
 
 /* Define to 1 if the X Window System is missing or not being used. */
 /* #undef X_DISPLAY_MISSING */
