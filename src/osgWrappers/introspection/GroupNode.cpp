@@ -21,6 +21,20 @@
 #undef OUT
 #endif
 
+BEGIN_VALUE_REFLECTOR(spin::DraggerCallback)
+	I_DeclaringFile("GroupNode.h");
+	I_Constructor1(IN, spin::GroupNode *, g,
+	               Properties::NON_EXPLICIT,
+	               ____DraggerCallback__GroupNode_P1,
+	               "",
+	               "");
+	I_Method1(bool, receive, IN, const osgManipulator::MotionCommand &, command,
+	          Properties::NON_VIRTUAL,
+	          __bool__receive__C5_osgManipulator_MotionCommand_R1,
+	          "",
+	          "");
+END_REFLECTOR
+
 BEGIN_ENUM_REFLECTOR(spin::GroupNode::interactionMode)
 	I_DeclaringFile("GroupNode.h");
 	I_EnumLabel(spin::GroupNode::STATIC);
@@ -185,6 +199,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __osg_Vec3__getOrientation,
 	          "",
 	          "");
+	I_Method0(osg::Quat, getOrientationQuat,
+	          Properties::NON_VIRTUAL,
+	          __osg_Quat__getOrientationQuat,
+	          "",
+	          "");
 	I_Method0(osg::Vec3, getScale,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getScale,
@@ -230,6 +249,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__stateDump,
 	          "",
 	          "We override stateDump so that we can additionally force a dumpGlobals() call whenever a dump is requested ");
+	I_Method0(osg::MatrixTransform *, getManipulatorTransform,
+	          Properties::NON_VIRTUAL,
+	          __osg_MatrixTransform_P1__getManipulatorTransform,
+	          "",
+	          "");
 	I_SimpleProperty(osg::Vec3, Center, 
 	                 __osg_Vec3__getCenter, 
 	                 0);
@@ -248,8 +272,14 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_SimpleProperty(const char *, Manipulator, 
 	                 __C5_char_P1__getManipulator, 
 	                 __void__setManipulator__C5_char_P1);
+	I_SimpleProperty(osg::MatrixTransform *, ManipulatorTransform, 
+	                 __osg_MatrixTransform_P1__getManipulatorTransform, 
+	                 0);
 	I_SimpleProperty(osg::Vec3, Orientation, 
 	                 __osg_Vec3__getOrientation, 
+	                 0);
+	I_SimpleProperty(osg::Quat, OrientationQuat, 
+	                 __osg_Quat__getOrientationQuat, 
 	                 0);
 	I_SimpleProperty(int, ReportMode, 
 	                 __int__getReportMode, 

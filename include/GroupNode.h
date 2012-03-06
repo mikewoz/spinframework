@@ -196,6 +196,7 @@ public:
     osg::Vec3 getClipping() const { return _clipping; };
     osg::Vec3 getTranslation() const { return mainTransform->getPosition(); };
     osg::Vec3 getOrientation() const { return _orientation; };
+    osg::Quat getOrientationQuat() const { return mainTransform->getAttitude(); };
     osg::Vec3 getScale() const { return mainTransform->getScale(); };
     osg::Vec3 getVelocity() const { return _velocity; };
     int getVelocityMode() const { return (int) _velocityMode; };
@@ -235,7 +236,7 @@ public:
 
 
 
-
+    osg::MatrixTransform *getManipulatorTransform() { return manipulatorTransform.get(); }
 
 protected:
 
@@ -273,6 +274,17 @@ private:
 
 };
 
+    
+class DraggerCallback : public osgManipulator::DraggerTransformCallback
+{
+
+public:
+    DraggerCallback(GroupNode* g);
+    bool receive(const osgManipulator::MotionCommand& command);
+private:
+    GroupNode *groupNode;
+};
+    
 } // end of namespace spin
 
 #endif
