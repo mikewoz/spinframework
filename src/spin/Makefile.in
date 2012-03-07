@@ -912,8 +912,7 @@ install-dvi: install-dvi-am
 install-dvi-am:
 
 install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
+
 install-html: install-html-am
 
 install-html-am:
@@ -956,7 +955,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-libspin_@SPIN_API_VERSION@_la_includeHEADERS \
 	uninstall-pythonLTLIBRARIES
 
-.MAKE: install-am install-exec-am install-strip
+.MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libLTLIBRARIES clean-libtool \
@@ -964,8 +963,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-hook \
-	install-html install-html-am install-info install-info-am \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am \
 	install-libLTLIBRARIES \
 	install-libspin_@SPIN_API_VERSION@_la_includeHEADERS \
 	install-man install-pdf install-pdf-am install-ps \
@@ -978,14 +977,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-libspin_@SPIN_API_VERSION@_la_includeHEADERS \
 	uninstall-pythonLTLIBRARIES
 
-# `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
-
-# On OSX, we need the python module to have a .so extension, but the -shrext option
-# doesn't work with glibtool, so we make a symbolic link in an install hook instead.
-# On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
-# do this only for OSX?
-install-exec-hook:
-	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
 
 ###############################################################################
 # CUSTOM targets:

@@ -1,6 +1,15 @@
 SPIN Framework release notes
 ============================
 
+2012-03-07 : spinframework 0.3.12
+---------------------------------
+This release is in the development series 0.3.x that has an unstable API. 
+
+Bugs fixed:
+
+* Get rid of OSX-specific hack
+
+
 2012-03-05 : spinframework 0.3.10
 ---------------------------------
 This release is in the development series 0.3.x that has an unstable API. 

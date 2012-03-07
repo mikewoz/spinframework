@@ -135,7 +135,7 @@
 #define PACKAGE_NAME "SPINFRAMEWORK"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "SPINFRAMEWORK 0.3.10"
+#define PACKAGE_STRING "SPINFRAMEWORK 0.3.12"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "spinframework"
@@ -144,7 +144,7 @@
 #define PACKAGE_URL "http://github.com/mikewoz/spinframework/issues"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.3.10"
+#define PACKAGE_VERSION "0.3.12"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -154,7 +154,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.3.10"
+#define VERSION "0.3.12"
 
 /* A flag that compiles additional features for use with the shared_video
    library from Scenic */
