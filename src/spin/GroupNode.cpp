@@ -93,41 +93,18 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
             _worldToLocal = osg::Matrix::inverse(_localToWorld);
             */
             success = true;
+            break;
         }
         case osgManipulator::MotionCommand::MOVE:
         {
             std::cout << "DraggerCallback MOVE" << std::endl;
             
-            /*
-            // Transform the command's motion matrix into local motion matrix.
-            osg::Matrix localMotionMatrix = _localToWorld * command.getWorldToLocal()
-            * command.getMotionMatrix()
-            * command.getLocalToWorld() * _worldToLocal;
-            
-            // Transform by the localMotionMatrix
-            _transform->setMatrix(localMotionMatrix * _startMotionMatrix);
-            */
-            
-            
-            /*
-            osg::Matrix m = _transform->getMatrix();
-            osg::Vec3 t = groupNode->getTranslation() + m.getTrans();
-            osg::Quat q = groupNode->getOrientationQuat() * m.getRotate();
-            osg::Vec3 s = osg::Vec3(groupNode->getScale().x() * m.getScale().x(),
-                                    groupNode->getScale().y() * m.getScale().y(),
-                                    groupNode->getScale().z() * m.getScale().z());
-            */
-            
             osg::Matrix m = _transform->getMatrix();
             osg::Vec3 t = m.getTrans();
             osg::Quat q = m.getRotate();
             osg::Vec3 s = m.getScale();
-            
-            
-            
-            
-            
-            
+
+            /*
             std::cout
             << "main x,y,z:\t"
             << groupNode->getTranslation().x() << ","
@@ -151,6 +128,7 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
             << m.getRotate().z() << ","
             << m.getRotate().w()
             << std::endl;
+             */
             
             
             // unlock the node:
@@ -177,11 +155,13 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
             
             
             success = true;
+            break;
         }
         case osgManipulator::MotionCommand::FINISH:
         {
             std::cout << "DraggerCallback FINISH" << std::endl;
             success = true;
+            break;
         }
         case osgManipulator::MotionCommand::NONE:
         default:
@@ -732,7 +712,7 @@ osgManipulator::Dragger* createDragger(const std::string& name, float size, osg:
         osgManipulator::TabPlaneTrackballDragger* d = new osgManipulator::TabPlaneTrackballDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 1.6;
+        size *= 2.5;
     }
     else if ("TabBoxTrackballDragger" == name)
     {
@@ -779,6 +759,7 @@ osgManipulator::Dragger* createDragger(const std::string& name, float size, osg:
     
     if (dragger)
     {
+        dragger->setName(name);
         dragger->setMatrix(osg::Matrix::scale(size, size, size) * osg::Matrix::translate(offset));
         
         // turn off lighing on dragger

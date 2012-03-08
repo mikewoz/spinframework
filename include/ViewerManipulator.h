@@ -109,6 +109,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         float lastX, lastY;
         float clickX, clickY;
         
+        bool manipulatorKey;
+        
         osg::Vec3 lastHitPoint;
 };
 

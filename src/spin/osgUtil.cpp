@@ -145,6 +145,31 @@ osg::Quat RotationBetweenVectors(osg::Vec3 v1, osg::Vec3 v2)
 
 } 
 
+osg::Vec3 cartesianToSpherical(osg::Vec3 v)
+{
+    // http://en.wikipedia.org/wiki/Spherical_coordinate_system
+    // but modified, since ground ref is the XY plane
+    
+    double azim, elev, dist;
+    
+    dist = v.length();
+    azim = atan2(v.y(),v.x()) - osg::PI_2;
+    
+    // put in range of [-pi,pi]
+    if (azim > osg::PI)
+        azim -= 2 * osg::PI;
+    else if (azim < -osg::PI)
+        azim += 2 * osg::PI;
+    
+    if (dist > 0.000001)
+        elev = osg::PI_2 - acos(v.z()/dist);
+    else
+        elev = 0.0;
+    
+    return osg::Vec3(azim, elev, dist);
+}
+    
+
 
 osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle)
 {
@@ -229,7 +254,8 @@ osg::Vec3 QuatToEuler(osg::Quat q)
 	return osg::Vec3(pitch,roll,yaw);
 }
 
-osg::Vec3 QuatToEuler_old(osg::Quat q)
+    
+osg::Vec3 QuatToEuler2(osg::Quat q)
 {
 	double pitch, roll, yaw;
 	

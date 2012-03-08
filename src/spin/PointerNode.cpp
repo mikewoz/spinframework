@@ -57,6 +57,7 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "osgUtil.h"
+#include "spinUtil.h"
 
 using namespace std;
 
@@ -154,23 +155,67 @@ void PointerNode::callbackUpdate()
 
 
     // TODO: dragger event:
-    if ((doManipulation) && dragger.valid() & (this->previousMatrix != myMatrix))
+    //if ((doManipulation) && dragger.valid() & (this->previousMatrix != myMatrix))
+    if (dragger.valid() & (this->previousMatrix != myMatrix))
     {
-        // find change in translation and orientation from original:
+        std::cout << "manipulating!" << std::endl;
+        
+        // find change in orientation from original:
         osg::Quat r1 = origMatrix.getRotate();
         osg::Quat r2 = myMatrix.getRotate();
         osg::Quat dr = r2 - r1;
+        osg::Quat deltaR = r1.inverse() * r2;
+        std::cout << "  r1=\t" << stringify(r1) << std::endl;
+        std::cout << "  r2=\t" << stringify(r2) << std::endl;
+        std::cout << "  delR=\t" << stringify(deltaR) << std::endl;
+        
 
-        /*
-        osg::Vec3 p1 = origMatrix.getTrans();
-        osg::Vec3 p2 = myMatrix.getTrans();
-        osg::Vec3 dp = p2 - p1;
-        */
+        osg::Vec3 v1 = r1 * osg::Y_AXIS;
+        osg::Vec3 v2 = r2 * osg::Y_AXIS;
+        std::cout << "  dir1=\t" << stringify(v1) << std::endl;
+        std::cout << "  dir2=\t" << stringify(v2) << std::endl;
+        
+        osg::Quat qfv;
+        qfv.makeRotate(v1, v2);
+        std::cout << "  qfv=\t" << stringify(qfv) << std::endl;
+        
+        osg::Vec3 eulers1 = Vec3inDegrees(QuatToEuler(r1));
+        osg::Vec3 eulers2 = Vec3inDegrees(QuatToEuler(r2));
+        std::cout << "  eul1=\t" << stringify(eulers1) << std::endl;
+        std::cout << "  eul2=\t" << stringify(eulers2) << std::endl;
 
+        osg::Vec3 aed1 = cartesianToSpherical(QuatToEuler2(r1));
+        osg::Vec3 aed2 = cartesianToSpherical(QuatToEuler2(r2));
+        std::cout << "  aed1=\t" << stringify(aed1) << std::endl;
+        std::cout << "  aed2=\t" << stringify(aed2) << std::endl;
+
+        
+        osg::Vec3 eulersR = Vec3inDegrees(QuatToEuler(deltaR));
+        
         osg::Vec3 drVect = Vec3inDegrees(QuatToEuler(dr));
 
+/*
+        std::cout << "   euler orig: "<<r1.x()<<","<<r1.y()<<","<<r1.z() << std::endl;
+        std::cout << "   euler  new: "<<r2.x()<<","<<r2.y()<<","<<r2.z() << std::endl;
+        std::cout << "   vect  orig: "<<v1.x()<<","<<v1.y()<<","<<v1.z() << std::endl;
+        std::cout << "   vect   new: "<<v2.x()<<","<<v2.y()<<","<<v2.z() << std::endl;
+        std::cout << "   aed   orig: "<<aed1.x()<<","<<aed1.y()<<","<<aed1.z() << std::endl;
+        std::cout << "   eulersR:    "<<eulersR.x()<<","<<eulersR.y()<<","<<eulersR.z() << std::endl;
+       */
+        
+        
+        double azim = AngleBetweenVectors(v1, v2, 3);
+        double elev = AngleBetweenVectors(v1, v2, 2);
+        double roll = AngleBetweenVectors(v1, v2, 1);
+        
+        std::cout << "   azim="<< azim<<" elev="<<elev<<" roll="<<roll << std::endl;
+        
+        
+        
         _pointer._hitIter = _pointer._hitList.begin();
-        _pointer.setMousePosition(drVect.x(), drVect.z());
+        //_pointer.setMousePosition(drVect.x(), drVect.z());
+        //_pointer.setMousePosition(eulersR.z(), eulersR.x());
+        _pointer.setMousePosition(elev, azim);
 
         ea->setEventType(osgGA::GUIEventAdapter::DRAG);
         dragger->handle(_pointer, *ea.get(), aa);
@@ -204,6 +249,14 @@ void PointerNode::callbackUpdate()
             const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
             for (i=intersection.nodePath.size()-1; i>=0; i--)
             {
+                
+                osgManipulator::Dragger* dragger = dynamic_cast<osgManipulator::Dragger*>(intersection.nodePath[i]);
+                if (dragger)
+                {
+                    //std::cout << "intersection with dragger" << std::endl;
+                    //break;
+                }
+
                 testNode = dynamic_cast<ReferencedNode*>(intersection.nodePath[i]);
                 if (testNode.valid()) // && (testNode->nodeType != "RayNode"))
                 {
@@ -219,6 +272,9 @@ void PointerNode::callbackUpdate()
                     }
                     break;
                 }
+                
+                
+                
                 //std::cout << " > " << intersection.nodePath[i]->getName();
             }
 
@@ -284,7 +340,8 @@ void PointerNode::callbackUpdate()
             for (i=0; i<intersectList.size(); i++) lo_message_add_string(msg, (char*)intersectList[i]->s_name);
         } else lo_message_add_string(msg, "NULL");
         
-        if (1)
+        // debug:
+        if (0)
         {
             std::cout << "PionterNode has new intersections:";
             if (intersectList.size())
@@ -294,6 +351,7 @@ void PointerNode::callbackUpdate()
             } else std::cout << " NULL";
             std::cout << std::endl;
         }
+        // end debug
 
         //sceneManager->sendNodeMessage(this->id, msg);
         NODE_LO_MSG(sceneManager, this, msg);
@@ -476,13 +534,90 @@ void PointerNode::highlight (int b)
     BROADCAST(this, "si", "highlight", this->getHighlight());
 }
 
+
+void PointerNode::manipulate (int b)
+{
+    doManipulation = (bool) b;
+    BROADCAST(this, "si", "manipulate", this->getManipulate());
+    
+    if (spinApp::Instance().getContext()->isServer()) return;
+
+    std::cout << "got manipulate: " << b << " (intersectList size: " << intersectList.size() << ")" << std::endl;
+    
+    //if (b && intersectList.size())
+    if (b)
+    {
+        // reset selection:
+        //selection->setMatrix(osg::Matrix::identity());
+        
+        // insert the selection node between targetNode and it's parent:
+        //selection->addChild(targetNode.get());
+        //targetNode->getParent(0)->replaceChild(targetNode.get(), selection.get());
+        
+        origMatrix = osg::computeLocalToWorld(this->currentNodePath);
+        
+        // transfer the intersections to the _pointer
+        _pointer.reset();
+        _pointer.setCamera(NULL);
+        
+        osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
+        osgUtil::LineSegmentIntersector::Intersections::iterator hitr;
+        for (hitr = intersections.begin(); hitr != intersections.end(); ++hitr)
+        {
+            _pointer.addIntersection(hitr->nodePath, hitr->getLocalIntersectPoint());
+        }
+        
+        for (osg::NodePath::iterator itr = _pointer._hitList.front().first.begin();
+             itr != _pointer._hitList.front().first.end();
+             ++itr)
+        {
+            osgManipulator::Dragger* ptrDragger = dynamic_cast<osgManipulator::Dragger*>(*itr);
+            if (ptrDragger)
+            {
+                std::cout << "manipulator PUSH" << std::endl;
+                
+                //_pointer.setMousePosition(ea->getX(), ea->getY());
+                _pointer.setMousePosition(0, 0);
+                
+                // set event to PUSH and invoke the dragger:
+                ea->setEventType(osgGA::GUIEventAdapter::PUSH);
+                ptrDragger->handle(_pointer, *ea.get(), aa);
+        
+                ptrDragger->setDraggerActive(true);
+                
+                dragger = ptrDragger;
+            }
+        }
+    }
+    
+    // end manipulation:
+    else if (dragger.valid())
+    {
+        //  set event to RELEASE and invoke handle()
+        std::cout << "manipulator PUSH" << std::endl;
+        
+        _pointer._hitIter = _pointer._hitList.begin();
+        
+        ea->setEventType(osgGA::GUIEventAdapter::RELEASE);
+        dragger->handle(_pointer, *ea.get(), aa);
+        
+        
+        dragger->setDraggerActive(false);
+        _pointer.reset();
+
+        dragger = NULL;
+    }
+}
+    
+    
 /**
  * The manipulate() method performs OSG dragger manipulations (once a node has
  * been "highlighted" for manipulation). That is, a dragger needs to be attached
  * to a node somewhere, and we check intersections to see if the pointer has
  * selected any of the dragger handles.
  */
-void PointerNode::manipulate (int b)
+    /*
+void PointerNode::manipulate_old (int b)
 {
     if (not spinApp::Instance().getContext()->isServer() and not dragger.valid()) 
         return;
@@ -557,7 +692,7 @@ void PointerNode::manipulate (int b)
 
     BROADCAST(this, "si", "manipulate", this->getManipulate());
 }
-
+*/
 
 
 
@@ -705,7 +840,7 @@ void PointerNode::slide (float f)
 std::vector<lo_message> PointerNode::getState () const
 {
     // inherit state from base class
-    std::vector<lo_message> ret = ReferencedNode::getState();
+    std::vector<lo_message> ret = RayNode::getState();
 
     lo_message msg;
 

@@ -159,13 +159,34 @@ std::string stringify(int x)
     if (!(o << x)) return "";
     return o.str();
 }
+    
+std::string stringify(osg::Quat q)
+{
+    std::ostringstream o;
+    o << q.x()<<" "<<q.y()<<" "<<q.z()<<" "<<q.w();
+    if (!o) return "0 0 0 0";
+    return o.str();
+}
+
+std::string stringify(osg::Vec3f v)
+{
+    std::ostringstream o;
+    o << v.x()<<" "<<v.y()<<" "<<v.z();
+    if (!o) return "0 0 0";
+    return o.str();
+}
+
+std::string stringify(osg::Vec3d v)
+{
+    osg::Vec3f vf(v);
+    return stringify(vf);
+}
 
 std::string leadingSpaces(int n)
 {
 	//return std::string(n, '\t');
 	return std::string(n, ' ');
 }
-
 
 std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
 {

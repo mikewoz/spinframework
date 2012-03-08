@@ -76,7 +76,6 @@ namespace spin
 #define AS_UNIT_SCALE  1.0f // 1m
 #define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
 
-
 /**
  * Returns an absolute angle difference between v1 and v2 (with no notion of
  * which is ahead or behind the other). Returned angle is from 0 to PI
@@ -95,9 +94,17 @@ double AngleBetweenVectors(osg::Vec3 v1, osg::Vec3 v2, int nullAxis);
 osg::Quat RotationBetweenVectors(osg::Vec3 v1, osg::Vec3 v2);
 
 
+/**
+ * Converts a direction vector in cartesian coordinates to radial
+ * (spherical) coordinates
+ * @return vector containing (azimuth,elevation,distance)
+ */
+osg::Vec3 cartesianToSpherical(osg::Vec3 v);
+    
 osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle);
 osg::Quat EulerToQuat(float roll, float pitch, float yaw);
 osg::Vec3 QuatToEuler(osg::Quat q);
+osg::Vec3 QuatToEuler2(osg::Quat q);
 
 //osg::Geode*     createGrid(int radius, osg::Vec4 color);
 osg::Geometry*    createPlane(float halfLength, osg::Vec4 color);
