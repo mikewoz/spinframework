@@ -59,12 +59,12 @@ BEGIN_OBJECT_REFLECTOR(spin::MeasurementNode)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getTarget,
 	          "",
-	          "");
+	          "Returns the name of the target node (the node being measured. ");
 	I_Method0(int, getReportingLevel,
 	          Properties::NON_VIRTUAL,
 	          __int__getReportingLevel,
 	          "",
-	          "");
+	          "Returns an integer representing the level of reporting as set in the ReportMode enum. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

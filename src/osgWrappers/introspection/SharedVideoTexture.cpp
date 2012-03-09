@@ -52,7 +52,7 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "");
+	          "Print debug information to console. ");
 	I_Method0(void, updateCallback,
 	          Properties::VIRTUAL,
 	          __void__updateCallback,

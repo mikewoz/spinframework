@@ -32,7 +32,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "");
+	          "TO_BE_DONE ");
 	I_Method0(bool, isValid,
 	          Properties::NON_VIRTUAL,
 	          __bool__isValid,
@@ -57,7 +57,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          Properties::NON_VIRTUAL,
 	          __int__getLighting,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether lighting affects the texture. ");
 	I_Method1(void, setRenderBin, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setRenderBin__int,
@@ -67,7 +67,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          Properties::NON_VIRTUAL,
 	          __int__getRenderBin,
 	          "",
-	          "");
+	          "Returns an integer indicating the render bin for this texture. Higher numbers get processed later (i.e. it appears on top). Default = 11 ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

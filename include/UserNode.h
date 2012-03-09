@@ -53,16 +53,18 @@ namespace spin
 /**
  * \brief Represents a user in the scene.
  *
- * This class is used to differentiate users from scene content. The subgraph
- * may contain:
- * - cameras that render according the user's perspective
+ * This class is used to differentiate users from scene content.
+ * its main use is to control a camera for viewing the scene
+ * The subgraph may contain:
+ * - the attached camera
  * - a graphical avatar to provide an objective representation of the user
- * - various soundNodes that correspond the ther users loudspeaker setup
+ * - various soundNodes that correspond to the user's loudspeaker setup
  * - etc.
  *
  * It is important to note that anything attached to a UserNode's subgraph will
  * not be saved with the scene.
  */
+
 class UserNode : public ConstraintsNode
 {
 
@@ -75,7 +77,8 @@ class UserNode : public ConstraintsNode
         /**
          * The UserNode needs an update callback to check if ping messages are
          * still being received. If not, the node and it's subgraph should be
-         * removed.
+         * removed. Please note that if the user node NEVER sends a ping, not
+         * even once, then it will be excluded from this obligation.
          */
         virtual void callbackUpdate();
 
@@ -83,18 +86,28 @@ class UserNode : public ConstraintsNode
         /**
          * The UserNode is used by OSG's NodeTrackerManipulator to position a
          * camera for the user. However, NodeTrackerManipulator doesn't check if
-         * the nodepath has changed, so we override updateNodePath() and set an
+         * the nodepath has changed, so we override updateNodePath() and set a
          * nodepathUpdate flag for the manipulator to see.
          */
         virtual void updateNodePath();
         bool nodepathUpdate;
         
-        
         // SET methods:
+
+        /**
+         * Sets a user-entered description for the node.
+         */
+        
         void setDescription (const char *s);
 
 
         // GET methods:
+
+        /**
+         * Returns a string containing the user-entered description for this
+         * node.
+         */
+
         const char* getDescription() const { return description_.c_str(); }
 
 
@@ -108,19 +121,28 @@ class UserNode : public ConstraintsNode
         * If we attach geometry under this, the camera will point at the center
         * of that geometry instead.
         */
-        osg::Group *getCameraAttachmentNode() const { return cameraAttachmentNode; }
+        osg::Group *getCameraAttachmentNode() const { return
+        	cameraAttachmentNode; }
+
+        /**
+         * Pings the server.
+         */
         
-        // ping message
         void ping();
+
+        /**
+         * Returns the timestamp of the last ping in unsigned long long format.
+         */
+
         osg::Timer_t getLastPing() const { return lastPing_; }
 
         /**
-         * For each subclass of ReferencedNode, we override the getState() method to
-         * fill the vector with the correct set of methods for this particular node
+         * For each subclass of ReferencedNode, we override the getState()
+         * method to fill the vector with the correct set of methods for this
+         * particular node
          */
+
         virtual std::vector<lo_message> getState() const;
-
-
 
 
     private:

@@ -63,7 +63,7 @@ BEGIN_VALUE_REFLECTOR(spin::NodeSearcher)
 	          Properties::NON_VIRTUAL,
 	          __void__search__osg_Node_P1__std_string,
 	          "",
-	          "");
+	          "Search for nodes with a given name in the provided subgraph. ");
 	I_PublicMemberProperty(std::string, _searchName);
 END_REFLECTOR
 

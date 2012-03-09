@@ -32,7 +32,7 @@ BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	          Properties::NON_VIRTUAL,
 	          __void__setVisible__int,
 	          "",
-	          "");
+	          "Set whether the light source is visible. ");
 	I_Method1(void, setCutoff, IN, float, cutoff,
 	          Properties::NON_VIRTUAL,
 	          __void__setCutoff__float,
@@ -52,22 +52,22 @@ BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	          Properties::NON_VIRTUAL,
 	          __void__setAmbient__float__float__float__float,
 	          "",
-	          "");
+	          "Sets the ambient value for the light source in RGBA. ");
 	I_Method4(void, setDiffuse, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setDiffuse__float__float__float__float,
 	          "",
-	          "");
+	          "Sets the diffuse value for the light source in RGBA. ");
 	I_Method4(void, setSpecular, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setSpecular__float__float__float__float,
 	          "",
-	          "");
+	          "Sets the specular value for the light source in RGBA. ");
 	I_Method0(int, getVisible,
 	          Properties::NON_VIRTUAL,
 	          __int__getVisible,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether the light source is visible. ");
 	I_Method0(float, getCutoff,
 	          Properties::NON_VIRTUAL,
 	          __float__getCutoff,
@@ -87,17 +87,17 @@ BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getAmbient,
 	          "",
-	          "");
+	          "Returns the ambient value of the light source in RGBA. ");
 	I_Method0(osg::Vec4, getDiffuse,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getDiffuse,
 	          "",
-	          "");
+	          "Returns the diffuse value of the light source in RGBA. ");
 	I_Method0(osg::Vec4, getSpecular,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getSpecular,
 	          "",
-	          "");
+	          "Returns the specular value of the light source in RGBA. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

@@ -69,6 +69,10 @@ public:
     ImageTexture(SceneManager *sceneManager, const char *initID);
     ~ImageTexture();
 
+    /**
+     * TO_BE_DONE
+     */
+
     virtual void debug();
     
     /**
@@ -86,6 +90,11 @@ public:
      * Set whether the texture is influenced by lighting
      */
     void setLighting(int i);
+
+    /**
+     * Returns a boolean indicating whether lighting affects the texture.
+     */
+
     int getLighting() const { return (int)_lightingEnabled; }
 
     /**
@@ -93,6 +102,12 @@ public:
      * gets processed (ie, it appears on top). Default renderBin = 11
      */
     void setRenderBin (int i);
+
+    /**
+     * Returns an integer indicating the render bin for this texture. Higher
+     * numbers get processed later (i.e. it appears on top). Default = 11
+     */
+
     int getRenderBin() const { return _renderBin; }
 
 

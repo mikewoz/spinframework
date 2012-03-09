@@ -51,7 +51,7 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "");
+	          "Print debug information to console. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

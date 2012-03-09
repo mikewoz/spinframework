@@ -66,7 +66,8 @@ namespace spin
  *        name/type in the scene graph.
  *
  * For example, this is used to find the switch & sequence nodes when loading
- * an OSG model in the ModelNode class, so that we may discover animation features
+ * an OSG model in the ModelNode class, so that we may discover animation
+ * features.
  */
 
 class SearchVisitor : public osg::NodeVisitor
@@ -108,8 +109,10 @@ typedef std::vector< osg::ref_ptr<osg::Node> > NodeList;
 
 // FIXME: is the definition below OK?
 /**
- * \brief A NodeVisitor that stores a list of all node whose name match the one we are looking for.
+ * \brief A NodeVisitor that stores a list of all nodes whose name matches
+ * the one we are looking for.
  */
+
 class NodeSearcher : public osg::NodeVisitor
 {
     public:
@@ -117,7 +120,10 @@ class NodeSearcher : public osg::NodeVisitor
 
         virtual void apply(osg::Node& node);
 
-        // search for node with given name in the provided subgraph
+        /**
+         * Search for nodes with a given name in the provided subgraph.
+         */
+
         void search(osg::Node* subgraph, std::string s);
 
         std::string _searchName;

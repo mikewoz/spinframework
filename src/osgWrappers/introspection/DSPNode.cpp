@@ -78,7 +78,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getActive,
 	          "",
-	          "");
+	          "for sending messages to the connections of this (source) node: virtual void connectionMsg (char *snkName, char *method, float value); ");
 	I_Method0(const char *, getPlugin,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPlugin,

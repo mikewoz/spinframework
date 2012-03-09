@@ -58,9 +58,8 @@ namespace spin
 /**
  * \brief Point Cloud renderer (can be used with Kinect data or any other .pcd
  * data
- *
- * 
  */
+
 class PointCloud : public GroupNode
 {
 

@@ -90,7 +90,7 @@ public:
 
     /**
      * IMPORTANT:
-     * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
+     * subclasses of ReferencedNode are allowed to contain complicated subgraphs
      * and can also change their attachmentNode so that children are attached
      * anywhere in that subgraph. If that is the case, the updateNodePath()
      * function MUST be overridden, and extra nodes must be manually pushed onto
@@ -99,7 +99,8 @@ public:
     virtual void updateNodePath(bool updateChildren = true);
 
     void mouseEvent (int event, int keyMask, int buttonMask, float x, float y);
-    void event (int event, const char* userString, float eData1, float eData2, float x, float y, float z);
+    void event (int event, const char* userString, float eData1, float eData2,
+    		float x, float y, float z);
 
     virtual void debug();
     

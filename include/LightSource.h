@@ -62,21 +62,61 @@ public:
     LightSource(SceneManager *sceneManager, char *initID);
     virtual ~LightSource();
 
+    /**
+     * Set whether the light source is visible.
+     */
+
     void setVisible        (int visibilityFlag);
+
+
+
     void setCutoff        (float cutoff);
     void setExponent    (float exponent);
     void setAttenuation    (float attenuation);
 
+    /**
+     * Sets the ambient value for the light source in RGBA.
+     */
+
     void setAmbient        (float red, float green, float blue, float alpha);
+
+    /**
+     * Sets the diffuse value for the light source in RGBA.
+     */
+
     void setDiffuse        (float red, float green, float blue, float alpha);
+
+    /**
+     * Sets the specular value for the light source in RGBA.
+     */
+
     void setSpecular    (float red, float green, float blue, float alpha);
+
+    /**
+     * Returns a boolean indicating whether the light source is visible.
+     */
 
     int getVisible() const;
     float getCutoff() const;
     float getExponent() const;
     float getAttenuation() const;
+
+    /**
+     * Returns the ambient value of the light source in RGBA.
+     */
+
     osg::Vec4 getAmbient() const;
+
+    /**
+     * Returns the diffuse value of the light source in RGBA.
+     */
+
     osg::Vec4 getDiffuse() const;
+
+    /**
+     * Returns the specular value of the light source in RGBA.
+     */
+
     osg::Vec4 getSpecular() const;
 
     /**

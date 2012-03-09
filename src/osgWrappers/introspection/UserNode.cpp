@@ -32,22 +32,22 @@ BEGIN_OBJECT_REFLECTOR(spin::UserNode)
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate,
 	          "",
-	          "The UserNode needs an update callback to check if ping messages are still being received. If not, the node and it's subgraph should be removed. ");
+	          "The UserNode needs an update callback to check if ping messages are still being received. If not, the node and it's subgraph should be removed. Please note that if the user node NEVER sends a ping, not even once, then it will be excluded from this obligation. ");
 	I_Method0(void, updateNodePath,
 	          Properties::VIRTUAL,
 	          __void__updateNodePath,
 	          "",
-	          "The UserNode is used by OSG's NodeTrackerManipulator to position a camera for the user. However, NodeTrackerManipulator doesn't check if the nodepath has changed, so we override updateNodePath() and set an nodepathUpdate flag for the manipulator to see. ");
+	          "The UserNode is used by OSG's NodeTrackerManipulator to position a camera for the user. However, NodeTrackerManipulator doesn't check if the nodepath has changed, so we override updateNodePath() and set a nodepathUpdate flag for the manipulator to see. ");
 	I_Method1(void, setDescription, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setDescription__C5_char_P1,
 	          "",
-	          "");
+	          "Sets a user-entered description for the node. ");
 	I_Method0(const char *, getDescription,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getDescription,
 	          "",
-	          "");
+	          "Returns a string containing the user-entered description for this node. ");
 	I_Method0(osg::Group *, getCameraAttachmentNode,
 	          Properties::NON_VIRTUAL,
 	          __osg_Group_P1__getCameraAttachmentNode,
@@ -57,12 +57,12 @@ BEGIN_OBJECT_REFLECTOR(spin::UserNode)
 	          Properties::NON_VIRTUAL,
 	          __void__ping,
 	          "",
-	          "");
+	          "Pings the server. ");
 	I_Method0(osg::Timer_t, getLastPing,
 	          Properties::NON_VIRTUAL,
 	          __osg_Timer_t__getLastPing,
 	          "",
-	          "");
+	          "Returns the timestamp of the last ping in unsigned long long format. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

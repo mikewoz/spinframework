@@ -59,7 +59,6 @@ class SceneManager;
 
 /**
  * \brief Provides 3D text rendered in the scene
- *
  */
 class TextNode : public GroupNode
 {
@@ -73,31 +72,31 @@ public:
      * The billboardType specifies how the text is oriented with respect to the
      * current camera position.
      */
+
     enum billboardType
     {
-        RELATIVE,
-        POINT_EYE,
-        STAY_UP
+        RELATIVE,  /*!< No billboarding. */
+        POINT_EYE, /*!< Set to rotate billboard around a camera's perspective */
+        STAY_UP	   /*!< Billboard rotates only on z axis. */
     };
 
     /**
      * The decorationType specifies the type of dropshadow/outline used, which
-     * can help the visibility of the text on noisy of similarly colored
-     * backgrounds.
+     * can help the visibility of text on noisy backgrounds of similar color.
      */
     enum decorationType
     {
         // these are an exact copy of osgText::Text::BackdropType
-        DROP_SHADOW_BOTTOM_RIGHT = 0,
-        DROP_SHADOW_CENTER_RIGHT,
-        DROP_SHADOW_TOP_RIGHT,
-        DROP_SHADOW_BOTTOM_CENTER,
-        DROP_SHADOW_TOP_CENTER,
-        DROP_SHADOW_BOTTOM_LEFT,
-        DROP_SHADOW_CENTER_LEFT,
-        DROP_SHADOW_TOP_LEFT,
-        OUTLINE,
-        NONE
+        DROP_SHADOW_BOTTOM_RIGHT = 0,	/*!< Shadows down and to the right. */
+        DROP_SHADOW_CENTER_RIGHT,		/*!< Shadows to the right. */
+        DROP_SHADOW_TOP_RIGHT,			/*!< Shadows up and to the right. */
+        DROP_SHADOW_BOTTOM_CENTER,		/*!< Shadows below. */
+        DROP_SHADOW_TOP_CENTER,			/*!< Shadows upwards. */
+        DROP_SHADOW_BOTTOM_LEFT,		/*!< Shadows down and to the left. */
+        DROP_SHADOW_CENTER_LEFT,		/*!< Shadows to the left. */
+        DROP_SHADOW_TOP_LEFT,			/*!< Shadows up and to the left. */
+        OUTLINE,						/*!< Creates an outline of the text. */
+        NONE							/*!< No shadowing or outline. */
     };
 
     /**
@@ -105,20 +104,72 @@ public:
      * text (filled or wireframe). Use setMargin along with this to adjust the
      * appearance of a text box.
      */
-    enum backgroundType { NO_BACKGROUND, FILLED, WIREFRAME, ALL };
+    enum backgroundType {
+    	NO_BACKGROUND,	/*!< The text box will have no background. */
+    	FILLED, 		/*!< Creates a text box with a filled background. */
+    	WIREFRAME, 		/*!< Creates a wireframe text box. */
+    	ALL 			/*!< Creates a filled background with visible
+						wireframe. */
+    };
 
 
     virtual void setContext    (const char *newvalue);
     
+    /**
+     * Accepts user-entered string for the node's text.
+     */
+
     void setTextValue        (const char* s);
+
+    /**
+     * Sets the font for the text associated with this node.
+     */
+
     void setFont            (const char* s);
+
+    /**
+     * Sets the point-size for the text associated with this node.
+     */
+
     void setSize            (float s);
+
+    /**
+     * Sets the color for the text associated to this node in RGBA values.
+     */
+
     void setColor            (float red, float green, float blue, float alpha);
-    void setBgColor            (float red, float green, float blue, float alpha);
-    void setMargin            (float margin);
+
+    /**
+     * Sets the background color for this node.
+     */
+
+    void setBgColor          (float red, float green, float blue, float alpha);
+
+    /**
+     * Sets the margins for the text associated to this node.
+     */
+
+    void setMargin           (float margin);
+
+    /**
+     * Sets the type of billboarding asigned to this node (drawn from the enum
+     * billboardType).
+     */
 
     void setBillboard        (billboardType t);
+
+    /**
+     * Sets the shadowing or outline type for this text node (drawn from the
+     * decorationType enum).
+     */
+
     void setDecoration        (decorationType t);
+
+    /**
+     * Sets a background type for the text box (drawn from the backgroundType
+     * enum).
+     */
+
     void setBackground        (backgroundType t);
 
 

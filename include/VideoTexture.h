@@ -77,42 +77,76 @@ public:
      * contains a sequence of images to stitch into a video.
      */
     void setPath (const char* newPath);
+
+    /**
+     * Returns a string indicating the path from which the video data is drawn.
+     * This is an abstract class and should be re-implemented in a derived class
+     */
+
     const char *getPath() const { return _path.c_str(); }
 
     /**
      * Enable (1) or disable (0) looping of the video
      */
     void setLoop (int i);
+
+    /**
+     * Returns a boolean indicating whether the video is set to loop or not.
+     */
+
     int getLoop() const { return (int)_loop; }
 
     /**
      * Normalized seek to a part of the video. ie, index in range [0,1]
      */
     void setIndex (float f);
+
+    /**
+     * Returns an index in the range 0,1 indicating a part of the video set to
+     * be rapidly accessed with the setIndex function.
+     */
+
     float getIndex() const { return _index; }
 
     /**
      * Only for image sequences; tells OSG how fast to play the sequence
      */
     void setFrameRate (float f);
+
+    /**
+     * Returns an integer indicating the set framerate of the video sequence.
+     */
+
     float getFrameRate() const { return _framerate; }
     
     /**
      * Play (1) or Pause (0) the video
      */
+
     void setPlay (int i);
+
+    /**
+     * Returns a boolean indicating whether the video is set to play or not.
+     */
+
     int getPlay() const { return (int)_play; }
 
-    
     /**
-     * Seek to beginning of video (quivalent to setIndex(0);
+     * Seek to beginning of video (equivalent to setIndex(0);
      */
     void rewind();
     
+    /**
+     * Flips the video horizontally.
+     */
     
     void flipHorizontal();
+
+    /**
+     * Flips the video vertically.
+     */
+
     void flipVertical();
-    
     
     /**
      * Returns whether there is a currently valid video

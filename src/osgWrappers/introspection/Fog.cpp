@@ -47,12 +47,12 @@ BEGIN_OBJECT_REFLECTOR(spin::Fog)
 	          Properties::NON_VIRTUAL,
 	          __void__setFogColor__float__float__float__float,
 	          "",
-	          "Set fog color ");
+	          "Set fog color in RGBA value. ");
 	I_Method0(osg::Vec4, getFogColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getFogColor,
 	          "",
-	          "Get fog color ");
+	          "Returns fog color ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

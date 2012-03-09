@@ -69,6 +69,11 @@ public:
     ReferencedStateSet(SceneManager *sceneManager, const char *initID);
     ~ReferencedStateSet();
 
+    /**
+     * This callback occurs every frame to update the state with any parameter
+     * changes.
+     */
+
     virtual void updateCallback();
 
     /**
@@ -89,6 +94,10 @@ public:
      */ 
     void replace(osg::StateSet *ss);
     
+    /**
+     * Print debug information to console.
+     */
+
     virtual void debug();
     
     /**
@@ -101,6 +110,11 @@ public:
      * StateDump() is a request to broadcast the node state via SceneManager.
      */
     virtual void stateDump();
+
+    /**
+     * StateDump() is a request to broadcast the node state via SceneMangager.
+     */
+
     virtual void stateDump(lo_address txAddr);
     
     

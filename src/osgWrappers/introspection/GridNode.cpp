@@ -37,17 +37,17 @@ BEGIN_OBJECT_REFLECTOR(spin::GridNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
 	          "",
-	          "Grid line color ");
+	          "Sets the grid's line color in RGBA value. ");
 	I_Method0(int, getSize,
 	          Properties::NON_VIRTUAL,
 	          __int__getSize,
 	          "",
-	          "");
+	          "Returns the size of the grid (in meters from the center). ");
 	I_Method0(osg::Vec4, getColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getColor,
 	          "",
-	          "");
+	          "Returns the color of the grid's lines in a Vector4 of RGBA values. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

@@ -66,47 +66,47 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setTextValue__C5_char_P1,
 	          "",
-	          "");
+	          "Accepts user-entered string for the node's text. ");
 	I_Method1(void, setFont, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setFont__C5_char_P1,
 	          "",
-	          "");
+	          "Sets the font for the text associated with this node. ");
 	I_Method1(void, setSize, IN, float, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setSize__float,
 	          "",
-	          "");
+	          "Sets the point-size for the text associated with this node. ");
 	I_Method4(void, setColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
 	          "",
-	          "");
+	          "Sets the color for the text associated to this node in RGBA values. ");
 	I_Method4(void, setBgColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setBgColor__float__float__float__float,
 	          "",
-	          "");
+	          "Sets the background color for this node. ");
 	I_Method1(void, setMargin, IN, float, margin,
 	          Properties::NON_VIRTUAL,
 	          __void__setMargin__float,
 	          "",
-	          "");
+	          "Sets the margins for the text associated to this node. ");
 	I_Method1(void, setBillboard, IN, spin::TextNode::billboardType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__billboardType,
 	          "",
-	          "");
+	          "Sets the type of billboarding asigned to this node (drawn from the enum billboardType). ");
 	I_Method1(void, setDecoration, IN, spin::TextNode::decorationType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setDecoration__decorationType,
 	          "",
-	          "");
+	          "Sets the shadowing or outline type for this text node (drawn from the decorationType enum). ");
 	I_Method1(void, setBackground, IN, spin::TextNode::backgroundType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBackground__backgroundType,
 	          "",
-	          "");
+	          "Sets a background type for the text box (drawn from the backgroundType enum). ");
 	I_Method0(const char *, getTextValue,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getTextValue,

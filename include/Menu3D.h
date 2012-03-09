@@ -53,7 +53,6 @@ typedef std::vector< osg::observer_ptr<TextNode> > MenuVector;
 
 /**
  * \brief Provides a positionable 3D menu composed of TextNodes
- *
  */
 class Menu3D : public GroupNode
 {
@@ -63,9 +62,23 @@ public:
     Menu3D(SceneManager *sceneManager, char *initID);
     virtual ~Menu3D();
 
+    /**
+     * This should likely be a private function. TO_BE_VERIFIED.
+     */
+
     virtual void updateNodePath();
 
+    /**
+     * Toggle whether this menu node is enabled or disabled.
+     */
+
     void setEnabled(int i);
+
+    /**
+     * Returns a boolean (int) indicating whether this menu node is enabled or
+     * disabled.
+     */
+
     int getEnabled() const { return enabled_; }
     
     /**
@@ -74,32 +87,83 @@ public:
     void addItem (const char *itemText);
 
     /**
-     * Remove an item from the list
+     * Remove an item (textNode) from the list by its itemIndex.
      */
     void removeItem (int itemIndex);
+
+    /**
+     * Remove an item (textNode) from the list by its ID.
+     */
+
     void removeItem (const char *itemID);
+
+    /**
+     * This should be a private function.
+     */
+
     int doRemoveItem (osg::observer_ptr<TextNode> n);
 
+    /**
+     * Removes all text nodes from the menu.
+     */
+
     void clearItems();
+
+    /**
+     * Redraws the menu after items are removed to eliminate the space left by
+     * the recently removed item(s).
+     */
+
     void redraw();
     
     /**
-     * Highlight an item from the list
+     * Highlight an item from the list by its itemIndex.
      */
     void setHighlighted(int itemIndex);
+
+    /**
+     * Highlight an item from the list by its itemID.
+     */
+
     void setHighlighted(const char *itemID);
+
+    /**
+     * This should be a private function.
+     */
+
     int doHighlight(osg::observer_ptr<TextNode> n);
-    const char *getHighlighted() const { if (highlighted_.valid()) return highlighted_->id->s_name; else return "NULL"; }
+
+    /**
+     * Returns the id of the currently highlighted menu item.
+     */
+
+    const char *getHighlighted() const { if (highlighted_.valid())
+    	return highlighted_->id->s_name; else return "NULL"; }
 
 
 
     /**
-     * Set the color of the font when highlighted
+     * Set the color of the font in RGBA values when highlighted
      */
+
     void setHighlightColor(float r, float g, float b, float a);
+
+    /**
+     * Returns the color of the font in RGBA values when highlighted.
+     */
+
     osg::Vec4 getHighlightColor() const { return highlightColor_; }
 
+    /**
+     * Highlights the item that follows the currently highlighted item.
+     */
+
     void highlightNext();
+
+    /**
+     * Highlights the item previous to the currently highlighted item.
+     */
+
     void highlightPrev();
 
     void select();
@@ -108,18 +172,24 @@ public:
      * Each successive menu item will appear at an offset from the previous
      */
     void setItemOffset(float x, float y, float z);
+
+    /**
+     * Returns the Vector3 value used to offset successive menu entries.
+     */
+
     osg::Vec3 getItemOffset() const { return itemOffset_; }
     
     /**
-     * wrapped from TextNode:
+     * wrapped from TextNode: sets font type
      */
     void setFont            (const char* s);
     /**
      * wrapped from TextNode:
+     * types come from billboardType enum: RELATIVE, POINT_EYE, STAY_UP
      */
     void setBillboard        (TextNode::billboardType t);
     /**
-     * wrapped from TextNode:
+     * wrapped from TextNode: sets color in RGBA values
      */
     void setColor            (float red, float green, float blue, float alpha);
 
