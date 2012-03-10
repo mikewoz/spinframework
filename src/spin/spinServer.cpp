@@ -55,6 +55,28 @@
 #include "spinLog.h"
 #include "config.h"
 
+#ifdef HAVE_POCO
+#include "Poco/Net/HTTPServer.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTMLForm.h"
+#include "Poco/Net/PartHandler.h"
+#include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/CountingStream.h"
+#include "Poco/NullStream.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/Exception.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
+#endif
+
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
@@ -124,6 +146,17 @@ int main(int argc, char **argv)
 	// *************************************************************************
 	// start spin:
 	server.start();
+
+
+	// *************************************************************************
+    // launch webserver:
+    
+#ifdef HAVE_POCO
+    //unsigned short port = 9980;
+			
+    // set-up a server socket
+	//Poco::Net::ServerSocket svs(port);
+#endif    
 
 	// *************************************************************************
 	// send a userRefresh message:

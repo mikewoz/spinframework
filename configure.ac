@@ -216,6 +216,11 @@ else
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
 
+AC_CHECK_LIB([PocoFoundation], [main], [pototest=true POCO_LIBS="-lPocoUtild -lPocoNetd -lPocoXMLd -lPocoFoundationd"], AC_MSG_WARN([missing Poco]))
+AM_CONDITIONAL(HAVE_POCO, [test x$pocotest = xtrue])
+AC_SUBST(POCO_LIBS)
+
+
 PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
     AC_MSG_WARN([missing package: libspatosc-0.3])
