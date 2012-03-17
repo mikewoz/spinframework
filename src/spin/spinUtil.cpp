@@ -102,12 +102,12 @@ std::string getMyIPaddress()
 					//printf("Internet Address: [%s] %s \n", tempIfAddr->ifa_name, IPaddress.c_str());
 				
 					// TODO: for now we just return the first address found. Eventually, we could ask for a specific address (eg, "eth0" vs "eth1")
-					break;					
+					return IPaddress;				
 				}
 			}
 		}
 	}
-	return IPaddress;
+	return std::string("127.0.0.1");
 }
 
 std::string getMyBroadcastAddress()
