@@ -86,6 +86,14 @@ public:
     enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
     enum velocityMode { TRANSLATE, MOVE };
     
+    enum OrientationMode
+    {
+        NORMAL,
+        POINT_TO_TARGET,
+        POINT_TO_TARGET_CENTROID,
+        POINT_TO_ORIGIN
+    };
+    
     virtual void callbackUpdate();
 
 
@@ -121,6 +129,9 @@ public:
      */
     virtual void setTranslation (float x, float y, float z);
 
+    void setOrientationMode(OrientationMode m);
+    int getOrientationMode() const { return (int)orientationMode_; };
+
     /**
      * The local orientation offset for this node with respect to it's parent
      */
@@ -130,6 +141,8 @@ public:
      * Set the orientation offset as a quaternion
      */
     virtual void setOrientationQuat (float x, float y, float z, float w);
+
+    void applyOrientationMode();
 
     /**
      * A grouped scale operation
@@ -259,6 +272,8 @@ protected:
     osg::Vec3 _globalScale;
     float _globalRadius;
 
+    enum OrientationMode orientationMode_;
+    t_symbol* orientationTarget_;
     osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 
     osg::Vec3 _velocity;

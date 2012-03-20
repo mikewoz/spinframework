@@ -37,6 +37,11 @@
 		1C0EED7714F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */; };
 		1C0EED7814F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */; };
 		1C0EED7914F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */; };
+		1C1ECB48150E4EC800CCBFF3 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C1ECB47150E4EC800CCBFF3 /* Shader.cpp */; };
+		1C1ECB4A150E4EE200CCBFF3 /* Shader.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C1ECB49150E4EE200CCBFF3 /* Shader.h */; };
+		1C1ECB4C150E54F400CCBFF3 /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C1ECB4B150E54F400CCBFF3 /* Shader.cpp */; };
+		1C1ECB4E150E659000CCBFF3 /* ShaderUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C1ECB4D150E659000CCBFF3 /* ShaderUtil.cpp */; };
+		1C1ECB50150E65B000CCBFF3 /* ShaderUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C1ECB4F150E65B000CCBFF3 /* ShaderUtil.h */; };
 		1C25F51314E57CD2007F97E5 /* PointCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C25F51214E57CD2007F97E5 /* PointCloud.h */; };
 		1C34AE4514DB32A8001DF418 /* GeometryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C34AE4414DB32A8001DF418 /* GeometryNode.h */; };
 		1C34AE4714DB32BE001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */; };
@@ -90,6 +95,10 @@
 		1C57789014BD6F4400632E46 /* spinserver.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C57788F14BD6F4400632E46 /* spinserver.1 */; };
 		1C57789514BD6FC900632E46 /* spinServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C57789414BD6FC900632E46 /* spinServer.cpp */; };
 		1C57789614BD702A00632E46 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
+		1C66174D1513DC1C0059C56A /* libboost_filesystem-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */; };
+		1C66174E1513DC1C0059C56A /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */; };
+		1C66174F1513DC5E0059C56A /* libboost_filesystem-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */; };
+		1C6617501513DC5E0059C56A /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */; };
 		1C70F2CE14C3A5B90054B0A1 /* osgdb_3dc.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE514C0D396006394AD /* osgdb_3dc.so */; };
 		1C70F2CF14C3A5B90054B0A1 /* osgdb_3ds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE614C0D396006394AD /* osgdb_3ds.so */; };
 		1C70F2D014C3A5B90054B0A1 /* osgdb_ac.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE714C0D396006394AD /* osgdb_ac.so */; };
@@ -167,8 +176,6 @@
 		1C70F31914C3A5B90054B0A1 /* osgdb_x.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3014C0D397006394AD /* osgdb_x.so */; };
 		1C70F31A14C3A5B90054B0A1 /* osgdb_zip.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3114C0D397006394AD /* osgdb_zip.so */; };
 		1C70F33414C3C7540054B0A1 /* osgPlugins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */; };
-		1C7267A814EEF3B000E3FFAE /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
-		1C7267AA14EEF3B100E3FFAE /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system.dylib */; };
 		1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1C7A4AD314F2CAC500EA83AB /* PointCloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C7267B314EF43AE00E3FFAE /* PointCloud.cpp */; };
@@ -313,8 +320,6 @@
 		1C87601A14C9BE3200A46EBC /* spinviewer.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FCB14C9BE3200A46EBC /* spinviewer.png */; };
 		1C87601B14C9BE3200A46EBC /* spinviewer.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FCB14C9BE3200A46EBC /* spinviewer.png */; };
 		1C87601D14CA65DA00A46EBC /* libSPIN.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
-		1C87601F14CA6E8E00A46EBC /* libboost_filesystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem.dylib */; };
-		1C87602014CA6ECF00A46EBC /* libboost_filesystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem.dylib */; };
 		1C90C15914CBB35000C929AE /* icon_fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C15814CBB35000C929AE /* icon_fullscreen.png */; };
 		1C90C15A14CBB35000C929AE /* icon_fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C15814CBB35000C929AE /* icon_fullscreen.png */; };
 		1C90C15F14CBB89C00C929AE /* spinCocoaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1C90C15E14CBB89C00C929AE /* spinCocoaWrapper.mm */; };
@@ -749,6 +754,8 @@
 				1C875F3B14C8EF4200A46EBC /* liblo.7.dylib in CopyFiles */,
 				1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C875F3C14C8EF4200A46EBC /* libcppintrospection-3.0.0.dylib in CopyFiles */,
+				1C66174D1513DC1C0059C56A /* libboost_filesystem-mt.dylib in CopyFiles */,
+				1C66174E1513DC1C0059C56A /* libboost_system-mt.dylib in CopyFiles */,
 				1C875F3F14C8EF4200A46EBC /* libboost_python.dylib in CopyFiles */,
 				1CE3AD3414CFE1EA007E722D /* libOpenThreads.12.dylib in CopyFiles */,
 				1CE3AD3514CFE1EA007E722D /* libosg.66.dylib in CopyFiles */,
@@ -866,6 +873,8 @@
 				1C94DED514C00548006394AD /* libcppintrospection-3.0.0.dylib in CopyFiles */,
 				1C34AE5514DCFBA9001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */,
 				1C94DECE14BFED32006394AD /* libboost_python.dylib in CopyFiles */,
+				1C66174F1513DC5E0059C56A /* libboost_filesystem-mt.dylib in CopyFiles */,
+				1C6617501513DC5E0059C56A /* libboost_system-mt.dylib in CopyFiles */,
 				1C9C082B14CFEA24006ABC85 /* libfreenect.0.0.1.dylib in CopyFiles */,
 				1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C94DEB314BFBAA0006394AD /* liblo.7.dylib in CopyFiles */,
@@ -905,6 +914,11 @@
 		1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_filesystem-mt.dylib"; path = "../../../../../opt/local/lib/libboost_filesystem-mt.dylib"; sourceTree = "<group>"; };
 		1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_system-mt.dylib"; path = "../../../../../opt/local/lib/libboost_system-mt.dylib"; sourceTree = "<group>"; };
 		1C14F41A14C3A3D4008889AE /* OpenThreads.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenThreads.framework; path = usr/local/lib/OpenThreads.framework; sourceTree = SDKROOT; };
+		1C1ECB47150E4EC800CCBFF3 /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Shader.cpp; path = ../src/spin/Shader.cpp; sourceTree = "<group>"; };
+		1C1ECB49150E4EE200CCBFF3 /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Shader.h; path = ../include/Shader.h; sourceTree = "<group>"; };
+		1C1ECB4B150E54F400CCBFF3 /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Shader.cpp; path = ../src/osgWrappers/introspection/Shader.cpp; sourceTree = "<group>"; };
+		1C1ECB4D150E659000CCBFF3 /* ShaderUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShaderUtil.cpp; path = ../src/spin/ShaderUtil.cpp; sourceTree = "<group>"; };
+		1C1ECB4F150E65B000CCBFF3 /* ShaderUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderUtil.h; path = ../include/ShaderUtil.h; sourceTree = "<group>"; };
 		1C25F51214E57CD2007F97E5 /* PointCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PointCloud.h; path = ../include/PointCloud.h; sourceTree = "<group>"; };
 		1C25F51414E58AC6007F97E5 /* PointCloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointCloud.cpp; path = ../src/osgWrappers/introspection/PointCloud.cpp; sourceTree = "<group>"; };
 		1C25F51614E59373007F97E5 /* libpcl_apps.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_apps.1.4.0.dylib; path = /usr/local/lib/libpcl_apps.1.4.0.dylib; sourceTree = "<absolute>"; };
@@ -1322,7 +1336,6 @@
 				1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1CA24DF714BE2D3C007A9C31 /* Cocoa.framework in Frameworks */,
 				1CA24C9114BE5AAA0023DD8B /* liblo.7.dylib in Frameworks */,
-				1C87601F14CA6E8E00A46EBC /* libboost_filesystem.dylib in Frameworks */,
 				1C94DEC514BFEC2E006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1CE3ACE614CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */,
@@ -1345,7 +1358,6 @@
 				1C9C082714CFE9BF006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082E14D07661006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */,
-				1C7267A814EEF3B000E3FFAE /* libboost_system.dylib in Frameworks */,
 				1C0EED7414F2F284001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7514F2F284001892A0 /* libboost_system-mt.dylib in Frameworks */,
 			);
@@ -1394,7 +1406,6 @@
 				1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */,
 				1C94DECB14BFEC2F006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED414C00252006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1C87602014CA6ECF00A46EBC /* libboost_filesystem.dylib in Frameworks */,
 				1CE3AD0814CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */,
 				1CE3AD0914CF7CB0007E722D /* libosg.66.dylib in Frameworks */,
 				1CE3AD0A14CF7CB0007E722D /* libosgAnimation.66.dylib in Frameworks */,
@@ -1415,7 +1426,6 @@
 				1C9C082914CFE9C0006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082C14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */,
-				1C7267AA14EEF3B100E3FFAE /* libboost_system.dylib in Frameworks */,
 				1C0EED7814F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7914F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */,
 			);
@@ -1519,6 +1529,8 @@
 				1C386C9E14BD3DF60065851F /* ReferencedStateSet.cpp */,
 				1C386C9F14BD3DF60065851F /* ReporterNode.cpp */,
 				1C386CA014BD3DF60065851F /* SceneManager.cpp */,
+				1C1ECB47150E4EC800CCBFF3 /* Shader.cpp */,
+				1C1ECB4D150E659000CCBFF3 /* ShaderUtil.cpp */,
 				1C386CA114BD3DF60065851F /* ShapeNode.cpp */,
 				1C386CA214BD3DF60065851F /* SharedVideoTexture.cpp */,
 				1C386CA314BD3DF60065851F /* SoundConnection.cpp */,
@@ -1574,6 +1586,8 @@
 				1CA24D8D14BE2892007A9C31 /* ReferencedStateSet.h */,
 				1CA24D8E14BE2892007A9C31 /* ReporterNode.h */,
 				1CA24D8F14BE2892007A9C31 /* SceneManager.h */,
+				1C1ECB49150E4EE200CCBFF3 /* Shader.h */,
+				1C1ECB4F150E65B000CCBFF3 /* ShaderUtil.h */,
 				1CA24D9014BE2892007A9C31 /* ShapeNode.h */,
 				1CA24D9214BE2892007A9C31 /* SharedVideoTexture.h */,
 				1CA24D9314BE2892007A9C31 /* SoundConnection.h */,
@@ -1624,6 +1638,7 @@
 				1CA24D4A14BE2875007A9C31 /* ReferencedNode.cpp */,
 				1CA24D4B14BE2875007A9C31 /* ReferencedStateSet.cpp */,
 				1CA24D4C14BE2875007A9C31 /* ReporterNode.cpp */,
+				1C1ECB4B150E54F400CCBFF3 /* Shader.cpp */,
 				1CA24D4D14BE2875007A9C31 /* ShapeNode.cpp */,
 				1CA24D4E14BE2875007A9C31 /* SharedVideoTexture.cpp */,
 				1CA24D4F14BE2875007A9C31 /* SoundConnection.cpp */,
@@ -1990,6 +2005,8 @@
 				1C90C16B14CCBDE200C929AE /* KinectCloud.h in Headers */,
 				1C34AE4514DB32A8001DF418 /* GeometryNode.h in Headers */,
 				1C25F51314E57CD2007F97E5 /* PointCloud.h in Headers */,
+				1C1ECB4A150E4EE200CCBFF3 /* Shader.h in Headers */,
+				1C1ECB50150E65B000CCBFF3 /* ShaderUtil.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2383,6 +2400,9 @@
 				1C34AE4914DB4A3B001DF418 /* GeometryNode.cpp in Sources */,
 				1C7A4AD314F2CAC500EA83AB /* PointCloud.cpp in Sources */,
 				1C7A4AD714F2CAE100EA83AB /* PointCloud.cpp in Sources */,
+				1C1ECB48150E4EC800CCBFF3 /* Shader.cpp in Sources */,
+				1C1ECB4C150E54F400CCBFF3 /* Shader.cpp in Sources */,
+				1C1ECB4E150E659000CCBFF3 /* ShaderUtil.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2556,7 +2576,7 @@
 					/opt/local/lib,
 					/opt/local/Library/Python.framework/Versions/2.6/config,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
@@ -2599,7 +2619,7 @@
 					/opt/local/lib,
 					/opt/local/Library/Python.framework/Versions/2.6/config,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",

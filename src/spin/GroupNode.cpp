@@ -199,7 +199,9 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
     //_reportGlobals = false;
     _reportMode = GroupNode::NONE;
     _interactionMode = GroupNode::STATIC;
-
+    orientationMode_ = GroupNode::NORMAL;
+    
+    orientationTarget_ = gensym("NULL");
 
     mainTransform = new osg::PositionAttitudeTransform();
     mainTransform->setName(string(id->s_name) + ".mainTransform");
@@ -577,35 +579,105 @@ void GroupNode::setTranslation (float x, float y, float z)
         mainTransform->setPosition(newTranslation);
         BROADCAST(this, "sfff", "setTranslation", x, y, z);
     }
+    
+    // if we've moved and the orientationMode requires us to point to a target
+    // node or the origin, we should apply that orientation change too:
+    if (orientationMode_!=NORMAL)
+    {
+        applyOrientationMode();
+    }
 }
 
 void GroupNode::setOrientationQuat (float x, float y, float z, float w)
 {
-	osg::Quat newQuat = osg::Quat(x,y,z,w);
-
-    if (newQuat != mainTransform->getAttitude())
+    if ((orientationMode_==NORMAL)||(!spinApp::Instance().getContext()->isServer()))
     {
-        mainTransform->setAttitude(newQuat);
-        _orientation = Vec3inDegrees(QuatToEuler(newQuat));
+        osg::Quat newQuat = osg::Quat(x,y,z,w);
 
-        BROADCAST(this, "sffff", "setOrientationQuat", x, y, z, w);
+        if (newQuat != mainTransform->getAttitude())
+        {
+            mainTransform->setAttitude(newQuat);
+            _orientation = Vec3inDegrees(QuatToEuler(newQuat));
+
+            BROADCAST(this, "sffff", "setOrientationQuat", x, y, z, w);
+        }
     }
-
 }
 
 void GroupNode::setOrientation (float p, float r, float y)
 {
-    osg::Vec3 newOrientation = osg::Vec3(p, r, y);
-
-    if (newOrientation != getOrientation())
+    // Only allow orientation changes if OrientationMode is NORMAL, or if this
+    // is a client. The server cannot apply orientations for other modes, but
+    // clients do need to be notified if the server sends a constrained 
+    // orientation
+    if ((orientationMode_==NORMAL)||(!spinApp::Instance().getContext()->isServer()))
     {
-        _orientation = newOrientation;
-        osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-                                 osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-                                 osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-        mainTransform->setAttitude(q);
-        BROADCAST(this, "sfff", "setOrientation", p, r, y);
+        osg::Vec3 newOrientation = osg::Vec3(p, r, y);
+
+        if (newOrientation != getOrientation())
+        {
+            _orientation = newOrientation;
+            osg::Quat q = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
+                                     osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
+                                     osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
+            mainTransform->setAttitude(q);
+            BROADCAST(this, "sfff", "setOrientation", p, r, y);
+        }
     }
+}
+
+void GroupNode::setOrientationMode (OrientationMode m)
+{
+	this->orientationMode_ = m;
+	BROADCAST(this, "si", "setOrientationMode", (int)orientationMode_);
+    if (orientationMode_!=NORMAL)
+    {
+        applyOrientationMode();
+    }
+}
+
+void GroupNode::applyOrientationMode()
+{
+    if (!spinApp::Instance().getContext()->isServer()) return;
+
+    osg::Vec3 targetPos;
+    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+    
+    if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
+    {
+        ReferencedNode *target = dynamic_cast<ReferencedNode*>(orientationTarget_->s_thing);
+        if (target)
+        {
+            // TODO: verify if we really need to recompute the matrices and bound every time.
+            // Perhaps the matrix is already stored somewhere in certain cases?
+            
+            if (orientationMode_==POINT_TO_TARGET_CENTROID)
+            {
+                targetPos = target->computeBound().center();
+            }
+            else
+            {
+                osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath);
+                targetPos = targetMatrix.getTrans();
+            }
+        }
+    }
+    else if (orientationMode_==POINT_TO_ORIGIN)
+    {
+        targetPos = osg::Vec3(0.0,0.0,0.0);
+    }
+    
+    osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
+    
+    // can't do this, because that function only does something for NORMAL mode
+    //setOrientation(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+
+    _orientation = osg::Vec3(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+    osg::Quat q = osg::Quat( osg::DegreesToRadians(_orientation.x()), osg::Vec3d(1,0,0),
+                             osg::DegreesToRadians(_orientation.y()), osg::Vec3d(0,1,0),
+                             osg::DegreesToRadians(_orientation.z()), osg::Vec3d(0,0,1));
+    mainTransform->setAttitude(q);
+    BROADCAST(this, "sfff", "setOrientation", _orientation.x(), _orientation.y(),  _orientation.z());
 }
 
 
@@ -1014,6 +1086,11 @@ std::vector<lo_message> GroupNode::getState () const
 
     msg = lo_message_new();
     lo_message_add(msg, "si", "setInteractionMode", getInteractionMode());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    v = getOrientation();
+    lo_message_add(msg, "si", "setOrientationMode", getOrientationMode());
     ret.push_back(msg);
 
     msg = lo_message_new();

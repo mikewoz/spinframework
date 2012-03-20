@@ -21,7 +21,7 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::constraintMode)
+BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::ConstraintMode)
 	I_DeclaringFile("ConstraintsNode.h");
 	I_EnumLabel(spin::ConstraintsNode::BASIC);
 	I_EnumLabel(spin::ConstraintsNode::DROP);
@@ -53,9 +53,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	          __C5_char_P1__getTarget,
 	          "",
 	          "");
-	I_Method1(void, setConstraintMode, IN, spin::ConstraintsNode::constraintMode, m,
+	I_Method1(void, setConstraintMode, IN, spin::ConstraintsNode::ConstraintMode, m,
 	          Properties::NON_VIRTUAL,
-	          __void__setConstraintMode__C5raintMode,
+	          __void__setConstraintMode__ConstraintMode,
 	          "",
 	          "");
 	I_Method0(int, getConstraintMode,

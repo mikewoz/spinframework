@@ -929,6 +929,8 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
         }
     }
 
+    // TODO: shader!
+
     // otherwise, assume a static image texture:
     else
     {

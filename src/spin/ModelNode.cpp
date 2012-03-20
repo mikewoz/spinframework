@@ -100,6 +100,7 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
     _registerStates = false;
 	_statesetList.clear();
     _renderBin = 10;
+    _lightingOverride = 0;
 
 	modelPath = "NULL";
 

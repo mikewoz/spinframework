@@ -57,6 +57,14 @@ BEGIN_ENUM_REFLECTOR(spin::GroupNode::velocityMode)
 	I_EnumLabel(spin::GroupNode::MOVE);
 END_REFLECTOR
 
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::OrientationMode)
+	I_DeclaringFile("GroupNode.h");
+	I_EnumLabel(spin::GroupNode::NORMAL);
+	I_EnumLabel(spin::GroupNode::POINT_TO_TARGET);
+	I_EnumLabel(spin::GroupNode::POINT_TO_TARGET_CENTROID);
+	I_EnumLabel(spin::GroupNode::POINT_TO_ORIGIN);
+END_REFLECTOR
+
 BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_DeclaringFile("GroupNode.h");
 	I_BaseType(spin::ReferencedNode);
@@ -114,6 +122,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setTranslation__float__float__float,
 	          "",
 	          "The local translation offset for this node with respect to it's parent ");
+	I_Method1(void, setOrientationMode, IN, spin::GroupNode::OrientationMode, m,
+	          Properties::NON_VIRTUAL,
+	          __void__setOrientationMode__OrientationMode,
+	          "",
+	          "");
+	I_Method0(int, getOrientationMode,
+	          Properties::NON_VIRTUAL,
+	          __int__getOrientationMode,
+	          "",
+	          "");
 	I_Method3(void, setOrientation, IN, float, pitch, IN, float, roll, IN, float, yaw,
 	          Properties::VIRTUAL,
 	          __void__setOrientation__float__float__float,
@@ -124,6 +142,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setOrientationQuat__float__float__float__float,
 	          "",
 	          "Set the orientation offset as a quaternion ");
+	I_Method0(void, applyOrientationMode,
+	          Properties::NON_VIRTUAL,
+	          __void__applyOrientationMode,
+	          "",
+	          "");
 	I_Method3(void, setScale, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,
@@ -277,6 +300,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                 0);
 	I_SimpleProperty(osg::Vec3, Orientation, 
 	                 __osg_Vec3__getOrientation, 
+	                 0);
+	I_SimpleProperty(int, OrientationMode, 
+	                 __int__getOrientationMode, 
 	                 0);
 	I_SimpleProperty(osg::Quat, OrientationQuat, 
 	                 __osg_Quat__getOrientationQuat, 

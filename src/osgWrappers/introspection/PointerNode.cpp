@@ -63,7 +63,7 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          Properties::NON_VIRTUAL,
 	          __void__manipulate__int,
 	          "",
-	          "The manipulate() method performs OSG dragger manipulations (once a node has been \"highlighted\" for manipulation). That is, a dragger needs to be attached to a node somewhere, and we check intersections to see if the pointer has selected any of the dragger handles. ");
+	          "");
 	I_Method0(const char *, getType,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getType,
@@ -83,7 +83,7 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          Properties::NON_VIRTUAL,
 	          __void__grab__int,
 	          "",
-	          "The grab method selects the closest intersected node and temporarily attaches it to the pointer, allowing it to inherit any translation or rotation offsets.Notes: Only nodes derived from GroupNode can be grabbed.If no node is intersected, the grab won't do anything.The node is re-attached to it's original parent when released, so don't delete the parent in the meantime  param b A boolean grab indicator (1 to grab, 0 to release)  ");
+	          "The grab method selects the closest intersected node and temporarily attaches it to the pointer, allowing it to inherit any translation or rotation offsets.Notes: Only nodes derived from GroupNode can be grabbed.If no node is intersected, the grab won't do anything.The node is re-attached to it's original parent when released, so don't delete the parent in the meantime  param b A boolean grab indicator (1 to grab, 0 to release) ");
 	I_Method1(void, slide, IN, float, f,
 	          Properties::NON_VIRTUAL,
 	          __void__slide__float,

@@ -106,7 +106,7 @@ public:
      * A fake constraint, which can be used to simply report when a collision 
      * occurs. The event reported is the same as that for COLLIDE.
      */
-    enum constraintMode {   BASIC,
+    enum ConstraintMode {   BASIC,
                             DROP,
                             COLLIDE,
                             BOUNCE,
@@ -118,16 +118,16 @@ public:
     virtual void callbackUpdate();
     
     void setTarget(const char *id);
-    const char *getTarget() const { return _target->s_name; }
+    const char *getTarget() const { return target_->s_name; }
     
-    void setConstraintMode(constraintMode m);
-    int getConstraintMode() const { return (int)_mode; };
+    void setConstraintMode(ConstraintMode m);
+    int getConstraintMode() const { return (int)constraintMode_; };
     
     void setCubeSize(float xScale, float yScale, float zScale);
     void setCubeOffset(float x, float y, float z);
 
-    osg::Vec3 getCubeSize() const { return _cubeSize; }
-    osg::Vec3 getCubeOffset() const { return _cubeOffset; }
+    osg::Vec3 getCubeSize() const { return cubeSize_; }
+    osg::Vec3 getCubeOffset() const { return cubeOffset_; }
 
     virtual void setTranslation (float x, float y, float z);
     virtual void translate (float x, float y, float z);
@@ -151,12 +151,12 @@ public:
     
 private:
     
-    enum constraintMode _mode;
+    enum ConstraintMode constraintMode_;
     
-    t_symbol* _target;
+    t_symbol* target_;
 
-    osg::Vec3 _cubeSize;
-    osg::Vec3 _cubeOffset;
+    osg::Vec3 cubeSize_;
+    osg::Vec3 cubeOffset_;
 
     osg::ref_ptr< osg::Drawable > lastDrawable;
     int lastPrimitiveIndex;
