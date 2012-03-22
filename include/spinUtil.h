@@ -146,6 +146,7 @@ std::string getAbsolutePath(const std::string &path);
 
 bool isVideoPath(const std::string &path);
 bool isImagePath(const std::string &path);
+bool isShaderPath(const std::string &path);
 
 std::string getSpinPath(const std::string &path);
 std::vector<char*> getUserArgs();

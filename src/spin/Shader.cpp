@@ -60,6 +60,8 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
+extern pthread_mutex_t sceneMutex;
+
 namespace spin
 {
 
@@ -69,13 +71,13 @@ static bool loadShaderSource(osg::Shader* obj, const std::string& fileName )
    std::string fqFileName = osgDB::findDataFile(fileName);
    if( fqFileName.length() == 0 )
    {
-      std::cout << "File \"" << fileName << "\" not found." << std::endl;
+      std::cout << "Warning: Shader file \"" << fileName << "\" not found." << std::endl;
       return false;
    }
    bool success = obj->loadShaderSourceFromFile( fqFileName.c_str());
    if ( !success  )
    {
-      std::cout << "Couldn't load file: " << fileName << std::endl;
+      std::cout << "Warning: Shader could not be loaded: " << fileName << std::endl;
       return false;
    }
    else
@@ -155,15 +157,15 @@ Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, ini
 	_renderBin = 11;
     _updateRate = 1.0;
 	_lightingEnabled = true;
-    
-    
-   
     _programObject = new osg::Program;
+
+    // NEEDED FOR TESTS:
+    /*
     _vertexObject = new osg::Shader( osg::Shader::VERTEX );
     _fragmentObject = new osg::Shader( osg::Shader::FRAGMENT );
     _programObject->addShader( _fragmentObject );
     _programObject->addShader( _vertexObject );
-    
+    */
 
     // TEST 1
     /*
@@ -172,16 +174,27 @@ Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, ini
     */
 
     // TEST 2
-    osg::Texture3D* noiseTexture = make3DNoiseTexture( 32 /*128*/ );
-    //osg::Texture1D* sineTexture = make1DSineTexture( 32 /*1024*/ );
+    /*
+    osg::Texture3D* noiseTexture = make3DNoiseTexture( 32 ); // 128 );
+    //osg::Texture1D* sineTexture = make1DSineTexture( 32 ); // 1024 );
     
     this->setTextureAttribute(TEXUNIT_NOISE, noiseTexture);
     loadShaderSource( _vertexObject, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/eroded.vert" );
     loadShaderSource( _fragmentObject, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/eroded.frag" );
     this->addUniform( new osg::Uniform("LightPosition", osg::Vec3(0.0f, 0.0f, 4.0f)) );
     this->addUniform( new osg::Uniform("Scale", 1.0f) );
+    this->addUniform( new osg::Uniform("Sine", 1.0f) );
     this->addUniform( new osg::Uniform("sampler3d", TEXUNIT_NOISE) );
     this->addUniform( new osg::Uniform("Offset", osg::Vec3(0.0f, 0.0f, 0.0f)) );
+    */
+    
+    // TEST 3:
+    /*
+    _programObject->setName( "blocky" );
+    loadShaderSource( _vertexObject,   "/Users/mikewoz/src/spinframework/src/Resources/shaders/blocky.vert" );
+    loadShaderSource( _fragmentObject, "/Users/mikewoz/src/spinframework/src/Resources/shaders/blocky.frag" );
+    this->addUniform( new osg::Uniform( "Sine", 0.0f ) );
+    */
     
     this->setAttributeAndModes(_programObject, osg::StateAttribute::ON);
 }
@@ -236,15 +249,45 @@ void Shader::debug()
         std::cout << "   frag shader: null" << std::endl;
     }
     
-    osg::Uniform *u = this->getUniform("Offset");
-    if (u)
+    //typedef std::map< std::string, RefUniformPair > UniformList
+    
+    const osg::StateSet::UniformList uniforms = this->getUniformList();
+ 	osg::StateSet::UniformList::const_iterator uitr;
+    for (uitr=uniforms.begin(); uitr!=uniforms.end(); ++uitr)
     {
-        osg::Vec3 v;
-        if (u->get(v))
-            std::cout << "   offset has vec3: " << stringify(v) << std::endl;
-        else 
-            std::cout << "   offset has UNDEFINED vec3" << std::endl;
-    } else std::cout << "   offset UNDEFINED" << std::endl;
+        const std::string& name = uitr->first;
+        osg::Uniform *u = uitr->second.first;
+        std::cout << "   uniform " << name;
+        
+        osg::Vec3 v3;
+        switch (u->getType())
+        {
+            case osg::Uniform::FLOAT:
+                float f;
+                u->get(f);
+                std::cout << " (type: FLOAT) = " << f;
+                break;
+            case osg::Uniform::FLOAT_VEC3:
+                u->get(v3);
+                std::cout << " (type: VEC3) = " << stringify(v3);
+                break;
+            case osg::Uniform::INT:
+                int i;
+                u->get(i);
+                std::cout << " (type: INT) = " << i;
+                break;
+            case osg::Uniform::BOOL:
+                bool b;
+                u->get(b);
+                std::cout << " (type: BOOL) = " << b;
+                break;
+
+            default:
+                std::cout << " (type: OTHER)";
+                break;
+        }
+        std::cout << std::endl;
+    }
 }
 
 
@@ -252,28 +295,18 @@ void Shader::debug()
 void Shader::setUniform_Float (const char* name, float f)
 {
     osg::Uniform *u = this->getUniform(name);
-    if (u)
-    {
-        std::cout << "set uniform '"<< name << "' = " << f << std::endl;
-        u->set(f);
-    }
-    else std::cout << "oops. could not find uniform '"<< name << "'" << std::endl;
+    if (u) u->set(f);
     
-    BROADCAST(this, "sf", "setUniform_Float", f);
+    BROADCAST(this, "ssf", "setUniform_Float", name, f);
 }
 
 void Shader::setUniform_Vec3 (const char* name, float x, float y, float z)
 {
     osg::Vec3 v = osg::Vec3(x,y,z);
     osg::Uniform *u = this->getUniform(name);
-    if (u)
-    {
-        std::cout << "set uniform '"<< name << "' = " << stringify(v) << std::endl;
-        u->set(v);
-    }
-    else std::cout << "oops. could not find uniform '"<< name << "'" << std::endl;
+    if (u) u->set(v);
     
-    BROADCAST(this, "sfff", "setUniform_Vec3", x, y, z);
+    BROADCAST(this, "ssfff", "setUniform_Vec3", name, x, y, z);
 }
 
 
@@ -284,13 +317,80 @@ void Shader::setPath (const char* newPath)
 	if (_path == std::string(newPath)) return;
 
 	_path = std::string(newPath);
+    
+
 	
 	if (sceneManager->isGraphical())
 	{
+        // remove previous shader:
+        //pthread_mutex_lock(&sceneMutex);
+        if (_vertexObject)
+        {
+            _programObject->removeShader(_vertexObject);
+            _vertexObject = 0;
+        }
+        if (_fragmentObject)
+        {
+            _programObject->removeShader(_fragmentObject);
+            _fragmentObject = 0;
+        }
+        //pthread_mutex_unlock(&sceneMutex);
+        
+        if (_path == "NULL")
+        {
+            std::cout << "Disabling shader '"<< this->id->s_name << "'" << std::endl;
+        }
+        else
+        {
+            // create new shaders:
+            osg::Shader *vertShader = new osg::Shader( osg::Shader::VERTEX );
+            osg::Shader *fragShader = new osg::Shader( osg::Shader::FRAGMENT );
 
-		std::string fullPath = getAbsolutePath(_path);
+            std::string fullPath = getAbsolutePath(_path);
+            std::cout << "Loading shader: " << fullPath << std::endl;
 
-		std::cout << "Loading shader: " << fullPath << std::endl;
+            std::string folderPath = osgDB::getFilePath(fullPath);
+
+            bool vertSuccess = false;
+            bool fragSuccess = false;
+            std::string ext = osgDB::getLowerCaseFileExtension(fullPath);
+            if (ext=="frag")
+            {
+                fragSuccess = loadShaderSource( fragShader, fullPath );
+                vertSuccess = loadShaderSource( vertShader, folderPath+".vert" );
+            }
+            else if (ext=="vert")
+            {
+                vertSuccess = loadShaderSource( vertShader, fullPath );
+                fragSuccess = loadShaderSource( fragShader, folderPath+".frag" );
+            }
+            else
+            {
+                // let's check if the user just passed the base file name (without an extention)
+                vertSuccess = loadShaderSource( vertShader, fullPath+".vert" );
+                fragSuccess = loadShaderSource( fragShader, fullPath+".frag" );
+            }
+            
+            // set name:
+            _programObject->setName(osgDB::getStrippedName(fullPath));
+
+            // add shaders to program:
+            if (vertSuccess)
+            {
+                _vertexObject = vertShader;
+                _programObject->addShader( _vertexObject );
+            }
+            if (fragSuccess)
+            {
+                _fragmentObject = fragShader;
+                _programObject->addShader( _fragmentObject );
+            }
+        }
+
+        // enable shader:
+        //if (vertSuccess && fragSuccess)
+        //    this->setAttributeAndModes(_programObject, osg::StateAttribute::ON);
+        _programObject->dirtyProgram();
 
 
         // set lighting:

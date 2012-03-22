@@ -53,6 +53,7 @@
 
 #include "ImageTexture.h"
 #include "VideoTexture.h"
+#include "Shader.h"
 #include "ShapeNode.h"
 #include "ModelNode.h"
 #include "SharedVideoTexture.h"
@@ -929,7 +930,16 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
         }
     }
 
-    // TODO: shader!
+    // shader
+    else if (isShaderPath(fullPath))
+    {
+        osg::ref_ptr<Shader> shdr = dynamic_cast<Shader*>(createStateSet(newID.c_str(), "Shader"));
+        if (shdr.valid())
+        {
+            shdr->setPath(getRelativePath(fname).c_str());
+            return shdr.get();
+        }
+    }
 
     // otherwise, assume a static image texture:
     else

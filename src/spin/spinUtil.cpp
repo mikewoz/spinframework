@@ -389,7 +389,27 @@ bool isImagePath(const std::string &path)
     return false;
 }
     
-
+bool isShaderPath(const std::string &path)
+{
+    using std::string;
+    string extension = osgDB::getLowerCaseFileExtension(path);
+    if  ((extension=="frag") ||
+         (extension=="vert"))
+    {
+        return true;
+    }
+    
+    // note: for shaders, users are allowed to pass the path without the .frag
+    // or .vert extension. The findDataFile method searches through all OSG data
+    // paths for the file and returns the full path or an empty string:
+    if (osgDB::findDataFile(path+".frag",osgDB::CASE_INSENSITIVE).length())
+        return true;
+    if (osgDB::findDataFile(path+".vert",osgDB::CASE_INSENSITIVE).length())
+        return true;
+        
+    return false;
+}
+    
 /**
  * This checks the file/path name to see there is encoded path information, and
  * if it doesn't we assume the user wants to put it in the SPIN_DIRECTORY
