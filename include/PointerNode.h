@@ -90,18 +90,12 @@ class PointerNode : public RayNode
 
         virtual void callbackUpdate();
 
-        void enableDragger();
-        void disableDragger();
 
         ReferencedNode *getNodeFromIntersections();
         //void computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T);
 
-        void setType (const char *s);
-        void highlight (int b);
-        void manipulate (int b);
 
-        const char* getType() const { return draggerType.c_str(); }
-        int getHighlight() const { return (int) dragger.valid(); }
+        void manipulate (int b);
         int getManipulate() const { return (int) doManipulation; }
 
         /**
@@ -139,6 +133,16 @@ class PointerNode : public RayNode
          */
         virtual std::vector<lo_message> getState() const;
 
+    protected:
+        /**
+         * Checks intersections for draggers and if so, we apply the drag events
+         */
+        void checkIntersections(osg::Vec3 start, osg::Vec3 end);
+
+        /**
+         * Reports the list of intersected nodes (server-side only)
+         */
+        void reportIntersections();
 
     private:
 
@@ -154,19 +158,21 @@ class PointerNode : public RayNode
         t_symbol *previousParent;
 
         // dragger stuff:
-        std::string draggerType;
         bool doManipulation;
         osg::ref_ptr<ReferencedNode> targetNode;
 
         osg::Matrix origMatrix;
         osg::Matrix previousMatrix;
-
+        
+        /*
         osg::ref_ptr<osgManipulator::Dragger> dragger;
         osg::ref_ptr<osgManipulator::Selection> selection;
         osg::ref_ptr<osgManipulator::CommandManager> cmdMgr;
-
+        */
+        
         osg::ref_ptr<osgGA::GUIEventAdapter> ea;
         PointerNodeActionAdapter aa;
+        
         osgManipulator::PointerInfo _pointer;
 };
 
