@@ -206,6 +206,7 @@ void spinBaseContext::addCommandLineOptions(osg::ArgumentParser *arguments)
     arguments->getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
     arguments->getApplicationUsage()->addCommandLineOption("--scene-id <id>", "Specify the id of the SPIN scene (Default: default)");
     arguments->getApplicationUsage()->addCommandLineOption("--disable-discovery", "Disables the multicast discovery service");
+    arguments->getApplicationUsage()->addCommandLineOption("--spatosc <translator> <URL>", "Enables SPIN's internal SpatOSC scene. Example: --spatosc BasicTranslator osc.tcp://localhost:18033");
 
     // TODO: add discovery addr <host> <port> (defaults is MULTICAST_GROUP:INFO_UDP_PORT)
     // for a client, this would be --recv-udp-discovery <host> <port>
