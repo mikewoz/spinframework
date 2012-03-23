@@ -63,6 +63,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     MediaManager.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    ParticleSystem.cpp \
     PointerNode.cpp \
     RayNode.cpp \
     ReferencedStateSet.cpp \
@@ -112,12 +113,14 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/nodeVisitors.h \
     $(top_srcdir)/include/oscParser.h \
     $(top_srcdir)/include/osgUtil.h \
+    $(top_srcdir)/include/ParticleSystem.h \
     $(top_srcdir)/include/PointerNode.h \
     $(top_srcdir)/include/RayNode.h \
     $(top_srcdir)/include/ReferencedNode.h \
     $(top_srcdir)/include/ReferencedStateSet.h \
     $(top_srcdir)/include/ReporterNode.h \
     $(top_srcdir)/include/SceneManager.h \
+    $(top_srcdir)/include/Shader.h \
     $(top_srcdir)/include/ShapeNode.h \
     $(top_srcdir)/include/SharedVideoTexture.h \
     $(top_srcdir)/include/SoundConnection.h \

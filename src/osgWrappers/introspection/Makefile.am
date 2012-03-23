@@ -19,6 +19,7 @@ libSPINwrappers_la_SOURCES = \
     MeasurementNode.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    ParticleSystem.cpp \
     PointerNode.cpp \
     RayNode.cpp \
     ReferencedNode.cpp \
