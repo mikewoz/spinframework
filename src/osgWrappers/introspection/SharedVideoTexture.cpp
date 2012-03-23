@@ -57,7 +57,7 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          Properties::VIRTUAL,
 	          __void__updateCallback,
 	          "",
-	          "");
+	          "This callback occurs every frame to update the state with any parameter changes. ");
 	I_Method0(void, consumeFrame,
 	          Properties::NON_VIRTUAL,
 	          __void__consumeFrame,

@@ -111,52 +111,52 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getTextValue,
 	          "",
-	          "");
+	          "Returns a string with the text associated to this node. ");
 	I_Method0(std::string, getTextString,
 	          Properties::NON_VIRTUAL,
 	          __std_string__getTextString,
 	          "",
-	          "");
+	          "Returns a string with the text associated to this node. ");
 	I_Method0(const char *, getFont,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getFont,
 	          "",
-	          "");
+	          "Returns a string indicating the font of the text associated to this node. ");
 	I_Method0(float, getSize,
 	          Properties::NON_VIRTUAL,
 	          __float__getSize,
 	          "",
-	          "");
+	          "Returns a float indicating the size of the text associated to this node. ");
 	I_Method0(osg::Vec4, getColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getColor,
 	          "",
-	          "");
+	          "Returns the color (in RGBA values) of the text associated to this node. ");
 	I_Method0(osg::Vec4, getBgColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getBgColor,
 	          "",
-	          "");
+	          "Returns the background color of the text box in RGBA values. ");
 	I_Method0(float, getMargin,
 	          Properties::NON_VIRTUAL,
 	          __float__getMargin,
 	          "",
-	          "");
+	          "Returns a float indicating the margin size of the text box. ");
 	I_Method0(int, getBillboard,
 	          Properties::NON_VIRTUAL,
 	          __int__getBillboard,
 	          "",
-	          "");
+	          "Returns the currently set billboarding type with respect to the billboardType enum. ");
 	I_Method0(int, getDecoration,
 	          Properties::NON_VIRTUAL,
 	          __int__getDecoration,
 	          "",
-	          "");
+	          "Returns the currently set decoration type (shadows or outlines) with respect to the decorationType enum. ");
 	I_Method0(int, getBackround,
 	          Properties::NON_VIRTUAL,
 	          __int__getBackround,
 	          "",
-	          "");
+	          "Returns the currently set background type with respect to the choices in the backgroundType enum. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

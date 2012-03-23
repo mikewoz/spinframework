@@ -31,7 +31,7 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	          Properties::VIRTUAL,
 	          __void__updateCallback,
 	          "",
-	          "");
+	          "This callback occurs every frame to update the state with any parameter changes. ");
 	I_Method0(const char *, getPath,
 	          Properties::PURE_VIRTUAL,
 	          __C5_char_P1__getPath,
@@ -66,7 +66,7 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	          Properties::VIRTUAL,
 	          __void__stateDump__lo_address,
 	          "",
-	          "");
+	          "StateDump() is a request to broadcast the node state via SceneMangager. ");
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 0);

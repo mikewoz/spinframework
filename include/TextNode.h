@@ -112,9 +112,8 @@ public:
 						wireframe. */
     };
 
-
     virtual void setContext    (const char *newvalue);
-    
+
     /**
      * Accepts user-entered string for the node's text.
      */
@@ -172,18 +171,58 @@ public:
 
     void setBackground        (backgroundType t);
 
-
-    //const char *getTextValue() { return textLabel->getText().createUTF8EncodedString().c_str(); }
+    /**
+     * Returns a string with the text associated to this node.
+     */
     const char    *getTextValue() const   { return _text.c_str(); }
+
+    /**
+     * Returns a string with the text associated to this node.
+     */
     std::string     getTextString() const  { return _text; }
+
+    /**
+     * Returns a string indicating the font of the text associated to this node.
+     */
     const char    *getFont() const        { return _font.c_str(); }
+
+    /**
+     * Returns a float indicating the size of the text associated to this node.
+     */
+
     float         getSize() const        { return _size; }
+
+    /**
+     * Returns the color (in RGBA values) of the text associated to this node.
+     */
     osg::Vec4     getColor() const        { return _color; };
+
+    /**
+     * Returns the background color of the text box in RGBA values.
+     */
     osg::Vec4     getBgColor() const        { return _bgColor; }
+
+    /**
+     * Returns a float indicating the margin size of the text box.
+     */
     float         getMargin() const        { return _margin; }
 
+    /**
+     * Returns the currently set billboarding type with respect to the
+     * billboardType enum.
+     */
     int             getBillboard()  const { return (int)_billboard; }
+
+    /**
+     * Returns the currently set decoration type (shadows or outlines) with
+     * respect to the decorationType enum.
+     */
     int             getDecoration() const { return (int)_decoration; }
+
+    /**
+     * Returns the currently set background type with respect to the choices
+     * in the backgroundType enum.
+     */
     int             getBackround() const   { return (int)_background; }
 
     /**
