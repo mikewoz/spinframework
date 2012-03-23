@@ -86,13 +86,17 @@ spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(sp
 #endif
 */
   
-    
+   
     osgDB::FilePathList osgLibPaths;
-    osgLibPaths.push_back("/usr/local/lib/osgPlugins-"+std::string(osgGetVersion()));
     osgLibPaths.push_back("/opt/local/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/lib64/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/local/lib/osgPlugins-"+std::string(osgGetVersion()));
+    osgLibPaths.push_back("/usr/local/lib64/osgPlugins-"+std::string(osgGetVersion()));
     osgDB::Registry::instance()->setLibraryFilePathList(osgLibPaths);
+
+
  
-    
     // Load the SPIN library:
     /*
     osgDB::Registry *reg = osgDB::Registry::instance();

@@ -9,7 +9,7 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/tinyxml
 
-LDADD = $(top_builddir)/src/spin/libSPIN.la
+LDADD = $(top_builddir)/src/spin/libspin_@SPIN_API_VERSION@.la
 
 AM_LDFLAGS = \
 	$(BOOST_FILESYSTEM_LIB) \
