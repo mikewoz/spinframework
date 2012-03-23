@@ -58,7 +58,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __void__connectSource__C5_char_P1,
 	          "",
-	          "");
+	          "Sets the current node as a sink to the specified node. ");
 	I_Method1(void, disconnect, IN, const char *, snk,
 	          Properties::NON_VIRTUAL,
 	          __void__disconnect__C5_char_P1,

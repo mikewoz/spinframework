@@ -37,17 +37,17 @@ BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	          Properties::NON_VIRTUAL,
 	          __void__setCutoff__float,
 	          "",
-	          "");
+	          "Sets the spread angle (in degrees) of the emitted light. 0 gives a single laser-pointer style beam while 90 gives a hemisphere of light. The range is 0-90, but a special value of 180 will turn the spotlight into an omnidirectional light. ");
 	I_Method1(void, setExponent, IN, float, exponent,
 	          Properties::NON_VIRTUAL,
 	          __void__setExponent__float,
 	          "",
-	          "");
+	          "This value defines the intensity of the light toward the edges of the cone. As objects move from the center of the spotlight to the edges, we have the option of attenuating the intensity of the light on the surface of the objects. ");
 	I_Method1(void, setAttenuation, IN, float, attenuation,
 	          Properties::NON_VIRTUAL,
 	          __void__setAttenuation__float,
 	          "",
-	          "");
+	          "This parameter controls the amount of attenuation that occurs as a light moves away from its source. A value of 0 means no attenuation, so light intensity will be the same for any distance. A value of 1 means full linear attenuation. ");
 	I_Method4(void, setAmbient, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setAmbient__float__float__float__float,
@@ -72,17 +72,17 @@ BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	          Properties::NON_VIRTUAL,
 	          __float__getCutoff,
 	          "",
-	          "");
+	          "Returns the currently set cutoff value for the given light source. See setCutoff. ");
 	I_Method0(float, getExponent,
 	          Properties::NON_VIRTUAL,
 	          __float__getExponent,
 	          "",
-	          "");
+	          "Returns the currently set exponent value for the given light source. See setExponent. ");
 	I_Method0(float, getAttenuation,
 	          Properties::NON_VIRTUAL,
 	          __float__getAttenuation,
 	          "",
-	          "");
+	          "Returns the currently set attenuation value for the given light source. See setAttenuation. ");
 	I_Method0(osg::Vec4, getAmbient,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getAmbient,

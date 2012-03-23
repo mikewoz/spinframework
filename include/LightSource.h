@@ -68,10 +68,31 @@ public:
 
     void setVisible        (int visibilityFlag);
 
-
+    /**
+     * Sets the spread angle (in degrees) of the emitted light. 0 gives a single
+     * laser-pointer style beam while 90 gives a hemisphere of light. The range
+     * is 0-90, but a special value of 180 will turn the spotlight into an
+     * omnidirectional light.
+     */
 
     void setCutoff        (float cutoff);
+
+    /**
+     * This value defines the intensity of the light toward the edges of the
+     * cone. As objects move from the center of the spotlight to the edges, we
+     * have the option of attenuating the intensity of the light on the surface
+     * of the objects.
+     */
+
     void setExponent    (float exponent);
+
+    /**
+     * This parameter controls the amount of attenuation that occurs as a light
+     * moves away from its source. A value of 0 means no attenuation, so light
+     * intensity will be the same for any distance. A value of 1 means full
+     * linear attenuation.
+     */
+
     void setAttenuation    (float attenuation);
 
     /**
@@ -97,8 +118,26 @@ public:
      */
 
     int getVisible() const;
+
+    /**
+     * Returns the currently set cutoff value for the given light source. See
+     * setCutoff.
+     */
+
     float getCutoff() const;
+
+    /**
+     * Returns the currently set exponent value for the given light source. See
+     * setExponent.
+     */
+
     float getExponent() const;
+
+    /**
+     * Returns the currently set attenuation value for the given light source.
+     * See setAttenuation.
+     */
+
     float getAttenuation() const;
 
     /**
