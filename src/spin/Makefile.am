@@ -13,7 +13,7 @@ AM_CPPFLAGS = \
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
-lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
+lib_LTLIBRARIES = libspin-@SPIN_API_VERSION@.la
 python_LTLIBRARIES = libSPINPyWrap.la
 
 libspin_@SPIN_API_VERSION@_la_LIBADD = \
@@ -143,7 +143,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 #libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libspin_@SPIN_API_VERSION@.la \
+libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
@@ -162,74 +162,18 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
+spinserver_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS)
 
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
+spinviewer_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
 
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
+spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
 
 ###############################################################################
 # CUSTOM targets:
-
-#OSG_VER = $(shell osgversion --so-number)
-#OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
-
-#OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer cppintrospection
-
-# WARNING: the .app generation script pulls some libs (eg, libspin_@SPIN_API_VERSION@) from /usr/local
-# so you must do a 'make install' before this will work (TODO: fix this)
-
-spinviewer.app: spinviewer$(EXEEXT)
-	@echo "\n--------------- Building $@: ---------------" 
-	-mkdir $@    
-	-mkdir $@/Contents
-	-mkdir $@/Contents/Frameworks
-	-mkdir $@/Contents/libs
-	-mkdir $@/Contents/MacOS
-	-mkdir $@/Contents/Resources
-	-mkdir $@/Contents/Resources/fonts
-	-mkdir $@/Contents/Resources/images
-	-mkdir $@/Contents/Resources/scripts
-	-mkdir $@/Contents/Resources/English.lproj
-	sed -e "s/IDENTIFIER/`echo ./ | sed -e 's,\.\./,,g' | sed -e 's,/,.,g'`/" \
-	-e "s/EXECUTABLE/$</" \
-	-e "s/VERSION/$(VERSION)/" \
-	spinviewer.plist.in >$@/Contents/Info.plist
-	echo -n 'APPL????' > $@/Contents/PkgInfo
-	cp /usr/local/bin/spinviewer $@/Contents/MacOS
-	../../util/dylibbundler/dylibbundler -of -b -x $@/Contents/MacOS/spinviewer -d $@/Contents/libs
-
-#	cp ../Resources/fonts/*.ttf $@/Contents/Resources/fonts
-#	cp ../Resources/images/*.icns ../Resources/images/*.xpm ../Resources/images/*.gif ../Resources/images/*.png $@/Contents/Resources/images
-#	cp ../Resources/scripts/*.py $@/Contents/Resources/scripts
-
-#cp .libs/spinviewer $@/Contents/MacOS
-
-#	install_name_tool -change libOpenThreads.$(OPENTHREADS_VER).dylib /usr/local/lib/libOpenThreads.$(OPENTHREADS_VER).dylib $@/Contents/MacOS/spinviewer
-#-cp -R /usr/local/lib/osgPlugins-* $@/Contents/libs
-#-cp /usr/local/lib/libosg*.dylib $@/Contents/libs
-#-cp /usr/local/lib/libOpenThreads.*.dylib $@/Contents/libs
-
-#install_name_tool -change libosg.55.dylib @executable_path/../libs/libosg.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgGA.55.dylib @executable_path/../libs/libosgGA.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgSim.55.dylib @executable_path/../libs/libosgSim.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgDB.55.dylib @executable_path/../libs/libosgDB.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgManipulator.55.dylib @executable_path/../libs/libosgManipulator.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgText.55.dylib @executable_path/../libs/libosgText.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgUtil.55.dylib @executable_path/../libs/libosgUtil.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgFX.55.dylib @executable_path/../libs/libosgFX.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgParticle.55.dylib @executable_path/../libs/libosgParticle.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgViewer.55.dylib @executable_path/../libs/libosgViewer.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libcppintrospection.55.dylib @executable_path/../libs/libcppintrospection.55.dylib $@/Contents/MacOS/spinviewer
-
-#install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinviewer
-#-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
-#-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
-#-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
 
 doc:
 	./spindocgenerator

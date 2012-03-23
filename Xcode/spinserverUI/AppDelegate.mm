@@ -42,6 +42,7 @@
 
 #import "AppDelegate.h"
 #include "spinApp.h"
+#include "spinUtil.h"
 #include "SceneManager.h"
 #include "spinServerContext.h"
 #ifdef WITH_SPATOSC
@@ -76,10 +77,51 @@
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(handleLog:) name: NSFileHandleReadCompletionNotification object: pipeReadHandle];
     [pipeReadHandle readInBackgroundAndNotify];
      
+    
+	// *************************************************************************
+    // If no command line arguments were passed, check if there is an args file
+    // at ~/.spinFramework/args and override argc and argv with those:
+    std::vector<char*> newArgs = spin::getUserArgs();
+    if (newArgs.size() > 1)
+    {
+        int argc;
+        char **argv;
+
+        newArgs.insert(newArgs.begin(), "fake");
+        argc = (int)newArgs.size()-1;
+        argv = &newArgs[0];         
+            
+        // PARSE ARGUMENTS::
+            
+        osg::ArgumentParser arguments(&argc,argv);
+            
+        if (!server.parseCommandLineOptions(&arguments))
+            std::cout << "spinserver: error parsing arguments" << std::endl;
+            
+        // remaining arguments are assumed to be scene elements to be loaded (.xml)
+        std::vector<std::string>::iterator arg;
+        for (int i=1; i<argc; i++) //arg=arguments.begin(); arg!=arguments.end(); ++arg)
+        {
+            if (arguments[i][0]!='-')
+            {
+                // not an option so assume string is a filename
+                spin::spinApp::Instance().sceneManager->loadXML(arguments[i]);
+            } else i++;
+        }
+        
+        arguments.reportRemainingOptionsAsUnrecognized();
+        if (arguments.errors()) arguments.writeErrorMessages(std::cout);
+
+    }
+
+    // *************************************************************************
     // for now, hardcode one spatosc translator in the scene:
 #ifdef WITH_SPATOSC
-    spin::spinApp::Instance().audioScene->addTranslator("spatosc01", "BasicTranslator", "127.0.0.1", "18032");
+    //spin::spinApp::Instance().audioScene->addTranslator("spatosc01", "BasicTranslator", "127.0.0.1", "18032");
+    spin::spinApp::Instance().audioScene->addTranslator("spatosc01", "BasicTranslator", "osc.tcp://localhost:18033");
     spin::spinApp::Instance().hasAudioRenderer = true;
+    //spin::spinApp::Instance().audioScene->debugPrint();
+
 #endif
     
     server.start();

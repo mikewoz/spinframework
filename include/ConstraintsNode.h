@@ -138,20 +138,21 @@ public:
      */
 
     const char *getTarget() const { return _target->s_name; }
-    
+
     /**
      * Sets the node's constraint mode, based on the types in constrainMode
      * enum (see enum for details)
      */
 
-    void setConstraintMode(constraintMode m);
+    void setConstraintMode(ConstraintMode m);
 
     /**
      * @return int which is converted to the type of constraint currently
      * set on the node (drawn from constraintMode enum)
      */
 
-    int getConstraintMode() const { return (int)_mode; };
+    int getConstraintMode() const { return (int)constraintMode_; };
+
     
     /**
      * Sets the size of the imaginary cube beyond which the constrained node
@@ -171,14 +172,15 @@ public:
      * @return Vec3 indicating the size of the cubic BASIC constraint
      */
 
-    osg::Vec3 getCubeSize() const { return _cubeSize; }
+    osg::Vec3 getCubeSize() const { return cubeSize_; }
 
     /**
      * @return Vec indicating the offset of the cubic BASIC constraint from its
      * local coordinate system.
      */
 
-    osg::Vec3 getCubeOffset() const { return _cubeOffset; }
+    osg::Vec3 getCubeOffset() const { return cubeOffset_; }
+
 
     virtual void setTranslation (float x, float y, float z);
     virtual void translate (float x, float y, float z);
@@ -202,12 +204,12 @@ public:
     
 private:
     
-    enum constraintMode _mode;
+    enum ConstraintMode constraintMode_;
     
-    t_symbol* _target;
+    t_symbol* target_;
 
-    osg::Vec3 _cubeSize;
-    osg::Vec3 _cubeOffset;
+    osg::Vec3 cubeSize_;
+    osg::Vec3 cubeOffset_;
 
     osg::ref_ptr< osg::Drawable > lastDrawable;
     int lastPrimitiveIndex;

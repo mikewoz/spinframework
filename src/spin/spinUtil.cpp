@@ -102,12 +102,12 @@ std::string getMyIPaddress()
 					//printf("Internet Address: [%s] %s \n", tempIfAddr->ifa_name, IPaddress.c_str());
 				
 					// TODO: for now we just return the first address found. Eventually, we could ask for a specific address (eg, "eth0" vs "eth1")
-					break;					
+					return IPaddress;				
 				}
 			}
 		}
 	}
-	return IPaddress;
+	return std::string("127.0.0.1");
 }
 
 std::string getMyBroadcastAddress()
@@ -159,13 +159,34 @@ std::string stringify(int x)
     if (!(o << x)) return "";
     return o.str();
 }
+    
+std::string stringify(osg::Quat q)
+{
+    std::ostringstream o;
+    o << q.x()<<" "<<q.y()<<" "<<q.z()<<" "<<q.w();
+    if (!o) return "0 0 0 0";
+    return o.str();
+}
+
+std::string stringify(osg::Vec3f v)
+{
+    std::ostringstream o;
+    o << v.x()<<" "<<v.y()<<" "<<v.z();
+    if (!o) return "0 0 0";
+    return o.str();
+}
+
+std::string stringify(osg::Vec3d v)
+{
+    osg::Vec3f vf(v);
+    return stringify(vf);
+}
 
 std::string leadingSpaces(int n)
 {
 	//return std::string(n, '\t');
 	return std::string(n, ' ');
 }
-
 
 std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
 {
@@ -368,7 +389,27 @@ bool isImagePath(const std::string &path)
     return false;
 }
     
-
+bool isShaderPath(const std::string &path)
+{
+    using std::string;
+    string extension = osgDB::getLowerCaseFileExtension(path);
+    if  ((extension=="frag") ||
+         (extension=="vert"))
+    {
+        return true;
+    }
+    
+    // note: for shaders, users are allowed to pass the path without the .frag
+    // or .vert extension. The findDataFile method searches through all OSG data
+    // paths for the file and returns the full path or an empty string:
+    if (osgDB::findDataFile(path+".frag",osgDB::CASE_INSENSITIVE).length())
+        return true;
+    if (osgDB::findDataFile(path+".vert",osgDB::CASE_INSENSITIVE).length())
+        return true;
+        
+    return false;
+}
+    
 /**
  * This checks the file/path name to see there is encoded path information, and
  * if it doesn't we assume the user wants to put it in the SPIN_DIRECTORY
@@ -396,8 +437,31 @@ std::string getSpinPath(const std::string &path)
 
 	return filename;
 }
-	
-
+    
+std::vector<char*> getUserArgs() 
+{
+    std::vector<char*> args;
+    
+    std::string path = SPIN_DIRECTORY + "/args";
+    if (fileExists(path))
+    {
+        std::stringstream ss;
+        ss << std::ifstream( path.c_str() ).rdbuf();
+        
+        std::string token;
+        while (ss >> token)
+        {
+            char *arg = new char[token.size() + 1];
+            copy(token.begin(), token.end(), arg);
+            arg[token.size()] = '\0';
+            args.push_back(arg);
+        }
+    }
+    
+    args.push_back(0); // needs to end with a null item
+    return args;
+}
+    
 // *****************************************************************************
 // gensym stuff
 

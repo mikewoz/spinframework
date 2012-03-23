@@ -1326,6 +1326,7 @@ int run(int argc, char **argv)
 // *****************************************************************************
 int main(int argc, char **argv)
 {
+    /*
     // *************************************************************************
     // If no command line arguments were passed, check if there is an args file
     // at ~/.spinFramework/args and override argc and argv with those:
@@ -1363,12 +1364,24 @@ int main(int argc, char **argv)
             std::cout << "Warning: cannot read arguments from " << SPIN_DIRECTORY+"/args. Reason: " << e.what() << std::endl;
         }
     }
-
+     */
     
     
-    try {
-        // Aug 19 2010:tmatth: Tried this to make multithreading work, didn't help
-        // osg::Referenced::setThreadSafeReferenceCounting(true);
+    // *************************************************************************
+    // If no command line arguments were passed, check if there is an args file
+    // at ~/.spinFramework/args and override argc and argv with those:
+    std::vector<char*> newArgs = spin::getUserArgs();
+    if ((argc==1) && (newArgs.size() > 1))
+    {
+        // need first arg (command name):
+        newArgs.insert(newArgs.begin(), argv[0]);
+        argc = (int)newArgs.size()-1;
+        argv = &newArgs[0];
+    }
+    
+    
+    try
+    {
         int result = run(argc, argv);
         std::cout << "\nspinviewer exited normally." << std::endl;
         return result;

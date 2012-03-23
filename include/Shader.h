@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -39,26 +39,86 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef MAINPAGE_H_
-#define MAINPAGE_H_
+#ifndef __Shader_H
+#define __Shader_H
 
-/** @mainpage SPIN (Spatial Interaction) Framework
-*
-*
-* @section intro SPIN Framework API Documentation
-*
-* This documentation is generated from source using Doxygen.
-* 
-* For class API documentation, see the
-* @htmlonly <a href="annotated.html">Class List</a>@endhtmlonly
-*
-* For the full list of OSC messages accepted by SPIN, see the
-* @htmlonly <a href="oscprotocol.html">OSC Protocol Documentation</a>@endhtmlonly
-* 
-*/
+class SceneManager;
 
-/** @page oscprotocol OSC Protocol
+#include <osg/Timer>
+namespace osg {
+    class Program;
+    class Shader;
+    class Uniform;
+}
+
+#include <string>
+#include <lo/lo_types.h>
+#include <vector>
+#include <osg/ref_ptr>
+#include "ReferencedStateSet.h"
+
+namespace spin
+{
+
+/**
+ * \brief A wrapper for GLSL shaders
+ *
  */
+class Shader : public ReferencedStateSet
+{
 
+public:
+
+    Shader(SceneManager *sceneManager, const char *initID);
+    ~Shader();
+
+    virtual void updateCallback();
+    virtual void debug();
+
+    void setUniform_Float (const char* name, float f);
+    void setUniform_Vec3 (const char* name, float x, float y, float z);
+
+    /**
+     * Creates a texture from a path on disk.
+     */
+    void setPath (const char* newPath);
+    const char *getPath() const { return _path.c_str(); }
+
+    /**
+     * Set whether the texture is influenced by lighting
+     */
+    void setLighting(int i);
+    int getLighting() const { return (int)_lightingEnabled; }
+
+    /**
+     * Set the render bin for this texture. The higher the number, the later it
+     * gets processed (ie, it appears on top). Default renderBin = 11
+     */
+    void setRenderBin (int i);
+    int getRenderBin() const { return _renderBin; }
+
+
+
+    // must reimplement
+    virtual std::vector<lo_message> getState() const;
+
+    
+private:
+    
+    osg::ref_ptr<osg::Program> _programObject;
+    osg::ref_ptr<osg::Shader> _vertexObject;
+    osg::ref_ptr<osg::Shader> _fragmentObject;
+    
+    std::string _path;
+    
+    float _updateRate; // seconds
+    
+    osg::Timer_t lastTick;
+
+    bool _lightingEnabled;
+    int  _renderBin;
+};
+
+} // end of namespace spin
 
 #endif

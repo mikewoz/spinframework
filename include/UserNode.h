@@ -89,7 +89,7 @@ class UserNode : public ConstraintsNode
          * the nodepath has changed, so we override updateNodePath() and set a
          * nodepathUpdate flag for the manipulator to see.
          */
-        virtual void updateNodePath();
+        virtual void updateNodePath(bool updateChildren);
         bool nodepathUpdate;
         
         // SET methods:
@@ -121,13 +121,40 @@ class UserNode : public ConstraintsNode
         * If we attach geometry under this, the camera will point at the center
         * of that geometry instead.
         */
-        osg::Group *getCameraAttachmentNode() const { return
-        	cameraAttachmentNode; }
+
+        osg::PositionAttitudeTransform *getCameraAttachmentNode() const
+        { return cameraAttachmentNode_.get(); }
+        osg::PositionAttitudeTransform *getCameraOffsetNode() const
+        { return cameraOffsetNode_.get(); }
+        
 
         /**
-         * Pings the server.
+         * Set the camera offset (from the UserNode's local origin). The default
+         * is (0,0,0), meaning that the camera position is exactly aligned with
+         * the UserNode.
          */
-        
+        void setCameraOffset(float x, float y, float z);
+        osg::Vec3 getCameraOffset() const { return
+        	cameraOffsetNode_->getPosition(); }
+
+        /**
+         * Set's the (local) orientation of the camera. The default is looking
+         * along the +Y axis with +Z up and +X to the right.
+         */
+        void setCameraOrientation (float pitch, float roll, float yaw);
+        osg::Vec3 getCameraOrientation() const { return eulers_; }
+
+        /**
+         * Provides a mechanism to set the orientation with a quaternion
+         */
+        void setCameraOrientationQuat (float x, float y, float z, float w);
+        osg::Quat getCameraOrientationQuat() const
+        { return cameraAttachmentNode_->getAttitude(); }
+
+		/**
+		 * Pings the server.
+		 */
+
         void ping();
 
         /**
@@ -150,9 +177,11 @@ class UserNode : public ConstraintsNode
         bool ping_;
         osg::Timer_t lastPing_;
         std::string description_;
+        
+        osg::ref_ptr<osg::PositionAttitudeTransform> cameraAttachmentNode_;
+        osg::ref_ptr<osg::PositionAttitudeTransform> cameraOffsetNode_;
 
-        osg::ref_ptr<osg::Group> cameraAttachmentNode;
-
+        osg::Vec3 eulers_;
 };
 
 } // end of namespace spin

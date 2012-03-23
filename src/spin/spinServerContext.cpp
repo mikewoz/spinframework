@@ -67,7 +67,8 @@ spinServerContext::spinServerContext() : syncThreadID(0)
     spinApp &spin = spinApp::Instance();
 
     // override sender and receiver addresses in server mode:
-    lo_rxAddrs_.push_back(lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT));
+    //lo_rxAddrs_.push_back(lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT));
+    lo_rxAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_RX_UDP_PORT));
     lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT));
 
     // now that we've overridden addresses, we can call setContext
@@ -221,7 +222,7 @@ void spinServerContext::createServers()
 #if 0
     // add OSC callback methods to match various incoming messages:
     // oscCallback_debug() will match any path and args:
-    for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++it)
+    for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
     	lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
     }

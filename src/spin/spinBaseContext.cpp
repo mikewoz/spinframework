@@ -703,6 +703,18 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     {   // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
         // invoke the method on the node, and if it doesn't work, then just forward
         // the message:
+        
+        if (0) // debug print
+        {
+            std::cout << "spinBaseContext got node message for: " << s->s_name << " method: " << theMethod << " args:";
+            for (i = 0; i < argc; i++)
+            {
+                std::cout << " ";
+                lo_arg_pp((lo_type)types[i], argv[i]);
+            }
+            std::cout << std::endl;
+        }
+        
         if (! introspector::invokeMethod(classInstance, classType, theMethod, theArgs))
         {
             //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
@@ -734,6 +746,17 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg **argv, int argc,
         void * /*data*/, void * /*user_data*/)
 {
+    if (0) // debug print
+    {
+        std::cout << "spinBaseContext got scene message: " << path << " args:";
+        for (unsigned int i=0; i<argc; i++)
+        {
+            std::cout << " ";
+            lo_arg_pp((lo_type)types[i], argv[i]);
+        }
+        std::cout << std::endl;
+    }
+
     spinApp &spin = spinApp::Instance();
     SceneManager *sceneManager = spin.sceneManager;
 

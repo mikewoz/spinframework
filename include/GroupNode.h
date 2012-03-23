@@ -48,9 +48,10 @@
 
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
+#include <osg/MatrixTransform>
 #include <osg/Timer>
 #include <osg/ClipNode>
-
+#include <osgManipulator/Dragger>
 #include <vector>
 
 namespace spin
@@ -85,6 +86,14 @@ public:
     enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
     enum velocityMode { TRANSLATE, MOVE };
     
+    enum OrientationMode
+    {
+        NORMAL,
+        POINT_TO_TARGET,
+        POINT_TO_TARGET_CENTROID,
+        POINT_TO_ORIGIN
+    };
+    
     virtual void callbackUpdate();
 
 
@@ -99,8 +108,11 @@ public:
     virtual void updateNodePath(bool updateChildren = true);
 
     void mouseEvent (int event, int keyMask, int buttonMask, float x, float y);
+
     void event (int event, const char* userString, float eData1, float eData2,
     		float x, float y, float z);
+	void setLock(const char* userString, int lock);
+
 
     virtual void debug();
     
@@ -120,6 +132,9 @@ public:
      */
     virtual void setTranslation (float x, float y, float z);
 
+    void setOrientationMode(OrientationMode m);
+    int getOrientationMode() const { return (int)orientationMode_; };
+
     /**
      * The local orientation offset for this node with respect to it's parent
      */
@@ -129,6 +144,8 @@ public:
      * Set the orientation offset as a quaternion
      */
     virtual void setOrientationQuat (float x, float y, float z, float w);
+
+    void applyOrientationMode();
 
     /**
      * A grouped scale operation
@@ -186,11 +203,16 @@ public:
     virtual void rotate (float pitch, float roll, float yaw);
 
 
+    virtual void setManipulator(const char *manipulatorType);
+    const char* getManipulator() const { return _manipulatorType.c_str(); }
+    
+    
     int getReportMode() const { return (int) _reportMode; };
     int getInteractionMode() const { return (int) _interactionMode; };
     osg::Vec3 getClipping() const { return _clipping; };
     osg::Vec3 getTranslation() const { return mainTransform->getPosition(); };
     osg::Vec3 getOrientation() const { return _orientation; };
+    osg::Quat getOrientationQuat() const { return mainTransform->getAttitude(); };
     osg::Vec3 getScale() const { return mainTransform->getScale(); };
     osg::Vec3 getVelocity() const { return _velocity; };
     int getVelocityMode() const { return (int) _velocityMode; };
@@ -230,14 +252,16 @@ public:
 
 
 
-
+    osg::MatrixTransform *getManipulatorTransform() { return manipulatorTransform.get(); }
 
 protected:
 
     osg::ref_ptr<UserNode> owner;
 
     osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
-
+    osg::ref_ptr<osg::MatrixTransform> manipulatorTransform;
+    
+    osg::ref_ptr<osgManipulator::Dragger> dragger;
     
     interactionMode _interactionMode;
     std::vector<osg::Vec4> _trajectory;
@@ -251,6 +275,8 @@ protected:
     osg::Vec3 _globalScale;
     float _globalRadius;
 
+    enum OrientationMode orientationMode_;
+    t_symbol* orientationTarget_;
     osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
 
     osg::Vec3 _velocity;
@@ -258,12 +284,25 @@ protected:
     osg::Vec3 _spin;
     float _damping;
     
+    std::string _manipulatorType;
+    
 private:
 
     osg::Timer_t lastTick;
 
 };
 
+    
+class DraggerCallback : public osgManipulator::DraggerTransformCallback
+{
+
+public:
+    DraggerCallback(GroupNode* g);
+    bool receive(const osgManipulator::MotionCommand& command);
+private:
+    GroupNode *groupNode;
+};
+    
 } // end of namespace spin
 
 #endif

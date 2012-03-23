@@ -48,6 +48,7 @@ namespace osg {
 }
 
 #include "ReferencedNode.h"
+//#include "GroupNode.h"
 
 namespace spin
 {
@@ -124,7 +125,7 @@ public:
     * (roll is not defined). So we specify the Y_AXIS.
     */
 
-    osg::Quat getOrientation(int index) const;
+    osg::Quat getOrientation(float index) const;
 
     /** We allow the index to be a float, so position can be interpolated between
     * two indices:
@@ -137,7 +138,7 @@ public:
      * This is handled using a value in the range 0 to 1.
      */
 
-    void setCurrentIndex (float newValue);
+    void setIndex (float newValue);
 
     /**
      * Sets the index to the vertex previous to the current index in the contour
@@ -255,11 +256,25 @@ public:
 
     osg::Vec4 getColor() const { return _color;  }
     
-    /**
-     * Draws the contour according to the parameters set, i.e. contour type,
-     * color, number of vertices.
+
+
+     /**
+      * Set whether the contour is influenced by lighting
      */
-    
+    void setLighting(int i);
+
+    /**
+     * Returns a boolean indicating whether the contour is affected by
+     * lighting.
+     */
+
+    int getLighting() const { return (int)_lightingEnabled; }
+
+	/**
+	 * Draws the contour according to the parameters set, i.e. contour type,
+	 * color, number of vertices.
+	 */
+
     void draw();
     
 
@@ -293,6 +308,7 @@ private:
 
     
     osg::Vec4 _color;
+    bool _lightingEnabled;
     
     ContourTypeEnum _lineType;
     float _thickness;

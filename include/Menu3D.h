@@ -82,7 +82,7 @@ public:
     int getEnabled() const { return enabled_; }
     
     /**
-     * Add an item (TextNode) to the list
+     * Add an item (TextNode) to the list (server-side only)
      */
     void addItem (const char *itemText);
 

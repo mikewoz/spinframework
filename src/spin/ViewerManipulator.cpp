@@ -70,6 +70,8 @@ ViewerManipulator::ViewerManipulator()
 	this->raw = false;
 	this->picker = false;
 	this->mover = true;	
+    
+    manipulatorKey = false;
 	
 	// set up user node tracker:
 	setTrackerMode(  osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION );
@@ -144,10 +146,12 @@ bool ViewerManipulator::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActio
 	}
 	
 	
-	else if (ea.getEventType()==GUIEventAdapter::KEYUP)
+	else if (ea.getEventType()==GUIEventAdapter::KEYDOWN || ea.getEventType()==GUIEventAdapter::KEYUP)
 	{
 		handleKeypress(ea);
 	}
+
+
 	
 	return false;
 }
@@ -157,8 +161,16 @@ void ViewerManipulator::handleKeypress(const osgGA::GUIEventAdapter& ea)
 {
 	if (ea.getKey()=='r')
 	{
-		sendEvent(user->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
+        if (ea.getEventType()==osgGA::GUIEventAdapter::KEYUP)
+            sendEvent(user->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
 	}
+    else if (ea.getKey()=='a')
+    {
+        if (ea.getEventType()==osgGA::GUIEventAdapter::KEYDOWN)
+            manipulatorKey = true;
+        else if (ea.getEventType()==osgGA::GUIEventAdapter::KEYUP)
+            manipulatorKey = false;
+    }
 }
 
 /*
@@ -300,8 +312,6 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 	
     
     if ((modkeyMask==GUIEventAdapter::MODKEY_LEFT_SHIFT) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_SHIFT) )
-    
-        //if (this->picker)
 	{
 		// This is how the Picker works:
 		//
@@ -468,9 +478,15 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 	} // end picker
 	
 	
-	
+    if ((modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_CTRL) || manipulatorKey)
+	{
+        // the CTRL button is reserved for osgManipulator draggers, so don't
+        // move the viewer!
+        
+    }
+        
     // scene event processing (eg, camera motion):
-	if ( this->mover && selectedNodes.empty() )
+	else if ( this->mover && selectedNodes.empty() )
 	{
 		float movScalar = 10.0;
 		float rotScalar = 30.0;
@@ -527,7 +543,10 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				    }
 				}
 			
-			    else if ( (modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_CTRL) )
+                // velocity based motion (currently disabled, because CTRL key
+                // is now used by osgManipulator draggers). TODO: bring this
+                // feature back??
+			    else if (0) // ( (modkeyMask==GUIEventAdapter::MODKEY_LEFT_CTRL) || (modkeyMask==GUIEventAdapter::MODKEY_RIGHT_CTRL) )
 			    	
 			    {
 			    	int dXsign, dYsign;
