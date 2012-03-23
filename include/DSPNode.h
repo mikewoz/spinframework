@@ -80,7 +80,20 @@ public:
         
         virtual void callbackUpdate();
         
+        /**
+         * Returns the SoundConnection object that exists between the current
+         * node and the sink or null if none is found.
+         * @param snk a pointer to the sink node
+         */
+
         SoundConnection *getConnection(DSPNode *snk);
+
+        /**
+         * Returns the SoundConnection object that exists between the current
+         * node and the sink or null if none is found.
+         * @param snk the name of the sink node to search for
+         */
+
         SoundConnection *getConnection(const char *snk);
 
         /**
@@ -89,6 +102,11 @@ public:
 
         void connect(DSPNode *snk);
         void connect(const char *snk);
+
+        /**
+         * Sets the current node as a sink to the specified node.
+         */
+
         void connectSource(const char *src);
 
         void disconnect(const char *snk);

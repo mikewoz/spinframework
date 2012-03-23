@@ -78,7 +78,7 @@ public:
     /**
      * Enumerator containing all of the constraint modes available
      */
-    enum constraintMode {   BASIC,			/*!< The node is just constrained
+    enum ConstraintMode {   BASIC,			/*!< The node is just constrained
 											within a cubic volume. Important
 											note: the BASIC constraint is always
 											maintained, even if another mode is
@@ -137,7 +137,7 @@ public:
      * are based (Note: The target could also be a group node).
      */
 
-    const char *getTarget() const { return _target->s_name; }
+    const char *getTarget() const { return target_->s_name; }
 
     /**
      * Sets the node's constraint mode, based on the types in constrainMode

@@ -38,12 +38,12 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__DSPNode_P1,
 	          "",
-	          "");
+	          " param snk a pointer to the sink node  ");
 	I_Method1(spin::SoundConnection *, getConnection, IN, const char *, snk,
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__C5_char_P1,
 	          "",
-	          "");
+	          " param snk the name of the sink node to search for  ");
 	I_Method1(void, connect, IN, spin::DSPNode *, snk,
 	          Properties::NON_VIRTUAL,
 	          __void__connect__DSPNode_P1,

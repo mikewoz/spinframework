@@ -21,7 +21,7 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::constraintMode)
+BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::ConstraintMode)
 	I_DeclaringFile("ConstraintsNode.h");
 	I_EnumLabel(spin::ConstraintsNode::BASIC);
 	I_EnumLabel(spin::ConstraintsNode::DROP);
@@ -53,7 +53,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	          __C5_char_P1__getTarget,
 	          "",
 	          "t_symbol which indicates the target ID on which the constraints are based (Note: The target could also be a group node).  ");
-	I_Method1(void, setConstraintMode, IN, ConstraintMode, m,
+	I_Method1(void, setConstraintMode, IN, spin::ConstraintsNode::ConstraintMode, m,
 	          Properties::NON_VIRTUAL,
 	          __void__setConstraintMode__ConstraintMode,
 	          "",
@@ -108,9 +108,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_SimpleProperty(ConstraintMode, ConstraintMode, 
-	                 0, 
-	                 __void__setConstraintMode__ConstraintMode);
+	I_SimpleProperty(int, ConstraintMode, 
+	                 __int__getConstraintMode, 
+	                 0);
 	I_SimpleProperty(osg::Vec3, CubeOffset, 
 	                 __osg_Vec3__getCubeOffset, 
 	                 0);

@@ -67,6 +67,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     RayNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    Shader.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \

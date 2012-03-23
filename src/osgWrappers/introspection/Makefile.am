@@ -24,6 +24,7 @@ libSPINwrappers_la_SOURCES = \
     ReferencedNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    Shader.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \
