@@ -42,9 +42,14 @@
 #ifndef ParticleSystem_H_
 #define ParticleSystem_H_
 
+#include <osgParticle/Particle>
 #include <osgParticle/ParticleSystem>
-#include <osgParticle/ModularEmitter>
 #include <osgParticle/ParticleSystemUpdater>
+#include <osgParticle/ModularEmitter>
+#include <osgParticle/RandomRateCounter>
+#include <osgParticle/SectorPlacer>
+#include <osgParticle/RadialShooter>
+
 #include "GroupNode.h"
 
 namespace spin
@@ -64,6 +69,15 @@ public:
     
     virtual void callbackUpdate();
     
+    void setLifeTime(float seconds);
+    float getLifeTime() { return (float) particle_.getLifeTime(); }
+
+    void setRadius(float radius);
+    float getRadius() { return (float) particle_.getRadius(); }
+
+    void setMass(float mass);
+    float getMass() { return (float) particle_.getMass(); }
+    
     void setEmissive(int emissiveFlag);
     int getEmissive() const { return (int) emissive_; }
 
@@ -73,8 +87,15 @@ public:
     void setImagePath(const char* path);
     const char* getImagePath() const { return imgPath_.c_str(); }
     
-    void setRate(float min, float max);
-    osg::Vec2 getRate() const { return rate_; }
+    void setFrequencyRange(float min, float max);
+    osg::Vec2 getFrequencyRange() const { return freqRange_; }
+
+    void setCircularRange(float min, float max);
+    osg::Vec2 getCircularRange();
+    
+    void setSpeedRange(float min, float max);
+    osg::Vec2 getSpeedRange();
+
 
     virtual std::vector<lo_message> getState() const;
 
@@ -85,8 +106,24 @@ private:
     osg::ref_ptr<osgParticle::ParticleSystem> system_;
     osg::ref_ptr<osgParticle::ParticleSystemUpdater> updater_;
     osg::ref_ptr<osgParticle::ModularEmitter> emitter_;
+    osg::ref_ptr<osgParticle::RandomRateCounter> counter_;
+    osg::ref_ptr<osgParticle::SectorPlacer> placer_;
+    osg::ref_ptr<osgParticle::RadialShooter> shooter_;
     
-    osg::Vec2 rate_;
+    osgParticle::Particle particle_;
+    
+    float lifetime_;
+    float radius_;
+    float mass_;
+    
+    osg::Vec2 freqRange_;
+    osg::Vec2 circularRange_;
+    osg::Vec2 angularRange_;
+    osg::Vec2 speedRange_;
+    osg::Vec2 alphaRange_;
+    osg::Vec2 sizeRange_;
+    osg::Vec4 colorMin_;
+    osg::Vec4 colorMax_;
     
     std::string imgPath_;
     bool emissive_;

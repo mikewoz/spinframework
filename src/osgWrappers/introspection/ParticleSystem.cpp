@@ -28,6 +28,41 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	               ____ParticleSystem__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_Method0(void, callbackUpdate,
+	          Properties::VIRTUAL,
+	          __void__callbackUpdate,
+	          "",
+	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
+	I_Method1(void, setLifeTime, IN, float, seconds,
+	          Properties::NON_VIRTUAL,
+	          __void__setLifeTime__float,
+	          "",
+	          "");
+	I_Method0(float, getLifeTime,
+	          Properties::NON_VIRTUAL,
+	          __float__getLifeTime,
+	          "",
+	          "");
+	I_Method1(void, setRadius, IN, float, radius,
+	          Properties::NON_VIRTUAL,
+	          __void__setRadius__float,
+	          "",
+	          "");
+	I_Method0(float, getRadius,
+	          Properties::NON_VIRTUAL,
+	          __float__getRadius,
+	          "",
+	          "");
+	I_Method1(void, setMass, IN, float, mass,
+	          Properties::NON_VIRTUAL,
+	          __void__setMass__float,
+	          "",
+	          "");
+	I_Method0(float, getMass,
+	          Properties::NON_VIRTUAL,
+	          __float__getMass,
+	          "",
+	          "");
 	I_Method1(void, setEmissive, IN, int, emissiveFlag,
 	          Properties::NON_VIRTUAL,
 	          __void__setEmissive__int,
@@ -58,14 +93,34 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __C5_char_P1__getImagePath,
 	          "",
 	          "");
-	I_Method2(void, setRate, IN, float, min, IN, float, max,
+	I_Method2(void, setFrequencyRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
-	          __void__setRate__float__float,
+	          __void__setFrequencyRange__float__float,
 	          "",
 	          "");
-	I_Method0(osg::Vec2, getRate,
+	I_Method0(osg::Vec2, getFrequencyRange,
 	          Properties::NON_VIRTUAL,
-	          __osg_Vec2__getRate,
+	          __osg_Vec2__getFrequencyRange,
+	          "",
+	          "");
+	I_Method2(void, setCircularRange, IN, float, min, IN, float, max,
+	          Properties::NON_VIRTUAL,
+	          __void__setCircularRange__float__float,
+	          "",
+	          "");
+	I_Method0(osg::Vec2, getCircularRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getCircularRange,
+	          "",
+	          "");
+	I_Method2(void, setSpeedRange, IN, float, min, IN, float, max,
+	          Properties::NON_VIRTUAL,
+	          __void__setSpeedRange__float__float,
+	          "",
+	          "");
+	I_Method0(osg::Vec2, getSpeedRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getSpeedRange,
 	          "",
 	          "");
 	I_Method0(std::vector< lo_message >, getState,
@@ -73,17 +128,32 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(osg::Vec2, CircularRange, 
+	                 __osg_Vec2__getCircularRange, 
+	                 0);
 	I_SimpleProperty(int, Emissive, 
 	                 __int__getEmissive, 
 	                 __void__setEmissive__int);
+	I_SimpleProperty(osg::Vec2, FrequencyRange, 
+	                 __osg_Vec2__getFrequencyRange, 
+	                 0);
 	I_SimpleProperty(const char *, ImagePath, 
 	                 __C5_char_P1__getImagePath, 
 	                 __void__setImagePath__C5_char_P1);
+	I_SimpleProperty(float, LifeTime, 
+	                 __float__getLifeTime, 
+	                 __void__setLifeTime__float);
 	I_SimpleProperty(int, Lighting, 
 	                 __int__getLighting, 
 	                 __void__setLighting__int);
-	I_SimpleProperty(osg::Vec2, Rate, 
-	                 __osg_Vec2__getRate, 
+	I_SimpleProperty(float, Mass, 
+	                 __float__getMass, 
+	                 __void__setMass__float);
+	I_SimpleProperty(float, Radius, 
+	                 __float__getRadius, 
+	                 __void__setRadius__float);
+	I_SimpleProperty(osg::Vec2, SpeedRange, 
+	                 __osg_Vec2__getSpeedRange, 
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 

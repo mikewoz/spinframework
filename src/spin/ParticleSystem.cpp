@@ -39,14 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include <osgParticle/Particle>
-#include <osgParticle/ParticleSystem>
-#include <osgParticle/ParticleSystemUpdater>
-#include <osgParticle/ModularEmitter>
-#include <osgParticle/ModularProgram>
-#include <osgParticle/RandomRateCounter>
-#include <osgParticle/SectorPlacer>
-#include <osgParticle/RadialShooter>
+
 #include <osgParticle/AccelOperator>
 #include <osgParticle/FluidFrictionOperator>
 
@@ -54,9 +47,6 @@
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-//#include "osgUtil.h"
-
-using namespace std;
 
 namespace spin
 {
@@ -65,15 +55,26 @@ namespace spin
 // constructor:
 ParticleSystem::ParticleSystem (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".ParticleSystem");
+	this->setName(std::string(id->s_name) + ".ParticleSystem");
 	nodeType = "ParticleSystem";
 
     imgPath_.clear();
     attachedFlag_ = false;
-    emissive_ = true;
+    emissive_ = false;
     lighting_ = false;
-    rate_ = osg::Vec2(10.0, 30.0); // random rate between 10-30 particles/second
     
+    lifetime_ = 3; // seconds
+    radius_ = 0.05;
+    mass_ = 0.05;
+
+    freqRange_ = osg::Vec2(10.0, 30.0); // 10-30 particles/second
+    circularRange_ = osg::Vec2(0.0, 2.0); // circle of 0-2m
+    angularRange_ = osg::Vec2(0.0, 2*osg::PI); // full circle
+    speedRange_ = osg::Vec2(1.0, 2.0); // speed of 1-2 m/s
+    alphaRange_ = osg::Vec2(0.0, 1.5); // alpha
+    sizeRange_ = osg::Vec2(0.25, 1.0); // size of 25cm to 1m
+    colorMin_ = osg::Vec4(1,1,1,1); // full white
+    colorMax_ = osg::Vec4(1,0,0,1); // full red
 
     // First of all, we create the ParticleSystem object; it will hold
     // our particles and expose the interface for managing them; this object
@@ -91,6 +92,15 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, char *initID) : Grou
     // the third parameter enables or disables lighting.
 
     system_->setDefaultAttributes(imgPath_, emissive_, lighting_);
+
+
+    // use a particle template:
+    particle_.setLifeTime(lifetime_);
+    particle_.setRadius(radius_);
+    particle_.setMass(mass_);
+    
+    system_->setDefaultParticleTemplate(particle_);
+
 
     // Now that our particle system is set we have to create an emitter, that is
     // an object (actually a Node descendant) that generate new particles at 
@@ -118,23 +128,69 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, char *initID) : Grou
     emitter_->setParticleSystem(system_);
     
     
-    // Ok, get a pointer to the emitter's Counter object. We could also
-    // create a new RandomRateCounter object and assign it to the emitter,
-    // but since the default counter is already a RandomRateCounter, we
-    // just get a pointer to it and change a value:
-    osgParticle::RandomRateCounter *rrc =
-        static_cast<osgParticle::RandomRateCounter *>(emitter_->getCounter());
+    // set the counter:
+    counter_ = new osgParticle::RandomRateCounter;
+    counter_->setRateRange(freqRange_.x(), freqRange_.y());
+    emitter_->setCounter(counter_);
+    
 
-    // Now set the rate range to a better value. The actual rate at each frame
-    // will be chosen randomly within that range.
-    rrc->setRateRange(rate_.x(), rate_.y());
+    // set the placer:
+    placer_ = new osgParticle::SectorPlacer;
+    placer_->setCenter(0,0,0);
+    placer_->setRadiusRange(0, 0);
+    placer_->setPhiRange(0, 2 * osg::PI);
+    emitter_->setPlacer(placer_);
+
+
+    // create the shooter:
+    shooter_ = new osgParticle::RadialShooter;
+    shooter_->setInitialSpeedRange(5, 10);
+    emitter_->setShooter(shooter_);
+    
     
     // The emitter is done! Let's attach it:
     this->getAttachmentNode()->addChild(emitter_);
     
+
+    // To simulate the effect of the earth gravity we have to create a Program.
+    // This is a particle processor just like the Emitter class, but it allows
+    // us to modify particle properties *after* they have been created.
+    // 
+    // The ModularProgram class can be thought as a sequence of operators,
+    // each one performing some actions on the particles. So, the trick is:
+    // create the ModularProgram object, create one or more Operator objects,
+    // add those operators to the ModularProgram, and finally add the
+    // ModularProgram object to the scene graph.
+    // NOTE: since the Program objects perform actions after the particles
+    // have been emitted by one or more Emitter objects, all instances of
+    // Program (and its descendants) should be placed *after* the instances
+    // of Emitter objects in the scene graph.
     
-    // We don't add any particle modifier 
-    // here (see ModularProgram and Operator classes), so all we still need is
+    osgParticle::ModularProgram *program = new osgParticle::ModularProgram;
+    program->setParticleSystem(system_);
+
+    // create an operator that simulates the gravity acceleration.
+    osgParticle::AccelOperator *op1 = new osgParticle::AccelOperator;
+    op1->setToGravity();
+    program->addOperator(op1);
+
+    // now create a custom operator, we have defined it above
+    /*
+    VortexOperator *op2 = new VortexOperator;
+    op2->setCenter(osg::Vec3(8, 0, 0));
+    program->addOperator(op2);
+    */
+
+    // let's add a fluid operator to simulate air friction.
+    osgParticle::FluidFrictionOperator *op3 = new osgParticle::FluidFrictionOperator;
+    op3->setFluidToAir();
+    program->addOperator(op3);
+
+    // add the program to the scene graph
+    this->getAttachmentNode()->addChild(program);
+    
+    
+    // all we still need is
     // to create a Geode and add the particle system to it, so it can be
     // displayed.
 
@@ -174,13 +230,32 @@ void ParticleSystem::callbackUpdate()
 }
     
 // *****************************************************************************
-void ParticleSystem::setRate (float min, float max)
+
+void ParticleSystem::setLifeTime(float seconds)
 {
-    rate_ = osg::Vec2(min,max);
+    particle_.setLifeTime(seconds);
+    BROADCAST(this, "sf", "setLifeTime", getLifeTime());
+}
+
+void ParticleSystem::setRadius(float radius)
+{
+    particle_.setRadius(radius);
+    BROADCAST(this, "sf", "setRadius", getRadius());
+}
+
+void ParticleSystem::setMass(float mass)
+{
+    particle_.setMass(mass);
+    BROADCAST(this, "sf", "setMass", getMass());
+}
+
+void ParticleSystem::setFrequencyRange (float min, float max)
+{
+    freqRange_ = osg::Vec2(min,max);
     
     // make sure rate is above zero and that max is bigger (or equal) to min:
-    if (rate_.x() < 0) rate_.x() = 0;
-    if (rate_.y() < rate_.x()) rate_.y() = rate_.x();
+    if (freqRange_.x() < 0) freqRange_.x() = 0;
+    if (freqRange_.y() < freqRange_.x()) freqRange_.y() = freqRange_.x();
 
     // Get a pointer to the emitter's Counter object:
     osgParticle::RandomRateCounter *rrc =
@@ -188,10 +263,35 @@ void ParticleSystem::setRate (float min, float max)
 
     // Set the min and max rate (number of particles per second). The actual
     // rate at each frame will be chosen randomly within that range.
-    rrc->setRateRange(rate_.x(), rate_.y());
+    rrc->setRateRange(freqRange_.x(), freqRange_.y());
 
-	BROADCAST(this, "sff", "setRate", rate_.x(), rate_.y());
+	BROADCAST(this, "sff", "setFrequencyRange", freqRange_.x(), freqRange_.y());
 }
+
+void ParticleSystem::setCircularRange(float min, float max)
+{
+    placer_->setRadiusRange(min, max);
+    BROADCAST(this, "sff", "setFrequencyRange", min, max);
+    //BROADCAST(this, "sff", "setCircularRange", range.minimum, range.maximum);
+}
+osg::Vec2 ParticleSystem::getCircularRange()
+{
+    const osgParticle::rangef range = placer_->getRadiusRange();
+    return osg::Vec2(range.minimum, range.maximum);
+}
+
+
+void ParticleSystem::setSpeedRange(float min, float max)
+{
+    shooter_->setInitialSpeedRange(min, max);
+    BROADCAST(this, "sff", "setSpeedRange", min, max);
+}
+osg::Vec2 ParticleSystem::getSpeedRange()
+{
+    const osgParticle::rangef range = shooter_->getInitialSpeedRange();
+    return osg::Vec2(range.minimum, range.maximum);
+}
+
 
 void ParticleSystem::setImagePath (const char* path)
 {
@@ -244,8 +344,8 @@ std::vector<lo_message> ParticleSystem::getState () const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    osg::Vec2 v = getRate();
-    lo_message_add(msg, "sff", "setRate", v.x(), v.y());
+    osg::Vec2 v = getFrequencyRange();
+    lo_message_add(msg, "sff", "setFrequencyRange", v.x(), v.y());
     ret.push_back(msg);
 
     return ret;
