@@ -227,6 +227,8 @@ SceneManager::SceneManager(std::string id)
     worldNode = new osg::ClearNode();
     worldNode->setName("world");
     rootNode->addChild(worldNode.get());
+    
+    worldStateSet_ = gensym("NULL");
 
     for (int i = 0; i < OSG_NUM_LIGHTS; i++)
     {
@@ -954,6 +956,28 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 
     std::cout << "ERROR creating ReferencedStateSet from file: " << fname << std::endl;
     return NULL;
+}
+
+void SceneManager::setWorldStateSet(const char *s)
+{
+    if (std::string(s)=="NULL")
+    {
+        worldNode->setStateSet(new osg::StateSet());
+        SCENE_MSG("ss", "setWorldStateSet", "NULL");
+    }
+    else
+    {
+        ReferencedStateSet *ss = getStateSet(s);
+        if (ss)
+        {
+            if (ss->id == worldStateSet_)
+                return; // we're already using that stateset
+        
+            worldStateSet_ = ss->id;
+            worldNode->setStateSet(ss);
+            SCENE_MSG("ss", "setWorldStateSet", s);
+        }
+	}
 }
 
 std::vector<t_symbol*> SceneManager::findNodes(const char *pattern)
@@ -2146,7 +2170,7 @@ bool SceneManager::loadXML(const char *s)
         return false;
     }
 
-    // Now see if there is a <connections> tag:
+    // Now see if there is a <statesets> tag:
     if ((root = doc.FirstChild("statesets")))
     {
         for (child = root->FirstChildElement(); child; child = child->NextSiblingElement())

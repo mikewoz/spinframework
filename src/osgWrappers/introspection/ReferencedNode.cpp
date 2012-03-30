@@ -143,6 +143,26 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __void__setParam__C5_char_P1__float,
 	          "",
 	          "");
+	I_Method1(void, setStateSetFromFile, IN, const char *, filename,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSetFromFile__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(void, setStateSet, IN, const char *, s,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSet__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(const char *, getStateSet,
+	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getStateSet,
+	          "",
+	          "");
+	I_Method0(void, updateStateSet,
+	          Properties::VIRTUAL,
+	          __void__updateStateSet,
+	          "",
+	          "In derived classes, you can handle how a stateset gets applied to a node (eg, which part of the subgraph it is attached by overriding the updateStateSet method. ");
 	I_Method0(osg::Group *, getAttachmentNode,
 	          Properties::NON_VIRTUAL,
 	          __osg_Group_P1__getAttachmentNode,
@@ -234,6 +254,12 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(const char *, StateSet, 
+	                 __C5_char_P1__getStateSet, 
+	                 __void__setStateSet__C5_char_P1);
+	I_SimpleProperty(const char *, StateSetFromFile, 
+	                 0, 
+	                 __void__setStateSetFromFile__C5_char_P1);
 	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(std::string, nodeType);
 	I_PublicMemberProperty(std::string, contextString);

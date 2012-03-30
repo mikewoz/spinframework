@@ -379,7 +379,7 @@ void ReferencedNode::setAlpha (float alpha)
 	ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 	ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-	this->setStateSet(ss);
+	this->osg::Group::setStateSet(ss);
 
     /*
     osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
@@ -412,6 +412,42 @@ void ReferencedNode::setParam (const char *paramName, float paramValue)
     floatParams[string(paramName)] = paramValue;
     BROADCAST(this, "ssf", "setParam", paramName, paramValue);
 }
+
+// -----------------------------------------------------------------------------
+
+void ReferencedNode::setStateSetFromFile(const char* filename)
+{
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
+	if (ss.valid())
+	{
+		if (ss->id == stateset_) return; // we're already using that stateset
+		stateset_ = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSet());
+	}
+}
+
+void ReferencedNode::setStateSet (const char* s)
+{
+	if (gensym(s)==stateset_) return;
+
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
+	if (ss.valid())
+	{
+		stateset_ = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSet());
+	}
+}
+
+void ReferencedNode::updateStateSet()
+{
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+	if (ss.valid()) osg::Group::setStateSet( ss.get() );
+}
+
+// -----------------------------------------------------------------------------
+
 
 void ReferencedNode::debug()
 {

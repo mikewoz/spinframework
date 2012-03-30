@@ -123,6 +123,8 @@ class SceneManager
         ReferencedStateSet* getStateSet(const char *id);
         ReferencedStateSet* createStateSet(const char *id, const char *type);
         ReferencedStateSet* createStateSet(const char *fname);
+        
+        void setWorldStateSet(const char *s);
 
         std::vector<t_symbol*> findNodes(const char *pattern);
         //nodeListType findNodes(const char *pattern);
@@ -196,6 +198,8 @@ class SceneManager
         osg::ref_ptr<osg::Group> rootNode;
         osg::ref_ptr<osg::ClearNode> worldNode;
         osg::ref_ptr<osg::Geode> gridGeode;
+        
+        t_symbol* worldStateSet_;
 
         /**
          * The scene manager can operate in graphical mode or non-graphical.

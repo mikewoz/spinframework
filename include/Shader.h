@@ -57,6 +57,8 @@ namespace osg {
 #include <osg/ref_ptr>
 #include "ReferencedStateSet.h"
 
+typedef std::map<std::string, std::string> ParsedUniforms; // map of name, type
+
 namespace spin
 {
 
@@ -74,28 +76,70 @@ public:
 
     virtual void updateCallback();
     virtual void debug();
+    
+    void printSource();
+    
+    /**
+     * Remove all uniforms from this stateset
+     */
+    void clearUniforms();
+    
+    /**
+     * Create a uniform with the provided name and type. The value will be set
+     * to some default value
+     */ 
+    void registerUniform(const char* name, const char* type);
+    
+    /**
+     * Create a uniform with the provided name and type, and set the initial 
+     * value for the uniform.
+     *
+     * Note that defaults are provided as strings in all cases. So in the case
+     * of several values, the defaultValue would be a space-separated list of
+     * values.
+     *
+     * It is also possible to specify an array of vectors. For example, if the
+     * type is vec2, you can specify a defaultValue of 0.0 0.1 1.0 1.0 and this
+     * will generate two vec2 uniforms with indexes automatically added to the
+     * name:
+     *   uniform name[0] = vec2(0.0,0.1);
+     *   uniform name[1] = vec2(1.0,1.0);
+     * To send OSC messages to control these uniforms, you need to use the full
+     * name including square brackets. For example:
+     *   /SPIN/default/shader setUniform_vec2 name[0] 0.0 0.0
+     */
+    void registerUniform(const char* name, const char* type, const char* defaultValue);
+    
+    ParsedUniforms parseUniformsFromShader(osg::Shader *shader);
+    
+    bool loadJitterShader(std::string path);
+    void loadGLSLShader(std::string path);
 
-    void setUniform_Float (const char* name, float f);
-    void setUniform_Vec3 (const char* name, float x, float y, float z);
+    void setUniform_bool (const char* name, int b);
+    void setUniform_int (const char* name, int b);
+    void setUniform_float (const char* name, float f);
+    void setUniform_vec2 (const char* name, float x, float y);
+    void setUniform_vec3 (const char* name, float x, float y, float z);
+    void setUniform_vec4 (const char* name, float x, float y, float z, float w);
 
     /**
      * Creates a texture from a path on disk.
      */
     void setPath (const char* newPath);
-    const char *getPath() const { return _path.c_str(); }
+    const char *getPath() const { return path_.c_str(); }
 
     /**
-     * Set whether the texture is influenced by lighting
+     * Set whether the stateset is influenced by lighting
      */
     void setLighting(int i);
-    int getLighting() const { return (int)_lightingEnabled; }
+    int getLighting() const { return (int)lightingEnabled_; }
 
     /**
-     * Set the render bin for this texture. The higher the number, the later it
+     * Set the render bin. The higher the number, the later it
      * gets processed (ie, it appears on top). Default renderBin = 11
      */
     void setRenderBin (int i);
-    int getRenderBin() const { return _renderBin; }
+    int getRenderBin() const { return renderBin_; }
 
 
 
@@ -105,18 +149,18 @@ public:
     
 private:
     
-    osg::ref_ptr<osg::Program> _programObject;
-    osg::ref_ptr<osg::Shader> _vertexObject;
-    osg::ref_ptr<osg::Shader> _fragmentObject;
+    osg::ref_ptr<osg::Program> programObject_;
+    osg::ref_ptr<osg::Shader> vertexObject_;
+    osg::ref_ptr<osg::Shader> fragmentObject_;
     
-    std::string _path;
+    std::string path_;
     
-    float _updateRate; // seconds
+    float updateRate_; // seconds
     
-    osg::Timer_t lastTick;
+    osg::Timer_t lastTick_;
 
-    bool _lightingEnabled;
-    int  _renderBin;
+    bool lightingEnabled_;
+    int  renderBin_;
 };
 
 } // end of namespace spin

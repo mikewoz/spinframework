@@ -38,14 +38,69 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          __void__debug,
 	          "",
 	          "Print debug information to console. ");
-	I_Method2(void, setUniform_Float, IN, const char *, name, IN, float, f,
+	I_Method0(void, printSource,
 	          Properties::NON_VIRTUAL,
-	          __void__setUniform_Float__C5_char_P1__float,
+	          __void__printSource,
 	          "",
 	          "");
-	I_Method4(void, setUniform_Vec3, IN, const char *, name, IN, float, x, IN, float, y, IN, float, z,
+	I_Method0(void, clearUniforms,
 	          Properties::NON_VIRTUAL,
-	          __void__setUniform_Vec3__C5_char_P1__float__float__float,
+	          __void__clearUniforms,
+	          "",
+	          "");
+	I_Method2(void, registerUniform, IN, const char *, name, IN, const char *, type,
+	          Properties::NON_VIRTUAL,
+	          __void__registerUniform__C5_char_P1__C5_char_P1,
+	          "",
+	          "");
+	I_Method3(void, registerUniform, IN, const char *, name, IN, const char *, type, IN, const char *, defaultValues,
+	          Properties::NON_VIRTUAL,
+	          __void__registerUniform__C5_char_P1__C5_char_P1__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(ParsedUniforms, parseUniformsFromShader, IN, osg::Shader *, shader,
+	          Properties::NON_VIRTUAL,
+	          __ParsedUniforms__parseUniformsFromShader__osg_Shader_P1,
+	          "",
+	          "");
+	I_Method1(bool, loadJitterShader, IN, std::string, path,
+	          Properties::NON_VIRTUAL,
+	          __bool__loadJitterShader__std_string,
+	          "",
+	          "");
+	I_Method1(void, loadGLSLShader, IN, std::string, path,
+	          Properties::NON_VIRTUAL,
+	          __void__loadGLSLShader__std_string,
+	          "",
+	          "");
+	I_Method2(void, setUniform_bool, IN, const char *, name, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setUniform_bool__C5_char_P1__int,
+	          "",
+	          "");
+	I_Method2(void, setUniform_int, IN, const char *, name, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setUniform_int__C5_char_P1__int,
+	          "",
+	          "");
+	I_Method2(void, setUniform_float, IN, const char *, name, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setUniform_float__C5_char_P1__float,
+	          "",
+	          "");
+	I_Method3(void, setUniform_vec2, IN, const char *, name, IN, float, x, IN, float, y,
+	          Properties::NON_VIRTUAL,
+	          __void__setUniform_vec2__C5_char_P1__float__float,
+	          "",
+	          "");
+	I_Method4(void, setUniform_vec3, IN, const char *, name, IN, float, x, IN, float, y, IN, float, z,
+	          Properties::NON_VIRTUAL,
+	          __void__setUniform_vec3__C5_char_P1__float__float__float,
+	          "",
+	          "");
+	I_Method5(void, setUniform_vec4, IN, const char *, name, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
+	          Properties::NON_VIRTUAL,
+	          __void__setUniform_vec4__C5_char_P1__float__float__float__float,
 	          "",
 	          "");
 	I_Method1(void, setPath, IN, const char *, newPath,
@@ -62,7 +117,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          Properties::NON_VIRTUAL,
 	          __void__setLighting__int,
 	          "",
-	          "Set whether the texture is influenced by lighting ");
+	          "Set whether the stateset is influenced by lighting ");
 	I_Method0(int, getLighting,
 	          Properties::NON_VIRTUAL,
 	          __int__getLighting,
@@ -72,7 +127,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          Properties::NON_VIRTUAL,
 	          __void__setRenderBin__int,
 	          "",
-	          "Set the render bin for this texture. The higher the number, the later it gets processed (ie, it appears on top). Default renderBin = 11 ");
+	          "Set the render bin. The higher the number, the later it gets processed (ie, it appears on top). Default renderBin = 11 ");
 	I_Method0(int, getRenderBin,
 	          Properties::NON_VIRTUAL,
 	          __int__getRenderBin,

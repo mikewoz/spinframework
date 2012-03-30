@@ -871,6 +871,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->createStateSet((char*) argv[1], (char*) argv[2]);
     else if ((theMethod == "createStateSet") && (argc==2))
         sceneManager->createStateSet((char*) argv[1]);
+    else if ((theMethod == "setWorldStateSet") && (argc==2))
+        sceneManager->setWorldStateSet((char*) argv[1]);
     else if ((theMethod == "deleteNode") && (argc==2))
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))

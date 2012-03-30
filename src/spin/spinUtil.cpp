@@ -159,12 +159,12 @@ std::string stringify(int x)
     if (!(o << x)) return "";
     return o.str();
 }
-    
-std::string stringify(osg::Quat q)
+
+std::string stringify(osg::Vec2f v)
 {
     std::ostringstream o;
-    o << q.x()<<" "<<q.y()<<" "<<q.z()<<" "<<q.w();
-    if (!o) return "0 0 0 0";
+    o << v.x()<<" "<<v.y();
+    if (!o) return "0 0";
     return o.str();
 }
 
@@ -176,10 +176,12 @@ std::string stringify(osg::Vec3f v)
     return o.str();
 }
 
-std::string stringify(osg::Vec3d v)
+std::string stringify(osg::Quat q)
 {
-    osg::Vec3f vf(v);
-    return stringify(vf);
+    std::ostringstream o;
+    o << q.x()<<" "<<q.y()<<" "<<q.z()<<" "<<q.w();
+    if (!o) return "0 0 0 0";
+    return o.str();
 }
 
 std::string leadingSpaces(int n)
@@ -193,6 +195,10 @@ std::vector<std::string> tokenize(const std::string& str, const std::string& del
     using std::vector;
     using std::string;
 	vector<string> tokens;
+    
+    // check if empty string:
+    if (str.empty())
+        return tokens;
 	
 	// skip delimiters at beginning:
 	string::size_type lastPos = str.find_first_not_of(delimiters, 0);

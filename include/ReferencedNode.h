@@ -219,6 +219,18 @@ public:
     virtual void setParam (const char *paramName, const char *paramValue);
     virtual void setParam (const char *paramName, float paramValue);
 
+    void setStateSetFromFile (const char* filename);
+    void setStateSet         (const char* s);
+    const char *getStateSet  () const { return stateset_->s_name; }
+    
+    /**
+     * In derived classes, you can handle how a stateset gets applied to a node
+     * (eg, which part of the subgraph it is attached by overriding the 
+     * updateStateSet method.
+     */
+    virtual void updateStateSet();
+
+
     /**
      * subclasses of ReferencedNode may contain complicated subgraphs, and any
      * children get attached not to the node pointer itself, but to an
@@ -343,6 +355,8 @@ public:
      */
     osg::Group *attachmentNode;
 
+
+    t_symbol* stateset_;
 };
 
 /**

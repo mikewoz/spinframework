@@ -147,6 +147,11 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __ReferencedStateSet_P1__createStateSet__C5_char_P1,
 	          "",
 	          "");
+	I_Method1(void, setWorldStateSet, IN, const char *, s,
+	          Properties::NON_VIRTUAL,
+	          __void__setWorldStateSet__C5_char_P1,
+	          "",
+	          "");
 	I_Method1(std::vector< spin::t_symbol * >, findNodes, IN, const char *, pattern,
 	          Properties::NON_VIRTUAL,
 	          __std_vectorT1_t_symbol_P1___findNodes__C5_char_P1,
@@ -282,10 +287,14 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_SimpleProperty(spin::spinLog &, Log, 
 	                 0, 
 	                 __void__setLog__spinLog_R1);
+	I_SimpleProperty(const char *, WorldStateSet, 
+	                 0, 
+	                 __void__setWorldStateSet__C5_char_P1);
 	I_PublicMemberProperty(std::string, sceneID);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Group >, rootNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, worldNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, gridGeode);
+	I_PublicMemberProperty(spin::t_symbol *, worldStateSet_);
 	I_PublicMemberProperty(bool, graphicalMode);
 	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);

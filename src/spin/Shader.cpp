@@ -86,66 +86,6 @@ static bool loadShaderSource(osg::Shader* obj, const std::string& fileName )
    }
 }
 
-static osg::Image*
-make3DNoiseImage(int texSize)
-{
-    osg::Image* image = new osg::Image;
-    image->setImage(texSize, texSize, texSize,
-            4, GL_RGBA, GL_UNSIGNED_BYTE,
-            new unsigned char[4 * texSize * texSize * texSize],
-            osg::Image::USE_NEW_DELETE);
-
-    const int startFrequency = 4;
-    const int numOctaves = 4;
-
-    int f, i, j, k, inc;
-    double ni[3];
-    double inci, incj, inck;
-    int frequency = startFrequency;
-    GLubyte *ptr;
-    double amp = 0.5;
-
-    osg::notify(osg::INFO) << "creating 3D noise texture... ";
-
-    for (f = 0, inc = 0; f < numOctaves; ++f, frequency *= 2, ++inc, amp *= 0.5)
-    {
-        SetNoiseFrequency(frequency);
-        ptr = image->data();
-        ni[0] = ni[1] = ni[2] = 0;
-
-        inci = 1.0 / (texSize / frequency);
-        for (i = 0; i < texSize; ++i, ni[0] += inci)
-        {
-            incj = 1.0 / (texSize / frequency);
-            for (j = 0; j < texSize; ++j, ni[1] += incj)
-            {
-                inck = 1.0 / (texSize / frequency);
-                for (k = 0; k < texSize; ++k, ni[2] += inck, ptr += 4)
-                {
-                    *(ptr+inc) = (GLubyte) (((noise3(ni) + 1.0) * amp) * 128.0);
-                }
-            }
-        }
-    }
-
-    osg::notify(osg::INFO) << "DONE" << std::endl;
-    return image;
-}
-
-static osg::Texture3D*
-make3DNoiseTexture(int texSize )
-{
-    osg::Texture3D* noiseTexture = new osg::Texture3D;
-    noiseTexture->setFilter(osg::Texture3D::MIN_FILTER, osg::Texture3D::LINEAR);
-    noiseTexture->setFilter(osg::Texture3D::MAG_FILTER, osg::Texture3D::LINEAR);
-    noiseTexture->setWrap(osg::Texture3D::WRAP_S, osg::Texture3D::REPEAT);
-    noiseTexture->setWrap(osg::Texture3D::WRAP_T, osg::Texture3D::REPEAT);
-    noiseTexture->setWrap(osg::Texture3D::WRAP_R, osg::Texture3D::REPEAT);
-    noiseTexture->setImage( make3DNoiseImage(texSize) );
-    return noiseTexture;
-}
-
-#define TEXUNIT_NOISE 2
 
 // *****************************************************************************
 // constructor:
@@ -153,24 +93,24 @@ Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, ini
 {
 	classType = "Shader";
 
-	_path = "NULL";
-	_renderBin = 11;
-    _updateRate = 1.0;
-	_lightingEnabled = true;
-    _programObject = new osg::Program;
+	path_ = "NULL";
+	renderBin_ = 11;
+    updateRate_ = 1.0;
+	lightingEnabled_ = true;
+    programObject_ = new osg::Program;
 
     // NEEDED FOR TESTS:
     /*
-    _vertexObject = new osg::Shader( osg::Shader::VERTEX );
-    _fragmentObject = new osg::Shader( osg::Shader::FRAGMENT );
-    _programObject->addShader( _fragmentObject );
-    _programObject->addShader( _vertexObject );
+    vertexObject_ = new osg::Shader( osg::Shader::VERTEX );
+    fragmentObject_ = new osg::Shader( osg::Shader::FRAGMENT );
+    programObject_->addShader( fragmentObject_ );
+    programObject_->addShader( vertexObject_ );
     */
 
     // TEST 1
     /*
-    loadShaderSource( _vertexObject, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/brick.vert" );
-    loadShaderSource( _fragmentObject, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/brick.frag" );
+    loadShaderSource( vertexObject_, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/brick.vert" );
+    loadShaderSource( fragmentObject_, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/brick.frag" );
     */
 
     // TEST 2
@@ -179,8 +119,8 @@ Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, ini
     //osg::Texture1D* sineTexture = make1DSineTexture( 32 ); // 1024 );
     
     this->setTextureAttribute(TEXUNIT_NOISE, noiseTexture);
-    loadShaderSource( _vertexObject, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/eroded.vert" );
-    loadShaderSource( _fragmentObject, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/eroded.frag" );
+    loadShaderSource( vertexObject_, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/eroded.vert" );
+    loadShaderSource( fragmentObject_, "/Users/mikewoz/src/OpenSceneGraph-Data-3.0.0/shaders/eroded.frag" );
     this->addUniform( new osg::Uniform("LightPosition", osg::Vec3(0.0f, 0.0f, 4.0f)) );
     this->addUniform( new osg::Uniform("Scale", 1.0f) );
     this->addUniform( new osg::Uniform("Sine", 1.0f) );
@@ -190,13 +130,40 @@ Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, ini
     
     // TEST 3:
     /*
-    _programObject->setName( "blocky" );
-    loadShaderSource( _vertexObject,   "/Users/mikewoz/src/spinframework/src/Resources/shaders/blocky.vert" );
-    loadShaderSource( _fragmentObject, "/Users/mikewoz/src/spinframework/src/Resources/shaders/blocky.frag" );
+    programObject_->setName( "blocky" );
+    loadShaderSource( vertexObject_,   "/Users/mikewoz/src/spinframework/src/Resources/shaders/blocky.vert" );
+    loadShaderSource( fragmentObject_, "/Users/mikewoz/src/spinframework/src/Resources/shaders/blocky.frag" );
     this->addUniform( new osg::Uniform( "Sine", 0.0f ) );
     */
     
-    this->setAttributeAndModes(_programObject, osg::StateAttribute::ON);
+    
+    
+    
+    
+    
+    //this->setTextureAttributeAndModes(0, new osg::Texture2D(osgDB::readImageFile( "/Users/mikewoz/src/pdsheefa/examples/Resources/lenna.jpg" )), osg::StateAttribute::ON);
+    
+
+    osg::Image *img = osgDB::readImageFile("/Users/mikewoz/src/pdsheefa/examples/Resources/lenna.jpg");
+    osg::TextureRectangle *tex = new osg::TextureRectangle(img);
+    //tex->setTextureSize(400, 400);
+	//osg::Texture *tex = new osg::Texture2D;
+    //tex->setResizeNonPowerOfTwoHint(false);
+    //tex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+    //tex->setImage(0,img);
+    //tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
+	//tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+	//tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+    tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+    //tex->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
+    //this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+    this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
+    
+    
+    
+    
+    this->setAttributeAndModes(programObject_, osg::StateAttribute::ON);
 }
 
 // destructor
@@ -214,15 +181,15 @@ void Shader::updateCallback()
 
     
 
-    // do something every _updateRate seconds:
+    // do something every updateRate_ seconds:
     osg::Timer_t tick = osg::Timer::instance()->tick();
-    float dt = osg::Timer::instance()->delta_s(lastTick,tick);
-    if (dt > _updateRate)
+    float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
+    if (dt > updateRate_)
     {
         
 
         // this is the last time we checked
-        lastTick = osg::Timer::instance()->tick();
+        lastTick_ = osg::Timer::instance()->tick();
     }
 
 
@@ -236,20 +203,15 @@ void Shader::debug()
 	std::cout << "   ---------" << std::endl;
 
 	// additional info
-	if (_vertexObject.valid())
-	{
-		std::cout << "   vert shader: " << _vertexObject->getShaderSource() << std::endl;
-	} else {
-        std::cout << "   vert shader: null" << std::endl;
-    }
-	if (_fragmentObject.valid())
-	{
-		std::cout << "   frag shader: " << _fragmentObject->getShaderSource() << std::endl;
-	} else {
-        std::cout << "   frag shader: null" << std::endl;
-    }
-    
-    //typedef std::map< std::string, RefUniformPair > UniformList
+	if (vertexObject_.valid())
+        std::cout << "   vert shader: LOADED" << std::endl;
+    else
+        std::cout << "   vert shader: NULL" << std::endl;
+
+	if (fragmentObject_.valid())
+		std::cout << "   frag shader: LOADED" << std::endl;
+	else
+        std::cout << "   frag shader: NULL" << std::endl;
     
     const osg::StateSet::UniformList uniforms = this->getUniformList();
  	osg::StateSet::UniformList::const_iterator uitr;
@@ -259,146 +221,572 @@ void Shader::debug()
         osg::Uniform *u = uitr->second.first;
         std::cout << "   uniform " << name;
         
+        osg::Vec2 v2;
         osg::Vec3 v3;
+        osg::Vec4 v4;
         switch (u->getType())
         {
             case osg::Uniform::FLOAT:
                 float f;
                 u->get(f);
-                std::cout << " (type: FLOAT) = " << f;
+                std::cout << " (float) = " << f;
+                break;
+            case osg::Uniform::FLOAT_VEC2:
+                u->get(v2);
+                std::cout << " (vec2) = " << stringify(v2);
                 break;
             case osg::Uniform::FLOAT_VEC3:
                 u->get(v3);
-                std::cout << " (type: VEC3) = " << stringify(v3);
+                std::cout << " (vec3) = " << stringify(v3);
+                break;
+            case osg::Uniform::FLOAT_VEC4:
+                u->get(v4);
+                std::cout << " (vec4) = " << stringify(v4);
                 break;
             case osg::Uniform::INT:
                 int i;
                 u->get(i);
-                std::cout << " (type: INT) = " << i;
+                std::cout << " (int) = " << i;
                 break;
             case osg::Uniform::BOOL:
                 bool b;
                 u->get(b);
-                std::cout << " (type: BOOL) = " << b;
+                std::cout << " (bool) = " << b;
                 break;
 
             default:
-                std::cout << " (type: OTHER)";
+                std::cout << " (other/unkown)";
                 break;
         }
         std::cout << std::endl;
     }
+	std::cout << "   ---------" << std::endl;
+}
+
+void Shader::printSource()
+{
+	std::cout << "---------" << std::endl;
+    std::cout << "VERTEX shader:" << std::endl;
+	if (vertexObject_.valid())
+        std::cout << vertexObject_->getShaderSource() << std::endl;
+    else
+        std::cout << "  N/A" << std::endl;
+    std::cout << "---------" << std::endl;
+    std::cout << "FRAGMENT shader:" << std::endl;
+	if (fragmentObject_.valid())
+        std::cout << fragmentObject_->getShaderSource() << std::endl;
+    else
+        std::cout << "  N/A" << std::endl;
+    std::cout << "---------" << std::endl;
+    
+    BROADCAST(this, "s", "printSource");
+}  
+
+
+// -----------------------------------------------------------------------------
+
+void Shader::clearUniforms()
+{
+    while (this->getUniformList().size())
+    {
+        osg::Uniform *u = this->getUniformList().begin()->second.first;
+        this->removeUniform(u);
+    }
+}
+
+void Shader::registerUniform(const char* name, const char* type)
+{
+    registerUniform(name,type,"");
+}
+
+void Shader::registerUniform(const char* name, const char* type, const char* defaultValue)
+{
+    if (this->getUniform(name))
+    {
+        std::cout << "Uniform '" << name << "' already exists" << std::endl;
+        return;
+    }
+
+    std::string typeStr = std::string(type);
+    std::string defaultStr = std::string(defaultValue);
+
+    if (!defaultStr.size())
+    {
+        if (typeStr=="float") defaultStr = "0.0";
+        else if (typeStr=="vec2") defaultStr = "0.0 0.0";
+        else if (typeStr=="vec3") defaultStr = "0.0 0.0 0.0";
+        else if (typeStr=="vec4") defaultStr = "0.0 0.0 0.0 0.0";
+        else defaultStr = "0";
+    
+        std::cout << "defined our own default: " << defaultStr << std::endl;
+    }
+
+    std::vector<std::string> argVector = tokenize(defaultStr);
+
+    float f1, f2, f3, f4;
+    int i;
+    bool b;
+    
+    bool error = false;
+    if (typeStr=="float")
+    {
+        if ( (argVector.size()==1)
+        && fromString<float>(f1, argVector[0]) )
+            this->addUniform(new osg::Uniform( name, f1 ));
+        else 
+            error = true;
+    }
+    else if (typeStr=="bool")
+    {
+        if ( (argVector.size()==1)
+        && fromString<bool>(b, argVector[0]) )
+            this->addUniform(new osg::Uniform( name, b ));
+        else
+            error = true;
+    }
+    else if (typeStr=="int")
+    {
+        if ( (argVector.size()==1)
+        && fromString<int>(i, argVector[0]) )
+            this->addUniform(new osg::Uniform( name, i ));
+        else
+            error = true;
+
+    }
+    else if (typeStr=="vec2")
+    {
+        // note, args could be a multiple (eg, .jxs format). If so, let's create
+        // several uniforms with array indices in the names
+        if (argVector.size() < 2)
+            error = true;
+        else
+        {
+            for (int index=0; index<(int)(argVector.size()/2); index++)
+            {
+                std::string indexName;
+                if (argVector.size()>2)
+                    indexName = std::string(name)+"["+stringify(index)+"]";
+                else
+                    indexName = std::string(name);
+                if (fromString<float>(f1, argVector[(index*2)+0])
+                 && fromString<float>(f2, argVector[(index*2)+1]) )
+               this->addUniform(new osg::Uniform( indexName.c_str(), osg::Vec2(f1,f2) ));
+            }
+        }
+
+    }
+    else if (typeStr=="vec3")
+    {
+        // note, args could be a multiple (eg, .jxs format). If so, let's create
+        // several uniforms with array indices in the names
+        if (argVector.size() < 3)
+            error = true;
+        else
+        {
+            for (int index=0; index<(int)(argVector.size()/3); index++)
+            {
+                std::string indexName;
+                if (argVector.size()>3)
+                    indexName = std::string(name)+"["+stringify(index)+"]";
+                else
+                    indexName = std::string(name);
+                if (fromString<float>(f1, argVector[(index*3)+0])
+                 && fromString<float>(f2, argVector[(index*3)+1])
+                 && fromString<float>(f3, argVector[(index*3)+2]) )
+               this->addUniform(new osg::Uniform( indexName.c_str(), osg::Vec3(f1,f2,f3) ));
+            }
+        }
+    }
+    else if (typeStr=="vec4")
+    {
+        // note, args could be a multiple (eg, .jxs format). If so, let's create
+        // several uniforms with array indices in the names
+        if (argVector.size() < 4)
+            error = true;
+        else
+        {
+            for (int index=0; index<(int)(argVector.size()/4); index++)
+            {
+                std::string indexName;
+                if (argVector.size()>4)
+                    indexName = std::string(name)+"["+stringify(index)+"]";
+                else
+                    indexName = std::string(name);
+                if (fromString<float>(f1, argVector[(index*4)+0])
+                 && fromString<float>(f2, argVector[(index*4)+1])
+                 && fromString<float>(f3, argVector[(index*4)+2])
+                 && fromString<float>(f4, argVector[(index*4)+3]) )
+               this->addUniform(new osg::Uniform( indexName.c_str(), osg::Vec4(f1,f2,f3,f4) ));
+            }
+        }
+    }
+    else if (typeStr=="sampler2DRect")
+    {
+        // TODO: figure out how to do multitexture ids:
+        this->addUniform(new osg::Uniform( name, 0 ) );
+    }
+    else
+    {
+        error = true;
+    }
+    
+    
+    // output a warning if we couldn't create the uniform, otherwise if this is
+    // the server, send the message to clients:
+    if (error)
+    {
+        std::cout << "Warning: Could not create uniform '" << name << "'. Perhaps  invalid type: '" << type << "', or incorrect args: {" << defaultStr << "}" << std::endl;
+    }
+    else
+    {
+        std::cout << "Registered uniform '" << name << "' (" << type << ") with value: " << defaultStr << std::endl;
+        
+        BROADCAST(this, "ssss", "registerUniform", name, type, defaultStr.c_str());
+    }
 }
 
 
+ParsedUniforms Shader::parseUniformsFromShader(osg::Shader *shader)
+{
+    char name[100];
+    char type[100];
+    
+    int pos=0;
+    int pend=0;
+    
+    ParsedUniforms uniforms;
+    
+    std::string s = shader->getShaderSource();    
+    while ( (pos=s.find("uniform", pend))!=std::string::npos )
+    {
+        if ( (pend=s.find(";",pos))==std::string::npos || pend-pos>100 )
+            break;
+        if ( sscanf(s.c_str()+pos," uniform %[^ ] %[^ ;] ;",type,name)!=2 )
+        {
+            printf("Unable to parse pos %d to %d\n",pos,pend);
+            break;
+        }
+        //printf("Found 'uniform' at pos %d to pos %d, type='%s' name='%s'\n",pos,pend,type,name);
+
+        uniforms.insert(std::pair<std::string, std::string>(name,type));
+    }
+    
+    return uniforms;
+}
+
+bool Shader::loadJitterShader(std::string path)
+{
+    TiXmlDocument doc( path.c_str() );
+
+    TiXmlNode *root = 0;
+    TiXmlElement *child = 0;
+    TiXmlElement *child2 = 0;
+
+    osg::Shader *vertShader = 0;
+    osg::Shader *fragShader = 0;
+
+    // Load the XML file and verify:
+    if (! doc.LoadFile())
+    {
+        std::cout << "ERROR: failed to load " << path << ". Invalid XML format." << std::endl;
+        return false;
+    }
+
+    // get the <jittershader> tag and verify:
+    if (! (root = doc.FirstChild("jittershader")))
+    {
+        std::cout << "ERROR: failed to load " << path << ". XML file has no <jittershader> tag." << std::endl;
+        return false;
+    }
+
+    //if (root->Attribute("name"))
+    //    programObject_->setName(root->Attribute("name"));
+
+    child = root->FirstChildElement("language");
+    if (child && (std::string(child->Attribute("name"))=="glsl"))
+    {
+        // look for shader programs:
+        for (child2 = child->FirstChildElement("program"); child2; child2 = child2->NextSiblingElement())
+        {
+            if (std::string(child2->Attribute("type"))=="vertex")
+            {
+                vertexObject_ = new osg::Shader( osg::Shader::VERTEX );
+                if (child2->Attribute("source"))
+                {
+                    if (loadShaderSource(vertexObject_, osgDB::getFilePath(path)+"/"+child2->Attribute("source")))
+                        programObject_->addShader( vertexObject_ );
+                }
+                else
+                {
+                    vertexObject_->setShaderSource(child2->FirstChild()->Value());
+                    programObject_->addShader( vertexObject_ );
+                }
+            }
+            else if (std::string(child2->Attribute("type"))=="fragment")
+            {
+                fragmentObject_ = new osg::Shader( osg::Shader::FRAGMENT );
+                if (child2->Attribute("source"))
+                {
+                    if (loadShaderSource(fragmentObject_, osgDB::getFilePath(path)+"/"+child2->Attribute("source")))
+                        programObject_->addShader( fragmentObject_ );
+                }
+                else
+                {
+                    fragmentObject_->setShaderSource(child2->FirstChild()->Value());
+                    programObject_->addShader( fragmentObject_ );
+                }
+                
+                // look for sampler2Drect:
+                ParsedUniforms uniforms;
+                uniforms = parseUniformsFromShader(vertexObject_.get());
+                for (ParsedUniforms::iterator u=uniforms.begin(); u!=uniforms.end(); ++u)
+                {
+                    if (u->second=="sampler2DRect")
+                        registerUniform(u->first.c_str(), u->second.c_str());
+                }
+                uniforms.clear();
+                uniforms = parseUniformsFromShader(fragmentObject_.get());
+                for (ParsedUniforms::iterator u=uniforms.begin(); u!=uniforms.end(); ++u)
+                {
+                    if (u->second=="sampler2DRect")
+                        registerUniform(u->first.c_str(), u->second.c_str());
+                }
+                
+
+            }
+        } 
+    }
+    else
+    {
+        std::cout << "ERROR: the shader " << path << " is not GLSL. Only GLSL is supported." << std::endl;
+        return false;
+    }
+    
+    // load all uniforms:
+    for (child = root->FirstChildElement("param"); child; child = child->NextSiblingElement())
+    {
+
+        // uniform
+        if ( (child->Attribute("name")) 
+        && (child->Attribute("type")) 
+        && (child->Attribute("default")) )
+        {
+            registerUniform(child->Attribute("name"), child->Attribute("type"), child->Attribute("default"));
+        }
+    }
+    
+    return true;
+}
+
+void Shader::loadGLSLShader(std::string path)
+{
+    // create tmp shaders:
+    osg::Shader *vertShader = new osg::Shader( osg::Shader::VERTEX );
+    osg::Shader *fragShader = new osg::Shader( osg::Shader::FRAGMENT );
+
+    std::string folderPath = osgDB::getFilePath(path);
+
+    bool vertSuccess = false;
+    bool fragSuccess = false;
+    
+    std::string ext = osgDB::getLowerCaseFileExtension(path);
+    if (ext=="frag")
+    {
+        fragSuccess = loadShaderSource( fragShader, path );
+        vertSuccess = loadShaderSource( vertShader, folderPath+".vert" );
+    }
+    else if (ext=="vert")
+    {
+        vertSuccess = loadShaderSource( vertShader, path );
+        fragSuccess = loadShaderSource( fragShader, folderPath+".frag" );
+    }
+    else
+    {
+        // let's check if the user just passed the base file name (without an extention)
+        vertSuccess = loadShaderSource( vertShader, path+".vert" );
+        fragSuccess = loadShaderSource( fragShader, path+".frag" );
+    }
+
+    if (vertSuccess)
+    {
+        vertexObject_ = vertShader;
+        
+        ParsedUniforms uniforms = parseUniformsFromShader(vertexObject_.get());
+        for (ParsedUniforms::iterator u=uniforms.begin(); u!=uniforms.end(); ++u)
+            registerUniform(u->first.c_str(), u->second.c_str());
+
+        programObject_->addShader( vertexObject_ );
+    }
+    if (fragSuccess)
+    {
+        fragmentObject_ = fragShader;
+        
+        ParsedUniforms uniforms = parseUniformsFromShader(fragmentObject_.get());
+        for (ParsedUniforms::iterator u=uniforms.begin(); u!=uniforms.end(); ++u)
+            registerUniform(u->first.c_str(), u->second.c_str());
+
+        programObject_->addShader( fragmentObject_ );
+    }
+    
+    programObject_->setName(osgDB::getStrippedName(path));
+}
+
 // *****************************************************************************
-void Shader::setUniform_Float (const char* name, float f)
+void Shader::setUniform_bool (const char* name, int b)
+{
+    osg::Uniform *u = this->getUniform(name);
+    if (u) u->set((bool)b);
+    
+    BROADCAST(this, "ssb", "setUniform_bool", name, (bool)b);
+}
+
+void Shader::setUniform_int (const char* name, int i)
+{
+    osg::Uniform *u = this->getUniform(name);
+    if (u) u->set(i);
+    
+    BROADCAST(this, "ssi", "setUniform_int", name, i);
+}
+
+void Shader::setUniform_float (const char* name, float f)
 {
     osg::Uniform *u = this->getUniform(name);
     if (u) u->set(f);
     
-    BROADCAST(this, "ssf", "setUniform_Float", name, f);
+    BROADCAST(this, "ssf", "setUniform_float", name, f);
 }
 
-void Shader::setUniform_Vec3 (const char* name, float x, float y, float z)
+void Shader::setUniform_vec2 (const char* name, float x, float y)
+{
+    osg::Vec2 v = osg::Vec2(x,y);
+    osg::Uniform *u = this->getUniform(name);
+    if (u) u->set(v);
+    
+    std::cout << "got vec2 update for '" << name <<"' = " <<x<<","<<y<<", valid? " << (bool)u << std::endl;
+    
+    BROADCAST(this, "ssff", "setUniform_vec2", name, x, y);
+}
+
+void Shader::setUniform_vec3 (const char* name, float x, float y, float z)
 {
     osg::Vec3 v = osg::Vec3(x,y,z);
     osg::Uniform *u = this->getUniform(name);
     if (u) u->set(v);
     
-    BROADCAST(this, "ssfff", "setUniform_Vec3", name, x, y, z);
+    BROADCAST(this, "ssfff", "setUniform_vec3", name, x, y, z);
 }
 
+void Shader::setUniform_vec4 (const char* name, float x, float y, float z, float w)
+{
+    osg::Vec4 v = osg::Vec4(x,y,z,w);
+    osg::Uniform *u = this->getUniform(name);
+    if (u) u->set(v);
+    
+    BROADCAST(this, "ssffff", "setUniform_vec4", name, x, y, z, w);
+}
 
 // *****************************************************************************
 void Shader::setPath (const char* newPath)
 {
 	// only do this if the id has changed:
-	if (_path == std::string(newPath)) return;
+	if (path_ == std::string(newPath)) return;
 
-	_path = std::string(newPath);
+	path_ = std::string(newPath);
     
+    // remove previous shader:
+    if (vertexObject_)
+    {
+        programObject_->removeShader(vertexObject_);
+        vertexObject_ = 0;
+    }
+    if (fragmentObject_)
+    {
+        programObject_->removeShader(fragmentObject_);
+        fragmentObject_ = 0;
+    }
+    clearUniforms();
+    
+    
+    if (path_ == "NULL")
+    {
+        std::cout << "Disabled shader '"<< this->id->s_name << "'" << std::endl;
+    }
+    else
+    {
+        // create new shaders:
+        osg::Shader *vertShader = new osg::Shader( osg::Shader::VERTEX );
+        osg::Shader *fragShader = new osg::Shader( osg::Shader::FRAGMENT );
 
-	
-	if (sceneManager->isGraphical())
-	{
-        // remove previous shader:
-        //pthread_mutex_lock(&sceneMutex);
-        if (_vertexObject)
+        std::string fullPath = getAbsolutePath(path_);
+        std::cout << "Loading shader: " << fullPath << std::endl;
+
+        std::string ext = osgDB::getLowerCaseFileExtension(fullPath);
+        if (ext=="jxs")
         {
-            _programObject->removeShader(_vertexObject);
-            _vertexObject = 0;
+            loadJitterShader(fullPath);
+        } else {
+            loadGLSLShader(fullPath);
         }
-        if (_fragmentObject)
-        {
-            _programObject->removeShader(_fragmentObject);
-            _fragmentObject = 0;
-        }
-        //pthread_mutex_unlock(&sceneMutex);
         
-        if (_path == "NULL")
+        /*
+        std::string folderPath = osgDB::getFilePath(fullPath);
+
+        bool vertSuccess = false;
+        bool fragSuccess = false;
+        std::string ext = osgDB::getLowerCaseFileExtension(fullPath);
+        if (ext=="frag")
         {
-            std::cout << "Disabling shader '"<< this->id->s_name << "'" << std::endl;
+            fragSuccess = loadShaderSource( fragShader, fullPath );
+            vertSuccess = loadShaderSource( vertShader, folderPath+".vert" );
+        }
+        else if (ext=="vert")
+        {
+            vertSuccess = loadShaderSource( vertShader, fullPath );
+            fragSuccess = loadShaderSource( fragShader, folderPath+".frag" );
+        }
+        else if (ext=="jxs")
+        {
+            loadJitterShader(fullPath);
         }
         else
         {
-            // create new shaders:
-            osg::Shader *vertShader = new osg::Shader( osg::Shader::VERTEX );
-            osg::Shader *fragShader = new osg::Shader( osg::Shader::FRAGMENT );
-
-            std::string fullPath = getAbsolutePath(_path);
-            std::cout << "Loading shader: " << fullPath << std::endl;
-
-            std::string folderPath = osgDB::getFilePath(fullPath);
-
-            bool vertSuccess = false;
-            bool fragSuccess = false;
-            std::string ext = osgDB::getLowerCaseFileExtension(fullPath);
-            if (ext=="frag")
-            {
-                fragSuccess = loadShaderSource( fragShader, fullPath );
-                vertSuccess = loadShaderSource( vertShader, folderPath+".vert" );
-            }
-            else if (ext=="vert")
-            {
-                vertSuccess = loadShaderSource( vertShader, fullPath );
-                fragSuccess = loadShaderSource( fragShader, folderPath+".frag" );
-            }
-            else
-            {
-                // let's check if the user just passed the base file name (without an extention)
-                vertSuccess = loadShaderSource( vertShader, fullPath+".vert" );
-                fragSuccess = loadShaderSource( fragShader, fullPath+".frag" );
-            }
-            
-            // set name:
-            _programObject->setName(osgDB::getStrippedName(fullPath));
-
-            // add shaders to program:
-            if (vertSuccess)
-            {
-                _vertexObject = vertShader;
-                _programObject->addShader( _vertexObject );
-            }
-            if (fragSuccess)
-            {
-                _fragmentObject = fragShader;
-                _programObject->addShader( _fragmentObject );
-            }
+            // let's check if the user just passed the base file name (without an extention)
+            vertSuccess = loadShaderSource( vertShader, fullPath+".vert" );
+            fragSuccess = loadShaderSource( fragShader, fullPath+".frag" );
         }
+        
+        // set name:
+        programObject_->setName(osgDB::getStrippedName(fullPath));
+
+        // add shaders to program:
+        if (vertSuccess)
+        {
+            vertexObject_ = vertShader;
+            parseUniformsFromShader(vertShader.get());
+            programObject_->addShader( vertexObject_ );
+        }
+        if (fragSuccess)
+        {
+            fragmentObject_ = fragShader;
+            parseUniformsFromShader(fragShader.get());
+            programObject_->addShader( fragmentObject_ );
+        }
+        */
+
 
         // enable shader:
         //if (vertSuccess && fragSuccess)
-        //    this->setAttributeAndModes(_programObject, osg::StateAttribute::ON);
-        _programObject->dirtyProgram();
-
+        //    this->setAttributeAndModes(programObject_, osg::StateAttribute::ON);
+        
+        
+        programObject_->dirtyProgram();
 
         // set lighting:
-        if (_lightingEnabled) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+        if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
         else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 
         // set renderbin:
-        this->setRenderBinDetails( _renderBin, "RenderBin");
+        this->setRenderBinDetails( renderBin_, "RenderBin");
 
 	}
 
@@ -407,9 +795,9 @@ void Shader::setPath (const char* newPath)
 
 void Shader::setLighting (int i)
 {
-	_lightingEnabled = (bool)i;
+	lightingEnabled_ = (bool)i;
 
-	if (_lightingEnabled) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+	if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
 	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 
 	BROADCAST(this, "si", "setLighting", getLighting());
@@ -417,8 +805,8 @@ void Shader::setLighting (int i)
 
 void Shader::setRenderBin (int i)
 {
-	_renderBin = i;
-	this->setRenderBinDetails( (int)_renderBin, "RenderBin");
+	renderBin_ = i;
+	this->setRenderBinDetails( (int)renderBin_, "RenderBin");
 
 	BROADCAST(this, "si", "setRenderBin", getRenderBin());
 }

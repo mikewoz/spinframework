@@ -50,8 +50,8 @@
 namespace osg {
     class Object;
     class Quat;
+    class Vec2f;
     class Vec3f;
-    class Vec3d;
 }
 
 // *****************************************************************************
@@ -125,9 +125,9 @@ template <typename T> bool fromString(T &aValue, const std::string &aStr)
 
 std::string stringify(float x);
 std::string stringify(int x);
-std::string stringify(osg::Quat q);
+std::string stringify(osg::Vec2f v);
 std::string stringify(osg::Vec3f v);
-std::string stringify(osg::Vec3d v);
+std::string stringify(osg::Quat q);
 std::string leadingSpaces(int n);
 
 
