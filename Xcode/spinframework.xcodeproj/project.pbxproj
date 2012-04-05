@@ -99,82 +99,6 @@
 		1C66174E1513DC1C0059C56A /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */; };
 		1C66174F1513DC5E0059C56A /* libboost_filesystem-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */; };
 		1C6617501513DC5E0059C56A /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */; };
-		1C70F2CE14C3A5B90054B0A1 /* osgdb_3dc.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE514C0D396006394AD /* osgdb_3dc.so */; };
-		1C70F2CF14C3A5B90054B0A1 /* osgdb_3ds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE614C0D396006394AD /* osgdb_3ds.so */; };
-		1C70F2D014C3A5B90054B0A1 /* osgdb_ac.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE714C0D396006394AD /* osgdb_ac.so */; };
-		1C70F2D114C3A5B90054B0A1 /* osgdb_bmp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE814C0D396006394AD /* osgdb_bmp.so */; };
-		1C70F2D214C3A5B90054B0A1 /* osgdb_bsp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE914C0D396006394AD /* osgdb_bsp.so */; };
-		1C70F2D314C3A5B90054B0A1 /* osgdb_bvh.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEA14C0D396006394AD /* osgdb_bvh.so */; };
-		1C70F2D414C3A5B90054B0A1 /* osgdb_cfg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEB14C0D396006394AD /* osgdb_cfg.so */; };
-		1C70F2D514C3A5B90054B0A1 /* osgdb_curl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEC14C0D396006394AD /* osgdb_curl.so */; };
-		1C70F2D614C3A5B90054B0A1 /* osgdb_dds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEED14C0D396006394AD /* osgdb_dds.so */; };
-		1C70F2D714C3A5B90054B0A1 /* osgdb_deprecated_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEE14C0D396006394AD /* osgdb_deprecated_osg.so */; };
-		1C70F2D814C3A5B90054B0A1 /* osgdb_deprecated_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEF14C0D396006394AD /* osgdb_deprecated_osganimation.so */; };
-		1C70F2D914C3A5B90054B0A1 /* osgdb_deprecated_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF014C0D396006394AD /* osgdb_deprecated_osgfx.so */; };
-		1C70F2DA14C3A5B90054B0A1 /* osgdb_deprecated_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF114C0D396006394AD /* osgdb_deprecated_osgparticle.so */; };
-		1C70F2DB14C3A5B90054B0A1 /* osgdb_deprecated_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF214C0D396006394AD /* osgdb_deprecated_osgshadow.so */; };
-		1C70F2DC14C3A5B90054B0A1 /* osgdb_deprecated_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF314C0D396006394AD /* osgdb_deprecated_osgsim.so */; };
-		1C70F2DD14C3A5B90054B0A1 /* osgdb_deprecated_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF414C0D396006394AD /* osgdb_deprecated_osgterrain.so */; };
-		1C70F2DE14C3A5B90054B0A1 /* osgdb_deprecated_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF514C0D396006394AD /* osgdb_deprecated_osgtext.so */; };
-		1C70F2DF14C3A5B90054B0A1 /* osgdb_deprecated_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF614C0D396006394AD /* osgdb_deprecated_osgviewer.so */; };
-		1C70F2E014C3A5B90054B0A1 /* osgdb_deprecated_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF714C0D396006394AD /* osgdb_deprecated_osgvolume.so */; };
-		1C70F2E114C3A5B90054B0A1 /* osgdb_deprecated_osgwidget.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF814C0D396006394AD /* osgdb_deprecated_osgwidget.so */; };
-		1C70F2E214C3A5B90054B0A1 /* osgdb_dot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF914C0D396006394AD /* osgdb_dot.so */; };
-		1C70F2E314C3A5B90054B0A1 /* osgdb_dw.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFA14C0D396006394AD /* osgdb_dw.so */; };
-		1C70F2E414C3A5B90054B0A1 /* osgdb_dxf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFB14C0D396006394AD /* osgdb_dxf.so */; };
-		1C70F2E614C3A5B90054B0A1 /* osgdb_freetype.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFD14C0D396006394AD /* osgdb_freetype.so */; };
-		1C70F2E714C3A5B90054B0A1 /* osgdb_gdal.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFE14C0D397006394AD /* osgdb_gdal.so */; };
-		1C70F2E814C3A5B90054B0A1 /* osgdb_geo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFF14C0D397006394AD /* osgdb_geo.so */; };
-		1C70F2E914C3A5B90054B0A1 /* osgdb_glsl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0014C0D397006394AD /* osgdb_glsl.so */; };
-		1C70F2EA14C3A5B90054B0A1 /* osgdb_gz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0114C0D397006394AD /* osgdb_gz.so */; };
-		1C70F2EB14C3A5B90054B0A1 /* osgdb_hdr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0214C0D397006394AD /* osgdb_hdr.so */; };
-		1C70F2EC14C3A5B90054B0A1 /* osgdb_imageio.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0314C0D397006394AD /* osgdb_imageio.so */; };
-		1C70F2ED14C3A5B90054B0A1 /* osgdb_ive.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0414C0D397006394AD /* osgdb_ive.so */; };
-		1C70F2EE14C3A5B90054B0A1 /* osgdb_jp2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0514C0D397006394AD /* osgdb_jp2.so */; };
-		1C70F2EF14C3A5B90054B0A1 /* osgdb_logo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0614C0D397006394AD /* osgdb_logo.so */; };
-		1C70F2F014C3A5B90054B0A1 /* osgdb_lwo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0714C0D397006394AD /* osgdb_lwo.so */; };
-		1C70F2F114C3A5B90054B0A1 /* osgdb_lws.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0814C0D397006394AD /* osgdb_lws.so */; };
-		1C70F2F214C3A5B90054B0A1 /* osgdb_md2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0914C0D397006394AD /* osgdb_md2.so */; };
-		1C70F2F314C3A5B90054B0A1 /* osgdb_mdl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0A14C0D397006394AD /* osgdb_mdl.so */; };
-		1C70F2F414C3A5B90054B0A1 /* osgdb_normals.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0B14C0D397006394AD /* osgdb_normals.so */; };
-		1C70F2F514C3A5B90054B0A1 /* osgdb_obj.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0C14C0D397006394AD /* osgdb_obj.so */; };
-		1C70F2F614C3A5B90054B0A1 /* osgdb_ogr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0D14C0D397006394AD /* osgdb_ogr.so */; };
-		1C70F2F714C3A5B90054B0A1 /* osgdb_openflight.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0E14C0D397006394AD /* osgdb_openflight.so */; };
-		1C70F2F814C3A5B90054B0A1 /* osgdb_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0F14C0D397006394AD /* osgdb_osg.so */; };
-		1C70F2F914C3A5B90054B0A1 /* osgdb_osga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1014C0D397006394AD /* osgdb_osga.so */; };
-		1C70F2FA14C3A5B90054B0A1 /* osgdb_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1114C0D397006394AD /* osgdb_osgshadow.so */; };
-		1C70F2FB14C3A5B90054B0A1 /* osgdb_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1214C0D397006394AD /* osgdb_osgterrain.so */; };
-		1C70F2FC14C3A5B90054B0A1 /* osgdb_osgtgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1314C0D397006394AD /* osgdb_osgtgz.so */; };
-		1C70F2FD14C3A5B90054B0A1 /* osgdb_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1414C0D397006394AD /* osgdb_osgviewer.so */; };
-		1C70F2FE14C3A5B90054B0A1 /* osgdb_p3d.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1514C0D397006394AD /* osgdb_p3d.so */; };
-		1C70F2FF14C3A5B90054B0A1 /* osgdb_pic.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1614C0D397006394AD /* osgdb_pic.so */; };
-		1C70F30014C3A5B90054B0A1 /* osgdb_ply.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1714C0D397006394AD /* osgdb_ply.so */; };
-		1C70F30114C3A5B90054B0A1 /* osgdb_pnm.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1814C0D397006394AD /* osgdb_pnm.so */; };
-		1C70F30214C3A5B90054B0A1 /* osgdb_revisions.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1914C0D397006394AD /* osgdb_revisions.so */; };
-		1C70F30314C3A5B90054B0A1 /* osgdb_rgb.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1A14C0D397006394AD /* osgdb_rgb.so */; };
-		1C70F30414C3A5B90054B0A1 /* osgdb_rot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1B14C0D397006394AD /* osgdb_rot.so */; };
-		1C70F30514C3A5B90054B0A1 /* osgdb_scale.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1C14C0D397006394AD /* osgdb_scale.so */; };
-		1C70F30614C3A5B90054B0A1 /* osgdb_serializers_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1D14C0D397006394AD /* osgdb_serializers_osg.so */; };
-		1C70F30714C3A5B90054B0A1 /* osgdb_serializers_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1E14C0D397006394AD /* osgdb_serializers_osganimation.so */; };
-		1C70F30814C3A5B90054B0A1 /* osgdb_serializers_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1F14C0D397006394AD /* osgdb_serializers_osgfx.so */; };
-		1C70F30914C3A5B90054B0A1 /* osgdb_serializers_osgmanipulator.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2014C0D397006394AD /* osgdb_serializers_osgmanipulator.so */; };
-		1C70F30A14C3A5B90054B0A1 /* osgdb_serializers_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2114C0D397006394AD /* osgdb_serializers_osgparticle.so */; };
-		1C70F30B14C3A5B90054B0A1 /* osgdb_serializers_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2214C0D397006394AD /* osgdb_serializers_osgshadow.so */; };
-		1C70F30C14C3A5B90054B0A1 /* osgdb_serializers_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2314C0D397006394AD /* osgdb_serializers_osgsim.so */; };
-		1C70F30D14C3A5B90054B0A1 /* osgdb_serializers_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2414C0D397006394AD /* osgdb_serializers_osgterrain.so */; };
-		1C70F30E14C3A5B90054B0A1 /* osgdb_serializers_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2514C0D397006394AD /* osgdb_serializers_osgtext.so */; };
-		1C70F30F14C3A5B90054B0A1 /* osgdb_serializers_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2614C0D397006394AD /* osgdb_serializers_osgvolume.so */; };
-		1C70F31014C3A5B90054B0A1 /* osgdb_shp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2714C0D397006394AD /* osgdb_shp.so */; };
-		1C70F31114C3A5B90054B0A1 /* osgdb_stl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2814C0D397006394AD /* osgdb_stl.so */; };
-		1C70F31214C3A5B90054B0A1 /* osgdb_tga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2914C0D397006394AD /* osgdb_tga.so */; };
-		1C70F31314C3A5B90054B0A1 /* osgdb_tgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2A14C0D397006394AD /* osgdb_tgz.so */; };
-		1C70F31414C3A5B90054B0A1 /* osgdb_trans.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2B14C0D397006394AD /* osgdb_trans.so */; };
-		1C70F31514C3A5B90054B0A1 /* osgdb_txf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2C14C0D397006394AD /* osgdb_txf.so */; };
-		1C70F31614C3A5B90054B0A1 /* osgdb_txp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2D14C0D397006394AD /* osgdb_txp.so */; };
-		1C70F31714C3A5B90054B0A1 /* osgdb_vrml.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2E14C0D397006394AD /* osgdb_vrml.so */; };
-		1C70F31814C3A5B90054B0A1 /* osgdb_vtf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2F14C0D397006394AD /* osgdb_vtf.so */; };
-		1C70F31914C3A5B90054B0A1 /* osgdb_x.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3014C0D397006394AD /* osgdb_x.so */; };
-		1C70F31A14C3A5B90054B0A1 /* osgdb_zip.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3114C0D397006394AD /* osgdb_zip.so */; };
 		1C70F33414C3C7540054B0A1 /* osgPlugins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */; };
 		1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
@@ -182,85 +106,252 @@
 		1C7A4AD514F2CAD200EA83AB /* libpcl_common.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51714E59373007F97E5 /* libpcl_common.1.4.0.dylib */; };
 		1C7A4AD614F2CAD600EA83AB /* libpcl_io.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51A14E59373007F97E5 /* libpcl_io.1.4.0.dylib */; };
 		1C7A4AD714F2CAE100EA83AB /* PointCloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C25F51414E58AC6007F97E5 /* PointCloud.cpp */; };
+		1C82ACEE152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
+		1C82ACEF152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
+		1C82ACF0152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
+		1C82ACF1152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
+		1C82ACF2152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
+		1C82ACF3152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
+		1C82ACF4152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
+		1C82ACF5152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
+		1C82ACF6152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
+		1C82ACF7152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
+		1C82ACF8152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
+		1C82ACF9152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
+		1C82ACFA152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
+		1C82ACFB152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
+		1C82ACFC152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
+		1C82ACFD152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
+		1C82ACFE152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
+		1C82ACFF152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
+		1C82AD00152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
+		1C82AD01152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
+		1C82AD02152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
+		1C82AD03152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
+		1C82AD04152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
+		1C82AD05152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
+		1C82AD06152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
+		1C82AD07152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
+		1C82AD08152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
+		1C82AD09152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
+		1C82AD0A152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
+		1C82AD0B152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
+		1C82AD0C152D07220085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
+		1C82AD0D152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
+		1C82AD0E152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
+		1C82AD0F152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
+		1C82AD10152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
+		1C82AD11152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
+		1C82AD12152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
+		1C82AD13152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
+		1C82AD14152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
+		1C82AD15152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
+		1C82AD16152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
+		1C82AD17152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
+		1C82AD18152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
+		1C82AD19152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
+		1C82AD1A152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
+		1C82AD1B152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
+		1C82AD1C152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
+		1C82AD1D152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
+		1C82AD1E152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
+		1C82AD1F152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
+		1C82AD20152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
+		1C82AD21152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
+		1C82AD22152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
+		1C82AD23152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
+		1C82AD24152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
+		1C82AD25152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
+		1C82AD26152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
+		1C82AD27152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
+		1C82AD28152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
+		1C82AD29152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
+		1C82AD2A152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
+		1C82AD2B152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
+		1C82AD2C152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
+		1C82AD2D152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
+		1C82AD2E152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
+		1C82AD2F152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
+		1C82AD30152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
+		1C82AD31152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
+		1C82AD32152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
+		1C82AD33152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
+		1C82AD34152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
+		1C82AD35152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
+		1C82AD36152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
+		1C82AD37152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
+		1C82AD38152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
+		1C82AD39152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
+		1C82AD3A152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
+		1C82AD3B152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
+		1C82AD3C152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
+		1C82AD3D152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
+		1C82AD3E152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
+		1C82AD3F152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
+		1C82AD40152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
+		1C82AD41152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
+		1C82AD42152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
+		1C82AE31152D30BF0085D8F0 /* osgdb_3dc.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD44152D07360085D8F0 /* osgdb_3dc.so */; };
+		1C82AE32152D30BF0085D8F0 /* osgdb_3ds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD45152D07360085D8F0 /* osgdb_3ds.so */; };
+		1C82AE33152D30BF0085D8F0 /* osgdb_ac.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD46152D07360085D8F0 /* osgdb_ac.so */; };
+		1C82AE34152D30BF0085D8F0 /* osgdb_bmp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD47152D07360085D8F0 /* osgdb_bmp.so */; };
+		1C82AE35152D30BF0085D8F0 /* osgdb_bsp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD48152D07360085D8F0 /* osgdb_bsp.so */; };
+		1C82AE36152D30BF0085D8F0 /* osgdb_bvh.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD49152D07360085D8F0 /* osgdb_bvh.so */; };
+		1C82AE37152D30BF0085D8F0 /* osgdb_cfg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4A152D07360085D8F0 /* osgdb_cfg.so */; };
+		1C82AE38152D30BF0085D8F0 /* osgdb_curl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4B152D07360085D8F0 /* osgdb_curl.so */; };
+		1C82AE39152D30BF0085D8F0 /* osgdb_dds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4C152D07360085D8F0 /* osgdb_dds.so */; };
+		1C82AE3A152D30BF0085D8F0 /* osgdb_deprecated_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4D152D07360085D8F0 /* osgdb_deprecated_osg.so */; };
+		1C82AE3B152D30BF0085D8F0 /* osgdb_deprecated_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4E152D07360085D8F0 /* osgdb_deprecated_osganimation.so */; };
+		1C82AE3C152D30BF0085D8F0 /* osgdb_deprecated_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4F152D07360085D8F0 /* osgdb_deprecated_osgfx.so */; };
+		1C82AE3D152D30BF0085D8F0 /* osgdb_deprecated_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD50152D07360085D8F0 /* osgdb_deprecated_osgparticle.so */; };
+		1C82AE3E152D30BF0085D8F0 /* osgdb_deprecated_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD51152D07360085D8F0 /* osgdb_deprecated_osgshadow.so */; };
+		1C82AE3F152D30BF0085D8F0 /* osgdb_deprecated_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD52152D07360085D8F0 /* osgdb_deprecated_osgsim.so */; };
+		1C82AE40152D30BF0085D8F0 /* osgdb_deprecated_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD53152D07360085D8F0 /* osgdb_deprecated_osgterrain.so */; };
+		1C82AE41152D30BF0085D8F0 /* osgdb_deprecated_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD54152D07360085D8F0 /* osgdb_deprecated_osgtext.so */; };
+		1C82AE42152D30BF0085D8F0 /* osgdb_deprecated_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD55152D07360085D8F0 /* osgdb_deprecated_osgviewer.so */; };
+		1C82AE43152D30BF0085D8F0 /* osgdb_deprecated_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD56152D07360085D8F0 /* osgdb_deprecated_osgvolume.so */; };
+		1C82AE44152D30BF0085D8F0 /* osgdb_deprecated_osgwidget.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD57152D07360085D8F0 /* osgdb_deprecated_osgwidget.so */; };
+		1C82AE45152D30BF0085D8F0 /* osgdb_dot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD58152D07360085D8F0 /* osgdb_dot.so */; };
+		1C82AE46152D30BF0085D8F0 /* osgdb_dw.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD59152D07360085D8F0 /* osgdb_dw.so */; };
+		1C82AE47152D30BF0085D8F0 /* osgdb_dxf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5A152D07360085D8F0 /* osgdb_dxf.so */; };
+		1C82AE48152D30BF0085D8F0 /* osgdb_ffmpeg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5B152D07360085D8F0 /* osgdb_ffmpeg.so */; };
+		1C82AE49152D30BF0085D8F0 /* osgdb_freetype.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5C152D07360085D8F0 /* osgdb_freetype.so */; };
+		1C82AE4A152D30BF0085D8F0 /* osgdb_gdal.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5D152D07360085D8F0 /* osgdb_gdal.so */; };
+		1C82AE4B152D30BF0085D8F0 /* osgdb_geo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5E152D07360085D8F0 /* osgdb_geo.so */; };
+		1C82AE4C152D30BF0085D8F0 /* osgdb_glsl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5F152D07360085D8F0 /* osgdb_glsl.so */; };
+		1C82AE4D152D30BF0085D8F0 /* osgdb_gz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD60152D07360085D8F0 /* osgdb_gz.so */; };
+		1C82AE4E152D30BF0085D8F0 /* osgdb_hdr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD61152D07360085D8F0 /* osgdb_hdr.so */; };
+		1C82AE4F152D30BF0085D8F0 /* osgdb_imageio.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD62152D07360085D8F0 /* osgdb_imageio.so */; };
+		1C82AE50152D30BF0085D8F0 /* osgdb_ive.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD63152D07360085D8F0 /* osgdb_ive.so */; };
+		1C82AE51152D30BF0085D8F0 /* osgdb_jp2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD64152D07360085D8F0 /* osgdb_jp2.so */; };
+		1C82AE52152D30BF0085D8F0 /* osgdb_logo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD65152D07370085D8F0 /* osgdb_logo.so */; };
+		1C82AE53152D30BF0085D8F0 /* osgdb_lwo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD66152D07370085D8F0 /* osgdb_lwo.so */; };
+		1C82AE54152D30BF0085D8F0 /* osgdb_lws.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD67152D07370085D8F0 /* osgdb_lws.so */; };
+		1C82AE55152D30BF0085D8F0 /* osgdb_md2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD68152D07370085D8F0 /* osgdb_md2.so */; };
+		1C82AE56152D30BF0085D8F0 /* osgdb_mdl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD69152D07370085D8F0 /* osgdb_mdl.so */; };
+		1C82AE57152D30BF0085D8F0 /* osgdb_normals.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6A152D07370085D8F0 /* osgdb_normals.so */; };
+		1C82AE58152D30BF0085D8F0 /* osgdb_obj.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6B152D07370085D8F0 /* osgdb_obj.so */; };
+		1C82AE59152D30BF0085D8F0 /* osgdb_ogr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6C152D07370085D8F0 /* osgdb_ogr.so */; };
+		1C82AE5A152D30BF0085D8F0 /* osgdb_openflight.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6D152D07370085D8F0 /* osgdb_openflight.so */; };
+		1C82AE5B152D30BF0085D8F0 /* osgdb_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6E152D07370085D8F0 /* osgdb_osg.so */; };
+		1C82AE5C152D30BF0085D8F0 /* osgdb_osga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6F152D07370085D8F0 /* osgdb_osga.so */; };
+		1C82AE5D152D30BF0085D8F0 /* osgdb_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD70152D07370085D8F0 /* osgdb_osgshadow.so */; };
+		1C82AE5E152D30BF0085D8F0 /* osgdb_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD71152D07370085D8F0 /* osgdb_osgterrain.so */; };
+		1C82AE5F152D30BF0085D8F0 /* osgdb_osgtgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD72152D07370085D8F0 /* osgdb_osgtgz.so */; };
+		1C82AE60152D30BF0085D8F0 /* osgdb_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD73152D07370085D8F0 /* osgdb_osgviewer.so */; };
+		1C82AE61152D30BF0085D8F0 /* osgdb_p3d.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD74152D07370085D8F0 /* osgdb_p3d.so */; };
+		1C82AE62152D30BF0085D8F0 /* osgdb_pic.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD75152D07370085D8F0 /* osgdb_pic.so */; };
+		1C82AE63152D30BF0085D8F0 /* osgdb_ply.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD76152D07370085D8F0 /* osgdb_ply.so */; };
+		1C82AE64152D30BF0085D8F0 /* osgdb_pnm.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD77152D07370085D8F0 /* osgdb_pnm.so */; };
+		1C82AE65152D30BF0085D8F0 /* osgdb_pov.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD78152D07370085D8F0 /* osgdb_pov.so */; };
+		1C82AE66152D30BF0085D8F0 /* osgdb_pvr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD79152D07370085D8F0 /* osgdb_pvr.so */; };
+		1C82AE67152D30BF0085D8F0 /* osgdb_revisions.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7A152D07370085D8F0 /* osgdb_revisions.so */; };
+		1C82AE68152D30BF0085D8F0 /* osgdb_rgb.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7B152D07370085D8F0 /* osgdb_rgb.so */; };
+		1C82AE69152D30BF0085D8F0 /* osgdb_rot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7C152D07370085D8F0 /* osgdb_rot.so */; };
+		1C82AE6A152D30BF0085D8F0 /* osgdb_scale.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7D152D07370085D8F0 /* osgdb_scale.so */; };
+		1C82AE6B152D30BF0085D8F0 /* osgdb_serializers_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7E152D07370085D8F0 /* osgdb_serializers_osg.so */; };
+		1C82AE6C152D30BF0085D8F0 /* osgdb_serializers_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7F152D07370085D8F0 /* osgdb_serializers_osganimation.so */; };
+		1C82AE6D152D30BF0085D8F0 /* osgdb_serializers_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD80152D07370085D8F0 /* osgdb_serializers_osgfx.so */; };
+		1C82AE6E152D30BF0085D8F0 /* osgdb_serializers_osgmanipulator.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD81152D07370085D8F0 /* osgdb_serializers_osgmanipulator.so */; };
+		1C82AE6F152D30BF0085D8F0 /* osgdb_serializers_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD82152D07370085D8F0 /* osgdb_serializers_osgparticle.so */; };
+		1C82AE70152D30BF0085D8F0 /* osgdb_serializers_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD83152D07370085D8F0 /* osgdb_serializers_osgshadow.so */; };
+		1C82AE71152D30BF0085D8F0 /* osgdb_serializers_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD84152D07370085D8F0 /* osgdb_serializers_osgsim.so */; };
+		1C82AE72152D30BF0085D8F0 /* osgdb_serializers_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD85152D07370085D8F0 /* osgdb_serializers_osgterrain.so */; };
+		1C82AE73152D30BF0085D8F0 /* osgdb_serializers_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD86152D07370085D8F0 /* osgdb_serializers_osgtext.so */; };
+		1C82AE74152D30BF0085D8F0 /* osgdb_serializers_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD87152D07370085D8F0 /* osgdb_serializers_osgvolume.so */; };
+		1C82AE75152D30BF0085D8F0 /* osgdb_shp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD88152D07370085D8F0 /* osgdb_shp.so */; };
+		1C82AE76152D30BF0085D8F0 /* osgdb_stl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD89152D07370085D8F0 /* osgdb_stl.so */; };
+		1C82AE77152D30BF0085D8F0 /* osgdb_tga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8A152D07370085D8F0 /* osgdb_tga.so */; };
+		1C82AE78152D30BF0085D8F0 /* osgdb_tgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8B152D07370085D8F0 /* osgdb_tgz.so */; };
+		1C82AE79152D30BF0085D8F0 /* osgdb_trans.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8C152D07370085D8F0 /* osgdb_trans.so */; };
+		1C82AE7A152D30BF0085D8F0 /* osgdb_txf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8D152D07370085D8F0 /* osgdb_txf.so */; };
+		1C82AE7B152D30BF0085D8F0 /* osgdb_txp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8E152D07370085D8F0 /* osgdb_txp.so */; };
+		1C82AE7C152D30BF0085D8F0 /* osgdb_vrml.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8F152D07370085D8F0 /* osgdb_vrml.so */; };
+		1C82AE7D152D30BF0085D8F0 /* osgdb_vtf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD90152D07380085D8F0 /* osgdb_vtf.so */; };
+		1C82AE7E152D30BF0085D8F0 /* osgdb_x.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD91152D07380085D8F0 /* osgdb_x.so */; };
+		1C82AE7F152D30BF0085D8F0 /* osgdb_zip.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD92152D07380085D8F0 /* osgdb_zip.so */; };
+		1C82AE80152D30E20085D8F0 /* osgdb_3dc.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD44152D07360085D8F0 /* osgdb_3dc.so */; };
+		1C82AE81152D30E20085D8F0 /* osgdb_3ds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD45152D07360085D8F0 /* osgdb_3ds.so */; };
+		1C82AE82152D30E20085D8F0 /* osgdb_ac.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD46152D07360085D8F0 /* osgdb_ac.so */; };
+		1C82AE83152D30E20085D8F0 /* osgdb_bmp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD47152D07360085D8F0 /* osgdb_bmp.so */; };
+		1C82AE84152D30E20085D8F0 /* osgdb_bsp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD48152D07360085D8F0 /* osgdb_bsp.so */; };
+		1C82AE85152D30E20085D8F0 /* osgdb_bvh.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD49152D07360085D8F0 /* osgdb_bvh.so */; };
+		1C82AE86152D30E20085D8F0 /* osgdb_cfg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4A152D07360085D8F0 /* osgdb_cfg.so */; };
+		1C82AE87152D30E20085D8F0 /* osgdb_curl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4B152D07360085D8F0 /* osgdb_curl.so */; };
+		1C82AE88152D30E20085D8F0 /* osgdb_dds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4C152D07360085D8F0 /* osgdb_dds.so */; };
+		1C82AE89152D30E20085D8F0 /* osgdb_deprecated_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4D152D07360085D8F0 /* osgdb_deprecated_osg.so */; };
+		1C82AE8A152D30E20085D8F0 /* osgdb_deprecated_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4E152D07360085D8F0 /* osgdb_deprecated_osganimation.so */; };
+		1C82AE8B152D30E20085D8F0 /* osgdb_deprecated_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD4F152D07360085D8F0 /* osgdb_deprecated_osgfx.so */; };
+		1C82AE8C152D30E20085D8F0 /* osgdb_deprecated_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD50152D07360085D8F0 /* osgdb_deprecated_osgparticle.so */; };
+		1C82AE8D152D30E20085D8F0 /* osgdb_deprecated_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD51152D07360085D8F0 /* osgdb_deprecated_osgshadow.so */; };
+		1C82AE8E152D30E20085D8F0 /* osgdb_deprecated_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD52152D07360085D8F0 /* osgdb_deprecated_osgsim.so */; };
+		1C82AE8F152D30E20085D8F0 /* osgdb_deprecated_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD53152D07360085D8F0 /* osgdb_deprecated_osgterrain.so */; };
+		1C82AE90152D30E20085D8F0 /* osgdb_deprecated_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD54152D07360085D8F0 /* osgdb_deprecated_osgtext.so */; };
+		1C82AE91152D30E20085D8F0 /* osgdb_deprecated_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD55152D07360085D8F0 /* osgdb_deprecated_osgviewer.so */; };
+		1C82AE92152D30E20085D8F0 /* osgdb_deprecated_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD56152D07360085D8F0 /* osgdb_deprecated_osgvolume.so */; };
+		1C82AE93152D30E20085D8F0 /* osgdb_deprecated_osgwidget.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD57152D07360085D8F0 /* osgdb_deprecated_osgwidget.so */; };
+		1C82AE94152D30E20085D8F0 /* osgdb_dot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD58152D07360085D8F0 /* osgdb_dot.so */; };
+		1C82AE95152D30E20085D8F0 /* osgdb_dw.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD59152D07360085D8F0 /* osgdb_dw.so */; };
+		1C82AE96152D30E20085D8F0 /* osgdb_dxf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5A152D07360085D8F0 /* osgdb_dxf.so */; };
+		1C82AE97152D30E20085D8F0 /* osgdb_ffmpeg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5B152D07360085D8F0 /* osgdb_ffmpeg.so */; };
+		1C82AE98152D30E20085D8F0 /* osgdb_freetype.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5C152D07360085D8F0 /* osgdb_freetype.so */; };
+		1C82AE99152D30E20085D8F0 /* osgdb_gdal.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5D152D07360085D8F0 /* osgdb_gdal.so */; };
+		1C82AE9A152D30E20085D8F0 /* osgdb_geo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5E152D07360085D8F0 /* osgdb_geo.so */; };
+		1C82AE9B152D30E20085D8F0 /* osgdb_glsl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD5F152D07360085D8F0 /* osgdb_glsl.so */; };
+		1C82AE9C152D30E20085D8F0 /* osgdb_gz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD60152D07360085D8F0 /* osgdb_gz.so */; };
+		1C82AE9D152D30E20085D8F0 /* osgdb_hdr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD61152D07360085D8F0 /* osgdb_hdr.so */; };
+		1C82AE9E152D30E20085D8F0 /* osgdb_imageio.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD62152D07360085D8F0 /* osgdb_imageio.so */; };
+		1C82AE9F152D30E20085D8F0 /* osgdb_ive.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD63152D07360085D8F0 /* osgdb_ive.so */; };
+		1C82AEA0152D30E20085D8F0 /* osgdb_jp2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD64152D07360085D8F0 /* osgdb_jp2.so */; };
+		1C82AEA1152D30E20085D8F0 /* osgdb_logo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD65152D07370085D8F0 /* osgdb_logo.so */; };
+		1C82AEA2152D30E20085D8F0 /* osgdb_lwo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD66152D07370085D8F0 /* osgdb_lwo.so */; };
+		1C82AEA3152D30E20085D8F0 /* osgdb_lws.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD67152D07370085D8F0 /* osgdb_lws.so */; };
+		1C82AEA4152D30E20085D8F0 /* osgdb_md2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD68152D07370085D8F0 /* osgdb_md2.so */; };
+		1C82AEA5152D30E20085D8F0 /* osgdb_mdl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD69152D07370085D8F0 /* osgdb_mdl.so */; };
+		1C82AEA6152D30E20085D8F0 /* osgdb_normals.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6A152D07370085D8F0 /* osgdb_normals.so */; };
+		1C82AEA7152D30E20085D8F0 /* osgdb_obj.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6B152D07370085D8F0 /* osgdb_obj.so */; };
+		1C82AEA8152D30E20085D8F0 /* osgdb_ogr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6C152D07370085D8F0 /* osgdb_ogr.so */; };
+		1C82AEA9152D30E20085D8F0 /* osgdb_openflight.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6D152D07370085D8F0 /* osgdb_openflight.so */; };
+		1C82AEAA152D30E20085D8F0 /* osgdb_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6E152D07370085D8F0 /* osgdb_osg.so */; };
+		1C82AEAB152D30E20085D8F0 /* osgdb_osga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD6F152D07370085D8F0 /* osgdb_osga.so */; };
+		1C82AEAC152D30E20085D8F0 /* osgdb_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD70152D07370085D8F0 /* osgdb_osgshadow.so */; };
+		1C82AEAD152D30E20085D8F0 /* osgdb_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD71152D07370085D8F0 /* osgdb_osgterrain.so */; };
+		1C82AEAE152D30E20085D8F0 /* osgdb_osgtgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD72152D07370085D8F0 /* osgdb_osgtgz.so */; };
+		1C82AEAF152D30E20085D8F0 /* osgdb_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD73152D07370085D8F0 /* osgdb_osgviewer.so */; };
+		1C82AEB0152D30E20085D8F0 /* osgdb_p3d.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD74152D07370085D8F0 /* osgdb_p3d.so */; };
+		1C82AEB1152D30E20085D8F0 /* osgdb_pic.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD75152D07370085D8F0 /* osgdb_pic.so */; };
+		1C82AEB2152D30E20085D8F0 /* osgdb_ply.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD76152D07370085D8F0 /* osgdb_ply.so */; };
+		1C82AEB3152D30E20085D8F0 /* osgdb_pnm.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD77152D07370085D8F0 /* osgdb_pnm.so */; };
+		1C82AEB4152D30E20085D8F0 /* osgdb_pov.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD78152D07370085D8F0 /* osgdb_pov.so */; };
+		1C82AEB5152D30E20085D8F0 /* osgdb_pvr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD79152D07370085D8F0 /* osgdb_pvr.so */; };
+		1C82AEB6152D30E20085D8F0 /* osgdb_revisions.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7A152D07370085D8F0 /* osgdb_revisions.so */; };
+		1C82AEB7152D30E20085D8F0 /* osgdb_rgb.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7B152D07370085D8F0 /* osgdb_rgb.so */; };
+		1C82AEB8152D30E20085D8F0 /* osgdb_rot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7C152D07370085D8F0 /* osgdb_rot.so */; };
+		1C82AEB9152D30E20085D8F0 /* osgdb_scale.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7D152D07370085D8F0 /* osgdb_scale.so */; };
+		1C82AEBA152D30E20085D8F0 /* osgdb_serializers_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7E152D07370085D8F0 /* osgdb_serializers_osg.so */; };
+		1C82AEBB152D30E20085D8F0 /* osgdb_serializers_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD7F152D07370085D8F0 /* osgdb_serializers_osganimation.so */; };
+		1C82AEBC152D30E20085D8F0 /* osgdb_serializers_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD80152D07370085D8F0 /* osgdb_serializers_osgfx.so */; };
+		1C82AEBD152D30E20085D8F0 /* osgdb_serializers_osgmanipulator.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD81152D07370085D8F0 /* osgdb_serializers_osgmanipulator.so */; };
+		1C82AEBE152D30E20085D8F0 /* osgdb_serializers_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD82152D07370085D8F0 /* osgdb_serializers_osgparticle.so */; };
+		1C82AEBF152D30E20085D8F0 /* osgdb_serializers_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD83152D07370085D8F0 /* osgdb_serializers_osgshadow.so */; };
+		1C82AEC0152D30E20085D8F0 /* osgdb_serializers_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD84152D07370085D8F0 /* osgdb_serializers_osgsim.so */; };
+		1C82AEC1152D30E20085D8F0 /* osgdb_serializers_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD85152D07370085D8F0 /* osgdb_serializers_osgterrain.so */; };
+		1C82AEC2152D30E20085D8F0 /* osgdb_serializers_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD86152D07370085D8F0 /* osgdb_serializers_osgtext.so */; };
+		1C82AEC3152D30E20085D8F0 /* osgdb_serializers_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD87152D07370085D8F0 /* osgdb_serializers_osgvolume.so */; };
+		1C82AEC4152D30E20085D8F0 /* osgdb_shp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD88152D07370085D8F0 /* osgdb_shp.so */; };
+		1C82AEC5152D30E20085D8F0 /* osgdb_stl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD89152D07370085D8F0 /* osgdb_stl.so */; };
+		1C82AEC6152D30E20085D8F0 /* osgdb_tga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8A152D07370085D8F0 /* osgdb_tga.so */; };
+		1C82AEC7152D30E20085D8F0 /* osgdb_tgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8B152D07370085D8F0 /* osgdb_tgz.so */; };
+		1C82AEC8152D30E20085D8F0 /* osgdb_trans.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8C152D07370085D8F0 /* osgdb_trans.so */; };
+		1C82AEC9152D30E20085D8F0 /* osgdb_txf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8D152D07370085D8F0 /* osgdb_txf.so */; };
+		1C82AECA152D30E20085D8F0 /* osgdb_txp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8E152D07370085D8F0 /* osgdb_txp.so */; };
+		1C82AECB152D30E20085D8F0 /* osgdb_vrml.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD8F152D07370085D8F0 /* osgdb_vrml.so */; };
+		1C82AECC152D30E20085D8F0 /* osgdb_vtf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD90152D07380085D8F0 /* osgdb_vtf.so */; };
+		1C82AECD152D30E20085D8F0 /* osgdb_x.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD91152D07380085D8F0 /* osgdb_x.so */; };
+		1C82AECE152D30E20085D8F0 /* osgdb_zip.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD92152D07380085D8F0 /* osgdb_zip.so */; };
 		1C875F3B14C8EF4200A46EBC /* liblo.7.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; };
 		1C875F3C14C8EF4200A46EBC /* libcppintrospection-3.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C875F3F14C8EF4200A46EBC /* libboost_python.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python.dylib */; };
-		1C875F5214C8EFA300A46EBC /* osgdb_3dc.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE514C0D396006394AD /* osgdb_3dc.so */; };
-		1C875F5314C8EFA300A46EBC /* osgdb_3ds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE614C0D396006394AD /* osgdb_3ds.so */; };
-		1C875F5414C8EFA300A46EBC /* osgdb_ac.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE714C0D396006394AD /* osgdb_ac.so */; };
-		1C875F5514C8EFA300A46EBC /* osgdb_bmp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE814C0D396006394AD /* osgdb_bmp.so */; };
-		1C875F5614C8EFA300A46EBC /* osgdb_bsp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEE914C0D396006394AD /* osgdb_bsp.so */; };
-		1C875F5714C8EFA300A46EBC /* osgdb_bvh.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEA14C0D396006394AD /* osgdb_bvh.so */; };
-		1C875F5814C8EFA300A46EBC /* osgdb_cfg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEB14C0D396006394AD /* osgdb_cfg.so */; };
-		1C875F5914C8EFA300A46EBC /* osgdb_curl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEC14C0D396006394AD /* osgdb_curl.so */; };
-		1C875F5A14C8EFA300A46EBC /* osgdb_dds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEED14C0D396006394AD /* osgdb_dds.so */; };
-		1C875F5B14C8EFA300A46EBC /* osgdb_deprecated_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEE14C0D396006394AD /* osgdb_deprecated_osg.so */; };
-		1C875F5C14C8EFA300A46EBC /* osgdb_deprecated_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEEF14C0D396006394AD /* osgdb_deprecated_osganimation.so */; };
-		1C875F5D14C8EFA300A46EBC /* osgdb_deprecated_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF014C0D396006394AD /* osgdb_deprecated_osgfx.so */; };
-		1C875F5E14C8EFA300A46EBC /* osgdb_deprecated_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF114C0D396006394AD /* osgdb_deprecated_osgparticle.so */; };
-		1C875F5F14C8EFA300A46EBC /* osgdb_deprecated_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF214C0D396006394AD /* osgdb_deprecated_osgshadow.so */; };
-		1C875F6014C8EFA300A46EBC /* osgdb_deprecated_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF314C0D396006394AD /* osgdb_deprecated_osgsim.so */; };
-		1C875F6114C8EFA300A46EBC /* osgdb_deprecated_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF414C0D396006394AD /* osgdb_deprecated_osgterrain.so */; };
-		1C875F6214C8EFA300A46EBC /* osgdb_deprecated_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF514C0D396006394AD /* osgdb_deprecated_osgtext.so */; };
-		1C875F6314C8EFA300A46EBC /* osgdb_deprecated_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF614C0D396006394AD /* osgdb_deprecated_osgviewer.so */; };
-		1C875F6414C8EFA300A46EBC /* osgdb_deprecated_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF714C0D396006394AD /* osgdb_deprecated_osgvolume.so */; };
-		1C875F6514C8EFA300A46EBC /* osgdb_deprecated_osgwidget.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF814C0D396006394AD /* osgdb_deprecated_osgwidget.so */; };
-		1C875F6614C8EFA300A46EBC /* osgdb_dot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEF914C0D396006394AD /* osgdb_dot.so */; };
-		1C875F6714C8EFA300A46EBC /* osgdb_dw.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFA14C0D396006394AD /* osgdb_dw.so */; };
-		1C875F6814C8EFA300A46EBC /* osgdb_dxf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFB14C0D396006394AD /* osgdb_dxf.so */; };
-		1C875F6A14C8EFA300A46EBC /* osgdb_freetype.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFD14C0D396006394AD /* osgdb_freetype.so */; };
-		1C875F6B14C8EFA300A46EBC /* osgdb_gdal.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFE14C0D397006394AD /* osgdb_gdal.so */; };
-		1C875F6C14C8EFA300A46EBC /* osgdb_geo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFF14C0D397006394AD /* osgdb_geo.so */; };
-		1C875F6D14C8EFA300A46EBC /* osgdb_glsl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0014C0D397006394AD /* osgdb_glsl.so */; };
-		1C875F6E14C8EFA300A46EBC /* osgdb_gz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0114C0D397006394AD /* osgdb_gz.so */; };
-		1C875F6F14C8EFA300A46EBC /* osgdb_hdr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0214C0D397006394AD /* osgdb_hdr.so */; };
-		1C875F7014C8EFA300A46EBC /* osgdb_imageio.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0314C0D397006394AD /* osgdb_imageio.so */; };
-		1C875F7114C8EFA300A46EBC /* osgdb_ive.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0414C0D397006394AD /* osgdb_ive.so */; };
-		1C875F7214C8EFA300A46EBC /* osgdb_jp2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0514C0D397006394AD /* osgdb_jp2.so */; };
-		1C875F7314C8EFA300A46EBC /* osgdb_logo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0614C0D397006394AD /* osgdb_logo.so */; };
-		1C875F7414C8EFA300A46EBC /* osgdb_lwo.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0714C0D397006394AD /* osgdb_lwo.so */; };
-		1C875F7514C8EFA300A46EBC /* osgdb_lws.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0814C0D397006394AD /* osgdb_lws.so */; };
-		1C875F7614C8EFA300A46EBC /* osgdb_md2.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0914C0D397006394AD /* osgdb_md2.so */; };
-		1C875F7714C8EFA300A46EBC /* osgdb_mdl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0A14C0D397006394AD /* osgdb_mdl.so */; };
-		1C875F7814C8EFA300A46EBC /* osgdb_normals.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0B14C0D397006394AD /* osgdb_normals.so */; };
-		1C875F7914C8EFA300A46EBC /* osgdb_obj.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0C14C0D397006394AD /* osgdb_obj.so */; };
-		1C875F7A14C8EFA300A46EBC /* osgdb_ogr.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0D14C0D397006394AD /* osgdb_ogr.so */; };
-		1C875F7B14C8EFA300A46EBC /* osgdb_openflight.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0E14C0D397006394AD /* osgdb_openflight.so */; };
-		1C875F7C14C8EFA300A46EBC /* osgdb_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF0F14C0D397006394AD /* osgdb_osg.so */; };
-		1C875F7D14C8EFA300A46EBC /* osgdb_osga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1014C0D397006394AD /* osgdb_osga.so */; };
-		1C875F7E14C8EFA300A46EBC /* osgdb_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1114C0D397006394AD /* osgdb_osgshadow.so */; };
-		1C875F7F14C8EFA300A46EBC /* osgdb_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1214C0D397006394AD /* osgdb_osgterrain.so */; };
-		1C875F8014C8EFA300A46EBC /* osgdb_osgtgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1314C0D397006394AD /* osgdb_osgtgz.so */; };
-		1C875F8114C8EFA300A46EBC /* osgdb_osgviewer.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1414C0D397006394AD /* osgdb_osgviewer.so */; };
-		1C875F8214C8EFA300A46EBC /* osgdb_p3d.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1514C0D397006394AD /* osgdb_p3d.so */; };
-		1C875F8314C8EFA300A46EBC /* osgdb_pic.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1614C0D397006394AD /* osgdb_pic.so */; };
-		1C875F8414C8EFA300A46EBC /* osgdb_ply.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1714C0D397006394AD /* osgdb_ply.so */; };
-		1C875F8514C8EFA300A46EBC /* osgdb_pnm.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1814C0D397006394AD /* osgdb_pnm.so */; };
-		1C875F8614C8EFA300A46EBC /* osgdb_revisions.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1914C0D397006394AD /* osgdb_revisions.so */; };
-		1C875F8714C8EFA300A46EBC /* osgdb_rgb.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1A14C0D397006394AD /* osgdb_rgb.so */; };
-		1C875F8814C8EFA300A46EBC /* osgdb_rot.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1B14C0D397006394AD /* osgdb_rot.so */; };
-		1C875F8914C8EFA300A46EBC /* osgdb_scale.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1C14C0D397006394AD /* osgdb_scale.so */; };
-		1C875F8A14C8EFA300A46EBC /* osgdb_serializers_osg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1D14C0D397006394AD /* osgdb_serializers_osg.so */; };
-		1C875F8B14C8EFA300A46EBC /* osgdb_serializers_osganimation.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1E14C0D397006394AD /* osgdb_serializers_osganimation.so */; };
-		1C875F8C14C8EFA300A46EBC /* osgdb_serializers_osgfx.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF1F14C0D397006394AD /* osgdb_serializers_osgfx.so */; };
-		1C875F8D14C8EFA300A46EBC /* osgdb_serializers_osgmanipulator.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2014C0D397006394AD /* osgdb_serializers_osgmanipulator.so */; };
-		1C875F8E14C8EFA300A46EBC /* osgdb_serializers_osgparticle.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2114C0D397006394AD /* osgdb_serializers_osgparticle.so */; };
-		1C875F8F14C8EFA300A46EBC /* osgdb_serializers_osgshadow.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2214C0D397006394AD /* osgdb_serializers_osgshadow.so */; };
-		1C875F9014C8EFA300A46EBC /* osgdb_serializers_osgsim.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2314C0D397006394AD /* osgdb_serializers_osgsim.so */; };
-		1C875F9114C8EFA300A46EBC /* osgdb_serializers_osgterrain.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2414C0D397006394AD /* osgdb_serializers_osgterrain.so */; };
-		1C875F9214C8EFA300A46EBC /* osgdb_serializers_osgtext.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2514C0D397006394AD /* osgdb_serializers_osgtext.so */; };
-		1C875F9314C8EFA300A46EBC /* osgdb_serializers_osgvolume.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2614C0D397006394AD /* osgdb_serializers_osgvolume.so */; };
-		1C875F9414C8EFA300A46EBC /* osgdb_shp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2714C0D397006394AD /* osgdb_shp.so */; };
-		1C875F9514C8EFA300A46EBC /* osgdb_stl.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2814C0D397006394AD /* osgdb_stl.so */; };
-		1C875F9614C8EFA300A46EBC /* osgdb_tga.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2914C0D397006394AD /* osgdb_tga.so */; };
-		1C875F9714C8EFA300A46EBC /* osgdb_tgz.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2A14C0D397006394AD /* osgdb_tgz.so */; };
-		1C875F9814C8EFA300A46EBC /* osgdb_trans.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2B14C0D397006394AD /* osgdb_trans.so */; };
-		1C875F9914C8EFA300A46EBC /* osgdb_txf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2C14C0D397006394AD /* osgdb_txf.so */; };
-		1C875F9A14C8EFA300A46EBC /* osgdb_txp.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2D14C0D397006394AD /* osgdb_txp.so */; };
-		1C875F9B14C8EFA300A46EBC /* osgdb_vrml.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2E14C0D397006394AD /* osgdb_vrml.so */; };
-		1C875F9C14C8EFA300A46EBC /* osgdb_vtf.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF2F14C0D397006394AD /* osgdb_vtf.so */; };
-		1C875F9D14C8EFA300A46EBC /* osgdb_x.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3014C0D397006394AD /* osgdb_x.so */; };
-		1C875F9E14C8EFA300A46EBC /* osgdb_zip.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DF3114C0D397006394AD /* osgdb_zip.so */; };
 		1C875FE214C9BE3200A46EBC /* icon_3Dsphere.xpm in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FAF14C9BE3200A46EBC /* icon_3Dsphere.xpm */; };
 		1C875FE314C9BE3200A46EBC /* icon_3Dsphere.xpm in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FAF14C9BE3200A46EBC /* icon_3Dsphere.xpm */; };
 		1C875FE414C9BE3200A46EBC /* icon_3Dview.gif in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FB014C9BE3200A46EBC /* icon_3Dview.gif */; };
@@ -466,131 +557,10 @@
 		1CCCA0F614BE389B00DCA0B7 /* spinViewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */; };
 		1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
-		1CE3ACC314CF7C1D007E722D /* libosg.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */; };
-		1CE3ACC414CF7C1D007E722D /* libosgAnimation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */; };
-		1CE3ACC514CF7C1E007E722D /* libosgDB.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */; };
-		1CE3ACC614CF7C1E007E722D /* libosgFX.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB614CF7C1D007E722D /* libosgFX.66.dylib */; };
-		1CE3ACC714CF7C1E007E722D /* libosgGA.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB714CF7C1D007E722D /* libosgGA.66.dylib */; };
-		1CE3ACC814CF7C1E007E722D /* libosgManipulator.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB814CF7C1D007E722D /* libosgManipulator.66.dylib */; };
-		1CE3ACC914CF7C1E007E722D /* libosgParticle.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB914CF7C1D007E722D /* libosgParticle.66.dylib */; };
-		1CE3ACCA14CF7C1E007E722D /* libosgPresentation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBA14CF7C1D007E722D /* libosgPresentation.66.dylib */; };
-		1CE3ACCB14CF7C1E007E722D /* libosgShadow.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBB14CF7C1D007E722D /* libosgShadow.66.dylib */; };
-		1CE3ACCC14CF7C1E007E722D /* libosgSim.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBC14CF7C1D007E722D /* libosgSim.66.dylib */; };
-		1CE3ACCD14CF7C1E007E722D /* libosgTerrain.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBD14CF7C1D007E722D /* libosgTerrain.66.dylib */; };
-		1CE3ACCE14CF7C1E007E722D /* libosgText.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBE14CF7C1D007E722D /* libosgText.66.dylib */; };
-		1CE3ACCF14CF7C1E007E722D /* libosgUtil.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBF14CF7C1D007E722D /* libosgUtil.66.dylib */; };
-		1CE3ACD014CF7C1E007E722D /* libosgViewer.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC014CF7C1D007E722D /* libosgViewer.66.dylib */; };
-		1CE3ACD114CF7C1E007E722D /* libosgVolume.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */; };
-		1CE3ACD214CF7C1E007E722D /* libosgWidget.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */; };
-		1CE3ACD414CF7C72007E722D /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3ACD514CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3ACD614CF7CAF007E722D /* libosg.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */; };
-		1CE3ACD714CF7CAF007E722D /* libosgAnimation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */; };
-		1CE3ACD814CF7CAF007E722D /* libosgDB.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */; };
-		1CE3ACD914CF7CAF007E722D /* libosgFX.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB614CF7C1D007E722D /* libosgFX.66.dylib */; };
-		1CE3ACDA14CF7CAF007E722D /* libosgGA.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB714CF7C1D007E722D /* libosgGA.66.dylib */; };
-		1CE3ACDB14CF7CAF007E722D /* libosgManipulator.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB814CF7C1D007E722D /* libosgManipulator.66.dylib */; };
-		1CE3ACDC14CF7CAF007E722D /* libosgParticle.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB914CF7C1D007E722D /* libosgParticle.66.dylib */; };
-		1CE3ACDD14CF7CAF007E722D /* libosgPresentation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBA14CF7C1D007E722D /* libosgPresentation.66.dylib */; };
-		1CE3ACDE14CF7CAF007E722D /* libosgShadow.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBB14CF7C1D007E722D /* libosgShadow.66.dylib */; };
-		1CE3ACDF14CF7CAF007E722D /* libosgSim.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBC14CF7C1D007E722D /* libosgSim.66.dylib */; };
-		1CE3ACE014CF7CAF007E722D /* libosgTerrain.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBD14CF7C1D007E722D /* libosgTerrain.66.dylib */; };
-		1CE3ACE114CF7CAF007E722D /* libosgText.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBE14CF7C1D007E722D /* libosgText.66.dylib */; };
-		1CE3ACE214CF7CAF007E722D /* libosgUtil.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBF14CF7C1D007E722D /* libosgUtil.66.dylib */; };
-		1CE3ACE314CF7CAF007E722D /* libosgViewer.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC014CF7C1D007E722D /* libosgViewer.66.dylib */; };
-		1CE3ACE414CF7CAF007E722D /* libosgVolume.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */; };
-		1CE3ACE514CF7CAF007E722D /* libosgWidget.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */; };
 		1CE3ACE614CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3ACE714CF7CAF007E722D /* libosg.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */; };
-		1CE3ACE814CF7CAF007E722D /* libosgAnimation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */; };
-		1CE3ACE914CF7CAF007E722D /* libosgDB.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */; };
-		1CE3ACEA14CF7CAF007E722D /* libosgFX.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB614CF7C1D007E722D /* libosgFX.66.dylib */; };
-		1CE3ACEB14CF7CAF007E722D /* libosgGA.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB714CF7C1D007E722D /* libosgGA.66.dylib */; };
-		1CE3ACEC14CF7CAF007E722D /* libosgManipulator.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB814CF7C1D007E722D /* libosgManipulator.66.dylib */; };
-		1CE3ACED14CF7CAF007E722D /* libosgParticle.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB914CF7C1D007E722D /* libosgParticle.66.dylib */; };
-		1CE3ACEE14CF7CAF007E722D /* libosgPresentation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBA14CF7C1D007E722D /* libosgPresentation.66.dylib */; };
-		1CE3ACEF14CF7CAF007E722D /* libosgShadow.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBB14CF7C1D007E722D /* libosgShadow.66.dylib */; };
-		1CE3ACF014CF7CAF007E722D /* libosgSim.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBC14CF7C1D007E722D /* libosgSim.66.dylib */; };
-		1CE3ACF114CF7CAF007E722D /* libosgTerrain.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBD14CF7C1D007E722D /* libosgTerrain.66.dylib */; };
-		1CE3ACF214CF7CAF007E722D /* libosgText.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBE14CF7C1D007E722D /* libosgText.66.dylib */; };
-		1CE3ACF314CF7CAF007E722D /* libosgUtil.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBF14CF7C1D007E722D /* libosgUtil.66.dylib */; };
-		1CE3ACF414CF7CAF007E722D /* libosgViewer.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC014CF7C1D007E722D /* libosgViewer.66.dylib */; };
-		1CE3ACF514CF7CAF007E722D /* libosgVolume.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */; };
-		1CE3ACF614CF7CAF007E722D /* libosgWidget.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */; };
-		1CE3ACF714CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3ACF814CF7CB0007E722D /* libosg.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */; };
-		1CE3ACF914CF7CB0007E722D /* libosgAnimation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */; };
-		1CE3ACFA14CF7CB0007E722D /* libosgDB.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */; };
-		1CE3ACFB14CF7CB0007E722D /* libosgFX.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB614CF7C1D007E722D /* libosgFX.66.dylib */; };
-		1CE3ACFC14CF7CB0007E722D /* libosgGA.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB714CF7C1D007E722D /* libosgGA.66.dylib */; };
-		1CE3ACFD14CF7CB0007E722D /* libosgManipulator.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB814CF7C1D007E722D /* libosgManipulator.66.dylib */; };
-		1CE3ACFE14CF7CB0007E722D /* libosgParticle.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB914CF7C1D007E722D /* libosgParticle.66.dylib */; };
-		1CE3ACFF14CF7CB0007E722D /* libosgPresentation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBA14CF7C1D007E722D /* libosgPresentation.66.dylib */; };
-		1CE3AD0014CF7CB0007E722D /* libosgShadow.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBB14CF7C1D007E722D /* libosgShadow.66.dylib */; };
-		1CE3AD0114CF7CB0007E722D /* libosgSim.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBC14CF7C1D007E722D /* libosgSim.66.dylib */; };
-		1CE3AD0214CF7CB0007E722D /* libosgTerrain.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBD14CF7C1D007E722D /* libosgTerrain.66.dylib */; };
-		1CE3AD0314CF7CB0007E722D /* libosgText.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBE14CF7C1D007E722D /* libosgText.66.dylib */; };
-		1CE3AD0414CF7CB0007E722D /* libosgUtil.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBF14CF7C1D007E722D /* libosgUtil.66.dylib */; };
-		1CE3AD0514CF7CB0007E722D /* libosgViewer.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC014CF7C1D007E722D /* libosgViewer.66.dylib */; };
-		1CE3AD0614CF7CB0007E722D /* libosgVolume.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */; };
-		1CE3AD0714CF7CB0007E722D /* libosgWidget.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */; };
 		1CE3AD0814CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3AD0914CF7CB0007E722D /* libosg.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */; };
-		1CE3AD0A14CF7CB0007E722D /* libosgAnimation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */; };
-		1CE3AD0B14CF7CB0007E722D /* libosgDB.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */; };
-		1CE3AD0C14CF7CB0007E722D /* libosgFX.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB614CF7C1D007E722D /* libosgFX.66.dylib */; };
-		1CE3AD0D14CF7CB0007E722D /* libosgGA.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB714CF7C1D007E722D /* libosgGA.66.dylib */; };
-		1CE3AD0E14CF7CB0007E722D /* libosgManipulator.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB814CF7C1D007E722D /* libosgManipulator.66.dylib */; };
-		1CE3AD0F14CF7CB0007E722D /* libosgParticle.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACB914CF7C1D007E722D /* libosgParticle.66.dylib */; };
-		1CE3AD1014CF7CB0007E722D /* libosgPresentation.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBA14CF7C1D007E722D /* libosgPresentation.66.dylib */; };
-		1CE3AD1114CF7CB0007E722D /* libosgShadow.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBB14CF7C1D007E722D /* libosgShadow.66.dylib */; };
-		1CE3AD1214CF7CB0007E722D /* libosgSim.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBC14CF7C1D007E722D /* libosgSim.66.dylib */; };
-		1CE3AD1314CF7CB0007E722D /* libosgTerrain.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBD14CF7C1D007E722D /* libosgTerrain.66.dylib */; };
-		1CE3AD1414CF7CB0007E722D /* libosgText.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBE14CF7C1D007E722D /* libosgText.66.dylib */; };
-		1CE3AD1514CF7CB0007E722D /* libosgUtil.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACBF14CF7C1D007E722D /* libosgUtil.66.dylib */; };
-		1CE3AD1614CF7CB0007E722D /* libosgViewer.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC014CF7C1D007E722D /* libosgViewer.66.dylib */; };
-		1CE3AD1714CF7CB0007E722D /* libosgVolume.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */; };
-		1CE3AD1814CF7CB0007E722D /* libosgWidget.66.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
-		1CE3AD1F14CFDB14007E722D /* osgdb_ffmpeg.so in Resources */ = {isa = PBXBuildFile; fileRef = 1C94DEFC14C0D396006394AD /* osgdb_ffmpeg.so */; };
-		1CE3AD2014CFDB15007E722D /* osgdb_ffmpeg.so in Resources */ = {isa = PBXBuildFile; fileRef = 1C94DEFC14C0D396006394AD /* osgdb_ffmpeg.so */; };
-		1CE3AD2114CFDB37007E722D /* osgdb_ffmpeg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFC14C0D396006394AD /* osgdb_ffmpeg.so */; };
-		1CE3AD2214CFDB4C007E722D /* osgdb_ffmpeg.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEFC14C0D396006394AD /* osgdb_ffmpeg.so */; };
-		1CE3AD2314CFE1E1007E722D /* libOpenThreads.12.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3AD2414CFE1E1007E722D /* libosg.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */; };
-		1CE3AD2514CFE1E1007E722D /* libosgAnimation.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */; };
-		1CE3AD2614CFE1E1007E722D /* libosgDB.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */; };
-		1CE3AD2714CFE1E1007E722D /* libosgFX.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB614CF7C1D007E722D /* libosgFX.66.dylib */; };
-		1CE3AD2814CFE1E1007E722D /* libosgGA.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB714CF7C1D007E722D /* libosgGA.66.dylib */; };
-		1CE3AD2914CFE1E1007E722D /* libosgManipulator.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB814CF7C1D007E722D /* libosgManipulator.66.dylib */; };
-		1CE3AD2A14CFE1E1007E722D /* libosgParticle.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB914CF7C1D007E722D /* libosgParticle.66.dylib */; };
-		1CE3AD2B14CFE1E1007E722D /* libosgPresentation.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBA14CF7C1D007E722D /* libosgPresentation.66.dylib */; };
-		1CE3AD2C14CFE1E1007E722D /* libosgShadow.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBB14CF7C1D007E722D /* libosgShadow.66.dylib */; };
-		1CE3AD2D14CFE1E1007E722D /* libosgSim.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBC14CF7C1D007E722D /* libosgSim.66.dylib */; };
-		1CE3AD2E14CFE1E1007E722D /* libosgTerrain.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBD14CF7C1D007E722D /* libosgTerrain.66.dylib */; };
-		1CE3AD2F14CFE1E1007E722D /* libosgText.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBE14CF7C1D007E722D /* libosgText.66.dylib */; };
-		1CE3AD3014CFE1E1007E722D /* libosgUtil.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBF14CF7C1D007E722D /* libosgUtil.66.dylib */; };
-		1CE3AD3114CFE1E1007E722D /* libosgViewer.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACC014CF7C1D007E722D /* libosgViewer.66.dylib */; };
-		1CE3AD3214CFE1E1007E722D /* libosgVolume.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */; };
-		1CE3AD3314CFE1E1007E722D /* libosgWidget.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */; };
-		1CE3AD3414CFE1EA007E722D /* libOpenThreads.12.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3AD3514CFE1EA007E722D /* libosg.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */; };
-		1CE3AD3614CFE1EA007E722D /* libosgAnimation.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */; };
-		1CE3AD3714CFE1EA007E722D /* libosgDB.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */; };
-		1CE3AD3814CFE1EA007E722D /* libosgFX.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB614CF7C1D007E722D /* libosgFX.66.dylib */; };
-		1CE3AD3914CFE1EA007E722D /* libosgGA.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB714CF7C1D007E722D /* libosgGA.66.dylib */; };
-		1CE3AD3A14CFE1EA007E722D /* libosgManipulator.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB814CF7C1D007E722D /* libosgManipulator.66.dylib */; };
-		1CE3AD3B14CFE1EA007E722D /* libosgParticle.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACB914CF7C1D007E722D /* libosgParticle.66.dylib */; };
-		1CE3AD3C14CFE1EA007E722D /* libosgPresentation.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBA14CF7C1D007E722D /* libosgPresentation.66.dylib */; };
-		1CE3AD3D14CFE1EA007E722D /* libosgShadow.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBB14CF7C1D007E722D /* libosgShadow.66.dylib */; };
-		1CE3AD3E14CFE1EA007E722D /* libosgSim.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBC14CF7C1D007E722D /* libosgSim.66.dylib */; };
-		1CE3AD3F14CFE1EA007E722D /* libosgTerrain.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBD14CF7C1D007E722D /* libosgTerrain.66.dylib */; };
-		1CE3AD4014CFE1EA007E722D /* libosgText.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBE14CF7C1D007E722D /* libosgText.66.dylib */; };
-		1CE3AD4114CFE1EA007E722D /* libosgUtil.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACBF14CF7C1D007E722D /* libosgUtil.66.dylib */; };
-		1CE3AD4214CFE1EA007E722D /* libosgViewer.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACC014CF7C1D007E722D /* libosgViewer.66.dylib */; };
-		1CE3AD4314CFE1EA007E722D /* libosgVolume.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */; };
-		1CE3AD4414CFE1EA007E722D /* libosgWidget.66.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
 		1CF94954151CD41F00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94953151CD41F00628872 /* ParticleSystem.cpp */; };
 		1CF94956151CD43C00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94955151CD43C00628872 /* ParticleSystem.cpp */; };
@@ -665,83 +635,85 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				1C70F2CE14C3A5B90054B0A1 /* osgdb_3dc.so in CopyFiles */,
-				1C70F2CF14C3A5B90054B0A1 /* osgdb_3ds.so in CopyFiles */,
-				1C70F2D014C3A5B90054B0A1 /* osgdb_ac.so in CopyFiles */,
-				1C70F2D114C3A5B90054B0A1 /* osgdb_bmp.so in CopyFiles */,
-				1C70F2D214C3A5B90054B0A1 /* osgdb_bsp.so in CopyFiles */,
-				1C70F2D314C3A5B90054B0A1 /* osgdb_bvh.so in CopyFiles */,
-				1C70F2D414C3A5B90054B0A1 /* osgdb_cfg.so in CopyFiles */,
-				1C70F2D514C3A5B90054B0A1 /* osgdb_curl.so in CopyFiles */,
-				1C70F2D614C3A5B90054B0A1 /* osgdb_dds.so in CopyFiles */,
-				1C70F2D714C3A5B90054B0A1 /* osgdb_deprecated_osg.so in CopyFiles */,
-				1C70F2D814C3A5B90054B0A1 /* osgdb_deprecated_osganimation.so in CopyFiles */,
-				1C70F2D914C3A5B90054B0A1 /* osgdb_deprecated_osgfx.so in CopyFiles */,
-				1C70F2DA14C3A5B90054B0A1 /* osgdb_deprecated_osgparticle.so in CopyFiles */,
-				1C70F2DB14C3A5B90054B0A1 /* osgdb_deprecated_osgshadow.so in CopyFiles */,
-				1C70F2DC14C3A5B90054B0A1 /* osgdb_deprecated_osgsim.so in CopyFiles */,
-				1C70F2DD14C3A5B90054B0A1 /* osgdb_deprecated_osgterrain.so in CopyFiles */,
-				1C70F2DE14C3A5B90054B0A1 /* osgdb_deprecated_osgtext.so in CopyFiles */,
-				1C70F2DF14C3A5B90054B0A1 /* osgdb_deprecated_osgviewer.so in CopyFiles */,
-				1C70F2E014C3A5B90054B0A1 /* osgdb_deprecated_osgvolume.so in CopyFiles */,
-				1C70F2E114C3A5B90054B0A1 /* osgdb_deprecated_osgwidget.so in CopyFiles */,
-				1C70F2E214C3A5B90054B0A1 /* osgdb_dot.so in CopyFiles */,
-				1C70F2E314C3A5B90054B0A1 /* osgdb_dw.so in CopyFiles */,
-				1C70F2E414C3A5B90054B0A1 /* osgdb_dxf.so in CopyFiles */,
-				1CE3AD2214CFDB4C007E722D /* osgdb_ffmpeg.so in CopyFiles */,
-				1C70F2E614C3A5B90054B0A1 /* osgdb_freetype.so in CopyFiles */,
-				1C70F2E714C3A5B90054B0A1 /* osgdb_gdal.so in CopyFiles */,
-				1C70F2E814C3A5B90054B0A1 /* osgdb_geo.so in CopyFiles */,
-				1C70F2E914C3A5B90054B0A1 /* osgdb_glsl.so in CopyFiles */,
-				1C70F2EA14C3A5B90054B0A1 /* osgdb_gz.so in CopyFiles */,
-				1C70F2EB14C3A5B90054B0A1 /* osgdb_hdr.so in CopyFiles */,
-				1C70F2EC14C3A5B90054B0A1 /* osgdb_imageio.so in CopyFiles */,
-				1C70F2ED14C3A5B90054B0A1 /* osgdb_ive.so in CopyFiles */,
-				1C70F2EE14C3A5B90054B0A1 /* osgdb_jp2.so in CopyFiles */,
-				1C70F2EF14C3A5B90054B0A1 /* osgdb_logo.so in CopyFiles */,
-				1C70F2F014C3A5B90054B0A1 /* osgdb_lwo.so in CopyFiles */,
-				1C70F2F114C3A5B90054B0A1 /* osgdb_lws.so in CopyFiles */,
-				1C70F2F214C3A5B90054B0A1 /* osgdb_md2.so in CopyFiles */,
-				1C70F2F314C3A5B90054B0A1 /* osgdb_mdl.so in CopyFiles */,
-				1C70F2F414C3A5B90054B0A1 /* osgdb_normals.so in CopyFiles */,
-				1C70F2F514C3A5B90054B0A1 /* osgdb_obj.so in CopyFiles */,
-				1C70F2F614C3A5B90054B0A1 /* osgdb_ogr.so in CopyFiles */,
-				1C70F2F714C3A5B90054B0A1 /* osgdb_openflight.so in CopyFiles */,
-				1C70F2F814C3A5B90054B0A1 /* osgdb_osg.so in CopyFiles */,
-				1C70F2F914C3A5B90054B0A1 /* osgdb_osga.so in CopyFiles */,
-				1C70F2FA14C3A5B90054B0A1 /* osgdb_osgshadow.so in CopyFiles */,
-				1C70F2FB14C3A5B90054B0A1 /* osgdb_osgterrain.so in CopyFiles */,
-				1C70F2FC14C3A5B90054B0A1 /* osgdb_osgtgz.so in CopyFiles */,
-				1C70F2FD14C3A5B90054B0A1 /* osgdb_osgviewer.so in CopyFiles */,
-				1C70F2FE14C3A5B90054B0A1 /* osgdb_p3d.so in CopyFiles */,
-				1C70F2FF14C3A5B90054B0A1 /* osgdb_pic.so in CopyFiles */,
-				1C70F30014C3A5B90054B0A1 /* osgdb_ply.so in CopyFiles */,
-				1C70F30114C3A5B90054B0A1 /* osgdb_pnm.so in CopyFiles */,
-				1C70F30214C3A5B90054B0A1 /* osgdb_revisions.so in CopyFiles */,
-				1C70F30314C3A5B90054B0A1 /* osgdb_rgb.so in CopyFiles */,
-				1C70F30414C3A5B90054B0A1 /* osgdb_rot.so in CopyFiles */,
-				1C70F30514C3A5B90054B0A1 /* osgdb_scale.so in CopyFiles */,
-				1C70F30614C3A5B90054B0A1 /* osgdb_serializers_osg.so in CopyFiles */,
-				1C70F30714C3A5B90054B0A1 /* osgdb_serializers_osganimation.so in CopyFiles */,
-				1C70F30814C3A5B90054B0A1 /* osgdb_serializers_osgfx.so in CopyFiles */,
-				1C70F30914C3A5B90054B0A1 /* osgdb_serializers_osgmanipulator.so in CopyFiles */,
-				1C70F30A14C3A5B90054B0A1 /* osgdb_serializers_osgparticle.so in CopyFiles */,
-				1C70F30B14C3A5B90054B0A1 /* osgdb_serializers_osgshadow.so in CopyFiles */,
-				1C70F30C14C3A5B90054B0A1 /* osgdb_serializers_osgsim.so in CopyFiles */,
-				1C70F30D14C3A5B90054B0A1 /* osgdb_serializers_osgterrain.so in CopyFiles */,
-				1C70F30E14C3A5B90054B0A1 /* osgdb_serializers_osgtext.so in CopyFiles */,
-				1C70F30F14C3A5B90054B0A1 /* osgdb_serializers_osgvolume.so in CopyFiles */,
-				1C70F31014C3A5B90054B0A1 /* osgdb_shp.so in CopyFiles */,
-				1C70F31114C3A5B90054B0A1 /* osgdb_stl.so in CopyFiles */,
-				1C70F31214C3A5B90054B0A1 /* osgdb_tga.so in CopyFiles */,
-				1C70F31314C3A5B90054B0A1 /* osgdb_tgz.so in CopyFiles */,
-				1C70F31414C3A5B90054B0A1 /* osgdb_trans.so in CopyFiles */,
-				1C70F31514C3A5B90054B0A1 /* osgdb_txf.so in CopyFiles */,
-				1C70F31614C3A5B90054B0A1 /* osgdb_txp.so in CopyFiles */,
-				1C70F31714C3A5B90054B0A1 /* osgdb_vrml.so in CopyFiles */,
-				1C70F31814C3A5B90054B0A1 /* osgdb_vtf.so in CopyFiles */,
-				1C70F31914C3A5B90054B0A1 /* osgdb_x.so in CopyFiles */,
-				1C70F31A14C3A5B90054B0A1 /* osgdb_zip.so in CopyFiles */,
+				1C82AE31152D30BF0085D8F0 /* osgdb_3dc.so in CopyFiles */,
+				1C82AE32152D30BF0085D8F0 /* osgdb_3ds.so in CopyFiles */,
+				1C82AE33152D30BF0085D8F0 /* osgdb_ac.so in CopyFiles */,
+				1C82AE34152D30BF0085D8F0 /* osgdb_bmp.so in CopyFiles */,
+				1C82AE35152D30BF0085D8F0 /* osgdb_bsp.so in CopyFiles */,
+				1C82AE36152D30BF0085D8F0 /* osgdb_bvh.so in CopyFiles */,
+				1C82AE37152D30BF0085D8F0 /* osgdb_cfg.so in CopyFiles */,
+				1C82AE38152D30BF0085D8F0 /* osgdb_curl.so in CopyFiles */,
+				1C82AE39152D30BF0085D8F0 /* osgdb_dds.so in CopyFiles */,
+				1C82AE3A152D30BF0085D8F0 /* osgdb_deprecated_osg.so in CopyFiles */,
+				1C82AE3B152D30BF0085D8F0 /* osgdb_deprecated_osganimation.so in CopyFiles */,
+				1C82AE3C152D30BF0085D8F0 /* osgdb_deprecated_osgfx.so in CopyFiles */,
+				1C82AE3D152D30BF0085D8F0 /* osgdb_deprecated_osgparticle.so in CopyFiles */,
+				1C82AE3E152D30BF0085D8F0 /* osgdb_deprecated_osgshadow.so in CopyFiles */,
+				1C82AE3F152D30BF0085D8F0 /* osgdb_deprecated_osgsim.so in CopyFiles */,
+				1C82AE40152D30BF0085D8F0 /* osgdb_deprecated_osgterrain.so in CopyFiles */,
+				1C82AE41152D30BF0085D8F0 /* osgdb_deprecated_osgtext.so in CopyFiles */,
+				1C82AE42152D30BF0085D8F0 /* osgdb_deprecated_osgviewer.so in CopyFiles */,
+				1C82AE43152D30BF0085D8F0 /* osgdb_deprecated_osgvolume.so in CopyFiles */,
+				1C82AE44152D30BF0085D8F0 /* osgdb_deprecated_osgwidget.so in CopyFiles */,
+				1C82AE45152D30BF0085D8F0 /* osgdb_dot.so in CopyFiles */,
+				1C82AE46152D30BF0085D8F0 /* osgdb_dw.so in CopyFiles */,
+				1C82AE47152D30BF0085D8F0 /* osgdb_dxf.so in CopyFiles */,
+				1C82AE48152D30BF0085D8F0 /* osgdb_ffmpeg.so in CopyFiles */,
+				1C82AE49152D30BF0085D8F0 /* osgdb_freetype.so in CopyFiles */,
+				1C82AE4A152D30BF0085D8F0 /* osgdb_gdal.so in CopyFiles */,
+				1C82AE4B152D30BF0085D8F0 /* osgdb_geo.so in CopyFiles */,
+				1C82AE4C152D30BF0085D8F0 /* osgdb_glsl.so in CopyFiles */,
+				1C82AE4D152D30BF0085D8F0 /* osgdb_gz.so in CopyFiles */,
+				1C82AE4E152D30BF0085D8F0 /* osgdb_hdr.so in CopyFiles */,
+				1C82AE4F152D30BF0085D8F0 /* osgdb_imageio.so in CopyFiles */,
+				1C82AE50152D30BF0085D8F0 /* osgdb_ive.so in CopyFiles */,
+				1C82AE51152D30BF0085D8F0 /* osgdb_jp2.so in CopyFiles */,
+				1C82AE52152D30BF0085D8F0 /* osgdb_logo.so in CopyFiles */,
+				1C82AE53152D30BF0085D8F0 /* osgdb_lwo.so in CopyFiles */,
+				1C82AE54152D30BF0085D8F0 /* osgdb_lws.so in CopyFiles */,
+				1C82AE55152D30BF0085D8F0 /* osgdb_md2.so in CopyFiles */,
+				1C82AE56152D30BF0085D8F0 /* osgdb_mdl.so in CopyFiles */,
+				1C82AE57152D30BF0085D8F0 /* osgdb_normals.so in CopyFiles */,
+				1C82AE58152D30BF0085D8F0 /* osgdb_obj.so in CopyFiles */,
+				1C82AE59152D30BF0085D8F0 /* osgdb_ogr.so in CopyFiles */,
+				1C82AE5A152D30BF0085D8F0 /* osgdb_openflight.so in CopyFiles */,
+				1C82AE5B152D30BF0085D8F0 /* osgdb_osg.so in CopyFiles */,
+				1C82AE5C152D30BF0085D8F0 /* osgdb_osga.so in CopyFiles */,
+				1C82AE5D152D30BF0085D8F0 /* osgdb_osgshadow.so in CopyFiles */,
+				1C82AE5E152D30BF0085D8F0 /* osgdb_osgterrain.so in CopyFiles */,
+				1C82AE5F152D30BF0085D8F0 /* osgdb_osgtgz.so in CopyFiles */,
+				1C82AE60152D30BF0085D8F0 /* osgdb_osgviewer.so in CopyFiles */,
+				1C82AE61152D30BF0085D8F0 /* osgdb_p3d.so in CopyFiles */,
+				1C82AE62152D30BF0085D8F0 /* osgdb_pic.so in CopyFiles */,
+				1C82AE63152D30BF0085D8F0 /* osgdb_ply.so in CopyFiles */,
+				1C82AE64152D30BF0085D8F0 /* osgdb_pnm.so in CopyFiles */,
+				1C82AE65152D30BF0085D8F0 /* osgdb_pov.so in CopyFiles */,
+				1C82AE66152D30BF0085D8F0 /* osgdb_pvr.so in CopyFiles */,
+				1C82AE67152D30BF0085D8F0 /* osgdb_revisions.so in CopyFiles */,
+				1C82AE68152D30BF0085D8F0 /* osgdb_rgb.so in CopyFiles */,
+				1C82AE69152D30BF0085D8F0 /* osgdb_rot.so in CopyFiles */,
+				1C82AE6A152D30BF0085D8F0 /* osgdb_scale.so in CopyFiles */,
+				1C82AE6B152D30BF0085D8F0 /* osgdb_serializers_osg.so in CopyFiles */,
+				1C82AE6C152D30BF0085D8F0 /* osgdb_serializers_osganimation.so in CopyFiles */,
+				1C82AE6D152D30BF0085D8F0 /* osgdb_serializers_osgfx.so in CopyFiles */,
+				1C82AE6E152D30BF0085D8F0 /* osgdb_serializers_osgmanipulator.so in CopyFiles */,
+				1C82AE6F152D30BF0085D8F0 /* osgdb_serializers_osgparticle.so in CopyFiles */,
+				1C82AE70152D30BF0085D8F0 /* osgdb_serializers_osgshadow.so in CopyFiles */,
+				1C82AE71152D30BF0085D8F0 /* osgdb_serializers_osgsim.so in CopyFiles */,
+				1C82AE72152D30BF0085D8F0 /* osgdb_serializers_osgterrain.so in CopyFiles */,
+				1C82AE73152D30BF0085D8F0 /* osgdb_serializers_osgtext.so in CopyFiles */,
+				1C82AE74152D30BF0085D8F0 /* osgdb_serializers_osgvolume.so in CopyFiles */,
+				1C82AE75152D30BF0085D8F0 /* osgdb_shp.so in CopyFiles */,
+				1C82AE76152D30BF0085D8F0 /* osgdb_stl.so in CopyFiles */,
+				1C82AE77152D30BF0085D8F0 /* osgdb_tga.so in CopyFiles */,
+				1C82AE78152D30BF0085D8F0 /* osgdb_tgz.so in CopyFiles */,
+				1C82AE79152D30BF0085D8F0 /* osgdb_trans.so in CopyFiles */,
+				1C82AE7A152D30BF0085D8F0 /* osgdb_txf.so in CopyFiles */,
+				1C82AE7B152D30BF0085D8F0 /* osgdb_txp.so in CopyFiles */,
+				1C82AE7C152D30BF0085D8F0 /* osgdb_vrml.so in CopyFiles */,
+				1C82AE7D152D30BF0085D8F0 /* osgdb_vtf.so in CopyFiles */,
+				1C82AE7E152D30BF0085D8F0 /* osgdb_x.so in CopyFiles */,
+				1C82AE7F152D30BF0085D8F0 /* osgdb_zip.so in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -760,23 +732,6 @@
 				1C66174D1513DC1C0059C56A /* libboost_filesystem-mt.dylib in CopyFiles */,
 				1C66174E1513DC1C0059C56A /* libboost_system-mt.dylib in CopyFiles */,
 				1C875F3F14C8EF4200A46EBC /* libboost_python.dylib in CopyFiles */,
-				1CE3AD3414CFE1EA007E722D /* libOpenThreads.12.dylib in CopyFiles */,
-				1CE3AD3514CFE1EA007E722D /* libosg.66.dylib in CopyFiles */,
-				1CE3AD3614CFE1EA007E722D /* libosgAnimation.66.dylib in CopyFiles */,
-				1CE3AD3714CFE1EA007E722D /* libosgDB.66.dylib in CopyFiles */,
-				1CE3AD3814CFE1EA007E722D /* libosgFX.66.dylib in CopyFiles */,
-				1CE3AD3914CFE1EA007E722D /* libosgGA.66.dylib in CopyFiles */,
-				1CE3AD3A14CFE1EA007E722D /* libosgManipulator.66.dylib in CopyFiles */,
-				1CE3AD3B14CFE1EA007E722D /* libosgParticle.66.dylib in CopyFiles */,
-				1CE3AD3C14CFE1EA007E722D /* libosgPresentation.66.dylib in CopyFiles */,
-				1CE3AD3D14CFE1EA007E722D /* libosgShadow.66.dylib in CopyFiles */,
-				1CE3AD3E14CFE1EA007E722D /* libosgSim.66.dylib in CopyFiles */,
-				1CE3AD3F14CFE1EA007E722D /* libosgTerrain.66.dylib in CopyFiles */,
-				1CE3AD4014CFE1EA007E722D /* libosgText.66.dylib in CopyFiles */,
-				1CE3AD4114CFE1EA007E722D /* libosgUtil.66.dylib in CopyFiles */,
-				1CE3AD4214CFE1EA007E722D /* libosgViewer.66.dylib in CopyFiles */,
-				1CE3AD4314CFE1EA007E722D /* libosgVolume.66.dylib in CopyFiles */,
-				1CE3AD4414CFE1EA007E722D /* libosgWidget.66.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -786,83 +741,85 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				1C875F5214C8EFA300A46EBC /* osgdb_3dc.so in CopyFiles */,
-				1C875F5314C8EFA300A46EBC /* osgdb_3ds.so in CopyFiles */,
-				1C875F5414C8EFA300A46EBC /* osgdb_ac.so in CopyFiles */,
-				1C875F5514C8EFA300A46EBC /* osgdb_bmp.so in CopyFiles */,
-				1C875F5614C8EFA300A46EBC /* osgdb_bsp.so in CopyFiles */,
-				1C875F5714C8EFA300A46EBC /* osgdb_bvh.so in CopyFiles */,
-				1C875F5814C8EFA300A46EBC /* osgdb_cfg.so in CopyFiles */,
-				1C875F5914C8EFA300A46EBC /* osgdb_curl.so in CopyFiles */,
-				1C875F5A14C8EFA300A46EBC /* osgdb_dds.so in CopyFiles */,
-				1C875F5B14C8EFA300A46EBC /* osgdb_deprecated_osg.so in CopyFiles */,
-				1C875F5C14C8EFA300A46EBC /* osgdb_deprecated_osganimation.so in CopyFiles */,
-				1C875F5D14C8EFA300A46EBC /* osgdb_deprecated_osgfx.so in CopyFiles */,
-				1C875F5E14C8EFA300A46EBC /* osgdb_deprecated_osgparticle.so in CopyFiles */,
-				1C875F5F14C8EFA300A46EBC /* osgdb_deprecated_osgshadow.so in CopyFiles */,
-				1C875F6014C8EFA300A46EBC /* osgdb_deprecated_osgsim.so in CopyFiles */,
-				1C875F6114C8EFA300A46EBC /* osgdb_deprecated_osgterrain.so in CopyFiles */,
-				1C875F6214C8EFA300A46EBC /* osgdb_deprecated_osgtext.so in CopyFiles */,
-				1C875F6314C8EFA300A46EBC /* osgdb_deprecated_osgviewer.so in CopyFiles */,
-				1C875F6414C8EFA300A46EBC /* osgdb_deprecated_osgvolume.so in CopyFiles */,
-				1C875F6514C8EFA300A46EBC /* osgdb_deprecated_osgwidget.so in CopyFiles */,
-				1C875F6614C8EFA300A46EBC /* osgdb_dot.so in CopyFiles */,
-				1C875F6714C8EFA300A46EBC /* osgdb_dw.so in CopyFiles */,
-				1C875F6814C8EFA300A46EBC /* osgdb_dxf.so in CopyFiles */,
-				1CE3AD2114CFDB37007E722D /* osgdb_ffmpeg.so in CopyFiles */,
-				1C875F6A14C8EFA300A46EBC /* osgdb_freetype.so in CopyFiles */,
-				1C875F6B14C8EFA300A46EBC /* osgdb_gdal.so in CopyFiles */,
-				1C875F6C14C8EFA300A46EBC /* osgdb_geo.so in CopyFiles */,
-				1C875F6D14C8EFA300A46EBC /* osgdb_glsl.so in CopyFiles */,
-				1C875F6E14C8EFA300A46EBC /* osgdb_gz.so in CopyFiles */,
-				1C875F6F14C8EFA300A46EBC /* osgdb_hdr.so in CopyFiles */,
-				1C875F7014C8EFA300A46EBC /* osgdb_imageio.so in CopyFiles */,
-				1C875F7114C8EFA300A46EBC /* osgdb_ive.so in CopyFiles */,
-				1C875F7214C8EFA300A46EBC /* osgdb_jp2.so in CopyFiles */,
-				1C875F7314C8EFA300A46EBC /* osgdb_logo.so in CopyFiles */,
-				1C875F7414C8EFA300A46EBC /* osgdb_lwo.so in CopyFiles */,
-				1C875F7514C8EFA300A46EBC /* osgdb_lws.so in CopyFiles */,
-				1C875F7614C8EFA300A46EBC /* osgdb_md2.so in CopyFiles */,
-				1C875F7714C8EFA300A46EBC /* osgdb_mdl.so in CopyFiles */,
-				1C875F7814C8EFA300A46EBC /* osgdb_normals.so in CopyFiles */,
-				1C875F7914C8EFA300A46EBC /* osgdb_obj.so in CopyFiles */,
-				1C875F7A14C8EFA300A46EBC /* osgdb_ogr.so in CopyFiles */,
-				1C875F7B14C8EFA300A46EBC /* osgdb_openflight.so in CopyFiles */,
-				1C875F7C14C8EFA300A46EBC /* osgdb_osg.so in CopyFiles */,
-				1C875F7D14C8EFA300A46EBC /* osgdb_osga.so in CopyFiles */,
-				1C875F7E14C8EFA300A46EBC /* osgdb_osgshadow.so in CopyFiles */,
-				1C875F7F14C8EFA300A46EBC /* osgdb_osgterrain.so in CopyFiles */,
-				1C875F8014C8EFA300A46EBC /* osgdb_osgtgz.so in CopyFiles */,
-				1C875F8114C8EFA300A46EBC /* osgdb_osgviewer.so in CopyFiles */,
-				1C875F8214C8EFA300A46EBC /* osgdb_p3d.so in CopyFiles */,
-				1C875F8314C8EFA300A46EBC /* osgdb_pic.so in CopyFiles */,
-				1C875F8414C8EFA300A46EBC /* osgdb_ply.so in CopyFiles */,
-				1C875F8514C8EFA300A46EBC /* osgdb_pnm.so in CopyFiles */,
-				1C875F8614C8EFA300A46EBC /* osgdb_revisions.so in CopyFiles */,
-				1C875F8714C8EFA300A46EBC /* osgdb_rgb.so in CopyFiles */,
-				1C875F8814C8EFA300A46EBC /* osgdb_rot.so in CopyFiles */,
-				1C875F8914C8EFA300A46EBC /* osgdb_scale.so in CopyFiles */,
-				1C875F8A14C8EFA300A46EBC /* osgdb_serializers_osg.so in CopyFiles */,
-				1C875F8B14C8EFA300A46EBC /* osgdb_serializers_osganimation.so in CopyFiles */,
-				1C875F8C14C8EFA300A46EBC /* osgdb_serializers_osgfx.so in CopyFiles */,
-				1C875F8D14C8EFA300A46EBC /* osgdb_serializers_osgmanipulator.so in CopyFiles */,
-				1C875F8E14C8EFA300A46EBC /* osgdb_serializers_osgparticle.so in CopyFiles */,
-				1C875F8F14C8EFA300A46EBC /* osgdb_serializers_osgshadow.so in CopyFiles */,
-				1C875F9014C8EFA300A46EBC /* osgdb_serializers_osgsim.so in CopyFiles */,
-				1C875F9114C8EFA300A46EBC /* osgdb_serializers_osgterrain.so in CopyFiles */,
-				1C875F9214C8EFA300A46EBC /* osgdb_serializers_osgtext.so in CopyFiles */,
-				1C875F9314C8EFA300A46EBC /* osgdb_serializers_osgvolume.so in CopyFiles */,
-				1C875F9414C8EFA300A46EBC /* osgdb_shp.so in CopyFiles */,
-				1C875F9514C8EFA300A46EBC /* osgdb_stl.so in CopyFiles */,
-				1C875F9614C8EFA300A46EBC /* osgdb_tga.so in CopyFiles */,
-				1C875F9714C8EFA300A46EBC /* osgdb_tgz.so in CopyFiles */,
-				1C875F9814C8EFA300A46EBC /* osgdb_trans.so in CopyFiles */,
-				1C875F9914C8EFA300A46EBC /* osgdb_txf.so in CopyFiles */,
-				1C875F9A14C8EFA300A46EBC /* osgdb_txp.so in CopyFiles */,
-				1C875F9B14C8EFA300A46EBC /* osgdb_vrml.so in CopyFiles */,
-				1C875F9C14C8EFA300A46EBC /* osgdb_vtf.so in CopyFiles */,
-				1C875F9D14C8EFA300A46EBC /* osgdb_x.so in CopyFiles */,
-				1C875F9E14C8EFA300A46EBC /* osgdb_zip.so in CopyFiles */,
+				1C82AE80152D30E20085D8F0 /* osgdb_3dc.so in CopyFiles */,
+				1C82AE81152D30E20085D8F0 /* osgdb_3ds.so in CopyFiles */,
+				1C82AE82152D30E20085D8F0 /* osgdb_ac.so in CopyFiles */,
+				1C82AE83152D30E20085D8F0 /* osgdb_bmp.so in CopyFiles */,
+				1C82AE84152D30E20085D8F0 /* osgdb_bsp.so in CopyFiles */,
+				1C82AE85152D30E20085D8F0 /* osgdb_bvh.so in CopyFiles */,
+				1C82AE86152D30E20085D8F0 /* osgdb_cfg.so in CopyFiles */,
+				1C82AE87152D30E20085D8F0 /* osgdb_curl.so in CopyFiles */,
+				1C82AE88152D30E20085D8F0 /* osgdb_dds.so in CopyFiles */,
+				1C82AE89152D30E20085D8F0 /* osgdb_deprecated_osg.so in CopyFiles */,
+				1C82AE8A152D30E20085D8F0 /* osgdb_deprecated_osganimation.so in CopyFiles */,
+				1C82AE8B152D30E20085D8F0 /* osgdb_deprecated_osgfx.so in CopyFiles */,
+				1C82AE8C152D30E20085D8F0 /* osgdb_deprecated_osgparticle.so in CopyFiles */,
+				1C82AE8D152D30E20085D8F0 /* osgdb_deprecated_osgshadow.so in CopyFiles */,
+				1C82AE8E152D30E20085D8F0 /* osgdb_deprecated_osgsim.so in CopyFiles */,
+				1C82AE8F152D30E20085D8F0 /* osgdb_deprecated_osgterrain.so in CopyFiles */,
+				1C82AE90152D30E20085D8F0 /* osgdb_deprecated_osgtext.so in CopyFiles */,
+				1C82AE91152D30E20085D8F0 /* osgdb_deprecated_osgviewer.so in CopyFiles */,
+				1C82AE92152D30E20085D8F0 /* osgdb_deprecated_osgvolume.so in CopyFiles */,
+				1C82AE93152D30E20085D8F0 /* osgdb_deprecated_osgwidget.so in CopyFiles */,
+				1C82AE94152D30E20085D8F0 /* osgdb_dot.so in CopyFiles */,
+				1C82AE95152D30E20085D8F0 /* osgdb_dw.so in CopyFiles */,
+				1C82AE96152D30E20085D8F0 /* osgdb_dxf.so in CopyFiles */,
+				1C82AE97152D30E20085D8F0 /* osgdb_ffmpeg.so in CopyFiles */,
+				1C82AE98152D30E20085D8F0 /* osgdb_freetype.so in CopyFiles */,
+				1C82AE99152D30E20085D8F0 /* osgdb_gdal.so in CopyFiles */,
+				1C82AE9A152D30E20085D8F0 /* osgdb_geo.so in CopyFiles */,
+				1C82AE9B152D30E20085D8F0 /* osgdb_glsl.so in CopyFiles */,
+				1C82AE9C152D30E20085D8F0 /* osgdb_gz.so in CopyFiles */,
+				1C82AE9D152D30E20085D8F0 /* osgdb_hdr.so in CopyFiles */,
+				1C82AE9E152D30E20085D8F0 /* osgdb_imageio.so in CopyFiles */,
+				1C82AE9F152D30E20085D8F0 /* osgdb_ive.so in CopyFiles */,
+				1C82AEA0152D30E20085D8F0 /* osgdb_jp2.so in CopyFiles */,
+				1C82AEA1152D30E20085D8F0 /* osgdb_logo.so in CopyFiles */,
+				1C82AEA2152D30E20085D8F0 /* osgdb_lwo.so in CopyFiles */,
+				1C82AEA3152D30E20085D8F0 /* osgdb_lws.so in CopyFiles */,
+				1C82AEA4152D30E20085D8F0 /* osgdb_md2.so in CopyFiles */,
+				1C82AEA5152D30E20085D8F0 /* osgdb_mdl.so in CopyFiles */,
+				1C82AEA6152D30E20085D8F0 /* osgdb_normals.so in CopyFiles */,
+				1C82AEA7152D30E20085D8F0 /* osgdb_obj.so in CopyFiles */,
+				1C82AEA8152D30E20085D8F0 /* osgdb_ogr.so in CopyFiles */,
+				1C82AEA9152D30E20085D8F0 /* osgdb_openflight.so in CopyFiles */,
+				1C82AEAA152D30E20085D8F0 /* osgdb_osg.so in CopyFiles */,
+				1C82AEAB152D30E20085D8F0 /* osgdb_osga.so in CopyFiles */,
+				1C82AEAC152D30E20085D8F0 /* osgdb_osgshadow.so in CopyFiles */,
+				1C82AEAD152D30E20085D8F0 /* osgdb_osgterrain.so in CopyFiles */,
+				1C82AEAE152D30E20085D8F0 /* osgdb_osgtgz.so in CopyFiles */,
+				1C82AEAF152D30E20085D8F0 /* osgdb_osgviewer.so in CopyFiles */,
+				1C82AEB0152D30E20085D8F0 /* osgdb_p3d.so in CopyFiles */,
+				1C82AEB1152D30E20085D8F0 /* osgdb_pic.so in CopyFiles */,
+				1C82AEB2152D30E20085D8F0 /* osgdb_ply.so in CopyFiles */,
+				1C82AEB3152D30E20085D8F0 /* osgdb_pnm.so in CopyFiles */,
+				1C82AEB4152D30E20085D8F0 /* osgdb_pov.so in CopyFiles */,
+				1C82AEB5152D30E20085D8F0 /* osgdb_pvr.so in CopyFiles */,
+				1C82AEB6152D30E20085D8F0 /* osgdb_revisions.so in CopyFiles */,
+				1C82AEB7152D30E20085D8F0 /* osgdb_rgb.so in CopyFiles */,
+				1C82AEB8152D30E20085D8F0 /* osgdb_rot.so in CopyFiles */,
+				1C82AEB9152D30E20085D8F0 /* osgdb_scale.so in CopyFiles */,
+				1C82AEBA152D30E20085D8F0 /* osgdb_serializers_osg.so in CopyFiles */,
+				1C82AEBB152D30E20085D8F0 /* osgdb_serializers_osganimation.so in CopyFiles */,
+				1C82AEBC152D30E20085D8F0 /* osgdb_serializers_osgfx.so in CopyFiles */,
+				1C82AEBD152D30E20085D8F0 /* osgdb_serializers_osgmanipulator.so in CopyFiles */,
+				1C82AEBE152D30E20085D8F0 /* osgdb_serializers_osgparticle.so in CopyFiles */,
+				1C82AEBF152D30E20085D8F0 /* osgdb_serializers_osgshadow.so in CopyFiles */,
+				1C82AEC0152D30E20085D8F0 /* osgdb_serializers_osgsim.so in CopyFiles */,
+				1C82AEC1152D30E20085D8F0 /* osgdb_serializers_osgterrain.so in CopyFiles */,
+				1C82AEC2152D30E20085D8F0 /* osgdb_serializers_osgtext.so in CopyFiles */,
+				1C82AEC3152D30E20085D8F0 /* osgdb_serializers_osgvolume.so in CopyFiles */,
+				1C82AEC4152D30E20085D8F0 /* osgdb_shp.so in CopyFiles */,
+				1C82AEC5152D30E20085D8F0 /* osgdb_stl.so in CopyFiles */,
+				1C82AEC6152D30E20085D8F0 /* osgdb_tga.so in CopyFiles */,
+				1C82AEC7152D30E20085D8F0 /* osgdb_tgz.so in CopyFiles */,
+				1C82AEC8152D30E20085D8F0 /* osgdb_trans.so in CopyFiles */,
+				1C82AEC9152D30E20085D8F0 /* osgdb_txf.so in CopyFiles */,
+				1C82AECA152D30E20085D8F0 /* osgdb_txp.so in CopyFiles */,
+				1C82AECB152D30E20085D8F0 /* osgdb_vrml.so in CopyFiles */,
+				1C82AECC152D30E20085D8F0 /* osgdb_vtf.so in CopyFiles */,
+				1C82AECD152D30E20085D8F0 /* osgdb_x.so in CopyFiles */,
+				1C82AECE152D30E20085D8F0 /* osgdb_zip.so in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -881,23 +838,6 @@
 				1C9C082B14CFEA24006ABC85 /* libfreenect.0.0.1.dylib in CopyFiles */,
 				1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C94DEB314BFBAA0006394AD /* liblo.7.dylib in CopyFiles */,
-				1CE3AD2314CFE1E1007E722D /* libOpenThreads.12.dylib in CopyFiles */,
-				1CE3AD2414CFE1E1007E722D /* libosg.66.dylib in CopyFiles */,
-				1CE3AD2514CFE1E1007E722D /* libosgAnimation.66.dylib in CopyFiles */,
-				1CE3AD2614CFE1E1007E722D /* libosgDB.66.dylib in CopyFiles */,
-				1CE3AD2714CFE1E1007E722D /* libosgFX.66.dylib in CopyFiles */,
-				1CE3AD2814CFE1E1007E722D /* libosgGA.66.dylib in CopyFiles */,
-				1CE3AD2914CFE1E1007E722D /* libosgManipulator.66.dylib in CopyFiles */,
-				1CE3AD2A14CFE1E1007E722D /* libosgParticle.66.dylib in CopyFiles */,
-				1CE3AD2B14CFE1E1007E722D /* libosgPresentation.66.dylib in CopyFiles */,
-				1CE3AD2C14CFE1E1007E722D /* libosgShadow.66.dylib in CopyFiles */,
-				1CE3AD2D14CFE1E1007E722D /* libosgSim.66.dylib in CopyFiles */,
-				1CE3AD2E14CFE1E1007E722D /* libosgTerrain.66.dylib in CopyFiles */,
-				1CE3AD2F14CFE1E1007E722D /* libosgText.66.dylib in CopyFiles */,
-				1CE3AD3014CFE1E1007E722D /* libosgUtil.66.dylib in CopyFiles */,
-				1CE3AD3114CFE1E1007E722D /* libosgViewer.66.dylib in CopyFiles */,
-				1CE3AD3214CFE1E1007E722D /* libosgVolume.66.dylib in CopyFiles */,
-				1CE3AD3314CFE1E1007E722D /* libosgWidget.66.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -916,7 +856,6 @@
 		1C072ACA14D9F6A5003D669E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_filesystem-mt.dylib"; path = "../../../../../opt/local/lib/libboost_filesystem-mt.dylib"; sourceTree = "<group>"; };
 		1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_system-mt.dylib"; path = "../../../../../opt/local/lib/libboost_system-mt.dylib"; sourceTree = "<group>"; };
-		1C14F41A14C3A3D4008889AE /* OpenThreads.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenThreads.framework; path = usr/local/lib/OpenThreads.framework; sourceTree = SDKROOT; };
 		1C1ECB47150E4EC800CCBFF3 /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Shader.cpp; path = ../src/spin/Shader.cpp; sourceTree = "<group>"; };
 		1C1ECB49150E4EE200CCBFF3 /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Shader.h; path = ../include/Shader.h; sourceTree = "<group>"; };
 		1C1ECB4B150E54F400CCBFF3 /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Shader.cpp; path = ../src/osgWrappers/introspection/Shader.cpp; sourceTree = "<group>"; };
@@ -993,6 +932,102 @@
 		1C70F33114C3C69C0054B0A1 /* osgPlugins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = osgPlugins.h; sourceTree = "<group>"; };
 		1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = osgPlugins.cpp; sourceTree = "<group>"; };
 		1C7267B314EF43AE00E3FFAE /* PointCloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointCloud.cpp; path = ../src/spin/PointCloud.cpp; sourceTree = "<group>"; };
+		1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenThreads.12.dylib; path = ../../../../../usr/local/lib/libOpenThreads.12.dylib; sourceTree = "<group>"; };
+		1C82ACDE152D07220085D8F0 /* libosg.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.91.dylib; path = ../../../../../usr/local/lib/libosg.91.dylib; sourceTree = "<group>"; };
+		1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.91.dylib; path = ../../../../../usr/local/lib/libosgAnimation.91.dylib; sourceTree = "<group>"; };
+		1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.91.dylib; path = ../../../../../usr/local/lib/libosgDB.91.dylib; sourceTree = "<group>"; };
+		1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgFX.91.dylib; path = ../../../../../usr/local/lib/libosgFX.91.dylib; sourceTree = "<group>"; };
+		1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgGA.91.dylib; path = ../../../../../usr/local/lib/libosgGA.91.dylib; sourceTree = "<group>"; };
+		1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgManipulator.91.dylib; path = ../../../../../usr/local/lib/libosgManipulator.91.dylib; sourceTree = "<group>"; };
+		1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgParticle.91.dylib; path = ../../../../../usr/local/lib/libosgParticle.91.dylib; sourceTree = "<group>"; };
+		1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgPresentation.91.dylib; path = ../../../../../usr/local/lib/libosgPresentation.91.dylib; sourceTree = "<group>"; };
+		1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgShadow.91.dylib; path = ../../../../../usr/local/lib/libosgShadow.91.dylib; sourceTree = "<group>"; };
+		1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgSim.91.dylib; path = ../../../../../usr/local/lib/libosgSim.91.dylib; sourceTree = "<group>"; };
+		1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgTerrain.91.dylib; path = ../../../../../usr/local/lib/libosgTerrain.91.dylib; sourceTree = "<group>"; };
+		1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgText.91.dylib; path = ../../../../../usr/local/lib/libosgText.91.dylib; sourceTree = "<group>"; };
+		1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgUtil.91.dylib; path = ../../../../../usr/local/lib/libosgUtil.91.dylib; sourceTree = "<group>"; };
+		1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgViewer.91.dylib; path = ../../../../../usr/local/lib/libosgViewer.91.dylib; sourceTree = "<group>"; };
+		1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.91.dylib; path = ../../../../../usr/local/lib/libosgVolume.91.dylib; sourceTree = "<group>"; };
+		1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgWidget.91.dylib; path = ../../../../../usr/local/lib/libosgWidget.91.dylib; sourceTree = "<group>"; };
+		1C82AD44152D07360085D8F0 /* osgdb_3dc.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_3dc.so; sourceTree = "<group>"; };
+		1C82AD45152D07360085D8F0 /* osgdb_3ds.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_3ds.so; sourceTree = "<group>"; };
+		1C82AD46152D07360085D8F0 /* osgdb_ac.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_ac.so; sourceTree = "<group>"; };
+		1C82AD47152D07360085D8F0 /* osgdb_bmp.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_bmp.so; sourceTree = "<group>"; };
+		1C82AD48152D07360085D8F0 /* osgdb_bsp.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_bsp.so; sourceTree = "<group>"; };
+		1C82AD49152D07360085D8F0 /* osgdb_bvh.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_bvh.so; sourceTree = "<group>"; };
+		1C82AD4A152D07360085D8F0 /* osgdb_cfg.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_cfg.so; sourceTree = "<group>"; };
+		1C82AD4B152D07360085D8F0 /* osgdb_curl.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_curl.so; sourceTree = "<group>"; };
+		1C82AD4C152D07360085D8F0 /* osgdb_dds.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_dds.so; sourceTree = "<group>"; };
+		1C82AD4D152D07360085D8F0 /* osgdb_deprecated_osg.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osg.so; sourceTree = "<group>"; };
+		1C82AD4E152D07360085D8F0 /* osgdb_deprecated_osganimation.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osganimation.so; sourceTree = "<group>"; };
+		1C82AD4F152D07360085D8F0 /* osgdb_deprecated_osgfx.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgfx.so; sourceTree = "<group>"; };
+		1C82AD50152D07360085D8F0 /* osgdb_deprecated_osgparticle.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgparticle.so; sourceTree = "<group>"; };
+		1C82AD51152D07360085D8F0 /* osgdb_deprecated_osgshadow.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgshadow.so; sourceTree = "<group>"; };
+		1C82AD52152D07360085D8F0 /* osgdb_deprecated_osgsim.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgsim.so; sourceTree = "<group>"; };
+		1C82AD53152D07360085D8F0 /* osgdb_deprecated_osgterrain.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgterrain.so; sourceTree = "<group>"; };
+		1C82AD54152D07360085D8F0 /* osgdb_deprecated_osgtext.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgtext.so; sourceTree = "<group>"; };
+		1C82AD55152D07360085D8F0 /* osgdb_deprecated_osgviewer.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgviewer.so; sourceTree = "<group>"; };
+		1C82AD56152D07360085D8F0 /* osgdb_deprecated_osgvolume.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgvolume.so; sourceTree = "<group>"; };
+		1C82AD57152D07360085D8F0 /* osgdb_deprecated_osgwidget.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_deprecated_osgwidget.so; sourceTree = "<group>"; };
+		1C82AD58152D07360085D8F0 /* osgdb_dot.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_dot.so; sourceTree = "<group>"; };
+		1C82AD59152D07360085D8F0 /* osgdb_dw.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_dw.so; sourceTree = "<group>"; };
+		1C82AD5A152D07360085D8F0 /* osgdb_dxf.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_dxf.so; sourceTree = "<group>"; };
+		1C82AD5B152D07360085D8F0 /* osgdb_ffmpeg.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_ffmpeg.so; sourceTree = "<group>"; };
+		1C82AD5C152D07360085D8F0 /* osgdb_freetype.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_freetype.so; sourceTree = "<group>"; };
+		1C82AD5D152D07360085D8F0 /* osgdb_gdal.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_gdal.so; sourceTree = "<group>"; };
+		1C82AD5E152D07360085D8F0 /* osgdb_geo.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_geo.so; sourceTree = "<group>"; };
+		1C82AD5F152D07360085D8F0 /* osgdb_glsl.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_glsl.so; sourceTree = "<group>"; };
+		1C82AD60152D07360085D8F0 /* osgdb_gz.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_gz.so; sourceTree = "<group>"; };
+		1C82AD61152D07360085D8F0 /* osgdb_hdr.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_hdr.so; sourceTree = "<group>"; };
+		1C82AD62152D07360085D8F0 /* osgdb_imageio.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_imageio.so; sourceTree = "<group>"; };
+		1C82AD63152D07360085D8F0 /* osgdb_ive.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_ive.so; sourceTree = "<group>"; };
+		1C82AD64152D07360085D8F0 /* osgdb_jp2.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_jp2.so; sourceTree = "<group>"; };
+		1C82AD65152D07370085D8F0 /* osgdb_logo.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_logo.so; sourceTree = "<group>"; };
+		1C82AD66152D07370085D8F0 /* osgdb_lwo.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_lwo.so; sourceTree = "<group>"; };
+		1C82AD67152D07370085D8F0 /* osgdb_lws.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_lws.so; sourceTree = "<group>"; };
+		1C82AD68152D07370085D8F0 /* osgdb_md2.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_md2.so; sourceTree = "<group>"; };
+		1C82AD69152D07370085D8F0 /* osgdb_mdl.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_mdl.so; sourceTree = "<group>"; };
+		1C82AD6A152D07370085D8F0 /* osgdb_normals.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_normals.so; sourceTree = "<group>"; };
+		1C82AD6B152D07370085D8F0 /* osgdb_obj.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_obj.so; sourceTree = "<group>"; };
+		1C82AD6C152D07370085D8F0 /* osgdb_ogr.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_ogr.so; sourceTree = "<group>"; };
+		1C82AD6D152D07370085D8F0 /* osgdb_openflight.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_openflight.so; sourceTree = "<group>"; };
+		1C82AD6E152D07370085D8F0 /* osgdb_osg.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_osg.so; sourceTree = "<group>"; };
+		1C82AD6F152D07370085D8F0 /* osgdb_osga.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_osga.so; sourceTree = "<group>"; };
+		1C82AD70152D07370085D8F0 /* osgdb_osgshadow.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_osgshadow.so; sourceTree = "<group>"; };
+		1C82AD71152D07370085D8F0 /* osgdb_osgterrain.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_osgterrain.so; sourceTree = "<group>"; };
+		1C82AD72152D07370085D8F0 /* osgdb_osgtgz.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_osgtgz.so; sourceTree = "<group>"; };
+		1C82AD73152D07370085D8F0 /* osgdb_osgviewer.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_osgviewer.so; sourceTree = "<group>"; };
+		1C82AD74152D07370085D8F0 /* osgdb_p3d.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_p3d.so; sourceTree = "<group>"; };
+		1C82AD75152D07370085D8F0 /* osgdb_pic.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_pic.so; sourceTree = "<group>"; };
+		1C82AD76152D07370085D8F0 /* osgdb_ply.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_ply.so; sourceTree = "<group>"; };
+		1C82AD77152D07370085D8F0 /* osgdb_pnm.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_pnm.so; sourceTree = "<group>"; };
+		1C82AD78152D07370085D8F0 /* osgdb_pov.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_pov.so; sourceTree = "<group>"; };
+		1C82AD79152D07370085D8F0 /* osgdb_pvr.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_pvr.so; sourceTree = "<group>"; };
+		1C82AD7A152D07370085D8F0 /* osgdb_revisions.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_revisions.so; sourceTree = "<group>"; };
+		1C82AD7B152D07370085D8F0 /* osgdb_rgb.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_rgb.so; sourceTree = "<group>"; };
+		1C82AD7C152D07370085D8F0 /* osgdb_rot.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_rot.so; sourceTree = "<group>"; };
+		1C82AD7D152D07370085D8F0 /* osgdb_scale.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_scale.so; sourceTree = "<group>"; };
+		1C82AD7E152D07370085D8F0 /* osgdb_serializers_osg.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osg.so; sourceTree = "<group>"; };
+		1C82AD7F152D07370085D8F0 /* osgdb_serializers_osganimation.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osganimation.so; sourceTree = "<group>"; };
+		1C82AD80152D07370085D8F0 /* osgdb_serializers_osgfx.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgfx.so; sourceTree = "<group>"; };
+		1C82AD81152D07370085D8F0 /* osgdb_serializers_osgmanipulator.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgmanipulator.so; sourceTree = "<group>"; };
+		1C82AD82152D07370085D8F0 /* osgdb_serializers_osgparticle.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgparticle.so; sourceTree = "<group>"; };
+		1C82AD83152D07370085D8F0 /* osgdb_serializers_osgshadow.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgshadow.so; sourceTree = "<group>"; };
+		1C82AD84152D07370085D8F0 /* osgdb_serializers_osgsim.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgsim.so; sourceTree = "<group>"; };
+		1C82AD85152D07370085D8F0 /* osgdb_serializers_osgterrain.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgterrain.so; sourceTree = "<group>"; };
+		1C82AD86152D07370085D8F0 /* osgdb_serializers_osgtext.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgtext.so; sourceTree = "<group>"; };
+		1C82AD87152D07370085D8F0 /* osgdb_serializers_osgvolume.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_serializers_osgvolume.so; sourceTree = "<group>"; };
+		1C82AD88152D07370085D8F0 /* osgdb_shp.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_shp.so; sourceTree = "<group>"; };
+		1C82AD89152D07370085D8F0 /* osgdb_stl.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_stl.so; sourceTree = "<group>"; };
+		1C82AD8A152D07370085D8F0 /* osgdb_tga.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_tga.so; sourceTree = "<group>"; };
+		1C82AD8B152D07370085D8F0 /* osgdb_tgz.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_tgz.so; sourceTree = "<group>"; };
+		1C82AD8C152D07370085D8F0 /* osgdb_trans.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_trans.so; sourceTree = "<group>"; };
+		1C82AD8D152D07370085D8F0 /* osgdb_txf.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_txf.so; sourceTree = "<group>"; };
+		1C82AD8E152D07370085D8F0 /* osgdb_txp.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_txp.so; sourceTree = "<group>"; };
+		1C82AD8F152D07370085D8F0 /* osgdb_vrml.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_vrml.so; sourceTree = "<group>"; };
+		1C82AD90152D07380085D8F0 /* osgdb_vtf.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_vtf.so; sourceTree = "<group>"; };
+		1C82AD91152D07380085D8F0 /* osgdb_x.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_x.so; sourceTree = "<group>"; };
+		1C82AD92152D07380085D8F0 /* osgdb_zip.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_zip.so; sourceTree = "<group>"; };
 		1C875FAF14C9BE3200A46EBC /* icon_3Dsphere.xpm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = icon_3Dsphere.xpm; path = ../src/Resources/images/icon_3Dsphere.xpm; sourceTree = "<group>"; };
 		1C875FB014C9BE3200A46EBC /* icon_3Dview.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = icon_3Dview.gif; path = ../src/Resources/images/icon_3Dview.gif; sourceTree = "<group>"; };
 		1C875FB114C9BE3200A46EBC /* icon_avatar.xpm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = icon_avatar.xpm; path = ../src/Resources/images/icon_avatar.xpm; sourceTree = "<group>"; };
@@ -1229,22 +1264,6 @@
 		1CCCA0F114BE361B00DCA0B7 /* spin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spin.icns; path = ../src/Resources/images/spin.icns; sourceTree = "<group>"; };
 		1CCCA0F314BE36CE00DCA0B7 /* spinViewer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spinViewer.icns; path = ../src/Resources/images/spinViewer.icns; sourceTree = "<group>"; };
 		1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinViewer.cpp; path = ../../src/spin/spinViewer.cpp; sourceTree = "<group>"; };
-		1CD770EE14C39F7600084B4E /* osg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osg.framework; path = usr/local/lib/osg.framework; sourceTree = SDKROOT; };
-		1CD770EF14C39F7600084B4E /* osgAnimation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgAnimation.framework; path = usr/local/lib/osgAnimation.framework; sourceTree = SDKROOT; };
-		1CD770F014C39F7600084B4E /* osgDB.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgDB.framework; path = usr/local/lib/osgDB.framework; sourceTree = SDKROOT; };
-		1CD770F114C39F7600084B4E /* osgFX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgFX.framework; path = usr/local/lib/osgFX.framework; sourceTree = SDKROOT; };
-		1CD770F214C39F7600084B4E /* osgGA.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgGA.framework; path = usr/local/lib/osgGA.framework; sourceTree = SDKROOT; };
-		1CD770F314C39F7600084B4E /* osgManipulator.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgManipulator.framework; path = usr/local/lib/osgManipulator.framework; sourceTree = SDKROOT; };
-		1CD770F414C39F7600084B4E /* osgParticle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgParticle.framework; path = usr/local/lib/osgParticle.framework; sourceTree = SDKROOT; };
-		1CD770F514C39F7600084B4E /* osgPresentation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgPresentation.framework; path = usr/local/lib/osgPresentation.framework; sourceTree = SDKROOT; };
-		1CD770F614C39F7600084B4E /* osgShadow.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgShadow.framework; path = usr/local/lib/osgShadow.framework; sourceTree = SDKROOT; };
-		1CD770F714C39F7600084B4E /* osgSim.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgSim.framework; path = usr/local/lib/osgSim.framework; sourceTree = SDKROOT; };
-		1CD770F814C39F7600084B4E /* osgTerrain.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgTerrain.framework; path = usr/local/lib/osgTerrain.framework; sourceTree = SDKROOT; };
-		1CD770F914C39F7600084B4E /* osgText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgText.framework; path = usr/local/lib/osgText.framework; sourceTree = SDKROOT; };
-		1CD770FA14C39F7600084B4E /* osgUtil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgUtil.framework; path = usr/local/lib/osgUtil.framework; sourceTree = SDKROOT; };
-		1CD770FB14C39F7600084B4E /* osgViewer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgViewer.framework; path = usr/local/lib/osgViewer.framework; sourceTree = SDKROOT; };
-		1CD770FC14C39F7600084B4E /* osgVolume.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgVolume.framework; path = usr/local/lib/osgVolume.framework; sourceTree = SDKROOT; };
-		1CD770FD14C39F7600084B4E /* osgWidget.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = osgWidget.framework; path = usr/local/lib/osgWidget.framework; sourceTree = SDKROOT; };
 		1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.66.dylib; path = usr/local/lib/libosg.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.66.dylib; path = usr/local/lib/libosgAnimation.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.66.dylib; path = usr/local/lib/libosgDB.66.dylib; sourceTree = SDKROOT; };
@@ -1273,23 +1292,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1C9C082514CFE988006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
-				1CE3ACD414CF7C72007E722D /* libOpenThreads.12.dylib in Frameworks */,
-				1CE3ACC314CF7C1D007E722D /* libosg.66.dylib in Frameworks */,
-				1CE3ACC414CF7C1D007E722D /* libosgAnimation.66.dylib in Frameworks */,
-				1CE3ACC514CF7C1E007E722D /* libosgDB.66.dylib in Frameworks */,
-				1CE3ACC614CF7C1E007E722D /* libosgFX.66.dylib in Frameworks */,
-				1CE3ACC714CF7C1E007E722D /* libosgGA.66.dylib in Frameworks */,
-				1CE3ACC814CF7C1E007E722D /* libosgManipulator.66.dylib in Frameworks */,
-				1CE3ACC914CF7C1E007E722D /* libosgParticle.66.dylib in Frameworks */,
-				1CE3ACCA14CF7C1E007E722D /* libosgPresentation.66.dylib in Frameworks */,
-				1CE3ACCB14CF7C1E007E722D /* libosgShadow.66.dylib in Frameworks */,
-				1CE3ACCC14CF7C1E007E722D /* libosgSim.66.dylib in Frameworks */,
-				1CE3ACCD14CF7C1E007E722D /* libosgTerrain.66.dylib in Frameworks */,
-				1CE3ACCE14CF7C1E007E722D /* libosgText.66.dylib in Frameworks */,
-				1CE3ACCF14CF7C1E007E722D /* libosgUtil.66.dylib in Frameworks */,
-				1CE3ACD014CF7C1E007E722D /* libosgViewer.66.dylib in Frameworks */,
-				1CE3ACD114CF7C1E007E722D /* libosgVolume.66.dylib in Frameworks */,
-				1CE3ACD214CF7C1E007E722D /* libosgWidget.66.dylib in Frameworks */,
 				1C90C16F14CCCD0100C929AE /* libusb-1.0.0.dylib in Frameworks */,
 				1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1C94DEBC14BFEBAB006394AD /* libboost_python.dylib in Frameworks */,
@@ -1299,6 +1301,23 @@
 				1C7A4AD614F2CAD600EA83AB /* libpcl_io.1.4.0.dylib in Frameworks */,
 				1C0EED7014F2F272001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7114F2F272001892A0 /* libboost_system-mt.dylib in Frameworks */,
+				1C82ACEE152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
+				1C82ACF3152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
+				1C82ACF8152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
+				1C82ACFD152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
+				1C82AD02152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
+				1C82AD07152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
+				1C82AD0C152D07220085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
+				1C82AD11152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
+				1C82AD16152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
+				1C82AD1B152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
+				1C82AD20152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
+				1C82AD25152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
+				1C82AD2A152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
+				1C82AD2F152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
+				1C82AD34152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
+				1C82AD39152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
+				1C82AD3E152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1310,28 +1329,28 @@
 				1C57789614BD702A00632E46 /* libSPIN.dylib in Frameworks */,
 				1C94DEC214BFEC2D006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED114C00250006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1CE3ACD514CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */,
-				1CE3ACD614CF7CAF007E722D /* libosg.66.dylib in Frameworks */,
-				1CE3ACD714CF7CAF007E722D /* libosgAnimation.66.dylib in Frameworks */,
-				1CE3ACD814CF7CAF007E722D /* libosgDB.66.dylib in Frameworks */,
-				1CE3ACD914CF7CAF007E722D /* libosgFX.66.dylib in Frameworks */,
-				1CE3ACDA14CF7CAF007E722D /* libosgGA.66.dylib in Frameworks */,
-				1CE3ACDB14CF7CAF007E722D /* libosgManipulator.66.dylib in Frameworks */,
-				1CE3ACDC14CF7CAF007E722D /* libosgParticle.66.dylib in Frameworks */,
-				1CE3ACDD14CF7CAF007E722D /* libosgPresentation.66.dylib in Frameworks */,
-				1CE3ACDE14CF7CAF007E722D /* libosgShadow.66.dylib in Frameworks */,
-				1CE3ACDF14CF7CAF007E722D /* libosgSim.66.dylib in Frameworks */,
-				1CE3ACE014CF7CAF007E722D /* libosgTerrain.66.dylib in Frameworks */,
-				1CE3ACE114CF7CAF007E722D /* libosgText.66.dylib in Frameworks */,
-				1CE3ACE214CF7CAF007E722D /* libosgUtil.66.dylib in Frameworks */,
-				1CE3ACE314CF7CAF007E722D /* libosgViewer.66.dylib in Frameworks */,
-				1CE3ACE414CF7CAF007E722D /* libosgVolume.66.dylib in Frameworks */,
-				1CE3ACE514CF7CAF007E722D /* libosgWidget.66.dylib in Frameworks */,
 				1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */,
 				1C9C082614CFE9BF006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082F14D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C0EED7214F2F283001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7314F2F283001892A0 /* libboost_system-mt.dylib in Frameworks */,
+				1C82ACEF152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
+				1C82ACF4152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
+				1C82ACF9152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
+				1C82ACFE152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
+				1C82AD03152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
+				1C82AD08152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
+				1C82AD0D152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
+				1C82AD12152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
+				1C82AD17152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
+				1C82AD1C152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
+				1C82AD21152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
+				1C82AD26152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
+				1C82AD2B152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
+				1C82AD30152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
+				1C82AD35152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
+				1C82AD3A152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
+				1C82AD3F152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1345,27 +1364,28 @@
 				1C94DEC514BFEC2E006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1CE3ACE614CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */,
-				1CE3ACE714CF7CAF007E722D /* libosg.66.dylib in Frameworks */,
-				1CE3ACE814CF7CAF007E722D /* libosgAnimation.66.dylib in Frameworks */,
-				1CE3ACE914CF7CAF007E722D /* libosgDB.66.dylib in Frameworks */,
-				1CE3ACEA14CF7CAF007E722D /* libosgFX.66.dylib in Frameworks */,
-				1CE3ACEB14CF7CAF007E722D /* libosgGA.66.dylib in Frameworks */,
-				1CE3ACEC14CF7CAF007E722D /* libosgManipulator.66.dylib in Frameworks */,
-				1CE3ACED14CF7CAF007E722D /* libosgParticle.66.dylib in Frameworks */,
-				1CE3ACEE14CF7CAF007E722D /* libosgPresentation.66.dylib in Frameworks */,
-				1CE3ACEF14CF7CAF007E722D /* libosgShadow.66.dylib in Frameworks */,
-				1CE3ACF014CF7CAF007E722D /* libosgSim.66.dylib in Frameworks */,
-				1CE3ACF114CF7CAF007E722D /* libosgTerrain.66.dylib in Frameworks */,
-				1CE3ACF214CF7CAF007E722D /* libosgText.66.dylib in Frameworks */,
-				1CE3ACF314CF7CAF007E722D /* libosgUtil.66.dylib in Frameworks */,
-				1CE3ACF414CF7CAF007E722D /* libosgViewer.66.dylib in Frameworks */,
-				1CE3ACF514CF7CAF007E722D /* libosgVolume.66.dylib in Frameworks */,
-				1CE3ACF614CF7CAF007E722D /* libosgWidget.66.dylib in Frameworks */,
 				1C9C082714CFE9BF006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082E14D07661006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0EED7414F2F284001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7514F2F284001892A0 /* libboost_system-mt.dylib in Frameworks */,
+				1C82ACF0152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
+				1C82ACF5152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
+				1C82ACFA152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
+				1C82ACFF152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
+				1C82AD04152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
+				1C82AD09152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
+				1C82AD0E152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
+				1C82AD13152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
+				1C82AD18152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
+				1C82AD1D152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
+				1C82AD22152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
+				1C82AD27152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
+				1C82AD2C152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
+				1C82AD31152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
+				1C82AD36152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
+				1C82AD3B152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
+				1C82AD40152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1377,28 +1397,28 @@
 				1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1C94DEC814BFEC2E006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED314C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1CE3ACF714CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */,
-				1CE3ACF814CF7CB0007E722D /* libosg.66.dylib in Frameworks */,
-				1CE3ACF914CF7CB0007E722D /* libosgAnimation.66.dylib in Frameworks */,
-				1CE3ACFA14CF7CB0007E722D /* libosgDB.66.dylib in Frameworks */,
-				1CE3ACFB14CF7CB0007E722D /* libosgFX.66.dylib in Frameworks */,
-				1CE3ACFC14CF7CB0007E722D /* libosgGA.66.dylib in Frameworks */,
-				1CE3ACFD14CF7CB0007E722D /* libosgManipulator.66.dylib in Frameworks */,
-				1CE3ACFE14CF7CB0007E722D /* libosgParticle.66.dylib in Frameworks */,
-				1CE3ACFF14CF7CB0007E722D /* libosgPresentation.66.dylib in Frameworks */,
-				1CE3AD0014CF7CB0007E722D /* libosgShadow.66.dylib in Frameworks */,
-				1CE3AD0114CF7CB0007E722D /* libosgSim.66.dylib in Frameworks */,
-				1CE3AD0214CF7CB0007E722D /* libosgTerrain.66.dylib in Frameworks */,
-				1CE3AD0314CF7CB0007E722D /* libosgText.66.dylib in Frameworks */,
-				1CE3AD0414CF7CB0007E722D /* libosgUtil.66.dylib in Frameworks */,
-				1CE3AD0514CF7CB0007E722D /* libosgViewer.66.dylib in Frameworks */,
-				1CE3AD0614CF7CB0007E722D /* libosgVolume.66.dylib in Frameworks */,
-				1CE3AD0714CF7CB0007E722D /* libosgWidget.66.dylib in Frameworks */,
 				1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */,
 				1C9C082814CFE9C0006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082D14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C0EED7614F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7714F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */,
+				1C82ACF1152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
+				1C82ACF6152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
+				1C82ACFB152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
+				1C82AD00152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
+				1C82AD05152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
+				1C82AD0A152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
+				1C82AD0F152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
+				1C82AD14152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
+				1C82AD19152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
+				1C82AD1E152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
+				1C82AD23152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
+				1C82AD28152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
+				1C82AD2D152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
+				1C82AD32152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
+				1C82AD37152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
+				1C82AD3C152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
+				1C82AD41152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1413,27 +1433,28 @@
 				1C94DECB14BFEC2F006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED414C00252006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1CE3AD0814CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */,
-				1CE3AD0914CF7CB0007E722D /* libosg.66.dylib in Frameworks */,
-				1CE3AD0A14CF7CB0007E722D /* libosgAnimation.66.dylib in Frameworks */,
-				1CE3AD0B14CF7CB0007E722D /* libosgDB.66.dylib in Frameworks */,
-				1CE3AD0C14CF7CB0007E722D /* libosgFX.66.dylib in Frameworks */,
-				1CE3AD0D14CF7CB0007E722D /* libosgGA.66.dylib in Frameworks */,
-				1CE3AD0E14CF7CB0007E722D /* libosgManipulator.66.dylib in Frameworks */,
-				1CE3AD0F14CF7CB0007E722D /* libosgParticle.66.dylib in Frameworks */,
-				1CE3AD1014CF7CB0007E722D /* libosgPresentation.66.dylib in Frameworks */,
-				1CE3AD1114CF7CB0007E722D /* libosgShadow.66.dylib in Frameworks */,
-				1CE3AD1214CF7CB0007E722D /* libosgSim.66.dylib in Frameworks */,
-				1CE3AD1314CF7CB0007E722D /* libosgTerrain.66.dylib in Frameworks */,
-				1CE3AD1414CF7CB0007E722D /* libosgText.66.dylib in Frameworks */,
-				1CE3AD1514CF7CB0007E722D /* libosgUtil.66.dylib in Frameworks */,
-				1CE3AD1614CF7CB0007E722D /* libosgViewer.66.dylib in Frameworks */,
-				1CE3AD1714CF7CB0007E722D /* libosgVolume.66.dylib in Frameworks */,
-				1CE3AD1814CF7CB0007E722D /* libosgWidget.66.dylib in Frameworks */,
 				1C9C082914CFE9C0006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082C14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0EED7814F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7914F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */,
+				1C82ACF2152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
+				1C82ACF7152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
+				1C82ACFC152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
+				1C82AD01152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
+				1C82AD06152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
+				1C82AD0B152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
+				1C82AD10152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
+				1C82AD15152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
+				1C82AD1A152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
+				1C82AD1F152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
+				1C82AD24152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
+				1C82AD29152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
+				1C82AD2E152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
+				1C82AD33152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
+				1C82AD38152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
+				1C82AD3D152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
+				1C82AD42152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1684,6 +1705,118 @@
 			path = spinserver;
 			sourceTree = "<group>";
 		};
+		1C82ACDB152D06180085D8F0 /* osg-3.1.1 */ = {
+			isa = PBXGroup;
+			children = (
+				1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */,
+				1C82ACDE152D07220085D8F0 /* libosg.91.dylib */,
+				1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */,
+				1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */,
+				1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */,
+				1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */,
+				1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */,
+				1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */,
+				1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */,
+				1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */,
+				1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */,
+				1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */,
+				1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */,
+				1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */,
+				1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */,
+				1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */,
+				1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */,
+				1C82AD43152D07360085D8F0 /* osgPlugins-3.1.1 */,
+			);
+			name = "osg-3.1.1";
+			sourceTree = "<group>";
+		};
+		1C82AD43152D07360085D8F0 /* osgPlugins-3.1.1 */ = {
+			isa = PBXGroup;
+			children = (
+				1C82AD44152D07360085D8F0 /* osgdb_3dc.so */,
+				1C82AD45152D07360085D8F0 /* osgdb_3ds.so */,
+				1C82AD46152D07360085D8F0 /* osgdb_ac.so */,
+				1C82AD47152D07360085D8F0 /* osgdb_bmp.so */,
+				1C82AD48152D07360085D8F0 /* osgdb_bsp.so */,
+				1C82AD49152D07360085D8F0 /* osgdb_bvh.so */,
+				1C82AD4A152D07360085D8F0 /* osgdb_cfg.so */,
+				1C82AD4B152D07360085D8F0 /* osgdb_curl.so */,
+				1C82AD4C152D07360085D8F0 /* osgdb_dds.so */,
+				1C82AD4D152D07360085D8F0 /* osgdb_deprecated_osg.so */,
+				1C82AD4E152D07360085D8F0 /* osgdb_deprecated_osganimation.so */,
+				1C82AD4F152D07360085D8F0 /* osgdb_deprecated_osgfx.so */,
+				1C82AD50152D07360085D8F0 /* osgdb_deprecated_osgparticle.so */,
+				1C82AD51152D07360085D8F0 /* osgdb_deprecated_osgshadow.so */,
+				1C82AD52152D07360085D8F0 /* osgdb_deprecated_osgsim.so */,
+				1C82AD53152D07360085D8F0 /* osgdb_deprecated_osgterrain.so */,
+				1C82AD54152D07360085D8F0 /* osgdb_deprecated_osgtext.so */,
+				1C82AD55152D07360085D8F0 /* osgdb_deprecated_osgviewer.so */,
+				1C82AD56152D07360085D8F0 /* osgdb_deprecated_osgvolume.so */,
+				1C82AD57152D07360085D8F0 /* osgdb_deprecated_osgwidget.so */,
+				1C82AD58152D07360085D8F0 /* osgdb_dot.so */,
+				1C82AD59152D07360085D8F0 /* osgdb_dw.so */,
+				1C82AD5A152D07360085D8F0 /* osgdb_dxf.so */,
+				1C82AD5B152D07360085D8F0 /* osgdb_ffmpeg.so */,
+				1C82AD5C152D07360085D8F0 /* osgdb_freetype.so */,
+				1C82AD5D152D07360085D8F0 /* osgdb_gdal.so */,
+				1C82AD5E152D07360085D8F0 /* osgdb_geo.so */,
+				1C82AD5F152D07360085D8F0 /* osgdb_glsl.so */,
+				1C82AD60152D07360085D8F0 /* osgdb_gz.so */,
+				1C82AD61152D07360085D8F0 /* osgdb_hdr.so */,
+				1C82AD62152D07360085D8F0 /* osgdb_imageio.so */,
+				1C82AD63152D07360085D8F0 /* osgdb_ive.so */,
+				1C82AD64152D07360085D8F0 /* osgdb_jp2.so */,
+				1C82AD65152D07370085D8F0 /* osgdb_logo.so */,
+				1C82AD66152D07370085D8F0 /* osgdb_lwo.so */,
+				1C82AD67152D07370085D8F0 /* osgdb_lws.so */,
+				1C82AD68152D07370085D8F0 /* osgdb_md2.so */,
+				1C82AD69152D07370085D8F0 /* osgdb_mdl.so */,
+				1C82AD6A152D07370085D8F0 /* osgdb_normals.so */,
+				1C82AD6B152D07370085D8F0 /* osgdb_obj.so */,
+				1C82AD6C152D07370085D8F0 /* osgdb_ogr.so */,
+				1C82AD6D152D07370085D8F0 /* osgdb_openflight.so */,
+				1C82AD6E152D07370085D8F0 /* osgdb_osg.so */,
+				1C82AD6F152D07370085D8F0 /* osgdb_osga.so */,
+				1C82AD70152D07370085D8F0 /* osgdb_osgshadow.so */,
+				1C82AD71152D07370085D8F0 /* osgdb_osgterrain.so */,
+				1C82AD72152D07370085D8F0 /* osgdb_osgtgz.so */,
+				1C82AD73152D07370085D8F0 /* osgdb_osgviewer.so */,
+				1C82AD74152D07370085D8F0 /* osgdb_p3d.so */,
+				1C82AD75152D07370085D8F0 /* osgdb_pic.so */,
+				1C82AD76152D07370085D8F0 /* osgdb_ply.so */,
+				1C82AD77152D07370085D8F0 /* osgdb_pnm.so */,
+				1C82AD78152D07370085D8F0 /* osgdb_pov.so */,
+				1C82AD79152D07370085D8F0 /* osgdb_pvr.so */,
+				1C82AD7A152D07370085D8F0 /* osgdb_revisions.so */,
+				1C82AD7B152D07370085D8F0 /* osgdb_rgb.so */,
+				1C82AD7C152D07370085D8F0 /* osgdb_rot.so */,
+				1C82AD7D152D07370085D8F0 /* osgdb_scale.so */,
+				1C82AD7E152D07370085D8F0 /* osgdb_serializers_osg.so */,
+				1C82AD7F152D07370085D8F0 /* osgdb_serializers_osganimation.so */,
+				1C82AD80152D07370085D8F0 /* osgdb_serializers_osgfx.so */,
+				1C82AD81152D07370085D8F0 /* osgdb_serializers_osgmanipulator.so */,
+				1C82AD82152D07370085D8F0 /* osgdb_serializers_osgparticle.so */,
+				1C82AD83152D07370085D8F0 /* osgdb_serializers_osgshadow.so */,
+				1C82AD84152D07370085D8F0 /* osgdb_serializers_osgsim.so */,
+				1C82AD85152D07370085D8F0 /* osgdb_serializers_osgterrain.so */,
+				1C82AD86152D07370085D8F0 /* osgdb_serializers_osgtext.so */,
+				1C82AD87152D07370085D8F0 /* osgdb_serializers_osgvolume.so */,
+				1C82AD88152D07370085D8F0 /* osgdb_shp.so */,
+				1C82AD89152D07370085D8F0 /* osgdb_stl.so */,
+				1C82AD8A152D07370085D8F0 /* osgdb_tga.so */,
+				1C82AD8B152D07370085D8F0 /* osgdb_tgz.so */,
+				1C82AD8C152D07370085D8F0 /* osgdb_trans.so */,
+				1C82AD8D152D07370085D8F0 /* osgdb_txf.so */,
+				1C82AD8E152D07370085D8F0 /* osgdb_txp.so */,
+				1C82AD8F152D07370085D8F0 /* osgdb_vrml.so */,
+				1C82AD90152D07380085D8F0 /* osgdb_vtf.so */,
+				1C82AD91152D07380085D8F0 /* osgdb_x.so */,
+				1C82AD92152D07380085D8F0 /* osgdb_zip.so */,
+			);
+			name = "osgPlugins-3.1.1";
+			path = "../../../../../usr/local/lib/osgPlugins-3.1.1";
+			sourceTree = "<group>";
+		};
 		1C875FA314C9BDAD00A46EBC /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -1789,8 +1922,9 @@
 		1C9EE82B14BE2725000976A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1C82ACDB152D06180085D8F0 /* osg-3.1.1 */,
 				1C25F53614E59387007F97E5 /* pcl */,
-				1CA24C5114BE57300023DD8B /* osg */,
+				1CA24C5114BE57300023DD8B /* osg-2.9.8 */,
 				1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */,
 				1CA24C2714BE514E0023DD8B /* liblo.7.dylib */,
 				1C34AE4A14DC4EC8001DF418 /* libjasper.1.0.0.dylib */,
@@ -1852,26 +1986,9 @@
 			name = images;
 			sourceTree = "<group>";
 		};
-		1CA24C5114BE57300023DD8B /* osg */ = {
+		1CA24C5114BE57300023DD8B /* osg-2.9.8 */ = {
 			isa = PBXGroup;
 			children = (
-				1C14F41A14C3A3D4008889AE /* OpenThreads.framework */,
-				1CD770EE14C39F7600084B4E /* osg.framework */,
-				1CD770EF14C39F7600084B4E /* osgAnimation.framework */,
-				1CD770F014C39F7600084B4E /* osgDB.framework */,
-				1CD770F114C39F7600084B4E /* osgFX.framework */,
-				1CD770F214C39F7600084B4E /* osgGA.framework */,
-				1CD770F314C39F7600084B4E /* osgManipulator.framework */,
-				1CD770F414C39F7600084B4E /* osgParticle.framework */,
-				1CD770F514C39F7600084B4E /* osgPresentation.framework */,
-				1CD770F614C39F7600084B4E /* osgShadow.framework */,
-				1CD770F714C39F7600084B4E /* osgSim.framework */,
-				1CD770F814C39F7600084B4E /* osgTerrain.framework */,
-				1CD770F914C39F7600084B4E /* osgText.framework */,
-				1CD770FA14C39F7600084B4E /* osgUtil.framework */,
-				1CD770FB14C39F7600084B4E /* osgViewer.framework */,
-				1CD770FC14C39F7600084B4E /* osgVolume.framework */,
-				1CD770FD14C39F7600084B4E /* osgWidget.framework */,
 				1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */,
 				1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */,
 				1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */,
@@ -1891,7 +2008,7 @@
 				1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */,
 				1C94DEE414C0D396006394AD /* osgPlugins-2.9.8 */,
 			);
-			name = osg;
+			name = "osg-2.9.8";
 			sourceTree = "<group>";
 		};
 		1CA24DF814BE2D3C007A9C31 /* spinserverUI */ = {
@@ -2219,7 +2336,6 @@
 				1C87601A14C9BE3200A46EBC /* spinviewer.png in Resources */,
 				1C90C15914CBB35000C929AE /* icon_fullscreen.png in Resources */,
 				1C90C16214CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png in Resources */,
-				1CE3AD1F14CFDB14007E722D /* osgdb_ffmpeg.so in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2262,7 +2378,6 @@
 				1C87601B14C9BE3200A46EBC /* spinviewer.png in Resources */,
 				1C90C15A14CBB35000C929AE /* icon_fullscreen.png in Resources */,
 				1C90C16314CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png in Resources */,
-				1CE3AD2014CFDB15007E722D /* osgdb_ffmpeg.so in Resources */,
 				1C072ACB14D9F6A5003D669E /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2281,7 +2396,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone";
 		};
 		1C87601C14CA023600A46EBC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2294,7 +2409,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libpcl_common.1.4.dylib libpcl_io.1.4.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libpcl_common.1.4.dylib libpcl_io.1.4.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone";
 		};
 		1C90C18214CCF82E00C929AE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2320,7 +2435,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.66.dylib libosgAnimation.66.dylib libosgDB.66.dylib libosgFX.66.dylib libosgGA.66.dylib libosgManipulator.66.dylib libosgParticle.66.dylib libosgPresentation.66.dylib libosgShadow.66.dylib libosgSim.66.dylib libosgTerrain.66.dylib libosgText.66.dylib libosgUtil.66.dylib libosgViewer.66.dylib libosgVolume.66.dylib libosgWidget.66.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\n  install_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n  install_name_tool -change libusb-1.0.0.dylib $REL_PATH/libusb-1.0.0 $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`                          \nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone\n\n# special libs from Macports needed by plugins (jasper, ffmpeg, etc):\ninstall_name_tool -change /opt/local/lib/libjasper.1.dylib @rpath/libjasper.1.0.0.dylib ${PLUGINPATH}/osgdb_jp2.so\n";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\n  install_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n  install_name_tool -change libusb-1.0.0.dylib $REL_PATH/libusb-1.0.0 $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`                          \nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone\n\n# special libs from Macports needed by plugins (jasper, ffmpeg, etc):\ninstall_name_tool -change /opt/local/lib/libjasper.1.dylib @rpath/libjasper.1.0.0.dylib ${PLUGINPATH}/osgdb_jp2.so\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2696,7 +2811,7 @@
 					/opt/local/Library/Frameworks,
 					"\"$(SDKROOT)/usr/local/lib\"",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-2.9.8 @loader_path/../Frameworks @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
+				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-3.1.1 @loader_path/../Frameworks @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/local/lib,
@@ -2714,7 +2829,7 @@
 					/opt/local/Library/Frameworks,
 					"\"$(SDKROOT)/usr/local/lib\"",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-2.9.8 @loader_path/../Frameworks @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
+				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-3.1.1 @loader_path/../Frameworks @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/local/lib,
@@ -2855,7 +2970,7 @@
 					/opt/local/Library/Frameworks,
 					"\"$(SDKROOT)/usr/local/lib\"",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-2.9.8 @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
+				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-3.1.1 @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/local/lib,
@@ -2873,7 +2988,7 @@
 					/opt/local/Library/Frameworks,
 					"\"$(SDKROOT)/usr/local/lib\"",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-2.9.8 @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
+				LD_RUNPATH_SEARCH_PATHS = "/usr/local/lib/osgPlugins-3.1.1 @loader_path/. /usr/local/Frameworks /usr/local/lib /opt/local/lib";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/local/lib,
