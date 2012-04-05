@@ -175,15 +175,21 @@ void spinBaseContext::debugPrint()
 #else
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
+
+#ifdef WITH_SHARED_VIDEO
+    std::cout << "  sharedvideo enabled?\tYES" << std::endl;
+#else
+    std::cout << "  sharedvideo enabled?\tNO" << std::endl;
+#endif
     std::cout << "  My IP address:\t\t" << getMyIPaddress() << std::endl;
     if (doDiscovery_)
     {
-        std::cout << "  Auto discovery address:\t" << lo_address_get_url(lo_infoAddr);
+        std::cout << "  Auto discovery addr:\t" << lo_address_get_url(lo_infoAddr);
         if (lo_address_get_ttl(lo_infoAddr)>0)
             std::cout << " TTL=" << lo_address_get_ttl(lo_infoAddr);
         std::cout << std::endl;
     } else {
-        std::cout << "  Auto discovery address:\tOFF" << std::endl;
+        std::cout << "  Auto discovery addr:\tOFF" << std::endl;
     }
     std::vector<lo_address>::iterator addrIter;
     for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
@@ -820,6 +826,16 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         else
         {
             spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
+            
+            // In the case of a client, we also need to check if the current 
+            // userNode is actually attached. The deleteNode / clear / whatever
+            // may have detached it from the scenegraph:
+            if (!sceneManager->worldNode->containsNode(spin.userNode.get()))
+            {
+                std::cout << "calling attach on userNode (newparent=" << spin.userNode->newParent->s_name << std::endl;
+                spin.userNode->newParent = WORLD_SYMBOL;
+                spin.userNode->attach();
+            }
             
             // if the server sends a userRefresh, it's possible that it has
             // only recently come online, so we need to re-subsrcibe:
