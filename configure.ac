@@ -55,7 +55,7 @@ AC_INIT(SPINFRAMEWORK,
         [spin_version],
         [http://www.spinframework.org],
         [spinframework],
-        [http://github.com/mikewoz/spinframework/issues])
+        [http://codered.sat.qc.ca/redmine/projects/spinframework])
 
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
