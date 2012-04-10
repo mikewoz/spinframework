@@ -94,9 +94,7 @@ Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, ini
 	classType = "Shader";
 
 	path_ = "NULL";
-	renderBin_ = 11;
     updateRate_ = 1.0;
-	lightingEnabled_ = true;
     programObject_ = new osg::Program;
 
     // NEEDED FOR TESTS:
@@ -159,7 +157,6 @@ Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, ini
     //tex->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
     //this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
     this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
-    
     
     
     
@@ -793,24 +790,6 @@ void Shader::setPath (const char* newPath)
 	BROADCAST(this, "ss", "setPath", getPath());
 }
 
-void Shader::setLighting (int i)
-{
-	lightingEnabled_ = (bool)i;
-
-	if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-
-	BROADCAST(this, "si", "setLighting", getLighting());
-}
-
-void Shader::setRenderBin (int i)
-{
-	renderBin_ = i;
-	this->setRenderBinDetails( (int)renderBin_, "RenderBin");
-
-	BROADCAST(this, "si", "setRenderBin", getRenderBin());
-}
-
 // *****************************************************************************
 std::vector<lo_message> Shader::getState () const
 {
@@ -821,14 +800,6 @@ std::vector<lo_message> Shader::getState () const
 	
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setPath", getPath());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setLighting", getLighting());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 	
 	return ret;

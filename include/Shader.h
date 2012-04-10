@@ -128,21 +128,6 @@ public:
     void setPath (const char* newPath);
     const char *getPath() const { return path_.c_str(); }
 
-    /**
-     * Set whether the stateset is influenced by lighting
-     */
-    void setLighting(int i);
-    int getLighting() const { return (int)lightingEnabled_; }
-
-    /**
-     * Set the render bin. The higher the number, the later it
-     * gets processed (ie, it appears on top). Default renderBin = 11
-     */
-    void setRenderBin (int i);
-    int getRenderBin() const { return renderBin_; }
-
-
-
     // must reimplement
     virtual std::vector<lo_message> getState() const;
 
@@ -159,8 +144,6 @@ private:
     
     osg::Timer_t lastTick_;
 
-    bool lightingEnabled_;
-    int  renderBin_;
 };
 
 } // end of namespace spin

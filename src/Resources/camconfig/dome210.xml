@@ -2,10 +2,10 @@
 <!DOCTYPE spinframework SYSTEM>
 <camConfig>
     <window id="dome view">
-        <screen>1</screen>
+        <screen>0</screen>
         <fullscreen>true</fullscreen>
         <windowPosition>0 0</windowPosition>
-        <windowSize>2240 2240</windowSize>
+        <windowSize>50% 50%</windowSize>
         <windowDecoration>false</windowDecoration>
         <useCursor>true</useCursor>
         <supportsResize>true</supportsResize>

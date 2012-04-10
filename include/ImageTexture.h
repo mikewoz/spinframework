@@ -86,32 +86,6 @@ public:
     void setPath (const char* newPath);
     const char *getPath() const { return _path.c_str(); }
 
-    /**
-     * Set whether the texture is influenced by lighting
-     */
-    void setLighting(int i);
-
-    /**
-     * Returns a boolean indicating whether lighting affects the texture.
-     */
-
-    int getLighting() const { return (int)_lightingEnabled; }
-
-    /**
-     * Set the render bin for this texture. The higher the number, the later it
-     * gets processed (ie, it appears on top). Default renderBin = 11
-     */
-    void setRenderBin (int i);
-
-    /**
-     * Returns an integer indicating the render bin for this texture. Higher
-     * numbers get processed later (i.e. it appears on top). Default = 11
-     */
-
-    int getRenderBin() const { return _renderBin; }
-
-
-
     // must reimplement
     virtual std::vector<lo_message> getState() const;
 
@@ -119,11 +93,8 @@ public:
 private:
     
     osg::ref_ptr<osg::Image> _image;
-
     std::string _path;
 
-    bool _lightingEnabled;
-    int  _renderBin;
     bool _useTextureRectangle;
 };
 

@@ -47,17 +47,17 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          Properties::NON_VIRTUAL,
 	          __void__clearUniforms,
 	          "",
-	          "");
+	          "Remove all uniforms from this stateset ");
 	I_Method2(void, registerUniform, IN, const char *, name, IN, const char *, type,
 	          Properties::NON_VIRTUAL,
 	          __void__registerUniform__C5_char_P1__C5_char_P1,
 	          "",
-	          "");
-	I_Method3(void, registerUniform, IN, const char *, name, IN, const char *, type, IN, const char *, defaultValues,
+	          "Create a uniform with the provided name and type. The value will be set to some default value ");
+	I_Method3(void, registerUniform, IN, const char *, name, IN, const char *, type, IN, const char *, defaultValue,
 	          Properties::NON_VIRTUAL,
 	          __void__registerUniform__C5_char_P1__C5_char_P1__C5_char_P1,
 	          "",
-	          "");
+	          "Create a uniform with the provided name and type, and set the initial value for the uniform.Note that defaults are provided as strings in all cases. So in the case of several values, the defaultValue would be a space-separated list of values.It is also possible to specify an array of vectors. For example, if the type is vec2, you can specify a defaultValue of 0.0 0.1 1.0 1.0 and this will generate two vec2 uniforms with indexes automatically added to the name: uniform name[0] = vec2(0.0,0.1); uniform name[1] = vec2(1.0,1.0); To send OSC messages to control these uniforms, you need to use the full name including square brackets. For example: /SPIN/default/shader setUniform_vec2 name[0] 0.0 0.0 ");
 	I_Method1(ParsedUniforms, parseUniformsFromShader, IN, osg::Shader *, shader,
 	          Properties::NON_VIRTUAL,
 	          __ParsedUniforms__parseUniformsFromShader__osg_Shader_P1,
@@ -113,40 +113,14 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          __C5_char_P1__getPath,
 	          "",
 	          "Abstract method getPath needs to be implemented ");
-	I_Method1(void, setLighting, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setLighting__int,
-	          "",
-	          "Set whether the stateset is influenced by lighting ");
-	I_Method0(int, getLighting,
-	          Properties::NON_VIRTUAL,
-	          __int__getLighting,
-	          "",
-	          "");
-	I_Method1(void, setRenderBin, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setRenderBin__int,
-	          "",
-	          "Set the render bin. The higher the number, the later it gets processed (ie, it appears on top). Default renderBin = 11 ");
-	I_Method0(int, getRenderBin,
-	          Properties::NON_VIRTUAL,
-	          __int__getRenderBin,
-	          "",
-	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "Just like a ReferencedNode, each subclass of ReferencedStateSet must override the getState() method to pass it's current state. ");
-	I_SimpleProperty(int, Lighting, 
-	                 __int__getLighting, 
-	                 __void__setLighting__int);
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 __void__setPath__C5_char_P1);
-	I_SimpleProperty(int, RenderBin, 
-	                 __int__getRenderBin, 
-	                 __void__setRenderBin__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
