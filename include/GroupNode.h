@@ -205,7 +205,12 @@ public:
 
     virtual void setManipulator(const char *manipulatorType);
     const char* getManipulator() const { return manipulatorType_.c_str(); }
-    
+
+    void setManipulatorMatrix(float a00, float a01, float a02, float a03,
+                              float a10, float a11, float a12, float a13,
+                              float a20, float a21, float a22, float a23,
+                              float a30, float a31, float a32, float a33);
+
     
     int getReportMode() const { return (int) _reportMode; };
     int getInteractionMode() const { return (int) _interactionMode; };
@@ -218,7 +223,6 @@ public:
     int getVelocityMode() const { return (int) _velocityMode; };
     float getDamping() const { return _damping; };
     //osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
-
 
     osg::Matrix getGlobalMatrix();
     osg::Vec3 getCenter() const;
@@ -288,6 +292,7 @@ protected:
     
     std::string manipulatorType_;
     bool manipulatorUpdateFlag_;
+    bool manipulatorShadowCopy_;
     
 private:
 

@@ -119,6 +119,8 @@ void PointerNode::callbackUpdate()
 {
     RayNode::callbackUpdate();
     
+    this->computeBound();
+    
 
     // TODO: It's too much work to perform an intersection traversal on all
     // objects in the scenegraph. We should add a way to limit this to only
@@ -162,7 +164,10 @@ void PointerNode::callbackUpdate()
         reportIntersections();
     }
     
-    applyManipulation(myMatrix, start, end);
+    if (!spinApp::Instance().getContext()->isServer())
+    {
+        applyManipulation(myMatrix, start, end);
+    }
      
     this->previousMatrix = myMatrix;
 }
@@ -187,97 +192,15 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
         // Transfer the intersections to the PointerInfo object:
         osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
         osgUtil::LineSegmentIntersector::Intersections::iterator hitr;
-        std::cout << intersections.size() << " INTERSECTIONS!!!!" << std::endl;
         for (hitr = intersections.begin(); hitr != intersections.end(); ++hitr)
         {
         
-            _pointer.addIntersection(hitr->nodePath, hitr->getLocalIntersectPoint());
-            
-            std::cout << "ADDED intersection to pointer: ";
-            for (int i=0; i<hitr->nodePath.size(); i++)
-            {
-                if (hitr->nodePath[i]->getName().empty()) std::cout << " ?";
-                else std::cout << " " << hitr->nodePath[i]->getName();
-            }
-            std::cout << std::endl;
-                
-                
-            /*
-            osg::NodePath cutNodePath;
-            
-            
-            // On the server side, we have an error when using TabBoxDraggers
-            // since all Dragger Handles (the green corner squares) are listed
-            // in the nodepath. This is NOT the case on the viewer side.
-            
-            // So here, we make sure to pass only the nodepath up
-            // to the first dragger, and then break.
-            
-            
-            
-            
-            std::cout << "ADDED intersection to pointer: ";
-            for (int i=0; i<hitr->nodePath.size(); i++)
-            //for (osg::NodePath::iterator itr2 = hitr->nodePath.begin(); itr2 != hitr->nodePath.end(); ++itr2)
-            {
-                //std::cout << " " << (*itr2)->getName();
-                std::cout << " " << hitr->nodePath[i]->getName() <<"("<<hitr->nodePath[i]->getNodeMask() << ")";
-                
-                
-                cutNodePath.push_back(hitr->nodePath[i]);
-                
-                if (dynamic_cast<osgManipulator::Dragger*>(hitr->nodePath[i]))
-                {
-                    std::cout << "BREAK" << std::endl;
-                    break;
-                }
-                
-            }
-            std::cout << std::endl;
-            
-            
-            osg::Node *lastNode = hitr->nodePath[hitr->nodePath.size()-1];
-            if (lastNode->getName()!="Dragger Handle")
-            {
-                std::cout << "ADDED intersection to pointer: ";
-                for (int i=0; i<hitr->nodePath.size(); i++)
-                    std::cout << " " << hitr->nodePath[i]->getName();
-                std::cout << std::endl;
-                
-                _pointer.addIntersection(hitr->nodePath, hitr->getLocalIntersectPoint());
-            } else
-            {
-            
-            }
-            
-            */
-            
+            _pointer.addIntersection(hitr->nodePath, hitr->getLocalIntersectPoint());       
        }
         
        
         //_pointer._hitIter = _pointer._hitList.begin();
 
-
-        
-        /*
-        for (hitr = intersections.begin(); hitr != intersections.end(); ++hitr)
-        {
-            std::cout << "intersection:" << std::endl;
-            const osgUtil::LineSegmentIntersector::Intersection& intersection = *hitr;
-            for (int i=intersection.nodePath.size()-1; i>=0; i--)
-            {
-                
-                osgManipulator::Dragger* dragger = dynamic_cast<osgManipulator::Dragger*>(intersection.nodePath[i]);
-                if (dragger)
-                {
-                    std::cout << i<<") dragger!: " << intersection.nodePath[i]->getName() << std::endl;
-                    //break;
-                }
-                else std::cout << i<<") " << intersection.nodePath[i]->getName() << std::endl;
-            }
-        }
-        */
-        
         
         for (osg::NodePath::iterator itr = _pointer._hitList.front().first.begin();
              itr != _pointer._hitList.front().first.end();
@@ -287,24 +210,6 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
             osgManipulator::Dragger* ptrDragger = dynamic_cast<osgManipulator::Dragger*>(*itr);
             if (ptrDragger)
             {
-                std::cout << "YES! manipulator PUSH (dragger name: " << ptrDragger->getName() << "). Intersection:";
-                for (osg::NodePath::iterator itr2 = _pointer._hitList.front().first.begin(); itr2 != _pointer._hitList.front().first.end(); ++itr2)
-                {
-                    std::cout << " " << (*itr2)->getName();
-                }
-                std::cout << std::endl;
-
-                                                
-                                                                                
-                if (dynamic_cast<osgManipulator::TabBoxDragger*>(*itr))
-                {
-                    //_pointer._hitList.front().first.pop_back();
-                    
-                    //std::cout << "this is h:";
-                 
-                }
-
-
                 // Update the PointerInfo by setting the start and end points
                 // based on our PointerNode ray:
                 _pointer.setNearFarPoints(start,end);
@@ -327,8 +232,6 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
         _pointer.setNearFarPoints(start,end);
         _pointer._hitIter = _pointer._hitList.begin();
 
-        std::cout << "manipulator DRAG: handled=" << ea->getHandled() << " wxh=" << ea->getWindowWidth()<<"x"<<ea->getWindowHeight() << std::endl;
-
         //ea->setHandled(false);
         ea->setEventType(osgGA::GUIEventAdapter::DRAG);
         dragger->handle(_pointer, *ea.get(), aa);
@@ -339,8 +242,6 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
     else if (!doManipulation && (dragger.valid()))
     {
         //  set event to RELEASE and invoke handle()
-        std::cout << "manipulator RELEASE" << std::endl;
-        
         _pointer.setNearFarPoints(start,end);
         _pointer._hitIter = _pointer._hitList.begin();
         
@@ -444,7 +345,7 @@ void PointerNode::reportIntersections()
     if (intersectChange)
     {
         
-        if (1)
+        if (0) // debug print
         {
             osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
             osgUtil::LineSegmentIntersector::Intersections::iterator itr;
@@ -469,10 +370,6 @@ void PointerNode::reportIntersections()
                     if (n) std::cout << ",  bound: " << stringify(n->getBound().center()) << ", radius=" << n->getBound().radius() << std::endl;
                     
                 } std::cout << std::endl;
-                
-                
-                
-                
             }
         }
         
@@ -503,7 +400,7 @@ void PointerNode::reportIntersections()
             lo_message_add_string(msg, "NULL");
         
         // debug:
-        if (1)
+        if (0)
         {
             std::cout << "PionterNode has new intersections:";
             if (intersectList.size())

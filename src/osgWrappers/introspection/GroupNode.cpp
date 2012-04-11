@@ -197,6 +197,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __C5_char_P1__getManipulator,
 	          "",
 	          "");
+	I_Method16(void, setManipulatorMatrix, IN, float, a00, IN, float, a01, IN, float, a02, IN, float, a03, IN, float, a10, IN, float, a11, IN, float, a12, IN, float, a13, IN, float, a20, IN, float, a21, IN, float, a22, IN, float, a23, IN, float, a30, IN, float, a31, IN, float, a32, IN, float, a33,
+	           Properties::NON_VIRTUAL,
+	           __void__setManipulatorMatrix__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float,
+	           "",
+	           "");
 	I_Method0(int, getReportMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getReportMode,
