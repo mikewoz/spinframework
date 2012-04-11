@@ -59,7 +59,7 @@
 #include "UserNode.h"
 #include "spinApp.h"
 
-using namespace std;
+extern pthread_mutex_t sceneMutex;
 
 namespace spin
 {
@@ -72,6 +72,7 @@ DraggerCallback::DraggerCallback(GroupNode* g) : DraggerTransformCallback(g->get
 
 bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
 {
+    std::cout << "DraggerCallback" << std::endl;
     if (!_transform) return false;
     
     bool success = false;
@@ -97,12 +98,28 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
         }
         case osgManipulator::MotionCommand::MOVE:
         {
-            std::cout << "DraggerCallback MOVE" << std::endl;
             
-            osg::Matrix m = _transform->getMatrix();
-            osg::Vec3 t = m.getTrans();
-            osg::Quat q = m.getRotate();
-            osg::Vec3 s = m.getScale();
+            osg::Matrix m1 = _transform->getMatrix();
+            osg::Vec3 t = m1.getTrans();
+            osg::Quat q = m1.getRotate();
+            osg::Vec3 s = m1.getScale();
+
+            std::cout << "DraggerCallback MOVE: " << std::endl;
+            std::cout << "  t1 = " << stringify(m1.getTrans()) << std::endl;
+            std::cout << "  q1 = " << stringify(m1.getRotate()) << std::endl;
+            std::cout << "  s1 = " << stringify(m1.getScale()) << std::endl;
+
+            osg::Matrix m2 = command.getWorldToLocal();
+            std::cout << "  t2 = " << stringify(m2.getTrans()) << std::endl;
+            std::cout << "  q2 = " << stringify(m2.getRotate()) << std::endl;
+            std::cout << "  s2 = " << stringify(m2.getScale()) << std::endl;
+            
+            osg::Matrix m3 = command.getMotionMatrix();
+            std::cout << "  t3 = " << stringify(m3.getTrans()) << std::endl;
+            std::cout << "  q3 = " << stringify(m3.getRotate()) << std::endl;
+            std::cout << "  s3 = " << stringify(m3.getScale()) << std::endl;
+            
+          
 
             /*
             std::cout
@@ -128,27 +145,43 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
             << m.getRotate().z() << ","
             << m.getRotate().w()
             << std::endl;
-             */
+            */
             
             
-            // unlock the node:
-            spinApp::Instance().NodeMessage(groupNode->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 0, SPIN_ARGS_END);
+            // TODO: unlock the node:
+            //spinApp::Instance().NodeMessage(groupNode->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 0, SPIN_ARGS_END);
+            //BROADCAST(groupNode, "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 0);
             
             // copy the transform to the (viewer's) mainTransform:
             // (note: we could skip this, because it will get updated from the
             //  server in a moment, but resetting the manipulatorTransform will
             //  cause the transform to flicker back to the original state 
             //  momentarily before the update from spinserver)
+            
+            
             /*
-            groupNode->setTranslation(t);
-            groupNode->setOrientationQuat(q);
-            groupNode->setScale(s);
+            groupNode->setTranslation(t.x(), t.y(), t.z());
+            groupNode->setOrientationQuat(q.x(), q.y(), q.z(), q.w());
+            groupNode->setScale(s.x(), s.y(), s.z());
             */
             
             // now, send this to the server so all other viewers get updated:
+            
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // Here, we don't know if the DraggerCallback is called on a client machine
+            // or a server. Each requires a different form of sending the update.
+            
+            
+            /*
             spinApp::Instance().NodeMessage(groupNode->getID().c_str(), "sfff", "setTranslation", t.x(), t.y(), t.z(), SPIN_ARGS_END);
             spinApp::Instance().NodeMessage(groupNode->getID().c_str(), "sffff", "setOrientationQuat", q.x(), q.y(), q.z(), q.w(), SPIN_ARGS_END);
             spinApp::Instance().NodeMessage(groupNode->getID().c_str(), "sfff", "setScale", s.x(), s.y(), s.z(), SPIN_ARGS_END);
+            */
+            /*
+            BROADCAST(groupNode, "sfff", "setTranslation", t.x(), t.y(), t.z());
+            BROADCAST(groupNode, "sffff", "setOrientationQuat", q.x(), q.y(), q.z(), q.w());
+            BROADCAST(groupNode, "sfff", "setScale", s.x(), s.y(), s.z());
+            */
 
             //_transform->setMatrix(osg::Matrix::identity());
             
@@ -168,6 +201,7 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
             success = false;
     }
 
+/*
     osg::Matrix m = this->getTransform()->getMatrix();
     std::cout
     << "DraggerCallback  trans: "
@@ -184,6 +218,7 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
     << m.getScale().y() << ","
     << m.getScale().z()
     << std::endl;
+*/
 
     return success;
 }
@@ -194,7 +229,7 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
 GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
 {
     nodeType = "GroupNode";
-    this->setName(string(id->s_name) + ".GroupNode");
+    this->setName(getID() + ".GroupNode");
 
     //_reportGlobals = false;
     _reportMode = GroupNode::NONE;
@@ -202,21 +237,23 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
     orientationMode_ = GroupNode::NORMAL;
     
     orientationTarget_ = gensym("NULL");
+    manipulatorType_ = "NULL";
+    manipulatorUpdateFlag_ = false;
 
     mainTransform = new osg::PositionAttitudeTransform();
-    mainTransform->setName(string(id->s_name) + ".mainTransform");
+    mainTransform->setName(getID() + ".mainTransform");
     //mainTransform->setAttitude(osg::Quat(0.0,0.0,0.0,0.0));
     //mainTransform->setPosition(osg::Vec3(0.0,0.0,0.0));
     this->addChild(mainTransform.get());
 
     manipulatorTransform = new osg::MatrixTransform();
-    manipulatorTransform->setName(string(id->s_name) + ".manipulatorTransform");
+    manipulatorTransform->setName(getID() + ".manipulatorTransform");
     this->addChild(manipulatorTransform.get());
     
 
     clipNode = new osg::ClipNode();
     clipNode->setCullingActive(false);
-    clipNode->setName(string(id->s_name) + ".clipNode");
+    clipNode->setName(getID() + ".clipNode");
     //manipulatorTransform->addChild(clipNode.get());
     mainTransform->addChild(clipNode.get());
 
@@ -245,6 +282,12 @@ GroupNode::~GroupNode()
 void GroupNode::callbackUpdate()
 {
     ReferencedNode::callbackUpdate();
+    
+    if (manipulatorUpdateFlag_)
+    {
+        drawManipulator();
+        manipulatorUpdateFlag_ = false;
+    }
 
     //printf("GroupNode: damping = %f\n", _damping);
 
@@ -294,15 +337,19 @@ void GroupNode::callbackUpdate()
 
 void GroupNode::updateNodePath(bool updateChildren)
 {
+    // get node path from parent class, but with the false flag so that children
+    // are not updated yet:
 	ReferencedNode::updateNodePath(false);
 
-    currentNodePath.push_back(mainTransform.get());
-    //currentNodePath.push_back(manipulatorTransform.get());
+    if (dragger.valid())
+        currentNodePath.push_back(manipulatorTransform.get());
+    else
+        currentNodePath.push_back(mainTransform.get());
+    
     currentNodePath.push_back(clipNode.get());
-
+    
     // now update NodePaths for all children:
     if (updateChildren) updateChildNodePaths();
-
 
 }
 
@@ -349,7 +396,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                         osg::Vec3 vel = osg::Vec3(0,0,0);
                         int count = 0;
 
-                        vector<osg::Vec4>::iterator it;
+                        std::vector<osg::Vec4>::iterator it;
                         for (it=_trajectory.begin(); it!=_trajectory.end(); ++it)
                         {
                             if (currentTime - (*it).w() < 500)
@@ -494,6 +541,11 @@ void GroupNode::debug()
 
     if (owner.valid()) std::cout << "   owner: " << owner->id->s_name << std::endl;
     else std::cout << "   owner: NULL" << std::endl;
+    
+    std::cout << "   mainX pos: " << stringify(mainTransform->getPosition()) << std::endl;
+    std::cout << "   mainX rot: " << stringify(mainTransform->getAttitude()) << std::endl;
+    std::cout << "   manip pos: " << stringify(manipulatorTransform->getMatrix().getTrans()) << std::endl;
+    std::cout << "   manip rot: " << stringify(manipulatorTransform->getMatrix().getRotate()) << std::endl;
 
 }
 
@@ -831,6 +883,7 @@ osgManipulator::Dragger* createDragger(const std::string& name, float size, osg:
     
     if (dragger)
     {
+        std::cout << "created dragger: " << name << std::endl;
         dragger->setName(name);
         dragger->setMatrix(osg::Matrix::scale(size, size, size) * osg::Matrix::translate(offset));
         
@@ -845,148 +898,180 @@ osgManipulator::Dragger* createDragger(const std::string& name, float size, osg:
 
 void GroupNode::setManipulator(const char *manipulatorType)
 {
-    
     if (this->owner.valid()) return;
+    if (std::string(manipulatorType)==manipulatorType_) return;
     
-    _manipulatorType = std::string(manipulatorType);
+    manipulatorType_ = std::string(manipulatorType);
     BROADCAST(this, "ss", "setManipulator", getManipulator());
 
-    // only do the dragger stuff on the viewer side:
-    if ( !spinApp::Instance().getContext()->isServer() )
-    {
-    
-        if (dragger.valid())
-        {            
-            // Apply the transform of the matrixTransform (updated by the
-            // dragger) to the mainTransform, but, we need to do this with
-            // setTranslation, setOrientation, and setScale calls so that the 
-            // server finally gets notified:
-            
-            osg::Matrix m = manipulatorTransform->getMatrix();
-            osg::Vec3 t = mainTransform->getPosition() + m.getTrans();
-            osg::Quat q = mainTransform->getAttitude() * m.getRotate();
-            osg::Vec3 s = osg::Vec3(mainTransform->getScale().x() * m.getScale().x(),
-                                    mainTransform->getScale().y() * m.getScale().y(),
-                                    mainTransform->getScale().z() * m.getScale().z());
-            
-            std::cout
-            << "main x,y,z:\t"
-            << mainTransform->getPosition().x() << ","
-            << mainTransform->getPosition().y() << ","
-            << mainTransform->getPosition().z()
-            << "  quat:\t"
-            << mainTransform->getAttitude().x() << ","
-            << mainTransform->getAttitude().y() << ","
-            << mainTransform->getAttitude().z() << ","
-            << mainTransform->getAttitude().w()
-            << std::endl;
+    // set the flag, which is checked during the updateCallback, and calls the
+    // drawManipulator method below
+    manipulatorUpdateFlag_ = true;
+}
 
-            std::cout
-            << "new x,y,z:\t"
-            << m.getTrans().x() << ","
-            << m.getTrans().y() << ","
-            << m.getTrans().z()
-            << "  quat:\t"
-            << m.getRotate().x() << ","
-            << m.getRotate().y() << ","
-            << m.getRotate().z() << ","
-            << m.getRotate().w()
-            << std::endl;
+void GroupNode::drawManipulator()
+{
 
-            
-            // unlock the node:
-            spinApp::Instance().NodeMessage(this->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 0, SPIN_ARGS_END);
-            
-            /*
-            // copy the transform to the (viewer's) mainTransform:
-            // (note: we could skip this, because it will get updated from the
-            //  server in a moment, but resetting the manipulatorTransform will
-            //  cause the transform to flicker back to the original state 
-            //  momentarily before the update from spinserver)
+    // remove the previously attached dragger (if one exists):
+    if (dragger.valid())
+    {            
+        // Get the transform of the matrixTransform (updated by the dragger) so
+        // that we can update the mainTransform. Hence, when we move the geometry
+        // back to the mainTransform, it will be at the correct position:
+        
+        osg::Matrix m = manipulatorTransform->getMatrix();
+        
+        /*
+        osg::Vec3 t = mainTransform->getPosition() + m.getTrans();
+        osg::Quat q = mainTransform->getAttitude() * m.getRotate();
+        osg::Vec3 s = osg::Vec3(mainTransform->getScale().x() * m.getScale().x(),
+                                mainTransform->getScale().y() * m.getScale().y(),
+                                mainTransform->getScale().z() * m.getScale().z());
+        */
+        
+        osg::Vec3 t = m.getTrans();
+        osg::Quat q = m.getRotate();
+        osg::Vec3 s = m.getScale();
+        
+        std::cout << "Applying manipulator:" << std::endl;
+        std::cout << "  t = " << stringify(t) << std::endl;
+        std::cout << "  q = " << stringify(q) << std::endl;
+        std::cout << "  s = " << stringify(s) << std::endl;
+        std::cout << "Previous mainTransform:" << std::endl;
+        std::cout << "  t = " << stringify(mainTransform->getPosition()) << std::endl;
+        std::cout << "  o = " << stringify(_orientation) << std::endl;
+        std::cout << "  q = " << stringify(mainTransform->getAttitude()) << std::endl;
+        std::cout << "  s = " << stringify(mainTransform->getScale()) << std::endl;
+
+        
+
+        // NOTE: we only really need to do this on the server side, since the 
+        // viewer will eventually get the update via OSC:
+        if (spinApp::Instance().getContext()->isServer())
+        {
+            this->setTranslation(t.x(), t.y(), t.z());
+            this->setOrientationQuat(q.x(), q.y(), q.z(), q.w());
+            this->setScale(s.x(), s.y(), s.z());
+        }
+        
+        // Actually, we will update mainTransform on the client side too...
+        // We could skip this, because it will get updated in a moment, but the
+        // update will prevent the transform from flickering back its original
+        // state momentarily before receiving the update
+        else
+        {
             mainTransform->setPosition(t);
             mainTransform->setAttitude(q);
             mainTransform->setScale(s);
-            
-            // now, send this to the server so all other viewers get updated:
-            spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setTranslation", t.x(), t.y(), t.z(), SPIN_ARGS_END);
-            spinApp::Instance().NodeMessage(this->getID().c_str(), "sffff", "setOrientationQuat", q.x(), q.y(), q.z(), q.w(), SPIN_ARGS_END);
-            spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setScale", s.x(), s.y(), s.z(), SPIN_ARGS_END);
-            */
-            
-            //this->replaceChild(manipulatorTransform.get(), mainTransform.get());
-            manipulatorTransform->removeChild(clipNode.get());
-            mainTransform->addChild(clipNode.get());
-            
-            // return the manipulatorTransform to an identity matrix, and remove
-            // the dragger:
-            manipulatorTransform->setMatrix(osg::Matrix::identity());
-            this->removeChild(dragger.get());
-            dragger = 0;
-
         }
+
+
         
-        dragger = createDragger(manipulatorType, this->getBound().radius(), mainTransform->getPosition());
-        if (dragger.valid())
-        {
-            // tell server that this viewer's UserNode is now the owner:
-            spinApp::Instance().NodeMessage(this->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 1, SPIN_ARGS_END);
-            
-            this->addChild(dragger.get());
-            
-            /*
-            float scale;
-            if (std::string(manipulatorType)=="TrackballDragger")
-                scale = this->getBound().radius() * 1.0;
-            else if (std::string(manipulatorType).find("Box")!=std::string::npos)
-                scale = this->getBound().radius() * 1.5;
-            else
-                scale = this->getBound().radius() * 2.0;
-            //dragger->setMatrix(osg::Matrix::scale(scale, scale, scale) * osg::Matrix::translate(this->getBound().center()));
-            //dragger->setMatrix(osg::Matrix::scale(scale, scale, scale));
-            dragger->setMatrix(osg::Matrix::scale(scale, scale, scale) * osg::Matrix::translate(mainTransform->getPosition()));
-            */
-                               
-            
-            // For the duration of the manipulation we swap the mainTransform 
-            // with the manipulator transform ONLY ON THIS CLIENT. This means
-            // that the dragger will update the transform here, while the
-            // dragger callback will send messages to the server and update the
-            // global state:
-            
-            
-            osg::Matrix m = osg::Matrix::scale(mainTransform->getScale())
-            * osg::Matrix::rotate(mainTransform->getAttitude())
-            * osg::Matrix::translate(mainTransform->getPosition());
-            
-            
-            manipulatorTransform->setMatrix(m);
-            //this->replaceChild(mainTransform.get(), manipulatorTransform.get());
-            manipulatorTransform->addChild(clipNode.get());
-            mainTransform->removeChild(clipNode.get());
-            
-            
+        
+        // TODO: unlock the node:
+        //spinApp::Instance().NodeMessage(this->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 0, SPIN_ARGS_END);
+        //BROADCAST(this, "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 0);
 
-            //dragger->addDraggerCallback(new DraggerCallback(manipulatorTransform.get()));
-            dragger->addDraggerCallback(new DraggerCallback(this));
-            
-            
-            
-            dragger->addTransformUpdating(manipulatorTransform.get());
-            
-            // we want the dragger to handle it's own events automatically
-            dragger->setHandleEvents(true);
-            
-            // if we don't set an activation key or mod mask then any mouse click on
-            // the dragger will activate it, however if do define either of ActivationModKeyMask or
-            // and ActivationKeyEvent then you'll have to press either than mod key or the specified key to
-            // be able to activate the dragger when you mouse click on it.  Please note the follow allows
-            // activation if either the ctrl key or the 'a' key is pressed and held down.
-            dragger->setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
-            dragger->setActivationKeyEvent('a');
-        }
+        
+        /*
+        // copy the transform to the (viewer's) mainTransform:
+        // (note: we could skip this, because it will get updated from the
+        //  server in a moment, but resetting the manipulatorTransform will
+        //  cause the transform to flicker back to the original state 
+        //  momentarily before the update from spinserver)
+        mainTransform->setPosition(t);
+        mainTransform->setAttitude(q);
+        mainTransform->setScale(s);
+        
+        // now, send this to the server so all other viewers get updated:
+        spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setTranslation", t.x(), t.y(), t.z(), SPIN_ARGS_END);
+        spinApp::Instance().NodeMessage(this->getID().c_str(), "sffff", "setOrientationQuat", q.x(), q.y(), q.z(), q.w(), SPIN_ARGS_END);
+        spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setScale", s.x(), s.y(), s.z(), SPIN_ARGS_END);
+        */
+        
+        //this->replaceChild(manipulatorTransform.get(), mainTransform.get());
+        
+        manipulatorTransform->removeChild(clipNode.get());
+        mainTransform->addChild(clipNode.get());
+        
+        // return the manipulatorTransform to an identity matrix, and remove
+        // the dragger:
+        manipulatorTransform->setMatrix(osg::Matrix::identity());
+        this->removeChild(dragger.get());
+        dragger = 0;
     }
-}
     
+    dragger = createDragger(manipulatorType_, this->getBound().radius(), mainTransform->getPosition());
+    if (dragger.valid())
+    {
+        // TODO: tell server that this viewer's UserNode is now the owner:
+        //spinApp::Instance().NodeMessage(this->getID().c_str(), "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 1, SPIN_ARGS_END);
+        //BROADCAST(this, "ssi", "setLock", spinApp::Instance().getUserID().c_str(), 1);
+        
+        this->addChild(dragger.get());
+
+        
+        // For the duration of the manipulation we swap the mainTransform 
+        // with the manipulator transform ONLY ON THIS CLIENT. This means
+        // that the dragger will update the transform here, while the
+        // dragger callback will send messages to the server and update the
+        // global state:
+        
+        
+        osg::Matrix m = osg::Matrix::scale(mainTransform->getScale())
+        * osg::Matrix::rotate(mainTransform->getAttitude())
+        * osg::Matrix::translate(mainTransform->getPosition());
+        
+        std::cout << "copy mainTransform:" << std::endl;
+        std::cout << "  t = " << stringify(mainTransform->getPosition()) << std::endl;
+        std::cout << "  o = " << stringify(_orientation) << std::endl;
+        std::cout << "  q = " << stringify(mainTransform->getAttitude()) << std::endl;
+        std::cout << "  s = " << stringify(mainTransform->getScale()) << std::endl;    
+        std::cout << "to manipulatorTransorm:" << std::endl;
+        std::cout << "  t = " << stringify(m.getTrans()) << std::endl;
+        std::cout << "  q = " << stringify(m.getRotate()) << std::endl;
+        std::cout << "  s = " << stringify(m.getScale()) << std::endl;
+        
+        
+        manipulatorTransform->setMatrix(m);
+        //this->replaceChild(mainTransform.get(), manipulatorTransform.get());
+        manipulatorTransform->addChild(clipNode.get());
+        mainTransform->removeChild(clipNode.get());
+        
+
+        //dragger->addDraggerCallback(new DraggerCallback(manipulatorTransform.get()));
+        dragger->addDraggerCallback(new DraggerCallback(this));
+        
+        //dragger->addTransformUpdating(manipulatorTransform.get());
+        if (dynamic_cast<osgManipulator::TabPlaneDragger*>(dragger.get()))
+        {
+            dragger->addTransformUpdating(manipulatorTransform.get(), osgManipulator::DraggerTransformCallback::HANDLE_TRANSLATE_IN_LINE);
+        }
+        else
+        {
+            dragger->addTransformUpdating(manipulatorTransform.get());
+        }
+
+        
+        
+        // we want the dragger to handle it's own events automatically
+        dragger->setHandleEvents(true);
+        
+        // if we don't set an activation key or mod mask then any mouse click on
+        // the dragger will activate it, however if do define either of ActivationModKeyMask or
+        // and ActivationKeyEvent then you'll have to press either than mod key or the specified key to
+        // be able to activate the dragger when you mouse click on it.  Please note the follow allows
+        // activation if either the ctrl key or the 'a' key is pressed and held down.
+        dragger->setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
+        dragger->setActivationKeyEvent('a');
+    }
+    
+                
+    // note: setAttachmentNode will call updateNodePath
+    this->setAttachmentNode(clipNode.get());
+    //this->updateNodePath();
+
+}
     
     
 // *****************************************************************************

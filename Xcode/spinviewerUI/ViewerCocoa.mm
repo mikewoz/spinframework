@@ -337,7 +337,7 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     osgDB::FilePathList osgLibPaths;
     osgLibPaths.push_back(bundlePath);
     osgLibPaths.push_back(bundlePath+"/Contents/PlugIns");
-    osgLibPaths.push_back(bundlePath+"/Contents/PlugIns/osgPlugins-2.9.8");
+    osgLibPaths.push_back(bundlePath+"/Contents/PlugIns/osgPlugins-3.1.1");
     //osgLibPaths.push_back("/usr/local/lib/osgPlugins-"+std::string(osgGetVersion()));
     //osgLibPaths.push_back("/opt/local/lib/osgPlugins-"+std::string(osgGetVersion()));
     osgDB::Registry::instance()->setLibraryFilePathList(osgLibPaths);

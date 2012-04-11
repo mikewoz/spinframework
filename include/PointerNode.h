@@ -137,7 +137,7 @@ class PointerNode : public RayNode
         /**
          * Checks intersections for draggers and if so, we apply the drag events
          */
-        void checkIntersections(osg::Vec3 start, osg::Vec3 end);
+        void applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 end);
 
         /**
          * Reports the list of intersected nodes (server-side only)

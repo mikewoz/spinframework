@@ -7,6 +7,19 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		1C122B3D153532720004D0A2 /* CommandLineTools */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 1C122B40153532720004D0A2 /* Build configuration list for PBXAggregateTarget "CommandLineTools" */;
+			buildPhases = (
+			);
+			dependencies = (
+				1C122B431535327F0004D0A2 /* PBXTargetDependency */,
+				1C122B47153532890004D0A2 /* PBXTargetDependency */,
+				1C122B45153532830004D0A2 /* PBXTargetDependency */,
+			);
+			name = CommandLineTools;
+			productName = CommandLineTools;
+		};
 		1C90C18C14CDCC3100C929AE /* ALL */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 1C90C18D14CDCC3100C929AE /* Build configuration list for PBXAggregateTarget "ALL" */;
@@ -106,91 +119,6 @@
 		1C7A4AD514F2CAD200EA83AB /* libpcl_common.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51714E59373007F97E5 /* libpcl_common.1.4.0.dylib */; };
 		1C7A4AD614F2CAD600EA83AB /* libpcl_io.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51A14E59373007F97E5 /* libpcl_io.1.4.0.dylib */; };
 		1C7A4AD714F2CAE100EA83AB /* PointCloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C25F51414E58AC6007F97E5 /* PointCloud.cpp */; };
-		1C82ACEE152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
-		1C82ACEF152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
-		1C82ACF0152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
-		1C82ACF1152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
-		1C82ACF2152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */; };
-		1C82ACF3152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
-		1C82ACF4152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
-		1C82ACF5152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
-		1C82ACF6152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
-		1C82ACF7152D07220085D8F0 /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDE152D07220085D8F0 /* libosg.91.dylib */; };
-		1C82ACF8152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
-		1C82ACF9152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
-		1C82ACFA152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
-		1C82ACFB152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
-		1C82ACFC152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */; };
-		1C82ACFD152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
-		1C82ACFE152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
-		1C82ACFF152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
-		1C82AD00152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
-		1C82AD01152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */; };
-		1C82AD02152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
-		1C82AD03152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
-		1C82AD04152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
-		1C82AD05152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
-		1C82AD06152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */; };
-		1C82AD07152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
-		1C82AD08152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
-		1C82AD09152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
-		1C82AD0A152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
-		1C82AD0B152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */; };
-		1C82AD0C152D07220085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
-		1C82AD0D152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
-		1C82AD0E152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
-		1C82AD0F152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
-		1C82AD10152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */; };
-		1C82AD11152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
-		1C82AD12152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
-		1C82AD13152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
-		1C82AD14152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
-		1C82AD15152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */; };
-		1C82AD16152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
-		1C82AD17152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
-		1C82AD18152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
-		1C82AD19152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
-		1C82AD1A152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */; };
-		1C82AD1B152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
-		1C82AD1C152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
-		1C82AD1D152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
-		1C82AD1E152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
-		1C82AD1F152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */; };
-		1C82AD20152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
-		1C82AD21152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
-		1C82AD22152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
-		1C82AD23152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
-		1C82AD24152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */; };
-		1C82AD25152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
-		1C82AD26152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
-		1C82AD27152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
-		1C82AD28152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
-		1C82AD29152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */; };
-		1C82AD2A152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
-		1C82AD2B152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
-		1C82AD2C152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
-		1C82AD2D152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
-		1C82AD2E152D07230085D8F0 /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */; };
-		1C82AD2F152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
-		1C82AD30152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
-		1C82AD31152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
-		1C82AD32152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
-		1C82AD33152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */; };
-		1C82AD34152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
-		1C82AD35152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
-		1C82AD36152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
-		1C82AD37152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
-		1C82AD38152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */; };
-		1C82AD39152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
-		1C82AD3A152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
-		1C82AD3B152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
-		1C82AD3C152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
-		1C82AD3D152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */; };
-		1C82AD3E152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
-		1C82AD3F152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
-		1C82AD40152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
-		1C82AD41152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
-		1C82AD42152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */; };
 		1C82AE31152D30BF0085D8F0 /* osgdb_3dc.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD44152D07360085D8F0 /* osgdb_3dc.so */; };
 		1C82AE32152D30BF0085D8F0 /* osgdb_3ds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD45152D07360085D8F0 /* osgdb_3ds.so */; };
 		1C82AE33152D30BF0085D8F0 /* osgdb_ac.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD46152D07360085D8F0 /* osgdb_ac.so */; };
@@ -545,6 +473,91 @@
 		1CA24E0314BE2D3D007A9C31 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 1CA24E0114BE2D3D007A9C31 /* Credits.rtf */; };
 		1CA24E0614BE2D3D007A9C31 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24E0514BE2D3D007A9C31 /* AppDelegate.mm */; };
 		1CA24E0914BE2D3E007A9C31 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CA24E0714BE2D3E007A9C31 /* MainMenu.xib */; };
+		1CC1074815332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
+		1CC1074915332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
+		1CC1074A15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
+		1CC1074B15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
+		1CC1074C15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
+		1CC1074D15332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
+		1CC1074E15332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
+		1CC1074F15332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
+		1CC1075015332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
+		1CC1075115332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
+		1CC1075215332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
+		1CC1075315332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
+		1CC1075415332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
+		1CC1075515332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
+		1CC1075615332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
+		1CC1075715332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
+		1CC1075815332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
+		1CC1075915332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
+		1CC1075A15332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
+		1CC1075B15332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
+		1CC1075C15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
+		1CC1075D15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
+		1CC1075E15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
+		1CC1075F15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
+		1CC1076015332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
+		1CC1076115332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
+		1CC1076215332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
+		1CC1076315332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
+		1CC1076415332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
+		1CC1076515332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
+		1CC1076615332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
+		1CC1076715332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
+		1CC1076815332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
+		1CC1076915332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
+		1CC1076A15332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
+		1CC1076B15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
+		1CC1076C15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
+		1CC1076D15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
+		1CC1076E15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
+		1CC1076F15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
+		1CC1077015332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
+		1CC1077115332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
+		1CC1077215332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
+		1CC1077315332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
+		1CC1077415332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
+		1CC1077515332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
+		1CC1077615332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
+		1CC1077715332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
+		1CC1077815332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
+		1CC1077915332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
+		1CC1077A15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
+		1CC1077B15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
+		1CC1077C15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
+		1CC1077D15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
+		1CC1077E15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
+		1CC1077F15332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
+		1CC1078015332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
+		1CC1078115332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
+		1CC1078215332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
+		1CC1078315332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
+		1CC1078415332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
+		1CC1078515332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
+		1CC1078615332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
+		1CC1078715332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
+		1CC1078815332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
+		1CC1078915332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
+		1CC1078A15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
+		1CC1078B15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
+		1CC1078C15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
+		1CC1078D15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
+		1CC1078E15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
+		1CC1078F15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
+		1CC1079015332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
+		1CC1079115332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
+		1CC1079215332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
+		1CC1079315332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
+		1CC1079415332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
+		1CC1079515332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
+		1CC1079615332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
+		1CC1079715332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
+		1CC1079815332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
+		1CC1079915332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
+		1CC1079A15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
+		1CC1079B15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
+		1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
 		1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C9EE82C14BE2725000976A6 /* Cocoa.framework */; };
 		1CCCA0D514BE31AC00DCA0B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D314BE31AC00DCA0B7 /* InfoPlist.strings */; };
 		1CCCA0D714BE31AC00DCA0B7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D614BE31AC00DCA0B7 /* main.mm */; };
@@ -557,8 +570,6 @@
 		1CCCA0F614BE389B00DCA0B7 /* spinViewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */; };
 		1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
-		1CE3ACE614CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
-		1CE3AD0814CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
@@ -567,6 +578,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1C122B421535327F0004D0A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C386C7414BD3CBD0065851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1C386C7C14BD3CBD0065851F;
+			remoteInfo = libSPIN;
+		};
+		1C122B44153532830004D0A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C386C7414BD3CBD0065851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1C57788914BD6F4400632E46;
+			remoteInfo = spinserver;
+		};
+		1C122B46153532890004D0A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1C386C7414BD3CBD0065851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1CCCA0BE14BE315400DCA0B7;
+			remoteInfo = spinviewer;
+		};
 		1C90C18314CCF8E400C929AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1C386C7414BD3CBD0065851F /* Project object */;
@@ -932,23 +964,6 @@
 		1C70F33114C3C69C0054B0A1 /* osgPlugins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = osgPlugins.h; sourceTree = "<group>"; };
 		1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = osgPlugins.cpp; sourceTree = "<group>"; };
 		1C7267B314EF43AE00E3FFAE /* PointCloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointCloud.cpp; path = ../src/spin/PointCloud.cpp; sourceTree = "<group>"; };
-		1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenThreads.12.dylib; path = ../../../../../usr/local/lib/libOpenThreads.12.dylib; sourceTree = "<group>"; };
-		1C82ACDE152D07220085D8F0 /* libosg.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.91.dylib; path = ../../../../../usr/local/lib/libosg.91.dylib; sourceTree = "<group>"; };
-		1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.91.dylib; path = ../../../../../usr/local/lib/libosgAnimation.91.dylib; sourceTree = "<group>"; };
-		1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.91.dylib; path = ../../../../../usr/local/lib/libosgDB.91.dylib; sourceTree = "<group>"; };
-		1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgFX.91.dylib; path = ../../../../../usr/local/lib/libosgFX.91.dylib; sourceTree = "<group>"; };
-		1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgGA.91.dylib; path = ../../../../../usr/local/lib/libosgGA.91.dylib; sourceTree = "<group>"; };
-		1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgManipulator.91.dylib; path = ../../../../../usr/local/lib/libosgManipulator.91.dylib; sourceTree = "<group>"; };
-		1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgParticle.91.dylib; path = ../../../../../usr/local/lib/libosgParticle.91.dylib; sourceTree = "<group>"; };
-		1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgPresentation.91.dylib; path = ../../../../../usr/local/lib/libosgPresentation.91.dylib; sourceTree = "<group>"; };
-		1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgShadow.91.dylib; path = ../../../../../usr/local/lib/libosgShadow.91.dylib; sourceTree = "<group>"; };
-		1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgSim.91.dylib; path = ../../../../../usr/local/lib/libosgSim.91.dylib; sourceTree = "<group>"; };
-		1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgTerrain.91.dylib; path = ../../../../../usr/local/lib/libosgTerrain.91.dylib; sourceTree = "<group>"; };
-		1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgText.91.dylib; path = ../../../../../usr/local/lib/libosgText.91.dylib; sourceTree = "<group>"; };
-		1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgUtil.91.dylib; path = ../../../../../usr/local/lib/libosgUtil.91.dylib; sourceTree = "<group>"; };
-		1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgViewer.91.dylib; path = ../../../../../usr/local/lib/libosgViewer.91.dylib; sourceTree = "<group>"; };
-		1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.91.dylib; path = ../../../../../usr/local/lib/libosgVolume.91.dylib; sourceTree = "<group>"; };
-		1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgWidget.91.dylib; path = ../../../../../usr/local/lib/libosgWidget.91.dylib; sourceTree = "<group>"; };
 		1C82AD44152D07360085D8F0 /* osgdb_3dc.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_3dc.so; sourceTree = "<group>"; };
 		1C82AD45152D07360085D8F0 /* osgdb_3ds.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_3ds.so; sourceTree = "<group>"; };
 		1C82AD46152D07360085D8F0 /* osgdb_ac.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = osgdb_ac.so; sourceTree = "<group>"; };
@@ -1250,6 +1265,23 @@
 		1CA24E0414BE2D3D007A9C31 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1CA24E0514BE2D3D007A9C31 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		1CA24E0814BE2D3E007A9C31 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenThreads.dylib; path = ../../../../../usr/local/lib/libOpenThreads.dylib; sourceTree = "<group>"; };
+		1CC1073815332A9800F0B1EA /* libosg.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.dylib; path = ../../../../../usr/local/lib/libosg.dylib; sourceTree = "<group>"; };
+		1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.dylib; path = ../../../../../usr/local/lib/libosgAnimation.dylib; sourceTree = "<group>"; };
+		1CC1073A15332A9800F0B1EA /* libosgDB.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.dylib; path = ../../../../../usr/local/lib/libosgDB.dylib; sourceTree = "<group>"; };
+		1CC1073B15332A9800F0B1EA /* libosgFX.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgFX.dylib; path = ../../../../../usr/local/lib/libosgFX.dylib; sourceTree = "<group>"; };
+		1CC1073C15332A9800F0B1EA /* libosgGA.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgGA.dylib; path = ../../../../../usr/local/lib/libosgGA.dylib; sourceTree = "<group>"; };
+		1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgManipulator.dylib; path = ../../../../../usr/local/lib/libosgManipulator.dylib; sourceTree = "<group>"; };
+		1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgParticle.dylib; path = ../../../../../usr/local/lib/libosgParticle.dylib; sourceTree = "<group>"; };
+		1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgPresentation.dylib; path = ../../../../../usr/local/lib/libosgPresentation.dylib; sourceTree = "<group>"; };
+		1CC1074015332A9800F0B1EA /* libosgShadow.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgShadow.dylib; path = ../../../../../usr/local/lib/libosgShadow.dylib; sourceTree = "<group>"; };
+		1CC1074115332A9800F0B1EA /* libosgSim.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgSim.dylib; path = ../../../../../usr/local/lib/libosgSim.dylib; sourceTree = "<group>"; };
+		1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgTerrain.dylib; path = ../../../../../usr/local/lib/libosgTerrain.dylib; sourceTree = "<group>"; };
+		1CC1074315332A9800F0B1EA /* libosgText.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgText.dylib; path = ../../../../../usr/local/lib/libosgText.dylib; sourceTree = "<group>"; };
+		1CC1074415332A9800F0B1EA /* libosgUtil.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgUtil.dylib; path = ../../../../../usr/local/lib/libosgUtil.dylib; sourceTree = "<group>"; };
+		1CC1074515332A9800F0B1EA /* libosgViewer.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgViewer.dylib; path = ../../../../../usr/local/lib/libosgViewer.dylib; sourceTree = "<group>"; };
+		1CC1074615332A9800F0B1EA /* libosgVolume.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.dylib; path = ../../../../../usr/local/lib/libosgVolume.dylib; sourceTree = "<group>"; };
+		1CC1074715332A9800F0B1EA /* libosgWidget.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgWidget.dylib; path = ../../../../../usr/local/lib/libosgWidget.dylib; sourceTree = "<group>"; };
 		1CCCA0BF14BE315400DCA0B7 /* spinviewer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinviewer; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0CD14BE31AB00DCA0B7 /* spinviewerUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spinviewerUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0D214BE31AB00DCA0B7 /* spinviewerUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spinviewerUI-Info.plist"; sourceTree = "<group>"; };
@@ -1301,23 +1333,23 @@
 				1C7A4AD614F2CAD600EA83AB /* libpcl_io.1.4.0.dylib in Frameworks */,
 				1C0EED7014F2F272001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7114F2F272001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1C82ACEE152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
-				1C82ACF3152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
-				1C82ACF8152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
-				1C82ACFD152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
-				1C82AD02152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
-				1C82AD07152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
-				1C82AD0C152D07220085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
-				1C82AD11152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
-				1C82AD16152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
-				1C82AD1B152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
-				1C82AD20152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
-				1C82AD25152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
-				1C82AD2A152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
-				1C82AD2F152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
-				1C82AD34152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
-				1C82AD39152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
-				1C82AD3E152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
+				1CC1074815332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
+				1CC1074D15332A9800F0B1EA /* libosg.dylib in Frameworks */,
+				1CC1075215332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
+				1CC1075715332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
+				1CC1075C15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
+				1CC1076115332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
+				1CC1076615332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */,
+				1CC1076B15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
+				1CC1077015332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
+				1CC1077515332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
+				1CC1077A15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
+				1CC1077F15332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
+				1CC1078415332A9900F0B1EA /* libosgText.dylib in Frameworks */,
+				1CC1078915332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
+				1CC1078E15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
+				1CC1079315332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
+				1CC1079815332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1334,23 +1366,23 @@
 				1C9C082F14D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C0EED7214F2F283001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7314F2F283001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1C82ACEF152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
-				1C82ACF4152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
-				1C82ACF9152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
-				1C82ACFE152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
-				1C82AD03152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
-				1C82AD08152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
-				1C82AD0D152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
-				1C82AD12152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
-				1C82AD17152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
-				1C82AD1C152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
-				1C82AD21152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
-				1C82AD26152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
-				1C82AD2B152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
-				1C82AD30152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
-				1C82AD35152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
-				1C82AD3A152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
-				1C82AD3F152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
+				1CC1074915332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
+				1CC1074E15332A9800F0B1EA /* libosg.dylib in Frameworks */,
+				1CC1075315332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
+				1CC1075815332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
+				1CC1075D15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
+				1CC1076215332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
+				1CC1076715332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */,
+				1CC1076C15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
+				1CC1077115332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
+				1CC1077615332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
+				1CC1077B15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
+				1CC1078015332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
+				1CC1078515332A9900F0B1EA /* libosgText.dylib in Frameworks */,
+				1CC1078A15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
+				1CC1078F15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
+				1CC1079415332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
+				1CC1079915332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1363,29 +1395,28 @@
 				1CA24C9114BE5AAA0023DD8B /* liblo.7.dylib in Frameworks */,
 				1C94DEC514BFEC2E006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1CE3ACE614CF7CAF007E722D /* libOpenThreads.12.dylib in Frameworks */,
 				1C9C082714CFE9BF006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082E14D07661006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0EED7414F2F284001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7514F2F284001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1C82ACF0152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
-				1C82ACF5152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
-				1C82ACFA152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
-				1C82ACFF152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
-				1C82AD04152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
-				1C82AD09152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
-				1C82AD0E152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
-				1C82AD13152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
-				1C82AD18152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
-				1C82AD1D152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
-				1C82AD22152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
-				1C82AD27152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
-				1C82AD2C152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
-				1C82AD31152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
-				1C82AD36152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
-				1C82AD3B152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
-				1C82AD40152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
+				1CC1074A15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
+				1CC1074F15332A9800F0B1EA /* libosg.dylib in Frameworks */,
+				1CC1075415332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
+				1CC1075915332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
+				1CC1075E15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
+				1CC1076315332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
+				1CC1076815332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */,
+				1CC1076D15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
+				1CC1077215332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
+				1CC1077715332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
+				1CC1077C15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
+				1CC1078115332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
+				1CC1078615332A9900F0B1EA /* libosgText.dylib in Frameworks */,
+				1CC1078B15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
+				1CC1079015332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
+				1CC1079515332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
+				1CC1079A15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1402,23 +1433,23 @@
 				1C9C082D14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C0EED7614F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7714F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1C82ACF1152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
-				1C82ACF6152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
-				1C82ACFB152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
-				1C82AD00152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
-				1C82AD05152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
-				1C82AD0A152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
-				1C82AD0F152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
-				1C82AD14152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
-				1C82AD19152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
-				1C82AD1E152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
-				1C82AD23152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
-				1C82AD28152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
-				1C82AD2D152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
-				1C82AD32152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
-				1C82AD37152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
-				1C82AD3C152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
-				1C82AD41152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
+				1CC1074B15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
+				1CC1075015332A9800F0B1EA /* libosg.dylib in Frameworks */,
+				1CC1075515332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
+				1CC1075A15332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
+				1CC1075F15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
+				1CC1076415332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
+				1CC1076915332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */,
+				1CC1076E15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
+				1CC1077315332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
+				1CC1077815332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
+				1CC1077D15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
+				1CC1078215332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
+				1CC1078715332A9900F0B1EA /* libosgText.dylib in Frameworks */,
+				1CC1078C15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
+				1CC1079115332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
+				1CC1079615332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
+				1CC1079B15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1432,29 +1463,28 @@
 				1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */,
 				1C94DECB14BFEC2F006394AD /* libboost_python.dylib in Frameworks */,
 				1C94DED414C00252006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1CE3AD0814CF7CB0007E722D /* libOpenThreads.12.dylib in Frameworks */,
 				1C9C082914CFE9C0006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C9C082C14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0EED7814F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7914F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1C82ACF2152D07220085D8F0 /* libOpenThreads.12.dylib in Frameworks */,
-				1C82ACF7152D07220085D8F0 /* libosg.91.dylib in Frameworks */,
-				1C82ACFC152D07220085D8F0 /* libosgAnimation.91.dylib in Frameworks */,
-				1C82AD01152D07220085D8F0 /* libosgDB.91.dylib in Frameworks */,
-				1C82AD06152D07220085D8F0 /* libosgFX.91.dylib in Frameworks */,
-				1C82AD0B152D07220085D8F0 /* libosgGA.91.dylib in Frameworks */,
-				1C82AD10152D07230085D8F0 /* libosgManipulator.91.dylib in Frameworks */,
-				1C82AD15152D07230085D8F0 /* libosgParticle.91.dylib in Frameworks */,
-				1C82AD1A152D07230085D8F0 /* libosgPresentation.91.dylib in Frameworks */,
-				1C82AD1F152D07230085D8F0 /* libosgShadow.91.dylib in Frameworks */,
-				1C82AD24152D07230085D8F0 /* libosgSim.91.dylib in Frameworks */,
-				1C82AD29152D07230085D8F0 /* libosgTerrain.91.dylib in Frameworks */,
-				1C82AD2E152D07230085D8F0 /* libosgText.91.dylib in Frameworks */,
-				1C82AD33152D07230085D8F0 /* libosgUtil.91.dylib in Frameworks */,
-				1C82AD38152D07230085D8F0 /* libosgViewer.91.dylib in Frameworks */,
-				1C82AD3D152D07230085D8F0 /* libosgVolume.91.dylib in Frameworks */,
-				1C82AD42152D07230085D8F0 /* libosgWidget.91.dylib in Frameworks */,
+				1CC1074C15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
+				1CC1075115332A9800F0B1EA /* libosg.dylib in Frameworks */,
+				1CC1075615332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
+				1CC1075B15332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
+				1CC1076015332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
+				1CC1076515332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
+				1CC1076A15332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */,
+				1CC1076F15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
+				1CC1077415332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
+				1CC1077915332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
+				1CC1077E15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
+				1CC1078315332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
+				1CC1078815332A9900F0B1EA /* libosgText.dylib in Frameworks */,
+				1CC1078D15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
+				1CC1079215332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
+				1CC1079715332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
+				1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1708,23 +1738,23 @@
 		1C82ACDB152D06180085D8F0 /* osg-3.1.1 */ = {
 			isa = PBXGroup;
 			children = (
-				1C82ACDD152D07220085D8F0 /* libOpenThreads.12.dylib */,
-				1C82ACDE152D07220085D8F0 /* libosg.91.dylib */,
-				1C82ACDF152D07220085D8F0 /* libosgAnimation.91.dylib */,
-				1C82ACE0152D07220085D8F0 /* libosgDB.91.dylib */,
-				1C82ACE1152D07220085D8F0 /* libosgFX.91.dylib */,
-				1C82ACE2152D07220085D8F0 /* libosgGA.91.dylib */,
-				1C82ACE3152D07220085D8F0 /* libosgManipulator.91.dylib */,
-				1C82ACE4152D07220085D8F0 /* libosgParticle.91.dylib */,
-				1C82ACE5152D07220085D8F0 /* libosgPresentation.91.dylib */,
-				1C82ACE6152D07220085D8F0 /* libosgShadow.91.dylib */,
-				1C82ACE7152D07220085D8F0 /* libosgSim.91.dylib */,
-				1C82ACE8152D07220085D8F0 /* libosgTerrain.91.dylib */,
-				1C82ACE9152D07220085D8F0 /* libosgText.91.dylib */,
-				1C82ACEA152D07220085D8F0 /* libosgUtil.91.dylib */,
-				1C82ACEB152D07220085D8F0 /* libosgViewer.91.dylib */,
-				1C82ACEC152D07220085D8F0 /* libosgVolume.91.dylib */,
-				1C82ACED152D07220085D8F0 /* libosgWidget.91.dylib */,
+				1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */,
+				1CC1073815332A9800F0B1EA /* libosg.dylib */,
+				1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */,
+				1CC1073A15332A9800F0B1EA /* libosgDB.dylib */,
+				1CC1073B15332A9800F0B1EA /* libosgFX.dylib */,
+				1CC1073C15332A9800F0B1EA /* libosgGA.dylib */,
+				1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */,
+				1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */,
+				1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */,
+				1CC1074015332A9800F0B1EA /* libosgShadow.dylib */,
+				1CC1074115332A9800F0B1EA /* libosgSim.dylib */,
+				1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */,
+				1CC1074315332A9800F0B1EA /* libosgText.dylib */,
+				1CC1074415332A9800F0B1EA /* libosgUtil.dylib */,
+				1CC1074515332A9800F0B1EA /* libosgViewer.dylib */,
+				1CC1074615332A9800F0B1EA /* libosgVolume.dylib */,
+				1CC1074715332A9800F0B1EA /* libosgWidget.dylib */,
 				1C82AD43152D07360085D8F0 /* osgPlugins-3.1.1 */,
 			);
 			name = "osg-3.1.1";
@@ -2292,6 +2322,7 @@
 				1C90C17714CCF7E800C929AE /* buildWrappers */,
 				1C90C18C14CDCC3100C929AE /* ALL */,
 				1CB6CD0614EDD20900A29B1C /* libspin-0.3 */,
+				1C122B3D153532720004D0A2 /* CommandLineTools */,
 			);
 		};
 /* End PBXProject section */
@@ -2573,6 +2604,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1C122B431535327F0004D0A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1C386C7C14BD3CBD0065851F /* libSPIN */;
+			targetProxy = 1C122B421535327F0004D0A2 /* PBXContainerItemProxy */;
+		};
+		1C122B45153532830004D0A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1C57788914BD6F4400632E46 /* spinserver */;
+			targetProxy = 1C122B44153532830004D0A2 /* PBXContainerItemProxy */;
+		};
+		1C122B47153532890004D0A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1CCCA0BE14BE315400DCA0B7 /* spinviewer */;
+			targetProxy = 1C122B46153532890004D0A2 /* PBXContainerItemProxy */;
+		};
 		1C90C18414CCF8E400C929AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 1C90C17714CCF7E800C929AE /* buildWrappers */;
@@ -2670,6 +2716,20 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		1C122B3E153532720004D0A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1C122B3F153532720004D0A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		1C386C7F14BD3CBD0065851F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2687,7 +2747,6 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -3043,6 +3102,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1C122B40153532720004D0A2 /* Build configuration list for PBXAggregateTarget "CommandLineTools" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C122B3E153532720004D0A2 /* Debug */,
+				1C122B3F153532720004D0A2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		1C386C7714BD3CBD0065851F /* Build configuration list for PBXProject "spinframework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

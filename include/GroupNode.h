@@ -204,7 +204,7 @@ public:
 
 
     virtual void setManipulator(const char *manipulatorType);
-    const char* getManipulator() const { return _manipulatorType.c_str(); }
+    const char* getManipulator() const { return manipulatorType_.c_str(); }
     
     
     int getReportMode() const { return (int) _reportMode; };
@@ -256,6 +256,8 @@ public:
 
 protected:
 
+    void drawManipulator();
+
     osg::ref_ptr<UserNode> owner;
 
     osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
@@ -284,7 +286,8 @@ protected:
     osg::Vec3 _spin;
     float _damping;
     
-    std::string _manipulatorType;
+    std::string manipulatorType_;
+    bool manipulatorUpdateFlag_;
     
 private:
 

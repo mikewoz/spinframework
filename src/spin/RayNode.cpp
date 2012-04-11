@@ -128,6 +128,7 @@ void RayNode::setColor (float r, float g, float b, float a)
 
 void RayNode::drawRay()
 {
+    std::cout << "drawRay attachmentNode: " << getAttachmentNode()->getName() << std::endl;
 
 	// remove the old ray:
 	if (getAttachmentNode()->containsNode(rayGeode.get()))

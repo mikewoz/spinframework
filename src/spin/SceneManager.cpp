@@ -141,6 +141,7 @@ SceneManager::SceneManager(std::string id)
     fpl.push_back( resourcesPath + "/scripts/");
     fpl.push_back( resourcesPath + "/fonts/");
     fpl.push_back( resourcesPath + "/images/");
+    fpl.push_back( resourcesPath + "/shaders/");
     osgDB::setDataFilePathList( fpl );
 
     mediaManager = new MediaManager(resourcesPath);
@@ -554,8 +555,8 @@ void SceneManager::debugSceneGraph()
 {
     std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
     std::cout << "-- SCENE GRAPH:" << std::endl;
-    DebugVisitor ev;
-    ev.apply(*(this->worldNode.get()));
+    DebugVisitor visitor;
+    visitor.print(this->worldNode.get());
 }
 
 void SceneManager::debug()
@@ -1220,9 +1221,15 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     pthread_mutex_unlock(&sceneMutex);
 
     // now force the actual delete by nulling this referenced pointer. At that
-    // time, the destructor for the node should be called
-    //char *nodeID = n->id->s_name; // but remember the name for the broadcast
+    // time, the destructor for the node should be called.
     n = NULL;
+    
+    // IMPORTANT: There is one node that will never be destroyed this way: the
+    // userNode in spinApp. This stays there no matter what since there is a
+    // ref_ptr that maintains a reference count in spinApp.
+    //
+    // ^ Becaue of this, we have to be careful to re-attach the user again when
+    // userRefresh is called.
 }
 
 void SceneManager::doDelete(ReferencedStateSet *s)
@@ -1317,6 +1324,9 @@ void SceneManager::clear()
        ClearSceneVisitor visitor;
        worldNode->accept(visitor);
      */
+     
+     
+     
 
     SCENE_MSG("s", "clear");
     sendNodeList("*");

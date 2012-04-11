@@ -277,6 +277,12 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __osg_MatrixTransform_P1__getManipulatorTransform,
 	          "",
 	          "");
+	I_ProtectedMethod0(void, drawManipulator,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__drawManipulator,
+	                   "",
+	                   "");
 	I_SimpleProperty(osg::Vec3, Center, 
 	                 __osg_Vec3__getCenter, 
 	                 0);

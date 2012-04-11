@@ -244,14 +244,16 @@ void ReferencedNode::updateNodePath(bool updateChildren)
         osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
         if (parentNode.valid())
         {
-            currentNodePath = parentNode->currentNodePath;
+            currentNodePath = parentNode->currentNodePath; // this does a copy
         }
     }
 
     // this nodePath only stores the path until this node (osg::Group).
     currentNodePath.push_back(this);
 
-    // now update NodePaths for all children:
+    // Now update NodePaths for all children if the updateChildren flag is set.
+    // For some derived nodes, they may want to control how they control the 
+    // update of children (eg, only after their nodepath is added).
     if (updateChildren)
         updateChildNodePaths();
 }
@@ -458,6 +460,16 @@ void ReferencedNode::debug()
     std::cout << "****************************************" << std::endl;
     std::cout << "************* NODE  DEBUG: *************" << std::endl;
     std::cout << "\nnode: " << id->s_name << ", type: " << nodeType << std::endl;
+
+    std::cout << "   Node path:" << std::endl;
+    for (osg::NodePath::iterator itr = currentNodePath.begin(); itr != currentNodePath.end(); ++itr)
+    {
+        std::cout << "   -> " << (*itr)->getName() << std::endl;
+    }
+    
+    const osg::BoundingSphere& bs = this->getBound();
+    std::cout << "   Subgraph centroid: " << stringify(bs.center()) << std::endl;
+    std::cout << "   Subgraph radius: " << bs.radius() << std::endl;
 
     vector<lo_message> nodeState = this->getState();
     vector<lo_message>::iterator nodeStateIterator;

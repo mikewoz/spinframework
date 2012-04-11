@@ -140,6 +140,11 @@ class DebugVisitor : public osg::NodeVisitor
 {
     public:
         DebugVisitor();
+        
+        /**
+         * prints the subgraph to std::cout
+         */
+        void print(osg::Node* subgraph);
 
         virtual void apply(osg::Node &node);
         virtual void apply(osg::PositionAttitudeTransform &node);

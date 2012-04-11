@@ -69,10 +69,10 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_ProtectedMethod2(void, checkIntersections, IN, osg::Vec3, start, IN, osg::Vec3, end,
+	I_ProtectedMethod3(void, applyManipulation, IN, osg::Matrix, mat, IN, osg::Vec3, start, IN, osg::Vec3, end,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
-	                   __void__checkIntersections__osg_Vec3__osg_Vec3,
+	                   __void__applyManipulation__osg_Matrix__osg_Vec3__osg_Vec3,
 	                   "",
 	                   "Checks intersections for draggers and if so, we apply the drag events ");
 	I_ProtectedMethod0(void, reportIntersections,

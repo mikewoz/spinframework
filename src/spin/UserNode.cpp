@@ -106,9 +106,11 @@ void UserNode::updateNodePath(bool updateChildren)
 {
     ConstraintsNode::updateNodePath(false);
 
+    /*
     currentNodePath.push_back(cameraOffsetNode_.get());
     currentNodePath.push_back(cameraAttachmentNode_.get());
-
+    */
+    
     // now update NodePaths for all children:
     if (updateChildren) updateChildNodePaths();
 
