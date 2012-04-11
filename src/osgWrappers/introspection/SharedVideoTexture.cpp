@@ -78,22 +78,9 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          __void__stop,
 	          "",
 	          "");
-	I_Method1(void, setRenderBin, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setRenderBin__int,
-	          "",
-	          "Set the render bin for this texture. The higher the number, the later it gets processed (ie, it appears on top). Default renderBin = 11 ");
-	I_Method0(int, getRenderBin,
-	          Properties::NON_VIRTUAL,
-	          __int__getRenderBin,
-	          "",
-	          "");
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 0);
-	I_SimpleProperty(int, RenderBin, 
-	                 __int__getRenderBin, 
-	                 __void__setRenderBin__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

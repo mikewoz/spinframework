@@ -79,21 +79,38 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     tex->setImage(img.get());
     tex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
     tex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-    tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-    tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+	
+    //tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    //tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+	if (textureRepeatS_)
+		tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+	else
+		tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+	if (textureRepeatT_)
+		tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+	else
+		tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
 
+	osg::TexEnv* texenv = new osg::TexEnv();
+	texenv->setMode(textureBlend_);
+	this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+	
     // It is important to disable resizing of this texture if
     // resolution is not a power of two. Othwerwise, there will
     // be a very slow resize every update. NOTE: this might cause
     // problems on harware that doesn't support NPOT textures.
     tex->setResizeNonPowerOfTwoHint(false);
 
-
     // add the texture to this (StateSet)
     this->setTextureAttributeAndModes(0, tex.get(), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
-    // turn off lighting 
-    this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	// set lighting:
+	if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+	// set renderbin:
+	this->setRenderBinDetails( renderBin_, "RenderBin");
+	
 	// enable blending:
     this->setMode(GL_BLEND, osg::StateAttribute::ON);
     this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
@@ -108,14 +125,6 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     // set initial textureID:
     //setTextureID(this->id->s_name);
 
-}
-
-void SharedVideoTexture::setRenderBin (int i)
-{
-	_renderBin = i;
-	this->setRenderBinDetails( (int)_renderBin, "RenderBin");
-
-	BROADCAST(this, "si", "setRenderBin", getRenderBin());
 }
 
 // ===================================================================
@@ -155,10 +164,6 @@ std::vector<lo_message> SharedVideoTexture::getState () const
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setTextureID", getTextureID());
     ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
-	ret.push_back(msg);
 
     return ret;
 }
