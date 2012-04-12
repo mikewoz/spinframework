@@ -644,6 +644,7 @@ void PointerNode::grab (int b)
         n->setTranslation(T.x(), T.y(), T.z());
         n->setOrientation(R.x(), R.y(), R.z());
 
+
         grabbedNode = NULL;
 
     }

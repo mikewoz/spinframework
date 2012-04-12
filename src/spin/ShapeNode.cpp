@@ -64,7 +64,7 @@ namespace spin
 
 // ===================================================================
 // constructor:
-ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".ShapeNode");
 	nodeType = "ShapeNode";
@@ -507,7 +507,7 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 std::vector<lo_message> ShapeNode::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = GroupNode::getState();
+	std::vector<lo_message> ret = ConstraintsNode::getState();
 
 	lo_message msg;
 	osg::Vec3 v;

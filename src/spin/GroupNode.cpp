@@ -529,9 +529,10 @@ void GroupNode::debug()
     
     std::cout << "   mainX pos: " << stringify(mainTransform->getPosition()) << std::endl;
     std::cout << "   mainX rot: " << stringify(mainTransform->getAttitude()) << std::endl;
+    std::cout << "   mainX scl: " << stringify(mainTransform->getScale()) << std::endl;
     std::cout << "   manip pos: " << stringify(manipulatorTransform->getMatrix().getTrans()) << std::endl;
     std::cout << "   manip rot: " << stringify(manipulatorTransform->getMatrix().getRotate()) << std::endl;
-
+    std::cout << "   manip scl: " << stringify(manipulatorTransform->getMatrix().getScale()) << std::endl;
 }
 
 
@@ -806,70 +807,73 @@ void GroupNode::rotate (float p, float r, float y)
 // *****************************************************************************
 
     
-osgManipulator::Dragger* createDragger(const std::string& name, float size, osg::Vec3 offset)
+osgManipulator::Dragger* createDragger(const std::string& name, float size, osg::Vec3 offset, osg::Vec3 scale)
 {
     osgManipulator::Dragger* dragger = 0;
+    float scaleFactor = 1.0;
     if ("TabPlaneDragger" == name)
     {
         osgManipulator::TabPlaneDragger* d = new osgManipulator::TabPlaneDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 2.0;
+        scaleFactor = 2.0;
     }
     else if ("TabPlaneTrackballDragger" == name)
     {
         osgManipulator::TabPlaneTrackballDragger* d = new osgManipulator::TabPlaneTrackballDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 2.5;
+        scaleFactor = 2.5;
     }
     else if ("TabBoxTrackballDragger" == name)
     {
         osgManipulator::TabBoxTrackballDragger* d = new osgManipulator::TabBoxTrackballDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 2.5;
+        scaleFactor = 2.5;
     }
     else if ("TrackballDragger" == name)
     {
         osgManipulator::TrackballDragger* d = new osgManipulator::TrackballDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 1.0;
+        scaleFactor = 1.0;
     }
     else if ("Translate1DDragger" == name)
     {
         osgManipulator::Translate1DDragger* d = new osgManipulator::Translate1DDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 2.0;
+        scaleFactor = 2.0;
     }
     else if ("Translate2DDragger" == name)
     {
         osgManipulator::Translate2DDragger* d = new osgManipulator::Translate2DDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 2.5;
+        scaleFactor = 2.5;
     }
     else if ("TranslateAxisDragger" == name)
     {
         osgManipulator::TranslateAxisDragger* d = new osgManipulator::TranslateAxisDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 1.2;
+        scaleFactor = 1.2;
     }
     else if ("TabBoxDragger" == name)
     {
         osgManipulator::TabBoxDragger* d = new osgManipulator::TabBoxDragger();
         d->setupDefaultGeometry();
         dragger = d;
-        size *= 1.6;
+        scaleFactor = 1.6;
     }
     
     if (dragger)
     {
         dragger->setName(name);
-        dragger->setMatrix(osg::Matrix::scale(size, size, size) * osg::Matrix::translate(offset));
+        
+        dragger->setMatrix(osg::Matrix::scale(size*scaleFactor, size*scaleFactor, size*scaleFactor) * osg::Matrix::translate(offset));
+        //dragger->setMatrix(osg::Matrix::scale(scale.x()*scaleFactor, scale.y()*scaleFactor, scale.z()*scaleFactor) * osg::Matrix::translate(offset));
         
         // turn off lighing on dragger
         osg::StateSet *ss = dragger->getOrCreateStateSet();
@@ -937,7 +941,8 @@ void GroupNode::drawManipulator()
         osg::Quat q = m.getRotate();
         osg::Vec3 s = m.getScale();
         
-        /*
+        std::cout << std::endl;
+        std::cout << std::endl;
         std::cout << "Applying manipulator:" << std::endl;
         std::cout << "  t = " << stringify(t) << std::endl;
         std::cout << "  q = " << stringify(q) << std::endl;
@@ -947,11 +952,11 @@ void GroupNode::drawManipulator()
         std::cout << "  o = " << stringify(_orientation) << std::endl;
         std::cout << "  q = " << stringify(mainTransform->getAttitude()) << std::endl;
         std::cout << "  s = " << stringify(mainTransform->getScale()) << std::endl;
-        */
+        
         
         // NOTE: we only really need to do this on the server side, since the 
         // viewer will eventually get the update via OSC:
-        if (spinApp::Instance().getContext()->isServer())
+        if (0)//spinApp::Instance().getContext()->isServer())
         {
             this->setTranslation(t.x(), t.y(), t.z());
             this->setOrientationQuat(q.x(), q.y(), q.z(), q.w());
@@ -962,12 +967,32 @@ void GroupNode::drawManipulator()
         // We could skip this, because it will get updated in a moment, but the
         // update will prevent the transform from flickering back its original
         // state momentarily before receiving the update
-        else
+        else if (0)
         {
             mainTransform->setPosition(t);
             mainTransform->setAttitude(q);
             mainTransform->setScale(s);
         }
+        
+        if (!spinApp::Instance().getContext()->isServer())
+        {
+            mainTransform->setPosition(t);
+            mainTransform->setAttitude(q);
+
+            spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setTranslation", t.x(), t.y(), t.z(), SPIN_ARGS_END);
+            spinApp::Instance().NodeMessage(this->getID().c_str(), "sffff", "setOrientationQuat", q.x(), q.y(), q.z(), q.w(), SPIN_ARGS_END);
+            
+            // don't scale for trackball:
+            if (1)//!dynamic_cast<osgManipulator::TrackballDragger*>(dragger.get()))
+            {
+            
+                mainTransform->setScale(s);
+                spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setScale", s.x(), s.y(), s.z(), SPIN_ARGS_END);
+            
+            }
+            
+        }
+        
         
         
         // TODO: unlock the node:
@@ -1028,7 +1053,7 @@ void GroupNode::drawManipulator()
         dragger = 0;
     }
     
-    dragger = createDragger(manipulatorType_, this->getBound().radius(), mainTransform->getPosition());
+    dragger = createDragger(manipulatorType_, this->getBound().radius(), mainTransform->getPosition(), mainTransform->getScale());
     if (dragger.valid())
     {
         // TODO: tell server that this viewer's UserNode is now the owner:
@@ -1044,10 +1069,17 @@ void GroupNode::drawManipulator()
         // dragger callback will send messages to the server and update the
         // global state:
         
-        
+        /*
         osg::Matrix m = osg::Matrix::scale(mainTransform->getScale())
-        * osg::Matrix::rotate(mainTransform->getAttitude())
-        * osg::Matrix::translate(mainTransform->getPosition());
+            * osg::Matrix::rotate(mainTransform->getAttitude())
+            * osg::Matrix::translate(mainTransform->getPosition());
+        */
+        
+        osg::NodePath np;
+        np.push_back(mainTransform);
+        osg::Matrix m = osg::computeLocalToWorld(np);
+        
+        
         
         /*
         std::cout << "copy mainTransform:" << std::endl;
@@ -1070,19 +1102,23 @@ void GroupNode::drawManipulator()
         }
 
         //dragger->addDraggerCallback(new DraggerCallback(manipulatorTransform.get()));
-        dragger->addDraggerCallback(new DraggerCallback(this));
+        //dragger->addDraggerCallback(new DraggerCallback(this));
         
-        /*
+        
         //dragger->addTransformUpdating(manipulatorTransform.get());
         if (dynamic_cast<osgManipulator::TabPlaneDragger*>(dragger.get()))
         {
-            dragger->addTransformUpdating(manipulatorTransform.get(), osgManipulator::DraggerTransformCallback::HANDLE_TRANSLATE_IN_LINE);
+            dragger->addTransformUpdating(manipulatorTransform.get(), osgManipulator::DraggerTransformCallback::HANDLE_TRANSLATE_IN_PLANE);
+        }
+        if (dynamic_cast<osgManipulator::TrackballDragger*>(dragger.get()))
+        {
+            dragger->addTransformUpdating(manipulatorTransform.get(), osgManipulator::DraggerTransformCallback::HANDLE_ROTATE_3D);
         }
         else
         {
             dragger->addTransformUpdating(manipulatorTransform.get());
         }
-        */
+        
         
         
         // we want the dragger to handle it's own events automatically
@@ -1101,7 +1137,6 @@ void GroupNode::drawManipulator()
     // note: setAttachmentNode will call updateNodePath
     this->setAttachmentNode(clipNode.get());
     //this->updateNodePath();
-
 }
     
     
