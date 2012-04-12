@@ -1102,9 +1102,10 @@ void GroupNode::drawManipulator()
         }
 
         //dragger->addDraggerCallback(new DraggerCallback(manipulatorTransform.get()));
-        //dragger->addDraggerCallback(new DraggerCallback(this));
+        dragger->addDraggerCallback(new DraggerCallback(this));
         
-        
+        /*
+        // require OSG 3.1.1 for this:
         //dragger->addTransformUpdating(manipulatorTransform.get());
         if (dynamic_cast<osgManipulator::TabPlaneDragger*>(dragger.get()))
         {
@@ -1118,7 +1119,7 @@ void GroupNode::drawManipulator()
         {
             dragger->addTransformUpdating(manipulatorTransform.get());
         }
-        
+        */
         
         
         // we want the dragger to handle it's own events automatically
