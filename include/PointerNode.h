@@ -72,12 +72,13 @@ class PointerNodeActionAdapter : public osgGA::GUIActionAdapter
   
 /**
  * \brief An interaction node that reports intersections with other nodes in the
- *        scene (test)
+ *        scene (only those that are have interactionMode > 0)
  * 
- * This node must be attached to an RayNode node, and reports a list of all nodes
- * with which the ray is intersecting (in order of closest to furthest). There
- * is also a grabber manipulator that allows the first node to be "grabbed" and
- * moved around.
+ * PointerNode reports a list of all nodes with which the ray is intersecting
+ * (in order of closest to furthest). It can also be used to grab and manipulate
+ * nodes. The grabber allows the first node to be "grabbed" and moved around,
+ * while the manipulate method checks the intersection for draggers in the scene
+ * and invokes a motion command on a dragger.
  */
 
 class PointerNode : public RayNode
@@ -92,11 +93,20 @@ class PointerNode : public RayNode
 
 
         ReferencedNode *getNodeFromIntersections();
-        //void computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T);
 
 
         void manipulate (int b);
         int getManipulate() const { return (int) doManipulation; }
+
+        /**
+         * We can call setManipulator and pass the name of a dragger, and the
+         * pointer will enable the dragger on the current GroupNode that it is
+         * currently pointing at. If the pointer is not intersecting with any
+         * node, this will set the dragger on the last manipulated node; this
+         * was found to be a desired behaviour instead of constantly ensuring an
+         * intersection whenever the user wanted to use a different manipulator.
+         */
+        void setManipulator(const char *manipulatorType);
 
         /**
          * The grab method selects the closest intersected node and temporarily
@@ -160,6 +170,7 @@ class PointerNode : public RayNode
         // dragger stuff:
         bool doManipulation;
         osg::ref_ptr<ReferencedNode> targetNode;
+        t_symbol *lastManipulated;
 
         osg::Matrix origMatrix;
         osg::Matrix previousMatrix;

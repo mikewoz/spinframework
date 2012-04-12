@@ -93,6 +93,8 @@ PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : RayNode(sc
     grabbedNode = NULL;
     targetNode = NULL;
 
+    lastManipulated = gensym("NULL");
+    
     intersectList.clear();
     
     
@@ -150,7 +152,7 @@ void PointerNode::callbackUpdate()
 
     // make sure to provide a nodemask so that only geometric nodes are checked
     // for intersections:
-    intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK);
+    intersectVisitor.setTraversalMask(INTERACTIVE_NODE_MASK);
 
     // start the visitor:
     sceneManager->worldNode->accept(intersectVisitor);
@@ -159,12 +161,13 @@ void PointerNode::callbackUpdate()
     //std::cout<<"Intersection completed in "<<osg::Timer::instance()->delta_s(startTick,endTick)<<std::endl;
 
 
-    //if (spinApp::Instance().getContext()->isServer())
+    if (spinApp::Instance().getContext()->isServer())
     {
         reportIntersections();
     }
     
-    if (!spinApp::Instance().getContext()->isServer())
+    //if (!spinApp::Instance().getContext()->isServer())
+    else
     {
         applyManipulation(myMatrix, start, end);
     }
@@ -482,6 +485,36 @@ void PointerNode::computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec
 
 // *****************************************************************************
 
+void PointerNode::setManipulator(const char *manipulatorType)
+{
+    // return if this spinContext is a slave
+    if (!spinApp::Instance().getContext()->isServer()) 
+        return;
+        
+    GroupNode *lastNode = dynamic_cast<GroupNode*>(lastManipulated->s_thing);
+        
+    // see if there is an intersection with a GroupNode, and if so, tell
+    // that node to enable the manipulator
+    GroupNode *n = dynamic_cast<GroupNode*>(getNodeFromIntersections());        
+    if (n)
+    {
+        // if we're targetting a new node, make sure that the last manipulated
+        // node's dragger gets turned off:
+        if ((lastNode) && (n != lastNode))
+            lastNode->setManipulator("NULL");
+    
+        n->setManipulator(manipulatorType);
+        lastManipulated = n->id;
+    }
+    
+    // if there was no intersection, load the manipulator on the last object
+    // that was manipulated
+    else if (lastNode)
+    {
+        lastNode->setManipulator(manipulatorType);
+    }
+}
+
 void PointerNode::manipulate (int b)
 {
     doManipulation = (bool) b;
@@ -515,7 +548,7 @@ void PointerNode::grab (int b)
 
         osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
 
-        // We will temporarily attach targetNode to this pointer, so we
+        // We will temporarily attach grabbedNode to this pointer, so we
         // need to keep track of the old parent so we can reattach it:
         previousParent = grabbedNode->parent;
 
@@ -532,12 +565,14 @@ void PointerNode::grab (int b)
 
         
         osg::Vec3 iv = ( srcMatrix.getRotate() * (worldIntersectPt-p1) );
+        /*
         std::cout << "p1=("<<p1.x()<<","<<p1.y()<<","<<p1.z()<< ")"<<std::endl;
         std::cout << "iv=("<<iv.x()<<","<<iv.y()<<","<<iv.z()<< ")"<<std::endl;
         std::cout << "dp=("<<dp.x()<<","<<dp.y()<<","<<dp.z()<< ")"<<std::endl;
         std::cout << "localIntersectPt=("<<localIntersectPt.x()<<","<<localIntersectPt.y()<<","<<localIntersectPt.z()<< ")"<<std::endl;
         std::cout << "worldIntersectPt=("<<worldIntersectPt.x()<<","<<worldIntersectPt.y()<<","<<worldIntersectPt.z()<< ")"<<std::endl;
         std::cout << "world - p1 =     ("<<worldIntersectPt.x()-p1.x()<<","<<worldIntersectPt.y()-p1.y()<<","<<worldIntersectPt.z()-p1.z()<< ")"<<std::endl;
+        */
         
 
         // ARGH. localIntersectPt is not correct!! TODO
@@ -552,9 +587,11 @@ void PointerNode::grab (int b)
 
         //T = osg::Vec3(0,dp.length(),0);
         //R = osgVec3(0,0,0);
-
+        
+        /*
         std::cout << "Attaching node [" << grabbedNode->id->s_name << "] to pointer with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
-
+        */
+        
         // attach node to this pointer:
         grabbedNode->newParent = this->id;
         grabbedNode->attach(); // this method locks the sceneMutex
@@ -574,7 +611,7 @@ void PointerNode::grab (int b)
     else if (grabbedNode.valid())
     {
 
-        // get the global positions of our targetNode and oldTargetParent
+        // get the global positions of our grabbedNode and oldTargetParent
 
         if (previousParent==gensym("world"))
             srcMatrix = osg::Matrix::identity();
@@ -596,9 +633,11 @@ void PointerNode::grab (int b)
         // re-attach node to it's old parent:
         grabbedNode->newParent = previousParent;
         grabbedNode->attach(); // this method locks the sceneMutex
-
+        
+        /*
         std::cout << "Re-attaching node [" << grabbedNode->id->s_name << "] to old parent [" << previousParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
-
+        */
+        
         // now apply the offset:
         // (TODO: use sceneManager->invokeMethod)
         osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());

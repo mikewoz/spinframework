@@ -49,6 +49,11 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          __int__getManipulate,
 	          "",
 	          "");
+	I_Method1(void, setManipulator, IN, const char *, manipulatorType,
+	          Properties::VIRTUAL,
+	          __void__setManipulator__C5_char_P1,
+	          "",
+	          "We can call setManipulator and pass the name of a dragger, and the pointer will enable the dragger on the current GroupNode that it is currently pointing at. If the pointer is not intersecting with any node, this will set the dragger on the last manipulated node; this was found to be a desired behaviour instead of constantly ensuring an intersection whenever the user wanted to use a different manipulator. ");
 	I_Method1(void, grab, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__grab__int,
@@ -87,6 +92,9 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	I_SimpleProperty(int, Manipulate, 
 	                 __int__getManipulate, 
 	                 0);
+	I_SimpleProperty(const char *, Manipulator, 
+	                 0, 
+	                 __void__setManipulator__C5_char_P1);
 	I_SimpleProperty(spin::ReferencedNode *, NodeFromIntersections, 
 	                 __ReferencedNode_P1__getNodeFromIntersections, 
 	                 0);

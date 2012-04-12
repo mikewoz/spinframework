@@ -239,7 +239,7 @@ void ReferencedStateSet::setTextureBlend (int mode)
 			textureBlend_ = osg::TexEnv::MODULATE;
 			break;
 	}
-			
+	
 	osg::StateSet::TextureAttributeList& texList = this->getTextureAttributeList();
 	for (unsigned int i=0; i<texList.size(); ++i)
 	{

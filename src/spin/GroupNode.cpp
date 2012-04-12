@@ -140,8 +140,10 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
             {
             
                 osg::Matrix m = _localToWorld * command.getWorldToLocal()
-                                            * command.getMotionMatrix()
-                                            * command.getLocalToWorld() * _worldToLocal  * _startMotionMatrix;
+                                              * command.getMotionMatrix()
+                                              * command.getLocalToWorld()
+                                              * _worldToLocal
+                                              * _startMotionMatrix;
 
                 spinApp::Instance().NodeMessage(groupNode->getID().c_str(), "sffffffffffffffff", "setManipulatorMatrix",
                     m(0,0),m(0,1),m(0,2),m(0,3),
