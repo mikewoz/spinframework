@@ -436,14 +436,31 @@ void setDomeCorrection(osg::View *view, osg::ArgumentParser& arguments)
         osg::notify(osg::NOTICE)<<"Error, no WindowSystemInterface available, cannot create windows."<<std::endl;
         return;
     }
+    
+    osg::GraphicsContext::ScreenIdentifier si;
+    si.readDISPLAY();
+
+/*
+    // displayNum has not been set so reset it to screenNum.
+    if (si.displayNum<0) si.displayNum = screenNum;
+    si.displayNum = screenNum;
+*/
+
+    //unsigned int screenNum;
+    while (arguments.read("--screen",si.screenNum)) {}
+
 
     unsigned int width, height;
-    wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(0), width, height);
+    wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(si.displayNum), width, height);
 
     while (arguments.read("--width",width)) {}
     while (arguments.read("--height",height)) {}
 
+    std::cout << "Resolution for screen " << si.screenNum << " is: " << width << "x" << height << std::endl;
+
     osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+    //traits->displayNum = 0;//si.displayNum;
+    traits->screenNum = si.screenNum;
     traits->x = 0;
     traits->y = 0;
     traits->width = width;
@@ -708,15 +725,7 @@ int main(int argc, char **argv)
 
 
 	
-	// For testing purposes, we allow loading a scene with a commandline arg:
-    osg::setNotifyLevel(osg::DEBUG_FP);
-    //std::cout << "DYLD_LIBRARY_PATH= " << getenv("DYLD_LIBRARY_PATH") << std::endl;
-    //std::cout << "OSG_LIBRARY_PATH=  " << getenv("OSG_LIBRARY_PATH") << std::endl;
-	//setenv("OSG_PLUGIN_EXTENSION", ".so", 1);
-    osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
-    
-    osg::setNotifyLevel(osg::FATAL);
-    
+   
 	// *************************************************************************
 	// construct the viewer:
 	// (note, this constructor gets rid of some additional args)
@@ -860,6 +869,18 @@ int main(int argc, char **argv)
 		}
 	}
 
+
+
+	// *************************************************************************
+	// For testing purposes, we allow loading a scene with a commandline arg:
+    osg::setNotifyLevel(osg::DEBUG_FP);
+    //std::cout << "DYLD_LIBRARY_PATH= " << getenv("DYLD_LIBRARY_PATH") << std::endl;
+    //std::cout << "OSG_LIBRARY_PATH=  " << getenv("OSG_LIBRARY_PATH") << std::endl;
+	//setenv("OSG_PLUGIN_EXTENSION", ".so", 1);
+    osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
+    
+    osg::setNotifyLevel(osg::FATAL);
+ 
 	
 	// *************************************************************************
 	// any option left unread are converted into errors to write out later.
