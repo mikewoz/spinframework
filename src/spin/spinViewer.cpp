@@ -1079,7 +1079,7 @@ int run(int argc, char **argv)
         }
 
         /// Thu Aug 19 2010:tmatth:FIXME: this segfaults in multithreaded mode
-        view->setSceneData(spin.sceneManager->rootNode.get());
+        view->setSceneData(spin.sceneManager->worldNode.get());
 
 	    view->addEventHandler(new osgViewer::StatsHandler);
 	    view->addEventHandler(new osgViewer::ThreadingHandler);

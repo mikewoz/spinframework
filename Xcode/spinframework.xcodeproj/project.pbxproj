@@ -570,6 +570,9 @@
 		1CCCA0F614BE389B00DCA0B7 /* spinViewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */; };
 		1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
+		1CCDCCBE15386DC300B9D191 /* TextArea.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CCDCCBD15386DC300B9D191 /* TextArea.h */; };
+		1CCDCCC115386DE900B9D191 /* TextArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCDCCC015386DE900B9D191 /* TextArea.cpp */; };
+		1CCDCCC315389C5D00B9D191 /* TextArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCDCCC215389C5D00B9D191 /* TextArea.cpp */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
@@ -1296,6 +1299,9 @@
 		1CCCA0F114BE361B00DCA0B7 /* spin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spin.icns; path = ../src/Resources/images/spin.icns; sourceTree = "<group>"; };
 		1CCCA0F314BE36CE00DCA0B7 /* spinViewer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spinViewer.icns; path = ../src/Resources/images/spinViewer.icns; sourceTree = "<group>"; };
 		1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinViewer.cpp; path = ../../src/spin/spinViewer.cpp; sourceTree = "<group>"; };
+		1CCDCCBD15386DC300B9D191 /* TextArea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextArea.h; path = ../include/TextArea.h; sourceTree = "<group>"; };
+		1CCDCCC015386DE900B9D191 /* TextArea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextArea.cpp; path = ../src/spin/TextArea.cpp; sourceTree = "<group>"; };
+		1CCDCCC215389C5D00B9D191 /* TextArea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextArea.cpp; path = ../src/osgWrappers/introspection/TextArea.cpp; sourceTree = "<group>"; };
 		1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.66.dylib; path = usr/local/lib/libosg.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.66.dylib; path = usr/local/lib/libosgAnimation.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.66.dylib; path = usr/local/lib/libosgDB.66.dylib; sourceTree = SDKROOT; };
@@ -1600,6 +1606,7 @@
 				1C386CA914BD3DF60065851F /* spinServerContext.cpp */,
 				1C386CAA14BD3DF60065851F /* spinUtil.cpp */,
 				1C386CAB14BD3DF60065851F /* SwitchNode.cpp */,
+				1CCDCCC015386DE900B9D191 /* TextArea.cpp */,
 				1C386CAC14BD3DF60065851F /* TextNode.cpp */,
 				1C386CAD14BD3DF60065851F /* UserNode.cpp */,
 				1C386CAE14BD3DF60065851F /* VideoTexture.cpp */,
@@ -1662,6 +1669,7 @@
 				1CA24D9D14BE2892007A9C31 /* spinUtil.h */,
 				1CA24D9E14BE2892007A9C31 /* spinWX.h */,
 				1CA24D9F14BE2892007A9C31 /* SwitchNode.h */,
+				1CCDCCBD15386DC300B9D191 /* TextArea.h */,
 				1CA24DA014BE2892007A9C31 /* TextNode.h */,
 				1CA24DA114BE2892007A9C31 /* UserNode.h */,
 				1CA24DA214BE2892007A9C31 /* util.h */,
@@ -1705,6 +1713,7 @@
 				1CA24D5014BE2875007A9C31 /* SoundNode.cpp */,
 				1CA24D5114BE2875007A9C31 /* SoundSpace.cpp */,
 				1CA24D5214BE2875007A9C31 /* SwitchNode.cpp */,
+				1CCDCCC215389C5D00B9D191 /* TextArea.cpp */,
 				1CA24D5314BE2875007A9C31 /* TextNode.cpp */,
 				1CA24D5414BE2875007A9C31 /* UserNode.cpp */,
 				1CA24D5514BE2875007A9C31 /* VideoTexture.cpp */,
@@ -2164,6 +2173,7 @@
 				1C1ECB4A150E4EE200CCBFF3 /* Shader.h in Headers */,
 				1C1ECB50150E65B000CCBFF3 /* ShaderUtil.h in Headers */,
 				1CF94951151CD40500628872 /* ParticleSystem.h in Headers */,
+				1CCDCCBE15386DC300B9D191 /* TextArea.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2561,6 +2571,8 @@
 				1C1ECB4E150E659000CCBFF3 /* ShaderUtil.cpp in Sources */,
 				1CF94954151CD41F00628872 /* ParticleSystem.cpp in Sources */,
 				1CF94956151CD43C00628872 /* ParticleSystem.cpp in Sources */,
+				1CCDCCC115386DE900B9D191 /* TextArea.cpp in Sources */,
+				1CCDCCC315389C5D00B9D191 /* TextArea.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3109,6 +3121,7 @@
 				1C122B3F153532720004D0A2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1C386C7714BD3CBD0065851F /* Build configuration list for PBXProject "spinframework" */ = {
 			isa = XCConfigurationList;

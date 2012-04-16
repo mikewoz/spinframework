@@ -44,9 +44,15 @@
 
 #include "GroupNode.h"
 
+#include <osgText/Text>
+#include <osgText/String>
+#include <osgText/TextBase>
+/*
 namespace osgText {
 class Text;
+class String;
 }
+*/
 
 namespace osg {
 class Geode;
@@ -56,6 +62,17 @@ namespace spin
 {
 
 class SceneManager;
+
+
+class spinTextNode : public osgText::Text
+{
+protected:
+    //spinTextNode();
+    //virtual spinTextNode();
+    osgText::String::iterator computeLastCharacterOnLine(osg::Vec2& cursor, osgText::String::iterator first, osgText::String::iterator last);
+    void computeGlyphRepresentation() { osgText::Text::computeGlyphRepresentation(); }
+};
+
 
 /**
  * \brief Provides 3D text rendered in the scene
@@ -67,6 +84,8 @@ public:
 
     TextNode(SceneManager *sceneManager, char *initID);
     virtual ~TextNode();
+
+    virtual void callbackUpdate();
 
     /**
      * The billboardType specifies how the text is oriented with respect to the
@@ -118,7 +137,13 @@ public:
      * Accepts user-entered string for the node's text.
      */
 
-    void setTextValue        (const char* s);
+    void setText        (const char* s);
+
+    /**
+     * Deprecated method (here for backwards compatibility).
+     */
+    void setTextValue        (const char* s) { setText(s); }
+
 
     /**
      * Sets the font for the text associated with this node.
@@ -131,12 +156,30 @@ public:
      */
 
     void setSize            (float s);
+    
+    /**
+     * Sets the maximum size of the text box. Values of 0 in either dimension
+     * means no maximum, so that the box will stretch to fit the text
+     */
+    void setBox            (float width, float height);
+
+    /**
+     * Sets the line spacing, as a percentage of the character height. The
+     * default is 0 
+     */
+    void setLineSpacing     (float spacing);
+
+    /**
+     * Sets the maximum size of the text box.
+     */
+    void setAlignment       (int alignment);
+
 
     /**
      * Sets the color for the text associated to this node in RGBA values.
      */
 
-    void setColor            (float red, float green, float blue, float alpha);
+    void setColor           (float red, float green, float blue, float alpha);
 
     /**
      * Sets the background color for this node.
@@ -174,7 +217,7 @@ public:
     /**
      * Returns a string with the text associated to this node.
      */
-    const char    *getTextValue() const   { return _text.c_str(); }
+    const char    *getText() const   { return _text.c_str(); }
 
     /**
      * Returns a string with the text associated to this node.
@@ -191,6 +234,13 @@ public:
      */
 
     float         getSize() const        { return _size; }
+
+    /**
+     * Returns a float indicating the line spacing (as a percentage of character
+     * height).
+     */
+
+    float         getLineSpacing() const        { return _lineSpacing; }
 
     /**
      * Returns the color (in RGBA values) of the text associated to this node.
@@ -234,10 +284,14 @@ public:
 
 private:
 
+    bool _updateFlag;
+
     std::string _font;
-    float _size;
+    float _size, _lineSpacing;
     osg::Vec4 _color, _bgColor;
     float _margin;
+    
+    osgText::TextBase::AlignmentType _alignment;
 
     billboardType _billboard;
     decorationType _decoration;
@@ -246,7 +300,7 @@ private:
     std::string _text; // we store this redundantly
 
     osg::ref_ptr<osg::Geode> textGeode;
-    osg::ref_ptr<osgText::Text> textLabel;
+    osg::ref_ptr<spinTextNode> textLabel;
     
     void drawText();
 
