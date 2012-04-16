@@ -14,6 +14,8 @@ LDFLAGS +=  -llo $(shell python-config --libs) `pkg-config --libs $(DEPS)`
 
 #LDFLAGS += -lPocoUtild -lPocoNetd -lPocoXMLd -lPocoFoundationd -lboost_system -ldl
 
+LDFLAGS += -lboost_system
+
 ifeq ($(shell uname -s),Darwin)
   CPPFLAGS += -I/opt/local/include
   LDFLAGS += -lboost_python -L/opt/local/lib

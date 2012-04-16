@@ -739,6 +739,8 @@ int main(int argc, char **argv)
 	}
 
 	spin.sceneManager->setGraphical(true);
+    
+    spin.sceneManager->createNode("grid", "GridNode");
 
 	// *************************************************************************
 	// get details on keyboard and mouse bindings used by the viewer.
@@ -751,22 +753,28 @@ int main(int argc, char **argv)
 	osg::ref_ptr<osgViewer::View> view = new osgViewer::View;
 
 
-	//setDomeFaces(view, arguments);
-	//setDomeCorrection(view, arguments);
-
+    if (arguments.read("--faces"))
+	{
+        setDomeFaces(view, arguments);
+        view->setSceneData(spin.sceneManager->rootNode.get());
+	}
+    else if (arguments.read("--distortion"))
+    {
+        
+        osg::Node* distortionNode = createDistortionSubgraph( spin.sceneManager->rootNode.get(), view->getCamera()->getClearColor());
+        view->setSceneData( distortionNode );
+    
+    }
+    else
+    {
+        setDomeCorrection(view, arguments);
+        view->setSceneData(spin.sceneManager->rootNode.get());
+    }
 
 	
 	viewer.addView(view.get());
 
 	view->getCamera()->setClearColor(osg::Vec4(0.0, 0.0, 0.0, 0.0));
-
-	osg::Node* distortionNode = createDistortionSubgraph( spin.sceneManager->rootNode.get(), view->getCamera()->getClearColor());
-    view->setSceneData( distortionNode );
-
-	//view->setSceneData(spin.sceneManager->rootNode.get());
-
-
-	
 
 	view->addEventHandler(new osgViewer::StatsHandler);
 	view->addEventHandler(new osgViewer::ThreadingHandler);
@@ -783,29 +791,6 @@ int main(int argc, char **argv)
 	view->setCameraManipulator(manipulator.get());
 
 	
-
-
-	/*
-    if (arguments.read("--dome") || arguments.read("--puffer") )
-    {    
-
-        setDomeCorrection(viewer, arguments);
-    
-        viewer.setSceneData( loadedModel );
-    }
-    else if (arguments.read("--faces"))
-    {    
-
-        setDomeFaces(viewer, arguments);
-
-        viewer.setSceneData( loadedModel );
-    }
-    else
-    {
-        osg::Node* distortionNode = createDistortionSubgraph( loadedModel, viewer.getCamera()->getClearColor());
-        viewer.setSceneData( distortionNode );
-    }
-*/
 
 
 	// ***************************************************************************
