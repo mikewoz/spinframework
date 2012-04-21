@@ -10,8 +10,8 @@
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
 
+#include <GroupNode.h>
 #include <PointerNode.h>
-#include <ReferencedNode.h>
 #include <SceneManager.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
@@ -34,9 +34,9 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          __void__callbackUpdate,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
-	I_Method0(spin::ReferencedNode *, getNodeFromIntersections,
+	I_Method1(spin::GroupNode *, getNodeFromIntersections, IN, int, index,
 	          Properties::NON_VIRTUAL,
-	          __ReferencedNode_P1__getNodeFromIntersections,
+	          __GroupNode_P1__getNodeFromIntersections__int,
 	          "",
 	          "");
 	I_Method1(void, manipulate, IN, int, b,
@@ -64,6 +64,11 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          __void__slide__float,
 	          "",
 	          "Slides the currently grabbed node (if there is one) along the pointer axis (ie, increasing or decreasing the distance). param f The amount by which to slide (positive values slide the attached node AWAY from the pointer  ");
+	I_Method1(void, spin, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__spin__float,
+	          "",
+	          "Spins the currently grabbed node (if there is one) around the pointer axis. param f The amount by which to spin (in degrees)  ");
 	I_Method0(int, getGrab,
 	          Properties::NON_VIRTUAL,
 	          __int__getGrab,
@@ -80,6 +85,12 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	                   __void__applyManipulation__osg_Matrix__osg_Vec3__osg_Vec3,
 	                   "",
 	                   "Checks intersections for draggers and if so, we apply the drag events ");
+	I_ProtectedMethod1(void, applyGrab, IN, osg::Matrix, mat,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__applyGrab__osg_Matrix,
+	                   "",
+	                   "");
 	I_ProtectedMethod0(void, reportIntersections,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -95,9 +106,6 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	I_SimpleProperty(const char *, Manipulator, 
 	                 0, 
 	                 __void__setManipulator__C5_char_P1);
-	I_SimpleProperty(spin::ReferencedNode *, NodeFromIntersections, 
-	                 __ReferencedNode_P1__getNodeFromIntersections, 
-	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

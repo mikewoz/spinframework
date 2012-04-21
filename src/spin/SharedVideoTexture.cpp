@@ -62,7 +62,7 @@ namespace spin
 // constructor:
 //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
 SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
-    ReferencedStateSet(s, initID), killed_(true)
+    Shader(s, initID), killed_(true)
 {
 	classType = "SharedVideoTexture";
 	
@@ -157,7 +157,7 @@ void SharedVideoTexture::setTextureID (const char* newID)
 std::vector<lo_message> SharedVideoTexture::getState () const
 {
     // inherit state from base class
-    std::vector<lo_message> ret = ReferencedStateSet::getState();
+    std::vector<lo_message> ret = Shader::getState();
 
     lo_message msg;
 
@@ -170,7 +170,7 @@ std::vector<lo_message> SharedVideoTexture::getState () const
 
 void SharedVideoTexture::debug()
 {
-	ReferencedStateSet::debug();
+	Shader::debug();
 	std::cout << "   ---------" << std::endl;
 	std::cout << "   Type: SharedVideoTexture" << std::endl;
 	std::cout << "   Texture ID: " << getTextureID() << std::endl;

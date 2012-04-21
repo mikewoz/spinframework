@@ -38,9 +38,9 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          __void__debug,
 	          "",
 	          "Print debug information to console. ");
-	I_Method0(void, printSource,
+	I_Method0(void, printShaderSource,
 	          Properties::NON_VIRTUAL,
-	          __void__printSource,
+	          __void__printShaderSource,
 	          "",
 	          "");
 	I_Method0(void, clearUniforms,
@@ -58,11 +58,6 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          __void__registerUniform__C5_char_P1__C5_char_P1__C5_char_P1,
 	          "",
 	          "Create a uniform with the provided name and type, and set the initial value for the uniform.Note that defaults are provided as strings in all cases. So in the case of several values, the defaultValue would be a space-separated list of values.It is also possible to specify an array of vectors. For example, if the type is vec2, you can specify a defaultValue of 0.0 0.1 1.0 1.0 and this will generate two vec2 uniforms with indexes automatically added to the name: uniform name[0] = vec2(0.0,0.1); uniform name[1] = vec2(1.0,1.0); To send OSC messages to control these uniforms, you need to use the full name including square brackets. For example: /SPIN/default/shader setUniform_vec2 name[0] 0.0 0.0 ");
-	I_Method1(ParsedUniforms, parseUniformsFromShader, IN, osg::Shader *, shader,
-	          Properties::NON_VIRTUAL,
-	          __ParsedUniforms__parseUniformsFromShader__osg_Shader_P1,
-	          "",
-	          "");
 	I_Method1(bool, loadJitterShader, IN, std::string, path,
 	          Properties::NON_VIRTUAL,
 	          __bool__loadJitterShader__std_string,
@@ -103,24 +98,24 @@ BEGIN_OBJECT_REFLECTOR(spin::Shader)
 	          __void__setUniform_vec4__C5_char_P1__float__float__float__float,
 	          "",
 	          "");
-	I_Method1(void, setPath, IN, const char *, newPath,
+	I_Method1(void, setShader, IN, const char *, path,
 	          Properties::NON_VIRTUAL,
-	          __void__setPath__C5_char_P1,
+	          __void__setShader__C5_char_P1,
 	          "",
 	          "Creates a texture from a path on disk. ");
-	I_Method0(const char *, getPath,
-	          Properties::VIRTUAL,
-	          __C5_char_P1__getPath,
+	I_Method0(const char *, getShader,
+	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getShader,
 	          "",
-	          "Abstract method getPath needs to be implemented ");
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "Just like a ReferencedNode, each subclass of ReferencedStateSet must override the getState() method to pass it's current state. ");
-	I_SimpleProperty(const char *, Path, 
-	                 __C5_char_P1__getPath, 
-	                 __void__setPath__C5_char_P1);
+	I_SimpleProperty(const char *, Shader, 
+	                 __C5_char_P1__getShader, 
+	                 __void__setShader__C5_char_P1);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

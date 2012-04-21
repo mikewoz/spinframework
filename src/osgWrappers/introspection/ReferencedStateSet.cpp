@@ -21,7 +21,7 @@
 #undef OUT
 #endif
 
-BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	I_DeclaringFile("ReferencedStateSet.h");
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____ReferencedStateSet__SceneManager_P1__C5_char_P1,
@@ -32,16 +32,11 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	          __void__updateCallback,
 	          "",
 	          "This callback occurs every frame to update the state with any parameter changes. ");
-	I_Method0(const char *, getPath,
-	          Properties::PURE_VIRTUAL,
-	          __C5_char_P1__getPath,
-	          "",
-	          "Abstract method getPath needs to be implemented ");
 	I_Method0(void, removeFromScene,
 	          Properties::NON_VIRTUAL,
 	          __void__removeFromScene,
 	          "",
-	          "Remove this stateset from all parents... essentially destroying the state, since no reference to it will exist anymore, and OSG will kill it. ");
+	          "Abstract method getPath needs to be implemented Remove this stateset from all parents... essentially destroying the state, since no reference to it will exist anymore, and OSG will kill it. ");
 	I_Method1(void, replace, IN, osg::StateSet *, ss,
 	          Properties::NON_VIRTUAL,
 	          __void__replace__osg_StateSet_P1,
@@ -105,9 +100,6 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	I_SimpleProperty(int, Lighting, 
 	                 __int__getLighting, 
 	                 __void__setLighting__int);
-	I_SimpleProperty(const char *, Path, 
-	                 __C5_char_P1__getPath, 
-	                 0);
 	I_SimpleProperty(int, RenderBin, 
 	                 __int__getRenderBin, 
 	                 __void__setRenderBin__int);
@@ -117,7 +109,6 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	I_SimpleProperty(int, TextureBlend, 
 	                 __int__getTextureBlend, 
 	                 __void__setTextureBlend__int);
-	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
 	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(std::string, classType);
 END_REFLECTOR

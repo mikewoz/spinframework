@@ -879,7 +879,12 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 
     // go through all existing statesets and see if any have fname as the
     // source for the image/video in question
-
+    
+    // mikewoz: 2012-04-20: I commented this out, because someone may want
+    // to load a texture multiple times ... and this doesn't make sense anymore
+    // with shaders. It's not correct to assume that every stateset has the
+    // notion of path.
+    /*
     ReferencedStateSetMap::iterator sIt;
     ReferencedStateSetList::iterator sIter;
     for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
@@ -897,7 +902,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
             }
         }
     }
-
+    */
 
     // otherwise, we assume this is a filename, and try to create a stateset of
     // the appropriate type
@@ -939,7 +944,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
         osg::ref_ptr<Shader> shdr = dynamic_cast<Shader*>(createStateSet(newID.c_str(), "Shader"));
         if (shdr.valid())
         {
-            shdr->setPath(getRelativePath(fname).c_str());
+            shdr->setShader(getRelativePath(fname).c_str());
             return shdr.get();
         }
     }
@@ -1373,6 +1378,8 @@ void SceneManager::clearStates()
 			*/
         }
     }
+    
+    SCENE_MSG("s", "clearStates");
 
     // TODO: separate sendNodeList to sendStateList as well
     sendNodeList("*");

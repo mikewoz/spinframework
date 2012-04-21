@@ -54,6 +54,7 @@
 #include "ImageTexture.h"
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
+#include "ShaderUtil.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ namespace spin
 
 // ===================================================================
 // constructor:
-ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
+ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
 {
 	this->setName(string(id->s_name) + ".ShapeNode");
 	nodeType = "ShapeNode";
@@ -77,6 +78,26 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : ConstraintsNod
 	stateset = gensym("NULL");
 	renderBin = 11;
 	lightingEnabled = true;
+    
+    
+    // quick shader test:
+    if (0)
+    {
+        osg::Geode* geode = new osg::Geode();
+        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(1,1,1), 1));
+        geode->addDrawable(drawable);
+        sceneManager->worldNode->addChild(geode);
+
+        osg::Shader* vshader = new osg::Shader(osg::Shader::VERTEX, microshaderVertSource );
+        osg::Shader* fshader = new osg::Shader(osg::Shader::FRAGMENT, microshaderFragSource );
+        osg::Program * prog = new osg::Program;
+        prog->addShader ( vshader );
+        prog->addShader ( fshader );
+        geode->getOrCreateStateSet()->setAttributeAndModes( prog, osg::StateAttribute::ON );
+
+    }
+    //
+    
 
     drawShape();
 }
@@ -507,7 +528,7 @@ void ShapeNode::addImageTexture(osg::Node *n, std::string path)
 std::vector<lo_message> ShapeNode::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ConstraintsNode::getState();
+	std::vector<lo_message> ret = GroupNode::getState();
 
 	lo_message msg;
 	osg::Vec3 v;

@@ -120,6 +120,26 @@ public:
 											is the same as that for COLLIDE. */
                         };
 
+
+enum CollisionMode {   POINT,               /*!< When computing collisions with
+                                            other surfaces, only the origin
+                                            point (local 0,0,0) of is 
+                                            considered. This is by far the most
+                                            efficient method. */
+    										
+                        BOUNDING_SPHERE,    /*!< When computing collisions with
+                                            other surfaces, we use the local 
+                                            bounding sphere of this node to
+                                            check the collision. */
+
+                        MESH                /*!< The most expensive method of
+                                            computing collisions, the entire 
+                                            mesh is traversed to check if any
+                                            parts of the mesh has collided with
+                                            others in the scene.
+                                            */
+                    };
+
         
     virtual void callbackUpdate();
     

@@ -35,9 +35,10 @@ BEGIN_VALUE_REFLECTOR(spin::DraggerCallback)
 	          "");
 END_REFLECTOR
 
-BEGIN_ENUM_REFLECTOR(spin::GroupNode::interactionMode)
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::InteractionMode)
 	I_DeclaringFile("GroupNode.h");
 	I_EnumLabel(spin::GroupNode::STATIC);
+	I_EnumLabel(spin::GroupNode::PASSTHRU);
 	I_EnumLabel(spin::GroupNode::SELECT);
 	I_EnumLabel(spin::GroupNode::DRAG);
 	I_EnumLabel(spin::GroupNode::THROW);
@@ -107,9 +108,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setReportMode__globalsReportMode,
 	          "",
 	          "");
-	I_Method1(void, setInteractionMode, IN, spin::GroupNode::interactionMode, mode,
+	I_Method1(void, setInteractionMode, IN, spin::GroupNode::InteractionMode, mode,
 	          Properties::NON_VIRTUAL,
-	          __void__setInteractionMode__interactionMode,
+	          __void__setInteractionMode__InteractionMode,
 	          "",
 	          "");
 	I_Method3(void, setClipping, IN, float, x, IN, float, y, IN, float, z,

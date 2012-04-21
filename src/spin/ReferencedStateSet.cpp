@@ -47,8 +47,7 @@
 #include "spinBaseContext.h"
 #include "SceneManager.h"
 #include "ReferencedStateSet.h"
-
-using namespace std;
+#include "ShaderUtil.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -77,13 +76,33 @@ ReferencedStateSet::ReferencedStateSet(SceneManager *s, const char *initID)
 	
 	classType = "ReferencedStateSet";
 	
-	this->setName(string(id->s_name) + ".ReferencedStateSet");
+	this->setName(std::string(id->s_name) + ".ReferencedStateSet");
 	
 	// We need to set up a callback. This should be on the topmost node, so that during node
 	// traversal, we update our parameters before anything is drawn.
 	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
 	this->setUpdateCallback(new ReferencedStateSet_callback);
+    
+    // initialize some stuff:
+    /*
+    osg::TexEnv* texenv = new osg::TexEnv();
+    texenv->setMode(textureBlend_);
+	this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+    */
 	
+    // set lighting:
+    if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+	// set renderbin:
+	this->setRenderBinDetails( renderBin_, "RenderBin");
+
+	// if image has transparency, enable blending:
+	if (0)//(_imageStream->isImageTranslucent())
+	{
+		this->setMode(GL_BLEND, osg::StateAttribute::ON);
+		this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+	}
 }
 
 // destructor
@@ -95,7 +114,7 @@ ReferencedStateSet::~ReferencedStateSet()
 // *****************************************************************************
 void ReferencedStateSet::updateCallback()
 {
-    // derived classes can do updates here   
+    // derived classes can do updates here 
 }
 
 
@@ -194,8 +213,8 @@ void ReferencedStateSet::debug()
 	//std::cout << "ref_count=" << test->getReferenceCount() << std::endl;
 	
 	
-	vector<lo_message> nodeState = this->getState();
-	vector<lo_message>::iterator nodeStateIterator;
+	std::vector<lo_message> nodeState = this->getState();
+	std::vector<lo_message>::iterator nodeStateIterator;
 	for (nodeStateIterator = nodeState.begin(); nodeStateIterator != nodeState.end(); ++nodeStateIterator)
 	{
 	    argTypes = lo_message_get_types(*nodeStateIterator);
@@ -312,6 +331,7 @@ void ReferencedStateSet::setRenderBin (int i)
 
 	BROADCAST(this, "si", "setRenderBin", getRenderBin());
 }
+
 
 // *****************************************************************************
 std::vector<lo_message> ReferencedStateSet::getState () const

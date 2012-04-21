@@ -80,7 +80,7 @@ public:
     /**
      * Abstract method getPath needs to be implemented
      */
-    virtual const char *getPath() const = 0;
+    //virtual const char *getPath() const = 0;
 	
     /**
     * Remove this stateset from all parents... essentially destroying the state,
@@ -157,21 +157,19 @@ public:
      */
     virtual int getRenderBin() const { return renderBin_; }
 
-
-
-
 	// TODO: these should at least be protected:
-    SceneManager *sceneManager;
     t_symbol *id;
     std::string classType;
 
 protected:
-
+    
 	osg::TexEnv::Mode textureBlend_;
 	bool textureRepeatS_;
 	bool textureRepeatT_;
 	bool lightingEnabled_;
     int  renderBin_;
+
+    SceneManager *sceneManager;
 
 };
 

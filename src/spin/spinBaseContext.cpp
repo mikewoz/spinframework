@@ -169,6 +169,7 @@ void spinBaseContext::debugPrint()
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+    std::cout << "  SPIN version:\t\t\t" << PACKAGE_VERSION << "" << std::endl;
     std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC
     std::cout << "  SpatOSC version:\t\t"<< SPATOSC_VERSION << " (enabled=" << spinApp::Instance().hasAudioRenderer << ")" << std::endl;
@@ -177,14 +178,14 @@ void spinBaseContext::debugPrint()
 #endif
 
 #ifdef WITH_SHARED_VIDEO
-    std::cout << "  sharedvideo enabled?\tYES" << std::endl;
+    std::cout << "  sharedvideo enabled?\t\tYES" << std::endl;
 #else
-    std::cout << "  sharedvideo enabled?\tNO" << std::endl;
+    std::cout << "  sharedvideo enabled?\t\tNO" << std::endl;
 #endif
     std::cout << "  My IP address:\t\t" << getMyIPaddress() << std::endl;
     if (doDiscovery_)
     {
-        std::cout << "  Auto discovery addr:\t" << lo_address_get_url(lo_infoAddr);
+        std::cout << "  Auto discovery addr:\t\t" << lo_address_get_url(lo_infoAddr);
         if (lo_address_get_ttl(lo_infoAddr)>0)
             std::cout << " TTL=" << lo_address_get_ttl(lo_infoAddr);
         std::cout << std::endl;
@@ -893,6 +894,16 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "setNotifyLevel") && (argc==2))
+    {
+        int lvl = (int) lo_hires_val((lo_type)types[1], argv[1]);
+        if ((lvl>=0) && (lvl<=6))
+        {
+            osg::setNotifyLevel((osg::NotifySeverity)lvl);
+            std::cout << "setNotifyLevel " << osg::getNotifyLevel() << std::endl;
+        }
+        SCENE_MSG("si", "setNotifyLevel", (int)osg::getNotifyLevel());
+    }
     else if ((theMethod == "optimize") && (argc==2))
     {
         osgUtil::Optimizer optimizer;

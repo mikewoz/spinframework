@@ -23,7 +23,7 @@
 
 BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	I_DeclaringFile("VideoTexture.h");
-	I_BaseType(spin::ReferencedStateSet);
+	I_BaseType(spin::Shader);
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____VideoTexture__SceneManager_P1__C5_char_P1,
 	               "",
@@ -39,7 +39,7 @@ BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	          "",
 	          "Creates a video from a path on disk. This can either be a single movie file (ie, a format that OSG knows how to read), or a folder name that contains a sequence of images to stitch into a video. ");
 	I_Method0(const char *, getPath,
-	          Properties::VIRTUAL,
+	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPath,
 	          "",
 	          "Returns a string indicating the path from which the video data is drawn. This is an abstract class and should be re-implemented in a derived class ");

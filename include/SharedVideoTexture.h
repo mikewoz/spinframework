@@ -45,7 +45,7 @@
 #include "config.h"
 #include <osg/Timer>
 
-#include "ReferencedStateSet.h"
+#include "Shader.h"
 
 #ifdef WITH_SHARED_VIDEO        
 #include <shared-video-0.6/sharedVideoBuffer.h>
@@ -88,7 +88,7 @@ namespace spin
  */
 
 
-class SharedVideoTexture : public ReferencedStateSet
+class SharedVideoTexture : public Shader
 {
 
 public:

@@ -42,7 +42,7 @@
 #ifndef __VideoTexture_H
 #define __VideoTexture_H
 
-#include "ReferencedStateSet.h"
+#include "Shader.h"
 
 namespace osg {
     class ImageStream;
@@ -59,7 +59,7 @@ class SceneManager;
  * This uses osg::ImageStream, so it can load several different movie formats,
  * including live feeds on the Mac via devices.live.
  */
-class VideoTexture : public ReferencedStateSet
+class VideoTexture : public Shader
 {
 
 public:

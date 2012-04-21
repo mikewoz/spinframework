@@ -60,7 +60,7 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-ImageTexture::ImageTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
+ImageTexture::ImageTexture (SceneManager *s, const char *initID) : Shader(s, initID)
 {
 	classType = "ImageTexture";
 
@@ -77,7 +77,7 @@ ImageTexture::~ImageTexture()
 
 void ImageTexture::debug()
 {
-	ReferencedStateSet::debug();
+	Shader::debug();
 	
 	std::cout << "   ---------" << std::endl;
 
@@ -160,7 +160,11 @@ void ImageTexture::setPath (const char* newPath)
 			{
 				this->setMode(GL_BLEND, osg::StateAttribute::ON);
 				this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-			}
+			} else
+            {
+                this->setMode(GL_BLEND, osg::StateAttribute::OFF);
+				this->setRenderingHint(osg::StateSet::DEFAULT_BIN);
+            }
 		
 		}
 
@@ -178,7 +182,7 @@ void ImageTexture::setPath (const char* newPath)
 std::vector<lo_message> ImageTexture::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedStateSet::getState();
+	std::vector<lo_message> ret = Shader::getState();
 		
 	lo_message msg;
 	

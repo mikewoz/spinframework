@@ -41,7 +41,7 @@ END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_DeclaringFile("ShapeNode.h");
-	I_BaseType(spin::ConstraintsNode);
+	I_BaseType(spin::GroupNode);
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
 	               ____ShapeNode__SceneManager_P1__char_P1,
 	               "",

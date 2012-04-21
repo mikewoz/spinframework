@@ -1,51 +1,40 @@
-/* -*-c++-*-
-*
-*  OpenSceneGraph example, osgshaders.
-*
-*  Permission is hereby granted, free of charge, to any person obtaining a copy
-*  of this software and associated documentation files (the "Software"), to deal
-*  in the Software without restriction, including without limitation the rights
-*  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-*  copies of the Software, and to permit persons to whom the Software is
-*  furnished to do so, subject to the following conditions:
-*
-*  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-*  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-*  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-*  THE SOFTWARE.
-*/
+#ifndef __ShaderUtil_h__
+#define __ShaderUtil_h__
+
+#include <osg/Shader>
+
+namespace spin
+{
+
+typedef std::map<std::string, std::string> ParsedUniforms; // map of name, type
 
 
-/************************************************************************
- *                                                                      *
- *                   Copyright (C) 2002  3Dlabs Inc. Ltd.               *
- *                                                                      *
- ***********************************************************************/
+bool loadShaderSource(osg::Shader* obj, const std::string& fileName );
 
-#ifndef __ogl2_demo_h__
-#define __ogl2_demo_h__
+void replaceSampler2DRect(osg::Shader* obj);
+
+ParsedUniforms parseUniformsFromShader(osg::Shader *shader);
 
 
-extern void SetNoiseFrequency(int frequency);
+static const char *microshaderVertSource = {
+    "#version 120\n"
+    "// microshader - colors a fragment based on its position\n"
+    "varying vec4 color;\n"
+    "void main(void)\n"
+    "{\n"
+    "    color = gl_Vertex;\n"
+    "    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+    "}\n"
+};
 
-extern double noise1(double arg);
-extern double noise2(double vec[2]);
-extern double noise3(double vec[3]);
-extern void normalize2(double vec[2]);
-extern void normalize3(double vec[3]);
+static const char *microshaderFragSource = {
+    "#version 120\n"
+    "varying vec4 color;\n"
+    "void main(void)\n"
+    "{\n"
+    "    gl_FragColor = clamp( color, 0.0, 1.0 );\n"
+    "}\n"
+};
+}
 
-/*
-   In what follows "alpha" is the weight when the sum is formed.
-   Typically it is 2, As this approaches 1 the function is noisier.
-   "beta" is the harmonic scaling/spacing, typically 2.
-*/
-
-extern double PerlinNoise1D(double x,double alpha, double beta, int n);
-extern double PerlinNoise2D(double x,double y,double alpha, double beta, int n);
-extern double PerlinNoise3D(double x,double y,double z,double alpha, double beta, int n);
-
-
-#endif // __ogl2_demo_h__
+#endif

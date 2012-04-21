@@ -92,8 +92,7 @@ class PointerNode : public RayNode
         virtual void callbackUpdate();
 
 
-        ReferencedNode *getNodeFromIntersections();
-
+        GroupNode *getNodeFromIntersections(int index);
 
         void manipulate (int b);
         int getManipulate() const { return (int) doManipulation; }
@@ -131,6 +130,14 @@ class PointerNode : public RayNode
          * attached node AWAY from the pointer
          */
         void slide (float f);
+        
+        /**
+         * Spins the currently grabbed node (if there is one) around the pointer
+         * axis.
+         *
+         * @param f The amount by which to spin (in degrees)
+         */
+        void spin (float f);
          
         /**
          * @return Whether there is a valid node that is currently 'grabbed'
@@ -149,6 +156,8 @@ class PointerNode : public RayNode
          */
         void applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 end);
 
+        void applyGrab(osg::Matrix mat);
+
         /**
          * Reports the list of intersected nodes (server-side only)
          */
@@ -163,7 +172,7 @@ class PointerNode : public RayNode
         std::vector<osgUtil::LineSegmentIntersector::Intersection> intersectData;
 
         // grabber stuff:
-        osg::ref_ptr<ReferencedNode> grabbedNode;
+        osg::ref_ptr<GroupNode> grabbedNode;
         osg::Vec3 grabbedOffset;
         t_symbol *previousParent;
 
@@ -172,8 +181,13 @@ class PointerNode : public RayNode
         osg::ref_ptr<ReferencedNode> targetNode;
         t_symbol *lastManipulated;
 
-        osg::Matrix origMatrix;
+        osg::Matrix origPointerMatrix;
+        osg::Matrix origGrabbedMatrix;
+        osg::Vec3 origGrabbedPoint;
         osg::Matrix previousMatrix;
+        
+        osg::Matrix _localToWorld;
+        osg::Matrix _worldToLocal;
         
         /*
         osg::ref_ptr<osgManipulator::Dragger> dragger;

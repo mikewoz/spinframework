@@ -222,6 +222,41 @@ void ConstraintsNode::move (float x, float y, float z)
     }
 }
 
+/*
+// attempt at this: http://forum.openscenegraph.org/viewtopic.php?p=23242
+osg::Polytope ConstraintsNode::getPolytope()
+{
+    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+    
+    osg::Vec3 local
+    
+    Pos = this->getTranslation();
+
+    const osg::BoundingSphere& bs = this->getBound();
+    float zMax = bs.center().z()+bs.radius();
+    float zMin = bs.center().z()-bs.radius();
+    
+    osg::Plane plane;
+
+    // RIGHT
+    {
+        osg::Vec3 start = this->getTranslation();
+        osg::Vec3 end = start + osg::Vec3(bs.radius()+1,0,0);
+        osgUtil::LineSegmentIntersector *intersector = new osgUtil::LineSegmentIntersector(start,end);
+        osgUtil::IntersectionVisitor iv(intersector);
+        this->accept(iv);
+
+        if (intersector->containsIntersections())
+        {
+            // get last (furthest) intersection
+            const osgUtil::LineSegmentIntersector::Intersection& intersection = *(--intersector->getIntersections().end());
+            plane.set( (start-end)/bs.radius()+1, 
+            
+            
+            
+        }
+}
+*/
 
 void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 {
@@ -246,6 +281,8 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	{
 		// get current position (including offset from previous bounces)
 		osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+
+        
 		osg::Vec3 worldPos = thisMatrix.getTrans();
 
 		// set up intersector:

@@ -82,7 +82,24 @@ public:
     GroupNode(SceneManager *sceneManager, char *initID);
     virtual ~GroupNode();
 
-    enum interactionMode { STATIC, SELECT, DRAG, THROW, DRAW };
+    enum InteractionMode
+    {
+        STATIC,     /*!< Mouse clicks and PointerNode have no effect on this
+                    node. */
+        PASSTHRU,   /*!< This passes the interaction event to the parent node,
+                    which is useful when we need a node with geometry to be
+                    selected, but want to move the parent group instead. NOTE:
+                    ONLY IMPLEMENTED FOR PointerNode; NOT DONE YET FOR MOUSE! */
+        SELECT,     /*!< This node responds to selection events (eg, can display
+                    manipulator handles when selected). */
+        DRAG,       /*!< This node responds to grag events, either invoked by
+                    mouse drags in ViewerManipulator or PointerNode. */
+        THROW,      /*!< The same as DRAG mode, but a direction vector is
+                    accumulated over the last few drags and a velocity is
+                    assigned to the node when released. */
+        DRAW        /*!< Provides access to the x,y,z intersection points as the
+                    user draws over the surface of a node */
+    };
     enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
     enum velocityMode { TRANSLATE, MOVE };
     
@@ -118,7 +135,7 @@ public:
     
     void setReportMode(globalsReportMode mode);
 
-    void setInteractionMode(interactionMode mode);
+    void setInteractionMode(InteractionMode mode);
     
     /**
      * Set a clipping rectangle for the model so that geometry outside of the
@@ -269,7 +286,7 @@ protected:
     
     osg::ref_ptr<osgManipulator::Dragger> dragger;
     
-    interactionMode _interactionMode;
+    InteractionMode _interactionMode;
     std::vector<osg::Vec4> _trajectory;
     int _drawMod;
     

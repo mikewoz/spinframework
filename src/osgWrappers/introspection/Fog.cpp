@@ -29,7 +29,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Fog)
 	               "",
 	               "");
 	I_Method0(const char *, getPath,
-	          Properties::VIRTUAL,
+	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPath,
 	          "",
 	          "need to implement abstract method... ?! ");

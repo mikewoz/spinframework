@@ -69,6 +69,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
     Shader.cpp \
+    ShaderUtil.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \
@@ -121,6 +122,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/ReporterNode.h \
     $(top_srcdir)/include/SceneManager.h \
     $(top_srcdir)/include/Shader.h \
+    $(top_srcdir)/include/ShaderUtil.h \
     $(top_srcdir)/include/ShapeNode.h \
     $(top_srcdir)/include/SharedVideoTexture.h \
     $(top_srcdir)/include/SoundConnection.h \

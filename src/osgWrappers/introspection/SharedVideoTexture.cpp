@@ -23,7 +23,7 @@
 
 BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	I_DeclaringFile("SharedVideoTexture.h");
-	I_BaseType(spin::ReferencedStateSet);
+	I_BaseType(spin::Shader);
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____SharedVideoTexture__SceneManager_P1__C5_char_P1,
 	               "",
@@ -39,10 +39,10 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          "",
 	          "");
 	I_Method0(const char *, getPath,
-	          Properties::VIRTUAL,
+	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPath,
 	          "",
-	          "Abstract method getPath needs to be implemented ");
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

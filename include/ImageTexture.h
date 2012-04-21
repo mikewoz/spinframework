@@ -52,7 +52,7 @@ namespace osg {
 #include <lo/lo_types.h>
 #include <vector>
 #include <osg/ref_ptr>
-#include "ReferencedStateSet.h"
+#include "Shader.h"
 
 namespace spin
 {
@@ -61,7 +61,7 @@ namespace spin
  * \brief A texture state that holds a static image
  *
  */
-class ImageTexture : public ReferencedStateSet
+class ImageTexture : public Shader
 {
 
 public:

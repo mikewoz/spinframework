@@ -60,7 +60,7 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
+VideoTexture::VideoTexture (SceneManager *s, const char *initID) : Shader(s, initID)
 {
 	classType = "VideoTexture";
 
@@ -93,7 +93,7 @@ VideoTexture::~VideoTexture()
 
 void VideoTexture::debug()
 {
-	ReferencedStateSet::debug();
+	Shader::debug();
 	
 	std::cout << "   ---------" << std::endl;
 	
@@ -376,7 +376,7 @@ void VideoTexture::flipVertical()
 std::vector<lo_message> VideoTexture::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedStateSet::getState();
+	std::vector<lo_message> ret = Shader::getState();
 		
 	lo_message msg;
 	

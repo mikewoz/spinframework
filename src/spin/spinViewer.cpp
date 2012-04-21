@@ -58,6 +58,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "config.h"
 #include "ViewerManipulator.h"
 #include "spinUtil.h"
 #include "spinApp.h"
@@ -66,7 +67,7 @@
 #include "GroupNode.h"
 #include "SceneManager.h"
 #include "ShapeNode.h"
-#include "config.h"
+
 
 extern pthread_mutex_t sceneMutex;
 
@@ -879,6 +880,8 @@ int run(int argc, char **argv)
 	std::string camConfig;
 	std::string sceneID = spin.getSceneID();
 	
+    //osg::setNotifyLevel(osg::INFO);
+    
     // *************************************************************************
 
 	// get arguments:
@@ -936,23 +939,20 @@ int run(int argc, char **argv)
 
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
-    osg::setNotifyLevel(osg::DEBUG_FP);
     //std::cout << "DYLD_LIBRARY_PATH= " << getenv("DYLD_LIBRARY_PATH") << std::endl;
     //std::cout << "OSG_LIBRARY_PATH=  " << getenv("OSG_LIBRARY_PATH") << std::endl;
 	//setenv("OSG_PLUGIN_EXTENSION", ".so", 1);
     osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
     
-    osg::setNotifyLevel(osg::FATAL);
     
 	// *************************************************************************
 	// construct the viewer:
 	// (note, this constructor gets rid of some additional args)
 
 	osgViewer::CompositeViewer viewer = osgViewer::CompositeViewer(arguments);
-    // Aug 19 2010:tmatth: Tried this for multithreading
-	//viewer.setThreadingModel(osgViewer::CompositeViewer::AutomaticSelection);
-	//viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
-	viewer.setThreadingModel(osgViewer::CompositeViewer::CullDrawThreadPerContext);
+    //viewer.setThreadingModel(osgViewer::CompositeViewer::AutomaticSelection);
+	viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
+	//viewer.setThreadingModel(osgViewer::CompositeViewer::CullDrawThreadPerContext);
 
 	viewer.getUsage(*arguments.getApplicationUsage());
 
@@ -1053,8 +1053,7 @@ int run(int argc, char **argv)
             //} 
         }
 
-        /// Thu Aug 19 2010:tmatth:FIXME: this segfaults in multithreaded mode
-        view->setSceneData(spin.sceneManager->worldNode.get());
+        view->setSceneData(spin.sceneManager->rootNode.get());
 
 	    view->addEventHandler(new osgViewer::StatsHandler);
 	    view->addEventHandler(new osgViewer::ThreadingHandler);

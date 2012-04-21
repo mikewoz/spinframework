@@ -31,6 +31,13 @@ BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::ConstraintMode)
 	I_EnumLabel(spin::ConstraintsNode::COLLIDE_THRU);
 END_REFLECTOR
 
+BEGIN_ENUM_REFLECTOR(spin::ConstraintsNode::CollisionMode)
+	I_DeclaringFile("ConstraintsNode.h");
+	I_EnumLabel(spin::ConstraintsNode::POINT);
+	I_EnumLabel(spin::ConstraintsNode::BOUNDING_SPHERE);
+	I_EnumLabel(spin::ConstraintsNode::MESH);
+END_REFLECTOR
+
 BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	I_DeclaringFile("ConstraintsNode.h");
 	I_BaseType(spin::GroupNode);

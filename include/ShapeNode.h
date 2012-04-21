@@ -42,7 +42,7 @@
 #ifndef __ShapeNode_H
 #define __ShapeNode_H
 
-#include "ConstraintsNode.h"
+#include "GroupNode.h"
 
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
@@ -65,7 +65,7 @@ namespace spin
  * "mainTransform" inherited from GroupNode, allowing the shape to be offset
  * from it's parent.
  */
-class ShapeNode : public ConstraintsNode
+class ShapeNode : public GroupNode
 {
 public:
 

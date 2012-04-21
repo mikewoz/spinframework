@@ -45,6 +45,7 @@
 class SceneManager;
 
 #include <osg/Timer>
+#include <osgDB/FileUtils>
 namespace osg {
     class Program;
     class Shader;
@@ -56,8 +57,8 @@ namespace osg {
 #include <vector>
 #include <osg/ref_ptr>
 #include "ReferencedStateSet.h"
+#include "ShaderUtil.h"
 
-typedef std::map<std::string, std::string> ParsedUniforms; // map of name, type
 
 namespace spin
 {
@@ -77,7 +78,7 @@ public:
     virtual void updateCallback();
     virtual void debug();
     
-    void printSource();
+    void printShaderSource();
     
     /**
      * Remove all uniforms from this stateset
@@ -110,8 +111,6 @@ public:
      */
     void registerUniform(const char* name, const char* type, const char* defaultValue);
     
-    ParsedUniforms parseUniformsFromShader(osg::Shader *shader);
-    
     bool loadJitterShader(std::string path);
     void loadGLSLShader(std::string path);
 
@@ -125,20 +124,20 @@ public:
     /**
      * Creates a texture from a path on disk.
      */
-    void setPath (const char* newPath);
-    const char *getPath() const { return path_.c_str(); }
+    void setShader (const char* path);
+    const char *getShader() const { return shaderPath_.c_str(); }
 
     // must reimplement
     virtual std::vector<lo_message> getState() const;
 
     
-private:
+protected:
     
     osg::ref_ptr<osg::Program> programObject_;
     osg::ref_ptr<osg::Shader> vertexObject_;
     osg::ref_ptr<osg::Shader> fragmentObject_;
     
-    std::string path_;
+    std::string shaderPath_;
     
     float updateRate_; // seconds
     

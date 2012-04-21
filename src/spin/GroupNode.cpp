@@ -559,7 +559,7 @@ void GroupNode::setReportMode (globalsReportMode mode)
     }
 }
 
-void GroupNode::setInteractionMode (interactionMode mode)
+void GroupNode::setInteractionMode (InteractionMode mode)
 {
     if (this->_interactionMode != (int)mode)
     {
@@ -946,13 +946,15 @@ void GroupNode::drawManipulator()
         std::cout << "Applying manipulator:" << std::endl;
         std::cout << "  t = " << stringify(t) << std::endl;
         std::cout << "  q = " << stringify(q) << std::endl;
+        std::cout << "  o = " << stringify(Vec3inDegrees(QuatToEuler(q))) << std::endl;
         std::cout << "  s = " << stringify(s) << std::endl;
+        /*
         std::cout << "Previous mainTransform:" << std::endl;
         std::cout << "  t = " << stringify(mainTransform->getPosition()) << std::endl;
         std::cout << "  o = " << stringify(_orientation) << std::endl;
         std::cout << "  q = " << stringify(mainTransform->getAttitude()) << std::endl;
         std::cout << "  s = " << stringify(mainTransform->getScale()) << std::endl;
-        
+        */
         
         // NOTE: we only really need to do this on the server side, since the 
         // viewer will eventually get the update via OSC:
@@ -976,8 +978,8 @@ void GroupNode::drawManipulator()
         
         if (!spinApp::Instance().getContext()->isServer())
         {
-            mainTransform->setPosition(t);
-            mainTransform->setAttitude(q);
+            //mainTransform->setPosition(t);
+            //mainTransform->setAttitude(q);
 
             spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setTranslation", t.x(), t.y(), t.z(), SPIN_ARGS_END);
             spinApp::Instance().NodeMessage(this->getID().c_str(), "sffff", "setOrientationQuat", q.x(), q.y(), q.z(), q.w(), SPIN_ARGS_END);
@@ -986,7 +988,7 @@ void GroupNode::drawManipulator()
             if (1)//!dynamic_cast<osgManipulator::TrackballDragger*>(dragger.get()))
             {
             
-                mainTransform->setScale(s);
+                //mainTransform->setScale(s);
                 spinApp::Instance().NodeMessage(this->getID().c_str(), "sfff", "setScale", s.x(), s.y(), s.z(), SPIN_ARGS_END);
             
             }
@@ -1048,9 +1050,9 @@ void GroupNode::drawManipulator()
         
         // return the manipulatorTransform to an identity matrix, and remove
         // the dragger:
-        manipulatorTransform->setMatrix(osg::Matrix::identity());
         this->removeChild(dragger.get());
         dragger = 0;
+        manipulatorTransform->setMatrix(osg::Matrix::identity());
     }
     
     dragger = createDragger(manipulatorType_, this->getBound().radius(), mainTransform->getPosition(), mainTransform->getScale());
@@ -1074,11 +1076,22 @@ void GroupNode::drawManipulator()
             * osg::Matrix::rotate(mainTransform->getAttitude())
             * osg::Matrix::translate(mainTransform->getPosition());
         */
-        
+        /*
+        osg::Matrix m = osg::Matrix::rotate(mainTransform->getAttitude())
+            * osg::Matrix::scale(mainTransform->getScale())
+            * osg::Matrix::translate(mainTransform->getPosition());
+        */
+        /*
         osg::NodePath np;
         np.push_back(mainTransform);
         osg::Matrix m = osg::computeLocalToWorld(np);
+        */
         
+        osg::Matrix m = osg::Matrix::identity();
+        m.preMultTranslate(mainTransform->getPosition());
+        m.preMultRotate(mainTransform->getAttitude());
+        m.preMultScale(mainTransform->getScale());
+
         
         
         /*
