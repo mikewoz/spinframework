@@ -48,7 +48,6 @@
 #include "config.h"
 #include "spinUtil.h"
 #include "libloUtil.h"
-#include "MediaManager.h"
 
 #include <osg/Referenced>
 #ifndef GL_GLEXT_LEGACY
@@ -293,7 +292,6 @@ public:
     //osg::ref_ptr<osg::Geode> textGeode;
 
     SceneManager *sceneManager;
-    MediaManager *mediaManager;
 
     //bool setScript( const std::string& s, const std::string& params );
     //bool setScript( const char *scriptPath, double freq );  // freq is nb of calls per second

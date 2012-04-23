@@ -78,7 +78,6 @@
 		1C386CBC14BD3DF60065851F /* LightSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9214BD3DF60065851F /* LightSource.cpp */; };
 		1C386CBD14BD3DF60065851F /* Listener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9314BD3DF60065851F /* Listener.cpp */; };
 		1C386CBE14BD3DF60065851F /* MeasurementNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9414BD3DF60065851F /* MeasurementNode.cpp */; };
-		1C386CBF14BD3DF60065851F /* MediaManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9514BD3DF60065851F /* MediaManager.cpp */; };
 		1C386CC014BD3DF60065851F /* Menu3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9614BD3DF60065851F /* Menu3D.cpp */; };
 		1C386CC114BD3DF60065851F /* ModelNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9714BD3DF60065851F /* ModelNode.cpp */; };
 		1C386CC214BD3DF60065851F /* nodeVisitors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9814BD3DF60065851F /* nodeVisitors.cpp */; };
@@ -427,7 +426,6 @@
 		1CA24DB514BE2892007A9C31 /* Listener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8114BE2892007A9C31 /* Listener.h */; };
 		1CA24DB614BE2892007A9C31 /* mainpage.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8214BE2892007A9C31 /* mainpage.h */; };
 		1CA24DB714BE2892007A9C31 /* MeasurementNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8314BE2892007A9C31 /* MeasurementNode.h */; };
-		1CA24DB814BE2892007A9C31 /* MediaManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8414BE2892007A9C31 /* MediaManager.h */; };
 		1CA24DB914BE2892007A9C31 /* Menu3D.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8514BE2892007A9C31 /* Menu3D.h */; };
 		1CA24DBA14BE2892007A9C31 /* ModelNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8614BE2892007A9C31 /* ModelNode.h */; };
 		1CA24DBB14BE2892007A9C31 /* nodeVisitors.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8714BE2892007A9C31 /* nodeVisitors.h */; };
@@ -573,6 +571,15 @@
 		1CCDCCBE15386DC300B9D191 /* TextArea.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CCDCCBD15386DC300B9D191 /* TextArea.h */; };
 		1CCDCCC115386DE900B9D191 /* TextArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCDCCC015386DE900B9D191 /* TextArea.cpp */; };
 		1CCDCCC315389C5D00B9D191 /* TextArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCDCCC215389C5D00B9D191 /* TextArea.cpp */; };
+		1CD9411D1543BBB80075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9411C1543BBB80075A81C /* CollisionShape.cpp */; };
+		1CD941201543BC0A0075A81C /* CollisionShape.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD9411F1543BC0A0075A81C /* CollisionShape.h */; };
+		1CD941251543BD8F0075A81C /* libBulletCollision.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941211543BD8F0075A81C /* libBulletCollision.dylib */; };
+		1CD941261543BD8F0075A81C /* libBulletDynamics.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941221543BD8F0075A81C /* libBulletDynamics.dylib */; };
+		1CD941271543BD8F0075A81C /* libBulletSoftBody.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941231543BD8F0075A81C /* libBulletSoftBody.dylib */; };
+		1CD941281543BD8F0075A81C /* libLinearMath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941241543BD8F0075A81C /* libLinearMath.dylib */; };
+		1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412A1543C77E0075A81C /* CollisionShape.cpp */; };
+		1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD9412C15448AFC0075A81C /* bulletUtil.h */; };
+		1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412E15448B0F0075A81C /* bulletUtil.cpp */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
@@ -934,7 +941,6 @@
 		1C386C9214BD3DF60065851F /* LightSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LightSource.cpp; path = ../src/spin/LightSource.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9314BD3DF60065851F /* Listener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Listener.cpp; path = ../src/spin/Listener.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9414BD3DF60065851F /* MeasurementNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeasurementNode.cpp; path = ../src/spin/MeasurementNode.cpp; sourceTree = SOURCE_ROOT; };
-		1C386C9514BD3DF60065851F /* MediaManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MediaManager.cpp; path = ../src/spin/MediaManager.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9614BD3DF60065851F /* Menu3D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Menu3D.cpp; path = ../src/spin/Menu3D.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9714BD3DF60065851F /* ModelNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ModelNode.cpp; path = ../src/spin/ModelNode.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9814BD3DF60065851F /* nodeVisitors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nodeVisitors.cpp; path = ../src/spin/nodeVisitors.cpp; sourceTree = SOURCE_ROOT; };
@@ -1219,7 +1225,6 @@
 		1CA24D8114BE2892007A9C31 /* Listener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Listener.h; path = ../include/Listener.h; sourceTree = "<group>"; };
 		1CA24D8214BE2892007A9C31 /* mainpage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mainpage.h; path = ../include/mainpage.h; sourceTree = "<group>"; };
 		1CA24D8314BE2892007A9C31 /* MeasurementNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MeasurementNode.h; path = ../include/MeasurementNode.h; sourceTree = "<group>"; };
-		1CA24D8414BE2892007A9C31 /* MediaManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MediaManager.h; path = ../include/MediaManager.h; sourceTree = "<group>"; };
 		1CA24D8514BE2892007A9C31 /* Menu3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Menu3D.h; path = ../include/Menu3D.h; sourceTree = "<group>"; };
 		1CA24D8614BE2892007A9C31 /* ModelNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ModelNode.h; path = ../include/ModelNode.h; sourceTree = "<group>"; };
 		1CA24D8714BE2892007A9C31 /* nodeVisitors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nodeVisitors.h; path = ../include/nodeVisitors.h; sourceTree = "<group>"; };
@@ -1302,6 +1307,15 @@
 		1CCDCCBD15386DC300B9D191 /* TextArea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextArea.h; path = ../include/TextArea.h; sourceTree = "<group>"; };
 		1CCDCCC015386DE900B9D191 /* TextArea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextArea.cpp; path = ../src/spin/TextArea.cpp; sourceTree = "<group>"; };
 		1CCDCCC215389C5D00B9D191 /* TextArea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextArea.cpp; path = ../src/osgWrappers/introspection/TextArea.cpp; sourceTree = "<group>"; };
+		1CD9411C1543BBB80075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CollisionShape.cpp; path = ../src/spin/CollisionShape.cpp; sourceTree = "<group>"; };
+		1CD9411F1543BC0A0075A81C /* CollisionShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CollisionShape.h; path = ../include/CollisionShape.h; sourceTree = "<group>"; };
+		1CD941211543BD8F0075A81C /* libBulletCollision.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletCollision.dylib; path = usr/local/lib/libBulletCollision.dylib; sourceTree = SDKROOT; };
+		1CD941221543BD8F0075A81C /* libBulletDynamics.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletDynamics.dylib; path = usr/local/lib/libBulletDynamics.dylib; sourceTree = SDKROOT; };
+		1CD941231543BD8F0075A81C /* libBulletSoftBody.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletSoftBody.dylib; path = usr/local/lib/libBulletSoftBody.dylib; sourceTree = SDKROOT; };
+		1CD941241543BD8F0075A81C /* libLinearMath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLinearMath.dylib; path = usr/local/lib/libLinearMath.dylib; sourceTree = SDKROOT; };
+		1CD9412A1543C77E0075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CollisionShape.cpp; path = ../src/osgWrappers/introspection/CollisionShape.cpp; sourceTree = "<group>"; };
+		1CD9412C15448AFC0075A81C /* bulletUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bulletUtil.h; path = ../include/bulletUtil.h; sourceTree = "<group>"; };
+		1CD9412E15448B0F0075A81C /* bulletUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bulletUtil.cpp; path = ../src/spin/bulletUtil.cpp; sourceTree = "<group>"; };
 		1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.66.dylib; path = usr/local/lib/libosg.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.66.dylib; path = usr/local/lib/libosgAnimation.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.66.dylib; path = usr/local/lib/libosgDB.66.dylib; sourceTree = SDKROOT; };
@@ -1329,6 +1343,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CD941251543BD8F0075A81C /* libBulletCollision.dylib in Frameworks */,
+				1CD941261543BD8F0075A81C /* libBulletDynamics.dylib in Frameworks */,
+				1CD941271543BD8F0075A81C /* libBulletSoftBody.dylib in Frameworks */,
+				1CD941281543BD8F0075A81C /* libLinearMath.dylib in Frameworks */,
 				1C9C082514CFE988006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C90C16F14CCCD0100C929AE /* libusb-1.0.0.dylib in Frameworks */,
 				1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
@@ -1564,6 +1582,8 @@
 			children = (
 				1C386C8614BD3DF60065851F /* AnimationNode.cpp */,
 				1C386C8714BD3DF60065851F /* AttractorNode.cpp */,
+				1CD9412E15448B0F0075A81C /* bulletUtil.cpp */,
+				1CD9411C1543BBB80075A81C /* CollisionShape.cpp */,
 				1C386C8814BD3DF60065851F /* ConstraintsNode.cpp */,
 				1C386C8914BD3DF60065851F /* Contour.cpp */,
 				1C386C8A14BD3DF60065851F /* DSPNode.cpp */,
@@ -1579,7 +1599,6 @@
 				1C386C9214BD3DF60065851F /* LightSource.cpp */,
 				1C386C9314BD3DF60065851F /* Listener.cpp */,
 				1C386C9414BD3DF60065851F /* MeasurementNode.cpp */,
-				1C386C9514BD3DF60065851F /* MediaManager.cpp */,
 				1C386C9614BD3DF60065851F /* Menu3D.cpp */,
 				1C386C9714BD3DF60065851F /* ModelNode.cpp */,
 				1C386C9814BD3DF60065851F /* nodeVisitors.cpp */,
@@ -1620,6 +1639,8 @@
 			children = (
 				1CA24D7214BE2891007A9C31 /* AnimationNode.h */,
 				1CA24D7314BE2891007A9C31 /* AttractorNode.h */,
+				1CD9412C15448AFC0075A81C /* bulletUtil.h */,
+				1CD9411F1543BC0A0075A81C /* CollisionShape.h */,
 				1CA24D7414BE2891007A9C31 /* config.h */,
 				1CA24D7514BE2891007A9C31 /* ConstraintsNode.h */,
 				1CA24D7614BE2891007A9C31 /* Contour.h */,
@@ -1638,7 +1659,6 @@
 				1CA24D8114BE2892007A9C31 /* Listener.h */,
 				1CA24D8214BE2892007A9C31 /* mainpage.h */,
 				1CA24D8314BE2892007A9C31 /* MeasurementNode.h */,
-				1CA24D8414BE2892007A9C31 /* MediaManager.h */,
 				1CA24D8514BE2892007A9C31 /* Menu3D.h */,
 				1CA24D8614BE2892007A9C31 /* ModelNode.h */,
 				1CA24D8714BE2892007A9C31 /* nodeVisitors.h */,
@@ -1685,6 +1705,7 @@
 			children = (
 				1CA24D3A14BE2875007A9C31 /* AnimationNode.cpp */,
 				1CA24D3B14BE2875007A9C31 /* AttractorNode.cpp */,
+				1CD9412A1543C77E0075A81C /* CollisionShape.cpp */,
 				1CA24D3C14BE2875007A9C31 /* ConstraintsNode.cpp */,
 				1CA24D3D14BE2875007A9C31 /* Contour.cpp */,
 				1CA24D3E14BE2875007A9C31 /* DSPNode.cpp */,
@@ -1961,6 +1982,7 @@
 		1C9EE82B14BE2725000976A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1CD941291543BD9B0075A81C /* bullet */,
 				1C82ACDB152D06180085D8F0 /* osg-3.1.1 */,
 				1C25F53614E59387007F97E5 /* pcl */,
 				1CA24C5114BE57300023DD8B /* osg-2.9.8 */,
@@ -2107,6 +2129,17 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		1CD941291543BD9B0075A81C /* bullet */ = {
+			isa = PBXGroup;
+			children = (
+				1CD941211543BD8F0075A81C /* libBulletCollision.dylib */,
+				1CD941221543BD8F0075A81C /* libBulletDynamics.dylib */,
+				1CD941231543BD8F0075A81C /* libBulletSoftBody.dylib */,
+				1CD941241543BD8F0075A81C /* libLinearMath.dylib */,
+			);
+			name = bullet;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2132,7 +2165,6 @@
 				1CA24DB514BE2892007A9C31 /* Listener.h in Headers */,
 				1CA24DB614BE2892007A9C31 /* mainpage.h in Headers */,
 				1CA24DB714BE2892007A9C31 /* MeasurementNode.h in Headers */,
-				1CA24DB814BE2892007A9C31 /* MediaManager.h in Headers */,
 				1CA24DB914BE2892007A9C31 /* Menu3D.h in Headers */,
 				1CA24DBA14BE2892007A9C31 /* ModelNode.h in Headers */,
 				1CA24DBB14BE2892007A9C31 /* nodeVisitors.h in Headers */,
@@ -2174,6 +2206,8 @@
 				1C1ECB50150E65B000CCBFF3 /* ShaderUtil.h in Headers */,
 				1CF94951151CD40500628872 /* ParticleSystem.h in Headers */,
 				1CCDCCBE15386DC300B9D191 /* TextArea.h in Headers */,
+				1CD941201543BC0A0075A81C /* CollisionShape.h in Headers */,
+				1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2500,7 +2534,6 @@
 				1C386CBC14BD3DF60065851F /* LightSource.cpp in Sources */,
 				1C386CBD14BD3DF60065851F /* Listener.cpp in Sources */,
 				1C386CBE14BD3DF60065851F /* MeasurementNode.cpp in Sources */,
-				1C386CBF14BD3DF60065851F /* MediaManager.cpp in Sources */,
 				1C386CC014BD3DF60065851F /* Menu3D.cpp in Sources */,
 				1C386CC114BD3DF60065851F /* ModelNode.cpp in Sources */,
 				1C386CC214BD3DF60065851F /* nodeVisitors.cpp in Sources */,
@@ -2573,6 +2606,9 @@
 				1CF94956151CD43C00628872 /* ParticleSystem.cpp in Sources */,
 				1CCDCCC115386DE900B9D191 /* TextArea.cpp in Sources */,
 				1CCDCCC315389C5D00B9D191 /* TextArea.cpp in Sources */,
+				1CD9411D1543BBB80075A81C /* CollisionShape.cpp in Sources */,
+				1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */,
+				1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2770,6 +2806,7 @@
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
 					"/usr/local/include/pcl-1.4",
+					/usr/local/include/bullet,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
@@ -2814,6 +2851,7 @@
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
 					"/usr/local/include/pcl-1.4",
+					/usr/local/include/bullet,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,

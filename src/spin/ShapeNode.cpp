@@ -49,7 +49,6 @@
 #include "osgUtil.h"
 #include "ShapeNode.h"
 #include "SceneManager.h"
-#include "MediaManager.h"
 
 #include "ImageTexture.h"
 #include "VideoTexture.h"

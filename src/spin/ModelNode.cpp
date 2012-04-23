@@ -64,7 +64,6 @@
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-#include "MediaManager.h"
 #include "nodeVisitors.h"
 
 #include "ImageTexture.h"

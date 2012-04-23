@@ -272,6 +272,21 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__refreshSubscribers__C5_std_mapT1_std_stringComma_lo_address__R1,
 	          "",
 	          "The refreshSubscribers method results in a publication of all nodelists to the given TCP subscribers. Then, the full node state is published to the subscribers, for ALL nodes. ");
+	I_Method3(void, setGravity, IN, float, x, IN, float, y, IN, float, z,
+	          Properties::NON_VIRTUAL,
+	          __void__setGravity__float__float__float,
+	          "",
+	          "Set the gravity vector for the physics engine (only used by some nodes). ");
+	I_Method1(void, setUpdateRate, IN, float, seconds,
+	          Properties::NON_VIRTUAL,
+	          __void__setUpdateRate__float,
+	          "",
+	          "Sets the update delay for the physics engine (in seconds). The default is 0.02 seconds (ie, 50hz). ");
+	I_Method2(void, detectCollision, IN, bool &, lastColState, IN, btCollisionWorld *, cw,
+	          Properties::NON_VIRTUAL,
+	          __void__detectCollision__bool_R1__btCollisionWorld_P1,
+	          "",
+	          "");
 	I_SimpleProperty(std::vector< std::string >, AllNodeTypes, 
 	                 __std_vectorT1_std_string___getAllNodeTypes, 
 	                 0);
@@ -287,6 +302,9 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_SimpleProperty(spin::spinLog &, Log, 
 	                 0, 
 	                 __void__setLog__spinLog_R1);
+	I_SimpleProperty(float, UpdateRate, 
+	                 0, 
+	                 __void__setUpdateRate__float);
 	I_SimpleProperty(const char *, WorldStateSet, 
 	                 0, 
 	                 __void__setWorldStateSet__C5_char_P1);
@@ -298,8 +316,11 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_PublicMemberProperty(bool, graphicalMode);
 	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);
-	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
+	I_PublicMemberProperty(bool, lastColState);
+	I_PublicMemberProperty(btDynamicsWorld *, dynamicsWorld_);
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)
 
 TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::nodeListType >, spin::nodeMapType)
 
@@ -320,6 +341,8 @@ STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::nodeListType >)
 STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::ReferencedStateSetList >)
 
 STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::nodeListType >)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedNode > >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
 

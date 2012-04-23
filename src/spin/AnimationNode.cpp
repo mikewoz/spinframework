@@ -45,7 +45,6 @@
 #include "AnimationNode.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-#include "MediaManager.h"
 
 namespace spin
 {

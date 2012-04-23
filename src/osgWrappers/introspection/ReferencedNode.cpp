@@ -275,7 +275,6 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_PublicMemberProperty(osg::NodePath, currentNodePath);
 	I_PublicMemberProperty(std::vector< spin::ReferencedNode * >, children);
 	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
-	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_callback)

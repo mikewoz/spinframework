@@ -126,7 +126,6 @@ ReferencedNode::~ReferencedNode()
 void ReferencedNode::registerNode(SceneManager *s)
 {
     sceneManager = s;
-    mediaManager = sceneManager->mediaManager;
 
     // register with OSC parser:
     string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);

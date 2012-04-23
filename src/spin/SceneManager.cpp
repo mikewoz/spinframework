@@ -44,7 +44,6 @@
 #include "DSPNode.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
-#include "MediaManager.h"
 #include "ReferencedNode.h"
 #include "SoundConnection.h"
 #include "spinUtil.h"
@@ -90,9 +89,64 @@
 #include <spatosc/spatosc.h>
 #endif
 
-using namespace cppintrospection;
-
 extern pthread_mutex_t sceneMutex;
+
+
+
+#ifdef WITH_BULLET
+#include <btBulletDynamicsCommon.h>
+#include "bulletUtil.h"
+#include "CollisionShape.h"
+
+extern ContactAddedCallback gContactAddedCallback;
+
+bool btCollisionCallback(btManifoldPoint& cp,
+                        const btCollisionObject* colObj0,
+                        int partId0,
+                        int index0,
+                        const btCollisionObject* colObj1,
+                        int partId1,
+                        int index1)
+{
+    using namespace spin;
+    
+    if (!colObj0->isStaticObject() && colObj0->isActive())
+    {
+        CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
+        CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
+    
+        // world hit point:
+        osg::Vec3 hitPoint = asOsgVec3( cp.getPositionWorldOnA() );
+        
+        // returns a unit vector:
+        osg::Vec3 normal = asOsgVec3( cp.m_normalWorldOnB );
+    
+        // penetration depth
+        float depth = cp.getDistance(); 
+
+        osg::Quat q;
+        q.makeRotate( osg::Vec3( 0, 0, 1 ), normal );
+        
+        //std::cout << "Hit between " << n0->getID() << " and " << n1->getID() << " at: " << stringify(hitPoint) << ", normal: " << stringify(normal) << ", depth="<< depth << std::endl;
+        
+        // TODO: collide message is usually ssfff: collide nodeID incidence(x,y,z). The following provides just the surface normal, which is wrong:
+        BROADCAST(n0, "ssfff", "collide", n1->id->s_name, normal.x(), normal.y(), normal.z());
+        
+        // We need to move the nodes so that they are not colliding any more.
+        // We just move along the normal by depth, and add a little extra for
+        // good measure:
+        osg::Vec3 offset = (normal * depth) + (normal * 0.00001);
+        n0->translate(-offset.x(), -offset.y(), -offset.z());
+        
+    }
+
+    return false;
+}
+
+#endif
+
+
+// -----------------------------------------------------------------------------
 
 namespace spin
 {
@@ -144,7 +198,6 @@ SceneManager::SceneManager(std::string id)
     fpl.push_back( resourcesPath + "/shaders/");
     osgDB::setDataFilePathList( fpl );
 
-    mediaManager = new MediaManager(resourcesPath);
 
     //std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
@@ -276,8 +329,35 @@ SceneManager::SceneManager(std::string id)
     osgDB::Registry::instance()->setOptions(opt);
     */
 
+#ifdef WITH_BULLET
+
+    lastColState = false;
+
+    btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration();
+    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+    btSequentialImpulseConstraintSolver *solver = new btSequentialImpulseConstraintSolver;
+    
+    // TODO: update based on bounds of OSG scene
+    btVector3 worldAabbMin(-100, -100, -100);
+    btVector3 worldAabbMax(100, 100, 100);
+    //const int maxProxies = 32766;
+    const int maxProxies = 1000;
+    btAxisSweep3 *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+
+    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 
+    // register global callback
+    gContactAddedCallback = btCollisionCallback;
+
+    dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
+        
+#endif
+
+
+    // keep a timer for dynamics/physics calculation:
+    dynamicsUpdateRate_; // in seconds
+    lastTick_ = osg::Timer::instance()->tick();
 }
 
 // destructor
@@ -1493,6 +1573,8 @@ return NULL;
 
 void SceneManager::update()
 {
+    osg::Timer_t tick = osg::Timer::instance()->tick();
+    double dt =osg::Timer::instance()->delta_s(lastTick_,tick);
 
 #ifdef WITH_SHARED_VIDEO
     // it's possible that a SharedVideoTexture is in the sceneManager, but not
@@ -1533,6 +1615,21 @@ void SceneManager::update()
 	        }
 	    }
     }
+    
+#ifdef WITH_BULLET
+    if (dt >= dynamicsUpdateRate_)
+    {
+        dynamicsWorld_->stepSimulation(dt);
+        dynamicsWorld_->updateAabbs(); // <- is this necessary?
+        
+        /*
+        collisionWorld_->performDiscreteCollisionDetection();
+        detectCollision( lastColState, collisionWorld_ );
+        */
+    }
+#endif
+
+    lastTick_ = tick;
 }
 
 // save scene as .osg
@@ -2224,6 +2321,66 @@ bool SceneManager::loadXML(const char *s)
     return true;
 }
 
+
+// *****************************************************************************
+void SceneManager::setGravity(float x, float y, float z)
+{
+#ifdef WITH_BULLET
+    dynamicsWorld_->setGravity(btVector3(x, y, z));
+#endif
+}
+
+void SceneManager::setUpdateRate(float seconds)
+{
+    dynamicsUpdateRate_ = seconds;
+}
+
+void detectCollision( bool& lastColState, btCollisionWorld* cw )
+{
+    unsigned int numManifolds = cw->getDispatcher()->getNumManifolds();
+    if( ( numManifolds == 0 ) && (lastColState == true ) )
+    {
+        osg::notify( osg::ALWAYS ) << "No collision." << std::endl;
+        lastColState = false;
+    }
+    else {
+        for( unsigned int i = 0; i < numManifolds; i++ )
+        {
+            btPersistentManifold* contactManifold = cw->getDispatcher()->getManifoldByIndexInternal(i);
+            unsigned int numContacts = contactManifold->getNumContacts();
+            for( unsigned int j=0; j<numContacts; j++ )
+            {
+                btManifoldPoint& pt = contactManifold->getContactPoint( j );
+                if( ( pt.getDistance() <= 0.f ) && ( lastColState == false ) )
+                {
+                    // grab these values for the contact normal arrows:
+                    osg::Vec3 pos = asOsgVec3( pt.getPositionWorldOnA() ); // position of the collision on object A
+                    osg::Vec3 normal = asOsgVec3( pt.m_normalWorldOnB ); // returns a unit vector
+                    float pen = pt.getDistance(); //penetration depth
+
+                    osg::Quat q;
+                    q.makeRotate( osg::Vec3( 0, 0, 1 ), normal );
+
+                    osg::notify( osg::ALWAYS ) << "Collision detected." << std::endl;
+
+                    osg::notify( osg::ALWAYS ) << "\tPosition: " << stringify(pos) << std::endl;
+                    osg::notify( osg::ALWAYS ) << "\tNormal: " << stringify(normal) << std::endl;
+                    osg::notify( osg::ALWAYS ) << "\tPenetration depth: " << pen << std::endl;
+                    //osg::notify( osg::ALWAYS ) << q.w() <<","<< q.x() <<","<< q.y() <<","<< q.z() << std::endl;
+                    lastColState = true;
+                }
+                else if( ( pt.getDistance() > 0.f ) && ( lastColState == true ) )
+                {
+                    osg::notify( osg::ALWAYS ) << "No collision." << std::endl;
+                    lastColState = false;
+                }
+            }
+        }
+    }
+}
+
+
+
 // *****************************************************************************
 // helper methods:
 
@@ -2235,7 +2392,7 @@ bool SceneManager::nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_p
 namespace introspector
 {
 
-int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, ValueList theArgs)
+int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs)
 {
 
     // TODO: we should try to store this globally somewhere, so that we don't do

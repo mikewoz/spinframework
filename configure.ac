@@ -223,11 +223,20 @@ AC_SUBST(POCO_LIBS)
 
 PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
-    AC_MSG_WARN([missing package: libspatosc-0.3])
+    AC_MSG_WARN([missing package: spatosc-0.3])
 else
     AC_DEFINE([WITH_SPATOSC],[1],[Enables linking with the SpatOSC library so that compatible audio renderers can be used for 3D sound spatialization]) AC_MSG_NOTICE([Enabled SpatOSC for audio])
     AC_MSG_NOTICE([SPATOSC_CFLAGS:        ${SPATOSC_CFLAGS}])
     AC_MSG_NOTICE([SPATOSC_LIBS:          ${SPATOSC_LIBS}])
+fi
+
+PKG_CHECK_MODULES(BULLET, bullet, have_bullet=true, have_bullet=false)
+if test "x${have_bullet}" = "xfalse" ; then
+    AC_MSG_WARN([missing package: bullet])
+else
+    AC_DEFINE([WITH_BULLET],[1],[Enables linking with the Bullet physics library to provide collisions and rigid body dynamics]) AC_MSG_NOTICE([Enabled Bullet physics])
+    AC_MSG_NOTICE([BULLET_CFLAGS:        ${BULLET_CFLAGS}])
+    AC_MSG_NOTICE([BULLET_LIBS:          ${BULLET_LIBS}])
 fi
 
 AC_ARG_ENABLE([editor],

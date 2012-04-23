@@ -49,7 +49,6 @@
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-#include "MediaManager.h"
 
 extern pthread_mutex_t sceneMutex;
 
