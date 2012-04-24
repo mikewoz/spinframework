@@ -35,10 +35,7 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHAREDVIDEO_LIBS) \
-    $(SPATOSC_LIBS) \
-    $(BULLET_LIBS)
-
-
+    $(SPATOSC_LIBS) 
     
 #	$(BOOST_THREAD_LIBS) 
 
@@ -46,8 +43,6 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
 libspin_@SPIN_API_VERSION@_la_SOURCES = \
     AnimationNode.cpp \
     AttractorNode.cpp \
-    bulletUtil.cpp \
-    CollisionShape.cpp \
     ConstraintsNode.cpp \
     Contour.cpp \
     DSPNode.cpp \
@@ -96,9 +91,7 @@ libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION
 libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
-    $(top_srcdir)/include/bulletUtil.h \
     $(top_srcdir)/include/config.h \
-    $(top_srcdir)/include/CollisionShape.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
     $(top_srcdir)/include/DSPNode.h \
@@ -171,6 +164,18 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 # 
 # #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
 
+if BULLET
+AM_CPPFLAGS += \
+    $(BULLET_CFLAGS) 
+libspin_@SPIN_API_VERSION@_la_SOURCES += \
+    CollisionShape.cpp\
+    bulletUtil.cpp
+libspin_@SPIN_API_VERSION@_la_LDFLAGS += \
+    $(BULLET_LIBS)
+libspin_@SPIN_API_VERSION@_la_include_HEADERS += \
+    $(top_srcdir)/include/bulletUtil.h \
+    $(top_srcdir)/include/CollisionShape.h
+endif
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
