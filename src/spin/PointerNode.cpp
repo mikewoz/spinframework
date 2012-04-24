@@ -202,7 +202,7 @@ void PointerNode::applyGrab(osg::Matrix mat)
         //osg::Matrix m = osg::Matrix::rotate(mainTransform->getAttitude())
         //    * osg::Matrix::scale(mainTransform->getScale())
         //    * osg::Matrix::translate(mainTransform->getPosition());
-        osg::Matrix m = osg::Matrix::rotate(mainTransform->getAttitude());
+        osg::Matrix m = osg::Matrix::rotate(this->getOrientationQuat());
         
         /*
         osg::Matrix localMotionMatrix = 

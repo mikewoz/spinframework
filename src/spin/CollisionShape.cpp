@@ -46,17 +46,12 @@
 #include "osgUtil.h"
 #include "bulletUtil.h"
 
-
 using namespace std;
 
-//extern pthread_mutex_t sceneMutex;
-//extern ContactAddedCallback gContactAddedCallback;
-
+extern float lastBtHitDepth;
 
 namespace spin
 {
-
-
 
 // -----------------------------------------------------------------------------
 // constructor:
@@ -94,7 +89,10 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, char *initID) : Shap
     body_->setCcdSweptSphereRadius(0.2 * 0.5);
     */
     
-    body_->setCollisionFlags( body_->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+    //Collision objects with a callback still have collision response with dynamic rigid bodies. In order to use collision objects as trigger, you have to disable the collision response.
+    //mBody->setCollisionFlags(mBody->getCollisionFlags() |btCollisionObject::CF_NO_CONTACT_RESPONSE));
+    
+    body_->setCollisionFlags( body_->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_NO_CONTACT_RESPONSE);
     body_->setActivationState( DISABLE_DEACTIVATION );
 
   
@@ -119,17 +117,19 @@ void CollisionShape::callbackUpdate()
     // from the dynamics engine... but only if the dynamics are currently on and
     // the user is not currently manipulating the object.
     
-    
-    if (isDynamic_ && (mass_!=0))
+    if (spinApp::Instance().getContext()->isServer())
     {
-        btScalar m[16];
+        if (isDynamic_ && (mass_!=0))
+        {
+            btScalar m[16];
 
-        btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
-        myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+            btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
+            myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
 
-        osg::Matrixf mat(m);
-        
-        this->setTranslation(mat.getTrans().x(),mat.getTrans().y(),mat.getTrans().z());
+            osg::Matrixf mat(m);
+            
+            this->setTranslation(mat.getTrans().x(),mat.getTrans().y(),mat.getTrans().z());
+        }
     }
 }
 
@@ -151,10 +151,11 @@ void CollisionShape::debug()
     std::cout << "   phys orien: " << stringify(mat.getRotate()) << std::endl;
     std::cout << "   phys scale: " << stringify(mat.getScale()) << std::endl;
 
-    btTransform t = body_->getWorldTransform();
-    
-    std::cout << "   wrld trans: " << stringify(asOsgVec3(t.getOrigin())) << std::endl;
-    std::cout << "   wrld orien: " << stringify(asOsgQuat(t.getRotation())) << std::endl;
+
+    osg::Matrix mat2 = asOsgMatrix(body_->getWorldTransform());
+    std::cout << "   wrld trans: " << stringify(mat2.getTrans()) << std::endl;
+    std::cout << "   wrld orien: " << stringify(mat2.getRotate()) << std::endl;
+    std::cout << "   wrld scale: " << stringify(mat2.getScale()) << std::endl;
 
     
 }
@@ -188,11 +189,20 @@ void CollisionShape::setDynamic(int isDynamic)
 
 void CollisionShape::setTranslation (float x, float y, float z)
 {
+    // wouldn't it be better to apply translation to the physics here, then
+    // check for collisions immediately and only proceed with setTranslation
+    // if there wasn't a collision?
+    // Would we use btCollisionWorld::ContactResultCallback for this?
+    // http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Callbacks_and_Triggers
+
+
+    lastBtHitDepth = 0;
+    
     ShapeNode::setTranslation(x,y,z);
     
     // TODO: use global matrix
     
-    btVector3 pos(mainTransform->getPosition().x(), mainTransform->getPosition().y(), mainTransform->getPosition().z());
+    btVector3 pos = asBtVector3(this->getTranslation());
         
     currentTransform_.setOrigin(pos);
     
@@ -206,7 +216,7 @@ void CollisionShape::setOrientation(float pitch, float roll, float yaw)
     
     // TODO: use global matrix
     
-    btQuaternion quat(mainTransform->getAttitude().x(), mainTransform->getAttitude().y(), mainTransform->getAttitude().z(), mainTransform->getAttitude().w());
+    btQuaternion quat = asBtQuaternion(this->getOrientationQuat());
     currentTransform_.setRotation(quat);
     
     //body_->setWorldTransform(currentTransform_);
@@ -220,7 +230,23 @@ void CollisionShape::setScale(float x, float y, float z)
     // TODO: use global matrix
     
     //body_->setWorldTransform(currentTransform_);
-    collisionObj_->setLocalScaling(asBtVector3(mainTransform->getScale()));
+    collisionObj_->setLocalScaling(asBtVector3(this->getScale()));
+}
+
+void CollisionShape::setManipulatorMatrix
+    (float a00, float a01, float a02, float a03,
+     float a10, float a11, float a12, float a13,
+     float a20, float a21, float a22, float a23,
+     float a30, float a31, float a32, float a33)
+{
+    ShapeNode::setManipulatorMatrix(a00,a01,a02,a03,
+                                    a10,a11,a12,a13,
+                                    a20,a21,a22,a23,
+                                    a30,a31,a32,a33);
+                                
+    currentTransform_ = asBtTransform(mainTransform->getMatrix());
+    body_->getMotionState()->setWorldTransform(currentTransform_);
+    collisionObj_->setLocalScaling(asBtVector3(this->getScale()));
 }
 
 // -----------------------------------------------------------------------------

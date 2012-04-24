@@ -269,9 +269,9 @@ void AnimationNode::storeCurrentPosition(double timestamp)
     );
     */
 
-    osg::Vec3 myPos = mainTransform->getPosition();
-    osg::Quat myRot = mainTransform->getAttitude();
-    osg::Vec3 myScl = mainTransform->getScale();
+    osg::Vec3 myPos = this->getTranslation();
+    osg::Quat myRot = this->getOrientationQuat();
+    osg::Vec3 myScl = this->getScale();
     controlPoint( timestamp, myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z(), myRot.w(), myScl.x(), myScl.y(), myScl.z() );
 }
 

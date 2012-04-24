@@ -127,7 +127,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setOrientationMode__OrientationMode,
 	          "",
-	          "");
+	          "Set the OrientationMode of the node, which will be applied after every transformation. ");
 	I_Method0(int, getOrientationMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getOrientationMode,
@@ -199,7 +199,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          "",
 	          "");
 	I_Method16(void, setManipulatorMatrix, IN, float, a00, IN, float, a01, IN, float, a02, IN, float, a03, IN, float, a10, IN, float, a11, IN, float, a12, IN, float, a13, IN, float, a20, IN, float, a21, IN, float, a22, IN, float, a23, IN, float, a30, IN, float, a31, IN, float, a32, IN, float, a33,
-	           Properties::NON_VIRTUAL,
+	           Properties::VIRTUAL,
 	           __void__setManipulatorMatrix__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float,
 	           "",
 	           "");
@@ -283,6 +283,23 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __osg_MatrixTransform_P1__getManipulatorTransform,
 	          "",
 	          "");
+	I_Method0(osg::MatrixTransform *, getTransform,
+	          Properties::NON_VIRTUAL,
+	          __osg_MatrixTransform_P1__getTransform,
+	          "",
+	          "");
+	I_ProtectedMethod0(void, updateDraggerMatrix,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__updateDraggerMatrix,
+	                   "",
+	                   "");
+	I_ProtectedMethod0(void, updateMatrix,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__updateMatrix,
+	                   "",
+	                   "");
 	I_ProtectedMethod0(void, drawManipulator,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -327,6 +344,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
+	                 0);
+	I_SimpleProperty(osg::MatrixTransform *, Transform, 
+	                 __osg_MatrixTransform_P1__getTransform, 
 	                 0);
 	I_SimpleProperty(osg::Vec3, Translation, 
 	                 __osg_Vec3__getTranslation, 

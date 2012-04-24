@@ -7,6 +7,7 @@ AM_CPPFLAGS = \
     $(OSG_CFLAGS) \
     $(SHAREDVIDEO_CFLAGS) \
     $(SPATOSC_CFLAGS) \
+    $(BULLET_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/tinyxml
 
@@ -34,40 +35,45 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHAREDVIDEO_LIBS) \
-    $(SPATOSC_LIBS)
+    $(SPATOSC_LIBS) \
+    $(BULLET_LIBS)
+
 
     
 #	$(BOOST_THREAD_LIBS) 
 
 # please keep those in alphabetical order:
 libspin_@SPIN_API_VERSION@_la_SOURCES = \
+    AnimationNode.cpp \
     AttractorNode.cpp \
+    bulletUtil.cpp \
+    CollisionShape.cpp \
     ConstraintsNode.cpp \
+    Contour.cpp \
     DSPNode.cpp \
     EventHandler.cpp \
     Fog.cpp \
     GeometryNode.cpp \
     GridNode.cpp \
-    ReferencedNode.cpp \
-    SceneManager.cpp \
-    UserNode.cpp \
-    osgUtil.cpp \
-    spinApp.cpp \
-    AnimationNode.cpp \
-    Contour.cpp \
     GroupNode.cpp \
     ImageTexture.cpp \
+    introspect_helpers.cpp \
+    libloUtil.cpp \
     LightSource.cpp \
     Listener.cpp \
     MeasurementNode.cpp \
     MediaManager.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    nodeVisitors.cpp \
+    osgUtil.cpp \
     ParticleSystem.cpp \
     PointerNode.cpp \
     RayNode.cpp \
+    ReferencedNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    SceneManager.cpp \
     Shader.cpp \
     ShaderUtil.cpp \
     ShapeNode.cpp \
@@ -75,23 +81,24 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     SoundConnection.cpp \
     SoundNode.cpp \
     SoundSpace.cpp \
-    SwitchNode.cpp \
-    TextNode.cpp \
-    VideoTexture.cpp \
-    ViewerManipulator.cpp \
-    libloUtil.cpp \
-    nodeVisitors.cpp \
+    spinApp.cpp \
     spinBaseContext.cpp \
     spinClientContext.cpp \
     spinServerContext.cpp \
     spinUtil.cpp \
-    introspect_helpers.cpp
+    SwitchNode.cpp \
+    TextNode.cpp \
+    UserNode.cpp \
+    VideoTexture.cpp \
+    ViewerManipulator.cpp
 
 libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
 libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
+    $(top_srcdir)/include/bulletUtil.h \
     $(top_srcdir)/include/config.h \
+    $(top_srcdir)/include/CollisionShape.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
     $(top_srcdir)/include/DSPNode.h \

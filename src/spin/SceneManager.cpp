@@ -100,6 +100,10 @@ extern pthread_mutex_t sceneMutex;
 
 extern ContactAddedCallback gContactAddedCallback;
 
+// NOTE: this callback is only added on the server side!
+
+float lastBtHitDepth = 0.0;
+
 bool btCollisionCallback(btManifoldPoint& cp,
                         const btCollisionObject* colObj0,
                         int partId0,
@@ -116,30 +120,36 @@ bool btCollisionCallback(btManifoldPoint& cp,
         CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
     
         // world hit point:
-        osg::Vec3 hitPoint = asOsgVec3( cp.getPositionWorldOnA() );
+        osg::Vec3 hitPoint0 = asOsgVec3( cp.getPositionWorldOnA() );
+        osg::Vec3 hitPoint1 = asOsgVec3( cp.getPositionWorldOnB() );
         
         // returns a unit vector:
         osg::Vec3 normal = asOsgVec3( cp.m_normalWorldOnB );
     
         // penetration depth
         float depth = cp.getDistance(); 
+        
 
-        osg::Quat q;
-        q.makeRotate( osg::Vec3( 0, 0, 1 ), normal );
+        if (depth != lastBtHitDepth)
+        {
+            //std::cout << "Hit between " << n0->getID() << " and " << n1->getID() << " at: pos0) " << stringify(hitPoint0) << " pos1)" << stringify(hitPoint1) << ", normal: " << stringify(normal) << ", depth="<< depth << std::endl;
+            
+            // TODO: collide message is usually ssfff: collide nodeID incidence(x,y,z). The following provides just the surface normal, which is wrong:
+            BROADCAST(n0, "ssfff", "collide", n1->id->s_name, normal.x(), normal.y(), normal.z());
+            
+            // We need to move the nodes so that they are not colliding any more.
+            // We just move along the normal by depth, and add a little extra for
+            // good measure:
+            osg::Vec3 offset = (normal * -depth);// + (normal * 0.00001);
+            n0->translate(offset.x(), offset.y(), offset.z());
+        } //else std::cout << "skipping duplicate hit" << std::endl;
         
-        //std::cout << "Hit between " << n0->getID() << " and " << n1->getID() << " at: " << stringify(hitPoint) << ", normal: " << stringify(normal) << ", depth="<< depth << std::endl;
-        
-        // TODO: collide message is usually ssfff: collide nodeID incidence(x,y,z). The following provides just the surface normal, which is wrong:
-        BROADCAST(n0, "ssfff", "collide", n1->id->s_name, normal.x(), normal.y(), normal.z());
-        
-        // We need to move the nodes so that they are not colliding any more.
-        // We just move along the normal by depth, and add a little extra for
-        // good measure:
-        osg::Vec3 offset = (normal * depth) + (normal * 0.00001);
-        n0->translate(-offset.x(), -offset.y(), -offset.z());
-        
+        lastBtHitDepth = depth;
     }
 
+    // Returns false, telling Bullet that we did not modify the contact point
+    // properties at all. We would return true if we changed friction or
+    // something
     return false;
 }
 
@@ -348,8 +358,11 @@ SceneManager::SceneManager(std::string id)
 
 
     // register global callback
-    gContactAddedCallback = btCollisionCallback;
-
+    if (spinApp::Instance().getContext()->isServer())
+    {
+        gContactAddedCallback = btCollisionCallback;
+    }
+    
     dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
         
 #endif
@@ -1619,13 +1632,18 @@ void SceneManager::update()
 #ifdef WITH_BULLET
     if (dt >= dynamicsUpdateRate_)
     {
-        dynamicsWorld_->stepSimulation(dt);
-        dynamicsWorld_->updateAabbs(); // <- is this necessary?
-        
-        /*
-        collisionWorld_->performDiscreteCollisionDetection();
-        detectCollision( lastColState, collisionWorld_ );
-        */
+        // only do on server side?
+        if (spinApp::Instance().getContext()->isServer())
+        {
+            //dynamicsWorld_->performDiscreteCollisionDetection();
+            dynamicsWorld_->stepSimulation(dt);
+            dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            
+            /*
+            collisionWorld_->performDiscreteCollisionDetection();
+            detectCollision( lastColState, collisionWorld_ );
+            */
+        }
     }
 #endif
 

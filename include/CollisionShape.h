@@ -81,6 +81,13 @@ public:
     virtual void setTranslation (float x, float y, float z);
     virtual void setScale (float x, float y, float z);
 
+    virtual void setManipulatorMatrix
+        (float a00, float a01, float a02, float a03,
+         float a10, float a11, float a12, float a13,
+         float a20, float a21, float a22, float a23,
+         float a30, float a31, float a32, float a33);
+
+
     virtual std::vector<lo_message> getState() const;
 
 protected:

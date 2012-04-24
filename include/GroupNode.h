@@ -143,12 +143,15 @@ public:
      */
     void setClipping(float x, float y, float z);
     
-    
     /**
      * The local translation offset for this node with respect to it's parent
      */
     virtual void setTranslation (float x, float y, float z);
 
+    /**
+     * Set the OrientationMode of the node, which will be applied after every
+     * transformation.
+     */
     void setOrientationMode(OrientationMode m);
     int getOrientationMode() const { return (int)orientationMode_; };
 
@@ -223,19 +226,20 @@ public:
     virtual void setManipulator(const char *manipulatorType);
     const char* getManipulator() const { return manipulatorType_.c_str(); }
 
-    void setManipulatorMatrix(float a00, float a01, float a02, float a03,
-                              float a10, float a11, float a12, float a13,
-                              float a20, float a21, float a22, float a23,
-                              float a30, float a31, float a32, float a33);
+    virtual void setManipulatorMatrix
+        (float a00, float a01, float a02, float a03,
+         float a10, float a11, float a12, float a13,
+         float a20, float a21, float a22, float a23,
+         float a30, float a31, float a32, float a33);
 
     
     int getReportMode() const { return (int) _reportMode; };
     int getInteractionMode() const { return (int) _interactionMode; };
     osg::Vec3 getClipping() const { return _clipping; };
-    osg::Vec3 getTranslation() const { return mainTransform->getPosition(); };
+    osg::Vec3 getTranslation() const { return mainTransform->getMatrix().getTrans(); };
     osg::Vec3 getOrientation() const { return _orientation; };
-    osg::Quat getOrientationQuat() const { return mainTransform->getAttitude(); };
-    osg::Vec3 getScale() const { return mainTransform->getScale(); };
+    osg::Quat getOrientationQuat() const { return mainTransform->getMatrix().getRotate(); };
+    osg::Vec3 getScale() const { return mainTransform->getMatrix().getScale(); };
     osg::Vec3 getVelocity() const { return _velocity; };
     int getVelocityMode() const { return (int) _velocityMode; };
     float getDamping() const { return _damping; };
@@ -274,14 +278,18 @@ public:
 
 
     osg::MatrixTransform *getManipulatorTransform() { return manipulatorTransform.get(); }
+    osg::MatrixTransform *getTransform() { return mainTransform.get(); }
 
 protected:
 
+    void updateDraggerMatrix();
+    void updateMatrix();
     void drawManipulator();
 
     osg::ref_ptr<UserNode> owner;
 
-    osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
+    //osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
+    osg::ref_ptr<osg::MatrixTransform> mainTransform;
     osg::ref_ptr<osg::MatrixTransform> manipulatorTransform;
     
     osg::ref_ptr<osgManipulator::Dragger> dragger;
@@ -301,6 +309,9 @@ protected:
     enum OrientationMode orientationMode_;
     t_symbol* orientationTarget_;
     osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
+    osg::Vec3 translation_;
+    osg::Vec3 scale_;
+    osg::Quat quat_;
 
     osg::Vec3 _velocity;
     velocityMode _velocityMode;
@@ -313,6 +324,7 @@ protected:
     
 private:
 
+    
     osg::Timer_t lastTick;
 
 };

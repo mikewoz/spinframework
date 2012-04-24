@@ -78,7 +78,6 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	renderBin = 11;
 	lightingEnabled = true;
     
-    
     // quick shader test:
     if (0)
     {
@@ -93,11 +92,9 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
         prog->addShader ( vshader );
         prog->addShader ( fshader );
         geode->getOrCreateStateSet()->setAttributeAndModes( prog, osg::StateAttribute::ON );
-
     }
-    //
+    // end shader test
     
-
     drawShape();
 }
 

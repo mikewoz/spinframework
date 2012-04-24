@@ -74,6 +74,11 @@ osg::Quat spin::asOsgQuat( const btQuaternion& q)
     return osg::Quat( q.getAngle(), spin::asOsgVec3(q.getAxis()) );
 }
 
+btQuaternion spin::asBtQuaternion( const osg::Quat& q)
+{
+    return btQuaternion( q.x(), q.y(), q.z(), q.w() );
+}
+
 btVector4 spin::asBtVector4( const osg::Vec4& v )
 {
     return btVector4( v.x(), v.y(), v.z(), v.w() );

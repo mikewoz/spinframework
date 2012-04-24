@@ -75,6 +75,7 @@ btVector3 asBtVector3( const osg::Vec3& v );
 osg::Vec4 asOsgVec4( const btVector3& v, const double w );
 osg::Vec4 asOsgVec4( const btVector4& v );
 osg::Quat asOsgQuat( const btQuaternion& q); // mikewoz
+btQuaternion asBtQuaternion( const osg::Quat& q); // mikewoz
 btVector4 asBtVector4( const osg::Vec4& v );
 
 /**@{*/
