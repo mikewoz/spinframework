@@ -32,7 +32,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	          Properties::VIRTUAL,
 	          __void__updateNodePath,
 	          "",
-	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in this subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto the currentNodePath. ");
+	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs and can also change their attachmentNode so that children are attached anywhere in this subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto the currentNodePath. ");
 	I_Method0(void, callbackUpdate,
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate,
@@ -42,112 +42,122 @@ BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	          Properties::NON_VIRTUAL,
 	          __void__updateTransforms,
 	          "",
-	          "");
-	I_Method1(osg::Quat, getOrientation, IN, int, index,
+	          "Updates the contour with respect to any new parameters recently set. This function is called automatically by most of the other functions, such as setCurrentIndex, add, etc. ");
+	I_Method1(osg::Quat, getOrientation, IN, float, index,
 	          Properties::NON_VIRTUAL,
-	          __osg_Quat__getOrientation__int,
+	          __osg_Quat__getOrientation__float,
 	          "",
-	          "");
+	          "This function gets the orientation of a given index into the soundLine. Note that the orientation along a line has only 2 degrees of freedom (roll is not defined). So we specify the Y_AXIS. ");
 	I_Method1(osg::Vec3, getTranslation, IN, float, index,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getTranslation__float,
 	          "",
-	          "");
-	I_Method1(void, setCurrentIndex, IN, float, newValue,
+	          "We allow the index to be a float, so position can be interpolated between two indices: ");
+	I_Method1(void, setIndex, IN, float, newValue,
 	          Properties::NON_VIRTUAL,
-	          __void__setCurrentIndex__float,
+	          __void__setIndex__float,
 	          "",
-	          "");
+	          "Sets the \"index\" vertex where child nodes will be attached to the contour This is handled using a value in the range 0 to 1. ");
 	I_Method0(void, prev,
 	          Properties::NON_VIRTUAL,
 	          __void__prev,
 	          "",
-	          "");
+	          "Sets the index to the vertex previous to the current index in the contour ");
 	I_Method0(void, next,
 	          Properties::NON_VIRTUAL,
 	          __void__next,
 	          "",
-	          "");
+	          "Sets the index to the vertex after the current index in the contour. ");
 	I_Method0(void, reset,
 	          Properties::NON_VIRTUAL,
 	          __void__reset,
 	          "",
-	          "");
+	          "Clears all information from the contour, leaving an empty node. ");
 	I_Method3(void, add, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__add__float__float__float,
 	          "",
-	          "");
+	          "Add a vertex to the front of the contour the (vectorArray). If the list of vectors reaches maximum size, the final vector is removed from the end of the contour. Please note that the index vertex (where children nodes are attached) remains in the same position on the contour even as the vertices change because this value is set as a proportion of the vertex length (a 0,1 range value). ");
 	I_Method1(void, setMaxVertices, IN, int, newValue,
 	          Properties::NON_VIRTUAL,
 	          __void__setMaxVertices__int,
 	          "",
-	          "");
+	          "Sets the maximum number of vertices on the contour. ");
 	I_Method1(void, setTrackingMode, IN, int, newValue,
 	          Properties::NON_VIRTUAL,
 	          __void__setTrackingMode__int,
 	          "",
-	          "");
+	          "Sets the mode of the contour according to the trackingMode enumerator. Determines whether children node will rotate as they move along the contour (FULL6D0F) or move along the contour without rotation (POSITION). ");
 	I_Method1(void, setVisible, IN, int, newValue,
 	          Properties::NON_VIRTUAL,
 	          __void__setVisible__int,
 	          "",
-	          "");
+	          "Sets whether the contour is visible or not. ");
 	I_Method1(void, setThickness, IN, float, newValue,
 	          Properties::NON_VIRTUAL,
 	          __void__setThickness__float,
 	          "",
-	          "");
+	          "Sets the thickness of the contour. ");
 	I_Method1(void, setLineType, IN, int, newValue,
 	          Properties::NON_VIRTUAL,
 	          __void__setLineType__int,
 	          "",
-	          "");
+	          "Sets the contour type according to the contourType enumerator. Determines whether the connections between vertices on the contour will be drawn as line segments (THIN), boxes (CUBIC), or circles (CYLINDRICAL). ");
 	I_Method4(void, setColor, IN, float, newR, IN, float, newG, IN, float, newB, IN, float, newA,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
 	          "",
-	          "");
+	          "Sets the color of the contour in RGBA value. ");
 	I_Method0(float, getCurrentIndex,
 	          Properties::NON_VIRTUAL,
 	          __float__getCurrentIndex,
 	          "",
-	          "");
+	          "Returns a float indicating the current index vertex for the contour. A float will interpolate a point between vertices to act as the index. ");
 	I_Method0(int, getMaxVertices,
 	          Properties::NON_VIRTUAL,
 	          __int__getMaxVertices,
 	          "",
-	          "");
+	          "Returns the maximum number of vertices currently permitted for the contour. ");
 	I_Method0(int, getTrackingMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getTrackingMode,
 	          "",
-	          "");
+	          "Returns an integer representing the tracking mode of the contour (whether children moving along the contour rotate or not). ");
 	I_Method0(int, getVisible,
 	          Properties::NON_VIRTUAL,
 	          __int__getVisible,
 	          "",
-	          "");
+	          "Returns an int representing whether the contour is visible or not. ");
 	I_Method0(float, getThickness,
 	          Properties::NON_VIRTUAL,
 	          __float__getThickness,
 	          "",
-	          "");
+	          "Returns a float representing the thickness value of the contour. ");
 	I_Method0(float, getLineType,
 	          Properties::NON_VIRTUAL,
 	          __float__getLineType,
 	          "",
-	          "");
+	          "Returns an integer representing the contour type according to the contourType enum. ");
 	I_Method0(osg::Vec4, getColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getColor,
 	          "",
-	          "");
+	          "Returns a Vector4 representing the RGBA value of the contour. ");
+	I_Method1(void, setLighting, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __void__setLighting__int,
+	          "",
+	          "Set whether the contour is influenced by lighting ");
+	I_Method0(int, getLighting,
+	          Properties::NON_VIRTUAL,
+	          __int__getLighting,
+	          "",
+	          "Returns a boolean indicating whether the contour is affected by lighting. ");
 	I_Method0(void, draw,
 	          Properties::NON_VIRTUAL,
 	          __void__draw,
 	          "",
-	          "");
+	          "Draws the contour according to the parameters set, i.e. contour type, color, number of vertices. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -158,7 +168,13 @@ BEGIN_OBJECT_REFLECTOR(spin::Contour)
 	                 0);
 	I_SimpleProperty(float, CurrentIndex, 
 	                 __float__getCurrentIndex, 
-	                 __void__setCurrentIndex__float);
+	                 0);
+	I_SimpleProperty(float, Index, 
+	                 0, 
+	                 __void__setIndex__float);
+	I_SimpleProperty(int, Lighting, 
+	                 __int__getLighting, 
+	                 __void__setLighting__int);
 	I_SimpleProperty(float, LineType, 
 	                 __float__getLineType, 
 	                 0);

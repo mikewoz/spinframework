@@ -56,11 +56,13 @@ namespace spin
  *
  * The following items are measured:
  *
- * distance        the distance to the target
- * direction    the absolute direction (angle) on the XY plane
- * incidence    the angle difference between the measurement node's current orientation to that which would point at the target
- * eulers        the angle difference separated into pitch, roll, and yaw components (NOTE: possible inaccuracies due to gimbal lock)
- * quaternion    the rotation required to point at the target
+ * distance		the distance to the target
+ * direction	the absolute direction (angle) on the XY plane
+ * incidence	the angle difference between the measurement node's current
+ * 				orientation to that which would point at the target
+ * eulers		the angle difference separated into pitch, roll, and yaw
+ * 				components (NOTE: possible inaccuracies due to gimbal lock)
+ * quaternion	the rotation required to point at the target
  *
  * Other notes:
  *
@@ -68,6 +70,7 @@ namespace spin
  * - the reportMode must be set to enable some measurements
  *
  */
+
 class MeasurementNode : public ReferencedNode
 {
 
@@ -79,14 +82,16 @@ public:
     /**
      * Level of reporting that is sent (see setReportingLevel for more details)
      *
-     * REPORT_NONE        sends no measurements
-     *
-     * REPORT_BASIC        sends distance, absolute direction, and incidence of orientation
-     *
-     * REPORT_ANGLES    sends above info, plus rotation information to target with respect to the MeasurementNode's current position and orientation (available as either euler angles or quaternion)
-     *
      */
-    enum reportMode { REPORT_NONE, REPORT_BASIC, REPORT_ANGLES };
+    enum reportMode { REPORT_NONE,	/*!< sends no measurements */
+					REPORT_BASIC, 	/*!< sends distance, absolute direction and
+									* incidence of orientation */
+					REPORT_ANGLES	/*!< sends the same as REPORT_BASIC, plus
+									* rotation information to target with
+									* respect to the MeasurementNode's current
+									* position and orientation (available as
+									* either euler angles or quaternion) */
+					};
 
     /**
      * The update callback for MeasurementNode checks to see if the target's or
@@ -113,8 +118,17 @@ public:
      */
     void setReportingLevel (reportMode level);
     
+    /**
+     * Returns the name of the target node (the node being measured.
+     */
 
     const char* getTarget() const { return this->targetName_->s_name; }
+
+    /**
+     * Returns an integer representing the level of reporting as set in the
+     * ReportMode enum.
+     */
+
     int getReportingLevel() const { return (int) this->reportingLevel_; }
     
     

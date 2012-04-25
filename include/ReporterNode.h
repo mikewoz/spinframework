@@ -118,6 +118,11 @@ public:
      * This enables or disables a particular reporting type
      */
     void setReporting(const char *type, bool enabled);
+
+    /**
+     * This returns the reporting type that is currently set.
+     */
+
     int getReporting(const char *type) const;
 
     /**
@@ -125,6 +130,11 @@ public:
      * necessary, so there is no constant reporting mode.
      */
     void setMaxRate(float hz);
+
+    /**
+     * This returns the current set reporting rate in Hz.
+     */
+
     float getMaxRate() const { return maxRate_; }
     
     /**

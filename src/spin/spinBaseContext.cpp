@@ -169,21 +169,28 @@ void spinBaseContext::debugPrint()
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
     std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+    std::cout << "  SPIN version:\t\t\t" << PACKAGE_VERSION << "" << std::endl;
     std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC
     std::cout << "  SpatOSC version:\t\t"<< SPATOSC_VERSION << " (enabled=" << spinApp::Instance().hasAudioRenderer << ")" << std::endl;
 #else
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
+
+#ifdef WITH_SHARED_VIDEO
+    std::cout << "  sharedvideo enabled?\t\tYES" << std::endl;
+#else
+    std::cout << "  sharedvideo enabled?\t\tNO" << std::endl;
+#endif
     std::cout << "  My IP address:\t\t" << getMyIPaddress() << std::endl;
     if (doDiscovery_)
     {
-        std::cout << "  Auto discovery address:\t" << lo_address_get_url(lo_infoAddr);
+        std::cout << "  Auto discovery addr:\t\t" << lo_address_get_url(lo_infoAddr);
         if (lo_address_get_ttl(lo_infoAddr)>0)
             std::cout << " TTL=" << lo_address_get_ttl(lo_infoAddr);
         std::cout << std::endl;
     } else {
-        std::cout << "  Auto discovery address:\tOFF" << std::endl;
+        std::cout << "  Auto discovery addr:\tOFF" << std::endl;
     }
     std::vector<lo_address>::iterator addrIter;
     for (addrIter = lo_txAddrs_.begin(); addrIter != lo_txAddrs_.end(); ++addrIter)
@@ -206,6 +213,7 @@ void spinBaseContext::addCommandLineOptions(osg::ArgumentParser *arguments)
     arguments->getApplicationUsage()->addCommandLineOption("--version", "Display the version number and exit.");
     arguments->getApplicationUsage()->addCommandLineOption("--scene-id <id>", "Specify the id of the SPIN scene (Default: default)");
     arguments->getApplicationUsage()->addCommandLineOption("--disable-discovery", "Disables the multicast discovery service");
+    arguments->getApplicationUsage()->addCommandLineOption("--spatosc <translator> <URL>", "Enables SPIN's internal SpatOSC scene. Example: --spatosc BasicTranslator osc.tcp://localhost:18033");
 
     // TODO: add discovery addr <host> <port> (defaults is MULTICAST_GROUP:INFO_UDP_PORT)
     // for a client, this would be --recv-udp-discovery <host> <port>
@@ -702,6 +710,18 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
     {   // if an eventScript was hooked to theMethod, do not execute theMethod.  functionality taken over by script
         // invoke the method on the node, and if it doesn't work, then just forward
         // the message:
+        
+        if (0) // debug print
+        {
+            std::cout << "spinBaseContext got node message for: " << s->s_name << " method: " << theMethod << " args:";
+            for (i = 0; i < argc; i++)
+            {
+                std::cout << " ";
+                lo_arg_pp((lo_type)types[i], argv[i]);
+            }
+            std::cout << std::endl;
+        }
+        
         if (! introspector::invokeMethod(classInstance, classType, theMethod, theArgs))
         {
             //std::cout << "Ignoring method '" << theMethod << "' for [" << s->s_name << "], but forwarding message anyway..." << std::endl;
@@ -733,6 +753,17 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg **argv, int argc,
         void * /*data*/, void * /*user_data*/)
 {
+    if (0) // debug print
+    {
+        std::cout << "spinBaseContext got scene message: " << path << " args:";
+        for (unsigned int i=0; i<argc; i++)
+        {
+            std::cout << " ";
+            lo_arg_pp((lo_type)types[i], argv[i]);
+        }
+        std::cout << std::endl;
+    }
+
     spinApp &spin = spinApp::Instance();
     SceneManager *sceneManager = spin.sceneManager;
 
@@ -797,6 +828,16 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         {
             spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
             
+            // In the case of a client, we also need to check if the current 
+            // userNode is actually attached. The deleteNode / clear / whatever
+            // may have detached it from the scenegraph:
+            if (!sceneManager->worldNode->containsNode(spin.userNode.get()))
+            {
+                std::cout << "calling attach on userNode (newparent=" << spin.userNode->newParent->s_name << std::endl;
+                spin.userNode->newParent = WORLD_SYMBOL;
+                spin.userNode->attach();
+            }
+            
             // if the server sends a userRefresh, it's possible that it has
             // only recently come online, so we need to re-subsrcibe:
             spinClientContext *clientContext = dynamic_cast<spinClientContext*>(spin.getContext());
@@ -847,10 +888,31 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->createStateSet((char*) argv[1], (char*) argv[2]);
     else if ((theMethod == "createStateSet") && (argc==2))
         sceneManager->createStateSet((char*) argv[1]);
+    else if ((theMethod == "setWorldStateSet") && (argc==2))
+        sceneManager->setWorldStateSet((char*) argv[1]);
     else if ((theMethod == "deleteNode") && (argc==2))
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "setGravity") && (argc==4))
+    {
+        float x = (float) lo_hires_val((lo_type)types[1], argv[1]);
+        float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
+        float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
+        sceneManager->setGravity(x,y,z);
+    }
+    else if ((theMethod == "setUpdateRate") && (argc==2))
+        sceneManager->setUpdateRate((float)lo_hires_val((lo_type)types[1], argv[1]));
+    else if ((theMethod == "setNotifyLevel") && (argc==2))
+    {
+        int lvl = (int) lo_hires_val((lo_type)types[1], argv[1]);
+        if ((lvl>=0) && (lvl<=6))
+        {
+            osg::setNotifyLevel((osg::NotifySeverity)lvl);
+            std::cout << "setNotifyLevel " << osg::getNotifyLevel() << std::endl;
+        }
+        SCENE_MSG("si", "setNotifyLevel", (int)osg::getNotifyLevel());
+    }
     else if ((theMethod == "optimize") && (argc==2))
     {
         osgUtil::Optimizer optimizer;

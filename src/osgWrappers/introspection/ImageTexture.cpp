@@ -23,7 +23,7 @@
 
 BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	I_DeclaringFile("ImageTexture.h");
-	I_BaseType(spin::ReferencedStateSet);
+	I_BaseType(spin::Shader);
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____ImageTexture__SceneManager_P1__C5_char_P1,
 	               "",
@@ -32,7 +32,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "");
+	          "TO_BE_DONE ");
 	I_Method0(bool, isValid,
 	          Properties::NON_VIRTUAL,
 	          __bool__isValid,
@@ -44,28 +44,8 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          "",
 	          "Creates a texture from a path on disk. ");
 	I_Method0(const char *, getPath,
-	          Properties::VIRTUAL,
+	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPath,
-	          "",
-	          "Abstract method getPath needs to be implemented ");
-	I_Method1(void, setLighting, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setLighting__int,
-	          "",
-	          "Set whether the texture is influenced by lighting ");
-	I_Method0(int, getLighting,
-	          Properties::NON_VIRTUAL,
-	          __int__getLighting,
-	          "",
-	          "");
-	I_Method1(void, setRenderBin, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setRenderBin__int,
-	          "",
-	          "Set the render bin for this texture. The higher the number, the later it gets processed (ie, it appears on top). Default renderBin = 11 ");
-	I_Method0(int, getRenderBin,
-	          Properties::NON_VIRTUAL,
-	          __int__getRenderBin,
 	          "",
 	          "");
 	I_Method0(std::vector< lo_message >, getState,
@@ -73,15 +53,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "Just like a ReferencedNode, each subclass of ReferencedStateSet must override the getState() method to pass it's current state. ");
-	I_SimpleProperty(int, Lighting, 
-	                 __int__getLighting, 
-	                 __void__setLighting__int);
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 __void__setPath__C5_char_P1);
-	I_SimpleProperty(int, RenderBin, 
-	                 __int__getRenderBin, 
-	                 __void__setRenderBin__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

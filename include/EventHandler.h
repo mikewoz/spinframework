@@ -16,6 +16,7 @@ class ReferencedNode;
  * EventHandler can be inherited in order to be receive notifications whenever
  * the spin context receives a message.
  */
+
 class EventHandler
 {
     public:
@@ -26,17 +27,20 @@ class EventHandler
     /**
      * An event that occurs whenever the server list changes (spin clients only)
      */
+
     virtual void onServerChange(std::vector<InfoMessage*> serverList) {}
 
     /**
      * Event handler for scene messages (eg, createNode, deleteNode, etc).
      */
-    virtual void onSceneMessage(const char * /*types*/, lo_arg ** /*argv*/, int /*argc*/) {}
+    virtual void onSceneMessage(const char * /*types*/, lo_arg ** /*argv*/,
+    		int /*argc*/) {}
 
     /**
      * Event handler for node messages
      */
-    virtual void onNodeMessage(ReferencedNode * /*node*/, const char * /*types*/, lo_arg ** /*argv*/, int /*argc*/) {}
+    virtual void onNodeMessage(ReferencedNode * /*node*/, const char *
+    		/*types*/, lo_arg ** /*argv*/, int /*argc*/) {}
 
     /**
      * Event handler for info messages.

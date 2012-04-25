@@ -44,6 +44,7 @@
 #include <osg/ShapeDrawable>
 
 #include "Contour.h"
+
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
@@ -73,6 +74,7 @@ Contour::Contour (SceneManager *sceneManager, char *initID) : ReferencedNode(sce
 
 	_visible = true;
 	_color = osg::Vec4(0,1,0,1); //green
+    _lightingEnabled = true;
 	
 	_thickness = 0.1;
 	_lineType = THIN;
@@ -112,9 +114,6 @@ Contour::Contour (SceneManager *sceneManager, char *initID) : ReferencedNode(sce
 // destructor
 Contour::~Contour()
 {
-	std::cout << " GOT TO Contour DESTRUCTOR !!! " << std::endl;
-	// TODO: uh oh !! we never get here. This is a potential memory leak.
-
 	_vArray->clear();
 }
 
@@ -143,16 +142,19 @@ void Contour::updateNodePath()
 void Contour::callbackUpdate()
 {
 	if (_redrawFlag) draw();
+    ReferencedNode::callbackUpdate();
 }
 
 
 // *****************************************************************************
 void Contour::updateTransforms()
 {
-	mainTransform->setPosition(getTranslation(_currentIndex));
+    float scaledIndex = _currentIndex * _vArray->size();
+    
+	mainTransform->setPosition(getTranslation(scaledIndex));
 	if (_trackingMode==FULL6DOF)
 	{
-		mainTransform->setAttitude(getOrientation((int)_currentIndex));
+		mainTransform->setAttitude(getOrientation(scaledIndex));
 	}
 }
 
@@ -161,20 +163,22 @@ void Contour::updateTransforms()
 // This function gets the orientation of a given index into the soundLine. Note
 // that the orientation along a line has only 2 degrees of freedom (roll is not
 // defined). So we specify the Y_AXIS.
-osg::Quat Contour::getOrientation(int index) const
+osg::Quat Contour::getOrientation(float index) const
 {
 	if (_vArray->size() < 2)
 	{
 		return osg::Quat();
 	}
-	else if (index == _vArray->size() - 1)
+	else if ((int)index >= _vArray->size() - 1)
 	{
 		return getOrientation(index-1);
 	}
 	
 	else
 	{
-		
+        // TODO: Interpolate between orientations!
+		float remainder = index - (int)index;
+        
 		osg::Quat rot;
 		osg::Vec3 v = osg::Vec3(_vArray->at((int)index+1)-_vArray->at((int)index));
 		//rot.makeRotate( osg::X_AXIS, v )
@@ -220,7 +224,7 @@ osg::Vec3 Contour::getTranslation(float index) const
 
 // *****************************************************************************
 
-void Contour::setCurrentIndex (float newValue)
+void Contour::setIndex (float newValue)
 {
 	// note newValue is in range [0,1] so we must scale:
 	//_currentIndex = (int) newValue * _vArray->size();
@@ -231,7 +235,7 @@ void Contour::setCurrentIndex (float newValue)
 	
 	updateTransforms();
 	
-	BROADCAST(this, "sf", "setCurrentIndex", _currentIndex);
+	BROADCAST(this, "sf", "setIndex", _currentIndex);
 }
 
 void Contour::next()
@@ -241,7 +245,7 @@ void Contour::next()
 	
 	updateTransforms();
 	
-	BROADCAST(this, "sf", "setCurrentIndex", _currentIndex);
+	BROADCAST(this, "sf", "setIndex", _currentIndex);
 }	
 void Contour::prev()
 {
@@ -250,7 +254,7 @@ void Contour::prev()
 	
 	updateTransforms();
 	
-	BROADCAST(this, "sf", "setCurrentIndex", _currentIndex);
+	BROADCAST(this, "sf", "setIndex", _currentIndex);
 }
 
 
@@ -266,7 +270,7 @@ void Contour::reset()
 	//std::cout << "cleared the Contour (" << this->id->s_name << ") size=" << _vArray->size() << std::endl;
 	
 	BROADCAST(this, "s", "reset");
-	BROADCAST(this, "sf", "setCurrentIndex", _currentIndex);
+	BROADCAST(this, "sf", "setIndex", _currentIndex);
 	
 	_redrawFlag = true;
 }
@@ -299,7 +303,6 @@ void Contour::add (float x, float y, float z)
 	_redrawFlag = true;
 	
 	BROADCAST(this, "sfff", "add", x, y, z);
-	//BROADCAST(this, "sf", "setCurrentIndex", _currentIndex);
 	
 }
 
@@ -380,7 +383,17 @@ void Contour::setColor (float newR, float newG, float newB, float newA)
 	BROADCAST(this, "sffff", "setColor", _color.x(), _color.y(), _color.z(), _color.w());
 }
 
-
+void Contour::setLighting (int i)
+{
+    _lightingEnabled = (bool)i;
+    
+    osg::StateSet *ss = vArrayGeode->getOrCreateStateSet();
+    
+    if (_lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+    else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    
+    BROADCAST(this, "si", "setLighting", getLighting());
+}
 
 
 // *****************************************************************************
@@ -415,7 +428,6 @@ void Contour::draw()
 		vArrayGeode = new osg::Geode();
 		osg::ref_ptr<osg::Geometry> vArrayGeometry = new osg::Geometry();
 		
-		// *************
 		// draw vertexArray with simple lines:
 		if (_lineType==THIN)
 		{
@@ -441,10 +453,10 @@ void Contour::draw()
 			vArrayGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 		}
 		
-		// *************
-		// draw vertexArray as a series of cylinders:
 		else if (_lineType==CYLINDRICAL)
 		{
+            // draw vertexArray as a series of cylinders:
+            
 			osg::Cylinder *cyl;
 			osg::ShapeDrawable* cylDrawable;
 			
@@ -459,11 +471,36 @@ void Contour::draw()
 				vArrayGeode->addDrawable(cylDrawable);
 			}
 		}
+        
+        else if (_lineType==CUBIC)
+		{
+            // draw vertexArray as a series of rectangles:
+            
+			osg::Box *box;
+			osg::ShapeDrawable* boxDrawable;
+			
+			for (int i=0; i<_vArray->size()-1; i++)
+			{
+                //osg::Box (const osg::Vec3 &center, float lengthX, float lengthY, float lengthZ)
+				box = new osg::Box(getTranslation(i+0.5), _thickness, _thickness, (getTranslation(i+1)-getTranslation(i)).length());
+				box->setRotation(getOrientation(i));
+				
+				boxDrawable = new osg::ShapeDrawable(box,hints);
+				boxDrawable->setColor(_color);
+				vArrayGeode->addDrawable(boxDrawable);
+			}
+		}
 		
-		
+		/*
 		osg::StateSet *vArrayStateSet = new osg::StateSet;
 		vArrayStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF);			
 		vArrayGeode->setStateSet ( vArrayStateSet );
+        */
+        
+        osg::StateSet *ss = vArrayGeode->getOrCreateStateSet();
+        if (_lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+        else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
 		
 		vArrayGeode->setName(string(id->s_name) + ".vArrayGeode");
 
@@ -487,7 +524,7 @@ std::vector<lo_message> Contour::getState () const
 	osg::Vec4 v4;
 	
 	msg = lo_message_new();
-	lo_message_add(msg, "sf", "setCurrentIndex", _currentIndex);
+	lo_message_add(msg, "sf", "setIndex", _currentIndex);
 	ret.push_back(msg);	
 	
 	msg = lo_message_new();
@@ -513,6 +550,10 @@ std::vector<lo_message> Contour::getState () const
 	msg = lo_message_new();
 	v4 = this->getColor();
 	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());
+	ret.push_back(msg);
+    
+    msg = lo_message_new();
+	lo_message_add(msg, "si", "setLighting", getLighting());
 	ret.push_back(msg);
 	
 	for (int i=_vArray->size()-1; i>=0; i--)

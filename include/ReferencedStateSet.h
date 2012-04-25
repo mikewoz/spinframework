@@ -49,6 +49,7 @@
 #define GL_GLEXT_LEGACY // To avoid glext error
 #endif
 #include <osg/StateSet>
+#include <osg/TexEnv>
 
 namespace spin
 {
@@ -69,13 +70,18 @@ public:
     ReferencedStateSet(SceneManager *sceneManager, const char *initID);
     ~ReferencedStateSet();
 
+    /**
+     * This callback occurs every frame to update the state with any parameter
+     * changes.
+     */
+
     virtual void updateCallback();
 
     /**
      * Abstract method getPath needs to be implemented
      */
-    virtual const char *getPath() const = 0;
-
+    //virtual const char *getPath() const = 0;
+	
     /**
     * Remove this stateset from all parents... essentially destroying the state,
     * since no reference to it will exist anymore, and OSG will kill it.
@@ -89,6 +95,10 @@ public:
      */ 
     void replace(osg::StateSet *ss);
     
+    /**
+     * Print debug information to console.
+     */
+
     virtual void debug();
     
     /**
@@ -101,16 +111,65 @@ public:
      * StateDump() is a request to broadcast the node state via SceneManager.
      */
     virtual void stateDump();
+
+    /**
+     * StateDump() is a request to broadcast the node state via SceneMangager.
+     */
+
     virtual void stateDump(lo_address txAddr);
-    
-    
-    SceneManager *sceneManager;
+
+	// --------------------------------
+
+    /**
+     * Set the blend mode for the texture (with material color).
+	 * 0=GL_MODULATE, 1=GL_DECAL, 2=GL_BLEND, 3=GL_REPLACE.
+	 * Default is 0 (GL_MODULATE)
+     */
+    virtual void setTextureBlend(int mode);
+	int getTextureBlend() const;
+	
+    /**
+     * Set whether the texture repeats after wrapping or not (in both the x and
+     * Y directions
+     */
+    virtual void setTextureRepeat(int s, int t);
+	
+    /**
+     * Set whether the texture is influenced by lighting
+     */
+    virtual void setLighting(int i);
+
+    /**
+     * Returns a boolean indicating whether lighting affects the texture.
+     */
+
+    virtual int getLighting() const { return (int)lightingEnabled_; }
+
+    /**
+     * Set the render bin for this texture. The higher the number, the later it
+     * gets processed (ie, it appears on top). Default renderBin = 11
+     */
+    virtual void setRenderBin (int i);
+
+    /**
+     * Returns an integer indicating the render bin for this texture. Higher
+     * numbers get processed later (i.e. it appears on top). Default = 11
+     */
+    virtual int getRenderBin() const { return renderBin_; }
+
+	// TODO: these should at least be protected:
     t_symbol *id;
     std::string classType;
 
-private:
+protected:
     
+	osg::TexEnv::Mode textureBlend_;
+	bool textureRepeatS_;
+	bool textureRepeatT_;
+	bool lightingEnabled_;
+    int  renderBin_;
 
+    SceneManager *sceneManager;
 
 };
 

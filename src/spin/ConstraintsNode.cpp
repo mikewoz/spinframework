@@ -65,11 +65,11 @@ ConstraintsNode::ConstraintsNode (SceneManager *sceneManager, char *initID) : Gr
     nodeType = "ConstraintsNode";
     this->setName(string(id->s_name) + ".ConstraintsNode");
 
-    _target= gensym("NULL");
-    _mode = BASIC;
+    target_= gensym("NULL");
+    constraintMode_ = BASIC;
 
-    _cubeSize = osg::Vec3(0,0,0);
-    _cubeOffset = osg::Vec3(0,0,0);
+    cubeSize_ = osg::Vec3(0,0,0);
+    cubeOffset_ = osg::Vec3(0,0,0);
 
 }
 
@@ -118,25 +118,25 @@ osg::Vec3 computeDropIntersection(osg::Node* subgraph,float x,float y)
 void ConstraintsNode::setTarget(const char *id)
 {
 	// we don't check here if the node actually exists... just set the param
-	this->_target = gensym(id);
+	this->target_ = gensym(id);
 	BROADCAST(this, "ss", "setTarget", getTarget());
 }
 
-void ConstraintsNode::setConstraintMode (constraintMode m)
+void ConstraintsNode::setConstraintMode (ConstraintMode m)
 {
-	this->_mode = m;
-	BROADCAST(this, "si", "setConstraintMode", (int)_mode);
+	this->constraintMode_ = m;
+	BROADCAST(this, "si", "setConstraintMode", (int)constraintMode_);
 }
 
 void ConstraintsNode::setCubeSize(float xScale, float yScale, float zScale)
 {
-	_cubeSize = osg::Vec3(xScale, yScale, zScale);
+	cubeSize_ = osg::Vec3(xScale, yScale, zScale);
 	BROADCAST(this, "sfff", "setCubeSize", xScale, yScale, zScale);
 }
 
 void ConstraintsNode::setCubeOffset(float x, float y, float z)
 {
-	_cubeOffset = osg::Vec3(x, y, z);
+	cubeOffset_ = osg::Vec3(x, y, z);
 	BROADCAST(this, "sfff", "setCubeOffset", x, y, z);
 }
 
@@ -147,33 +147,33 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
     if (!sceneManager->isGraphical())
 	{
 
-		if (_mode == DROP)
+		if (constraintMode_ == DROP)
 		{
-			osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(_target->s_thing);
+			osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(target_->s_thing);
 			if (targetNode.valid())
 			{
 				v = computeDropIntersection(targetNode.get(), x, y);
 			}
 		}
 
-		if (_cubeSize.length())
+		if (cubeSize_.length())
 		{
-			//std::cout << "v=("<<v.x()<<","<<v.y()<<","<<v.z()<<"), cubeOffset="<<_cubeOffset.x()<<","<<_cubeOffset.y()<<","<<_cubeOffset.z()<<"), cubeSize="<<_cubeSize.x()<<","<<_cubeSize.y()<<","<<_cubeSize.z()<<")" << std::endl;
+			//std::cout << "v=("<<v.x()<<","<<v.y()<<","<<v.z()<<"), cubeOffset="<<cubeOffset_.x()<<","<<cubeOffset_.y()<<","<<cubeOffset_.z()<<"), cubeSize="<<cubeSize_.x()<<","<<cubeSize_.y()<<","<<cubeSize_.z()<<")" << std::endl;
 
 			float epsilon = 0.0001;
-			if (v.x() > _cubeOffset.x() + _cubeSize.x()/2)
-				v.x() = _cubeOffset.x() + _cubeSize.x()/2 - epsilon;
-			if (v.y() > _cubeOffset.y() + _cubeSize.y()/2)
-				v.y() = _cubeOffset.y() + _cubeSize.y()/2 - epsilon;
-			if (v.z() > _cubeOffset.z() + _cubeSize.z()/2)
-				v.z() = _cubeOffset.z() + _cubeSize.z()/2 - epsilon;
+			if (v.x() > cubeOffset_.x() + cubeSize_.x()/2)
+				v.x() = cubeOffset_.x() + cubeSize_.x()/2 - epsilon;
+			if (v.y() > cubeOffset_.y() + cubeSize_.y()/2)
+				v.y() = cubeOffset_.y() + cubeSize_.y()/2 - epsilon;
+			if (v.z() > cubeOffset_.z() + cubeSize_.z()/2)
+				v.z() = cubeOffset_.z() + cubeSize_.z()/2 - epsilon;
 
-			if (v.x() < _cubeOffset.x() - _cubeSize.x()/2)
-				v.x() = _cubeOffset.x() - _cubeSize.x()/2 + epsilon;
-			if (v.y() < _cubeOffset.y() - _cubeSize.y()/2)
-				v.y() = _cubeOffset.y() - _cubeSize.y()/2 + epsilon;
-			if (v.z() < _cubeOffset.z() - _cubeSize.z()/2)
-				v.z() = _cubeOffset.z() - _cubeSize.z()/2 + epsilon;
+			if (v.x() < cubeOffset_.x() - cubeSize_.x()/2)
+				v.x() = cubeOffset_.x() - cubeSize_.x()/2 + epsilon;
+			if (v.y() < cubeOffset_.y() - cubeSize_.y()/2)
+				v.y() = cubeOffset_.y() - cubeSize_.y()/2 + epsilon;
+			if (v.z() < cubeOffset_.z() - cubeSize_.z()/2)
+				v.z() = cubeOffset_.z() - cubeSize_.z()/2 + epsilon;
 		}
 	}
 
@@ -186,7 +186,7 @@ void ConstraintsNode::translate (float x, float y, float z)
 
     if ( !sceneManager->isGraphical() )
     {
-    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==COLLIDE_THRU)||(_mode==STICK))
+    	if ((constraintMode_==BOUNCE)||(constraintMode_==COLLIDE)||(constraintMode_==COLLIDE_THRU)||(constraintMode_==STICK))
     	{
     		// reset the lastDrawable
     		lastDrawable = 0;
@@ -195,7 +195,7 @@ void ConstraintsNode::translate (float x, float y, float z)
     		applyConstrainedTranslation(osg::Vec3(x,y,z));
     	}
     	else {
-    		osg::Vec3 newPos = mainTransform->getPosition() + osg::Vec3(x,y,z);
+    		osg::Vec3 newPos = this->getTranslation() + osg::Vec3(x,y,z);
     		setTranslation(newPos.x(),newPos.y(),newPos.z());
     	}
     }
@@ -206,9 +206,9 @@ void ConstraintsNode::move (float x, float y, float z)
 {
     if ( !sceneManager->isGraphical() )
     {
-    	osg::Vec3 v = mainTransform->getAttitude() * osg::Vec3(x,y,z);
+    	osg::Vec3 v = this->getOrientationQuat() * osg::Vec3(x,y,z);
 
-    	if ((_mode==BOUNCE)||(_mode==COLLIDE)||(_mode==COLLIDE_THRU)||(_mode==STICK))
+    	if ((constraintMode_==BOUNCE)||(constraintMode_==COLLIDE)||(constraintMode_==COLLIDE_THRU)||(constraintMode_==STICK))
     	{
     		lastDrawable = 0;
     		lastPrimitiveIndex = -1;
@@ -216,12 +216,47 @@ void ConstraintsNode::move (float x, float y, float z)
     		applyConstrainedTranslation(v);
     	}
     	else {
-    		osg::Vec3 newPos = mainTransform->getPosition() + v;
+    		osg::Vec3 newPos = this->getTranslation() + v;
     		setTranslation(newPos.x(),newPos.y(),newPos.z());
     	}
     }
 }
 
+/*
+// attempt at this: http://forum.openscenegraph.org/viewtopic.php?p=23242
+osg::Polytope ConstraintsNode::getPolytope()
+{
+    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+    
+    osg::Vec3 local
+    
+    Pos = this->getTranslation();
+
+    const osg::BoundingSphere& bs = this->getBound();
+    float zMax = bs.center().z()+bs.radius();
+    float zMin = bs.center().z()-bs.radius();
+    
+    osg::Plane plane;
+
+    // RIGHT
+    {
+        osg::Vec3 start = this->getTranslation();
+        osg::Vec3 end = start + osg::Vec3(bs.radius()+1,0,0);
+        osgUtil::LineSegmentIntersector *intersector = new osgUtil::LineSegmentIntersector(start,end);
+        osgUtil::IntersectionVisitor iv(intersector);
+        this->accept(iv);
+
+        if (intersector->containsIntersections())
+        {
+            // get last (furthest) intersection
+            const osgUtil::LineSegmentIntersector::Intersection& intersection = *(--intersector->getIntersections().end());
+            plane.set( (start-end)/bs.radius()+1, 
+            
+            
+            
+        }
+}
+*/
 
 void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 {
@@ -240,12 +275,14 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	std::cout << "v =      " << v.x()<<","<<v.y()<<","<<v.z() << std::endl;
 	*/
 
-	osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(_target->s_thing);
+	osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(target_->s_thing);
 
 	if (targetNode.valid())
 	{
 		// get current position (including offset from previous bounces)
 		osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+
+        
 		osg::Vec3 worldPos = thisMatrix.getTrans();
 
 		// set up intersector:
@@ -297,7 +334,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					// do recursive translations after repositioning the node at
 					// the bounce point (and there may be numerical imprecision)
 					// If so, we skip this intersection:
-					if ((_mode==BOUNCE) &&
+					if ((constraintMode_==BOUNCE) &&
 					    (lastDrawable.get()==(*itr).drawable.get()) &&
 						    (lastPrimitiveIndex==(int)(*itr).primitiveIndex))
 					{
@@ -340,7 +377,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					//std::cout << "newHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
 
-					if ((_mode==COLLIDE)||(_mode==COLLIDE_THRU)||(_mode==STICK))
+					if ((constraintMode_==COLLIDE)||(constraintMode_==COLLIDE_THRU)||(constraintMode_==STICK))
 					{
 						// Let the collisionPoint be just a bit before the real
 						// hitpoint (to avoid numerical imprecision placing the
@@ -353,7 +390,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 
-						if (_mode==COLLIDE)
+						if (constraintMode_==COLLIDE)
 						{
                             // SLIDE along the hit plane with the left over energy:
                             // ie, project the remaining vector onto the surface we
@@ -370,7 +407,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
                             // pseudo-recursively apply remainder of bounce:
                             applyConstrainedTranslation( slideVector );
 						}
-                        else if (_mode==COLLIDE_THRU)
+                        else if (constraintMode_==COLLIDE_THRU)
 						{
                             // allow the node to pass thru (ie, just apply the
                             // translation):
@@ -383,7 +420,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 					}
 
 
-					else if (_mode==BOUNCE)
+					else if (constraintMode_==BOUNCE)
 					{
 						// bounce returns a translation mirrored about the hit
 						// normal to the surface

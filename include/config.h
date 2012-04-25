@@ -135,16 +135,16 @@
 #define PACKAGE_NAME "SPINFRAMEWORK"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "SPINFRAMEWORK 0.3.12"
+#define PACKAGE_STRING "SPINFRAMEWORK 0.3.13"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "spinframework"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL "http://github.com/mikewoz/spinframework/issues"
+#define PACKAGE_URL "http://codered.sat.qc.ca/redmine/projects/spinframework"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.3.12"
+#define PACKAGE_VERSION "0.3.13"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -154,7 +154,11 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.3.12"
+#define VERSION "0.3.13"
+
+/* Enables linking with the Bullet physics library to provide collisions and
+   rigid body dynamics */
+/* #undef WITH_BULLET */
 
 /* A flag that compiles additional features for use with the shared_video
    library from Scenic */

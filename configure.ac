@@ -17,7 +17,7 @@ AC_PREREQ([2.61])
 # - increase spin_interface_version to the next odd number
 m4_define([spin_major_version], [0])
 m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [12])
+m4_define([spin_micro_version], [13])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -55,7 +55,7 @@ AC_INIT(SPINFRAMEWORK,
         [spin_version],
         [http://www.spinframework.org],
         [spinframework],
-        [http://github.com/mikewoz/spinframework/issues])
+        [http://codered.sat.qc.ca/redmine/projects/spinframework])
 
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
@@ -216,14 +216,31 @@ else
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
 
+AC_CHECK_LIB([PocoFoundation], [main], [pototest=true POCO_LIBS="-lPocoUtild -lPocoNetd -lPocoXMLd -lPocoFoundationd"], AC_MSG_WARN([missing Poco]))
+AM_CONDITIONAL(HAVE_POCO, [test x$pocotest = xtrue])
+AC_SUBST(POCO_LIBS)
+
+
 PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
-    AC_MSG_WARN([missing package: libspatosc-0.3])
+    AC_MSG_WARN([missing package: spatosc-0.3])
 else
     AC_DEFINE([WITH_SPATOSC],[1],[Enables linking with the SpatOSC library so that compatible audio renderers can be used for 3D sound spatialization]) AC_MSG_NOTICE([Enabled SpatOSC for audio])
     AC_MSG_NOTICE([SPATOSC_CFLAGS:        ${SPATOSC_CFLAGS}])
     AC_MSG_NOTICE([SPATOSC_LIBS:          ${SPATOSC_LIBS}])
 fi
+
+PKG_CHECK_MODULES(BULLET, bullet, have_bullet=true, have_bullet=false)
+if test "x${have_bullet}" = "xfalse" ; then
+    AC_MSG_WARN([missing package: bullet])
+else
+    AC_DEFINE([WITH_BULLET],[1],[Enables linking with the Bullet physics library to provide collisions and rigid body dynamics]) AC_MSG_NOTICE([Enabled Bullet physics])
+    AC_MSG_NOTICE([BULLET_CFLAGS:        ${BULLET_CFLAGS}])
+    AC_MSG_NOTICE([BULLET_LIBS:          ${BULLET_LIBS}])
+fi
+AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
+AC_SUBST(BULLET_CFLAGS)
+AC_SUBST(BULLET_LIBS)
 
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),

@@ -66,12 +66,13 @@ am_libSPINwrappers_la_OBJECTS = libSPINwrappers_la-AnimationNode.lo \
 	libSPINwrappers_la-Listener.lo \
 	libSPINwrappers_la-MeasurementNode.lo \
 	libSPINwrappers_la-Menu3D.lo libSPINwrappers_la-ModelNode.lo \
+	libSPINwrappers_la-ParticleSystem.lo \
 	libSPINwrappers_la-PointerNode.lo \
 	libSPINwrappers_la-RayNode.lo \
 	libSPINwrappers_la-ReferencedNode.lo \
 	libSPINwrappers_la-ReferencedStateSet.lo \
 	libSPINwrappers_la-ReporterNode.lo \
-	libSPINwrappers_la-ShapeNode.lo \
+	libSPINwrappers_la-Shader.lo libSPINwrappers_la-ShapeNode.lo \
 	libSPINwrappers_la-SharedVideoTexture.lo \
 	libSPINwrappers_la-SoundConnection.lo \
 	libSPINwrappers_la-SoundNode.lo \
@@ -124,6 +125,8 @@ BOOST_ROOT = @BOOST_ROOT@
 BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
 BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
 BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
+BULLET_CFLAGS = @BULLET_CFLAGS@
+BULLET_LIBS = @BULLET_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -194,6 +197,7 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+POCO_LIBS = @POCO_LIBS@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
@@ -319,11 +323,13 @@ libSPINwrappers_la_SOURCES = \
     MeasurementNode.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    ParticleSystem.cpp \
     PointerNode.cpp \
     RayNode.cpp \
     ReferencedNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    Shader.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \
@@ -357,9 +363,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/osgWrappers/introspection/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/osgWrappers/introspection/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/osgWrappers/introspection/Makefile
+	  $(AUTOMAKE) --gnu src/osgWrappers/introspection/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -411,11 +417,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-MeasurementNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-Menu3D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ModelNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ParticleSystem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-PointerNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-RayNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ReferencedNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ReferencedStateSet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ReporterNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-Shader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-ShapeNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-SharedVideoTexture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libSPINwrappers_la-SoundConnection.Plo@am__quote@
@@ -555,6 +563,13 @@ libSPINwrappers_la-ModelNode.lo: ModelNode.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ModelNode.lo `test -f 'ModelNode.cpp' || echo '$(srcdir)/'`ModelNode.cpp
 
+libSPINwrappers_la-ParticleSystem.lo: ParticleSystem.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ParticleSystem.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ParticleSystem.Tpo -c -o libSPINwrappers_la-ParticleSystem.lo `test -f 'ParticleSystem.cpp' || echo '$(srcdir)/'`ParticleSystem.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-ParticleSystem.Tpo $(DEPDIR)/libSPINwrappers_la-ParticleSystem.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ParticleSystem.cpp' object='libSPINwrappers_la-ParticleSystem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ParticleSystem.lo `test -f 'ParticleSystem.cpp' || echo '$(srcdir)/'`ParticleSystem.cpp
+
 libSPINwrappers_la-PointerNode.lo: PointerNode.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-PointerNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-PointerNode.Tpo -c -o libSPINwrappers_la-PointerNode.lo `test -f 'PointerNode.cpp' || echo '$(srcdir)/'`PointerNode.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-PointerNode.Tpo $(DEPDIR)/libSPINwrappers_la-PointerNode.Plo
@@ -589,6 +604,13 @@ libSPINwrappers_la-ReporterNode.lo: ReporterNode.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='ReporterNode.cpp' object='libSPINwrappers_la-ReporterNode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-ReporterNode.lo `test -f 'ReporterNode.cpp' || echo '$(srcdir)/'`ReporterNode.cpp
+
+libSPINwrappers_la-Shader.lo: Shader.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-Shader.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-Shader.Tpo -c -o libSPINwrappers_la-Shader.lo `test -f 'Shader.cpp' || echo '$(srcdir)/'`Shader.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libSPINwrappers_la-Shader.Tpo $(DEPDIR)/libSPINwrappers_la-Shader.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Shader.cpp' object='libSPINwrappers_la-Shader.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libSPINwrappers_la-Shader.lo `test -f 'Shader.cpp' || echo '$(srcdir)/'`Shader.cpp
 
 libSPINwrappers_la-ShapeNode.lo: ShapeNode.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libSPINwrappers_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libSPINwrappers_la-ShapeNode.lo -MD -MP -MF $(DEPDIR)/libSPINwrappers_la-ShapeNode.Tpo -c -o libSPINwrappers_la-ShapeNode.lo `test -f 'ShapeNode.cpp' || echo '$(srcdir)/'`ShapeNode.cpp

@@ -121,6 +121,8 @@ BOOST_ROOT = @BOOST_ROOT@
 BOOST_SYSTEM_LDFLAGS = @BOOST_SYSTEM_LDFLAGS@
 BOOST_SYSTEM_LDPATH = @BOOST_SYSTEM_LDPATH@
 BOOST_SYSTEM_LIBS = @BOOST_SYSTEM_LIBS@
+BULLET_CFLAGS = @BULLET_CFLAGS@
+BULLET_LIBS = @BULLET_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -191,6 +193,7 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+POCO_LIBS = @POCO_LIBS@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
@@ -307,9 +310,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Resources/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Resources/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/Resources/Makefile
+	  $(AUTOMAKE) --gnu src/Resources/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

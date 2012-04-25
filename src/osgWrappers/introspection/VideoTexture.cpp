@@ -23,7 +23,7 @@
 
 BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	I_DeclaringFile("VideoTexture.h");
-	I_BaseType(spin::ReferencedStateSet);
+	I_BaseType(spin::Shader);
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____VideoTexture__SceneManager_P1__C5_char_P1,
 	               "",
@@ -32,17 +32,17 @@ BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "");
+	          "Print debug information to console. ");
 	I_Method1(void, setPath, IN, const char *, newPath,
 	          Properties::NON_VIRTUAL,
 	          __void__setPath__C5_char_P1,
 	          "",
 	          "Creates a video from a path on disk. This can either be a single movie file (ie, a format that OSG knows how to read), or a folder name that contains a sequence of images to stitch into a video. ");
 	I_Method0(const char *, getPath,
-	          Properties::VIRTUAL,
+	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPath,
 	          "",
-	          "Abstract method getPath needs to be implemented ");
+	          "Returns a string indicating the path from which the video data is drawn. This is an abstract class and should be re-implemented in a derived class ");
 	I_Method1(void, setLoop, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setLoop__int,
@@ -52,7 +52,7 @@ BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	          Properties::NON_VIRTUAL,
 	          __int__getLoop,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether the video is set to loop or not. ");
 	I_Method1(void, setIndex, IN, float, f,
 	          Properties::NON_VIRTUAL,
 	          __void__setIndex__float,
@@ -62,7 +62,7 @@ BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	          Properties::NON_VIRTUAL,
 	          __float__getIndex,
 	          "",
-	          "");
+	          "Returns an index in the range 0,1 indicating a part of the video set to be rapidly accessed with the setIndex function. ");
 	I_Method1(void, setFrameRate, IN, float, f,
 	          Properties::NON_VIRTUAL,
 	          __void__setFrameRate__float,
@@ -72,7 +72,7 @@ BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	          Properties::NON_VIRTUAL,
 	          __float__getFrameRate,
 	          "",
-	          "");
+	          "Returns an integer indicating the set framerate of the video sequence. ");
 	I_Method1(void, setPlay, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setPlay__int,
@@ -82,22 +82,22 @@ BEGIN_OBJECT_REFLECTOR(spin::VideoTexture)
 	          Properties::NON_VIRTUAL,
 	          __int__getPlay,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether the video is set to play or not. ");
 	I_Method0(void, rewind,
 	          Properties::NON_VIRTUAL,
 	          __void__rewind,
 	          "",
-	          "Seek to beginning of video (quivalent to setIndex(0); ");
+	          "Seek to beginning of video (equivalent to setIndex(0); ");
 	I_Method0(void, flipHorizontal,
 	          Properties::NON_VIRTUAL,
 	          __void__flipHorizontal,
 	          "",
-	          "");
+	          "Flips the video horizontally. ");
 	I_Method0(void, flipVertical,
 	          Properties::NON_VIRTUAL,
 	          __void__flipVertical,
 	          "",
-	          "");
+	          "Flips the video vertically. ");
 	I_Method0(bool, isValid,
 	          Properties::NON_VIRTUAL,
 	          __bool__isValid,

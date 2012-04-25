@@ -60,11 +60,12 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-VideoTexture::VideoTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
+VideoTexture::VideoTexture (SceneManager *s, const char *initID) : Shader(s, initID)
 {
 	classType = "VideoTexture";
 
 	_useTextureRectangle = false;
+	lightingEnabled_ = false;
 	
 	_index = 0.0;
 	_loop = true;
@@ -92,7 +93,7 @@ VideoTexture::~VideoTexture()
 
 void VideoTexture::debug()
 {
-	ReferencedStateSet::debug();
+	Shader::debug();
 	
 	std::cout << "   ---------" << std::endl;
 	
@@ -162,11 +163,20 @@ void VideoTexture::setPath (const char* newPath)
 		vidTexture->setResizeNonPowerOfTwoHint(false);
 		vidTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
 		//vidTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-		vidTexture->setWrap(osg::Texture::WRAP_R,osg::Texture::REPEAT);
-		vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
-		vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+		if (textureRepeatS_)
+			vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+		else
+			vidTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+		if (textureRepeatT_)
+			vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+		else
+			vidTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
 
-	
+		osg::TexEnv* texenv = new osg::TexEnv();
+		texenv->setMode(textureBlend_);
+		this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+
+		
 		// Check if _path is a directory. If so, load all contained image
 		// files into an osg::ImageSequence.
 		osgDB::DirectoryContents dir = osgDB::getDirectoryContents(fullPath);
@@ -248,8 +258,12 @@ void VideoTexture::setPath (const char* newPath)
 			// add texture to stateset:
 			this->setTextureAttributeAndModes( 0, vidTexture, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
-			// turn off lighting 
-			this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+			// set lighting:
+			if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+			else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+			// set renderbin:
+			this->setRenderBinDetails( renderBin_, "RenderBin");
 
 			// if image has transparency, enable blending:
 			if (1)//(_imageStream->isImageTranslucent())
@@ -362,7 +376,7 @@ void VideoTexture::flipVertical()
 std::vector<lo_message> VideoTexture::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedStateSet::getState();
+	std::vector<lo_message> ret = Shader::getState();
 		
 	lo_message msg;
 	

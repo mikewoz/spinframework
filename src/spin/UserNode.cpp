@@ -42,6 +42,7 @@
 #include "UserNode.h"
 #include "SceneManager.h"
 #include "spinApp.h"
+#include "osgUtil.h"
 #include "spinBaseContext.h"
 
 namespace spin
@@ -57,12 +58,19 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
 
     description_ = string(initID);
 
+	cameraOffsetNode_ = new osg::PositionAttitudeTransform();
+	cameraOffsetNode_->setName(string(id->s_name) + ".cameraOffset");
+	cameraAttachmentNode_ = new osg::PositionAttitudeTransform();
+	cameraAttachmentNode_->setName(string(id->s_name) + ".cameraAttachmentNode");
+
+    // should we attach ourselves to GroupNode's mainTransform or clipNode?
+	getAttachmentNode()->addChild(cameraOffsetNode_.get());
+	cameraOffsetNode_->addChild(cameraAttachmentNode_.get());
+    
+    //setAttachmentNode(cameraAttachmentNode_.get());
+
     setTranslation(0.0, -5.0, 0.5);
     setReportMode(GroupNode::GLOBAL_6DOF);
-
-	cameraAttachmentNode = new osg::Group();
-	cameraAttachmentNode->setName(string(id->s_name) + ".cameraAttachmentNode");
-	mainTransform->addChild(cameraAttachmentNode.get());
 
     ping_ = false;
 }
@@ -94,9 +102,18 @@ void UserNode::callbackUpdate()
 
 }
 
-void UserNode::updateNodePath()
+void UserNode::updateNodePath(bool updateChildren)
 {
-    GroupNode::updateNodePath();
+    ConstraintsNode::updateNodePath(false);
+
+    /*
+    currentNodePath.push_back(cameraOffsetNode_.get());
+    currentNodePath.push_back(cameraAttachmentNode_.get());
+    */
+    
+    // now update NodePaths for all children:
+    if (updateChildren) updateChildNodePaths();
+
     this->nodepathUpdate = true;
 }
 
@@ -115,6 +132,46 @@ void UserNode::ping()
 	ping_ = true;
 }
 
+void UserNode::setCameraOffset(float x, float y, float z)
+{
+    osg::Vec3 newOffset = osg::Vec3(x,y,z);
+
+    if (newOffset != getCameraOffset())
+    {
+        cameraOffsetNode_->setPosition(newOffset);
+        BROADCAST(this, "sfff", "setCameraOffset", x, y, z);
+    }
+}
+
+void UserNode::setCameraOrientationQuat (float x, float y, float z, float w)
+{
+	osg::Quat newQuat = osg::Quat(x,y,z,w);
+
+    if (newQuat != cameraAttachmentNode_->getAttitude())
+    {
+        cameraAttachmentNode_->setAttitude(newQuat);
+        eulers_ = Vec3inDegrees(QuatToEuler(newQuat));
+
+        BROADCAST(this, "sffff", "setCameraOrientationQuat", x, y, z, w);
+    }
+
+}
+
+void UserNode::setCameraOrientation (float pitch, float roll, float yaw)
+{
+    osg::Vec3 newOrientation = osg::Vec3(pitch, roll, yaw);
+
+    if (newOrientation != getOrientation())
+    {
+        eulers_ = newOrientation;
+        osg::Quat q = osg::Quat( osg::DegreesToRadians(pitch), osg::Vec3d(1,0,0),
+                                 osg::DegreesToRadians(roll), osg::Vec3d(0,1,0),
+                                 osg::DegreesToRadians(yaw), osg::Vec3d(0,0,1));
+        cameraAttachmentNode_->setAttitude(q);
+        BROADCAST(this, "sfff", "setCameraOrientation", pitch, roll, yaw);
+    }
+}
+
 // *****************************************************************************
 
 std::vector<lo_message> UserNode::getState () const
@@ -123,11 +180,21 @@ std::vector<lo_message> UserNode::getState () const
 	std::vector<lo_message> ret = ConstraintsNode::getState();
 
 	lo_message msg;
+    osg::Vec3 v;
 
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setDescription", getDescription());
 	ret.push_back(msg);
 
+    msg = lo_message_new();
+    v = getCameraOffset();
+    lo_message_add(msg, "sfff", "setCameraOffset", v.x(), v.y(), v.z());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    v = getCameraOrientation();
+    lo_message_add(msg, "sfff", "setCameraOrientation", v.x(), v.y(), v.z());
+    ret.push_back(msg);
 
 	return ret;
 }

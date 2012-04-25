@@ -54,22 +54,22 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setUpdateRate__float,
 	          "Set the update rate (in Hz). ",
-	          "The animation will send setTranslation, setOrientation, and setScale events at this rate (assuming there is a change). Values will be interpolated in between control points. ");
+	          " param hz Update rate in hz  ");
 	I_Method0(float, getUpdateRate,
 	          Properties::NON_VIRTUAL,
 	          __float__getUpdateRate,
 	          "",
-	          "");
+	          "update rate in hz  ");
 	I_Method1(void, setPlay, IN, int, p,
 	          Properties::NON_VIRTUAL,
 	          __void__setPlay__int,
 	          "",
-	          "");
+	          "Turns animation on/off. ");
 	I_Method0(int, getPlay,
 	          Properties::NON_VIRTUAL,
 	          __int__getPlay,
 	          "",
-	          "");
+	          "a boolean value which indicates whether the animation is playing or not  ");
 	I_Method1(void, setRecord, IN, int, r,
 	          Properties::NON_VIRTUAL,
 	          __void__setRecord__int,
@@ -79,7 +79,7 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getRecord,
 	          "",
-	          "");
+	          "a boolean value which indicates whether the node is recording or not  ");
 	I_Method1(void, setLoopMode, IN, spin::AnimationNode::LoopMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setLoopMode__LoopMode,
@@ -89,7 +89,7 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getLoopMode,
 	          "",
-	          "");
+	          "the loop mode for the animation. eg, SWING, LOOP, NO_LOOPING.  ");
 	I_Method3(void, setTranslation, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setTranslation__float__float__float,

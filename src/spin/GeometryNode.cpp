@@ -330,7 +330,7 @@ std::vector<lo_message> GeometryNode::getState () const
     */
     
     osg::Vec3Array *vArray = dynamic_cast<osg::Vec3Array*>(geometry_->getVertexArray());
-    for (int i=0; i<vArray->getNumElements(); i++)
+    for (unsigned int i=0; i<vArray->getNumElements(); i++)
     {
         //v3 = (*vArray)[i];
         
@@ -340,7 +340,7 @@ std::vector<lo_message> GeometryNode::getState () const
     }
     
     osg::Vec4Array *cArray = dynamic_cast<osg::Vec4Array*>(geometry_->getColorArray());
-    for (int i=0; i<cArray->getNumElements(); i++)
+    for (unsigned int i=0; i<cArray->getNumElements(); i++)
     {
         msg = lo_message_new();
         lo_message_add(msg, "siffff", "setColor", i, (*cArray)[i].x(), (*cArray)[i].y(), (*cArray)[i].z(), (*cArray)[i].w());
@@ -349,7 +349,7 @@ std::vector<lo_message> GeometryNode::getState () const
     
     
     osg::Vec2Array *tArray = dynamic_cast<osg::Vec2Array*>(geometry_->getTexCoordArray(0));
-    for (int i=0; i<tArray->getNumElements(); i++)
+    for (unsigned int i=0; i<tArray->getNumElements(); i++)
     {
         msg = lo_message_new();
         lo_message_add(msg, "siff", "setTexCoord", i, (*tArray)[i].x(), (*tArray)[i].y());

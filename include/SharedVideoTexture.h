@@ -45,7 +45,7 @@
 #include "config.h"
 #include <osg/Timer>
 
-#include "ReferencedStateSet.h"
+#include "Shader.h"
 
 #ifdef WITH_SHARED_VIDEO        
 #include <shared-video-0.6/sharedVideoBuffer.h>
@@ -88,7 +88,7 @@ namespace spin
  */
 
 
-class SharedVideoTexture : public ReferencedStateSet
+class SharedVideoTexture : public Shader
 {
 
 public:
@@ -105,7 +105,6 @@ public:
     std::vector<lo_message> getState () const;
     void debug();
     
-    //#ifdef WITH_SHARED_VIDEO
     void updateCallback();
     
     void consumeFrame();
@@ -113,14 +112,6 @@ public:
 
     void start();
     void stop();
-    //#endif
-        
-    /**
-     * Set the render bin for this texture. The higher the number, the later it
-     * gets processed (ie, it appears on top). Default renderBin = 11
-     */
-    void setRenderBin (int i);
-    int getRenderBin() const { return _renderBin; }
 
 private:
     
@@ -135,33 +126,15 @@ private:
         
     bool killed_;
     
-
 #ifdef WITH_SHARED_VIDEO        
     boost::thread worker_;
     boost::mutex displayMutex_;
     boost::condition_variable textureUploadedCondition_;
     SharedVideoBuffer *sharedBuffer;
 #endif
-        
-    int  _renderBin;
+	
 };
 
-/*
-class SharedVideoTexture_callback : public osg::StateAttribute::StateAttribute::Callback
-{
-
-    public:
-        virtual void operator()(osg::StateAttribute* attr, osg::NodeVisitor* nv)
-        {
-            osg::ref_ptr<SharedVideoTexture> thisAttr = dynamic_cast<SharedVideoTexture*> (attr->getUserData());
-
-            if (thisAttr != NULL)
-            {
-                thisAttr->updateCallback();
-            }
-        }
-};
-*/
 
 } // end of namespace spin
 

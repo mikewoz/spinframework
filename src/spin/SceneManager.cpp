@@ -44,7 +44,6 @@
 #include "DSPNode.h"
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
-#include "MediaManager.h"
 #include "ReferencedNode.h"
 #include "SoundConnection.h"
 #include "spinUtil.h"
@@ -53,6 +52,7 @@
 
 #include "ImageTexture.h"
 #include "VideoTexture.h"
+#include "Shader.h"
 #include "ShapeNode.h"
 #include "ModelNode.h"
 #include "SharedVideoTexture.h"
@@ -89,9 +89,74 @@
 #include <spatosc/spatosc.h>
 #endif
 
-using namespace cppintrospection;
-
 extern pthread_mutex_t sceneMutex;
+
+
+
+#ifdef WITH_BULLET
+#include <btBulletDynamicsCommon.h>
+#include "bulletUtil.h"
+#include "CollisionShape.h"
+
+extern ContactAddedCallback gContactAddedCallback;
+
+// NOTE: this callback is only added on the server side!
+
+float lastBtHitDepth = 0.0;
+
+bool btCollisionCallback(btManifoldPoint& cp,
+                        const btCollisionObject* colObj0,
+                        int partId0,
+                        int index0,
+                        const btCollisionObject* colObj1,
+                        int partId1,
+                        int index1)
+{
+    using namespace spin;
+    
+    if (!colObj0->isStaticObject() && colObj0->isActive())
+    {
+        CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
+        CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
+    
+        // world hit point:
+        osg::Vec3 hitPoint0 = asOsgVec3( cp.getPositionWorldOnA() );
+        osg::Vec3 hitPoint1 = asOsgVec3( cp.getPositionWorldOnB() );
+        
+        // returns a unit vector:
+        osg::Vec3 normal = asOsgVec3( cp.m_normalWorldOnB );
+    
+        // penetration depth
+        float depth = cp.getDistance(); 
+        
+
+        if (depth != lastBtHitDepth)
+        {
+            //std::cout << "Hit between " << n0->getID() << " and " << n1->getID() << " at: pos0) " << stringify(hitPoint0) << " pos1)" << stringify(hitPoint1) << ", normal: " << stringify(normal) << ", depth="<< depth << std::endl;
+            
+            // TODO: collide message is usually ssfff: collide nodeID incidence(x,y,z). The following provides just the surface normal, which is wrong:
+            BROADCAST(n0, "ssfff", "collide", n1->id->s_name, normal.x(), normal.y(), normal.z());
+            
+            // We need to move the nodes so that they are not colliding any more.
+            // We just move along the normal by depth, and add a little extra for
+            // good measure:
+            osg::Vec3 offset = (normal * -depth);// + (normal * 0.00001);
+            n0->translate(offset.x(), offset.y(), offset.z());
+        } //else std::cout << "skipping duplicate hit" << std::endl;
+        
+        lastBtHitDepth = depth;
+    }
+
+    // Returns false, telling Bullet that we did not modify the contact point
+    // properties at all. We would return true if we changed friction or
+    // something
+    return false;
+}
+
+#endif
+
+
+// -----------------------------------------------------------------------------
 
 namespace spin
 {
@@ -140,9 +205,9 @@ SceneManager::SceneManager(std::string id)
     fpl.push_back( resourcesPath + "/scripts/");
     fpl.push_back( resourcesPath + "/fonts/");
     fpl.push_back( resourcesPath + "/images/");
+    fpl.push_back( resourcesPath + "/shaders/");
     osgDB::setDataFilePathList( fpl );
 
-    mediaManager = new MediaManager(resourcesPath);
 
     //std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
@@ -226,6 +291,8 @@ SceneManager::SceneManager(std::string id)
     worldNode = new osg::ClearNode();
     worldNode->setName("world");
     rootNode->addChild(worldNode.get());
+    
+    worldStateSet_ = gensym("NULL");
 
     for (int i = 0; i < OSG_NUM_LIGHTS; i++)
     {
@@ -272,8 +339,38 @@ SceneManager::SceneManager(std::string id)
     osgDB::Registry::instance()->setOptions(opt);
     */
 
+#ifdef WITH_BULLET
+
+    lastColState = false;
+
+    btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration();
+    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+    btSequentialImpulseConstraintSolver *solver = new btSequentialImpulseConstraintSolver;
+    
+    // TODO: update based on bounds of OSG scene
+    btVector3 worldAabbMin(-100, -100, -100);
+    btVector3 worldAabbMax(100, 100, 100);
+    //const int maxProxies = 32766;
+    const int maxProxies = 1000;
+    btAxisSweep3 *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+
+    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 
+    // register global callback
+    if (spinApp::Instance().getContext()->isServer())
+    {
+        gContactAddedCallback = btCollisionCallback;
+    }
+    
+    dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
+        
+#endif
+
+
+    // keep a timer for dynamics/physics calculation:
+    dynamicsUpdateRate_; // in seconds
+    lastTick_ = osg::Timer::instance()->tick();
 }
 
 // destructor
@@ -551,8 +648,8 @@ void SceneManager::debugSceneGraph()
 {
     std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
     std::cout << "-- SCENE GRAPH:" << std::endl;
-    DebugVisitor ev;
-    ev.apply(*(this->worldNode.get()));
+    DebugVisitor visitor;
+    visitor.print(this->worldNode.get());
 }
 
 void SceneManager::debug()
@@ -875,7 +972,12 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 
     // go through all existing statesets and see if any have fname as the
     // source for the image/video in question
-
+    
+    // mikewoz: 2012-04-20: I commented this out, because someone may want
+    // to load a texture multiple times ... and this doesn't make sense anymore
+    // with shaders. It's not correct to assume that every stateset has the
+    // notion of path.
+    /*
     ReferencedStateSetMap::iterator sIt;
     ReferencedStateSetList::iterator sIter;
     for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
@@ -893,7 +995,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
             }
         }
     }
-
+    */
 
     // otherwise, we assume this is a filename, and try to create a stateset of
     // the appropriate type
@@ -929,6 +1031,17 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
         }
     }
 
+    // shader
+    else if (isShaderPath(fullPath))
+    {
+        osg::ref_ptr<Shader> shdr = dynamic_cast<Shader*>(createStateSet(newID.c_str(), "Shader"));
+        if (shdr.valid())
+        {
+            shdr->setShader(getRelativePath(fname).c_str());
+            return shdr.get();
+        }
+    }
+
     // otherwise, assume a static image texture:
     else
     {
@@ -942,6 +1055,28 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 
     std::cout << "ERROR creating ReferencedStateSet from file: " << fname << std::endl;
     return NULL;
+}
+
+void SceneManager::setWorldStateSet(const char *s)
+{
+    if (std::string(s)=="NULL")
+    {
+        worldNode->setStateSet(new osg::StateSet());
+        SCENE_MSG("ss", "setWorldStateSet", "NULL");
+    }
+    else
+    {
+        ReferencedStateSet *ss = getStateSet(s);
+        if (ss)
+        {
+            if (ss->id == worldStateSet_)
+                return; // we're already using that stateset
+        
+            worldStateSet_ = ss->id;
+            worldNode->setStateSet(ss);
+            SCENE_MSG("ss", "setWorldStateSet", s);
+        }
+	}
 }
 
 std::vector<t_symbol*> SceneManager::findNodes(const char *pattern)
@@ -1184,9 +1319,15 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     pthread_mutex_unlock(&sceneMutex);
 
     // now force the actual delete by nulling this referenced pointer. At that
-    // time, the destructor for the node should be called
-    //char *nodeID = n->id->s_name; // but remember the name for the broadcast
+    // time, the destructor for the node should be called.
     n = NULL;
+    
+    // IMPORTANT: There is one node that will never be destroyed this way: the
+    // userNode in spinApp. This stays there no matter what since there is a
+    // ref_ptr that maintains a reference count in spinApp.
+    //
+    // ^ Becaue of this, we have to be careful to re-attach the user again when
+    // userRefresh is called.
 }
 
 void SceneManager::doDelete(ReferencedStateSet *s)
@@ -1281,6 +1422,9 @@ void SceneManager::clear()
        ClearSceneVisitor visitor;
        worldNode->accept(visitor);
      */
+     
+     
+     
 
     SCENE_MSG("s", "clear");
     sendNodeList("*");
@@ -1327,6 +1471,8 @@ void SceneManager::clearStates()
 			*/
         }
     }
+    
+    SCENE_MSG("s", "clearStates");
 
     // TODO: separate sendNodeList to sendStateList as well
     sendNodeList("*");
@@ -1440,6 +1586,8 @@ return NULL;
 
 void SceneManager::update()
 {
+    osg::Timer_t tick = osg::Timer::instance()->tick();
+    double dt =osg::Timer::instance()->delta_s(lastTick_,tick);
 
 #ifdef WITH_SHARED_VIDEO
     // it's possible that a SharedVideoTexture is in the sceneManager, but not
@@ -1480,6 +1628,26 @@ void SceneManager::update()
 	        }
 	    }
     }
+    
+#ifdef WITH_BULLET
+    if (dt >= dynamicsUpdateRate_)
+    {
+        // only do on server side?
+        if (spinApp::Instance().getContext()->isServer())
+        {
+            //dynamicsWorld_->performDiscreteCollisionDetection();
+            dynamicsWorld_->stepSimulation(dt);
+            dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            
+            /*
+            collisionWorld_->performDiscreteCollisionDetection();
+            detectCollision( lastColState, collisionWorld_ );
+            */
+        }
+    }
+#endif
+
+    lastTick_ = tick;
 }
 
 // save scene as .osg
@@ -2134,7 +2302,7 @@ bool SceneManager::loadXML(const char *s)
         return false;
     }
 
-    // Now see if there is a <connections> tag:
+    // Now see if there is a <statesets> tag:
     if ((root = doc.FirstChild("statesets")))
     {
         for (child = root->FirstChildElement(); child; child = child->NextSiblingElement())
@@ -2171,6 +2339,68 @@ bool SceneManager::loadXML(const char *s)
     return true;
 }
 
+
+// *****************************************************************************
+void SceneManager::setGravity(float x, float y, float z)
+{
+#ifdef WITH_BULLET
+    dynamicsWorld_->setGravity(btVector3(x, y, z));
+#endif
+}
+
+void SceneManager::setUpdateRate(float seconds)
+{
+    dynamicsUpdateRate_ = seconds;
+}
+
+#ifdef WITH_BULLET
+void detectCollision( bool& lastColState, btCollisionWorld* cw )
+{
+    unsigned int numManifolds = cw->getDispatcher()->getNumManifolds();
+    if( ( numManifolds == 0 ) && (lastColState == true ) )
+    {
+        osg::notify( osg::ALWAYS ) << "No collision." << std::endl;
+        lastColState = false;
+    }
+    else {
+        for( unsigned int i = 0; i < numManifolds; i++ )
+        {
+            btPersistentManifold* contactManifold = cw->getDispatcher()->getManifoldByIndexInternal(i);
+            unsigned int numContacts = contactManifold->getNumContacts();
+            for( unsigned int j=0; j<numContacts; j++ )
+            {
+                btManifoldPoint& pt = contactManifold->getContactPoint( j );
+                if( ( pt.getDistance() <= 0.f ) && ( lastColState == false ) )
+                {
+                    // grab these values for the contact normal arrows:
+                    osg::Vec3 pos = asOsgVec3( pt.getPositionWorldOnA() ); // position of the collision on object A
+                    osg::Vec3 normal = asOsgVec3( pt.m_normalWorldOnB ); // returns a unit vector
+                    float pen = pt.getDistance(); //penetration depth
+
+                    osg::Quat q;
+                    q.makeRotate( osg::Vec3( 0, 0, 1 ), normal );
+
+                    osg::notify( osg::ALWAYS ) << "Collision detected." << std::endl;
+
+                    osg::notify( osg::ALWAYS ) << "\tPosition: " << stringify(pos) << std::endl;
+                    osg::notify( osg::ALWAYS ) << "\tNormal: " << stringify(normal) << std::endl;
+                    osg::notify( osg::ALWAYS ) << "\tPenetration depth: " << pen << std::endl;
+                    //osg::notify( osg::ALWAYS ) << q.w() <<","<< q.x() <<","<< q.y() <<","<< q.z() << std::endl;
+                    lastColState = true;
+                }
+                else if( ( pt.getDistance() > 0.f ) && ( lastColState == true ) )
+                {
+                    osg::notify( osg::ALWAYS ) << "No collision." << std::endl;
+                    lastColState = false;
+                }
+            }
+        }
+    }
+}
+#endif
+
+
+
 // *****************************************************************************
 // helper methods:
 
@@ -2182,7 +2412,7 @@ bool SceneManager::nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_p
 namespace introspector
 {
 
-int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, ValueList theArgs)
+int invokeMethod(const cppintrospection::Value classInstance, const cppintrospection::Type &classType, std::string method, cppintrospection::ValueList theArgs)
 {
 
     // TODO: we should try to store this globally somewhere, so that we don't do

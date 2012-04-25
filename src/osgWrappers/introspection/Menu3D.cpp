@@ -33,87 +33,87 @@ BEGIN_OBJECT_REFLECTOR(spin::Menu3D)
 	          Properties::VIRTUAL,
 	          __void__updateNodePath,
 	          "",
-	          "");
+	          "This should likely be a private function. TO_BE_VERIFIED. ");
 	I_Method1(void, setEnabled, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setEnabled__int,
 	          "",
-	          "");
+	          "Toggle whether this menu node is enabled or disabled. ");
 	I_Method0(int, getEnabled,
 	          Properties::NON_VIRTUAL,
 	          __int__getEnabled,
 	          "",
-	          "");
+	          "Returns a boolean (int) indicating whether this menu node is enabled or disabled. ");
 	I_Method1(void, addItem, IN, const char *, itemText,
 	          Properties::NON_VIRTUAL,
 	          __void__addItem__C5_char_P1,
 	          "",
-	          "Add an item (TextNode) to the list ");
+	          "Add an item (TextNode) to the list (server-side only) ");
 	I_Method1(void, removeItem, IN, int, itemIndex,
 	          Properties::NON_VIRTUAL,
 	          __void__removeItem__int,
 	          "",
-	          "Remove an item from the list ");
+	          "Remove an item (textNode) from the list by its itemIndex. ");
 	I_Method1(void, removeItem, IN, const char *, itemID,
 	          Properties::NON_VIRTUAL,
 	          __void__removeItem__C5_char_P1,
 	          "",
-	          "");
+	          "Remove an item (textNode) from the list by its ID. ");
 	I_Method1(int, doRemoveItem, IN, osg::observer_ptr< spin::TextNode >, n,
 	          Properties::NON_VIRTUAL,
 	          __int__doRemoveItem__osg_observer_ptrT1_TextNode_,
 	          "",
-	          "");
+	          "This should be a private function. ");
 	I_Method0(void, clearItems,
 	          Properties::NON_VIRTUAL,
 	          __void__clearItems,
 	          "",
-	          "");
+	          "Removes all text nodes from the menu. ");
 	I_Method0(void, redraw,
 	          Properties::NON_VIRTUAL,
 	          __void__redraw,
 	          "",
-	          "");
+	          "Redraws the menu after items are removed to eliminate the space left by the recently removed item(s). ");
 	I_Method1(void, setHighlighted, IN, int, itemIndex,
 	          Properties::NON_VIRTUAL,
 	          __void__setHighlighted__int,
 	          "",
-	          "Highlight an item from the list ");
+	          "Highlight an item from the list by its itemIndex. ");
 	I_Method1(void, setHighlighted, IN, const char *, itemID,
 	          Properties::NON_VIRTUAL,
 	          __void__setHighlighted__C5_char_P1,
 	          "",
-	          "");
+	          "Highlight an item from the list by its itemID. ");
 	I_Method1(int, doHighlight, IN, osg::observer_ptr< spin::TextNode >, n,
 	          Properties::NON_VIRTUAL,
 	          __int__doHighlight__osg_observer_ptrT1_TextNode_,
 	          "",
-	          "");
+	          "This should be a private function. ");
 	I_Method0(const char *, getHighlighted,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getHighlighted,
 	          "",
-	          "");
+	          "Returns the id of the currently highlighted menu item. ");
 	I_Method4(void, setHighlightColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
 	          Properties::NON_VIRTUAL,
 	          __void__setHighlightColor__float__float__float__float,
 	          "",
-	          "Set the color of the font when highlighted ");
+	          "Set the color of the font in RGBA values when highlighted ");
 	I_Method0(osg::Vec4, getHighlightColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getHighlightColor,
 	          "",
-	          "");
+	          "Returns the color of the font in RGBA values when highlighted. ");
 	I_Method0(void, highlightNext,
 	          Properties::NON_VIRTUAL,
 	          __void__highlightNext,
 	          "",
-	          "");
+	          "Highlights the item that follows the currently highlighted item. ");
 	I_Method0(void, highlightPrev,
 	          Properties::NON_VIRTUAL,
 	          __void__highlightPrev,
 	          "",
-	          "");
+	          "Highlights the item previous to the currently highlighted item. ");
 	I_Method0(void, select,
 	          Properties::NON_VIRTUAL,
 	          __void__select,
@@ -128,22 +128,22 @@ BEGIN_OBJECT_REFLECTOR(spin::Menu3D)
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getItemOffset,
 	          "",
-	          "");
+	          "Returns the Vector3 value used to offset successive menu entries. ");
 	I_Method1(void, setFont, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setFont__C5_char_P1,
 	          "",
-	          "wrapped from TextNode: ");
+	          "wrapped from TextNode: sets font type ");
 	I_Method1(void, setBillboard, IN, spin::TextNode::billboardType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__TextNode_billboardType,
 	          "",
-	          "wrapped from TextNode: ");
+	          "wrapped from TextNode: types come from billboardType enum: RELATIVE, POINT_EYE, STAY_UP ");
 	I_Method4(void, setColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
 	          "",
-	          "wrapped from TextNode: ");
+	          "wrapped from TextNode: sets color in RGBA values ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

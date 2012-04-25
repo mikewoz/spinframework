@@ -49,10 +49,10 @@ BEGIN_OBJECT_REFLECTOR(spin::GeometryNode)
 	          "",
 	          "");
 	I_Method0(void, updateStateSet,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__updateStateSet,
 	          "",
-	          "");
+	          "In derived classes, you can handle how a stateset gets applied to a node (eg, which part of the subgraph it is attached by overriding the updateStateSet method. ");
 	I_Method0(int, getRenderBin,
 	          Properties::NON_VIRTUAL,
 	          __int__getRenderBin,

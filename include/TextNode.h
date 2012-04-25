@@ -44,9 +44,15 @@
 
 #include "GroupNode.h"
 
+#include <osgText/Text>
+#include <osgText/String>
+#include <osgText/TextBase>
+/*
 namespace osgText {
 class Text;
+class String;
 }
+*/
 
 namespace osg {
 class Geode;
@@ -57,9 +63,19 @@ namespace spin
 
 class SceneManager;
 
+
+class spinTextNode : public osgText::Text
+{
+protected:
+    //spinTextNode();
+    //virtual spinTextNode();
+    osgText::String::iterator computeLastCharacterOnLine(osg::Vec2& cursor, osgText::String::iterator first, osgText::String::iterator last);
+    void computeGlyphRepresentation() { osgText::Text::computeGlyphRepresentation(); }
+};
+
+
 /**
  * \brief Provides 3D text rendered in the scene
- *
  */
 class TextNode : public GroupNode
 {
@@ -69,35 +85,37 @@ public:
     TextNode(SceneManager *sceneManager, char *initID);
     virtual ~TextNode();
 
+    virtual void callbackUpdate();
+
     /**
      * The billboardType specifies how the text is oriented with respect to the
      * current camera position.
      */
+
     enum billboardType
     {
-        RELATIVE,
-        POINT_EYE,
-        STAY_UP
+        RELATIVE,  /*!< No billboarding. */
+        POINT_EYE, /*!< Set to rotate billboard around a camera's perspective */
+        STAY_UP	   /*!< Billboard rotates only on z axis. */
     };
 
     /**
      * The decorationType specifies the type of dropshadow/outline used, which
-     * can help the visibility of the text on noisy of similarly colored
-     * backgrounds.
+     * can help the visibility of text on noisy backgrounds of similar color.
      */
     enum decorationType
     {
         // these are an exact copy of osgText::Text::BackdropType
-        DROP_SHADOW_BOTTOM_RIGHT = 0,
-        DROP_SHADOW_CENTER_RIGHT,
-        DROP_SHADOW_TOP_RIGHT,
-        DROP_SHADOW_BOTTOM_CENTER,
-        DROP_SHADOW_TOP_CENTER,
-        DROP_SHADOW_BOTTOM_LEFT,
-        DROP_SHADOW_CENTER_LEFT,
-        DROP_SHADOW_TOP_LEFT,
-        OUTLINE,
-        NONE
+        DROP_SHADOW_BOTTOM_RIGHT = 0,	/*!< Shadows down and to the right. */
+        DROP_SHADOW_CENTER_RIGHT,		/*!< Shadows to the right. */
+        DROP_SHADOW_TOP_RIGHT,			/*!< Shadows up and to the right. */
+        DROP_SHADOW_BOTTOM_CENTER,		/*!< Shadows below. */
+        DROP_SHADOW_TOP_CENTER,			/*!< Shadows upwards. */
+        DROP_SHADOW_BOTTOM_LEFT,		/*!< Shadows down and to the left. */
+        DROP_SHADOW_CENTER_LEFT,		/*!< Shadows to the left. */
+        DROP_SHADOW_TOP_LEFT,			/*!< Shadows up and to the left. */
+        OUTLINE,						/*!< Creates an outline of the text. */
+        NONE							/*!< No shadowing or outline. */
     };
 
     /**
@@ -105,34 +123,156 @@ public:
      * text (filled or wireframe). Use setMargin along with this to adjust the
      * appearance of a text box.
      */
-    enum backgroundType { NO_BACKGROUND, FILLED, WIREFRAME, ALL };
-
+    enum backgroundType {
+    	NO_BACKGROUND,	/*!< The text box will have no background. */
+    	FILLED, 		/*!< Creates a text box with a filled background. */
+    	WIREFRAME, 		/*!< Creates a wireframe text box. */
+    	ALL 			/*!< Creates a filled background with visible
+						wireframe. */
+    };
 
     virtual void setContext    (const char *newvalue);
-    
-    void setTextValue        (const char* s);
+
+    /**
+     * Accepts user-entered string for the node's text.
+     */
+
+    void setText        (const char* s);
+
+    /**
+     * Deprecated method (here for backwards compatibility).
+     */
+    void setTextValue        (const char* s) { setText(s); }
+
+
+    /**
+     * Sets the font for the text associated with this node.
+     */
+
     void setFont            (const char* s);
+
+    /**
+     * Sets the point-size for the text associated with this node.
+     */
+
     void setSize            (float s);
-    void setColor            (float red, float green, float blue, float alpha);
-    void setBgColor            (float red, float green, float blue, float alpha);
-    void setMargin            (float margin);
+    
+    /**
+     * Sets the maximum size of the text box. Values of 0 in either dimension
+     * means no maximum, so that the box will stretch to fit the text
+     */
+    void setBox            (float width, float height);
+
+    /**
+     * Sets the line spacing, as a percentage of the character height. The
+     * default is 0 
+     */
+    void setLineSpacing     (float spacing);
+
+    /**
+     * Sets the maximum size of the text box.
+     */
+    void setAlignment       (int alignment);
+
+
+    /**
+     * Sets the color for the text associated to this node in RGBA values.
+     */
+
+    void setColor           (float red, float green, float blue, float alpha);
+
+    /**
+     * Sets the background color for this node.
+     */
+
+    void setBgColor          (float red, float green, float blue, float alpha);
+
+    /**
+     * Sets the margins for the text associated to this node.
+     */
+
+    void setMargin           (float margin);
+
+    /**
+     * Sets the type of billboarding asigned to this node (drawn from the enum
+     * billboardType).
+     */
 
     void setBillboard        (billboardType t);
+
+    /**
+     * Sets the shadowing or outline type for this text node (drawn from the
+     * decorationType enum).
+     */
+
     void setDecoration        (decorationType t);
+
+    /**
+     * Sets a background type for the text box (drawn from the backgroundType
+     * enum).
+     */
+
     void setBackground        (backgroundType t);
 
+    /**
+     * Returns a string with the text associated to this node.
+     */
+    const char    *getText() const   { return _text.c_str(); }
 
-    //const char *getTextValue() { return textLabel->getText().createUTF8EncodedString().c_str(); }
-    const char    *getTextValue() const   { return _text.c_str(); }
+    /**
+     * Returns a string with the text associated to this node.
+     */
     std::string     getTextString() const  { return _text; }
+
+    /**
+     * Returns a string indicating the font of the text associated to this node.
+     */
     const char    *getFont() const        { return _font.c_str(); }
+
+    /**
+     * Returns a float indicating the size of the text associated to this node.
+     */
+
     float         getSize() const        { return _size; }
+
+    /**
+     * Returns a float indicating the line spacing (as a percentage of character
+     * height).
+     */
+
+    float         getLineSpacing() const        { return _lineSpacing; }
+
+    /**
+     * Returns the color (in RGBA values) of the text associated to this node.
+     */
     osg::Vec4     getColor() const        { return _color; };
+
+    /**
+     * Returns the background color of the text box in RGBA values.
+     */
     osg::Vec4     getBgColor() const        { return _bgColor; }
+
+    /**
+     * Returns a float indicating the margin size of the text box.
+     */
     float         getMargin() const        { return _margin; }
 
+    /**
+     * Returns the currently set billboarding type with respect to the
+     * billboardType enum.
+     */
     int             getBillboard()  const { return (int)_billboard; }
+
+    /**
+     * Returns the currently set decoration type (shadows or outlines) with
+     * respect to the decorationType enum.
+     */
     int             getDecoration() const { return (int)_decoration; }
+
+    /**
+     * Returns the currently set background type with respect to the choices
+     * in the backgroundType enum.
+     */
     int             getBackround() const   { return (int)_background; }
 
     /**
@@ -144,10 +284,14 @@ public:
 
 private:
 
+    bool _updateFlag;
+
     std::string _font;
-    float _size;
+    float _size, _lineSpacing;
     osg::Vec4 _color, _bgColor;
     float _margin;
+    
+    osgText::TextBase::AlignmentType _alignment;
 
     billboardType _billboard;
     decorationType _decoration;
@@ -156,7 +300,7 @@ private:
     std::string _text; // we store this redundantly
 
     osg::ref_ptr<osg::Geode> textGeode;
-    osg::ref_ptr<osgText::Text> textLabel;
+    osg::ref_ptr<spinTextNode> textLabel;
     
     void drawText();
 

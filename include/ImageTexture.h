@@ -52,7 +52,7 @@ namespace osg {
 #include <lo/lo_types.h>
 #include <vector>
 #include <osg/ref_ptr>
-#include "ReferencedStateSet.h"
+#include "Shader.h"
 
 namespace spin
 {
@@ -61,13 +61,17 @@ namespace spin
  * \brief A texture state that holds a static image
  *
  */
-class ImageTexture : public ReferencedStateSet
+class ImageTexture : public Shader
 {
 
 public:
 
     ImageTexture(SceneManager *sceneManager, const char *initID);
     ~ImageTexture();
+
+    /**
+     * TO_BE_DONE
+     */
 
     virtual void debug();
     
@@ -82,21 +86,6 @@ public:
     void setPath (const char* newPath);
     const char *getPath() const { return _path.c_str(); }
 
-    /**
-     * Set whether the texture is influenced by lighting
-     */
-    void setLighting(int i);
-    int getLighting() const { return (int)_lightingEnabled; }
-
-    /**
-     * Set the render bin for this texture. The higher the number, the later it
-     * gets processed (ie, it appears on top). Default renderBin = 11
-     */
-    void setRenderBin (int i);
-    int getRenderBin() const { return _renderBin; }
-
-
-
     // must reimplement
     virtual std::vector<lo_message> getState() const;
 
@@ -104,11 +93,8 @@ public:
 private:
     
     osg::ref_ptr<osg::Image> _image;
-
     std::string _path;
 
-    bool _lightingEnabled;
-    int  _renderBin;
     bool _useTextureRectangle;
 };
 

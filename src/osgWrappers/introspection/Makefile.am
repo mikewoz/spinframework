@@ -19,11 +19,13 @@ libSPINwrappers_la_SOURCES = \
     MeasurementNode.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    ParticleSystem.cpp \
     PointerNode.cpp \
     RayNode.cpp \
     ReferencedNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    Shader.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \

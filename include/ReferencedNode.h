@@ -48,7 +48,6 @@
 #include "config.h"
 #include "spinUtil.h"
 #include "libloUtil.h"
-#include "MediaManager.h"
 
 #include <osg/Referenced>
 #ifndef GL_GLEXT_LEGACY
@@ -219,6 +218,18 @@ public:
     virtual void setParam (const char *paramName, const char *paramValue);
     virtual void setParam (const char *paramName, float paramValue);
 
+    void setStateSetFromFile (const char* filename);
+    void setStateSet         (const char* s);
+    const char *getStateSet  () const { return stateset_->s_name; }
+    
+    /**
+     * In derived classes, you can handle how a stateset gets applied to a node
+     * (eg, which part of the subgraph it is attached by overriding the 
+     * updateStateSet method.
+     */
+    virtual void updateStateSet();
+
+
     /**
      * subclasses of ReferencedNode may contain complicated subgraphs, and any
      * children get attached not to the node pointer itself, but to an
@@ -281,7 +292,6 @@ public:
     //osg::ref_ptr<osg::Geode> textGeode;
 
     SceneManager *sceneManager;
-    MediaManager *mediaManager;
 
     //bool setScript( const std::string& s, const std::string& params );
     //bool setScript( const char *scriptPath, double freq );  // freq is nb of calls per second
@@ -343,6 +353,8 @@ public:
      */
     osg::Group *attachmentNode;
 
+
+    t_symbol* stateset_;
 };
 
 /**

@@ -21,9 +21,24 @@
 #undef OUT
 #endif
 
-BEGIN_ENUM_REFLECTOR(spin::GroupNode::interactionMode)
+BEGIN_VALUE_REFLECTOR(spin::DraggerCallback)
+	I_DeclaringFile("GroupNode.h");
+	I_Constructor1(IN, spin::GroupNode *, g,
+	               Properties::NON_EXPLICIT,
+	               ____DraggerCallback__GroupNode_P1,
+	               "",
+	               "");
+	I_Method1(bool, receive, IN, const osgManipulator::MotionCommand &, command,
+	          Properties::NON_VIRTUAL,
+	          __bool__receive__C5_osgManipulator_MotionCommand_R1,
+	          "",
+	          "");
+END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::InteractionMode)
 	I_DeclaringFile("GroupNode.h");
 	I_EnumLabel(spin::GroupNode::STATIC);
+	I_EnumLabel(spin::GroupNode::PASSTHRU);
 	I_EnumLabel(spin::GroupNode::SELECT);
 	I_EnumLabel(spin::GroupNode::DRAG);
 	I_EnumLabel(spin::GroupNode::THROW);
@@ -43,6 +58,14 @@ BEGIN_ENUM_REFLECTOR(spin::GroupNode::velocityMode)
 	I_EnumLabel(spin::GroupNode::MOVE);
 END_REFLECTOR
 
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::OrientationMode)
+	I_DeclaringFile("GroupNode.h");
+	I_EnumLabel(spin::GroupNode::NORMAL);
+	I_EnumLabel(spin::GroupNode::POINT_TO_TARGET);
+	I_EnumLabel(spin::GroupNode::POINT_TO_TARGET_CENTROID);
+	I_EnumLabel(spin::GroupNode::POINT_TO_ORIGIN);
+END_REFLECTOR
+
 BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_DeclaringFile("GroupNode.h");
 	I_BaseType(spin::ReferencedNode);
@@ -59,7 +82,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
 	                      "",
-	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
 	I_Method5(void, mouseEvent, IN, int, event, IN, int, keyMask, IN, int, buttonMask, IN, float, x, IN, float, y,
 	          Properties::NON_VIRTUAL,
 	          __void__mouseEvent__int__int__int__float__float,
@@ -68,6 +91,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_Method7(void, event, IN, int, event, IN, const char *, userString, IN, float, eData1, IN, float, eData2, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__event__int__C5_char_P1__float__float__float__float__float,
+	          "",
+	          "");
+	I_Method2(void, setLock, IN, const char *, userString, IN, int, lock,
+	          Properties::NON_VIRTUAL,
+	          __void__setLock__C5_char_P1__int,
 	          "",
 	          "");
 	I_Method0(void, debug,
@@ -80,9 +108,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setReportMode__globalsReportMode,
 	          "",
 	          "");
-	I_Method1(void, setInteractionMode, IN, spin::GroupNode::interactionMode, mode,
+	I_Method1(void, setInteractionMode, IN, spin::GroupNode::InteractionMode, mode,
 	          Properties::NON_VIRTUAL,
-	          __void__setInteractionMode__interactionMode,
+	          __void__setInteractionMode__InteractionMode,
 	          "",
 	          "");
 	I_Method3(void, setClipping, IN, float, x, IN, float, y, IN, float, z,
@@ -95,6 +123,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setTranslation__float__float__float,
 	          "",
 	          "The local translation offset for this node with respect to it's parent ");
+	I_Method1(void, setOrientationMode, IN, spin::GroupNode::OrientationMode, m,
+	          Properties::NON_VIRTUAL,
+	          __void__setOrientationMode__OrientationMode,
+	          "",
+	          "Set the OrientationMode of the node, which will be applied after every transformation. ");
+	I_Method0(int, getOrientationMode,
+	          Properties::NON_VIRTUAL,
+	          __int__getOrientationMode,
+	          "",
+	          "");
 	I_Method3(void, setOrientation, IN, float, pitch, IN, float, roll, IN, float, yaw,
 	          Properties::VIRTUAL,
 	          __void__setOrientation__float__float__float,
@@ -105,6 +143,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setOrientationQuat__float__float__float__float,
 	          "",
 	          "Set the orientation offset as a quaternion ");
+	I_Method0(void, applyOrientationMode,
+	          Properties::NON_VIRTUAL,
+	          __void__applyOrientationMode,
+	          "",
+	          "");
 	I_Method3(void, setScale, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,
@@ -145,6 +188,21 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__rotate__float__float__float,
 	          "",
 	          "The rotate command adds a relative rotation to the node's current orientation. ");
+	I_Method1(void, setManipulator, IN, const char *, manipulatorType,
+	          Properties::VIRTUAL,
+	          __void__setManipulator__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(const char *, getManipulator,
+	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getManipulator,
+	          "",
+	          "");
+	I_Method16(void, setManipulatorMatrix, IN, float, a00, IN, float, a01, IN, float, a02, IN, float, a03, IN, float, a10, IN, float, a11, IN, float, a12, IN, float, a13, IN, float, a20, IN, float, a21, IN, float, a22, IN, float, a23, IN, float, a30, IN, float, a31, IN, float, a32, IN, float, a33,
+	           Properties::VIRTUAL,
+	           __void__setManipulatorMatrix__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float,
+	           "",
+	           "");
 	I_Method0(int, getReportMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getReportMode,
@@ -168,6 +226,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_Method0(osg::Vec3, getOrientation,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getOrientation,
+	          "",
+	          "");
+	I_Method0(osg::Quat, getOrientationQuat,
+	          Properties::NON_VIRTUAL,
+	          __osg_Quat__getOrientationQuat,
 	          "",
 	          "");
 	I_Method0(osg::Vec3, getScale,
@@ -215,6 +278,34 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__stateDump,
 	          "",
 	          "We override stateDump so that we can additionally force a dumpGlobals() call whenever a dump is requested ");
+	I_Method0(osg::MatrixTransform *, getManipulatorTransform,
+	          Properties::NON_VIRTUAL,
+	          __osg_MatrixTransform_P1__getManipulatorTransform,
+	          "",
+	          "");
+	I_Method0(osg::MatrixTransform *, getTransform,
+	          Properties::NON_VIRTUAL,
+	          __osg_MatrixTransform_P1__getTransform,
+	          "",
+	          "");
+	I_ProtectedMethod0(void, updateDraggerMatrix,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__updateDraggerMatrix,
+	                   "",
+	                   "");
+	I_ProtectedMethod0(void, updateMatrix,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__updateMatrix,
+	                   "",
+	                   "");
+	I_ProtectedMethod0(void, drawManipulator,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__drawManipulator,
+	                   "",
+	                   "");
 	I_SimpleProperty(osg::Vec3, Center, 
 	                 __osg_Vec3__getCenter, 
 	                 0);
@@ -230,8 +321,20 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_SimpleProperty(int, InteractionMode, 
 	                 __int__getInteractionMode, 
 	                 0);
+	I_SimpleProperty(const char *, Manipulator, 
+	                 __C5_char_P1__getManipulator, 
+	                 __void__setManipulator__C5_char_P1);
+	I_SimpleProperty(osg::MatrixTransform *, ManipulatorTransform, 
+	                 __osg_MatrixTransform_P1__getManipulatorTransform, 
+	                 0);
 	I_SimpleProperty(osg::Vec3, Orientation, 
 	                 __osg_Vec3__getOrientation, 
+	                 0);
+	I_SimpleProperty(int, OrientationMode, 
+	                 __int__getOrientationMode, 
+	                 0);
+	I_SimpleProperty(osg::Quat, OrientationQuat, 
+	                 __osg_Quat__getOrientationQuat, 
 	                 0);
 	I_SimpleProperty(int, ReportMode, 
 	                 __int__getReportMode, 
@@ -241,6 +344,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
+	                 0);
+	I_SimpleProperty(osg::MatrixTransform *, Transform, 
+	                 __osg_MatrixTransform_P1__getTransform, 
 	                 0);
 	I_SimpleProperty(osg::Vec3, Translation, 
 	                 __osg_Vec3__getTranslation, 

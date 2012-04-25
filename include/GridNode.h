@@ -65,14 +65,24 @@ public:
      * The grid size is measured in meters, and defines how far out from the
      * center the grid is drawn (ie, half width).
      */
+
     void setSize        (int _size);
 
     /**
-     * Grid line color
+     * Sets the grid's line color in RGBA value.
      */
     void setColor        (float red, float green, float blue, float alpha);
 
+    /**
+     * Returns the size of the grid (in meters from the center).
+     */
+
     int getSize() const { return (int) this->_size; }
+
+    /**
+     * Returns the color of the grid's lines in a Vector4 of RGBA values.
+     */
+
     osg::Vec4 getColor() const { return this->_color;  };
 
 

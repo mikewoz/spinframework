@@ -155,6 +155,10 @@
 /* Version number of package */
 #undef VERSION
 
+/* Enables linking with the Bullet physics library to provide collisions and
+   rigid body dynamics */
+#undef WITH_BULLET
+
 /* A flag that compiles additional features for use with the shared_video
    library from Scenic */
 #undef WITH_SHARED_VIDEO

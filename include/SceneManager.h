@@ -59,6 +59,11 @@
 #include "lo/lo.h"
 #include "tinyxml.h"
 
+#ifdef WITH_BULLET
+class btCollisionWorld;
+class btDynamicsWorld;
+#endif
+
 namespace spin
 {
 
@@ -71,7 +76,6 @@ typedef std::map< std::string, ReferencedStateSetList > ReferencedStateSetMap;
 typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
 
 // forward declarations:
-class MediaManager;
 class GroupNode;
 class UserNode;
 class SoundConnection;
@@ -123,6 +127,8 @@ class SceneManager
         ReferencedStateSet* getStateSet(const char *id);
         ReferencedStateSet* createStateSet(const char *id, const char *type);
         ReferencedStateSet* createStateSet(const char *fname);
+        
+        void setWorldStateSet(const char *s);
 
         std::vector<t_symbol*> findNodes(const char *pattern);
         //nodeListType findNodes(const char *pattern);
@@ -196,6 +202,8 @@ class SceneManager
         osg::ref_ptr<osg::Group> rootNode;
         osg::ref_ptr<osg::ClearNode> worldNode;
         osg::ref_ptr<osg::Geode> gridGeode;
+        
+        t_symbol* worldStateSet_;
 
         /**
          * The scene manager can operate in graphical mode or non-graphical.
@@ -227,8 +235,6 @@ class SceneManager
 
         std::string resourcesPath;
 
-        MediaManager *mediaManager;
-
         //osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
         /**
@@ -245,6 +251,24 @@ class SceneManager
          */
         void refreshSubscribers(const std::map<std::string, lo_address> &clients);
 
+        /**
+         * Set the gravity vector for the physics engine (only used by some
+         * nodes).
+         */
+        void setGravity(float x, float y, float z);
+        
+        /**
+         * Sets the update delay for the physics engine (in seconds). The
+         * default is 0.02 seconds (ie, 50hz).
+         */
+        void setUpdateRate(float seconds);
+        
+
+#ifdef WITH_BULLET
+        bool lastColState;
+        void detectCollision( bool& lastColState, btCollisionWorld* cw );
+        btDynamicsWorld *dynamicsWorld_;
+#endif
 
     private:
 
@@ -252,6 +276,9 @@ class SceneManager
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
         nodeMapType nodeMap; // the nodeList arranged by type
         ReferencedStateSetMap stateMap;
+        
+        float dynamicsUpdateRate_; // in seconds
+        osg::Timer_t lastTick_;
 };
 
 /**

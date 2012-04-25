@@ -47,8 +47,7 @@
 #include "spinBaseContext.h"
 #include "SceneManager.h"
 #include "ReferencedStateSet.h"
-
-using namespace std;
+#include "ShaderUtil.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -66,18 +65,44 @@ ReferencedStateSet::ReferencedStateSet(SceneManager *s, const char *initID)
 	id = gensym(initID);
 	id->s_thing = this;
 	id->s_type = REFERENCED_STATESET;
+
+	renderBin_ = 11;
+	lightingEnabled_ = true;
+	textureBlend_ = osg::TexEnv::MODULATE;
+	textureRepeatS_ = false;
+	textureRepeatT_ = false;
 	
 	sceneManager = s;
 	
 	classType = "ReferencedStateSet";
 	
-	this->setName(string(id->s_name) + ".ReferencedStateSet");
+	this->setName(std::string(id->s_name) + ".ReferencedStateSet");
 	
 	// We need to set up a callback. This should be on the topmost node, so that during node
 	// traversal, we update our parameters before anything is drawn.
 	this->setUserData( dynamic_cast<osg::Referenced*>(this) );
 	this->setUpdateCallback(new ReferencedStateSet_callback);
+    
+    // initialize some stuff:
+    /*
+    osg::TexEnv* texenv = new osg::TexEnv();
+    texenv->setMode(textureBlend_);
+	this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+    */
 	
+    // set lighting:
+    if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+	// set renderbin:
+	this->setRenderBinDetails( renderBin_, "RenderBin");
+
+	// if image has transparency, enable blending:
+	if (0)//(_imageStream->isImageTranslucent())
+	{
+		this->setMode(GL_BLEND, osg::StateAttribute::ON);
+		this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+	}
 }
 
 // destructor
@@ -89,7 +114,7 @@ ReferencedStateSet::~ReferencedStateSet()
 // *****************************************************************************
 void ReferencedStateSet::updateCallback()
 {
-    // derived classes can do updates here   
+    // derived classes can do updates here 
 }
 
 
@@ -188,8 +213,8 @@ void ReferencedStateSet::debug()
 	//std::cout << "ref_count=" << test->getReferenceCount() << std::endl;
 	
 	
-	vector<lo_message> nodeState = this->getState();
-	vector<lo_message>::iterator nodeStateIterator;
+	std::vector<lo_message> nodeState = this->getState();
+	std::vector<lo_message>::iterator nodeStateIterator;
 	for (nodeStateIterator = nodeState.begin(); nodeStateIterator != nodeState.end(); ++nodeStateIterator)
 	{
 	    argTypes = lo_message_get_types(*nodeStateIterator);
@@ -215,10 +240,124 @@ void ReferencedStateSet::debug()
 }
 
 // *****************************************************************************
+
+void ReferencedStateSet::setTextureBlend (int mode)
+{
+	switch (mode)
+	{
+		case 1:
+			textureBlend_ = osg::TexEnv::DECAL;
+			break;
+		case 2:
+			textureBlend_ = osg::TexEnv::BLEND;
+			break;
+		case 3:
+			textureBlend_ = osg::TexEnv::REPLACE;
+			break;
+		default:
+			textureBlend_ = osg::TexEnv::MODULATE;
+			break;
+	}
+	
+	osg::StateSet::TextureAttributeList& texList = this->getTextureAttributeList();
+	for (unsigned int i=0; i<texList.size(); ++i)
+	{
+		osg::TexEnv* texenv = dynamic_cast<osg::TexEnv*>(this->getTextureAttribute(i,osg::StateAttribute::TEXENV));
+		if (texenv)
+		{
+			texenv->setMode(textureBlend_);
+		}
+	}
+
+	BROADCAST(this, "si", "setTextureBlend", getTextureBlend());
+}
+
+int ReferencedStateSet::getTextureBlend() const
+{
+	switch (textureBlend_)
+	{
+		case osg::TexEnv::DECAL:
+			return 1;
+		case osg::TexEnv::BLEND:
+			return 2;
+		case osg::TexEnv::REPLACE:
+			return 3;
+		default:
+			return 0;
+	}
+}	
+
+void ReferencedStateSet::setTextureRepeat (int s, int t)
+{
+	textureRepeatS_=(bool)s;
+	textureRepeatT_=(bool)t;
+	
+	osg::StateSet::TextureAttributeList& texList = this->getTextureAttributeList();
+	for (unsigned int i=0; i<texList.size(); ++i)
+	{
+		osg::Texture* tex = dynamic_cast<osg::Texture*>(this->getTextureAttribute(i,osg::StateAttribute::TEXTURE));
+		if (tex)
+		{
+			// TODO: what is WRAP_R ?
+			//tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
+			if (textureRepeatS_)
+				tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+			else
+				tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+			if (textureRepeatT_)
+				tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+			else
+				tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
+		}
+	}
+	
+	BROADCAST(this, "sii", "setTextureRepeat", (int)textureRepeatS_, (int)textureRepeatT_);
+}
+
+void ReferencedStateSet::setLighting (int i)
+{
+	lightingEnabled_ = (bool)i;
+
+	if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+	BROADCAST(this, "si", "setLighting", getLighting());
+}
+
+void ReferencedStateSet::setRenderBin (int i)
+{
+	renderBin_ = i;
+	this->setRenderBinDetails( (int)renderBin_, "RenderBin");
+
+	BROADCAST(this, "si", "setRenderBin", getRenderBin());
+}
+
+
+// *****************************************************************************
 std::vector<lo_message> ReferencedStateSet::getState () const
 {
 	std::vector<lo_message> ret;
 
+	lo_message msg;
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setTextureBlend", getTextureBlend());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "sii", "setTextureRepeat", (int)textureRepeatS_, (int)textureRepeatT_);
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setLighting", getLighting());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
+	ret.push_back(msg);
+
+
+	
 	return ret;
 }
 

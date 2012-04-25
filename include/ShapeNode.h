@@ -75,7 +75,8 @@ public:
     /**
      * Possible shapes for a ShapeNode.
      * 
-     * Each of these types of shape is identified by a unique number. The first of these shape types has number 0, the second is number 1, and so on.
+     * Each of these types of shape is identified by a unique number. The first
+     * of these shape types has number 0, the second is number 1, and so on.
      * 
      * We provide several possible shapes
      */

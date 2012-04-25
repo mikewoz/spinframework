@@ -63,6 +63,7 @@ public:
     AnimationNode(SceneManager *sceneManager, char *initID);
     virtual ~AnimationNode();
     
+    
     enum LoopMode { SWING, LOOP, NO_LOOPING };
 
     
@@ -88,13 +89,26 @@ public:
      * The animation will send setTranslation, setOrientation, and setScale
      * events at this rate (assuming there is a change). Values will be
      * interpolated in between control points.
+     * @param hz Update rate in hz
      */
     void setUpdateRate (float hz);
+    
+    /**
+     * @return update rate in hz
+     */
     float getUpdateRate() const { return _updateRate; }
     
-    
+    /**
+    * Turns animation on/off.
+    */
     
     void setPlay (int p);
+    
+    /**
+    * @return a boolean value which indicates whether the animation is playing
+    * or not
+    */
+    
     int getPlay() const { return (int) _play; }
         
     /**
@@ -104,12 +118,24 @@ public:
      * of the recording.
      */
     void setRecord (int r);
+    
+    /**
+    * @return a boolean value which indicates whether the node is recording or
+    * not
+    */
+    
     int getRecord() const { return (int) _record; }
     
     /**
      * Sets the loop mode for the animation. eg, SWING, LOOP, NO_LOOPING.
      */
+     
     void setLoopMode (LoopMode mode);
+    
+    /**
+    * @return the loop mode for the animation. eg, SWING, LOOP, NO_LOOPING.
+    */
+    
     int getLoopMode() const { return (int) _animationPath->getLoopMode(); }
     
     /**
@@ -144,7 +170,9 @@ public:
     /**
      * Explicitely adds a control point into the animation sequence
      */
-    void controlPoint (double timestamp, float x, float y, float z, float rotX, float rotY, float rotZ, float rotW, float scaleX, float scaleY, float scaleZ);
+    void controlPoint (double timestamp, float x, float y, float z, float rotX,
+    		float rotY, float rotZ, float rotW, float scaleX, float scaleY,
+    		float scaleZ);
     
     /**
      * Clears the current animation sequence

@@ -43,6 +43,7 @@
 #include <osg/StateAttribute>
 #include <osg/TextureRectangle>
 #include <osg/Texture2D>
+#include <osg/TexEnv>
 #include <osgDB/ReadFile>
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
@@ -59,13 +60,11 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-ImageTexture::ImageTexture (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
+ImageTexture::ImageTexture (SceneManager *s, const char *initID) : Shader(s, initID)
 {
 	classType = "ImageTexture";
 
 	_path = "NULL";
-	_renderBin = 11;
-	_lightingEnabled = true;
 	_useTextureRectangle = false;
 }
 
@@ -78,7 +77,7 @@ ImageTexture::~ImageTexture()
 
 void ImageTexture::debug()
 {
-	ReferencedStateSet::debug();
+	Shader::debug();
 	
 	std::cout << "   ---------" << std::endl;
 
@@ -125,9 +124,15 @@ void ImageTexture::setPath (const char* newPath)
 			tex->setResizeNonPowerOfTwoHint(false);
 			tex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
 			//tex->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-			tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
-			tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
-			tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+			//tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
+			if (textureRepeatS_)
+				tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+			else
+				tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+			if (textureRepeatT_)
+				tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+			else
+				tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
 
 			// set the image:
 			tex->setImage(0,test.get());
@@ -138,68 +143,51 @@ void ImageTexture::setPath (const char* newPath)
 			// add texture to stateset:
 			this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
+			// osg::TexEnv::REPLACE  osg::TexEnv::DECAL  osg::TexEnv::MODULATE osg::TexEnv::BLEND
+			osg::TexEnv* texenv = new osg::TexEnv();
+			texenv->setMode(textureBlend_);
+			this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+	
 			// set lighting:
-			if (_lightingEnabled) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+			if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
 			else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 
 			// set renderbin:
-			this->setRenderBinDetails( _renderBin, "RenderBin");
+			this->setRenderBinDetails( renderBin_, "RenderBin");
 
 			// if image has transparency, enable blending:
 			if (1)//(_imageStream->isImageTranslucent())
 			{
 				this->setMode(GL_BLEND, osg::StateAttribute::ON);
 				this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-			}
+			} else
+            {
+                this->setMode(GL_BLEND, osg::StateAttribute::OFF);
+				this->setRenderingHint(osg::StateSet::DEFAULT_BIN);
+            }
 		
 		}
 
 		else {
 			std::cout << "ImageTexture ERROR. Bad format?: " << _path << std::endl;
 		}
-
-
 	}
 
 	BROADCAST(this, "ss", "setPath", getPath());
 }
 
-void ImageTexture::setLighting (int i)
-{
-	_lightingEnabled = (bool)i;
 
-	if (_lightingEnabled) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-
-	BROADCAST(this, "si", "setLighting", getLighting());
-}
-
-void ImageTexture::setRenderBin (int i)
-{
-	_renderBin = i;
-	this->setRenderBinDetails( (int)_renderBin, "RenderBin");
-
-	BROADCAST(this, "si", "setRenderBin", getRenderBin());
-}
 
 // *****************************************************************************
 std::vector<lo_message> ImageTexture::getState () const
 {
 	// inherit state from base class
-	std::vector<lo_message> ret = ReferencedStateSet::getState();
+	std::vector<lo_message> ret = Shader::getState();
 		
 	lo_message msg;
 	
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setPath", getPath());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setLighting", getLighting());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 	
 	return ret;

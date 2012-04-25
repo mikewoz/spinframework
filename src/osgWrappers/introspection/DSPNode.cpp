@@ -38,12 +38,12 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__DSPNode_P1,
 	          "",
-	          "");
+	          " param snk a pointer to the sink node  ");
 	I_Method1(spin::SoundConnection *, getConnection, IN, const char *, snk,
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__C5_char_P1,
 	          "",
-	          "");
+	          " param snk the name of the sink node to search for  ");
 	I_Method1(void, connect, IN, spin::DSPNode *, snk,
 	          Properties::NON_VIRTUAL,
 	          __void__connect__DSPNode_P1,
@@ -58,7 +58,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __void__connectSource__C5_char_P1,
 	          "",
-	          "");
+	          "Sets the current node as a sink to the specified node. ");
 	I_Method1(void, disconnect, IN, const char *, snk,
 	          Properties::NON_VIRTUAL,
 	          __void__disconnect__C5_char_P1,
@@ -78,7 +78,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getActive,
 	          "",
-	          "");
+	          "for sending messages to the connections of this (source) node: virtual void connectionMsg (char *snkName, char *method, float value); ");
 	I_Method0(const char *, getPlugin,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPlugin,

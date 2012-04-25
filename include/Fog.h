@@ -83,11 +83,11 @@ public:
     float getFogDensity() const;
 
     /**
-     * Set fog color
+     * Set fog color in RGBA value.
      */
     void setFogColor (float r, float g, float b, float a);
     /**
-     * Get fog color
+     * Returns fog color
      */
     osg::Vec4 getFogColor() const;
 
