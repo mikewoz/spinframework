@@ -238,6 +238,9 @@ else
     AC_MSG_NOTICE([BULLET_CFLAGS:        ${BULLET_CFLAGS}])
     AC_MSG_NOTICE([BULLET_LIBS:          ${BULLET_LIBS}])
 fi
+AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
+AC_SUBST(BULLET_CFLAGS)
+AC_SUBST(BULLET_LIBS)
 
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),

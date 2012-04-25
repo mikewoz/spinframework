@@ -2353,6 +2353,7 @@ void SceneManager::setUpdateRate(float seconds)
     dynamicsUpdateRate_ = seconds;
 }
 
+#ifdef WITH_BULLET
 void detectCollision( bool& lastColState, btCollisionWorld* cw )
 {
     unsigned int numManifolds = cw->getDispatcher()->getNumManifolds();
@@ -2396,6 +2397,7 @@ void detectCollision( bool& lastColState, btCollisionWorld* cw )
         }
     }
 }
+#endif
 
 
 
