@@ -357,10 +357,16 @@ SceneManager::SceneManager(std::string id)
     dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 
-    // register global callback
+    // This callback is a global method of checking collisions after every 
+    // pyhsics step. We register a global callback using gContactAddedCallback,
+    // but the problem is that all objects move actually be moved first, which
+    // means that they will move and then need to be moved back (this results in
+    // jittery updates). Instead, we use the ContactResultCallback method , only
+    // when nodes are updated in CollisionShape. See the following for more info
+    // http://www.bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Callbacks_and_Triggers
     if (spinApp::Instance().getContext()->isServer())
     {
-        gContactAddedCallback = btCollisionCallback;
+        //gContactAddedCallback = btCollisionCallback;
     }
     
     dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
@@ -1630,7 +1636,7 @@ void SceneManager::update()
     }
     
 #ifdef WITH_BULLET
-    if (dt >= dynamicsUpdateRate_)
+    if (1)//(dt >= dynamicsUpdateRate_)
     {
         // only do on server side?
         if (spinApp::Instance().getContext()->isServer())
@@ -1638,11 +1644,6 @@ void SceneManager::update()
             //dynamicsWorld_->performDiscreteCollisionDetection();
             dynamicsWorld_->stepSimulation(dt);
             dynamicsWorld_->updateAabbs(); // <- is this necessary?
-            
-            /*
-            collisionWorld_->performDiscreteCollisionDetection();
-            detectCollision( lastColState, collisionWorld_ );
-            */
         }
     }
 #endif

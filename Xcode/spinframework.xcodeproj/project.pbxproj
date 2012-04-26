@@ -104,6 +104,10 @@
 		1C386CD714BD3DF60065851F /* UserNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CAD14BD3DF60065851F /* UserNode.cpp */; };
 		1C386CD814BD3DF60065851F /* VideoTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CAE14BD3DF60065851F /* VideoTexture.cpp */; };
 		1C386CD914BD3DF60065851F /* ViewerManipulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CAF14BD3DF60065851F /* ViewerManipulator.cpp */; };
+		1C4E06421548F3C30056BD10 /* DraggerWith3Axes.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4E06411548F3C30056BD10 /* DraggerWith3Axes.h */; };
+		1C4E06451548F3DC0056BD10 /* DraggerWith3Axes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C4E06441548F3DC0056BD10 /* DraggerWith3Axes.cpp */; };
+		1C4E06471548FC8D0056BD10 /* DraggerTrackball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C4E06461548FC8D0056BD10 /* DraggerTrackball.cpp */; };
+		1C4E06491548FC9B0056BD10 /* DraggerTrackball.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4E06481548FC9B0056BD10 /* DraggerTrackball.h */; };
 		1C57789014BD6F4400632E46 /* spinserver.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C57788F14BD6F4400632E46 /* spinserver.1 */; };
 		1C57789514BD6FC900632E46 /* spinServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C57789414BD6FC900632E46 /* spinServer.cpp */; };
 		1C57789614BD702A00632E46 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
@@ -967,6 +971,10 @@
 		1C386CAD14BD3DF60065851F /* UserNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = UserNode.cpp; path = ../src/spin/UserNode.cpp; sourceTree = SOURCE_ROOT; };
 		1C386CAE14BD3DF60065851F /* VideoTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = VideoTexture.cpp; path = ../src/spin/VideoTexture.cpp; sourceTree = SOURCE_ROOT; };
 		1C386CAF14BD3DF60065851F /* ViewerManipulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ViewerManipulator.cpp; path = ../src/spin/ViewerManipulator.cpp; sourceTree = SOURCE_ROOT; };
+		1C4E06411548F3C30056BD10 /* DraggerWith3Axes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DraggerWith3Axes.h; path = ../include/DraggerWith3Axes.h; sourceTree = "<group>"; };
+		1C4E06441548F3DC0056BD10 /* DraggerWith3Axes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DraggerWith3Axes.cpp; path = ../src/spin/DraggerWith3Axes.cpp; sourceTree = "<group>"; };
+		1C4E06461548FC8D0056BD10 /* DraggerTrackball.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DraggerTrackball.cpp; path = ../src/spin/DraggerTrackball.cpp; sourceTree = "<group>"; };
+		1C4E06481548FC9B0056BD10 /* DraggerTrackball.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DraggerTrackball.h; path = ../include/DraggerTrackball.h; sourceTree = "<group>"; };
 		1C57788A14BD6F4400632E46 /* spinserver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinserver; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C57788F14BD6F4400632E46 /* spinserver.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = spinserver.1; sourceTree = "<group>"; };
 		1C57789414BD6FC900632E46 /* spinServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinServer.cpp; path = ../../src/spin/spinServer.cpp; sourceTree = "<group>"; };
@@ -1586,6 +1594,8 @@
 				1CD9411C1543BBB80075A81C /* CollisionShape.cpp */,
 				1C386C8814BD3DF60065851F /* ConstraintsNode.cpp */,
 				1C386C8914BD3DF60065851F /* Contour.cpp */,
+				1C4E06461548FC8D0056BD10 /* DraggerTrackball.cpp */,
+				1C4E06441548F3DC0056BD10 /* DraggerWith3Axes.cpp */,
 				1C386C8A14BD3DF60065851F /* DSPNode.cpp */,
 				1C386C8B14BD3DF60065851F /* EventHandler.cpp */,
 				1C386C8C14BD3DF60065851F /* Fog.cpp */,
@@ -1644,6 +1654,8 @@
 				1CA24D7414BE2891007A9C31 /* config.h */,
 				1CA24D7514BE2891007A9C31 /* ConstraintsNode.h */,
 				1CA24D7614BE2891007A9C31 /* Contour.h */,
+				1C4E06481548FC9B0056BD10 /* DraggerTrackball.h */,
+				1C4E06411548F3C30056BD10 /* DraggerWith3Axes.h */,
 				1CA24D7714BE2891007A9C31 /* DSPNode.h */,
 				1CA24D7814BE2891007A9C31 /* EventHandler.h */,
 				1CA24D7914BE2891007A9C31 /* EventTypes.h */,
@@ -2208,6 +2220,8 @@
 				1CCDCCBE15386DC300B9D191 /* TextArea.h in Headers */,
 				1CD941201543BC0A0075A81C /* CollisionShape.h in Headers */,
 				1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */,
+				1C4E06421548F3C30056BD10 /* DraggerWith3Axes.h in Headers */,
+				1C4E06491548FC9B0056BD10 /* DraggerTrackball.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2609,6 +2623,8 @@
 				1CD9411D1543BBB80075A81C /* CollisionShape.cpp in Sources */,
 				1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */,
 				1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */,
+				1C4E06451548F3DC0056BD10 /* DraggerWith3Axes.cpp in Sources */,
+				1C4E06471548FC8D0056BD10 /* DraggerTrackball.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

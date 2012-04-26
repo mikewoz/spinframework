@@ -77,8 +77,10 @@ public:
     void setDynamic(int isDynamic);
     int getDynamic() const { return (int)isDynamic_; };
 
-    virtual void setOrientation (float pitch, float roll, float yaw);
+    bool checkCollisions(btTransform tranform);
     virtual void setTranslation (float x, float y, float z);
+    virtual void setOrientationQuat(float x, float y, float z, float w);
+    virtual void setOrientation (float pitch, float roll, float yaw);
     virtual void setScale (float x, float y, float z);
 
     virtual void setManipulatorMatrix
@@ -89,6 +91,8 @@ public:
 
 
     virtual std::vector<lo_message> getState() const;
+    
+    osg::Vec3 collisionOffset_;
 
 protected:
 
@@ -103,6 +107,8 @@ private:
 
     bool isDynamic_;
     btScalar mass_;
+    
+    osg::Timer_t lastTick_;
 
 };
 

@@ -188,12 +188,18 @@ public:
     /**
      * Returns the current parent name (string)
      */
-    char *getParent() const { return parent->s_name; }
+    char* getParent() const { return parent->s_name; }
 
     /**
      * Returns the current parent as an osg::Group
      */
-    osg::Group *getParent(int i) { return osg::Group::getParent(i); }
+    osg::Group* getParent(int i) { return osg::Group::getParent(i); }
+
+    /**
+     * Returns the currently identified parent node:
+     */
+    ReferencedNode* getParentNode() { return dynamic_cast<ReferencedNode*>(parent->s_thing); }
+
 
     /**
      * A node can 'belong' to a certain host machine, allowing it to be rendered

@@ -58,16 +58,26 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          __int__getDynamic,
 	          "",
 	          "");
-	I_Method3(void, setOrientation, IN, float, pitch, IN, float, roll, IN, float, yaw,
-	          Properties::VIRTUAL,
-	          __void__setOrientation__float__float__float,
+	I_Method1(bool, checkCollisions, IN, btTransform, tranform,
+	          Properties::NON_VIRTUAL,
+	          __bool__checkCollisions__btTransform,
 	          "",
-	          "The local orientation offset for this node with respect to it's parent ");
+	          "");
 	I_Method3(void, setTranslation, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setTranslation__float__float__float,
 	          "",
 	          "The local translation offset for this node with respect to it's parent ");
+	I_Method4(void, setOrientationQuat, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
+	          Properties::VIRTUAL,
+	          __void__setOrientationQuat__float__float__float__float,
+	          "",
+	          "Set the orientation offset as a quaternion ");
+	I_Method3(void, setOrientation, IN, float, pitch, IN, float, roll, IN, float, yaw,
+	          Properties::VIRTUAL,
+	          __void__setOrientation__float__float__float,
+	          "",
+	          "The local orientation offset for this node with respect to it's parent ");
 	I_Method3(void, setScale, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,
@@ -98,5 +108,6 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_PublicMemberProperty(osg::Vec3, collisionOffset_);
 END_REFLECTOR
 
