@@ -22,6 +22,12 @@
 #undef OUT
 #endif
 
+BEGIN_ENUM_REFLECTOR(spin::PointerNode::GrabMode)
+	I_DeclaringFile("PointerNode.h");
+	I_EnumLabel(spin::PointerNode::AXIS_LOCK);
+	I_EnumLabel(spin::PointerNode::RELATIVE);
+END_REFLECTOR
+
 BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	I_DeclaringFile("PointerNode.h");
 	I_BaseType(spin::RayNode);
@@ -38,7 +44,12 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          Properties::NON_VIRTUAL,
 	          __GroupNode_P1__getNodeFromIntersections__int,
 	          "",
-	          "");
+	          "Get the first GroupNode encountered with interaction mode greater than passthru ");
+	I_Method0(osgManipulator::Dragger *, getDraggerFromIntersections,
+	          Properties::NON_VIRTUAL,
+	          __osgManipulator_Dragger_P1__getDraggerFromIntersections,
+	          "",
+	          "return the first dragger in the intersection list ");
 	I_Method1(void, manipulate, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__manipulate__int,
@@ -49,26 +60,41 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	          __int__getManipulate,
 	          "",
 	          "");
+	I_Method1(void, lockToTarget, IN, const char *, nodeToLock,
+	          Properties::NON_VIRTUAL,
+	          __void__lockToTarget__C5_char_P1,
+	          "",
+	          "This looks to see if there is a node being pointed at, and if so, it tells the nodeToLock to lock it's orientation to always point at that target. Useful for cameras. ");
 	I_Method1(void, setManipulator, IN, const char *, manipulatorType,
 	          Properties::VIRTUAL,
 	          __void__setManipulator__C5_char_P1,
 	          "",
 	          "We can call setManipulator and pass the name of a dragger, and the pointer will enable the dragger on the current GroupNode that it is currently pointing at. If the pointer is not intersecting with any node, this will set the dragger on the last manipulated node; this was found to be a desired behaviour instead of constantly ensuring an intersection whenever the user wanted to use a different manipulator. ");
+	I_Method1(void, setGrabMode, IN, spin::PointerNode::GrabMode, mode,
+	          Properties::NON_VIRTUAL,
+	          __void__setGrabMode__GrabMode,
+	          "",
+	          "Set the OrientationMode of the node, which will be applied after every transformation. ");
+	I_Method0(int, getGrabMode,
+	          Properties::NON_VIRTUAL,
+	          __int__getGrabMode,
+	          "",
+	          "");
 	I_Method1(void, grab, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__grab__int,
 	          "",
 	          "The grab method selects the closest intersected node and temporarily attaches it to the pointer, allowing it to inherit any translation or rotation offsets.Notes: Only nodes derived from GroupNode can be grabbed.If no node is intersected, the grab won't do anything.The node is re-attached to it's original parent when released, so don't delete the parent in the meantime  param b A boolean grab indicator (1 to grab, 0 to release)  ");
-	I_Method1(void, slide, IN, float, f,
+	I_Method1(void, translateOnPointer, IN, float, f,
 	          Properties::NON_VIRTUAL,
-	          __void__slide__float,
+	          __void__translateOnPointer__float,
 	          "",
 	          "Slides the currently grabbed node (if there is one) along the pointer axis (ie, increasing or decreasing the distance). param f The amount by which to slide (positive values slide the attached node AWAY from the pointer  ");
-	I_Method1(void, spin, IN, float, f,
+	I_Method1(void, rotateOnPointer, IN, float, f,
 	          Properties::NON_VIRTUAL,
-	          __void__spin__float,
+	          __void__rotateOnPointer__float,
 	          "",
-	          "Spins the currently grabbed node (if there is one) around the pointer axis. param f The amount by which to spin (in degrees)  ");
+	          "Rotates the currently grabbed node (if there is one) around the pointer axis. param f The amount by which to rotate around the pointer ray (in degrees)  ");
 	I_Method0(int, getGrab,
 	          Properties::NON_VIRTUAL,
 	          __int__getGrab,
@@ -97,8 +123,14 @@ BEGIN_OBJECT_REFLECTOR(spin::PointerNode)
 	                   __void__reportIntersections,
 	                   "",
 	                   "Reports the list of intersected nodes (server-side only) ");
+	I_SimpleProperty(osgManipulator::Dragger *, DraggerFromIntersections, 
+	                 __osgManipulator_Dragger_P1__getDraggerFromIntersections, 
+	                 0);
 	I_SimpleProperty(int, Grab, 
 	                 __int__getGrab, 
+	                 0);
+	I_SimpleProperty(int, GrabMode, 
+	                 __int__getGrabMode, 
 	                 0);
 	I_SimpleProperty(int, Manipulate, 
 	                 __int__getManipulate, 

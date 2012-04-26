@@ -863,6 +863,7 @@ int run(int argc, char **argv)
 	bool picker = false;
 	bool mover = true;
 	
+    int multisamples = 4;
 	bool fullscreen = false;
 	bool hideCursor=false;
 
@@ -904,6 +905,7 @@ int run(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--clipping <near far>", "Manually specify fixed clipping planes (Default: clipping planes will be recomputed for every frame)");
     arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
+	arguments.getApplicationUsage()->addCommandLineOption("--multisamples <num>", "Set the level of multisampling for antialiasing (Default: 4)");
 	arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-baed camera controls for this user. This is helpful when using a mouse picker.");
 	arguments.getApplicationUsage()->addCommandLineOption("--enable-mouse-picker", "Enable the mouse picker, and send events to the server");
 
@@ -934,6 +936,7 @@ int run(int argc, char **argv)
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}
+	while (arguments.read("--multisamples",multisamples)) {}
 	if (arguments.read("--disable-camera-controls")) mover=false;
 	if (arguments.read("--enable-mouse-picker")) picker=true;
 
@@ -956,6 +959,7 @@ int run(int argc, char **argv)
 
 	viewer.getUsage(*arguments.getApplicationUsage());
 
+    osg::DisplaySettings::instance()->setNumMultiSamples( multisamples );
 
 	// *************************************************************************
 	// start the listener thread:

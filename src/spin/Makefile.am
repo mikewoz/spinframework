@@ -45,6 +45,8 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
     Contour.cpp \
+    DraggerTrackball.cpp \
+    DraggerWith3Axes.cpp \
     DSPNode.cpp \
     EventHandler.cpp \
     Fog.cpp \
@@ -94,6 +96,8 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/config.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
+    $(top_srcdir)/include/DraggerTrackball.h \
+    $(top_srcdir)/include/DraggerWith3Axes.h \
     $(top_srcdir)/include/DSPNode.h \
     $(top_srcdir)/include/EventHandler.h \
     $(top_srcdir)/include/EventTypes.h \

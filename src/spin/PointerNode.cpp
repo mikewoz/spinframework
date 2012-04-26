@@ -73,6 +73,7 @@ PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : RayNode(sc
     this->setName(string(id->s_name) + ".PointerNode");
     nodeType = "PointerNode";
 
+    lastManipulatorType_ = "TabBoxDragger";
     //draggerType = "TabPlaneDragger";
     //draggerType = "TrackballDragger";
     //draggerType = "RotateCylinderDragger";
@@ -89,6 +90,9 @@ PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : RayNode(sc
     ea->setWindowRectangle(1, 1, 1, 1);
 
     doManipulation = false;
+
+    slideIncrement_ = 0.0;
+    rollIncrement_ = 0.0;
 
     grabbedNode = NULL;
     targetNode = NULL;
@@ -131,16 +135,20 @@ void PointerNode::callbackUpdate()
     
     //osg::Timer_t startTick = osg::Timer::instance()->tick();
 
+    
+
     // get line segment start and end points:
+    
     osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
 
-    // only proceed if myMatrix has changed since last time
-    // NO!, can't do that in case other objects move!
-    //if (this->previousMatrix == myMatrix) return;
-
-    osg::Vec3 start = myMatrix.getTrans();
-    osg::Vec3 end = start + ( myMatrix.getRotate() * osg::Vec3(0.0,this->getLength(),0.0) );
-
+    osg::Vec3 t;
+    osg::Quat q;
+    osg::Vec3 s;
+    osg::Quat so;
+    myMatrix.decompose(t, q, s, so); // <- to heavy?
+    
+    osg::Vec3 start = t;
+    osg::Vec3 end = t + ( q * osg::Vec3(0.0,this->getLength(),0.0) );
 
 
 
@@ -184,56 +192,61 @@ void PointerNode::applyGrab(osg::Matrix mat)
 {
     if (this->previousMatrix != mat)
     {
-        osg::Matrix grabbedLocalToWorld = osg::computeLocalToWorld(grabbedNode->currentNodePath);
-        osg::Matrix grabbedWorldToLocal = osg::Matrix::inverse(grabbedLocalToWorld);
-        
-        // this rotates in a good way, but around the origin:
-        /*
-        osg::Matrix deltaMatrix = mat * osg::Matrix::inverse(origPointerMatrix);
-        osg::Vec3 T = osg::Matrix::inverse(deltaMatrix) * (origGrabbedMatrix.getTrans());
-         std::cout << "T = " << stringify(T) << std::endl;
-        
-        grabbedNode->setTranslation(T.x(), T.y(), T.z());
-        //grabbedNode->setOrientation(R.x(), R.y(), R.z());
-        */
-        
+
         osg::Matrix newMatrix;
-        
-        //osg::Matrix m = osg::Matrix::rotate(mainTransform->getAttitude())
-        //    * osg::Matrix::scale(mainTransform->getScale())
-        //    * osg::Matrix::translate(mainTransform->getPosition());
-        osg::Matrix m = osg::Matrix::rotate(this->getOrientationQuat());
-        
+        osg::Matrix diff = osg::Matrix::inverse(origPointerMatrix) * mat;
+
         /*
-        osg::Matrix localMotionMatrix = 
-            _localToWorld *
-            grabbedWorldToLocal *
-            m *
-            grabbedWorldToLocal *
-            _worldToLocal;
-        */
-        /*
-        osg::Matrix newMatrix =
-            grabbedLocalToWorld *
-            _worldToLocal *
-            m *
-            _localToWorld *
-            grabbedWorldToLocal *
-            origGrabbedMatrix;
+        std::cout << "Grabbed nodepath:" << std::endl;
+        for (osg::NodePath::iterator itr = grabbedNode->currentNodePath.begin(); itr != grabbedNode->currentNodePath.end(); ++itr)
+        {
+            std::cout << "   -> " << (*itr)->getName() << std::endl;
+        }
+        
+        std::cout << "diff      pos: " << stringify(diff.getTrans()) << std::endl;
+        std::cout << "diff      rot: " << stringify(diff.getRotate()) << std::endl;
+        std::cout << "diff      eul: " << stringify(QuatToEuler(diff.getRotate())) << std::endl;
         */
         
-        //newMatrix = osg::Matrix::inverse(mat) * origGrabbedMatrix;
         
-        // works, except that there's a 180deg offset in rotation:
-        newMatrix = osg::Matrix::inverse(origGrabbedMatrix) * mat * origGrabbedMatrix;
         
-        // works, but is transformed an extra -cube matrix
-        newMatrix = origGrabbedMatrix * mat * osg::Matrix::inverse(origGrabbedMatrix);
- 
-        newMatrix = origGrabbedMatrix * mat;
-                                                          
+        osg::Matrix grabbedLocalToWorld;
+        ReferencedNode *parentNode = grabbedNode->getParentNode();
+        if (parentNode)
+        {
+            grabbedLocalToWorld = osg::computeWorldToLocal(parentNode->currentNodePath);
+        } else
+        {
+            grabbedLocalToWorld = osg::Matrix::identity();
+            //grabbedLocalToWorld = osg::computeWorldToLocal(grabbedNode->currentNodePath);
+        }
+         
+         
+        /*
+        // NOTE: this is the test that work to fix parent offset
+        osg::NodePath newPath = grabbedNode->currentNodePath;
+        newPath.pop_back();
+        newPath.pop_back();
+        std::cout << "newpath:" << std::endl;
+        for (osg::NodePath::iterator itr = newPath.begin(); itr != newPath.end(); ++itr)
+        {
+            std::cout << "   -> " << (*itr)->getName() << std::endl;
+        }
+        
+        osg::Matrix grabbedWorldToLocal2 = osg::Matrix::inverse(osg::computeLocalToWorld(newPath));
+        */
+
+        osg::Matrix slideMatrix = osg::Matrix::translate(osg::Vec3(0.0,slideIncrement_,0.0));
+         
+        newMatrix =  grabbedLocalToWorld * origGrabbedMatrix * slideMatrix * diff;
         grabbedNode->setTranslation(newMatrix.getTrans().x(), newMatrix.getTrans().y(), newMatrix.getTrans().z());
-        
+
+        if (grabMode_ == RELATIVE)
+        {
+            newMatrix = grabbedLocalToWorld * mat;
+            osg::Quat rot = newMatrix.getRotate();
+            grabbedNode->setOrientationQuat(rot.x(), rot.y(), rot.z(), rot.w());
+        }
         
     }
 }
@@ -262,11 +275,12 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
         {
         
             _pointer.addIntersection(hitr->nodePath, hitr->getLocalIntersectPoint());       
-       }
+        }
         
        
         //_pointer._hitIter = _pointer._hitList.begin();
 
+        bool didDragger = false;
         
         for (osg::NodePath::iterator itr = _pointer._hitList.front().first.begin();
              itr != _pointer._hitList.front().first.end();
@@ -284,9 +298,14 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
                 ptrDragger->handle(_pointer, *ea.get(), aa);
                 ptrDragger->setDraggerActive(true);
                 dragger = ptrDragger;
+                
+                didDragger = true;
                 //break;
             }
         }
+        
+        // If the ...
+        
     }
 
     // if the dragger is already valid, then just do the DRAG
@@ -301,6 +320,7 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
         //ea->setHandled(false);
         ea->setEventType(osgGA::GUIEventAdapter::DRAG);
         dragger->handle(_pointer, *ea.get(), aa);
+
     }
     
     // if the dragger is valid and the manipulator flag has been set to off,
@@ -514,6 +534,29 @@ GroupNode *PointerNode::getNodeFromIntersections(int index)
     return NULL;
 }
 
+osgManipulator::Dragger* PointerNode::getDraggerFromIntersections()
+{
+    osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
+    osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+
+    for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+    {
+        const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
+
+        for (int i=intersection.nodePath.size()-1; i>=0; i--)
+        {
+            
+            osgManipulator::Dragger* dragger = dynamic_cast<osgManipulator::Dragger*>(intersection.nodePath[i]);
+            if (dragger)
+            {
+                return dragger;
+            }
+        }
+    }
+    return NULL;
+}
+
+
 /*
 void PointerNode::computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T)
 {
@@ -553,38 +596,94 @@ void PointerNode::computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec
 
 // *****************************************************************************
 
-void PointerNode::setManipulator(const char *manipulatorType)
+void PointerNode::lockToTarget(const char *nodeToLock)
 {
-    // return if this spinContext is a slave
-    if (!spinApp::Instance().getContext()->isServer()) 
+    if (!spinApp::Instance().getContext()->isServer())
         return;
         
-    GroupNode *lastNode = dynamic_cast<GroupNode*>(lastManipulated->s_thing);
+    GroupNode *node = dynamic_cast<GroupNode*>(sceneManager->getNode(nodeToLock));
+    if (node)
+    {
+        GroupNode *target = dynamic_cast<GroupNode*>(getNodeFromIntersections(0));        
+        if (target)
+        {
+            node->setOrientationMode(GroupNode::POINT_TO_TARGET_CENTROID);
+            node->setOrientationTarget(target->id->s_name);
+        }
+        else
+        {
+            // What do we do if there is no target?
+            node->setOrientationTarget(lastManipulated->s_name);
+        }
+    }
+
+}
+
+void PointerNode::setManipulator(const char *manipulatorType)
+{
+    if (spinApp::Instance().getContext()->isServer()) 
+    {
+        GroupNode *lastNode = dynamic_cast<GroupNode*>(lastManipulated->s_thing);
+            
+        // see if there is an intersection with a GroupNode, and if so, tell
+        // that node to enable the manipulator
+        GroupNode *n = dynamic_cast<GroupNode*>(getNodeFromIntersections(0));        
+        if (n)
+        {
+            // if we're targetting a new node, make sure that the last
+            // manipulated node's dragger gets turned off:
+            if ((lastNode) && (n != lastNode))
+                lastNode->setManipulator("NULL");
         
-    // see if there is an intersection with a GroupNode, and if so, tell
-    // that node to enable the manipulator
-    GroupNode *n = dynamic_cast<GroupNode*>(getNodeFromIntersections(0));        
-    if (n)
-    {
-        // if we're targetting a new node, make sure that the last manipulated
-        // node's dragger gets turned off:
-        if ((lastNode) && (n != lastNode))
-            lastNode->setManipulator("NULL");
+            n->setManipulator(manipulatorType);
+            lastManipulated = n->id;
+        }
+        
+        // if there was no intersection, load the manipulator on the last object
+        // that was manipulated
+        else if (lastNode)
+        {
+            lastNode->setManipulator(manipulatorType);
+        }
     
-        n->setManipulator(manipulatorType);
-        lastManipulated = n->id;
+        lastManipulatorType_ = std::string(manipulatorType);
     }
-    
-    // if there was no intersection, load the manipulator on the last object
-    // that was manipulated
-    else if (lastNode)
+    else
     {
-        lastNode->setManipulator(manipulatorType);
+        BROADCAST(this, "ss", "setManipulator", manipulatorType);
     }
+}
+
+void PointerNode::setGrabMode (GrabMode mode)
+{
+	this->grabMode_ = mode;
+	BROADCAST(this, "si", "setGrabMode", getGrabMode());
 }
 
 void PointerNode::manipulate (int b)
 {
+    // Immediately when the user presses the manipulate button, we check to see
+    // if we are pointing at a new node. ie, we make sure the user is NOT
+    // pointing at a dragger anymore, and 
+    if (b && spinApp::Instance().getContext()->isServer()) 
+    {
+        if (1) //!getDraggerFromIntersections())
+        {
+            GroupNode *lastNode = dynamic_cast<GroupNode*>(lastManipulated->s_thing);
+            GroupNode *newNode = dynamic_cast<GroupNode*>(getNodeFromIntersections(0));
+
+            if (newNode && (newNode!=lastNode))
+            {
+                dragger = NULL;
+                if (lastNode) lastNode->setManipulator("NULL");
+                newNode->setManipulator(lastManipulatorType_.c_str());
+                lastManipulated = newNode->id;
+            }
+        }
+    }
+            
+    // then we just set the 'doManipulation' flag, which will 
+
     doManipulation = (bool) b;
     BROADCAST(this, "si", "manipulate", this->getManipulate());
 }
@@ -622,6 +721,8 @@ void PointerNode::grab (int b)
             origPointerMatrix = osg::computeLocalToWorld(this->currentNodePath);
             origGrabbedMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);
             
+            slideIncrement_ = 0.0;
+            
             /*
            origPointerMatrix = osg::Matrix::rotate(mainTransform->getAttitude())
             * osg::Matrix::scale(mainTransform->getScale())
@@ -658,160 +759,54 @@ void PointerNode::grab (int b)
 
 }
 
-#ifdef IGNORE
-void PointerNode::grab (int b)
-{
-    // return if this spinContext is a slave
-    if (!spinApp::Instance().getContext()->isServer()) 
-        return;
-
-    osg::Matrix srcMatrix, dstMatrix;
-
-    // start grab:
-    if (b and intersectList.size())
-    {
-
-        // What do we do if a node is already grabbed? let go and grab again?
-        // ... for now, let's do nothing.
-        if (grabbedNode.valid()) return;
-
-        grabbedNode = getNodeFromIntersections(0);
-
-        //osg::Vec3 localIntersectPt = intersectListOffsets[0];
-        osg::Vec3 localIntersectPt = intersectData[0].getLocalIntersectPoint();
-        osg::Vec3 worldIntersectPt = intersectData[0].getWorldIntersectPoint();
-
-
-        if (!grabbedNode.valid()) return;
-
-        osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
-
-        // We will temporarily attach grabbedNode to this pointer, so we
-        // need to keep track of the old parent so we can reattach it:
-        previousParent = grabbedNode->parent;
-
-        // we need to give grabbedNode an local offset equivalent to
-        // it's current difference from this node
-
-        srcMatrix = osg::computeLocalToWorld(this->currentNodePath);
-        dstMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);
-
-        osg::Vec3 p1 = srcMatrix.getTrans();
-        osg::Vec3 p2 = dstMatrix.getTrans();
-        osg::Vec3 dp = p2 - p1;
-
-
-        
-        osg::Vec3 iv = ( srcMatrix.getRotate() * (worldIntersectPt-p1) );
-        /*
-        std::cout << "p1=("<<p1.x()<<","<<p1.y()<<","<<p1.z()<< ")"<<std::endl;
-        std::cout << "iv=("<<iv.x()<<","<<iv.y()<<","<<iv.z()<< ")"<<std::endl;
-        std::cout << "dp=("<<dp.x()<<","<<dp.y()<<","<<dp.z()<< ")"<<std::endl;
-        std::cout << "localIntersectPt=("<<localIntersectPt.x()<<","<<localIntersectPt.y()<<","<<localIntersectPt.z()<< ")"<<std::endl;
-        std::cout << "worldIntersectPt=("<<worldIntersectPt.x()<<","<<worldIntersectPt.y()<<","<<worldIntersectPt.z()<< ")"<<std::endl;
-        std::cout << "world - p1 =     ("<<worldIntersectPt.x()-p1.x()<<","<<worldIntersectPt.y()-p1.y()<<","<<worldIntersectPt.z()-p1.z()<< ")"<<std::endl;
-        */
-        
-
-        // ARGH. localIntersectPt is not correct!! TODO
-        //osg::Vec3 T = osg::Vec3(-localIntersectPt.x(),dp.length(),-localIntersectPt.z());
-        osg::Vec3 T = osg::Vec3(0,dp.length(),0);
-
-        osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
-        osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));
-        osg::Vec3 R = r2 - r1;
-
-
-
-        //T = osg::Vec3(0,dp.length(),0);
-        //R = osgVec3(0,0,0);
-        
-        /*
-        std::cout << "Attaching node [" << grabbedNode->id->s_name << "] to pointer with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
-        */
-        
-        // attach node to this pointer:
-        grabbedNode->newParent = this->id;
-        grabbedNode->attach(); // this method locks the sceneMutex
-
-
-        // now apply the offset:
-        //
-        // TODO: do this with sceneManager->invokeMethod() so that it need not
-        //       be a basicNode.
-
-
-        n->setTranslation(T.x(), T.y(), T.z());
-        n->setOrientation(R.x(), R.y(), R.z());
-    }
-
-    // end grab:
-    else if (grabbedNode.valid())
-    {
-
-        // get the global positions of our grabbedNode and oldTargetParent
-
-        if (previousParent==gensym("world"))
-            srcMatrix = osg::Matrix::identity();
-        else
-            srcMatrix = osg::computeLocalToWorld(dynamic_cast<ReferencedNode*>(previousParent->s_thing)->currentNodePath);
-
-        dstMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);
-
-        // find change in translation and orientation from src to dst:
-        osg::Vec3 r1 = Vec3inDegrees(QuatToEuler(srcMatrix.getRotate()));
-        osg::Vec3 r2 = Vec3inDegrees(QuatToEuler(dstMatrix.getRotate()));
-        osg::Vec3 R = r2 - r1;
-
-        osg::Vec3 p1 = srcMatrix.getTrans();
-        osg::Vec3 p2 = dstMatrix.getTrans();
-        osg::Vec3 T = p2 - p1;
-
-
-        // re-attach node to it's old parent:
-        grabbedNode->newParent = previousParent;
-        grabbedNode->attach(); // this method locks the sceneMutex
-        
-        /*
-        std::cout << "Re-attaching node [" << grabbedNode->id->s_name << "] to old parent [" << previousParent->s_name << "] with T=(" <<T.x()<<","<<T.y()<<","<<T.z()<< "), R=(" <<R.x()<<","<<R.y()<<","<<R.z()<< ")" << std::endl;
-        */
-        
-        // now apply the offset:
-        // (TODO: use sceneManager->invokeMethod)
-        osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
-        n->setTranslation(T.x(), T.y(), T.z());
-        n->setOrientation(R.x(), R.y(), R.z());
-
-
-        grabbedNode = NULL;
-
-    }
-
-    BROADCAST(this, "si", "grab", this->getGrab());
-}
-#endif
-
-void PointerNode::slide (float f)
+void PointerNode::translateOnPointer (float f)
 {
     if (grabbedNode.valid())
     {
+        std::cout << "slideIncrement = " << f << std::endl;
+        slideIncrement_ = f;
+        return;
         osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
         osg::Vec3 T = n->getTranslation() + osg::Vec3(0,f,0);
 
         // (TODO: use sceneManager->invokeMethod)
         n->setTranslation(T.x(), T.y(), T.z());
     }
+    else
+        slideIncrement_ = 0.0;
 }
 
-void PointerNode::spin (float f)
+void PointerNode::rotateOnPointer (float f)
 {
     if (grabbedNode.valid())
     {
+    
+        // Note: don't use roll from pointer, since it is typically NOT updated. Usually only pitch/yaw ie, azim/elev are sent my a sensor to avoid gimbal issues.
+
+        
+        osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
+        
+        osg::Vec3 t;
+        osg::Quat q;
+        osg::Vec3 s;
+        osg::Quat so;
+        origGrabbedMatrix.decompose(t, q, s, so);
+
+        //std::cout << "Got twist of " << f << ", orig angles= " << stringify(Vec3inDegrees(QuatToEuler(q))) << std::endl;
+        
+        
+        //osg::Quat newQuat = q * n->getOrientationQuat() ;
+        osg::Quat newQuat = q * osg::Quat(osg::DegreesToRadians(f),osg::Y_AXIS);
+        
+        n->setOrientationQuat(newQuat.x(), newQuat.y(), newQuat.z(), newQuat.w());
+        
+        
+        // old method
+        /*
         osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
         osg::Vec3 R = n->getOrientation() + osg::Vec3(0,f,0);
-
-        // (TODO: use sceneManager->invokeMethod)
         n->setOrientation(R.x(), R.y(), R.z());
+        */
     }
 }
 
@@ -825,6 +820,10 @@ std::vector<lo_message> PointerNode::getState () const
     std::vector<lo_message> ret = RayNode::getState();
 
     lo_message msg;
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setGrabMode", getGrabMode());
+    ret.push_back(msg);
 
 /*
     msg = lo_message_new();

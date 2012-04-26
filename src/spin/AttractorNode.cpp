@@ -96,6 +96,8 @@ void AttractorNode::callbackUpdate()
 
 				// get direction of force by converting the AttractorNode's
 				// orientation to world coords:
+                // TODO: don't use getRoatate! it's not safe when matrix is scaled
+                // use matrix::decompose instead
 				osg::Quat thisQuat = thisMat.getRotate();
 				osg::Vec3 thisDir = thisQuat * osg::Y_AXIS;
 

@@ -133,6 +133,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __int__getOrientationMode,
 	          "",
 	          "");
+	I_Method1(void, setOrientationTarget, IN, const char *, target,
+	          Properties::NON_VIRTUAL,
+	          __void__setOrientationTarget__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(char *, getOrientationTarget,
+	          Properties::NON_VIRTUAL,
+	          __char_P1__getOrientationTarget,
+	          "",
+	          "");
 	I_Method3(void, setOrientation, IN, float, pitch, IN, float, roll, IN, float, yaw,
 	          Properties::VIRTUAL,
 	          __void__setOrientation__float__float__float,
@@ -218,14 +228,14 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __osg_Vec3__getClipping,
 	          "",
 	          "");
-	I_Method0(osg::Vec3, getTranslation,
-	          Properties::NON_VIRTUAL,
-	          __osg_Vec3__getTranslation,
-	          "",
-	          "");
 	I_Method0(osg::Vec3, getOrientation,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getOrientation,
+	          "",
+	          "");
+	I_Method0(osg::Vec3, getTranslation,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec3__getTranslation,
 	          "",
 	          "");
 	I_Method0(osg::Quat, getOrientationQuat,
@@ -278,22 +288,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__stateDump,
 	          "",
 	          "We override stateDump so that we can additionally force a dumpGlobals() call whenever a dump is requested ");
-	I_Method0(osg::MatrixTransform *, getManipulatorTransform,
-	          Properties::NON_VIRTUAL,
-	          __osg_MatrixTransform_P1__getManipulatorTransform,
-	          "",
-	          "");
 	I_Method0(osg::MatrixTransform *, getTransform,
 	          Properties::NON_VIRTUAL,
 	          __osg_MatrixTransform_P1__getTransform,
 	          "",
 	          "");
-	I_ProtectedMethod0(void, updateDraggerMatrix,
-	                   Properties::NON_VIRTUAL,
-	                   Properties::NON_CONST,
-	                   __void__updateDraggerMatrix,
-	                   "",
-	                   "");
+	I_Method0(void, updateDraggerMatrix,
+	          Properties::NON_VIRTUAL,
+	          __void__updateDraggerMatrix,
+	          "",
+	          "");
 	I_ProtectedMethod0(void, updateMatrix,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -324,9 +328,6 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_SimpleProperty(const char *, Manipulator, 
 	                 __C5_char_P1__getManipulator, 
 	                 __void__setManipulator__C5_char_P1);
-	I_SimpleProperty(osg::MatrixTransform *, ManipulatorTransform, 
-	                 __osg_MatrixTransform_P1__getManipulatorTransform, 
-	                 0);
 	I_SimpleProperty(osg::Vec3, Orientation, 
 	                 __osg_Vec3__getOrientation, 
 	                 0);
@@ -335,6 +336,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                 0);
 	I_SimpleProperty(osg::Quat, OrientationQuat, 
 	                 __osg_Quat__getOrientationQuat, 
+	                 0);
+	I_SimpleProperty(char *, OrientationTarget, 
+	                 __char_P1__getOrientationTarget, 
 	                 0);
 	I_SimpleProperty(int, ReportMode, 
 	                 __int__getReportMode, 

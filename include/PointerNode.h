@@ -88,14 +88,37 @@ class PointerNode : public RayNode
 
         PointerNode(SceneManager *sceneManager, char *initID);
         virtual ~PointerNode();
+        
+        enum GrabMode
+        {
+            AXIS_LOCK,
+            RELATIVE
+        };
+            
 
         virtual void callbackUpdate();
 
-
+        /**
+         * Get the first GroupNode encountered with interaction mode greater
+         * than passthru
+         */
         GroupNode *getNodeFromIntersections(int index);
 
+        /**
+         * return the first dragger in the intersection list
+         */
+        osgManipulator::Dragger* getDraggerFromIntersections();
+        
+        
         void manipulate (int b);
         int getManipulate() const { return (int) doManipulation; }
+
+        /**
+         * This looks to see if there is a node being pointed at, and if so, it
+         * tells the nodeToLock to lock it's orientation to always point at that
+         * target. Useful for cameras.
+         */
+        void lockToTarget(const char *nodeToLock);
 
         /**
          * We can call setManipulator and pass the name of a dragger, and the
@@ -106,6 +129,15 @@ class PointerNode : public RayNode
          * intersection whenever the user wanted to use a different manipulator.
          */
         void setManipulator(const char *manipulatorType);
+
+            
+        /**
+         * Set the OrientationMode of the node, which will be applied after every
+         * transformation.
+         */
+        void setGrabMode(GrabMode mode);
+        int getGrabMode() const { return (int)grabMode_; };
+
 
         /**
          * The grab method selects the closest intersected node and temporarily
@@ -129,15 +161,16 @@ class PointerNode : public RayNode
          * @param f The amount by which to slide (positive values slide the 
          * attached node AWAY from the pointer
          */
-        void slide (float f);
+        void translateOnPointer (float f);
         
         /**
-         * Spins the currently grabbed node (if there is one) around the pointer
+         * Rotates the currently grabbed node (if there is one) around the pointer
          * axis.
          *
-         * @param f The amount by which to spin (in degrees)
+         * @param f The amount by which to rotate around the pointer ray
+         * (in degrees)
          */
-        void spin (float f);
+        void rotateOnPointer (float f);
          
         /**
          * @return Whether there is a valid node that is currently 'grabbed'
@@ -175,11 +208,15 @@ class PointerNode : public RayNode
         osg::ref_ptr<GroupNode> grabbedNode;
         osg::Vec3 grabbedOffset;
         t_symbol *previousParent;
+        GrabMode grabMode_;
+        float slideIncrement_;
+        float rollIncrement_;
 
         // dragger stuff:
         bool doManipulation;
         osg::ref_ptr<ReferencedNode> targetNode;
         t_symbol *lastManipulated;
+        std::string lastManipulatorType_;
 
         osg::Matrix origPointerMatrix;
         osg::Matrix origGrabbedMatrix;

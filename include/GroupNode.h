@@ -155,6 +155,10 @@ public:
     void setOrientationMode(OrientationMode m);
     int getOrientationMode() const { return (int)orientationMode_; };
 
+    void setOrientationTarget(const char* target);
+    char* getOrientationTarget() const { return orientationTarget_->s_name; };
+
+
     /**
      * The local orientation offset for this node with respect to it's parent
      */
@@ -236,10 +240,18 @@ public:
     int getReportMode() const { return (int) _reportMode; };
     int getInteractionMode() const { return (int) _interactionMode; };
     osg::Vec3 getClipping() const { return _clipping; };
-    osg::Vec3 getTranslation() const { return mainTransform->getMatrix().getTrans(); };
     osg::Vec3 getOrientation() const { return _orientation; };
+    
+    /*
+    osg::Vec3 getTranslation() const { return mainTransform->getMatrix().getTrans(); };
     osg::Quat getOrientationQuat() const { return mainTransform->getMatrix().getRotate(); };
     osg::Vec3 getScale() const { return mainTransform->getMatrix().getScale(); };
+    */
+    
+    osg::Vec3 getTranslation() const { return translation_; };
+    osg::Quat getOrientationQuat() const { return quat_; };
+    osg::Vec3 getScale() const { return scale_; };     
+    
     osg::Vec3 getVelocity() const { return _velocity; };
     int getVelocityMode() const { return (int) _velocityMode; };
     float getDamping() const { return _damping; };
@@ -277,12 +289,13 @@ public:
 
 
 
-    osg::MatrixTransform *getManipulatorTransform() { return manipulatorTransform.get(); }
     osg::MatrixTransform *getTransform() { return mainTransform.get(); }
+
+    void updateDraggerMatrix();
+
 
 protected:
 
-    void updateDraggerMatrix();
     void updateMatrix();
     void drawManipulator();
 

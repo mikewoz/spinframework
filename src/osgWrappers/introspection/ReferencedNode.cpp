@@ -108,6 +108,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __osg_Group_P1__getParent__int,
 	          "",
 	          "Returns the current parent as an osg::Group ");
+	I_Method0(spin::ReferencedNode *, getParentNode,
+	          Properties::NON_VIRTUAL,
+	          __ReferencedNode_P1__getParentNode,
+	          "",
+	          "Returns the currently identified parent node: ");
 	I_Method1(void, setContext, IN, const char *, newvalue,
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
@@ -250,6 +255,9 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	                 0);
 	I_SimpleProperty(char *, Parent, 
 	                 __char_P1__getParent, 
+	                 0);
+	I_SimpleProperty(spin::ReferencedNode *, ParentNode, 
+	                 __ReferencedNode_P1__getParentNode, 
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
