@@ -181,6 +181,14 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS += \
     $(top_srcdir)/include/CollisionShape.h
 endif
 
+if PCL
+AM_CPPFLAGS += $(PCL_CFLAGS) 
+libspin_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
+libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
+libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h
+endif
+
+
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp

@@ -44,6 +44,7 @@
 
 #include "ShapeNode.h"
 #include <btBulletDynamicsCommon.h>
+#include <btBulletCollisionCommon.h>
 
 
 namespace spin
