@@ -24,7 +24,7 @@
 
 BEGIN_ENUM_REFLECTOR(spin::PointerNode::GrabMode)
 	I_DeclaringFile("PointerNode.h");
-	I_EnumLabel(spin::PointerNode::AXIS_LOCK);
+	I_EnumLabel(spin::PointerNode::ORIENTATION_LOCK);
 	I_EnumLabel(spin::PointerNode::RELATIVE);
 END_REFLECTOR
 
