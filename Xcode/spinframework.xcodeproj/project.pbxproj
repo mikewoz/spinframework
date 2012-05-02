@@ -560,6 +560,7 @@
 		1CC1079A15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
 		1CC1079B15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
 		1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
+		1CC5D51615505575009C63A5 /* Syphon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC5D51515505575009C63A5 /* Syphon.framework */; };
 		1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C9EE82C14BE2725000976A6 /* Cocoa.framework */; };
 		1CCCA0D514BE31AC00DCA0B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D314BE31AC00DCA0B7 /* InfoPlist.strings */; };
 		1CCCA0D714BE31AC00DCA0B7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D614BE31AC00DCA0B7 /* main.mm */; };
@@ -584,6 +585,9 @@
 		1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412A1543C77E0075A81C /* CollisionShape.cpp */; };
 		1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD9412C15448AFC0075A81C /* bulletUtil.h */; };
 		1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412E15448B0F0075A81C /* bulletUtil.cpp */; };
+		1CDDB28B1551AD7300A45ADA /* SyphonTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */; };
+		1CDDB28D1551AD8500A45ADA /* SyphonTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */; };
+		1CDDB28F1551AE2800A45ADA /* SyphonTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
@@ -1298,6 +1302,7 @@
 		1CC1074515332A9800F0B1EA /* libosgViewer.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgViewer.dylib; path = ../../../../../usr/local/lib/libosgViewer.dylib; sourceTree = "<group>"; };
 		1CC1074615332A9800F0B1EA /* libosgVolume.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.dylib; path = ../../../../../usr/local/lib/libosgVolume.dylib; sourceTree = "<group>"; };
 		1CC1074715332A9800F0B1EA /* libosgWidget.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgWidget.dylib; path = ../../../../../usr/local/lib/libosgWidget.dylib; sourceTree = "<group>"; };
+		1CC5D51515505575009C63A5 /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Syphon.framework; path = ../../../Library/Developer/Frameworks/Syphon.framework; sourceTree = "<group>"; };
 		1CCCA0BF14BE315400DCA0B7 /* spinviewer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinviewer; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0CD14BE31AB00DCA0B7 /* spinviewerUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spinviewerUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0D214BE31AB00DCA0B7 /* spinviewerUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spinviewerUI-Info.plist"; sourceTree = "<group>"; };
@@ -1324,6 +1329,9 @@
 		1CD9412A1543C77E0075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CollisionShape.cpp; path = ../src/osgWrappers/introspection/CollisionShape.cpp; sourceTree = "<group>"; };
 		1CD9412C15448AFC0075A81C /* bulletUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bulletUtil.h; path = ../include/bulletUtil.h; sourceTree = "<group>"; };
 		1CD9412E15448B0F0075A81C /* bulletUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bulletUtil.cpp; path = ../src/spin/bulletUtil.cpp; sourceTree = "<group>"; };
+		1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SyphonTexture.cpp; path = ../src/spin/SyphonTexture.cpp; sourceTree = "<group>"; };
+		1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SyphonTexture.h; path = ../include/SyphonTexture.h; sourceTree = "<group>"; };
+		1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SyphonTexture.cpp; path = ../src/osgWrappers/introspection/SyphonTexture.cpp; sourceTree = "<group>"; };
 		1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.66.dylib; path = usr/local/lib/libosg.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.66.dylib; path = usr/local/lib/libosgAnimation.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.66.dylib; path = usr/local/lib/libosgDB.66.dylib; sourceTree = SDKROOT; };
@@ -1517,6 +1525,7 @@
 				1CC1079215332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
 				1CC1079715332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
 				1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
+				1CC5D51615505575009C63A5 /* Syphon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1635,6 +1644,7 @@
 				1C386CA914BD3DF60065851F /* spinServerContext.cpp */,
 				1C386CAA14BD3DF60065851F /* spinUtil.cpp */,
 				1C386CAB14BD3DF60065851F /* SwitchNode.cpp */,
+				1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */,
 				1CCDCCC015386DE900B9D191 /* TextArea.cpp */,
 				1C386CAC14BD3DF60065851F /* TextNode.cpp */,
 				1C386CAD14BD3DF60065851F /* UserNode.cpp */,
@@ -1701,6 +1711,7 @@
 				1CA24D9D14BE2892007A9C31 /* spinUtil.h */,
 				1CA24D9E14BE2892007A9C31 /* spinWX.h */,
 				1CA24D9F14BE2892007A9C31 /* SwitchNode.h */,
+				1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */,
 				1CCDCCBD15386DC300B9D191 /* TextArea.h */,
 				1CA24DA014BE2892007A9C31 /* TextNode.h */,
 				1CA24DA114BE2892007A9C31 /* UserNode.h */,
@@ -1746,6 +1757,7 @@
 				1CA24D5014BE2875007A9C31 /* SoundNode.cpp */,
 				1CA24D5114BE2875007A9C31 /* SoundSpace.cpp */,
 				1CA24D5214BE2875007A9C31 /* SwitchNode.cpp */,
+				1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */,
 				1CCDCCC215389C5D00B9D191 /* TextArea.cpp */,
 				1CA24D5314BE2875007A9C31 /* TextNode.cpp */,
 				1CA24D5414BE2875007A9C31 /* UserNode.cpp */,
@@ -2010,6 +2022,7 @@
 				1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */,
 				1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */,
 				1C94DEB914BFEBAA006394AD /* libboost_python.dylib */,
+				1CC5D51515505575009C63A5 /* Syphon.framework */,
 				1C9EE82F14BE2725000976A6 /* AppKit.framework */,
 				1C9EE83014BE2725000976A6 /* CoreData.framework */,
 				1C9EE83114BE2725000976A6 /* Foundation.framework */,
@@ -2222,6 +2235,7 @@
 				1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */,
 				1C4E06421548F3C30056BD10 /* DraggerWith3Axes.h in Headers */,
 				1C4E06491548FC9B0056BD10 /* DraggerTrackball.h in Headers */,
+				1CDDB28D1551AD8500A45ADA /* SyphonTexture.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2625,6 +2639,8 @@
 				1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */,
 				1C4E06451548F3DC0056BD10 /* DraggerWith3Axes.cpp in Sources */,
 				1C4E06471548FC8D0056BD10 /* DraggerTrackball.cpp in Sources */,
+				1CDDB28B1551AD7300A45ADA /* SyphonTexture.cpp in Sources */,
+				1CDDB28F1551AE2800A45ADA /* SyphonTexture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3131,6 +3147,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)/usr/local/lib\"",
+					"\"$(SRCROOT)/../../../Library/Developer/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spinviewerUI/spinviewerUI-Prefix.pch";
@@ -3152,6 +3169,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)/usr/local/lib\"",
+					"\"$(SRCROOT)/../../../Library/Developer/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spinviewerUI/spinviewerUI-Prefix.pch";
