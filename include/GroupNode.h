@@ -48,9 +48,10 @@
 
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
+#include <osg/MatrixTransform>
 #include <osg/Timer>
 #include <osg/ClipNode>
-
+#include <osgManipulator/Dragger>
 #include <vector>
 
 namespace spin
@@ -81,16 +82,41 @@ public:
     GroupNode(SceneManager *sceneManager, char *initID);
     virtual ~GroupNode();
 
-    enum interactionMode { STATIC, SELECT, DRAG, THROW, DRAW };
+    enum InteractionMode
+    {
+        STATIC,     /*!< Mouse clicks and PointerNode have no effect on this
+                    node. */
+        PASSTHRU,   /*!< This passes the interaction event to the parent node,
+                    which is useful when we need a node with geometry to be
+                    selected, but want to move the parent group instead. NOTE:
+                    ONLY IMPLEMENTED FOR PointerNode; NOT DONE YET FOR MOUSE! */
+        SELECT,     /*!< This node responds to selection events (eg, can display
+                    manipulator handles when selected). */
+        DRAG,       /*!< This node responds to grag events, either invoked by
+                    mouse drags in ViewerManipulator or PointerNode. */
+        THROW,      /*!< The same as DRAG mode, but a direction vector is
+                    accumulated over the last few drags and a velocity is
+                    assigned to the node when released. */
+        DRAW        /*!< Provides access to the x,y,z intersection points as the
+                    user draws over the surface of a node */
+    };
     enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
     enum velocityMode { TRANSLATE, MOVE };
+    
+    enum OrientationMode
+    {
+        NORMAL,
+        POINT_TO_TARGET,
+        POINT_TO_TARGET_CENTROID,
+        POINT_TO_ORIGIN
+    };
     
     virtual void callbackUpdate();
 
 
     /**
      * IMPORTANT:
-     * subclasses of ReferencedNode are allowed to contain complicated subgraphs,
+     * subclasses of ReferencedNode are allowed to contain complicated subgraphs
      * and can also change their attachmentNode so that children are attached
      * anywhere in that subgraph. If that is the case, the updateNodePath()
      * function MUST be overridden, and extra nodes must be manually pushed onto
@@ -99,13 +125,17 @@ public:
     virtual void updateNodePath(bool updateChildren = true);
 
     void mouseEvent (int event, int keyMask, int buttonMask, float x, float y);
-    void event (int event, const char* userString, float eData1, float eData2, float x, float y, float z);
+
+    void event (int event, const char* userString, float eData1, float eData2,
+    		float x, float y, float z);
+	void setLock(const char* userString, int lock);
+
 
     virtual void debug();
     
     void setReportMode(globalsReportMode mode);
 
-    void setInteractionMode(interactionMode mode);
+    void setInteractionMode(InteractionMode mode);
     
     /**
      * Set a clipping rectangle for the model so that geometry outside of the
@@ -113,11 +143,21 @@ public:
      */
     void setClipping(float x, float y, float z);
     
-    
     /**
      * The local translation offset for this node with respect to it's parent
      */
     virtual void setTranslation (float x, float y, float z);
+
+    /**
+     * Set the OrientationMode of the node, which will be applied after every
+     * transformation.
+     */
+    void setOrientationMode(OrientationMode m);
+    int getOrientationMode() const { return (int)orientationMode_; };
+
+    void setOrientationTarget(const char* target);
+    char* getOrientationTarget() const { return orientationTarget_->s_name; };
+
 
     /**
      * The local orientation offset for this node with respect to it's parent
@@ -128,6 +168,8 @@ public:
      * Set the orientation offset as a quaternion
      */
     virtual void setOrientationQuat (float x, float y, float z, float w);
+
+    void applyOrientationMode();
 
     /**
      * A grouped scale operation
@@ -185,17 +227,35 @@ public:
     virtual void rotate (float pitch, float roll, float yaw);
 
 
+    virtual void setManipulator(const char *manipulatorType);
+    const char* getManipulator() const { return manipulatorType_.c_str(); }
+
+    virtual void setManipulatorMatrix
+        (float a00, float a01, float a02, float a03,
+         float a10, float a11, float a12, float a13,
+         float a20, float a21, float a22, float a23,
+         float a30, float a31, float a32, float a33);
+
+    
     int getReportMode() const { return (int) _reportMode; };
     int getInteractionMode() const { return (int) _interactionMode; };
     osg::Vec3 getClipping() const { return _clipping; };
-    osg::Vec3 getTranslation() const { return mainTransform->getPosition(); };
     osg::Vec3 getOrientation() const { return _orientation; };
-    osg::Vec3 getScale() const { return mainTransform->getScale(); };
+    
+    /*
+    osg::Vec3 getTranslation() const { return mainTransform->getMatrix().getTrans(); };
+    osg::Quat getOrientationQuat() const { return mainTransform->getMatrix().getRotate(); };
+    osg::Vec3 getScale() const { return mainTransform->getMatrix().getScale(); };
+    */
+    
+    osg::Vec3 getTranslation() const { return translation_; };
+    osg::Quat getOrientationQuat() const { return quat_; };
+    osg::Vec3 getScale() const { return scale_; };     
+    
     osg::Vec3 getVelocity() const { return _velocity; };
     int getVelocityMode() const { return (int) _velocityMode; };
     float getDamping() const { return _damping; };
     //osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
-
 
     osg::Matrix getGlobalMatrix();
     osg::Vec3 getCenter() const;
@@ -229,16 +289,25 @@ public:
 
 
 
+    osg::MatrixTransform *getTransform() { return mainTransform.get(); }
+
+    void updateDraggerMatrix();
 
 
 protected:
 
+    void updateMatrix();
+    void drawManipulator();
+
     osg::ref_ptr<UserNode> owner;
 
-    osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
-
+    //osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
+    osg::ref_ptr<osg::MatrixTransform> mainTransform;
+    osg::ref_ptr<osg::MatrixTransform> manipulatorTransform;
     
-    interactionMode _interactionMode;
+    osg::ref_ptr<osgManipulator::Dragger> dragger;
+    
+    InteractionMode _interactionMode;
     std::vector<osg::Vec4> _trajectory;
     int _drawMod;
     
@@ -250,19 +319,40 @@ protected:
     osg::Vec3 _globalScale;
     float _globalRadius;
 
+    enum OrientationMode orientationMode_;
+    t_symbol* orientationTarget_;
     osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
+    osg::Vec3 translation_;
+    osg::Vec3 scale_;
+    osg::Quat quat_;
 
     osg::Vec3 _velocity;
     velocityMode _velocityMode;
     osg::Vec3 _spin;
     float _damping;
     
+    std::string manipulatorType_;
+    bool manipulatorUpdateFlag_;
+    bool manipulatorShadowCopy_;
+    
 private:
 
+    
     osg::Timer_t lastTick;
 
 };
 
+    
+class DraggerCallback : public osgManipulator::DraggerTransformCallback
+{
+
+public:
+    DraggerCallback(GroupNode* g);
+    bool receive(const osgManipulator::MotionCommand& command);
+private:
+    GroupNode *groupNode;
+};
+    
 } // end of namespace spin
 
 #endif

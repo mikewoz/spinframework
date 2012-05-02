@@ -21,7 +21,7 @@
 #undef OUT
 #endif
 
-BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
+BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	I_DeclaringFile("ReferencedStateSet.h");
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____ReferencedStateSet__SceneManager_P1__C5_char_P1,
@@ -31,17 +31,12 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	          Properties::VIRTUAL,
 	          __void__updateCallback,
 	          "",
-	          "");
-	I_Method0(const char *, getPath,
-	          Properties::PURE_VIRTUAL,
-	          __C5_char_P1__getPath,
-	          "",
-	          "Abstract method getPath needs to be implemented ");
+	          "This callback occurs every frame to update the state with any parameter changes. ");
 	I_Method0(void, removeFromScene,
 	          Properties::NON_VIRTUAL,
 	          __void__removeFromScene,
 	          "",
-	          "Remove this stateset from all parents... essentially destroying the state, since no reference to it will exist anymore, and OSG will kill it. ");
+	          "Abstract method getPath needs to be implemented Remove this stateset from all parents... essentially destroying the state, since no reference to it will exist anymore, and OSG will kill it. ");
 	I_Method1(void, replace, IN, osg::StateSet *, ss,
 	          Properties::NON_VIRTUAL,
 	          __void__replace__osg_StateSet_P1,
@@ -51,7 +46,7 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "");
+	          "Print debug information to console. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -66,14 +61,54 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::ReferencedStateSet)
 	          Properties::VIRTUAL,
 	          __void__stateDump__lo_address,
 	          "",
+	          "StateDump() is a request to broadcast the node state via SceneMangager. ");
+	I_Method1(void, setTextureBlend, IN, int, mode,
+	          Properties::VIRTUAL,
+	          __void__setTextureBlend__int,
+	          "",
+	          "Set the blend mode for the texture (with material color). 0=GL_MODULATE, 1=GL_DECAL, 2=GL_BLEND, 3=GL_REPLACE. Default is 0 (GL_MODULATE) ");
+	I_Method0(int, getTextureBlend,
+	          Properties::NON_VIRTUAL,
+	          __int__getTextureBlend,
+	          "",
 	          "");
-	I_SimpleProperty(const char *, Path, 
-	                 __C5_char_P1__getPath, 
-	                 0);
+	I_Method2(void, setTextureRepeat, IN, int, s, IN, int, t,
+	          Properties::VIRTUAL,
+	          __void__setTextureRepeat__int__int,
+	          "",
+	          "Set whether the texture repeats after wrapping or not (in both the x and Y directions ");
+	I_Method1(void, setLighting, IN, int, i,
+	          Properties::VIRTUAL,
+	          __void__setLighting__int,
+	          "",
+	          "Set whether the texture is influenced by lighting ");
+	I_Method0(int, getLighting,
+	          Properties::VIRTUAL,
+	          __int__getLighting,
+	          "",
+	          "Returns a boolean indicating whether lighting affects the texture. ");
+	I_Method1(void, setRenderBin, IN, int, i,
+	          Properties::VIRTUAL,
+	          __void__setRenderBin__int,
+	          "",
+	          "Set the render bin for this texture. The higher the number, the later it gets processed (ie, it appears on top). Default renderBin = 11 ");
+	I_Method0(int, getRenderBin,
+	          Properties::VIRTUAL,
+	          __int__getRenderBin,
+	          "",
+	          "Returns an integer indicating the render bin for this texture. Higher numbers get processed later (i.e. it appears on top). Default = 11 ");
+	I_SimpleProperty(int, Lighting, 
+	                 __int__getLighting, 
+	                 __void__setLighting__int);
+	I_SimpleProperty(int, RenderBin, 
+	                 __int__getRenderBin, 
+	                 __void__setRenderBin__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
+	I_SimpleProperty(int, TextureBlend, 
+	                 __int__getTextureBlend, 
+	                 __void__setTextureBlend__int);
 	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(std::string, classType);
 END_REFLECTOR

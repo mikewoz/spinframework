@@ -49,6 +49,9 @@
 // forward declaration
 namespace osg {
     class Object;
+    class Quat;
+    class Vec2f;
+    class Vec3f;
 }
 
 // *****************************************************************************
@@ -122,7 +125,9 @@ template <typename T> bool fromString(T &aValue, const std::string &aStr)
 
 std::string stringify(float x);
 std::string stringify(int x);
-
+std::string stringify(osg::Vec2f v);
+std::string stringify(osg::Vec3f v);
+std::string stringify(osg::Quat q);
 std::string leadingSpaces(int n);
 
 
@@ -141,8 +146,10 @@ std::string getAbsolutePath(const std::string &path);
 
 bool isVideoPath(const std::string &path);
 bool isImagePath(const std::string &path);
+bool isShaderPath(const std::string &path);
 
 std::string getSpinPath(const std::string &path);
+std::vector<char*> getUserArgs();
 
 // *****************************************************************************
 // gensym stuff (from m_pd.h)

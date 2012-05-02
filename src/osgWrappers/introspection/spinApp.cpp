@@ -175,6 +175,5 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	I_PublicMemberProperty(spatosc::Scene *, audioScene);
 	I_PublicMemberProperty(bool, hasAudioRenderer);
 	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
-	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
 

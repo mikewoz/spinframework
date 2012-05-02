@@ -1,6 +1,26 @@
 SPIN Framework release notes
 ============================
 
+2012-05-02 : spinframework 0.3.14
+---------------------------------
+This release is in the development series 0.3.x that has an unstable API. 
+
+New features:
+
+* Shaders support
+* Point Cloud (PCL) support
+* Initial physics support (via bullet)
+* Initial particle system
+* Bounding text box with wrapping for TextNode
+
+Bugs fixed:
+
+* Lots of refactoring
+* Reattachment of UserNode
+* Debug scene graph printing on client side
+* Camera attachement on new camera offset node
+
+
 2012-03-07 : spinframework 0.3.12
 ---------------------------------
 This release is in the development series 0.3.x that has an unstable API. 

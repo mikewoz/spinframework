@@ -62,7 +62,7 @@ namespace spin
 // constructor:
 //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
 SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
-    ReferencedStateSet(s, initID), killed_(true)
+    Shader(s, initID), killed_(true)
 {
 	classType = "SharedVideoTexture";
 	
@@ -79,26 +79,43 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     tex->setImage(img.get());
     tex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
     tex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-    tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-    tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+	
+    //tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    //tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+	if (textureRepeatS_)
+		tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+	else
+		tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+	if (textureRepeatT_)
+		tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+	else
+		tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
 
+	osg::TexEnv* texenv = new osg::TexEnv();
+	texenv->setMode(textureBlend_);
+	this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+	
     // It is important to disable resizing of this texture if
     // resolution is not a power of two. Othwerwise, there will
     // be a very slow resize every update. NOTE: this might cause
     // problems on harware that doesn't support NPOT textures.
     tex->setResizeNonPowerOfTwoHint(false);
 
-
     // add the texture to this (StateSet)
     this->setTextureAttributeAndModes(0, tex.get(), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
-    // turn off lighting 
-    this->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	// set lighting:
+	if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+	// set renderbin:
+	this->setRenderBinDetails( renderBin_, "RenderBin");
+	
 	// enable blending:
     this->setMode(GL_BLEND, osg::StateAttribute::ON);
     this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
     // disable depth test (FIXME)
-    this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+    //this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
     // keep a timer for reload attempts:
     lastTick = 0;
@@ -108,14 +125,6 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     // set initial textureID:
     //setTextureID(this->id->s_name);
 
-}
-
-void SharedVideoTexture::setRenderBin (int i)
-{
-	_renderBin = i;
-	this->setRenderBinDetails( (int)_renderBin, "RenderBin");
-
-	BROADCAST(this, "si", "setRenderBin", getRenderBin());
 }
 
 // ===================================================================
@@ -148,7 +157,7 @@ void SharedVideoTexture::setTextureID (const char* newID)
 std::vector<lo_message> SharedVideoTexture::getState () const
 {
     // inherit state from base class
-    std::vector<lo_message> ret = ReferencedStateSet::getState();
+    std::vector<lo_message> ret = Shader::getState();
 
     lo_message msg;
 
@@ -156,16 +165,12 @@ std::vector<lo_message> SharedVideoTexture::getState () const
     lo_message_add(msg, "ss", "setTextureID", getTextureID());
     ret.push_back(msg);
 
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
-	ret.push_back(msg);
-
     return ret;
 }
 
 void SharedVideoTexture::debug()
 {
-	ReferencedStateSet::debug();
+	Shader::debug();
 	std::cout << "   ---------" << std::endl;
 	std::cout << "   Type: SharedVideoTexture" << std::endl;
 	std::cout << "   Texture ID: " << getTextureID() << std::endl;

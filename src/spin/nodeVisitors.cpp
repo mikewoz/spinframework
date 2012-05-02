@@ -145,25 +145,32 @@ void NodeSearcher::search(osg::Node* subgraph, std::string s)
     subgraph->accept(*this);
 }
 
-DebugVisitor::DebugVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN) {}
+DebugVisitor::DebugVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
+{
+    setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN );
+}
 
+void DebugVisitor::print(osg::Node* subgraph)
+{
+    subgraph->accept(*this);
+}
 
 void DebugVisitor::apply(osg::Node &node)
 {
-    osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "NODE:  " << node.getName() << std::endl;
+    std::cout << leadingSpaces(getNodePath().size()) << "NODE:  " << node.getName() << std::endl;
     traverse(node);
 }
 
 void DebugVisitor::apply(osg::PositionAttitudeTransform &node)
 {
-    osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "PAT:   " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
+    std::cout << leadingSpaces(getNodePath().size()) << "PAT:   " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
     traverse(node);
 }
 
 
 void DebugVisitor::apply(osg::Geode &node)
 {
-    osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "GEODE: " << node.getName() << std::endl;
+    std::cout << leadingSpaces(getNodePath().size()) << "GEODE: " << node.getName() << std::endl;
     traverse(node);
 }
 
@@ -173,9 +180,9 @@ void DebugVisitor::apply(osg::Group &node)
     ReferencedNode *n;
 
     if ((n=dynamic_cast<ReferencedNode*>(&node))) {
-        osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->nodeType << ", id=" << n->id->s_name << "  (" << node.getNumChildren () << " children)" << std::endl;
+        std::cout << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->nodeType << ", id=" << n->id->s_name << "  (" << node.getNumChildren () << " children)" << std::endl;
     } else {
-        osg::notify(osg::NOTICE) << leadingSpaces(getNodePath().size()) << "GROUP: " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
+        std::cout << leadingSpaces(getNodePath().size()) << "GROUP: " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
     }
     traverse(node);
 }
@@ -188,10 +195,11 @@ void UpdateSceneVisitor::apply(osg::Node &node) {
 }
 
 
-void UpdateSceneVisitor::apply(osg::Group &node)  {
+void UpdateSceneVisitor::apply(osg::Group &node)
+{
     ReferencedNode *n;
-    if ((n = dynamic_cast<ReferencedNode*>(&node))) {
-        //printf("UpdateSceneVisitor: we got ourselves a node here....\n");
+    if ((n = dynamic_cast<ReferencedNode*>(&node)))
+    {
         n->callbackUpdate();
     }
     traverse(node);
@@ -216,7 +224,6 @@ void TextureStateSetFinder::apply(osg::Geode& geode)
     {
         apply(geode.getDrawable(i)->getStateSet());
     }
-
     traverse(geode);
 }
 

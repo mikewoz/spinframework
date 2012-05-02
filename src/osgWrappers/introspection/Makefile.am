@@ -19,11 +19,13 @@ libSPINwrappers_la_SOURCES = \
     MeasurementNode.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    ParticleSystem.cpp \
     PointerNode.cpp \
     RayNode.cpp \
     ReferencedNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    Shader.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \
@@ -43,6 +45,18 @@ libSPINwrappers_la_CPPFLAGS = \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/spin \
     -I$(top_srcdir)/src/tinyxml
+
+
+if BULLET
+libSPINwrappers_la_CPPFLAGS += $(BULLET_CFLAGS)
+libSPINwrappers_la_SOURCES += CollisionShape.cpp
+endif
+
+if PCL
+libSPINwrappers_la_CPPFLAGS += $(PCL_CFLAGS)
+libSPINwrappers_la_SOURCES += PointCloud.cpp
+endif
+
 
 # TODO: Could be nice to regenerate the wrapper every time a source file from src/spin changes:
 # FIXME: These depend on the headers, and more specifically, each generated wrapper should only depend on one header

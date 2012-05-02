@@ -79,25 +79,69 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         //ViewerManipulator(UserNode *u);
         ViewerManipulator();
         
+        /**
+         * Enables or disables use of the mouse to pick nodes.
+         */
+
         void setPicker(bool b);
+
+        /**
+         * Enables or disables the use of camera motion controls.
+         */
+
         void setMover(bool b);
+
+        /**
+         * Enables or disables raw mouse events. TO_BE_VERIFIED
+         */
+
         void setRaw(bool b);
         
-        bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa);
-        void handleKeypress(const osgGA::GUIEventAdapter& ea);
-        void handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea);
-        
-        //GroupNode* getNodeFromIntersection(osgUtil::LineSegmentIntersector::Intersection intersection);
-        //std::vector<GroupNode*> getNodesFromIntersections(osgUtil::LineSegmentIntersector::Intersections intersections);
+        /**
+         * if the userNode's nodepath has changed, we must call setTrackNode
+         * again to force NodeTrackerManipulator to store the proper nodePath
+         */
 
-        void sendPick(GroupNode *hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint);
+        bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter&
+        		aa);
+
+        /**
+         * Handles keyboard input.
+         */
+
+        void handleKeypress(const osgGA::GUIEventAdapter& ea);
+        
+        /**
+         * Handles mouse interaction with the scene. Includes camera navigation,
+         * picking interactive nodes and manipulating nodes with manipulator
+         * handles.
+         */
+
+        void handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter&
+        		ea);
+
+
+        virtual ~ViewerManipulator();
+
+    private:
+        /**
+         * Sends MOVE events to the server. Example, manipulation of interactive
+         * nodes. private
+         */
+
+        void sendPick(GroupNode *hitNode, unsigned int eventType,
+        		unsigned int modKeyMask, unsigned int buttonMask,
+        		float scrollX, float scrollY, float dX, float dY,
+        		osg::Vec3 hitPoint);
+
+        /**
+         * Should both be private?
+         */
+
         void sendEvent(const char *nodeId, const char *types, ...);
         void sendEvent(const char *nodeId, const char *types, va_list ap);
 
-
     protected:
-        virtual ~ViewerManipulator();
-        
         //spinContext *spin;
         //osg::ref_ptr<UserNode> user;
         t_symbol *user;
@@ -108,6 +152,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         bool picker, mover, raw;
         float lastX, lastY;
         float clickX, clickY;
+        
+        bool manipulatorKey;
         
         osg::Vec3 lastHitPoint;
 };

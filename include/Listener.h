@@ -67,8 +67,9 @@ class Listener : public DSPNode
         virtual void callbackUpdate();
 
         /**
-         * For each subclass of ReferencedNode, we override the getState() method to
-         * fill the vector with the correct set of methods for this particular node
+         * For each subclass of ReferencedNode, we override the getState()
+         * method to fill the vector with the correct set of methods for this
+         * particular node
          */
         virtual std::vector<lo_message> getState() const;
         

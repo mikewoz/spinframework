@@ -49,11 +49,11 @@
 #include "osgUtil.h"
 #include "ShapeNode.h"
 #include "SceneManager.h"
-#include "MediaManager.h"
 
 #include "ImageTexture.h"
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
+#include "ShaderUtil.h"
 
 using namespace std;
 
@@ -77,7 +77,24 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	stateset = gensym("NULL");
 	renderBin = 11;
 	lightingEnabled = true;
+    
+    // quick shader test:
+    if (0)
+    {
+        osg::Geode* geode = new osg::Geode();
+        osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(1,1,1), 1));
+        geode->addDrawable(drawable);
+        sceneManager->worldNode->addChild(geode);
 
+        osg::Shader* vshader = new osg::Shader(osg::Shader::VERTEX, microshaderVertSource );
+        osg::Shader* fshader = new osg::Shader(osg::Shader::FRAGMENT, microshaderFragSource );
+        osg::Program * prog = new osg::Program;
+        prog->addShader ( vshader );
+        prog->addShader ( fshader );
+        geode->getOrCreateStateSet()->setAttributeAndModes( prog, osg::StateAttribute::ON );
+    }
+    // end shader test
+    
     drawShape();
 }
 

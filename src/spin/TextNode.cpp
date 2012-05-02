@@ -49,12 +49,112 @@
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-#include "MediaManager.h"
 
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
 {
+
+osgText::String::iterator spinTextNode::computeLastCharacterOnLine(osg::Vec2& cursor, osgText::String::iterator first, osgText::String::iterator last)
+{
+    using namespace osgText;
+    
+    Font* activefont = getActiveFont();
+    if (!activefont) return last;
+
+    float hr = _characterHeight;
+    float wr = hr/getCharacterAspectRatio();
+
+    bool kerning = true;
+    unsigned int previous_charcode = 0;
+
+    String::iterator lastChar = first;
+    
+    std::cout << "my computeLastCharacterOnLine" << std::endl;
+
+    for(bool outOfSpace=false;lastChar!=last;++lastChar)
+    {
+        unsigned int charcode = *lastChar;
+
+        if (charcode=='\n')
+        {
+            return lastChar;
+        }
+
+        Glyph* glyph = activefont->getGlyph(_fontSize, charcode);
+        if (glyph)
+        {
+
+           float width = (float)(glyph->getWidth()) * wr;
+
+            if (_layout==RIGHT_TO_LEFT)
+            {
+                cursor.x() -= glyph->getHorizontalAdvance() * wr;
+            }
+
+            // adjust cursor position w.r.t any kerning.
+            if (kerning && previous_charcode)
+            {
+                switch(_layout)
+                {
+                  case LEFT_TO_RIGHT:
+                  {
+                    osg::Vec2 delta(activefont->getKerning(previous_charcode,charcode,_kerningType));
+                    cursor.x() += delta.x() * wr;
+                    cursor.y() += delta.y() * hr;
+                    break;
+                  }
+                  case RIGHT_TO_LEFT:
+                  {
+                    osg::Vec2 delta(activefont->getKerning(charcode,previous_charcode,_kerningType));
+                    cursor.x() -= delta.x() * wr;
+                    cursor.y() -= delta.y() * hr;
+                    break;
+                  }
+                  case VERTICAL:
+                    break; // no kerning when vertical.
+                }            // check to see if we are still within line if not move to next line.
+            }
+            
+            switch(_layout)
+            {
+              case LEFT_TO_RIGHT:
+              {
+                if (_maximumWidth>0.0f && cursor.x()+width>_maximumWidth) outOfSpace=true;
+                if(_maximumHeight>0.0f && cursor.y()<-_maximumHeight) outOfSpace=true;
+                break;
+              }
+              case RIGHT_TO_LEFT:
+              {
+                if (_maximumWidth>0.0f && cursor.x()<-_maximumWidth) outOfSpace=true;
+                if(_maximumHeight>0.0f && cursor.y()<-_maximumHeight) outOfSpace=true;
+                break;
+              }
+              case VERTICAL:
+                if (_maximumHeight>0.0f && cursor.y()<-_maximumHeight) outOfSpace=true;
+                break;
+            }
+
+            // => word boundary detection & wrapping
+            if (outOfSpace) break;
+
+            // move the cursor onto the next character.
+            switch(_layout)
+            {
+              case LEFT_TO_RIGHT: cursor.x() += glyph->getHorizontalAdvance() * wr; break;
+              case VERTICAL:      cursor.y() -= glyph->getVerticalAdvance() *hr; break;
+              case RIGHT_TO_LEFT: break; // nop.
+            }
+
+            previous_charcode = charcode;
+
+        }
+
+    }
+    
+    return lastChar;
+}
+
 
 // ===================================================================
 // constructor:
@@ -75,8 +175,10 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	_decoration = DROP_SHADOW_BOTTOM_RIGHT;
 	_background = NO_BACKGROUND;
 
-	textLabel = new osgText::Text();
+	textLabel = new spinTextNode(); //new osgText::Text();
 	
+    _updateFlag = false;
+    
 	// By default osgText is not properly rotated for our use. We want the text
 	// to "face" in the direction of the parent's orientation.
 	setOrientation(0,0,180);
@@ -93,6 +195,17 @@ TextNode::~TextNode()
 
 // ===================================================================
 
+void TextNode::callbackUpdate()
+{
+    GroupNode::callbackUpdate();
+    
+    if (_updateFlag)
+    {
+        drawText();
+        _updateFlag = false;
+    }
+}
+
 // ===================================================================
 // ======================== SET METHODS: =============================
 // ===================================================================
@@ -102,26 +215,31 @@ void TextNode::setContext (const char *newvalue)
 {
 	// need to redraw after setContext() is called:
 	ReferencedNode::setContext(newvalue);
-	drawText();
+	//drawText();
+    _updateFlag = true;
 }
 
-void TextNode::setTextValue (const char *s)
+void TextNode::setText (const char *s)
 {
-    using std::string;
 	//if (textLabel->getText().createUTF8EncodedString() != string(s))
-	if (_text != string(s))
+	if (_text != std::string(s))
 	{
+        _text = s;
 		//getText().createUTF8EncodedString();
 		
+        /*
 		this->_text = string(s);
 		pthread_mutex_lock(&sceneMutex);
 		textLabel->setText(s);
-		pthread_mutex_unlock(&sceneMutex);
+		//pthread_mutex_unlock(&sceneMutex);
 		//drawText();
+        */
+        _updateFlag = true;
+
 
 		//std::cout << "debug: setting text label to: " << s << ", getTextValue() reports: " << getTextValue() << std::endl;
 
-		BROADCAST(this, "ss", "setTextValue", getTextValue());
+		BROADCAST(this, "ss", "setText", getText());
 	}
 }
 
@@ -130,11 +248,14 @@ void TextNode::setFont (const char *s)
     using std::string;
 	if (this->_font != string(s))
 	{
+        /*
 		this->_font = string(s);
 		pthread_mutex_lock(&sceneMutex);
 		textLabel->setFont( sceneManager->resourcesPath + "/fonts/" + _font );
 		pthread_mutex_unlock(&sceneMutex);
 		//drawText();
+        */
+        _updateFlag = true;
 
 		BROADCAST(this, "ss", "setFont", getFont());
 	}
@@ -145,6 +266,38 @@ void TextNode::setSize (float s)
 	_size = s;
 	textLabel->setCharacterSize( _size );
 	BROADCAST(this, "sf", "setSize", getSize());
+}
+
+void TextNode::setBox (float width, float height)
+{
+    pthread_mutex_lock(&sceneMutex);
+	textLabel->setMaximumWidth(width);
+    textLabel->setMaximumHeight(height);
+    pthread_mutex_unlock(&sceneMutex);
+	BROADCAST(this, "sff", "setBox", textLabel->getMaximumWidth(), textLabel->getMaximumHeight());
+}
+
+void TextNode::setLineSpacing (float spacing)
+{
+    _lineSpacing = spacing;
+    /*
+    pthread_mutex_lock(&sceneMutex);
+    textLabel->setLineSpacing(spacing);
+   	pthread_mutex_unlock(&sceneMutex);
+    BROADCAST(this, "sf", "setLineSpacing", textLabel->getLineSpacing());
+    */
+    _updateFlag = true;
+    BROADCAST(this, "sf", "setLineSpacing", getLineSpacing());
+}
+
+void TextNode::setAlignment (int alignment)
+{
+    _alignment = (osgText::TextBase::AlignmentType)alignment;
+
+    pthread_mutex_lock(&sceneMutex);
+    textLabel->setAlignment((osgText::TextBase::AlignmentType)alignment);
+    pthread_mutex_unlock(&sceneMutex);
+   	BROADCAST(this, "si", "setAlignment", (int)textLabel->getAlignment());    
 }
 
 void TextNode::setColor (float r, float g, float b, float a)
@@ -180,7 +333,8 @@ void TextNode::setBillboard (billboardType t)
 {
 	if (t == _billboard) return;
 	else _billboard = t;
-	drawText();
+	//drawText();
+    _updateFlag = true;
 	BROADCAST(this, "si", "setBillboard", (int) _billboard);
 }
 
@@ -188,14 +342,16 @@ void TextNode::setDecoration (decorationType t)
 {
 	_decoration = t;
 	//textLabel->setBackdropType((osgText::Text::BackdropType)_decoration);
-	drawText();
+	//drawText();
+    _updateFlag = true;
 	BROADCAST(this, "si", "setDecoration", getBackround());
 }
 
 void TextNode::setBackground (backgroundType t)
 {
 	_background = t;
-	drawText();
+	//drawText();
+    _updateFlag = true;
 	BROADCAST(this, "si", "setBackground", getBackround());
 
 }
@@ -205,8 +361,9 @@ void TextNode::drawText()
 {
     using std::string;
 	osg::Billboard *b;
+    
 	
-    pthread_mutex_lock(&sceneMutex);
+    //pthread_mutex_lock(&sceneMutex);
 	
 	
 	// first remove existing text:
@@ -300,10 +457,12 @@ void TextNode::drawText()
 		// CENTER_CENTER, CENTER_BOTTOM, RIGHT_TOP, RIGHT_CENTER,
 		// RIGHT_BOTTOM, LEFT_BASE_LINE, CENTER_BASE_LINE, RIGHT_BASE_LINE,
 		// LEFT_BOTTOM_BASE_LINE, CENTER_BOTTOM_BASE_LINE, RIGHT_BOTTOM_BASE_LINE
-		textLabel->setAlignment(osgText::Text::CENTER_CENTER);
+		textLabel->setAlignment(_alignment);
 
 		//textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS) * osg::Quat(osg::PI, osg::Z_AXIS));
 		textLabel->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS));
+
+        textLabel->setLineSpacing(_lineSpacing);
 
 		
 		// disable lighting effects on the text, and allow transparency:
@@ -313,9 +472,13 @@ void TextNode::drawText()
 		labelStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 		labelStateSet->setRenderBinDetails( 100, "RenderBin");
 		textLabel->setStateSet( labelStateSet );
+        
+        
+        // finally, set the actual text string:
+        textLabel->setText(_text);
 	}
 
-	pthread_mutex_unlock(&sceneMutex);
+	//pthread_mutex_unlock(&sceneMutex);
 
 }
 
@@ -329,7 +492,7 @@ std::vector<lo_message> TextNode::getState () const
 	osg::Vec4 v4;
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setTextValue", getTextValue());
+	lo_message_add(msg, "ss", "setText", getText());
 	ret.push_back(msg);
 
 	msg = lo_message_new();
@@ -338,6 +501,18 @@ std::vector<lo_message> TextNode::getState () const
 
 	msg = lo_message_new();
 	lo_message_add(msg, "sf", "setSize", getSize());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "sff", "setBox", textLabel->getMaximumWidth(), textLabel->getMaximumHeight());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setLineSpacing", getLineSpacing());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setAlignment", (int)textLabel->getAlignment());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

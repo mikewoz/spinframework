@@ -54,7 +54,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getModelFromFile,
 	          "",
-	          "");
+	          "Returns the file path of the 3d model attached to this node. ");
 	I_Method1(void, setAttachCentroid, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setAttachCentroid__int,
@@ -64,7 +64,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getAttachCentroid,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether attachCentroid is enabled. ");
 	I_Method0(void, makeCentered,
 	          Properties::NON_VIRTUAL,
 	          __void__makeCentered,
@@ -79,7 +79,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getStateRegistration,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether StateRegistration is set. See setStateRegistration for more information. ");
 	I_Method1(void, setRenderBin, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setRenderBin__int,
@@ -89,7 +89,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getRenderBin,
 	          "",
-	          "");
+	          "Returns an integer representing the render bin of the node. See setRenderBin for more information. ");
 	I_Method2(void, setKeyframe, IN, int, index, IN, float, keyframe,
 	          Properties::NON_VIRTUAL,
 	          __void__setKeyframe__int__float,
@@ -99,7 +99,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getKeyframe__int,
 	          "",
-	          "");
+	          "Return the keyframe of a particular animation saved within the model (there can be several animations, hence the required index number) ");
 	I_Method2(void, setPlaying, IN, int, index, IN, int, playState,
 	          Properties::NON_VIRTUAL,
 	          __void__setPlaying__int__int,
@@ -109,7 +109,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getPlaying__int,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether the animation is currently playing. ");
 	I_Method2(void, setStateSet, IN, int, index, IN, const char *, replacement,
 	          Properties::NON_VIRTUAL,
 	          __void__setStateSet__int__C5_char_P1,
@@ -129,7 +129,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getLighting,
 	          "",
-	          "");
+	          "Returns a boolean indicating whether lighting is enabled for the model. ");
 	I_SimpleProperty(int, AttachCentroid, 
 	                 __int__getAttachCentroid, 
 	                 __void__setAttachCentroid__int);

@@ -80,28 +80,49 @@ public:
         
         virtual void callbackUpdate();
         
+        /**
+         * Returns the SoundConnection object that exists between the current
+         * node and the sink or null if none is found.
+         * @param snk a pointer to the sink node
+         */
+
         SoundConnection *getConnection(DSPNode *snk);
+
+        /**
+         * Returns the SoundConnection object that exists between the current
+         * node and the sink or null if none is found.
+         * @param snk the name of the sink node to search for
+         */
+
         SoundConnection *getConnection(const char *snk);
 
-        
+        /**
+         *
+         */
 
         void connect(DSPNode *snk);
         void connect(const char *snk);
+
+        /**
+         * Sets the current node as a sink to the specified node.
+         */
+
         void connectSource(const char *src);
 
         void disconnect(const char *snk);
         void setActive (int i);
         void setPlugin (const char *filename);
         
-        // for sending messages to the connections of this (source) node:
-        //virtual void connectionMsg (char *snkName, char *method, float value);
-
+       /**	for sending messages to the connections of this (source) node:
+        *	virtual void connectionMsg (char *snkName, char *method, float
+        * 	value);
+		*/
         
         int getActive() const { return (int)active; }
         const char* getPlugin() const { return plugin.c_str(); }
         
         /**
-         * We maintian 2 lists of all SoundConnection for this node (it is
+         * We maintain 2 lists of all SoundConnection for this node (it is
          * redundant, but useful to have both forward and backward connection
          * pointers).
          */
@@ -180,7 +201,8 @@ private:
         osg::Vec3 currentSoundColor;
 
 
-        std::string _rolloff; // we keep a reference name for the rolloff (directivity) table
+        std::string _rolloff; // we keep a reference name for the rolloff
+							  //	(directivity) table
         float _spread; // propagation cone for source
         float _length; // the length of the laser and cone
 

@@ -25,6 +25,11 @@ BEGIN_VALUE_REFLECTOR(spin::DebugVisitor)
 	I_Constructor0(____DebugVisitor,
 	               "",
 	               "");
+	I_Method1(void, print, IN, osg::Node *, subgraph,
+	          Properties::NON_VIRTUAL,
+	          __void__print__osg_Node_P1,
+	          "",
+	          "prints the subgraph to std::cout ");
 	I_Method1(void, apply, IN, osg::Node &, node,
 	          Properties::VIRTUAL,
 	          __void__apply__osg_Node_R1,
@@ -63,7 +68,7 @@ BEGIN_VALUE_REFLECTOR(spin::NodeSearcher)
 	          Properties::NON_VIRTUAL,
 	          __void__search__osg_Node_P1__std_string,
 	          "",
-	          "");
+	          "Search for nodes with a given name in the provided subgraph. ");
 	I_PublicMemberProperty(std::string, _searchName);
 END_REFLECTOR
 

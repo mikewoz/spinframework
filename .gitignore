@@ -59,3 +59,7 @@ tests/stats
 xml/
 !prototypes/web-server/Makefile
 prototypes/web-server/main
+prototypes/bullet/bullettest
+prototypes/domeviewer/domeviewer
+prototypes/shaders/shadertest
+

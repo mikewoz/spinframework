@@ -7,13 +7,14 @@ AM_CPPFLAGS = \
     $(OSG_CFLAGS) \
     $(SHAREDVIDEO_CFLAGS) \
     $(SPATOSC_CFLAGS) \
+    $(BULLET_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/tinyxml
 
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
-lib_LTLIBRARIES = libspin_@SPIN_API_VERSION@.la
+lib_LTLIBRARIES = libspin-@SPIN_API_VERSION@.la
 python_LTLIBRARIES = libSPINPyWrap.la
 
 libspin_@SPIN_API_VERSION@_la_LIBADD = \
@@ -34,55 +35,59 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHAREDVIDEO_LIBS) \
-    $(SPATOSC_LIBS)
-
+    $(SPATOSC_LIBS) 
     
 #	$(BOOST_THREAD_LIBS) 
 
 # please keep those in alphabetical order:
 libspin_@SPIN_API_VERSION@_la_SOURCES = \
+    AnimationNode.cpp \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
+    Contour.cpp \
+    DraggerTrackball.cpp \
+    DraggerWith3Axes.cpp \
     DSPNode.cpp \
     EventHandler.cpp \
     Fog.cpp \
     GeometryNode.cpp \
     GridNode.cpp \
-    ReferencedNode.cpp \
-    SceneManager.cpp \
-    UserNode.cpp \
-    osgUtil.cpp \
-    spinApp.cpp \
-    AnimationNode.cpp \
-    Contour.cpp \
     GroupNode.cpp \
     ImageTexture.cpp \
+    introspect_helpers.cpp \
+    libloUtil.cpp \
     LightSource.cpp \
     Listener.cpp \
     MeasurementNode.cpp \
     MediaManager.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
+    nodeVisitors.cpp \
+    osgUtil.cpp \
+    ParticleSystem.cpp \
     PointerNode.cpp \
     RayNode.cpp \
+    ReferencedNode.cpp \
     ReferencedStateSet.cpp \
     ReporterNode.cpp \
+    SceneManager.cpp \
+    Shader.cpp \
+    ShaderUtil.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
     SoundConnection.cpp \
     SoundNode.cpp \
     SoundSpace.cpp \
-    SwitchNode.cpp \
-    TextNode.cpp \
-    VideoTexture.cpp \
-    ViewerManipulator.cpp \
-    libloUtil.cpp \
-    nodeVisitors.cpp \
+    spinApp.cpp \
     spinBaseContext.cpp \
     spinClientContext.cpp \
     spinServerContext.cpp \
     spinUtil.cpp \
-    introspect_helpers.cpp
+    SwitchNode.cpp \
+    TextNode.cpp \
+    UserNode.cpp \
+    VideoTexture.cpp \
+    ViewerManipulator.cpp
 
 libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
 libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
@@ -91,6 +96,8 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/config.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
+    $(top_srcdir)/include/DraggerTrackball.h \
+    $(top_srcdir)/include/DraggerWith3Axes.h \
     $(top_srcdir)/include/DSPNode.h \
     $(top_srcdir)/include/EventHandler.h \
     $(top_srcdir)/include/EventTypes.h \
@@ -111,12 +118,15 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/nodeVisitors.h \
     $(top_srcdir)/include/oscParser.h \
     $(top_srcdir)/include/osgUtil.h \
+    $(top_srcdir)/include/ParticleSystem.h \
     $(top_srcdir)/include/PointerNode.h \
     $(top_srcdir)/include/RayNode.h \
     $(top_srcdir)/include/ReferencedNode.h \
     $(top_srcdir)/include/ReferencedStateSet.h \
     $(top_srcdir)/include/ReporterNode.h \
     $(top_srcdir)/include/SceneManager.h \
+    $(top_srcdir)/include/Shader.h \
+    $(top_srcdir)/include/ShaderUtil.h \
     $(top_srcdir)/include/ShapeNode.h \
     $(top_srcdir)/include/SharedVideoTexture.h \
     $(top_srcdir)/include/SoundConnection.h \
@@ -143,7 +153,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
 
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 #libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libspin_@SPIN_API_VERSION@.la \
+libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
@@ -158,78 +168,42 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 # 
 # #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
 
+if BULLET
+AM_CPPFLAGS += \
+    $(BULLET_CFLAGS) 
+libspin_@SPIN_API_VERSION@_la_SOURCES += \
+    CollisionShape.cpp\
+    bulletUtil.cpp
+libspin_@SPIN_API_VERSION@_la_LDFLAGS += \
+    $(BULLET_LIBS)
+libspin_@SPIN_API_VERSION@_la_include_HEADERS += \
+    $(top_srcdir)/include/bulletUtil.h \
+    $(top_srcdir)/include/CollisionShape.h
+endif
+
+if PCL
+AM_CPPFLAGS += $(PCL_CFLAGS) 
+libspin_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
+libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
+libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h
+endif
+
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
+spinserver_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS)
 
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
+spinviewer_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS)
 
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin_@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_FILESYSTEM_LIBS)
+spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS)
 
 ###############################################################################
 # CUSTOM targets:
-
-#OSG_VER = $(shell osgversion --so-number)
-#OPENTHREADS_VER= $(shell osgversion --openthreads-soversion-number)
-
-#OSX_OSG_LIBS = osg osgGA osgSim osgDB osgManipulator osgText osgUtil osgFX osgParticle osgViewer cppintrospection
-
-# WARNING: the .app generation script pulls some libs (eg, libspin_@SPIN_API_VERSION@) from /usr/local
-# so you must do a 'make install' before this will work (TODO: fix this)
-
-spinviewer.app: spinviewer$(EXEEXT)
-	@echo "\n--------------- Building $@: ---------------" 
-	-mkdir $@    
-	-mkdir $@/Contents
-	-mkdir $@/Contents/Frameworks
-	-mkdir $@/Contents/libs
-	-mkdir $@/Contents/MacOS
-	-mkdir $@/Contents/Resources
-	-mkdir $@/Contents/Resources/fonts
-	-mkdir $@/Contents/Resources/images
-	-mkdir $@/Contents/Resources/scripts
-	-mkdir $@/Contents/Resources/English.lproj
-	sed -e "s/IDENTIFIER/`echo ./ | sed -e 's,\.\./,,g' | sed -e 's,/,.,g'`/" \
-	-e "s/EXECUTABLE/$</" \
-	-e "s/VERSION/$(VERSION)/" \
-	spinviewer.plist.in >$@/Contents/Info.plist
-	echo -n 'APPL????' > $@/Contents/PkgInfo
-	cp /usr/local/bin/spinviewer $@/Contents/MacOS
-	../../util/dylibbundler/dylibbundler -of -b -x $@/Contents/MacOS/spinviewer -d $@/Contents/libs
-
-#	cp ../Resources/fonts/*.ttf $@/Contents/Resources/fonts
-#	cp ../Resources/images/*.icns ../Resources/images/*.xpm ../Resources/images/*.gif ../Resources/images/*.png $@/Contents/Resources/images
-#	cp ../Resources/scripts/*.py $@/Contents/Resources/scripts
-
-#cp .libs/spinviewer $@/Contents/MacOS
-
-#	install_name_tool -change libOpenThreads.$(OPENTHREADS_VER).dylib /usr/local/lib/libOpenThreads.$(OPENTHREADS_VER).dylib $@/Contents/MacOS/spinviewer
-#-cp -R /usr/local/lib/osgPlugins-* $@/Contents/libs
-#-cp /usr/local/lib/libosg*.dylib $@/Contents/libs
-#-cp /usr/local/lib/libOpenThreads.*.dylib $@/Contents/libs
-
-#install_name_tool -change libosg.55.dylib @executable_path/../libs/libosg.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgGA.55.dylib @executable_path/../libs/libosgGA.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgSim.55.dylib @executable_path/../libs/libosgSim.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgDB.55.dylib @executable_path/../libs/libosgDB.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgManipulator.55.dylib @executable_path/../libs/libosgManipulator.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgText.55.dylib @executable_path/../libs/libosgText.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgUtil.55.dylib @executable_path/../libs/libosgUtil.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgFX.55.dylib @executable_path/../libs/libosgFX.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgParticle.55.dylib @executable_path/../libs/libosgParticle.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libosgViewer.55.dylib @executable_path/../libs/libosgViewer.55.dylib $@/Contents/MacOS/spinviewer
-#install_name_tool -change libcppintrospection.55.dylib @executable_path/../libs/libcppintrospection.55.dylib $@/Contents/MacOS/spinviewer
-
-#install_name_tool -change libSPIN.dylib @executable_path/../libs/libSPIN.dylib $@/Contents/MacOS/spinviewer
-#-cp -R /Library/Frameworks/osg* $@/Contents/Frameworks
-#-cp -R /Library/Frameworks/OpenThreads.framework $@/Contents/Frameworks
-#-cp -R /Library/Application\ Support/OpenSceneGraph/PlugIns $@/Contents
 
 doc:
 	./spindocgenerator

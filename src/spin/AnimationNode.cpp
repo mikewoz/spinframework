@@ -45,7 +45,6 @@
 #include "AnimationNode.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-#include "MediaManager.h"
 
 namespace spin
 {
@@ -116,10 +115,18 @@ bool AnimationNode::doUpdate(double timestamp)
     osg::Matrix myMatrix;
     if (_animationPath->getMatrix(timestamp, myMatrix))
     {
+        osg::Vec3 myPos;
+        osg::Quat myQuat;
+        osg::Vec3 myScl;
+        osg::Quat mySclOrientation;
+        myMatrix.decompose(myPos, myQuat, myScl, mySclOrientation);
+        osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myQuat));
+        
+        /*
         osg::Vec3 myPos = myMatrix.getTrans();
         osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
         osg::Vec3 myScl = myMatrix.getScale();
-
+        */
         setTranslation(myPos.x(), myPos.y(), myPos.z());
         setOrientation(myRot.x(), myRot.y(), myRot.z());
         setScale(myScl.x(), myScl.y(), myScl.z());
@@ -270,9 +277,9 @@ void AnimationNode::storeCurrentPosition(double timestamp)
     );
     */
 
-    osg::Vec3 myPos = mainTransform->getPosition();
-    osg::Quat myRot = mainTransform->getAttitude();
-    osg::Vec3 myScl = mainTransform->getScale();
+    osg::Vec3 myPos = this->getTranslation();
+    osg::Quat myRot = this->getOrientationQuat();
+    osg::Vec3 myScl = this->getScale();
     controlPoint( timestamp, myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z(), myRot.w(), myScl.x(), myScl.y(), myScl.z() );
 }
 

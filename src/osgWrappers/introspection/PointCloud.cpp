@@ -36,6 +36,7 @@ BEGIN_ENUM_REFLECTOR(spin::PointCloud::DrawMode)
 	I_EnumLabel(spin::PointCloud::POLYGON);
 	I_EnumLabel(spin::PointCloud::LIGHTPOINTS);
 	I_EnumLabel(spin::PointCloud::BOXES);
+	I_EnumLabel(spin::PointCloud::CUSTOM);
 END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
@@ -45,14 +46,29 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	               ____PointCloud__SceneManager_P1__char_P1,
 	               "",
 	               "");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "Debug print (to log/console) ");
 	I_Method0(void, callbackUpdate,
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate,
 	          "",
-	          "update from kinect ");
+	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
 	I_Method1(void, loadFile, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __void__loadFile__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(void, draw,
+	          Properties::VIRTUAL,
+	          __void__draw,
+	          "",
+	          "");
+	I_Method1(void, setCustomNode, IN, const char *, nodeID,
+	          Properties::NON_VIRTUAL,
+	          __void__setCustomNode__C5_char_P1,
 	          "",
 	          "");
 	I_Method1(void, setDrawMode, IN, spin::PointCloud::DrawMode, mode,
@@ -78,6 +94,11 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	I_Method4(void, setColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
+	          "",
+	          "");
+	I_Method0(const char *, getCustomNode,
+	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getCustomNode,
 	          "",
 	          "");
 	I_Method0(int, getDrawMode,
@@ -113,6 +134,9 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	I_SimpleProperty(osg::Vec4, Color, 
 	                 __osg_Vec4__getColor, 
 	                 0);
+	I_SimpleProperty(const char *, CustomNode, 
+	                 __C5_char_P1__getCustomNode, 
+	                 __void__setCustomNode__C5_char_P1);
 	I_SimpleProperty(int, DrawMode, 
 	                 __int__getDrawMode, 
 	                 0);

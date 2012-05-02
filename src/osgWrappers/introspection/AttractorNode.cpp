@@ -48,7 +48,7 @@ BEGIN_OBJECT_REFLECTOR(spin::AttractorNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getDistanceDecay,
 	          "",
-	          "");
+	          "a float that indicates the decay of the node's attractive force as a function of distance from the node  ");
 	I_Method1(void, setAngularDecay, IN, float, decay,
 	          Properties::NON_VIRTUAL,
 	          __void__setAngularDecay__float,
@@ -58,7 +58,7 @@ BEGIN_OBJECT_REFLECTOR(spin::AttractorNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getAngularDecay,
 	          "",
-	          "");
+	          "a float which indicates how the attractive force of the node decays as a function of incidence to the attractor's current orientation (i.e. at what angle objects are from the attractive node)  ");
 	I_Method1(void, setAttractorMode, IN, spin::AttractorNode::attractorMode, m,
 	          Properties::NON_VIRTUAL,
 	          __void__setAttractorMode__attractorMode,
@@ -68,7 +68,7 @@ BEGIN_OBJECT_REFLECTOR(spin::AttractorNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getAttractorMode,
 	          "",
-	          "");
+	          "an int indicating the attractor mode currently set for the node, see the attractorMode enum for types  ");
 	I_Method1(void, setForce, IN, float, force,
 	          Properties::NON_VIRTUAL,
 	          __void__setForce__float,
@@ -78,7 +78,7 @@ BEGIN_OBJECT_REFLECTOR(spin::AttractorNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getForce,
 	          "",
-	          "");
+	          "a float which indicates the attractive force of the node  ");
 	I_Method1(void, addTarget, IN, const char *, targetID,
 	          Properties::NON_VIRTUAL,
 	          __void__addTarget__C5_char_P1,

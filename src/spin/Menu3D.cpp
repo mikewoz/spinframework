@@ -133,7 +133,7 @@ void Menu3D::addItem (const char *itemText)
 	n->setColor(color_.x(),color_.y(),color_.z(),color_.w());
 	n->setBillboard(billboardType_);
 	n->setInteractionMode(GroupNode::SELECT);
-	n->setTextValue(itemText);
+	n->setText(itemText);
 	n->setParent(this->id->s_name);
 
 	// add it to the list:
@@ -400,7 +400,7 @@ std::vector<lo_message> Menu3D::getState () const
     	if ((*i).valid())
 		{
     		msg = lo_message_new();
-    		lo_message_add(msg, "sss", "addItem", (*i)->id->s_name, (*i)->getTextValue());
+    		lo_message_add(msg, "sss", "addItem", (*i)->id->s_name, (*i)->getText());
     		ret.push_back(msg);
 		}
     }

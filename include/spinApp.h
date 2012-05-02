@@ -66,7 +66,6 @@ namespace spin
 
 class spinBaseContext;
 class SceneManager;
-class MediaManager;
 class UserNode;
 
 #define SPIN_ARGS_END LO_ARGS_END
@@ -165,7 +164,6 @@ class spinApp
         bool hasAudioRenderer;
 
         SceneManager *sceneManager;
-        MediaManager *mediaManager;
         void setUserID(const std::string &id) { userID_ = id; }
         std::string getUserID() const { return userID_; }
 

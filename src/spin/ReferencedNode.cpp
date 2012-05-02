@@ -126,7 +126,6 @@ ReferencedNode::~ReferencedNode()
 void ReferencedNode::registerNode(SceneManager *s)
 {
     sceneManager = s;
-    mediaManager = sceneManager->mediaManager;
 
     // register with OSC parser:
     string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
@@ -244,14 +243,16 @@ void ReferencedNode::updateNodePath(bool updateChildren)
         osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
         if (parentNode.valid())
         {
-            currentNodePath = parentNode->currentNodePath;
+            currentNodePath = parentNode->currentNodePath; // this does a copy
         }
     }
 
     // this nodePath only stores the path until this node (osg::Group).
     currentNodePath.push_back(this);
 
-    // now update NodePaths for all children:
+    // Now update NodePaths for all children if the updateChildren flag is set.
+    // For some derived nodes, they may want to control how they control the 
+    // update of children (eg, only after their nodepath is added).
     if (updateChildren)
         updateChildNodePaths();
 }
@@ -379,7 +380,7 @@ void ReferencedNode::setAlpha (float alpha)
 	ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 	ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-	this->setStateSet(ss);
+	this->osg::Group::setStateSet(ss);
 
     /*
     osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
@@ -413,6 +414,42 @@ void ReferencedNode::setParam (const char *paramName, float paramValue)
     BROADCAST(this, "ssf", "setParam", paramName, paramValue);
 }
 
+// -----------------------------------------------------------------------------
+
+void ReferencedNode::setStateSetFromFile(const char* filename)
+{
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
+	if (ss.valid())
+	{
+		if (ss->id == stateset_) return; // we're already using that stateset
+		stateset_ = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSet());
+	}
+}
+
+void ReferencedNode::setStateSet (const char* s)
+{
+	if (gensym(s)==stateset_) return;
+
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
+	if (ss.valid())
+	{
+		stateset_ = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSet());
+	}
+}
+
+void ReferencedNode::updateStateSet()
+{
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+	if (ss.valid()) osg::Group::setStateSet( ss.get() );
+}
+
+// -----------------------------------------------------------------------------
+
+
 void ReferencedNode::debug()
 {
     lo_arg **args;
@@ -422,6 +459,16 @@ void ReferencedNode::debug()
     std::cout << "****************************************" << std::endl;
     std::cout << "************* NODE  DEBUG: *************" << std::endl;
     std::cout << "\nnode: " << id->s_name << ", type: " << nodeType << std::endl;
+
+    std::cout << "   Node path:" << std::endl;
+    for (osg::NodePath::iterator itr = currentNodePath.begin(); itr != currentNodePath.end(); ++itr)
+    {
+        std::cout << "   -> " << (*itr)->getName() << std::endl;
+    }
+    
+    const osg::BoundingSphere& bs = this->getBound();
+    std::cout << "   Subgraph centroid: " << stringify(bs.center()) << std::endl;
+    std::cout << "   Subgraph radius: " << bs.radius() << std::endl;
 
     vector<lo_message> nodeState = this->getState();
     vector<lo_message>::iterator nodeStateIterator;

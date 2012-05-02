@@ -72,7 +72,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ReporterNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getReporting__C5_char_P1,
 	          "",
-	          "");
+	          "This returns the reporting type that is currently set. ");
 	I_Method1(void, setMaxRate, IN, float, hz,
 	          Properties::NON_VIRTUAL,
 	          __void__setMaxRate__float,
@@ -82,7 +82,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ReporterNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getMaxRate,
 	          "",
-	          "");
+	          "This returns the current set reporting rate in Hz. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

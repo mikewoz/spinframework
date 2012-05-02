@@ -64,7 +64,6 @@
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
-#include "MediaManager.h"
 #include "nodeVisitors.h"
 
 #include "ImageTexture.h"
@@ -93,6 +92,7 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
     // Children of this node will be attached there, and an offset will be added
     // depending whether _attachCentroid is enabled or not:
     _centroid = new osg::PositionAttitudeTransform();
+    _centroid->setName(getID()+".CentroidOffset");
     this->getAttachmentNode()->addChild(_centroid.get());
     this->setAttachmentNode(_centroid.get());
 
@@ -100,6 +100,7 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
     _registerStates = false;
 	_statesetList.clear();
     _renderBin = 10;
+    _lightingOverride = 0;
 
 	modelPath = "NULL";
 
@@ -199,6 +200,7 @@ void ModelNode::makeCentered()
             _modelAttachmentNode->removeChild(model.get());
 
             osg::PositionAttitudeTransform *mpat = new osg::PositionAttitudeTransform();
+            mpat->setName(getID()+".ModelAttachment");
             mpat->setPosition(-bound.center());
 
             mpat->addChild(model.get());
@@ -385,9 +387,10 @@ void ModelNode::drawModel()
 	if ((modelPath != string("NULL")) && !ignoreOnThisHost)
 	{
 
-		//model = dynamic_cast<osg::Group*>(osgDB::readNodeFile(modelPath));
+        //osg::setNotifyLevel(osg::DEBUG_FP);
 		model = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
-
+        //osg::setNotifyLevel(osg::FATAL);
+        
 		if (model.valid())
 		{
 			
@@ -475,8 +478,6 @@ void ModelNode::drawModel()
                 osgUtil::Optimizer::FLATTEN_STATIC_TRANSFORMS_DUPLICATING_SHARED_SUBGRAPHS 
 			);
             */
-
-            model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 			StateSetList statesets;
 			TextureStateSetFinder f(statesets);
@@ -636,6 +637,8 @@ void ModelNode::drawModel()
 			// *****************************************************************
 
 			_modelAttachmentNode->addChild(model.get());
+            model->setName(getID()+".file['"+modelPath+"']");
+            //model->setName(string(id->s_name) + ".model['" + modelPath + "']");
 
 			std::cout << "Created model " << modelPath << std::endl;
 			osg::BoundingSphere bound = model->computeBound();

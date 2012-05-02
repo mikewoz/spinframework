@@ -46,7 +46,8 @@
 #include <osgManipulator/Dragger> // for PointerInf
 #include <osgManipulator/Selection> // for Selection (typedef)
 #include <osgUtil/LineSegmentIntersector>
-#include "ReferencedNode.h"
+#include "RayNode.h"
+
 
 namespace osgGA {
     class GUIEventAdapter;
@@ -68,44 +69,112 @@ class PointerNodeActionAdapter : public osgGA::GUIActionAdapter
     void requestContinuousUpdate(bool){};
     void requestWarpPointer(float,float) {};
 };
-
+  
 /**
  * \brief An interaction node that reports intersections with other nodes in the
- *        scene
+ *        scene (only those that are have interactionMode > 0)
  * 
- * This node must be attached to an RayNode node, and reports a list of all nodes
- * with which the ray is intersecting (in order of closest to furthest). There
- * is also a grabber manipulator that allows the first node to be "grabbed" and
- * moved around.
+ * PointerNode reports a list of all nodes with which the ray is intersecting
+ * (in order of closest to furthest). It can also be used to grab and manipulate
+ * nodes. The grabber allows the first node to be "grabbed" and moved around,
+ * while the manipulate method checks the intersection for draggers in the scene
+ * and invokes a motion command on a dragger.
  */
 
-class PointerNode : public ReferencedNode
+class PointerNode : public RayNode
 {
 
     public:
 
         PointerNode(SceneManager *sceneManager, char *initID);
         virtual ~PointerNode();
+        
+        enum GrabMode
+        {
+            ORIENTATION_LOCK,
+            RELATIVE
+        };
+            
 
         virtual void callbackUpdate();
 
-        void enableDragger();
-        void disableDragger();
+        /**
+         * Get the first GroupNode encountered with interaction mode greater
+         * than passthru
+         */
+        GroupNode *getNodeFromIntersections(int index);
 
-        ReferencedNode *getNodeFromIntersections();
-        //void computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec3 &T);
-
-        void setType (char *s);
-        void highlight (int b);
+        /**
+         * return the first dragger in the intersection list
+         */
+        osgManipulator::Dragger* getDraggerFromIntersections();
+        
+        
         void manipulate (int b);
-
-        const char* getType() const { return draggerType.c_str(); }
-        int getHighlight() const { return (int) dragger.valid(); }
         int getManipulate() const { return (int) doManipulation; }
 
-        // grab stuff:
+        /**
+         * This looks to see if there is a node being pointed at, and if so, it
+         * tells the nodeToLock to lock it's orientation to always point at that
+         * target. Useful for cameras.
+         */
+        void lockToTarget(const char *nodeToLock);
+
+        /**
+         * We can call setManipulator and pass the name of a dragger, and the
+         * pointer will enable the dragger on the current GroupNode that it is
+         * currently pointing at. If the pointer is not intersecting with any
+         * node, this will set the dragger on the last manipulated node; this
+         * was found to be a desired behaviour instead of constantly ensuring an
+         * intersection whenever the user wanted to use a different manipulator.
+         */
+        void setManipulator(const char *manipulatorType);
+
+            
+        /**
+         * Set the OrientationMode of the node, which will be applied after every
+         * transformation.
+         */
+        void setGrabMode(GrabMode mode);
+        int getGrabMode() const { return (int)grabMode_; };
+
+
+        /**
+         * The grab method selects the closest intersected node and temporarily
+         * attaches it to the pointer, allowing it to inherit any translation or
+         * rotation offsets.
+         *
+         * Notes:
+         * - Only nodes derived from GroupNode can be grabbed.
+         * - If no node is intersected, the grab won't do anything.
+         * - The node is re-attached to it's original parent when released, so
+         * don't delete the parent in the meantime
+         * 
+         * @param b A boolean grab indicator (1 to grab, 0 to release)
+         */
         void grab (int b);
-        void pull (float f);
+    
+        /**
+         * Slides the currently grabbed node (if there is one) along the pointer
+         * axis (ie, increasing or decreasing the distance).
+         *
+         * @param f The amount by which to slide (positive values slide the 
+         * attached node AWAY from the pointer
+         */
+        void translateOnPointer (float f);
+        
+        /**
+         * Rotates the currently grabbed node (if there is one) around the pointer
+         * axis.
+         *
+         * @param f The amount by which to rotate around the pointer ray
+         * (in degrees)
+         */
+        void rotateOnPointer (float f);
+         
+        /**
+         * @return Whether there is a valid node that is currently 'grabbed'
+         */
         int getGrab() const { return (int) grabbedNode.valid(); }
 
         /**
@@ -114,12 +183,18 @@ class PointerNode : public ReferencedNode
          */
         virtual std::vector<lo_message> getState() const;
 
+    protected:
         /**
-         * We must include a stateDump() method that simply invokes the base class
-         * method. Simple C++ inheritance is not enough, because osg::Introspection
-         * won't see it.
+         * Checks intersections for draggers and if so, we apply the drag events
          */
-        //virtual void stateDump() { ReferencedNode::stateDump(); };
+        void applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 end);
+
+        void applyGrab(osg::Matrix mat);
+
+        /**
+         * Reports the list of intersected nodes (server-side only)
+         */
+        void reportIntersections();
 
     private:
 
@@ -130,24 +205,36 @@ class PointerNode : public ReferencedNode
         std::vector<osgUtil::LineSegmentIntersector::Intersection> intersectData;
 
         // grabber stuff:
-        osg::ref_ptr<ReferencedNode> grabbedNode;
+        osg::ref_ptr<GroupNode> grabbedNode;
         osg::Vec3 grabbedOffset;
         t_symbol *previousParent;
+        GrabMode grabMode_;
+        float slideIncrement_;
+        float rollIncrement_;
 
         // dragger stuff:
-        std::string draggerType;
         bool doManipulation;
         osg::ref_ptr<ReferencedNode> targetNode;
+        t_symbol *lastManipulated;
+        std::string lastManipulatorType_;
 
-        osg::Matrix origMatrix;
+        osg::Matrix origPointerMatrix;
+        osg::Matrix origGrabbedMatrix;
+        osg::Vec3 origGrabbedPoint;
         osg::Matrix previousMatrix;
-
+        
+        osg::Matrix _localToWorld;
+        osg::Matrix _worldToLocal;
+        
+        /*
         osg::ref_ptr<osgManipulator::Dragger> dragger;
         osg::ref_ptr<osgManipulator::Selection> selection;
         osg::ref_ptr<osgManipulator::CommandManager> cmdMgr;
-
+        */
+        
         osg::ref_ptr<osgGA::GUIEventAdapter> ea;
         PointerNodeActionAdapter aa;
+        
         osgManipulator::PointerInfo _pointer;
 };
 

@@ -42,11 +42,9 @@
 #ifndef PointCloud_H_
 #define PointCloud_H_
 
+#include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>
 #include <osg/ShapeDrawable>
-
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
 
 #include "GroupNode.h"
 
@@ -58,9 +56,8 @@ namespace spin
 /**
  * \brief Point Cloud renderer (can be used with Kinect data or any other .pcd
  * data
- *
- * 
  */
+
 class PointCloud : public GroupNode
 {
 
@@ -69,58 +66,55 @@ public:
     PointCloud(SceneManager *sceneManager, char *initID);
     virtual ~PointCloud();
     
-    enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON, LIGHTPOINTS, BOXES };
+    enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON, LIGHTPOINTS, BOXES, CUSTOM };
     
-    
-    /**
-     * update from kinect
-     */
+    virtual void debug();
     virtual void callbackUpdate();
 
     void loadFile(const char* filename);
+    virtual void draw();
     
+    void setCustomNode   (const char* nodeID);
     void setDrawMode     (DrawMode mode);
     void setSpacing      (float spacing);
     void setRandomCoeff  (float randomCoeff);
     void setPointSize    (float pointsize);
     void setColor        (float red, float green, float blue, float alpha);
 
+    const char* getCustomNode() const;
     int getDrawMode()      const { return (int)this->drawMode_; };
     float getSpacing()     const { return this->spacing_; };
     float getRandomCoeff() const { return this->randomCoeff_; };
     float getPointSize()   const { return this->pointSize_; };
     osg::Vec4 getColor()   const { return this->color_;  };
 
-
-    /**
-     * For each subclass of ReferencedNode, we override the getState() method to
-     * fill the vector with the correct set of methods for this particular node
-     */
     virtual std::vector<lo_message> getState() const;
 
-    
+
 private:
     
     //double depth_data[240][320];
-    pcl::PointCloud<pcl::PointXYZRGB> cloud_;
+    //pcl::PointCloud<pcl::PointXYZRGB> cloud_;
+    //pcl::PointCloud cloud_;
     
-    osg::ref_ptr<osg::MatrixTransform> cloudGroup;
-    osg::ref_ptr<osg::Geode> cloudGeode_;
+    t_symbol* customNode_;
+    
+    osg::ref_ptr<osg::Vec3Array> vertices_;
+    osg::ref_ptr<osg::Vec4Array> colors_;
+    
+    osg::ref_ptr<osg::PositionAttitudeTransform> cloudGroup_;
 
     DrawMode drawMode_;
     
     std::string path_;
     
-    osg::ref_ptr<osg::MatrixTransform> shapeGroup;
-    std::vector< osg::ref_ptr<osg::ShapeDrawable> > shapes;
-    std::vector< osg::ref_ptr<osg::MatrixTransform> > shapeTransforms;
     
     float spacing_;
     float randomCoeff_;
     float pointSize_;
     osg::Vec4 color_;
     
-    bool valid_;
+    bool redrawFlag_;
 
 };
 

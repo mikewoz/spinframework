@@ -108,6 +108,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __osg_Group_P1__getParent__int,
 	          "",
 	          "Returns the current parent as an osg::Group ");
+	I_Method0(spin::ReferencedNode *, getParentNode,
+	          Properties::NON_VIRTUAL,
+	          __ReferencedNode_P1__getParentNode,
+	          "",
+	          "Returns the currently identified parent node: ");
 	I_Method1(void, setContext, IN, const char *, newvalue,
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
@@ -143,6 +148,26 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __void__setParam__C5_char_P1__float,
 	          "",
 	          "");
+	I_Method1(void, setStateSetFromFile, IN, const char *, filename,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSetFromFile__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(void, setStateSet, IN, const char *, s,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSet__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(const char *, getStateSet,
+	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getStateSet,
+	          "",
+	          "");
+	I_Method0(void, updateStateSet,
+	          Properties::VIRTUAL,
+	          __void__updateStateSet,
+	          "",
+	          "In derived classes, you can handle how a stateset gets applied to a node (eg, which part of the subgraph it is attached by overriding the updateStateSet method. ");
 	I_Method0(osg::Group *, getAttachmentNode,
 	          Properties::NON_VIRTUAL,
 	          __osg_Group_P1__getAttachmentNode,
@@ -231,9 +256,18 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(char *, Parent, 
 	                 __char_P1__getParent, 
 	                 0);
+	I_SimpleProperty(spin::ReferencedNode *, ParentNode, 
+	                 __ReferencedNode_P1__getParentNode, 
+	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(const char *, StateSet, 
+	                 __C5_char_P1__getStateSet, 
+	                 __void__setStateSet__C5_char_P1);
+	I_SimpleProperty(const char *, StateSetFromFile, 
+	                 0, 
+	                 __void__setStateSetFromFile__C5_char_P1);
 	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(std::string, nodeType);
 	I_PublicMemberProperty(std::string, contextString);
@@ -249,7 +283,6 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_PublicMemberProperty(osg::NodePath, currentNodePath);
 	I_PublicMemberProperty(std::vector< spin::ReferencedNode * >, children);
 	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
-	I_PublicMemberProperty(spin::MediaManager *, mediaManager);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_callback)

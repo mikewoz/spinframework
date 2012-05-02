@@ -58,6 +58,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "config.h"
 #include "ViewerManipulator.h"
 #include "spinUtil.h"
 #include "spinApp.h"
@@ -66,7 +67,7 @@
 #include "GroupNode.h"
 #include "SceneManager.h"
 #include "ShapeNode.h"
-#include "config.h"
+
 
 extern pthread_mutex_t sceneMutex;
 
@@ -81,25 +82,23 @@ struct frustum
 	float far;
 };
 
-
-static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, const osg::Vec3& widthVector, const osg::Vec3& heightVector, double sphere_radius, double collar_radius,osg::Image* intensityMap, const osg::Matrix& projectorMatrix)
+static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, const osg::Vec3& widthVector, const osg::Vec3& heightVector, double sphere_radius, double collar_radius, double distance=0)
 {
+
     osg::Vec3d center(0.0,0.0,0.0);
     osg::Vec3d eye(0.0,0.0,0.0);
-
-    double distance = sqrt(sphere_radius*sphere_radius - collar_radius*collar_radius);
-
-    //bool centerProjection = true;
-    bool centerProjection = false;
-
-    //osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
-    //projector = osg::Vec3d(0.0, 0.0, -2.5);
     
-    //mikewoz:
-    //osg::Vec3 heightVector = osg::Vec3(
-    //    heightVector_.x() * 0.6666,
-    //    heightVector_.y() * 0.6666,
-    //    heightVector_.z() * 0.6666);
+    // this lets users override the distance:
+    if (fabs(distance)<0.000001)
+        distance = sqrt(sphere_radius*sphere_radius - collar_radius*collar_radius);
+    
+    bool centerProjection = false;
+    osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
+    
+    /*
+    osg::notify(osg::NOTICE)<<"Projector position = "<<spin::stringify(projector)<<std::endl;
+    osg::notify(osg::NOTICE)<<"distance = "<<distance<<std::endl;
+    */
 
     // create the quad to visualize.
     osg::Geometry* geometry = new osg::Geometry();
@@ -113,24 +112,19 @@ static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& or
     osg::Vec3 yAxis(heightVector);
     float height = heightVector.length();
     yAxis /= height;
-
+    
     int noSteps = 50;
 
     osg::Vec3Array* vertices = new osg::Vec3Array;
-    osg::Vec3Array* texcoords0 = new osg::Vec3Array;
-    osg::Vec2Array* texcoords1 = intensityMap==0 ? new osg::Vec2Array : 0;
+    osg::Vec3Array* texcoords = new osg::Vec3Array;
     osg::Vec4Array* colors = new osg::Vec4Array;
 
     osg::Vec3 bottom = origin;
     osg::Vec3 dx = xAxis*(width/((float)(noSteps-1)));
     osg::Vec3 dy = yAxis*(height/((float)(noSteps-1)));
-
+    
     osg::Vec3d screenCenter = origin + widthVector*0.5f + heightVector*0.5f;
     float screenRadius = heightVector.length() * 0.5f;
-    //float screenRadius = heightVector.length() * 0.75f;
-    
-    //std::cout <<"create3DSphericalDisplayDistortionMesh : Projector position = "<<projector<<std::endl;
-    std::cout <<"create3DSphericalDisplayDistortionMesh : distance = "<<distance<< " size="<<width<<"x"<<height<<", center="<<screenCenter.x()<<","<<screenCenter.y()<<","<<screenCenter.z()<<", radius="<<screenRadius<<std::endl;
 
     int i,j;
     if (centerProjection)
@@ -147,31 +141,19 @@ static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& or
 
                 phi *= 2.0;
 
-                if (theta<0.0) theta += 2.0*osg::PI;
-
-                // OSG_NOTICE<<"theta = "<<theta<< "phi="<<phi<<std::endl;
+                // osg::notify(osg::NOTICE)<<"theta = "<<theta<< "phi="<<phi<<std::endl;
 
                 osg::Vec3 texcoord(sin(phi) * cos(theta),
                                    sin(phi) * sin(theta),
                                    cos(phi));
 
                 vertices->push_back(cursor);
-                texcoords0->push_back(texcoord * projectorMatrix);
-
-                osg::Vec2 texcoord1(theta/(2.0*osg::PI), 1.0f - phi/osg::PI_2);
-                if (intensityMap)
-                {
-                    colors->push_back(intensityMap->getColor(texcoord1));
-                }
-                else
-                {
-                    colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
-                    if (texcoords1) texcoords1->push_back( texcoord1 );
-                }
+                colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+                texcoords->push_back(texcoord);
 
                 cursor += dx;
             }
-            // OSG_NOTICE<<std::endl;
+            // osg::notify(osg::NOTICE)<<std::endl;
         }
     }
     else
@@ -185,48 +167,36 @@ static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& or
                 double theta = atan2(-delta.y(), delta.x());
                 double phi = osg::PI_2 * delta.length() / screenRadius;
                 if (phi > osg::PI_2) phi = osg::PI_2;
-                if (theta<0.0) theta += 2.0*osg::PI;
 
-                // OSG_NOTICE<<"theta = "<<theta<< "phi="<<phi<<std::endl;
-
+                // osg::notify(osg::NOTICE)<<"theta = "<<theta<< "phi="<<phi<<std::endl;
+                
                 double f = distance * sin(phi);
                 double e = distance * cos(phi) + sqrt( sphere_radius*sphere_radius - f*f);
                 double l = e * cos(phi);
                 double h = e * sin(phi);
                 double z = l - distance;
-
+                
                 osg::Vec3 texcoord(h * cos(theta) / sphere_radius,
                                    h * sin(theta) / sphere_radius,
                                    z / sphere_radius);
 
                 vertices->push_back(cursor);
-                texcoords0->push_back(texcoord * projectorMatrix);
-
-                osg::Vec2 texcoord1(theta/(2.0*osg::PI), 1.0f - phi/osg::PI_2);
-                if (intensityMap)
-                {
-                    colors->push_back(intensityMap->getColor(texcoord1));
-                }
-                else
-                {
-                    colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
-                    if (texcoords1) texcoords1->push_back( texcoord1 );
-                }
+                colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+                texcoords->push_back(texcoord);
 
                 cursor += dx;
             }
-            // OSG_NOTICE<<std::endl;
+            // osg::notify(osg::NOTICE)<<std::endl;
         }
     }
-
+    
     // pass the created vertex array to the points geometry object.
     geometry->setVertexArray(vertices);
 
     geometry->setColorArray(colors);
     geometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
-    geometry->setTexCoordArray(0,texcoords0);
-    if (texcoords1) geometry->setTexCoordArray(1,texcoords1);
+    geometry->setTexCoordArray(0,texcoords);
 
     for(i=0;i<noSteps-1;++i)
     {
@@ -238,27 +208,21 @@ static osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& or
         }
         geometry->addPrimitiveSet(elements);
     }
-
+    
     return geometry;
 }
 
-static void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits, osg::View *view, osg::Camera *cam, double radius, double collar, double crop, osg::Image* intensityMap, const osg::Matrixd& projectorMatrix)
+
+static void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits, osg::View *view, osg::Camera *cam, int textureSize, double radius, double collar, double distance, double crop, osg::Image* intensityMap, const osg::Matrixd& projectorMatrix)
 {
     bool applyIntensityMapAsColours = true;
 
-    //int tex_width = 512;
-    //int tex_height = 512;
-    int tex_width = 1024;
-    int tex_height = 1024;
-    //int tex_width = 2048;
-    //int tex_height = 2048;
-
-    int camera_width = tex_width;
-    int camera_height = tex_height;
+    int camera_width = textureSize;
+    int camera_height = textureSize;
 
     osg::TextureCubeMap* texture = new osg::TextureCubeMap;
 
-    texture->setTextureSize(tex_width, tex_height);
+    texture->setTextureSize(textureSize, textureSize);
     texture->setInternalFormat(GL_RGB);
     texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
     texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
@@ -292,13 +256,13 @@ static void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits 
         view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd());
     }
 
-
     // top face
     {
         osg::ref_ptr<osg::Camera> camera = new osg::Camera;
         camera->setName("Top face camera");
         camera->setGraphicsContext(gc);
         camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
+        GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
         camera->setDrawBuffer(buffer);
         camera->setReadBuffer(buffer);
         camera->setAllowEventFocus(false);
@@ -394,7 +358,9 @@ static void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits 
     // distortion correction set up.
     {
         osg::Geode* geode = new osg::Geode();
-        geode->addDrawable(create3DSphericalDisplayDistortionMesh(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(traits->width,0.0f,0.0f), osg::Vec3(0.0f,traits->height,0.0f), radius, collar, applyIntensityMapAsColours ? intensityMap : 0, projectorMatrix));
+        // old method:
+        //geode->addDrawable(create3DSphericalDisplayDistortionMesh(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(traits->width,0.0f,0.0f), osg::Vec3(0.0f,traits->height,0.0f), radius, collar, applyIntensityMapAsColours ? intensityMap : 0, projectorMatrix));
+        geode->addDrawable(create3DSphericalDisplayDistortionMesh(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(traits->width,0.0f,0.0f), osg::Vec3(0.0f,traits->height,0.0f), radius, collar, distance));
 
         // new we need to add the texture to the mesh, we do so by creating a
         // StateSet to contain the Texture StateAttribute.
@@ -522,8 +488,10 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
 	
     if (spherical)
     {
+        int textureSize = 2048;
         float radius = 1.0;
-        float collar = 0.0;
+        float collar = 0.45;
+        float distance = 0.0;
         float crop = 0.0;
         float near = 1.0;
         float far = 1000.0; 
@@ -535,13 +503,21 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
 	    		val = child->FirstChild()->Value();
 	    	} else continue;
         
-		    if (tag=="radius")
+		    if (tag=="textureSize")
+            {
+                sscanf(val.c_str(), "%d", &textureSize);
+            }
+		    else if (tag=="radius")
             {
                 sscanf(val.c_str(), "%f", &radius);
             }
             else if (tag=="collar")
             {
                 sscanf(val.c_str(), "%f", &collar);
+            }
+            else if (tag=="distance")
+            {
+                sscanf(val.c_str(), "%f", &distance);
             }
             else if (tag=="crop")
             {
@@ -564,10 +540,10 @@ static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, 
         osg::Matrixd projMatrix = osg::Matrixd::identity();
         //osg::Matrixd projMatrix = osg::Matrixd::translate(osg::Vec3(0,0,1.0));
  
-        std::cout << "creating spherical display with radius="<<radius<<", collar="<<collar<<", crop="<<crop<<std::endl;
+        std::cout << "creating spherical display with textureSize="<<textureSize<<", radius="<<radius<<", collar="<<collar<<", crop="<<crop<<std::endl;
 
         //view->setUpViewFor3DSphericalDisplay(radius, collar, screenNum, intensityMap, projMatrix);
-        makeDomeView(gc, traits, view, cam, radius, collar, crop, intensityMap, projMatrix);
+        makeDomeView(gc, traits, view, cam, textureSize, radius, collar, distance, crop, intensityMap, projMatrix);
 
         double fovy, aspectRatio, zNear, zFar;
         cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
@@ -887,6 +863,7 @@ int run(int argc, char **argv)
 	bool picker = false;
 	bool mover = true;
 	
+    int multisamples = 4;
 	bool fullscreen = false;
 	bool hideCursor=false;
 
@@ -904,6 +881,8 @@ int run(int argc, char **argv)
 	std::string camConfig;
 	std::string sceneID = spin.getSceneID();
 	
+    //osg::setNotifyLevel(osg::INFO);
+    
     // *************************************************************************
 
 	// get arguments:
@@ -926,6 +905,7 @@ int run(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--clipping <near far>", "Manually specify fixed clipping planes (Default: clipping planes will be recomputed for every frame)");
     arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
+	arguments.getApplicationUsage()->addCommandLineOption("--multisamples <num>", "Set the level of multisampling for antialiasing (Default: 4)");
 	arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-baed camera controls for this user. This is helpful when using a mouse picker.");
 	arguments.getApplicationUsage()->addCommandLineOption("--enable-mouse-picker", "Enable the mouse picker, and send events to the server");
 
@@ -956,31 +936,30 @@ int run(int argc, char **argv)
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}
+	while (arguments.read("--multisamples",multisamples)) {}
 	if (arguments.read("--disable-camera-controls")) mover=false;
 	if (arguments.read("--enable-mouse-picker")) picker=true;
 
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
-    osg::setNotifyLevel(osg::DEBUG_FP);
     //std::cout << "DYLD_LIBRARY_PATH= " << getenv("DYLD_LIBRARY_PATH") << std::endl;
     //std::cout << "OSG_LIBRARY_PATH=  " << getenv("OSG_LIBRARY_PATH") << std::endl;
 	//setenv("OSG_PLUGIN_EXTENSION", ".so", 1);
     osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
     
-    osg::setNotifyLevel(osg::FATAL);
     
 	// *************************************************************************
 	// construct the viewer:
 	// (note, this constructor gets rid of some additional args)
 
 	osgViewer::CompositeViewer viewer = osgViewer::CompositeViewer(arguments);
-    // Aug 19 2010:tmatth: Tried this for multithreading
-	//viewer.setThreadingModel(osgViewer::CompositeViewer::AutomaticSelection);
-	//viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
-	viewer.setThreadingModel(osgViewer::CompositeViewer::CullDrawThreadPerContext);
+    //viewer.setThreadingModel(osgViewer::CompositeViewer::AutomaticSelection);
+	viewer.setThreadingModel(osgViewer::CompositeViewer::SingleThreaded);
+	//viewer.setThreadingModel(osgViewer::CompositeViewer::CullDrawThreadPerContext);
 
 	viewer.getUsage(*arguments.getApplicationUsage());
 
+    osg::DisplaySettings::instance()->setNumMultiSamples( multisamples );
 
 	// *************************************************************************
 	// start the listener thread:
@@ -1078,7 +1057,6 @@ int run(int argc, char **argv)
             //} 
         }
 
-        /// Thu Aug 19 2010:tmatth:FIXME: this segfaults in multithreaded mode
         view->setSceneData(spin.sceneManager->rootNode.get());
 
 	    view->addEventHandler(new osgViewer::StatsHandler);
@@ -1326,6 +1304,7 @@ int run(int argc, char **argv)
 // *****************************************************************************
 int main(int argc, char **argv)
 {
+    /*
     // *************************************************************************
     // If no command line arguments were passed, check if there is an args file
     // at ~/.spinFramework/args and override argc and argv with those:
@@ -1363,12 +1342,24 @@ int main(int argc, char **argv)
             std::cout << "Warning: cannot read arguments from " << SPIN_DIRECTORY+"/args. Reason: " << e.what() << std::endl;
         }
     }
-
+     */
     
     
-    try {
-        // Aug 19 2010:tmatth: Tried this to make multithreading work, didn't help
-        // osg::Referenced::setThreadSafeReferenceCounting(true);
+    // *************************************************************************
+    // If no command line arguments were passed, check if there is an args file
+    // at ~/.spinFramework/args and override argc and argv with those:
+    std::vector<char*> newArgs = spin::getUserArgs();
+    if ((argc==1) && (newArgs.size() > 1))
+    {
+        // need first arg (command name):
+        newArgs.insert(newArgs.begin(), argv[0]);
+        argc = (int)newArgs.size()-1;
+        argv = &newArgs[0];
+    }
+    
+    
+    try
+    {
         int result = run(argc, argv);
         std::cout << "\nspinviewer exited normally." << std::endl;
         return result;

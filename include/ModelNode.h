@@ -96,6 +96,11 @@ public:
      * over any textures or shaders withing the model
      */
     void setModelFromFile        (const char *filename);
+
+    /**
+     * Returns the file path of the 3d model attached to this node.
+     */
+
     const char* getModelFromFile() const { return modelPath.c_str(); }
 
     /**
@@ -104,6 +109,11 @@ public:
      * to this ModelNode's local origin.
      */
     void setAttachCentroid(int i);
+
+    /**
+     * Returns a boolean indicating whether attachCentroid is enabled.
+     */
+
     int  getAttachCentroid() const { return (int)_attachCentroid; }
     
     /**
@@ -118,7 +128,14 @@ public:
      * SPIN. This way, you'll be able to swap textures, control videos, adjust
      * shader parameters, etc.
      */
+
     void setStateRegistration    (int i);
+
+    /**
+     * Returns a boolean indicating whether StateRegistration is set. See
+     * setStateRegistration for more information.
+     */
+
     int getStateRegistration() const { return (int)_registerStates; }
 
     /**
@@ -127,6 +144,12 @@ public:
      * Default renderBin = 11
      */
     void setRenderBin            (int i);
+
+    /**
+     * Returns an integer representing the render bin of the node. See
+     * setRenderBin for more information.
+     */
+
     int getRenderBin() const { return _renderBin; }
 
     /**
@@ -134,12 +157,23 @@ public:
      * (there can be several animations, hence the required index number)
      */
     void setKeyframe (int index, float keyframe);
+
+    /**
+     * Return the keyframe of a particular animation saved within the model
+     * (there can be several animations, hence the required index number)
+     */
+
     float getKeyframe(int index) const { return _keyframe[index]; }
 
     /**
      * Set the playing state of a particular animation (paused by default)
      */
     void setPlaying (int index, int playState);
+
+    /**
+     * Returns a boolean indicating whether the animation is currently playing.
+     */
+
     float getPlaying(int index) const { return _playState[index]; }
 
     
@@ -162,6 +196,11 @@ public:
      * really this should be done in individual statesets and can be overridden
      */
     void setLighting (int i);
+
+    /**
+     * Returns a boolean indicating whether lighting is enabled for the model.
+     */
+
     int getLighting() const { return (int)_lightingOverride; }
 
     std::vector<t_symbol*> _statesetList;

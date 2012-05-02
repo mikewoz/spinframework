@@ -67,7 +67,12 @@ public:
      * is the default behaviour). An INTRISIC attractor actually changes the
      * velocity of the target.
      */
-    enum attractorMode { EXTRINSIC, INTRINSIC };
+    enum attractorMode { 
+    					EXTRINSIC, /*!< translates the attracted target by a
+									small amount each time increment */
+    					INTRINSIC  /*!< changes the velocity of the attracted
+									target */
+    					};
     
 
     virtual void callbackUpdate();
@@ -80,6 +85,12 @@ public:
      * implies a constant decay (independent of distance).
      */
     void setDistanceDecay(float decay);
+    
+    /**
+    * @return a float that indicates the decay of the node's attractive force as
+    * a function of distance from the node
+    */
+    
     float getDistanceDecay() const { return distanceDecay_; }
 
     /**
@@ -90,18 +101,36 @@ public:
      * target.
      */
     void setAngularDecay(float decay);
+    
+    /**
+    * @return a float which indicates how the attractive force of the node
+    * decays as a function of incidence to the attractor's current orientation
+    * (i.e. at what angle objects are from the attractive node)
+    */
+    
     float getAngularDecay() const { return angularDecay_; }
 
     /**
      * Change the mode (see attractorMode enum).
      */
     void setAttractorMode(attractorMode m);
+    
+    /**
+    * @return an int indicating the attractor mode currently set for the node,
+    * see the attractorMode enum for types
+    */
+    
     int getAttractorMode() const { return (int)mode_; }
 
     /**
      * Set the attractive force (negative force for repulsion)
      */
     void setForce(float force);
+    
+    /**
+    * @return a float which indicates the attractive force of the node
+    */
+    
     float getForce() const { return force_; }
 
     /**
