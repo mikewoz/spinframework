@@ -688,6 +688,14 @@ void GroupNode::setOrientation (float p, float r, float y)
             quat_ = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
                                      osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
                                      osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
+            
+            // fix numerical imprecision:
+            float epsilon = 0.0000001;
+            if (fabs(quat_.x())<epsilon) quat_ = osg::Quat(0.0,quat_.y(),quat_.z(),quat_.w());
+            if (fabs(quat_.y())<epsilon) quat_ = osg::Quat(quat_.x(),0.0,quat_.z(),quat_.w());
+            if (fabs(quat_.z())<epsilon) quat_ = osg::Quat(quat_.x(),quat_.y(),0.0,quat_.w());
+            if (fabs(quat_.w())<epsilon) quat_ = osg::Quat(quat_.x(),quat_.y(),quat_.z(),0.0);
+    
             updateMatrix();
             BROADCAST(this, "sfff", "setOrientation", p, r, y);
         }
