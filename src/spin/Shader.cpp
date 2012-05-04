@@ -56,6 +56,7 @@
 #include "SceneManager.h"
 #include "Shader.h"
 #include "ShaderUtil.h"
+#include "spinUtil.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
@@ -404,6 +405,13 @@ void Shader::registerUniform(const char* name, const char* type, const char* def
 
 bool Shader::loadJitterShader(std::string path)
 {
+
+    if (! fileExists(path))
+    {
+        std::cout << "ERROR: failed to load " << path << ". The file does not exist." << std::endl;
+        return false;
+    }
+
     TiXmlDocument doc( path.c_str() );
 
     TiXmlNode *root = 0;
