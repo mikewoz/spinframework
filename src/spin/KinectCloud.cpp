@@ -167,7 +167,6 @@ void KinectCloud::callbackUpdate()
     }
 
     
-    
     cloudGroup = new osg::MatrixTransform;
     
     //cloudGroup->setDataVariance(osg::Object::STATIC);

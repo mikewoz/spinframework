@@ -70,11 +70,15 @@ namespace spin
 
 #define Vec3inDegrees(v) (osg::Vec3( osg::RadiansToDegrees(v.x()), osg::RadiansToDegrees(v.y()), osg::RadiansToDegrees(v.z()) ))
 
-
 #define GENERIC_SHAPE_RESOLUTION 10.0f
 
 #define AS_UNIT_SCALE  1.0f // 1m
 #define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
+
+float random(float min,float max);
+int random(int min,int max);
+osg::Vec3 randomVec3();
+
 
 /**
  * Returns an absolute angle difference between v1 and v2 (with no notion of
