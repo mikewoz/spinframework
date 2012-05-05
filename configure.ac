@@ -86,7 +86,6 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 
-AC_LANG_DEFINES_PROVIDED # remove autogen.sh warnings on OSX
 AC_PROG_LIBTOOL
 # LT_INIT should be used instead of AC_PROG_LIBTOOL
 #LT_PREREQ([2.4])
@@ -113,6 +112,7 @@ fi
 
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
+  #AC_LANG_DEFINES_PROVIDED # remove autogen.sh warnings on OSX
   LIBTOOL="glibtool"
   #LIBTOOL="libtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
