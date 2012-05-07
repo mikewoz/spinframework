@@ -73,7 +73,7 @@ public:
     virtual ~PointCloud();
     
     enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON, LIGHTPOINTS, BOXES, CUSTOM };
-    
+    enum ColorMode { NORMAL, OVERRIDE };
     virtual void debug();
     virtual void callbackUpdate();
     
@@ -98,6 +98,7 @@ public:
     void setRandomCoeff  (float randomCoeff);
     void setPointSize    (float pointsize);
     void setColor        (float red, float green, float blue, float alpha);
+    void setColorMode    (ColorMode mode);
 
     /**
      * Set the voxelSize for the pcl::VoxelGrid filter, which downsamples points
@@ -116,12 +117,13 @@ public:
 
 
     const char* getCustomNode() const;
-    int getDrawMode()      const { return (int)this->drawMode_; };
-    float getSpacing()     const { return this->spacing_; };
-    float getRandomCoeff() const { return this->randomCoeff_; };
-    float getPointSize()   const { return this->pointSize_; };
-    osg::Vec4 getColor()   const { return this->color_;  };
-    float getFilterSize()  const { return this->voxelSize_; };
+    int getDrawMode()       const { return (int)this->drawMode_; };
+    float getSpacing()      const { return this->spacing_; };
+    float getRandomCoeff()  const { return this->randomCoeff_; };
+    float getPointSize()    const { return this->pointSize_; };
+    osg::Vec4 getColor()    const { return this->color_;  };
+    int getColorMode()      const { return (int)this->colorMode_; };
+    float getFilterSize()   const { return this->voxelSize_; };
     osg::Vec2 getDistCrop() const { return this->distCrop_; };
 
     virtual std::vector<lo_message> getState() const;
@@ -150,6 +152,7 @@ private:
     float randomCoeff_;
     float pointSize_;
     osg::Vec4 color_;
+    ColorMode colorMode_;
     float voxelSize_;
     osg::Vec2 distCrop_;
     

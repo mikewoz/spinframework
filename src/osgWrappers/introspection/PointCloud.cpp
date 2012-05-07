@@ -39,6 +39,12 @@ BEGIN_ENUM_REFLECTOR(spin::PointCloud::DrawMode)
 	I_EnumLabel(spin::PointCloud::CUSTOM);
 END_REFLECTOR
 
+BEGIN_ENUM_REFLECTOR(spin::PointCloud::ColorMode)
+	I_DeclaringFile("PointCloud.h");
+	I_EnumLabel(spin::PointCloud::NORMAL);
+	I_EnumLabel(spin::PointCloud::OVERRIDE);
+END_REFLECTOR
+
 BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	I_DeclaringFile("PointCloud.h");
 	I_BaseType(spin::GroupNode);
@@ -116,6 +122,11 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          __void__setColor__float__float__float__float,
 	          "",
 	          "");
+	I_Method1(void, setColorMode, IN, spin::PointCloud::ColorMode, mode,
+	          Properties::NON_VIRTUAL,
+	          __void__setColorMode__ColorMode,
+	          "",
+	          "");
 	I_Method1(void, setVoxelSize, IN, float, voxelSize,
 	          Properties::NON_VIRTUAL,
 	          __void__setVoxelSize__float,
@@ -156,6 +167,11 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          __osg_Vec4__getColor,
 	          "",
 	          "");
+	I_Method0(int, getColorMode,
+	          Properties::NON_VIRTUAL,
+	          __int__getColorMode,
+	          "",
+	          "");
 	I_Method0(float, getFilterSize,
 	          Properties::NON_VIRTUAL,
 	          __float__getFilterSize,
@@ -173,6 +189,9 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
 	I_SimpleProperty(osg::Vec4, Color, 
 	                 __osg_Vec4__getColor, 
+	                 0);
+	I_SimpleProperty(int, ColorMode, 
+	                 __int__getColorMode, 
 	                 0);
 	I_SimpleProperty(const char *, CustomNode, 
 	                 __C5_char_P1__getCustomNode, 

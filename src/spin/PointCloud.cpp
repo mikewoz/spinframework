@@ -89,7 +89,7 @@ PointCloud::PointCloud (SceneManager *sceneManager, char *initID) : GroupNode(sc
     path_ = "NULL";
     customNode_ = gensym("NULL");
     
-    color_ = osg::Vec4(1.0,1.0,0.0,1.0);
+    color_ = osg::Vec4(1.0,1.0,1.0,1.0);
     spacing_ = 1.0;
     randomCoeff_ = 0.0;
     pointSize_ = 1.0;
@@ -208,6 +208,8 @@ osg::Vec3 PointCloud::getPos(unsigned int i)
 
 osg::Vec4f PointCloud::getColor(unsigned int i)
 {
+    if (colorMode_==OVERRIDE) return color_;
+
     uint32_t rgba_val_;
     memcpy(&rgba_val_, &(cloud_->points[i].rgba), sizeof(uint32_t));
     
@@ -742,6 +744,17 @@ void PointCloud::setColor (float r, float g, float b, float a)
 	}
 }
 
+void PointCloud::setColorMode (ColorMode mode)
+{
+	if (this->colorMode_ != (int)mode)
+	{
+		this->colorMode_ = mode;
+		BROADCAST(this, "si", "setColorMode", getColorMode());
+        
+        updateFlag_ = true;
+	}
+}
+
 // -----------------------------------------------------------------------------
 std::vector<lo_message> PointCloud::getState () const
 {
@@ -782,7 +795,12 @@ std::vector<lo_message> PointCloud::getState () const
     msg = lo_message_new();
     osg::Vec4 v3 = this->getColor();
     lo_message_add(msg, "sffff", "setColor", v3.x(), v3.y(), v3.z(), v3.w());
+ 
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setColorMode", getColorMode());
     ret.push_back(msg);
+
+   ret.push_back(msg);
     
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setURI", path_.c_str());
