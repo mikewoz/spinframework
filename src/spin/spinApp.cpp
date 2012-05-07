@@ -39,6 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "config.h"
+
 #include <string>
 #include <iostream>
 #include <pthread.h>

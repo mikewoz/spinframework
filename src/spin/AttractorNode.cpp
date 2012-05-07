@@ -148,7 +148,7 @@ void AttractorNode::callbackUpdate()
 
 					// We now apply the force, scaling by amount of time,
 					// and distance/angular decay factors:
-					delta *= abs(force_) * dt * distanceScalar * angularScalar;
+					delta *= fabs(force_) * dt * distanceScalar * angularScalar;
 
 					// if the force is an attraction (negative) and this update
 					// will bypass our location, then scale delta so the target

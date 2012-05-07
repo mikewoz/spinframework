@@ -157,6 +157,22 @@ AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
+# Method to disable Python (note the negative: DISable)
+AC_ARG_ENABLE([python],
+    AS_HELP_STRING([--enable-python], [Enables the Python interpreter within SPIN (enabled by default)]),
+    [enable_python=$enableval],
+    [enable_python=yes])
+#AM_CONDITIONAL(DISABLE_PYTHON, test "x$enable_python" = xno)
+#AC_SUBST(DISABLE_PYTHON)
+
+if test "x$enable_python" = xno; then
+AC_DEFINE([DISABLE_PYTHON],[1],[Disables python interpreter and thus all behaviours scripts in SPIN]) AC_MSG_NOTICE([Disabled Python scripts])
+AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xyes)
+fi
+
+
+if test "x$enable_python" = xyes; then
+
 # Check for Python:
 AM_PATH_PYTHON
 
@@ -172,7 +188,7 @@ case "$host" in *-darwin* | *-macos10*)
   pythondir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
   pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 esac
-
+fi
 
 BOOST_REQUIRE([1.35])
 BOOST_REGEX
@@ -180,16 +196,21 @@ BOOST_SYSTEM
 BOOST_FILESYSTEM
 #BOOST_THREAD
 BOOST_PROGRAM_OPTIONS
+if test "x$enable_python" = xyes; then
 BOOST_PYTHON
+fi
 
 #AC_MSG_NOTICE([BOOST_LDFLAGS:        ${BOOST_LDFLAGS}])
 AC_MSG_NOTICE([BOOST_CPPFLAGS:             ${BOOST_CPPFLAGS}])
 AC_MSG_NOTICE([BOOST_SYSTEM_LIBS:          ${BOOST_SYSTEM_LIBS}])
 AC_MSG_NOTICE([BOOST_FILESYSTEM_LIBS:      ${BOOST_FILESYSTEM_LIBS}])
 AC_MSG_NOTICE([BOOST_PROGRAM_OPTIONS_LIBS: ${BOOST_PROGRAM_OPTIONS_LIBS}])
+if test "x$enable_python" = xyes; then
 AC_MSG_NOTICE([BOOST_PYTHON_LIBS:          ${BOOST_PYTHON_LIBS}])
 AC_MSG_NOTICE([BOOST_PYTHON_LDFLAGS:       ${BOOST_PYTHON_LDFLAGS}])
-
+else
+AC_MSG_NOTICE([BOOST_PYTHON_LIBS:          DISABLED])
+fi
 
 
 
@@ -216,7 +237,7 @@ else
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
 
-AC_CHECK_LIB([PocoFoundation], [main], [pototest=true POCO_LIBS="-lPocoUtild -lPocoNetd -lPocoXMLd -lPocoFoundationd"], AC_MSG_WARN([missing Poco]))
+AC_CHECK_LIB([PocoFoundation], [main], [pototest=true POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
 AM_CONDITIONAL(HAVE_POCO, [test x$pocotest = xtrue])
 AC_SUBST(POCO_LIBS)
 
@@ -240,7 +261,7 @@ else
 fi
 AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
-PCL_PKGS="pcl_common-1.5 pcl_io-1.5"
+PCL_PKGS="pcl_common-1.5 pcl_io-1.5 pcl_filters-1.5"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])

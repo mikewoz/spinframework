@@ -151,6 +151,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
 
 # $(top_srcdir)/include/videoSize.h
 
+if HAVE_PYTHON
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 #libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
 libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
@@ -167,6 +168,8 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 #     cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
 # 
 # #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
+endif
+
 
 if BULLET
 AM_CPPFLAGS += \

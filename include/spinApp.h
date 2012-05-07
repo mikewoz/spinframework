@@ -42,6 +42,8 @@
 #ifndef __spinApp_H
 #define __spinApp_H
 
+#include "config.h"
+
 #ifndef DISABLE_PYTHON
 //#include "Python.h"
 //#include <Python.h>
@@ -49,11 +51,11 @@
 
 #endif
 
+#include <stdarg.h>
 #include <osg/Timer>
 #include <lo/lo_types.h>
 #include <osg/ref_ptr>
 
-#include "config.h"
 #include "spinUtil.h"
 
 namespace spatosc
