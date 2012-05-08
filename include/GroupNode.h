@@ -102,7 +102,7 @@ public:
     };
     enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
     enum velocityMode { TRANSLATE, MOVE };
-    
+    enum ComputationMode { SERVER_SIDE, CLIENT_SIDE };
     enum OrientationMode
     {
         NORMAL,
@@ -130,13 +130,49 @@ public:
     		float x, float y, float z);
 	void setLock(const char* userString, int lock);
 
-
+    /**
+     * Print debug information about the node to standard out (when running in
+     * console mode). It may be possible to redirect this to a text box for GUI
+     * logs.
+     */
     virtual void debug();
+    
+    /**
+     * setStateSetFromFile guesses the type of stateset from the filename
+     * extension, creates a new stateset of that type and assigns it to this
+     * node
+     */
+    void setStateSetFromFile(const char* filename);
+    
+    /**
+     * Assign an existing stateset to this node
+     */
+    void setStateSet(const char* s);
+    t_symbol* getStateSetSymbol() const { return stateset_; }
+    
+    /**
+     * This method actually applies the stateset to the subgraph, replacing any
+     * existing stateset with this one. The setStateSet and setStateSetFromFile
+     * methods just set the stateset_ symbol, while updateStateSet does the
+     * actual work.
+     *
+     * Override this method in subclasses in order to change how stateset should
+     * be applied. For example, to which node in the subgraph it should be
+     * attached, or whether it should be merged with the existing stateset
+     * (rather than merged).
+     *
+     * By default it is applied to the mainTransform.
+     */
+    virtual void updateStateSet();
+    
     
     void setReportMode(globalsReportMode mode);
 
     void setInteractionMode(InteractionMode mode);
     
+    void setComputationMode(ComputationMode mode);
+    int getComputationMode() const { return (int)computationMode_; };
+
     /**
      * Set a clipping rectangle for the model so that geometry outside of the
      * region (+-x, +-y, +-z) will not be shown (or used in interactive events)
@@ -300,6 +336,8 @@ protected:
     void drawManipulator();
 
     osg::ref_ptr<UserNode> owner;
+    
+    t_symbol *stateset_;
 
     //osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
     osg::ref_ptr<osg::MatrixTransform> mainTransform;
@@ -319,6 +357,8 @@ protected:
     osg::Vec3 _globalScale;
     float _globalRadius;
 
+    bool computationMode_;
+
     enum OrientationMode orientationMode_;
     t_symbol* orientationTarget_;
     osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
@@ -337,7 +377,6 @@ protected:
     
 private:
 
-    
     osg::Timer_t lastTick;
 
 };

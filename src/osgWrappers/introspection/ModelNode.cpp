@@ -115,6 +115,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          __void__setStateSet__int__C5_char_P1,
 	          "",
 	          "For statesets embedded in the model, it is possible to swap with some other (already existing) stateset.Note: for this to work, stateRegistration must be enabled. ");
+	I_Method0(void, updateStateSet,
+	          Properties::VIRTUAL,
+	          __void__updateStateSet,
+	          "",
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

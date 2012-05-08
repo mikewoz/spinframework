@@ -33,46 +33,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GeometryNode)
 	          __void__callbackUpdate,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
-	I_Method1(void, setStateSetFromFile, IN, const char *, filename,
-	          Properties::NON_VIRTUAL,
-	          __void__setStateSetFromFile__C5_char_P1,
-	          "",
-	          "");
-	I_Method1(void, setStateSet, IN, const char *, s,
-	          Properties::NON_VIRTUAL,
-	          __void__setStateSet__C5_char_P1,
-	          "",
-	          "");
-	I_Method0(const char *, getStateSet,
-	          Properties::NON_VIRTUAL,
-	          __C5_char_P1__getStateSet,
-	          "",
-	          "");
 	I_Method0(void, updateStateSet,
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,
 	          "",
-	          "In derived classes, you can handle how a stateset gets applied to a node (eg, which part of the subgraph it is attached by overriding the updateStateSet method. ");
-	I_Method0(int, getRenderBin,
-	          Properties::NON_VIRTUAL,
-	          __int__getRenderBin,
-	          "",
-	          "");
-	I_Method0(int, getLighting,
-	          Properties::NON_VIRTUAL,
-	          __int__getLighting,
-	          "",
-	          "");
-	I_Method1(void, setRenderBin, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setRenderBin__int,
-	          "",
-	          "");
-	I_Method1(void, setLighting, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setLighting__int,
-	          "",
-	          "");
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform. ");
 	I_Method1(void, setNumVertices, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setNumVertices__int,
@@ -98,23 +63,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GeometryNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_SimpleProperty(int, Lighting, 
-	                 __int__getLighting, 
-	                 __void__setLighting__int);
 	I_SimpleProperty(int, NumVertices, 
 	                 0, 
 	                 __void__setNumVertices__int);
-	I_SimpleProperty(int, RenderBin, 
-	                 __int__getRenderBin, 
-	                 __void__setRenderBin__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_SimpleProperty(const char *, StateSet, 
-	                 __C5_char_P1__getStateSet, 
-	                 __void__setStateSet__C5_char_P1);
-	I_SimpleProperty(const char *, StateSetFromFile, 
-	                 0, 
-	                 __void__setStateSetFromFile__C5_char_P1);
 END_REFLECTOR
 

@@ -21,6 +21,12 @@
 #undef OUT
 #endif
 
+BEGIN_ENUM_REFLECTOR(spin::ImageTexture::TextureMode)
+	I_DeclaringFile("ImageTexture.h");
+	I_EnumLabel(spin::ImageTexture::TEXTURE_2D);
+	I_EnumLabel(spin::ImageTexture::TEXTURE_RECTANGLE);
+END_REFLECTOR
+
 BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	I_DeclaringFile("ImageTexture.h");
 	I_BaseType(spin::Shader);
@@ -32,7 +38,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "TO_BE_DONE ");
+	          "Print debug information to console. ");
 	I_Method0(bool, isValid,
 	          Properties::NON_VIRTUAL,
 	          __bool__isValid,
@@ -48,16 +54,35 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          __C5_char_P1__getPath,
 	          "",
 	          "");
+	I_Method1(void, setTextureMode, IN, spin::ImageTexture::TextureMode, mode,
+	          Properties::NON_VIRTUAL,
+	          __void__setTextureMode__TextureMode,
+	          "",
+	          "");
+	I_Method0(int, getTextureMode,
+	          Properties::NON_VIRTUAL,
+	          __int__getTextureMode,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "Just like a ReferencedNode, each subclass of ReferencedStateSet must override the getState() method to pass it's current state. ");
+	I_ProtectedMethod0(void, draw,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__draw,
+	                   "",
+	                   "");
 	I_SimpleProperty(const char *, Path, 
 	                 __C5_char_P1__getPath, 
 	                 __void__setPath__C5_char_P1);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
+	                 0);
+	I_SimpleProperty(int, TextureMode, 
+	                 __int__getTextureMode, 
 	                 0);
 END_REFLECTOR
 

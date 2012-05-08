@@ -69,9 +69,7 @@ public:
     ImageTexture(SceneManager *sceneManager, const char *initID);
     ~ImageTexture();
 
-    /**
-     * TO_BE_DONE
-     */
+    enum TextureMode { TEXTURE_2D, TEXTURE_RECTANGLE };
 
     virtual void debug();
     
@@ -86,16 +84,22 @@ public:
     void setPath (const char* newPath);
     const char *getPath() const { return _path.c_str(); }
 
+    void setTextureMode(TextureMode mode);
+    int getTextureMode() const { return (int)textureMode_; };
+
     // must reimplement
     virtual std::vector<lo_message> getState() const;
 
-    
+protected:
+
+    void draw();
+
 private:
     
     osg::ref_ptr<osg::Image> _image;
     std::string _path;
-
-    bool _useTextureRectangle;
+    
+    TextureMode textureMode_;
 };
 
 } // end of namespace spin

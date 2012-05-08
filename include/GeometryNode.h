@@ -67,17 +67,7 @@ public:
     virtual ~GeometryNode();
     
     virtual void callbackUpdate();
-
-    void setStateSetFromFile(const char* filename);
-    void setStateSet        (const char* s);
-    const char *getStateSet () const { return stateset->s_name; }
-    void updateStateSet        ();
-
-    int getRenderBin() const { return renderBin_; }
-    int getLighting() const { return (int)lightingEnabled_; }
-    
-    void setRenderBin(int i);
-    void setLighting(int i);
+    virtual void updateStateSet();
     
     void setNumVertices(int i);
     void setVertex(int index, float x, float y, float z);
@@ -86,19 +76,13 @@ public:
 
     virtual std::vector<lo_message> getState() const;
 
-    
 private:
     
     osg::ref_ptr<osg::Geode> geode_;
     osg::ref_ptr<osg::Geometry> geometry_;
     unsigned int numVertices_;
     
-    t_symbol *stateset;
-    
-    int renderBin_;
-    bool lightingEnabled_;
     bool updateFlag_;
-    
 };
 
 } // end of namespace spin

@@ -12,6 +12,7 @@
 
 #include <GroupNode.h>
 #include <SceneManager.h>
+#include <spinUtil.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -58,6 +59,12 @@ BEGIN_ENUM_REFLECTOR(spin::GroupNode::velocityMode)
 	I_EnumLabel(spin::GroupNode::MOVE);
 END_REFLECTOR
 
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::ComputationMode)
+	I_DeclaringFile("GroupNode.h");
+	I_EnumLabel(spin::GroupNode::SERVER_SIDE);
+	I_EnumLabel(spin::GroupNode::CLIENT_SIDE);
+END_REFLECTOR
+
 BEGIN_ENUM_REFLECTOR(spin::GroupNode::OrientationMode)
 	I_DeclaringFile("GroupNode.h");
 	I_EnumLabel(spin::GroupNode::NORMAL);
@@ -102,7 +109,27 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "Debug print (to log/console) ");
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
+	I_Method1(void, setStateSetFromFile, IN, const char *, filename,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSetFromFile__C5_char_P1,
+	          "",
+	          "setStateSetFromFile guesses the type of stateset from the filename extension, creates a new stateset of that type and assigns it to this node ");
+	I_Method1(void, setStateSet, IN, const char *, s,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSet__C5_char_P1,
+	          "",
+	          "Assign an existing stateset to this node ");
+	I_Method0(spin::t_symbol *, getStateSetSymbol,
+	          Properties::NON_VIRTUAL,
+	          __t_symbol_P1__getStateSetSymbol,
+	          "",
+	          "");
+	I_Method0(void, updateStateSet,
+	          Properties::VIRTUAL,
+	          __void__updateStateSet,
+	          "",
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform. ");
 	I_Method1(void, setReportMode, IN, spin::GroupNode::globalsReportMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setReportMode__globalsReportMode,
@@ -111,6 +138,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_Method1(void, setInteractionMode, IN, spin::GroupNode::InteractionMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setInteractionMode__InteractionMode,
+	          "",
+	          "");
+	I_Method1(void, setComputationMode, IN, spin::GroupNode::ComputationMode, mode,
+	          Properties::NON_VIRTUAL,
+	          __void__setComputationMode__ComputationMode,
+	          "",
+	          "");
+	I_Method0(int, getComputationMode,
+	          Properties::NON_VIRTUAL,
+	          __int__getComputationMode,
 	          "",
 	          "");
 	I_Method3(void, setClipping, IN, float, x, IN, float, y, IN, float, z,
@@ -316,6 +353,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_SimpleProperty(osg::Vec3, Clipping, 
 	                 __osg_Vec3__getClipping, 
 	                 0);
+	I_SimpleProperty(int, ComputationMode, 
+	                 __int__getComputationMode, 
+	                 0);
 	I_SimpleProperty(float, Damping, 
 	                 __float__getDamping, 
 	                 __void__setDamping__float);
@@ -348,6 +388,15 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
+	                 0);
+	I_SimpleProperty(const char *, StateSet, 
+	                 0, 
+	                 __void__setStateSet__C5_char_P1);
+	I_SimpleProperty(const char *, StateSetFromFile, 
+	                 0, 
+	                 __void__setStateSetFromFile__C5_char_P1);
+	I_SimpleProperty(spin::t_symbol *, StateSetSymbol, 
+	                 __t_symbol_P1__getStateSetSymbol, 
 	                 0);
 	I_SimpleProperty(osg::MatrixTransform *, Transform, 
 	                 __osg_MatrixTransform_P1__getTransform, 

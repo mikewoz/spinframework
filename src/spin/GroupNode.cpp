@@ -210,7 +210,9 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
     //mainTransform->setPosition(osg::Vec3(0.0,0.0,0.0));
     this->addChild(mainTransform.get());
 
-    
+    computationMode_ = SERVER_SIDE;
+
+    stateset_ = gensym("NULL");
 
     clipNode = new osg::ClipNode();
     clipNode->setCullingActive(false);
@@ -259,7 +261,26 @@ void GroupNode::callbackUpdate()
     // Now we need to update translation/orientation based on our velocity/spin.
     // We find out how many seconds passed since the last time this was called,
     // and move by _velocity*dt (ie, m/s) and rotate by _spin*dt (ie, deg/sec)
-    if ( spinApp::Instance().getContext()->isServer() )
+    
+    if (spinApp::Instance().getContext()->isServer())
+    {
+        if (computationMode_==SERVER_SIDE)
+        {
+            // update based on velocity and broadcast
+        
+        }
+        else
+        {
+        
+            // don't broadcast any massages but keep the node's position up to date
+         }   
+    }
+    else
+    {
+        // just call move(), translate(), etc.
+    }
+    
+    if (1)
     {
         osg::Timer_t tick = osg::Timer::instance()->tick();
         float dt = osg::Timer::instance()->delta_s(lastTick,tick);
@@ -515,19 +536,16 @@ void GroupNode::debug()
 }
 
 
-// ***********************************************************
-// ***********************************************************
+// -----------------------------------------------------------------------------
 
-/*
-void GroupNode::reportGlobals (int b)
+void GroupNode::setComputationMode (ComputationMode mode)
 {
-    if (this->_reportGlobals != (bool)b)
+    if (this->computationMode_ != (int)mode)
     {
-        this->_reportGlobals = (bool) b;
-        BROADCAST(this, "si", "reportGlobals", (int) this->_reportGlobals);
+        this->computationMode_ = mode;
+        BROADCAST(this, "si", "setComputationMode", getComputationMode());
     }
 }
-*/
 
 void GroupNode::setReportMode (globalsReportMode mode)
 {
@@ -583,6 +601,43 @@ void GroupNode::setInteractionMode (InteractionMode mode)
         
     }
 }
+
+// -----------------------------------------------------------------------------
+
+void GroupNode::setStateSetFromFile(const char* filename)
+{
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
+	if (ss.valid())
+	{
+		if (ss->id == stateset_) return; // we're already using that stateset
+		stateset_ = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
+	}
+}
+
+void GroupNode::setStateSet (const char* s)
+{
+	if (gensym(s)==stateset_) return;
+
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
+	if (ss.valid())
+	{
+		stateset_ = ss->id;
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
+	}
+}
+
+void GroupNode::updateStateSet()
+{
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+	if (mainTransform.valid() && ss.valid()) mainTransform->setStateSet( ss.get() );
+}
+
+
+
+// -----------------------------------------------------------------------------
 
 void GroupNode::setClipping(float x, float y, float z)
 {
@@ -1166,6 +1221,13 @@ std::vector<lo_message> GroupNode::getState () const
     lo_message msg;
     osg::Vec3 v;
 
+	msg = lo_message_new();
+	lo_message_add(msg,  "ss", "setStateSet", getStateSetSymbol()->s_name);
+	ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setComputationMode", getComputationMode());
+    ret.push_back(msg);
 
     msg = lo_message_new();
     lo_message_add(msg, "si", "setReportMode", getReportMode());

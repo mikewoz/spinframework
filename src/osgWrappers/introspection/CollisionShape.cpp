@@ -37,7 +37,7 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "Debug print (to log/console) ");
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
 	I_Method1(void, setMass, IN, float, mass,
 	          Properties::NON_VIRTUAL,
 	          __void__setMass__float,
