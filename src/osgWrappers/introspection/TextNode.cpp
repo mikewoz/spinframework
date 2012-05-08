@@ -151,6 +151,11 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          __void__setBackground__backgroundType,
 	          "",
 	          "Sets a background type for the text box (drawn from the backgroundType enum). ");
+	I_Method1(void, setSingleSided, IN, int, singleSided,
+	          Properties::NON_VIRTUAL,
+	          __void__setSingleSided__int,
+	          "",
+	          "Specify whether both sides or only one side of the text is rendered. ie, whether the backface is culled or not. ");
 	I_Method0(const char *, getText,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getText,
@@ -206,6 +211,11 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          __int__getBackround,
 	          "",
 	          "Returns the currently set background type with respect to the choices in the backgroundType enum. ");
+	I_Method0(int, getSingleSided,
+	          Properties::NON_VIRTUAL,
+	          __int__getSingleSided,
+	          "",
+	          "Returns whether the text is drawn single-sided or not. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -244,6 +254,9 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_SimpleProperty(float, Margin, 
 	                 __float__getMargin, 
 	                 __void__setMargin__float);
+	I_SimpleProperty(int, SingleSided, 
+	                 __int__getSingleSided, 
+	                 __void__setSingleSided__int);
 	I_SimpleProperty(float, Size, 
 	                 __float__getSize, 
 	                 __void__setSize__float);

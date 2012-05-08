@@ -174,45 +174,45 @@ public:
      */
     void setAlignment       (int alignment);
 
-
     /**
      * Sets the color for the text associated to this node in RGBA values.
      */
-
     void setColor           (float red, float green, float blue, float alpha);
 
     /**
      * Sets the background color for this node.
      */
-
     void setBgColor          (float red, float green, float blue, float alpha);
 
     /**
      * Sets the margins for the text associated to this node.
      */
-
     void setMargin           (float margin);
 
     /**
      * Sets the type of billboarding asigned to this node (drawn from the enum
      * billboardType).
      */
-
     void setBillboard        (billboardType t);
 
     /**
      * Sets the shadowing or outline type for this text node (drawn from the
      * decorationType enum).
      */
-
     void setDecoration        (decorationType t);
 
     /**
      * Sets a background type for the text box (drawn from the backgroundType
      * enum).
      */
-
     void setBackground        (backgroundType t);
+
+    /**
+     * Specify whether both sides or only one side of the text is rendered. ie,
+     * whether the backface is culled or not.
+     */
+    void setSingleSided       (int singleSided);
+
 
     /**
      * Returns a string with the text associated to this node.
@@ -276,6 +276,11 @@ public:
     int             getBackround() const   { return (int)_background; }
 
     /**
+     * Returns whether the text is drawn single-sided or not.
+     */
+    int             getSingleSided() const   { return (int)singleSided_; }
+    
+    /**
      * For each subclass of ReferencedNode, we override the getState() method to
      * fill the vector with the correct set of methods for this particular node
      */
@@ -296,6 +301,7 @@ private:
     billboardType _billboard;
     decorationType _decoration;
     backgroundType _background;
+    bool singleSided_;
 
     std::string _text; // we store this redundantly
 

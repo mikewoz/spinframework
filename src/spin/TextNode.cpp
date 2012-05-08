@@ -356,6 +356,13 @@ void TextNode::setBackground (backgroundType t)
 
 }
 
+void TextNode::setSingleSided (int singleSided)
+{
+    singleSided_ = singleSided;
+    _updateFlag = true;
+	BROADCAST(this, "si", "setSingleSided", getSingleSided());
+}
+
 // =============================================================================
 void TextNode::drawText()
 {
@@ -470,6 +477,12 @@ void TextNode::drawText()
 		labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 		labelStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
 		labelStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+        
+        if (singleSided_)
+            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+        else
+            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+        
 		labelStateSet->setRenderBinDetails( 100, "RenderBin");
 		textLabel->setStateSet( labelStateSet );
         
@@ -540,6 +553,12 @@ std::vector<lo_message> TextNode::getState () const
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setBackground", getBackround());
 	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setSingleSided", getSingleSided());
+	ret.push_back(msg);
+
+    
 	return ret;
 }
 
