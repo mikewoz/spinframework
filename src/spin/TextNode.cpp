@@ -344,7 +344,7 @@ void TextNode::setDecoration (decorationType t)
 	//textLabel->setBackdropType((osgText::Text::BackdropType)_decoration);
 	//drawText();
     _updateFlag = true;
-	BROADCAST(this, "si", "setDecoration", getBackround());
+	BROADCAST(this, "si", "setDecoration", getDecoration());
 }
 
 void TextNode::setBackground (backgroundType t)
