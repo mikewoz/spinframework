@@ -64,6 +64,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          __int__getTextureMode,
 	          "",
 	          "");
+	I_Method1(void, setTextureResize, IN, bool, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setTextureResize__bool,
+	          "",
+	          "");
+	I_Method0(int, getTextureResize,
+	          Properties::NON_VIRTUAL,
+	          __int__getTextureResize,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -84,5 +94,8 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	I_SimpleProperty(int, TextureMode, 
 	                 __int__getTextureMode, 
 	                 0);
+	I_SimpleProperty(bool, TextureResize, 
+	                 0, 
+	                 __void__setTextureResize__bool);
 END_REFLECTOR
 

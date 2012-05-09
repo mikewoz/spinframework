@@ -87,6 +87,9 @@ public:
     void setTextureMode(TextureMode mode);
     int getTextureMode() const { return (int)textureMode_; };
 
+    void setTextureResize(bool b);
+    int getTextureResize() const { return (int)textureResize_; };
+
     // must reimplement
     virtual std::vector<lo_message> getState() const;
 
@@ -100,6 +103,7 @@ private:
     std::string _path;
     
     TextureMode textureMode_;
+    bool textureResize_;
 };
 
 } // end of namespace spin

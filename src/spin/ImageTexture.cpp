@@ -66,6 +66,7 @@ ImageTexture::ImageTexture (SceneManager *s, const char *initID) : Shader(s, ini
 
 	_path = "NULL";
 	textureMode_ = TEXTURE_2D;
+    textureResize_ = true;
 }
 
 // destructor
@@ -106,7 +107,17 @@ void ImageTexture::setTextureMode(TextureMode mode)
     {
         this->textureMode_ = mode;
         if (sceneManager->isGraphical()) this->draw();
-        BROADCAST(this, "si", "setTextureMode", (int) this->textureMode_);
+        BROADCAST(this, "si", "setTextureMode", getTextureMode());
+    }
+}
+
+void ImageTexture::setTextureResize(bool b)
+{
+    if (this->textureResize_ != (bool)b)
+    {
+        this->textureResize_ = b;
+        if (sceneManager->isGraphical()) this->draw();
+        BROADCAST(this, "si", "setTextureResize", getTextureResize());
     }
 }
 
@@ -130,9 +141,11 @@ void ImageTexture::draw()
             tex = new osg::TextureRectangle;
         } else {
             tex = new osg::Texture2D;
+            
         }
     
-        tex->setResizeNonPowerOfTwoHint(false);
+        tex->setResizeNonPowerOfTwoHint(textureResize_);
+                   
         tex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
         //tex->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
         //tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
@@ -196,6 +209,10 @@ std::vector<lo_message> ImageTexture::getState () const
 	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setTextureMode", getTextureMode());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setTextureResize", getTextureResize());
 	ret.push_back(msg);
 	
 	msg = lo_message_new();
