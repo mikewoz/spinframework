@@ -39,8 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#ifndef __TextNode_H
-#define __TextNode_H
+#ifndef _TextNode_H
+#define _TextNode_H
 
 #include "GroupNode.h"
 
@@ -136,7 +136,6 @@ public:
     /**
      * Accepts user-entered string for the node's text.
      */
-
     void setText        (const char* s);
 
     /**
@@ -148,20 +147,23 @@ public:
     /**
      * Sets the font for the text associated with this node.
      */
-
     void setFont            (const char* s);
 
     /**
-     * Sets the point-size for the text associated with this node.
+     * Set the font resolution. eg, 128 will produce 128x128 textures
      */
+    void setFontResolution        (int resolution);
 
-    void setSize            (float s);
+    /**
+     * Sets the size of text characters (in local coordinate system units)
+     */
+    void setCharacterSize            (float s);
     
     /**
      * Sets the maximum size of the text box. Values of 0 in either dimension
      * means no maximum, so that the box will stretch to fit the text
      */
-    void setBox            (float width, float height);
+    void setBoxSize            (float width, float height);
 
     /**
      * Sets the line spacing, as a percentage of the character height. The
@@ -217,23 +219,29 @@ public:
     /**
      * Returns a string with the text associated to this node.
      */
-    const char    *getText() const   { return _text.c_str(); }
+    const char    *getText() const   { return text_.c_str(); }
 
     /**
      * Returns a string with the text associated to this node.
      */
-    std::string     getTextString() const  { return _text; }
+    std::string     getTextString() const  { return text_; }
 
     /**
      * Returns a string indicating the font of the text associated to this node.
      */
-    const char    *getFont() const        { return _font.c_str(); }
+    const char    *getFont() const        { return font_.c_str(); }
 
     /**
-     * Returns a float indicating the size of the text associated to this node.
+     * Returns the font resolution
+     */
+    int    getFontResolution() const        { return resolution_; }
+
+
+    /**
+     * Returns a float indicating the size of characters associated to this node.
      */
 
-    float         getSize() const        { return _size; }
+    float         getCharacterSize() const        { return characterSize_; }
 
     /**
      * Returns a float indicating the line spacing (as a percentage of character
@@ -245,35 +253,35 @@ public:
     /**
      * Returns the color (in RGBA values) of the text associated to this node.
      */
-    osg::Vec4     getColor() const        { return _color; };
+    osg::Vec4     getColor() const        { return color_; };
 
     /**
      * Returns the background color of the text box in RGBA values.
      */
-    osg::Vec4     getBgColor() const        { return _bgColor; }
+    osg::Vec4     getBgColor() const        { return bgColor_; }
 
     /**
      * Returns a float indicating the margin size of the text box.
      */
-    float         getMargin() const        { return _margin; }
+    float         getMargin() const        { return margin_; }
 
     /**
      * Returns the currently set billboarding type with respect to the
      * billboardType enum.
      */
-    int             getBillboard()  const { return (int)_billboard; }
+    int             getBillboard()  const { return (int)billboard_; }
 
     /**
      * Returns the currently set decoration type (shadows or outlines) with
      * respect to the decorationType enum.
      */
-    int             getDecoration() const { return (int)_decoration; }
+    int             getDecoration() const { return (int)decoration_; }
 
     /**
      * Returns the currently set background type with respect to the choices
      * in the backgroundType enum.
      */
-    int             getBackround() const   { return (int)_background; }
+    int             getBackround() const   { return (int)background_; }
 
     /**
      * Returns whether the text is drawn single-sided or not.
@@ -289,26 +297,31 @@ public:
 
 private:
 
-    bool _updateFlag;
+    bool updateFlag_;
+    bool redrawFlag_;
 
-    std::string _font;
-    float _size, _lineSpacing;
-    osg::Vec4 _color, _bgColor;
-    float _margin;
+    std::string font_;
+    int resolution_;
+    float characterSize_, _lineSpacing;
+    osg::Vec4 color_, bgColor_;
+    float margin_;
+    osg::Vec2 boxSize_;
     
-    osgText::TextBase::AlignmentType _alignment;
+    osgText::TextBase::AlignmentType alignment_;
 
-    billboardType _billboard;
-    decorationType _decoration;
-    backgroundType _background;
+    billboardType billboard_;
+    decorationType decoration_;
+    backgroundType background_;
     bool singleSided_;
+    
 
-    std::string _text; // we store this redundantly
+    std::string text_; // we store this redundantly
 
-    osg::ref_ptr<osg::Geode> textGeode;
-    osg::ref_ptr<spinTextNode> textLabel;
+    osg::ref_ptr<osg::Geode> textGeode_;
+    osg::ref_ptr<spinTextNode> textLabel_;
     
     void drawText();
+    void updateText();
 
 };
 

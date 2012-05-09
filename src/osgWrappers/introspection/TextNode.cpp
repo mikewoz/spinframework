@@ -101,14 +101,19 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          __void__setFont__C5_char_P1,
 	          "",
 	          "Sets the font for the text associated with this node. ");
-	I_Method1(void, setSize, IN, float, s,
+	I_Method1(void, setFontResolution, IN, int, resolution,
 	          Properties::NON_VIRTUAL,
-	          __void__setSize__float,
+	          __void__setFontResolution__int,
 	          "",
-	          "Sets the point-size for the text associated with this node. ");
-	I_Method2(void, setBox, IN, float, width, IN, float, height,
+	          "Set the font resolution. eg, 128 will produce 128x128 textures ");
+	I_Method1(void, setCharacterSize, IN, float, s,
 	          Properties::NON_VIRTUAL,
-	          __void__setBox__float__float,
+	          __void__setCharacterSize__float,
+	          "",
+	          "Sets the size of text characters (in local coordinate system units) ");
+	I_Method2(void, setBoxSize, IN, float, width, IN, float, height,
+	          Properties::NON_VIRTUAL,
+	          __void__setBoxSize__float__float,
 	          "",
 	          "Sets the maximum size of the text box. Values of 0 in either dimension means no maximum, so that the box will stretch to fit the text ");
 	I_Method1(void, setLineSpacing, IN, float, spacing,
@@ -171,11 +176,16 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          __C5_char_P1__getFont,
 	          "",
 	          "Returns a string indicating the font of the text associated to this node. ");
-	I_Method0(float, getSize,
+	I_Method0(int, getFontResolution,
 	          Properties::NON_VIRTUAL,
-	          __float__getSize,
+	          __int__getFontResolution,
 	          "",
-	          "Returns a float indicating the size of the text associated to this node. ");
+	          "Returns the font resolution ");
+	I_Method0(float, getCharacterSize,
+	          Properties::NON_VIRTUAL,
+	          __float__getCharacterSize,
+	          "",
+	          "Returns a float indicating the size of characters associated to this node. ");
 	I_Method0(float, getLineSpacing,
 	          Properties::NON_VIRTUAL,
 	          __float__getLineSpacing,
@@ -236,6 +246,9 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_SimpleProperty(int, Billboard, 
 	                 __int__getBillboard, 
 	                 0);
+	I_SimpleProperty(float, CharacterSize, 
+	                 __float__getCharacterSize, 
+	                 __void__setCharacterSize__float);
 	I_SimpleProperty(osg::Vec4, Color, 
 	                 __osg_Vec4__getColor, 
 	                 0);
@@ -248,6 +261,9 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_SimpleProperty(const char *, Font, 
 	                 __C5_char_P1__getFont, 
 	                 __void__setFont__C5_char_P1);
+	I_SimpleProperty(int, FontResolution, 
+	                 __int__getFontResolution, 
+	                 __void__setFontResolution__int);
 	I_SimpleProperty(float, LineSpacing, 
 	                 __float__getLineSpacing, 
 	                 __void__setLineSpacing__float);
@@ -257,9 +273,6 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_SimpleProperty(int, SingleSided, 
 	                 __int__getSingleSided, 
 	                 __void__setSingleSided__int);
-	I_SimpleProperty(float, Size, 
-	                 __float__getSize, 
-	                 __void__setSize__float);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
