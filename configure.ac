@@ -167,8 +167,8 @@ AC_ARG_ENABLE([python],
 
 if test "x$enable_python" = xno; then
 AC_DEFINE([DISABLE_PYTHON],[1],[Disables python interpreter and thus all behaviours scripts in SPIN]) AC_MSG_NOTICE([Disabled Python scripts])
-AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xyes)
 fi
+AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xyes)
 
 
 if test "x$enable_python" = xyes; then
