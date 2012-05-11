@@ -90,7 +90,7 @@ Listener::~Listener()
 void Listener::callbackUpdate()
 {
     // need to first call the superclass update method (specifically, GroupNode)
-    // which will update _globalMatrix
+    // which will update globalMatrix_
     DSPNode::callbackUpdate();
 
     // now, we can get the global position and orientation, and we can forward
@@ -99,8 +99,8 @@ void Listener::callbackUpdate()
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        osg::Vec3 myPos = _globalMatrix.getTrans();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        osg::Vec3 myPos = globalMatrix_.getTrans();
+        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
 
         spatOSCListener->setPosition(myPos.x(), myPos.y(), myPos.z());
         spatOSCListener->setOrientation(myRot.x(), myRot.y(), myRot.z());

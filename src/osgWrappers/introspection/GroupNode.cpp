@@ -129,7 +129,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,
 	          "",
-	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform. ");
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform_. ");
 	I_Method1(void, setReportMode, IN, spin::GroupNode::globalsReportMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setReportMode__globalsReportMode,
@@ -190,11 +190,6 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setOrientationQuat__float__float__float__float,
 	          "",
 	          "Set the orientation offset as a quaternion ");
-	I_Method0(void, applyOrientationMode,
-	          Properties::NON_VIRTUAL,
-	          __void__applyOrientationMode,
-	          "",
-	          "");
 	I_Method3(void, setScale, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,
@@ -335,6 +330,12 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__updateDraggerMatrix,
 	          "",
 	          "");
+	I_ProtectedMethod0(void, updateQuat,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__updateQuat,
+	                   "",
+	                   "");
 	I_ProtectedMethod0(void, updateMatrix,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -345,6 +346,12 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
 	                   __void__drawManipulator,
+	                   "",
+	                   "");
+	I_ProtectedMethod0(void, applyOrientationMode,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__applyOrientationMode,
 	                   "",
 	                   "");
 	I_SimpleProperty(osg::Vec3, Center, 

@@ -80,7 +80,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,
 	          "",
-	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform. ");
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform_. ");
 	I_Method0(int, getShape,
 	          Properties::NON_VIRTUAL,
 	          __int__getShape,

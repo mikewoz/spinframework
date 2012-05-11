@@ -256,7 +256,7 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
 
     // If the user is holding down the manipulate button, and the dragger has
     // not yet been created, then we need to create a dragger
-    if ((doManipulation) && (!dragger.valid()))
+    if ((doManipulation) && (!dragger_.valid()))
     {        
         // Reset the PointerInfo object (clear old intersections)
         _pointer.reset();
@@ -297,7 +297,7 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
                 ea->setEventType(osgGA::GUIEventAdapter::PUSH);
                 ptrDragger->handle(_pointer, *ea.get(), aa);
                 ptrDragger->setDraggerActive(true);
-                dragger = ptrDragger;
+                dragger_ = ptrDragger;
                 
                 didDragger = true;
                 //break;
@@ -310,7 +310,7 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
 
     // if the dragger is already valid, then just do the DRAG
     //else if (doManipulation && dragger.valid())
-    else if (doManipulation && dragger.valid() && (this->previousMatrix != mat))
+    else if (doManipulation && dragger_.valid() && (this->previousMatrix != mat))
     {
         // Update the PointerInfo by setting the start and end points based on our
         // PointerNode ray:
@@ -319,24 +319,24 @@ void PointerNode::applyManipulation(osg::Matrix mat, osg::Vec3 start, osg::Vec3 
 
         //ea->setHandled(false);
         ea->setEventType(osgGA::GUIEventAdapter::DRAG);
-        dragger->handle(_pointer, *ea.get(), aa);
+        dragger_->handle(_pointer, *ea.get(), aa);
 
     }
     
     // if the dragger is valid and the manipulator flag has been set to off,
     // then we release the dragger:
-    else if (!doManipulation && (dragger.valid()))
+    else if (!doManipulation && (dragger_.valid()))
     {
         //  set event to RELEASE and invoke handle()
         _pointer.setNearFarPoints(start,end);
         _pointer._hitIter = _pointer._hitList.begin();
         
         ea->setEventType(osgGA::GUIEventAdapter::RELEASE);
-        dragger->handle(_pointer, *ea.get(), aa);
-        dragger->setDraggerActive(false);
+        dragger_->handle(_pointer, *ea.get(), aa);
+        dragger_->setDraggerActive(false);
         _pointer.reset();
 
-        dragger = NULL;
+        dragger_ = NULL;
     }
 
 }
@@ -674,7 +674,7 @@ void PointerNode::manipulate (int b)
 
             if (newNode && (newNode!=lastNode))
             {
-                dragger = NULL;
+                dragger_ = NULL;
                 if (lastNode) lastNode->setManipulator("NULL");
                 newNode->setManipulator(lastManipulatorType_.c_str());
                 lastManipulated = newNode->id;
@@ -730,7 +730,7 @@ void PointerNode::grab (int b)
             */
             
             osg::NodePath nodePathToRoot;
-            osgManipulator::computeNodePathToRoot(*mainTransform,nodePathToRoot);
+            osgManipulator::computeNodePathToRoot(*mainTransform_,nodePathToRoot);
             _localToWorld = osg::computeLocalToWorld(nodePathToRoot);
             _worldToLocal = osg::Matrix::inverse(_localToWorld);
             

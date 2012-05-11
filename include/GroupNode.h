@@ -161,7 +161,7 @@ public:
      * attached, or whether it should be merged with the existing stateset
      * (rather than merged).
      *
-     * By default it is applied to the mainTransform.
+     * By default it is applied to the mainTransform_.
      */
     virtual void updateStateSet();
     
@@ -204,8 +204,6 @@ public:
      * Set the orientation offset as a quaternion
      */
     virtual void setOrientationQuat (float x, float y, float z, float w);
-
-    void applyOrientationMode();
 
     /**
      * A grouped scale operation
@@ -273,25 +271,25 @@ public:
          float a30, float a31, float a32, float a33);
 
     
-    int getReportMode() const { return (int) _reportMode; };
-    int getInteractionMode() const { return (int) _interactionMode; };
-    osg::Vec3 getClipping() const { return _clipping; };
-    osg::Vec3 getOrientation() const { return _orientation; };
+    int getReportMode() const { return (int) reportMode_; };
+    int getInteractionMode() const { return (int) interactionMode_; };
+    osg::Vec3 getClipping() const { return clipping_; };
+    osg::Vec3 getOrientation() const { return orientation_; };
     
     /*
-    osg::Vec3 getTranslation() const { return mainTransform->getMatrix().getTrans(); };
-    osg::Quat getOrientationQuat() const { return mainTransform->getMatrix().getRotate(); };
-    osg::Vec3 getScale() const { return mainTransform->getMatrix().getScale(); };
+    osg::Vec3 getTranslation() const { return mainTransform_->getMatrix().getTrans(); };
+    osg::Quat getOrientationQuat() const { return mainTransform_->getMatrix().getRotate(); };
+    osg::Vec3 getScale() const { return mainTransform_->getMatrix().getScale(); };
     */
     
     osg::Vec3 getTranslation() const { return translation_; };
     osg::Quat getOrientationQuat() const { return quat_; };
     osg::Vec3 getScale() const { return scale_; };     
     
-    osg::Vec3 getVelocity() const { return _velocity; };
-    int getVelocityMode() const { return (int) _velocityMode; };
-    float getDamping() const { return _damping; };
-    //osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
+    osg::Vec3 getVelocity() const { return velocity_; };
+    int getVelocityMode() const { return (int) velocityMode_; };
+    float getDamping() const { return damping_; };
+    //osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform_->getAttitude()).asVec3()); };
 
     osg::Matrix getGlobalMatrix();
     osg::Vec3 getCenter() const;
@@ -325,51 +323,53 @@ public:
 
 
 
-    osg::MatrixTransform *getTransform() { return mainTransform.get(); }
+    osg::MatrixTransform *getTransform() { return mainTransform_.get(); }
 
     void updateDraggerMatrix();
 
 
 protected:
 
+    void updateQuat();
     void updateMatrix();
     void drawManipulator();
+    
+    void applyOrientationMode();
 
-    osg::ref_ptr<UserNode> owner;
+
+    osg::ref_ptr<UserNode> owner_;
     
     t_symbol *stateset_;
 
-    //osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
-    osg::ref_ptr<osg::MatrixTransform> mainTransform;
-    osg::ref_ptr<osg::MatrixTransform> manipulatorTransform;
+    osg::ref_ptr<osg::MatrixTransform> mainTransform_;
     
-    osg::ref_ptr<osgManipulator::Dragger> dragger;
+    osg::ref_ptr<osgManipulator::Dragger> dragger_;
     
-    InteractionMode _interactionMode;
-    std::vector<osg::Vec4> _trajectory;
-    int _drawMod;
+    InteractionMode interactionMode_;
+    std::vector<osg::Vec4> trajectory_;
+    int drawMod_;
     
-    osg::ref_ptr<osg::ClipNode> clipNode;
-    osg::Vec3 _clipping;
+    osg::ref_ptr<osg::ClipNode> clipNode_;
+    osg::Vec3 clipping_;
     
-    globalsReportMode _reportMode;
-    osg::Matrix _globalMatrix;
+    globalsReportMode reportMode_;
+    osg::Matrix globalMatrix_;
     osg::Vec3 _globalScale;
-    float _globalRadius;
+    float globalRadius_;
 
-    bool computationMode_;
+    ComputationMode computationMode_;
 
     enum OrientationMode orientationMode_;
     t_symbol* orientationTarget_;
-    osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
+    osg::Vec3 orientation_; // store the orientation as it comes in (in degrees)
     osg::Vec3 translation_;
     osg::Vec3 scale_;
     osg::Quat quat_;
 
-    osg::Vec3 _velocity;
-    velocityMode _velocityMode;
-    osg::Vec3 _spin;
-    float _damping;
+    osg::Vec3 velocity_;
+    velocityMode velocityMode_;
+    osg::Vec3 spin_;
+    float damping_;
     
     std::string manipulatorType_;
     bool manipulatorUpdateFlag_;
@@ -377,8 +377,8 @@ protected:
     
 private:
 
-    osg::Timer_t lastTick;
-
+    bool broadcastLock_;
+    osg::Timer_t lastTick_;
 };
 
     

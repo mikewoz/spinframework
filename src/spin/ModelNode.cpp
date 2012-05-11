@@ -286,7 +286,7 @@ void ModelNode::setStateSet (int i, const char *replacement)
     if (i==0)
     {
         osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
-        if (mainTransform.valid() && ss.valid()) mainTransform->setStateSet( ss.get() );
+        if (mainTransform_.valid() && ss.valid()) mainTransform_->setStateSet( ss.get() );
     }
     else if ((i>0) && (i<_statesetList.size()))
     {

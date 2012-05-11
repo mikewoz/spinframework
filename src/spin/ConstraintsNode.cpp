@@ -184,7 +184,7 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 void ConstraintsNode::translate (float x, float y, float z)
 {
 
-    if ( !sceneManager->isGraphical() )
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
     	if ((constraintMode_==BOUNCE)||(constraintMode_==COLLIDE)||(constraintMode_==COLLIDE_THRU)||(constraintMode_==STICK))
     	{
@@ -204,7 +204,7 @@ void ConstraintsNode::translate (float x, float y, float z)
 
 void ConstraintsNode::move (float x, float y, float z)
 {
-    if ( !sceneManager->isGraphical() )
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
     	osg::Vec3 v = this->getOrientationQuat() * osg::Vec3(x,y,z);
 
@@ -444,16 +444,16 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// in node is translating (ie, changing position
 						// independently from it's orientatino), then we need to
 						// flip the velocity vector.
-						if (_velocityMode == GroupNode::TRANSLATE)
+						if (velocityMode_ == GroupNode::TRANSLATE)
 						{
-							osg::Vec3 newVel = newDir * _velocity.length();
+							osg::Vec3 newVel = newDir * velocity_.length();
 							setVelocity(newVel.x(), newVel.y(), newVel.z());
 						}
 
 						// if the node is moving along it's orientation vector,
 						// we need to update the orientation of so that it
 						// points in 'bounced' direction
-						else if (_velocityMode == GroupNode::MOVE)
+						else if (velocityMode_ == GroupNode::MOVE)
 						{
 							osg::Quat newQuat;
 							newQuat.makeRotate(osg::Vec3(0,1,0),  newDir);
