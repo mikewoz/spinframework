@@ -91,7 +91,7 @@ class PointerNode : public RayNode
         
         enum GrabMode
         {
-            AXIS_LOCK,
+            ORIENTATION_LOCK,
             RELATIVE
         };
             

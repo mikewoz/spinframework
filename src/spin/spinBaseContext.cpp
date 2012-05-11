@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "config.h"
 
 #include <string>
 #include <iostream>
@@ -71,7 +72,6 @@
 #include "nodeVisitors.h"
 #include "SoundConnection.h"
 #include "spinDefaults.h"
-#include "config.h"
 
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>

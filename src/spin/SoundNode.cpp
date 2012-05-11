@@ -94,8 +94,8 @@ void SoundNode::callbackUpdate()
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        osg::Vec3 myPos = _globalMatrix.getTrans();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        osg::Vec3 myPos = globalMatrix_.getTrans();
+        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
 
         spatOSCSource->setPosition(myPos.x(), myPos.y(), myPos.z());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
@@ -131,8 +131,8 @@ void SoundNode::setTranslation (float x, float y, float z)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        this->_globalMatrix = getGlobalMatrix();
-        osg::Vec3 myPos = _globalMatrix.getTrans();
+        this->globalMatrix_ = getGlobalMatrix();
+        osg::Vec3 myPos = globalMatrix_.getTrans();
         spatOSCSource->setPosition(myPos.x(), myPos.y(), myPos.z());
     }
 #endif
@@ -145,8 +145,8 @@ void SoundNode::setOrientation (float p, float r, float y)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        this->_globalMatrix = getGlobalMatrix();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        this->globalMatrix_ = getGlobalMatrix();
+        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
     }
 #endif
@@ -158,8 +158,8 @@ void SoundNode::setOrientationQuat (float x, float y, float z, float w)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        this->_globalMatrix = getGlobalMatrix();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        this->globalMatrix_ = getGlobalMatrix();
+        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
     }
 #endif

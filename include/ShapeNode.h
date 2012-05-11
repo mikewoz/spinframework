@@ -108,14 +108,10 @@ public:
      * \param alpha Opacity channel. Number in the range [0, 1]
      */
     void setColor            (float red, float green, float blue, float alpha);
-    void setTextureFromFile    (const char* filename);
     void setRenderBin        (int i);
     void setLighting        (int i);
 
-    void setStateSetFromFile(const char* filename);
-    void setStateSet        (const char* s);
-    const char *getStateSet () const { return stateset->s_name; }
-    void updateStateSet        ();
+    virtual void updateStateSet();
 
     int getShape() const { return (int)shape; }
     int getBillboard() const { return (int)billboard; }
@@ -123,9 +119,6 @@ public:
     int getRenderBin() const { return renderBin; }
     int getLighting() const { return (int)lightingEnabled; }
 
-    //void addSharedVideoTexture(osg::Node *n, std::string shID);
-    //void addVideoTexture(osg::Node *n, std::string texturePath);
-    void addImageTexture(osg::Node *n, std::string texturePath);
     
     /**
      * For each subclass of ReferencedNode, we override the getState() method to
@@ -135,7 +128,6 @@ public:
 
     shapeType shape;
     
-    t_symbol *stateset;
 
     billboardType billboard;
 
@@ -145,7 +137,6 @@ public:
     std::string texturePath;
 
     int renderBin;
-
     bool lightingEnabled;
 
     //osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
@@ -156,7 +147,6 @@ public:
 
 protected:
     virtual void drawShape();
-    virtual void drawTexture();
 
 };
 

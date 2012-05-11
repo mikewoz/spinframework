@@ -1827,51 +1827,25 @@ std::vector<t_symbol*> SceneManager::getSavableStateSets(ReferencedNode *n, bool
 		statesetsToSave = getSavableStateSets(*childIter, withUsers);
 	}
 
-	// the only subgraphs which can have statesets are:
-
-
-	// oops this doesn't work on the server (isGraphical==false) because it
-	// doesn't actually add the statesets to the nodes
-	/*
-	if ((n->nodeType=="ShapeNode") || (n->nodeType=="ModelNode"))
-	{
-		std::cout << "getting statesets for shape/model: " << n->id->s_name <<  std::endl;
-
-
-		// to actually find the stateset, we use the TextureStateSetFinder
-		// node visitor
-		StateSetList statesets;
-		TextureStateSetFinder f(statesets);
-		n->accept(f);
-
-		// these statesets could be regular osg statesets, but we keep only
-		// those which can be cast as ReferencedStateSet
-		for (StateSetList::iterator itr=statesets.begin(); itr!=statesets.end(); ++itr)
-		{
-			std::cout << "found one ... testing if referenced stateset" <<  std::endl;
-
-			ReferencedStateSet *refStateSet = dynamic_cast<ReferencedStateSet*>((*itr).get());
-			if (refStateSet) statesetsToSave.push_back(refStateSet);
-		}
-	}
-	*/
-
-	if (n->nodeType == "ShapeNode")
-	{
-		ShapeNode *shp = dynamic_cast<ShapeNode*>(n);
-		if (shp)
-		{
-			statesetsToSave.push_back(shp->stateset);
-		}
-	}
-	else if (n->nodeType == "ModelNode")
+	if (n->nodeType == "ModelNode")
 	{
 		ModelNode *mdl = dynamic_cast<ModelNode*>(n);
 		if (mdl)
 		{
 			statesetsToSave.insert( statesetsToSave.begin(), mdl->_statesetList.begin(), mdl->_statesetList.end());
 		}
-	}
+	}    
+    else
+    {
+        GroupNode *grp = dynamic_cast<GroupNode*>(n);
+		if (grp)
+		{
+            t_symbol *ss = grp->getStateSetSymbol();
+            if (ss->s_thing)
+                statesetsToSave.push_back(ss);
+		}
+    }
+    
 	return statesetsToSave;
 }
 

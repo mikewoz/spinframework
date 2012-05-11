@@ -115,7 +115,7 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     this->setMode(GL_BLEND, osg::StateAttribute::ON);
     this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
     // disable depth test (FIXME)
-    this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+    //this->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
     // keep a timer for reload attempts:
     lastTick = 0;

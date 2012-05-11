@@ -119,8 +119,6 @@
 		1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1C7A4AD314F2CAC500EA83AB /* PointCloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C7267B314EF43AE00E3FFAE /* PointCloud.cpp */; };
-		1C7A4AD514F2CAD200EA83AB /* libpcl_common.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51714E59373007F97E5 /* libpcl_common.1.4.0.dylib */; };
-		1C7A4AD614F2CAD600EA83AB /* libpcl_io.1.4.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C25F51A14E59373007F97E5 /* libpcl_io.1.4.0.dylib */; };
 		1C7A4AD714F2CAE100EA83AB /* PointCloud.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C25F51414E58AC6007F97E5 /* PointCloud.cpp */; };
 		1C82AE31152D30BF0085D8F0 /* osgdb_3dc.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD44152D07360085D8F0 /* osgdb_3dc.so */; };
 		1C82AE32152D30BF0085D8F0 /* osgdb_3ds.so in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C82AD45152D07360085D8F0 /* osgdb_3ds.so */; };
@@ -560,6 +558,7 @@
 		1CC1079A15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
 		1CC1079B15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
 		1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
+		1CC5D51615505575009C63A5 /* Syphon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC5D51515505575009C63A5 /* Syphon.framework */; };
 		1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C9EE82C14BE2725000976A6 /* Cocoa.framework */; };
 		1CCCA0D514BE31AC00DCA0B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D314BE31AC00DCA0B7 /* InfoPlist.strings */; };
 		1CCCA0D714BE31AC00DCA0B7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D614BE31AC00DCA0B7 /* main.mm */; };
@@ -584,8 +583,14 @@
 		1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412A1543C77E0075A81C /* CollisionShape.cpp */; };
 		1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD9412C15448AFC0075A81C /* bulletUtil.h */; };
 		1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412E15448B0F0075A81C /* bulletUtil.cpp */; };
+		1CDDB28B1551AD7300A45ADA /* SyphonTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */; };
+		1CDDB28D1551AD8500A45ADA /* SyphonTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */; };
+		1CDDB28F1551AE2800A45ADA /* SyphonTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */; };
+		1CDDB292155224D700A45ADA /* libpcl_common.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDDB290155224D700A45ADA /* libpcl_common.1.5.1.dylib */; };
+		1CDDB293155224D700A45ADA /* libpcl_io.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDDB291155224D700A45ADA /* libpcl_io.1.5.1.dylib */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
+		1CF8EA051552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CF8EA041552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
 		1CF94954151CD41F00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94953151CD41F00628872 /* ParticleSystem.cpp */; };
 		1CF94956151CD43C00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94955151CD43C00628872 /* ParticleSystem.cpp */; };
@@ -909,22 +914,6 @@
 		1C1ECB4F150E65B000CCBFF3 /* ShaderUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShaderUtil.h; path = ../include/ShaderUtil.h; sourceTree = "<group>"; };
 		1C25F51214E57CD2007F97E5 /* PointCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PointCloud.h; path = ../include/PointCloud.h; sourceTree = "<group>"; };
 		1C25F51414E58AC6007F97E5 /* PointCloud.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointCloud.cpp; path = ../src/osgWrappers/introspection/PointCloud.cpp; sourceTree = "<group>"; };
-		1C25F51614E59373007F97E5 /* libpcl_apps.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_apps.1.4.0.dylib; path = /usr/local/lib/libpcl_apps.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51714E59373007F97E5 /* libpcl_common.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_common.1.4.0.dylib; path = /usr/local/lib/libpcl_common.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51814E59373007F97E5 /* libpcl_features.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_features.1.4.0.dylib; path = /usr/local/lib/libpcl_features.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51914E59373007F97E5 /* libpcl_filters.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_filters.1.4.0.dylib; path = /usr/local/lib/libpcl_filters.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51A14E59373007F97E5 /* libpcl_io.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_io.1.4.0.dylib; path = /usr/local/lib/libpcl_io.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51B14E59373007F97E5 /* libpcl_kdtree.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_kdtree.1.4.0.dylib; path = /usr/local/lib/libpcl_kdtree.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51C14E59374007F97E5 /* libpcl_keypoints.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_keypoints.1.4.0.dylib; path = /usr/local/lib/libpcl_keypoints.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51D14E59374007F97E5 /* libpcl_octree.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_octree.1.4.0.dylib; path = /usr/local/lib/libpcl_octree.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51E14E59374007F97E5 /* libpcl_range_image_border_extractor.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_range_image_border_extractor.1.4.0.dylib; path = /usr/local/lib/libpcl_range_image_border_extractor.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F51F14E59374007F97E5 /* libpcl_range_image.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_range_image.1.4.0.dylib; path = /usr/local/lib/libpcl_range_image.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F52014E59374007F97E5 /* libpcl_registration.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_registration.1.4.0.dylib; path = /usr/local/lib/libpcl_registration.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F52114E59374007F97E5 /* libpcl_sample_consensus.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_sample_consensus.1.4.0.dylib; path = /usr/local/lib/libpcl_sample_consensus.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F52214E59374007F97E5 /* libpcl_search.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_search.1.4.0.dylib; path = /usr/local/lib/libpcl_search.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F52314E59374007F97E5 /* libpcl_segmentation.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_segmentation.1.4.0.dylib; path = /usr/local/lib/libpcl_segmentation.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F52414E59374007F97E5 /* libpcl_surface.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_surface.1.4.0.dylib; path = /usr/local/lib/libpcl_surface.1.4.0.dylib; sourceTree = "<absolute>"; };
-		1C25F52514E59374007F97E5 /* libpcl_visualization.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_visualization.1.4.0.dylib; path = /usr/local/lib/libpcl_visualization.1.4.0.dylib; sourceTree = "<absolute>"; };
 		1C34AE4414DB32A8001DF418 /* GeometryNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeometryNode.h; path = ../include/GeometryNode.h; sourceTree = "<group>"; };
 		1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/spin/GeometryNode.cpp; sourceTree = "<group>"; };
 		1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/osgWrappers/introspection/GeometryNode.cpp; sourceTree = "<group>"; };
@@ -1298,6 +1287,7 @@
 		1CC1074515332A9800F0B1EA /* libosgViewer.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgViewer.dylib; path = ../../../../../usr/local/lib/libosgViewer.dylib; sourceTree = "<group>"; };
 		1CC1074615332A9800F0B1EA /* libosgVolume.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.dylib; path = ../../../../../usr/local/lib/libosgVolume.dylib; sourceTree = "<group>"; };
 		1CC1074715332A9800F0B1EA /* libosgWidget.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgWidget.dylib; path = ../../../../../usr/local/lib/libosgWidget.dylib; sourceTree = "<group>"; };
+		1CC5D51515505575009C63A5 /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Syphon.framework; path = ../../../Library/Developer/Frameworks/Syphon.framework; sourceTree = "<group>"; };
 		1CCCA0BF14BE315400DCA0B7 /* spinviewer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinviewer; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0CD14BE31AB00DCA0B7 /* spinviewerUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spinviewerUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0D214BE31AB00DCA0B7 /* spinviewerUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spinviewerUI-Info.plist"; sourceTree = "<group>"; };
@@ -1324,6 +1314,11 @@
 		1CD9412A1543C77E0075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CollisionShape.cpp; path = ../src/osgWrappers/introspection/CollisionShape.cpp; sourceTree = "<group>"; };
 		1CD9412C15448AFC0075A81C /* bulletUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bulletUtil.h; path = ../include/bulletUtil.h; sourceTree = "<group>"; };
 		1CD9412E15448B0F0075A81C /* bulletUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bulletUtil.cpp; path = ../src/spin/bulletUtil.cpp; sourceTree = "<group>"; };
+		1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SyphonTexture.cpp; path = ../src/spin/SyphonTexture.cpp; sourceTree = "<group>"; };
+		1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SyphonTexture.h; path = ../include/SyphonTexture.h; sourceTree = "<group>"; };
+		1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SyphonTexture.cpp; path = ../src/osgWrappers/introspection/SyphonTexture.cpp; sourceTree = "<group>"; };
+		1CDDB290155224D700A45ADA /* libpcl_common.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_common.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_common.1.5.1.dylib; sourceTree = "<group>"; };
+		1CDDB291155224D700A45ADA /* libpcl_io.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_io.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_io.1.5.1.dylib; sourceTree = "<group>"; };
 		1CE3ACB314CF7C1D007E722D /* libosg.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.66.dylib; path = usr/local/lib/libosg.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB414CF7C1D007E722D /* libosgAnimation.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.66.dylib; path = usr/local/lib/libosgAnimation.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACB514CF7C1D007E722D /* libosgDB.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.66.dylib; path = usr/local/lib/libosgDB.66.dylib; sourceTree = SDKROOT; };
@@ -1341,6 +1336,22 @@
 		1CE3ACC114CF7C1D007E722D /* libosgVolume.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.66.dylib; path = usr/local/lib/libosgVolume.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACC214CF7C1D007E722D /* libosgWidget.66.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgWidget.66.dylib; path = usr/local/lib/libosgWidget.66.dylib; sourceTree = SDKROOT; };
 		1CE3ACD314CF7C72007E722D /* libOpenThreads.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenThreads.12.dylib; path = usr/local/lib/libOpenThreads.12.dylib; sourceTree = SDKROOT; };
+		1CF8E9F41552E883004EDF18 /* libpcl_apps.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_apps.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_apps.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9F51552E883004EDF18 /* libpcl_features.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_features.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_features.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9F61552E883004EDF18 /* libpcl_io_ply.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_io_ply.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_io_ply.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9F71552E883004EDF18 /* libpcl_kdtree.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_kdtree.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_kdtree.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9F81552E883004EDF18 /* libpcl_keypoints.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_keypoints.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_keypoints.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9F91552E883004EDF18 /* libpcl_octree.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_octree.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_octree.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9FA1552E883004EDF18 /* libpcl_range_image_border_extractor.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_range_image_border_extractor.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_range_image_border_extractor.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9FB1552E883004EDF18 /* libpcl_range_image.1.4.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_range_image.1.4.0.dylib; path = ../../../../../usr/local/lib/libpcl_range_image.1.4.0.dylib; sourceTree = "<group>"; };
+		1CF8E9FC1552E883004EDF18 /* libpcl_registration.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_registration.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_registration.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9FD1552E883004EDF18 /* libpcl_sample_consensus.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_sample_consensus.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_sample_consensus.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9FE1552E883004EDF18 /* libpcl_search.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_search.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_search.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8E9FF1552E883004EDF18 /* libpcl_segmentation.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_segmentation.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_segmentation.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8EA001552E883004EDF18 /* libpcl_surface.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_surface.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_surface.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8EA011552E883004EDF18 /* libpcl_tracking.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_tracking.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_tracking.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8EA021552E883004EDF18 /* libpcl_visualization.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_visualization.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_visualization.1.5.1.dylib; sourceTree = "<group>"; };
+		1CF8EA041552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_filters.1.5.1.dylib; path = ../../../../../usr/local/lib/libpcl_filters.1.5.1.dylib; sourceTree = "<group>"; };
 		1CF94950151CD40500628872 /* ParticleSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParticleSystem.h; path = ../include/ParticleSystem.h; sourceTree = "<group>"; };
 		1CF94953151CD41F00628872 /* ParticleSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleSystem.cpp; path = ../src/spin/ParticleSystem.cpp; sourceTree = "<group>"; };
 		1CF94955151CD43C00628872 /* ParticleSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleSystem.cpp; path = ../src/osgWrappers/introspection/ParticleSystem.cpp; sourceTree = "<group>"; };
@@ -1361,8 +1372,6 @@
 				1C94DEBC14BFEBAB006394AD /* libboost_python.dylib in Frameworks */,
 				1CA24C2914BE51610023DD8B /* liblo.7.dylib in Frameworks */,
 				1C9C083014D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
-				1C7A4AD514F2CAD200EA83AB /* libpcl_common.1.4.0.dylib in Frameworks */,
-				1C7A4AD614F2CAD600EA83AB /* libpcl_io.1.4.0.dylib in Frameworks */,
 				1C0EED7014F2F272001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7114F2F272001892A0 /* libboost_system-mt.dylib in Frameworks */,
 				1CC1074815332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
@@ -1382,6 +1391,9 @@
 				1CC1078E15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
 				1CC1079315332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
 				1CC1079815332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
+				1CDDB292155224D700A45ADA /* libpcl_common.1.5.1.dylib in Frameworks */,
+				1CDDB293155224D700A45ADA /* libpcl_io.1.5.1.dylib in Frameworks */,
+				1CF8EA051552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1517,6 +1529,7 @@
 				1CC1079215332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
 				1CC1079715332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
 				1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
+				1CC5D51615505575009C63A5 /* Syphon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1526,22 +1539,24 @@
 		1C25F53614E59387007F97E5 /* pcl */ = {
 			isa = PBXGroup;
 			children = (
-				1C25F51614E59373007F97E5 /* libpcl_apps.1.4.0.dylib */,
-				1C25F51714E59373007F97E5 /* libpcl_common.1.4.0.dylib */,
-				1C25F51814E59373007F97E5 /* libpcl_features.1.4.0.dylib */,
-				1C25F51914E59373007F97E5 /* libpcl_filters.1.4.0.dylib */,
-				1C25F51A14E59373007F97E5 /* libpcl_io.1.4.0.dylib */,
-				1C25F51B14E59373007F97E5 /* libpcl_kdtree.1.4.0.dylib */,
-				1C25F51C14E59374007F97E5 /* libpcl_keypoints.1.4.0.dylib */,
-				1C25F51D14E59374007F97E5 /* libpcl_octree.1.4.0.dylib */,
-				1C25F51E14E59374007F97E5 /* libpcl_range_image_border_extractor.1.4.0.dylib */,
-				1C25F51F14E59374007F97E5 /* libpcl_range_image.1.4.0.dylib */,
-				1C25F52014E59374007F97E5 /* libpcl_registration.1.4.0.dylib */,
-				1C25F52114E59374007F97E5 /* libpcl_sample_consensus.1.4.0.dylib */,
-				1C25F52214E59374007F97E5 /* libpcl_search.1.4.0.dylib */,
-				1C25F52314E59374007F97E5 /* libpcl_segmentation.1.4.0.dylib */,
-				1C25F52414E59374007F97E5 /* libpcl_surface.1.4.0.dylib */,
-				1C25F52514E59374007F97E5 /* libpcl_visualization.1.4.0.dylib */,
+				1CF8E9F41552E883004EDF18 /* libpcl_apps.1.5.1.dylib */,
+				1CDDB290155224D700A45ADA /* libpcl_common.1.5.1.dylib */,
+				1CF8EA041552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib */,
+				1CF8E9F51552E883004EDF18 /* libpcl_features.1.5.1.dylib */,
+				1CDDB291155224D700A45ADA /* libpcl_io.1.5.1.dylib */,
+				1CF8E9F61552E883004EDF18 /* libpcl_io_ply.1.5.1.dylib */,
+				1CF8E9F71552E883004EDF18 /* libpcl_kdtree.1.5.1.dylib */,
+				1CF8E9F81552E883004EDF18 /* libpcl_keypoints.1.5.1.dylib */,
+				1CF8E9F91552E883004EDF18 /* libpcl_octree.1.5.1.dylib */,
+				1CF8E9FA1552E883004EDF18 /* libpcl_range_image_border_extractor.1.5.1.dylib */,
+				1CF8E9FB1552E883004EDF18 /* libpcl_range_image.1.4.0.dylib */,
+				1CF8E9FC1552E883004EDF18 /* libpcl_registration.1.5.1.dylib */,
+				1CF8E9FD1552E883004EDF18 /* libpcl_sample_consensus.1.5.1.dylib */,
+				1CF8E9FE1552E883004EDF18 /* libpcl_search.1.5.1.dylib */,
+				1CF8E9FF1552E883004EDF18 /* libpcl_segmentation.1.5.1.dylib */,
+				1CF8EA001552E883004EDF18 /* libpcl_surface.1.5.1.dylib */,
+				1CF8EA011552E883004EDF18 /* libpcl_tracking.1.5.1.dylib */,
+				1CF8EA021552E883004EDF18 /* libpcl_visualization.1.5.1.dylib */,
 			);
 			name = pcl;
 			sourceTree = "<group>";
@@ -1635,6 +1650,7 @@
 				1C386CA914BD3DF60065851F /* spinServerContext.cpp */,
 				1C386CAA14BD3DF60065851F /* spinUtil.cpp */,
 				1C386CAB14BD3DF60065851F /* SwitchNode.cpp */,
+				1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */,
 				1CCDCCC015386DE900B9D191 /* TextArea.cpp */,
 				1C386CAC14BD3DF60065851F /* TextNode.cpp */,
 				1C386CAD14BD3DF60065851F /* UserNode.cpp */,
@@ -1701,6 +1717,7 @@
 				1CA24D9D14BE2892007A9C31 /* spinUtil.h */,
 				1CA24D9E14BE2892007A9C31 /* spinWX.h */,
 				1CA24D9F14BE2892007A9C31 /* SwitchNode.h */,
+				1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */,
 				1CCDCCBD15386DC300B9D191 /* TextArea.h */,
 				1CA24DA014BE2892007A9C31 /* TextNode.h */,
 				1CA24DA114BE2892007A9C31 /* UserNode.h */,
@@ -1746,6 +1763,7 @@
 				1CA24D5014BE2875007A9C31 /* SoundNode.cpp */,
 				1CA24D5114BE2875007A9C31 /* SoundSpace.cpp */,
 				1CA24D5214BE2875007A9C31 /* SwitchNode.cpp */,
+				1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */,
 				1CCDCCC215389C5D00B9D191 /* TextArea.cpp */,
 				1CA24D5314BE2875007A9C31 /* TextNode.cpp */,
 				1CA24D5414BE2875007A9C31 /* UserNode.cpp */,
@@ -2010,6 +2028,7 @@
 				1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */,
 				1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */,
 				1C94DEB914BFEBAA006394AD /* libboost_python.dylib */,
+				1CC5D51515505575009C63A5 /* Syphon.framework */,
 				1C9EE82F14BE2725000976A6 /* AppKit.framework */,
 				1C9EE83014BE2725000976A6 /* CoreData.framework */,
 				1C9EE83114BE2725000976A6 /* Foundation.framework */,
@@ -2222,6 +2241,7 @@
 				1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */,
 				1C4E06421548F3C30056BD10 /* DraggerWith3Axes.h in Headers */,
 				1C4E06491548FC9B0056BD10 /* DraggerTrackball.h in Headers */,
+				1CDDB28D1551AD8500A45ADA /* SyphonTexture.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2625,6 +2645,8 @@
 				1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */,
 				1C4E06451548F3DC0056BD10 /* DraggerWith3Axes.cpp in Sources */,
 				1C4E06471548FC8D0056BD10 /* DraggerTrackball.cpp in Sources */,
+				1CDDB28B1551AD7300A45ADA /* SyphonTexture.cpp in Sources */,
+				1CDDB28F1551AE2800A45ADA /* SyphonTexture.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2821,8 +2843,9 @@
 					"/usr/local/include/cppintrospection-3.0",
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
-					"/usr/local/include/pcl-1.4",
+					"/usr/local/include/pcl-1.5",
 					/usr/local/include/bullet,
+					/usr/include/ni,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
@@ -2866,8 +2889,9 @@
 					"/usr/local/include/cppintrospection-3.0",
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
-					"/usr/local/include/pcl-1.4",
+					"/usr/local/include/pcl-1.5",
 					/usr/local/include/bullet,
+					/usr/include/ni,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
@@ -3131,6 +3155,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)/usr/local/lib\"",
+					"\"$(SRCROOT)/../../../Library/Developer/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spinviewerUI/spinviewerUI-Prefix.pch";
@@ -3152,6 +3177,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SDKROOT)/usr/local/lib\"",
+					"\"$(SRCROOT)/../../../Library/Developer/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "spinviewerUI/spinviewerUI-Prefix.pch";

@@ -184,6 +184,7 @@ public:
      * Note: for this to work, stateRegistration must be enabled.
      */
     void setStateSet (int index, const char *replacement);
+    void updateStateSet();
 
     /**
      * For each subclass of ReferencedNode, we override the getState() method to

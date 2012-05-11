@@ -42,14 +42,18 @@
 #ifndef PointCloud_H_
 #define PointCloud_H_
 
+#include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>
 #include <osg/ShapeDrawable>
-
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
+#include <osgSim/LightPointNode>
+#include <osg/Timer>
 
 #include "GroupNode.h"
 
+#include <pcl/pcl_config.h>
+#include <pcl/io/openni_grabber.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
 
 namespace spin
 {
@@ -68,58 +72,94 @@ public:
     PointCloud(SceneManager *sceneManager, char *initID);
     virtual ~PointCloud();
     
-    enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON, LIGHTPOINTS, BOXES };
-    
-    
-    /**
-     * update from kinect
-     */
+    enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON, LIGHTPOINTS, BOXES, CUSTOM };
+    enum ColorMode { NORMAL, OVERRIDE };
+    virtual void debug();
     virtual void callbackUpdate();
-
-    void loadFile(const char* filename);
     
+
+    void setURI(const char* filename);
+    virtual void draw();
+
+//#if PCL_MAJOR_VERSION>1 && PCL_MINOR_VERSION>5
+    void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &cloud);
+//#else
+//    void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr &cloud);
+//#endif
+
+    osg::Vec3 getPos(unsigned int i);
+    osg::Vec4f getColor(unsigned int i);
+
+    virtual void updatePoints();
+    
+    void setCustomNode   (const char* nodeID);
     void setDrawMode     (DrawMode mode);
     void setSpacing      (float spacing);
     void setRandomCoeff  (float randomCoeff);
     void setPointSize    (float pointsize);
     void setColor        (float red, float green, float blue, float alpha);
-
-    int getDrawMode()      const { return (int)this->drawMode_; };
-    float getSpacing()     const { return this->spacing_; };
-    float getRandomCoeff() const { return this->randomCoeff_; };
-    float getPointSize()   const { return this->pointSize_; };
-    osg::Vec4 getColor()   const { return this->color_;  };
-
+    void setColorMode    (ColorMode mode);
 
     /**
-     * For each subclass of ReferencedNode, we override the getState() method to
-     * fill the vector with the correct set of methods for this particular node
+     * Set the voxelSize for the pcl::VoxelGrid filter, which downsamples points
+     * to the nearest voxel in a 3D voxel grid. Think about a voxel grid as a
+     * set of tiny 3D boxes in space.
+     *
+     * @param voxelSize in metres (default is 0.01, ie, 1cm). A value of 0 will
+     * disable the VoxelGrid filter.
      */
-    virtual std::vector<lo_message> getState() const;
-
+    void setVoxelSize   (float voxelSize);
     
+    /**
+     * Set the minimum and maximum distance of valid points (in metres)
+     */
+    void setDistCrop   (float min, float max);
+
+
+    const char* getCustomNode() const;
+    int getDrawMode()       const { return (int)this->drawMode_; };
+    float getSpacing()      const { return this->spacing_; };
+    float getRandomCoeff()  const { return this->randomCoeff_; };
+    float getPointSize()    const { return this->pointSize_; };
+    osg::Vec4 getColor()    const { return this->color_;  };
+    int getColorMode()      const { return (int)this->colorMode_; };
+    float getFilterSize()   const { return this->voxelSize_; };
+    osg::Vec2 getDistCrop() const { return this->distCrop_; };
+
+    virtual std::vector<lo_message> getState() const;
+    
+
+
 private:
     
-    //double depth_data[240][320];
-    pcl::PointCloud<pcl::PointXYZRGB> cloud_;
+    pcl::Grabber* grabber_;
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
     
-    osg::ref_ptr<osg::MatrixTransform> cloudGroup;
+    t_symbol* customNode_;
+    
+    osg::ref_ptr<osg::PositionAttitudeTransform> cloudGroup_;
+    osg::ref_ptr<osgSim::LightPointNode> lightPointNode_;
     osg::ref_ptr<osg::Geode> cloudGeode_;
-
+    std::vector<osg::MatrixTransform*> xforms_;
+    
     DrawMode drawMode_;
     
     std::string path_;
     
-    osg::ref_ptr<osg::MatrixTransform> shapeGroup;
-    std::vector< osg::ref_ptr<osg::ShapeDrawable> > shapes;
-    std::vector< osg::ref_ptr<osg::MatrixTransform> > shapeTransforms;
+    int maxPoints_; // for kinect, or any time you need to reserve points
     
     float spacing_;
     float randomCoeff_;
     float pointSize_;
     osg::Vec4 color_;
+    ColorMode colorMode_;
+    float voxelSize_;
+    osg::Vec2 distCrop_;
     
-    bool valid_;
+    bool redrawFlag_;
+    bool updateFlag_;
+    
+    float framerate_;
 
 };
 

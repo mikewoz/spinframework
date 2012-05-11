@@ -74,7 +74,6 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	shape = BOX;
 	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
-	stateset = gensym("NULL");
 	renderBin = 11;
 	lightingEnabled = true;
     
@@ -157,47 +156,10 @@ void ShapeNode::setColor (float r, float g, float b, float a)
 }
 
 // ===================================================================
-void ShapeNode::setTextureFromFile (const char* s)
-{
-	string path = getRelativePath(string(s));
-	
-	// don't do anything if the current texture is already loaded:
-	if (path==texturePath) return;
-	else texturePath=path;
-	
-	//drawTexture();
-
-	BROADCAST(this, "ss", "setTextureFromFile", texturePath.c_str());
-}
-
-void ShapeNode::setStateSetFromFile(const char* filename)
-{
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
-	if (ss.valid())
-	{
-		if (ss->id == stateset) return; // we're already using that stateset
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
-
-void ShapeNode::setStateSet (const char* s)
-{
-	if (gensym(s)==stateset) return;
-
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
-	if (ss.valid())
-	{
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
 
 void ShapeNode::updateStateSet()
 {
-	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset->s_thing);
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
 	if (shapeGeode.valid() && ss.valid()) shapeGeode->setStateSet( ss.get() );
 }
 
@@ -223,7 +185,7 @@ void ShapeNode::setLighting (int i)
 	if (lightingEnabled==(bool)i) return;
 	lightingEnabled = (bool)i;
 
-	if (shapeGeode.valid() && !stateset->s_thing)
+	if (shapeGeode.valid() && !stateset_->s_thing)
 	{
 		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
 		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
@@ -370,7 +332,7 @@ void ShapeNode::drawShape()
 
 		// if this shape has a stateset, then lighting is defined there.
 		// Otherwise, we have an internal lighting parameter for the shape:
-		if (!stateset->s_thing)
+		if (!stateset_->s_thing)
 		{
 			if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
 			else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
@@ -384,140 +346,7 @@ void ShapeNode::drawShape()
 	pthread_mutex_unlock(&sceneMutex);
 
 	
-	//drawTexture();
 	updateStateSet();
-
-}
-
-
-// ===================================================================
-void ShapeNode::drawTexture()
-{
-	
-
-	//std::cout << "debug texturepath: " << texturePath <<  std::endl;
-
-
-	if (texturePath==string("NULL"))
-	{
-		// remove current texture
-		//shapeGeode->setStateSet( new osg::StateSet() );
-		//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
-	}
-
-	else if (shapeGeode.valid())
-	{
-		pthread_mutex_lock(&sceneMutex);
-		
-		std::string fullPath = getAbsolutePath(texturePath);
-		
-		// if filename contains "shared_video_texture", then replace
-		// current TextureAttribute with a SharedVideoTexture
-		
-		size_t pos;
-
-		if ((pos=fullPath.find("shared_video_texture")) != string::npos)
-		{
-			// find the shared memory id from the filename:
-			std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
-			osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->createStateSet(shID.c_str(), "SharedVideoTexture"));
-			if (shvid.valid())
-			{
-				shapeGeode->setStateSet( shvid.get() );
-			} else {
-				std::cout << "ERROR creating SharedVideoTexture '" << shID << "' for ShapeNode: " << id->s_name << std::endl;
-			}
-
-		}
-
-		else if (isVideoPath(fullPath))
-		{
-			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/VideoTexture").c_str(), "VideoTexture"));
-			if (vid.valid())
-			{
-				vid->setPath(fullPath.c_str());
-				shapeGeode->setStateSet( vid.get() );
-			} else {
-				std::cout << "ERROR creating VideoTexture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
-			}
-		}
-		
-		else
-		{
-			//addImageTexture(shapeGeode.get(), fullPath);
-			osg::ref_ptr<ImageTexture> tex = dynamic_cast<ImageTexture*>(sceneManager->createStateSet((string(id->s_name)+"/Texture").c_str(), "ImageTexture"));
-			if (tex.valid())
-			{
-				tex->setPath(fullPath.c_str());
-				shapeGeode->setStateSet( tex.get() );
-			} else {
-				std::cout << "ERROR creating ImageTexture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
-			}
-
-		}
-
-		pthread_mutex_unlock(&sceneMutex);
-	}
-}
-			
-			
-void ShapeNode::addImageTexture(osg::Node *n, std::string path)
-{
-	if (!sceneManager->isGraphical()) return;
-	
-	osg::StateSet *ss = n->getOrCreateStateSet();
-		
-	//osg::ref_ptr<osg::Image> image;
-	osg::ref_ptr<osg::Image> textureImage = osgDB::readImageFile( path.c_str() );
-	if (textureImage.valid())
-	{
-
-		// old:
-		/*
-		shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
-		osg::Texture2D* shapeTexture = new osg::Texture2D();
-		shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-		shapeTexture->setImage(textureImage.get());
-		shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
-		shapeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-		*/
-
-
-		osg::Texture2D* shapeTexture = new osg::Texture2D();
-		shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-		shapeTexture->setImage(textureImage.get());
-
-		//osg::StateSet *ss = new osg::StateSet();
-		//osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
-
-		// Turn blending on:
-		ss->setMode( GL_BLEND, osg::StateAttribute::ON );
-		ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-
-		// Disable depth testing so geometry is drawn regardless of depth values
-		// of geometry already draw.
-		//ss->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-
-		// Disable lighting:
-		//ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-
-		// Need to make sure this geometry is draw last. RenderBins are handled
-		// in numerical order.
-		ss->setRenderBinDetails( renderBin, "RenderBin");
-
-		// Set Texture:
-		ss->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
-
-		//n->setStateSet( shapeStateSet );
-
-		/*
-		if (sceneManager->sharedStateManager.valid())
-				sceneManager->sharedStateManager->share(n);
-		*/
-	} else {
-		std::cout << "ERROR (setTexture): The file " << path << " is not a valid texture." << std::endl;
-	}
-
 
 }
 
@@ -543,10 +372,6 @@ std::vector<lo_message> ShapeNode::getState () const
 
 	msg = lo_message_new();
 	lo_message_add(msg,  "ss", "setTextureFromFile", texturePath.c_str());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setStateSet", getStateSet());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

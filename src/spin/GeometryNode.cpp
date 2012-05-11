@@ -69,13 +69,8 @@ GeometryNode::GeometryNode (SceneManager *sceneManager, char *initID) : GroupNod
 	this->setName(string(id->s_name) + ".GeometryNode");
 	nodeType = "GeometryNode";
 
-
-	stateset = gensym("NULL");
-	renderBin_ = 11;
-	lightingEnabled_ = true;
     updateFlag_ = false;
 
-    
     numVertices_ = 4;
     osg::Vec3Array *vertexArray_ = new osg::Vec3Array(numVertices_);
     osg::Vec4Array *colorArray_ = new osg::Vec4Array(numVertices_);
@@ -145,71 +140,12 @@ void GeometryNode::callbackUpdate()
     
 // -----------------------------------------------------------------------------
 
-
-void GeometryNode::setStateSetFromFile(const char* filename)
-{
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
-	if (ss.valid())
-	{
-		if (ss->id == stateset) return; // we're already using that stateset
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
-
-void GeometryNode::setStateSet (const char* s)
-{
-	if (gensym(s)==stateset) return;
-
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
-	if (ss.valid())
-	{
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
-
 void GeometryNode::updateStateSet()
 {
-	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset->s_thing);
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
 	if (geode_.valid() && ss.valid()) geode_->setStateSet( ss.get() );
 }
 
- 
-void GeometryNode::setRenderBin (int i)
-{
-	if (renderBin_ == i) return;
-
-	renderBin_ = i;
-
-	if (geode_.valid())
-	{
-		osg::StateSet *ss = geode_->getOrCreateStateSet();
-		ss->setRenderBinDetails( (int)renderBin_, "RenderBin");
-		//setStateSet( shapeStateSet );
-	}
-
-	BROADCAST(this, "si", "setRenderBin", renderBin_);
-}
-    
-void GeometryNode::setLighting (int i)
-{
-	if (lightingEnabled_==(bool)i) return;
-	lightingEnabled_ = (bool)i;
-
-	if (geode_.valid() && !stateset->s_thing)
-	{
-		osg::StateSet *ss = geode_->getOrCreateStateSet();
-		if (lightingEnabled_) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-	}
-
-	BROADCAST(this, "si", "setLighting", getLighting());
-
-}
-    
 void GeometryNode::setNumVertices(int i)
 {
     if (numVertices_ != i)
@@ -309,18 +245,6 @@ std::vector<lo_message> GeometryNode::getState () const
 	lo_message msg;
 	osg::Vec3 v3;
 	osg::Vec4 v4;
-
-	msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setStateSet", getStateSet());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setLighting", getLighting());
-	ret.push_back(msg);
 
 	// put this one last:
 	/*

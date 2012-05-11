@@ -51,6 +51,21 @@
 namespace spin
 {
 
+float random(float min,float max)
+{
+    return min + (max-min)*(float)rand()/(float)RAND_MAX;
+}
+
+int random(int min,int max)
+{
+    return min + (int)((float)(max-min)*(float)rand()/(float)RAND_MAX);
+}
+
+osg::Vec3 randomVec3()
+{
+    return osg::Vec3(random(-1.0f,1.0f),random(-1.0f,1.0f),random(-1.0f,1.0f));
+}
+
 /**
  * Returns an absolute angle difference between v1 and v2 (with no notion of
  * which is ahead or behind the other). Returned angle is from 0 to PI

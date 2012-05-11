@@ -102,7 +102,7 @@ public:
     };
     enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
     enum velocityMode { TRANSLATE, MOVE };
-    
+    enum ComputationMode { SERVER_SIDE, CLIENT_SIDE };
     enum OrientationMode
     {
         NORMAL,
@@ -130,13 +130,49 @@ public:
     		float x, float y, float z);
 	void setLock(const char* userString, int lock);
 
-
+    /**
+     * Print debug information about the node to standard out (when running in
+     * console mode). It may be possible to redirect this to a text box for GUI
+     * logs.
+     */
     virtual void debug();
+    
+    /**
+     * setStateSetFromFile guesses the type of stateset from the filename
+     * extension, creates a new stateset of that type and assigns it to this
+     * node
+     */
+    void setStateSetFromFile(const char* filename);
+    
+    /**
+     * Assign an existing stateset to this node
+     */
+    void setStateSet(const char* s);
+    t_symbol* getStateSetSymbol() const { return stateset_; }
+    
+    /**
+     * This method actually applies the stateset to the subgraph, replacing any
+     * existing stateset with this one. The setStateSet and setStateSetFromFile
+     * methods just set the stateset_ symbol, while updateStateSet does the
+     * actual work.
+     *
+     * Override this method in subclasses in order to change how stateset should
+     * be applied. For example, to which node in the subgraph it should be
+     * attached, or whether it should be merged with the existing stateset
+     * (rather than merged).
+     *
+     * By default it is applied to the mainTransform_.
+     */
+    virtual void updateStateSet();
+    
     
     void setReportMode(globalsReportMode mode);
 
     void setInteractionMode(InteractionMode mode);
     
+    void setComputationMode(ComputationMode mode);
+    int getComputationMode() const { return (int)computationMode_; };
+
     /**
      * Set a clipping rectangle for the model so that geometry outside of the
      * region (+-x, +-y, +-z) will not be shown (or used in interactive events)
@@ -168,8 +204,6 @@ public:
      * Set the orientation offset as a quaternion
      */
     virtual void setOrientationQuat (float x, float y, float z, float w);
-
-    void applyOrientationMode();
 
     /**
      * A grouped scale operation
@@ -237,25 +271,25 @@ public:
          float a30, float a31, float a32, float a33);
 
     
-    int getReportMode() const { return (int) _reportMode; };
-    int getInteractionMode() const { return (int) _interactionMode; };
-    osg::Vec3 getClipping() const { return _clipping; };
-    osg::Vec3 getOrientation() const { return _orientation; };
+    int getReportMode() const { return (int) reportMode_; };
+    int getInteractionMode() const { return (int) interactionMode_; };
+    osg::Vec3 getClipping() const { return clipping_; };
+    osg::Vec3 getOrientation() const { return orientation_; };
     
     /*
-    osg::Vec3 getTranslation() const { return mainTransform->getMatrix().getTrans(); };
-    osg::Quat getOrientationQuat() const { return mainTransform->getMatrix().getRotate(); };
-    osg::Vec3 getScale() const { return mainTransform->getMatrix().getScale(); };
+    osg::Vec3 getTranslation() const { return mainTransform_->getMatrix().getTrans(); };
+    osg::Quat getOrientationQuat() const { return mainTransform_->getMatrix().getRotate(); };
+    osg::Vec3 getScale() const { return mainTransform_->getMatrix().getScale(); };
     */
     
     osg::Vec3 getTranslation() const { return translation_; };
     osg::Quat getOrientationQuat() const { return quat_; };
     osg::Vec3 getScale() const { return scale_; };     
     
-    osg::Vec3 getVelocity() const { return _velocity; };
-    int getVelocityMode() const { return (int) _velocityMode; };
-    float getDamping() const { return _damping; };
-    //osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform->getAttitude()).asVec3()); };
+    osg::Vec3 getVelocity() const { return velocity_; };
+    int getVelocityMode() const { return (int) velocityMode_; };
+    float getDamping() const { return damping_; };
+    //osg::Vec3 getOrientation() { return Vec3inDegrees((mainTransform_->getAttitude()).asVec3()); };
 
     osg::Matrix getGlobalMatrix();
     osg::Vec3 getCenter() const;
@@ -289,47 +323,53 @@ public:
 
 
 
-    osg::MatrixTransform *getTransform() { return mainTransform.get(); }
+    osg::MatrixTransform *getTransform() { return mainTransform_.get(); }
 
     void updateDraggerMatrix();
 
 
 protected:
 
+    void updateQuat();
     void updateMatrix();
     void drawManipulator();
+    
+    void applyOrientationMode();
 
-    osg::ref_ptr<UserNode> owner;
 
-    //osg::ref_ptr<osg::PositionAttitudeTransform> mainTransform;
-    osg::ref_ptr<osg::MatrixTransform> mainTransform;
-    osg::ref_ptr<osg::MatrixTransform> manipulatorTransform;
+    osg::ref_ptr<UserNode> owner_;
     
-    osg::ref_ptr<osgManipulator::Dragger> dragger;
+    t_symbol *stateset_;
+
+    osg::ref_ptr<osg::MatrixTransform> mainTransform_;
     
-    InteractionMode _interactionMode;
-    std::vector<osg::Vec4> _trajectory;
-    int _drawMod;
+    osg::ref_ptr<osgManipulator::Dragger> dragger_;
     
-    osg::ref_ptr<osg::ClipNode> clipNode;
-    osg::Vec3 _clipping;
+    InteractionMode interactionMode_;
+    std::vector<osg::Vec4> trajectory_;
+    int drawMod_;
     
-    globalsReportMode _reportMode;
-    osg::Matrix _globalMatrix;
+    osg::ref_ptr<osg::ClipNode> clipNode_;
+    osg::Vec3 clipping_;
+    
+    globalsReportMode reportMode_;
+    osg::Matrix globalMatrix_;
     osg::Vec3 _globalScale;
-    float _globalRadius;
+    float globalRadius_;
+
+    ComputationMode computationMode_;
 
     enum OrientationMode orientationMode_;
     t_symbol* orientationTarget_;
-    osg::Vec3 _orientation; // store the orientation as it comes in (in degrees)
+    osg::Vec3 orientation_; // store the orientation as it comes in (in degrees)
     osg::Vec3 translation_;
     osg::Vec3 scale_;
     osg::Quat quat_;
 
-    osg::Vec3 _velocity;
-    velocityMode _velocityMode;
-    osg::Vec3 _spin;
-    float _damping;
+    osg::Vec3 velocity_;
+    velocityMode velocityMode_;
+    osg::Vec3 spin_;
+    float damping_;
     
     std::string manipulatorType_;
     bool manipulatorUpdateFlag_;
@@ -337,9 +377,8 @@ protected:
     
 private:
 
-    
-    osg::Timer_t lastTick;
-
+    bool broadcastLock_;
+    osg::Timer_t lastTick_;
 };
 
     
