@@ -76,6 +76,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 	texturePath = "NULL";
 	renderBin = 11;
 	lightingEnabled = true;
+    singleSided_ = false;
     
     // quick shader test:
     if (0)
@@ -193,8 +194,21 @@ void ShapeNode::setLighting (int i)
 	}
 
 	BROADCAST(this, "si", "setLighting", getLighting());
-
 }
+
+void ShapeNode::setSingleSided (int singleSided)
+{
+    singleSided_ = singleSided;
+    
+    osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+    if (singleSided_)
+        ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+    else
+        ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+
+	BROADCAST(this, "si", "setSingleSided", getSingleSided());
+}
+
 
 // ===================================================================
 void ShapeNode::drawShape()
@@ -338,6 +352,11 @@ void ShapeNode::drawShape()
 			else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 		}
 		
+        if (singleSided_)
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+        else
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+        
 		this->getAttachmentNode()->addChild(shapeGeode.get());
 		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
 		optimizer.optimize(shapeGeode.get()); // ?
