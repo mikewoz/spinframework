@@ -47,6 +47,7 @@
 #include <osg/Geometry>
 #include <osgUtil/SmoothingVisitor>
 #include <osgSim/LightPointNode>
+#include <osgDB/FileNameUtils>
 
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -54,6 +55,7 @@
 #include <pcl/common/time.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/passthrough.h>
+#include <pcl/compression/octree_pointcloud_compression.h>
 
 #include "PointCloud.h"
 #include "SceneManager.h"
@@ -115,8 +117,15 @@ void PointCloud::debug()
     GroupNode::debug();
 
     boost::mutex::scoped_lock lock(grabberMutex);
-    std::cout << "   " << (int)cloud_->points.size() << " of " << maxPoints_ << " displayed" << std::endl;
-    std::cout << "   Avg framerate: " << framerate_ << std::endl;
+    if (cloud_)
+    {
+        std::cout << "   " << (int)cloud_->points.size() << " of " << maxPoints_ << " displayed" << std::endl;
+        std::cout << "   Avg framerate: " << framerate_ << std::endl;
+    }
+    else
+    {
+        std::cout << "   No valid point cloud loaded" << std::endl;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -580,33 +589,56 @@ void PointCloud::setURI(const char* filename)
     else
     {
         // load the file:
+        std::string absPath = getAbsolutePath(std::string(path_));
+        std::string ext = osgDB::getLowerCaseFileExtension(absPath);
         
         try
         {
-            pcl::PointCloud<pcl::PointXYZRGBA> tmpCloud;
-            if (pcl::io::loadPCDFile<pcl::PointXYZRGBA>(getAbsolutePath(std::string(path_)), tmpCloud) != -1)  
-            {            
-                std::cout << tmpCloud.points.size() << " PointXYZRGBA " << std::endl;
+            if (ext=="cpc")
+            {
+                std::stringstream compressedData;
+                pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::octree::PointCloudCompression<pcl::PointXYZRGBA>();
+                pcl::PointCloud<pcl::PointXYZRGBA>::Ptr tmpCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
 
+                std::ifstream readCompressedFile(absPath.c_str());
+                compressedData << readCompressedFile.rdbuf();
+                
+                pointCloudDecoder->decodePointCloud(compressedData, tmpCloud);
+                
                 {
                     boost::mutex::scoped_lock lock (grabberMutex);
-                    cloud_ = tmpCloud.makeShared(); // note: deep copy (fix?)
+                    cloud_.swap(tmpCloud);
                 }
                 maxPoints_ = cloud_->points.size();
                 success = true;
-                
+            }
+            
+            else // if (ext=="pcd")
+            {
+                pcl::PointCloud<pcl::PointXYZRGBA> tmpCloud;
+                if (pcl::io::loadPCDFile<pcl::PointXYZRGBA>(absPath, tmpCloud) != -1)  
+                {            
+                    std::cout << tmpCloud.points.size() << " PointXYZRGBA " << std::endl;
+
+                    {
+                        boost::mutex::scoped_lock lock (grabberMutex);
+                        cloud_ = tmpCloud.makeShared(); // note: deep copy (fix?)
+                    }
+                    maxPoints_ = cloud_->points.size();
+                    success = true;
+                }
             }
         }
         catch (pcl::InvalidConversionException e)
         {
-            std::cout << "[PointCloud]: Couldn't load .pcd ing XYZRGBA format. Trying XYZ." << std::endl;
+            std::cout << "[PointCloud]: Couldn't load " << path_ <<  "in XYZRGBA format. Trying XYZ." << std::endl;
         }
 
         if (!success)
         try
         {
             pcl::PointCloud<pcl::PointXYZ> tmpCloud;
-            if (pcl::io::loadPCDFile(getAbsolutePath(std::string(path_)), tmpCloud) != -1)  
+            if (pcl::io::loadPCDFile(absPath, tmpCloud) != -1)  
             {     
                 // now we need to convert to XYZRGBA:
                 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr converted(new pcl::PointCloud<pcl::PointXYZRGBA>);
