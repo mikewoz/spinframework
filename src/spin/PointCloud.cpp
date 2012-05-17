@@ -182,6 +182,8 @@ void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::Cons
     if (redrawFlag_) return;
     
     
+    applyFilters(rawCloud);
+    /*
     // First apply crop filter along depth (z) axis:
     
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
@@ -205,9 +207,38 @@ void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::Cons
         boost::mutex::scoped_lock lock (grabberMutex);
         cloud_.swap(cloud);
     }
+    */
     
     // Set the flag so that we update during the next traversal:
     updateFlag_ = true;
+}
+
+void PointCloud::applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
+{
+            
+    // First apply crop filter along depth (z) axis:
+    
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
+    pcl::PassThrough<pcl::PointXYZRGBA> pass;
+    pass.setInputCloud(rawCloud);
+    pass.setFilterFieldName ("z");
+    pass.setFilterLimits (distCrop_.x(), distCrop_.y());
+    //pass.setFilterLimitsNegative (true);
+    pass.filter(*cloudFiltered);
+    
+    // Now we apply a VoxelGrid filter to reduce the number of points
+    
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+    pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
+    sor.setInputCloud(cloudFiltered);
+    sor.setLeafSize(voxelSize_, voxelSize_, voxelSize_);
+    sor.filter(*cloud);
+    
+    // now set out member pointer with a mutex
+    {
+        boost::mutex::scoped_lock lock (grabberMutex);
+        cloud_.swap(cloud);
+    }
 }
 
 osg::Vec3 PointCloud::getPos(unsigned int i)
@@ -240,8 +271,7 @@ void PointCloud::updatePoints()
     boost::mutex::scoped_lock lock(grabberMutex);
     
     //std::cout << "doing update. cloudsize=" << cloud_->points.size() << " maxsize=" << maxPoints_ << std::endl;
-    //if (lightPointNode_.valid()) std::cout << "num lightpoints=" << lightPointNode_->getNumLightPoints() << std::endl;
-    
+    //if (lightPointNode_.valid()) std::cout << "num lightpoints=" << lightPointNode_->getNumLightPoints() << std::endl;    
         
     if ((drawMode_>POINTS) && (drawMode_<=POLYGON))
     {
@@ -607,9 +637,9 @@ void PointCloud::setURI(const char* filename)
                 
                 {
                     boost::mutex::scoped_lock lock (grabberMutex);
-                    cloud_.swap(tmpCloud);
+                    cloudOrig_.swap(tmpCloud);
                 }
-                maxPoints_ = cloud_->points.size();
+                maxPoints_ = cloudOrig_->points.size();
                 success = true;
             }
             
@@ -622,9 +652,9 @@ void PointCloud::setURI(const char* filename)
 
                     {
                         boost::mutex::scoped_lock lock (grabberMutex);
-                        cloud_ = tmpCloud.makeShared(); // note: deep copy (fix?)
+                        cloudOrig_ = tmpCloud.makeShared(); // note: deep copy (fix?)
                     }
-                    maxPoints_ = cloud_->points.size();
+                    maxPoints_ = cloudOrig_->points.size();
                     success = true;
                 }
             }
@@ -652,9 +682,9 @@ void PointCloud::setURI(const char* filename)
                 
                 {
                     boost::mutex::scoped_lock lock (grabberMutex);
-                    cloud_.swap(converted);
+                    cloudOrig_.swap(converted);
                 }
-                maxPoints_ = cloud_->points.size();
+                maxPoints_ = cloudOrig_->points.size();
                 success = true;
             }
         }
@@ -668,6 +698,7 @@ void PointCloud::setURI(const char* filename)
     if (success)
     {    
         std::cout << "[PointCloud]: Loaded " << maxPoints_ << " data points from " << path_ << std::endl;
+        this->applyFilters(cloudOrig_);
         redrawFlag_ = true;
     } else
     {
@@ -719,7 +750,6 @@ void PointCloud::setSpacing (float spacing)
 	{
 		this->spacing_ = spacing;
 		BROADCAST(this, "sf", "setSpacing", this->spacing_);
-        //redrawFlag_ = true;
         updateFlag_ = true;
 	}
 }
@@ -730,7 +760,6 @@ void PointCloud::setRandomCoeff (float randomCoeff)
 	{
 		this->randomCoeff_ = randomCoeff;
 		BROADCAST(this, "sf", "setRandomCoeff", this->randomCoeff_);
-        //redrawFlag_ = true;
         updateFlag_ = true;
 	}
 }
@@ -741,7 +770,6 @@ void PointCloud::setPointSize (float size)
     {
         this->pointSize_ = size;
         BROADCAST(this, "sf", "setPointSize", this->pointSize_);
-        //redrawFlag_ = true;
         updateFlag_ = true;
     }
 }
@@ -752,17 +780,34 @@ void PointCloud::setVoxelSize (float voxelSize)
     {
         this->voxelSize_ = voxelSize;
         BROADCAST(this, "sf", "setVoxelSize", this->voxelSize_);
-        //redrawFlag_ = true;
+        
+        if (cloudOrig_)
+        {
+            // if cloudOrig_ is valid, it means this point cloud was loaded
+            // from file, and we need to apply filters:
+            this->applyFilters(cloudOrig_);
+        }
+        
         updateFlag_ = true;
     }
 }
 
 void PointCloud::setDistCrop (float min, float max)
 {
-    distCrop_ = osg::Vec2(min,max);
-    BROADCAST(this, "sff", "setDistCrop", min, max);
-    //redrawFlag_ = true;
-    updateFlag_ = true;
+    if ((min!=distCrop_.x()) || (max!=distCrop_.y()))
+    {
+        distCrop_ = osg::Vec2(min,max);
+        BROADCAST(this, "sff", "setDistCrop", min, max);
+        
+        if (cloudOrig_)
+        {
+            // if cloudOrig_ is valid, it means this point cloud was loaded
+            // from file, and we need to apply filters:
+            this->applyFilters(cloudOrig_);
+        }
+
+        updateFlag_ = true;
+    }
 }
 
 void PointCloud::setColor (float r, float g, float b, float a)
@@ -771,7 +816,6 @@ void PointCloud::setColor (float r, float g, float b, float a)
 	{
 		this->color_ = osg::Vec4(r,g,b,a);
 		BROADCAST(this, "sffff", "setColor", r, g, b, a);
-        //redrawFlag_ = true;
         updateFlag_ = true;
 	}
 }

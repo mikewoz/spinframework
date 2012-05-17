@@ -81,11 +81,8 @@ public:
     void setURI(const char* filename);
     virtual void draw();
 
-//#if PCL_MAJOR_VERSION>1 && PCL_MINOR_VERSION>5
     void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &cloud);
-//#else
-//    void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr &cloud);
-//#endif
+    void applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud);
 
     osg::Vec3 getPos(unsigned int i);
     osg::Vec4f getColor(unsigned int i);
@@ -134,6 +131,7 @@ private:
     
     pcl::Grabber* grabber_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
     
     t_symbol* customNode_;
     
