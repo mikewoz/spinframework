@@ -45,6 +45,8 @@
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
 #include <osg/Geometry>
+#include <osg/Point>
+#include <osg/PolygonMode>
 #include <osgUtil/SmoothingVisitor>
 #include <osgSim/LightPointNode>
 #include <osgDB/FileNameUtils>
@@ -228,16 +230,24 @@ void PointCloud::applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr
     
     // Now we apply a VoxelGrid filter to reduce the number of points
     
-    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
-    pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
-    sor.setInputCloud(cloudFiltered);
-    sor.setLeafSize(voxelSize_, voxelSize_, voxelSize_);
-    sor.filter(*cloud);
-    
-    // now set out member pointer with a mutex
+    if (voxelSize_>0)
+    {
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+        pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
+        sor.setInputCloud(cloudFiltered);
+        sor.setLeafSize(voxelSize_, voxelSize_, voxelSize_);
+        sor.filter(*cloud);
+        
+        // now set out member pointer with a mutex
+        {
+            boost::mutex::scoped_lock lock (grabberMutex);
+            cloud_.swap(cloud);
+        }
+    }
+    else 
     {
         boost::mutex::scoped_lock lock (grabberMutex);
-        cloud_.swap(cloud);
+        cloud_.swap(cloudFiltered);
     }
 }
 
@@ -273,7 +283,7 @@ void PointCloud::updatePoints()
     //std::cout << "doing update. cloudsize=" << cloud_->points.size() << " maxsize=" << maxPoints_ << std::endl;
     //if (lightPointNode_.valid()) std::cout << "num lightpoints=" << lightPointNode_->getNumLightPoints() << std::endl;    
         
-    if ((drawMode_>POINTS) && (drawMode_<=POLYGON))
+    if ((drawMode_>=POINTS) && (drawMode_<=POLYGON))
     {
         cloudGeode_->removeDrawables(0,cloudGeode_->getNumDrawables());
         
@@ -318,6 +328,11 @@ void PointCloud::updatePoints()
                 break;
             default: // POINTS
                 geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,cloud_->points.size()));
+                
+                osg::Point *point = new osg::Point();
+                point->setSize(pointSize_*2);
+                cloudGeode_->getOrCreateStateSet()->setAttribute(point);
+
                 break;
         }
         geom->setVertexArray(verts);
@@ -406,7 +421,7 @@ void PointCloud::draw()
     cloudGroup_->setName(std::string(id->s_name) + ".CloudGroup");
 
     
-    if ((drawMode_>POINTS) && (drawMode_<=POLYGON))
+    if ((drawMode_>=POINTS) && (drawMode_<=POLYGON))
     {
         cloudGeode_ = new osg::Geode();
         cloudGeode_->setName(std::string(id->s_name) + ".CloudGeode");
@@ -415,56 +430,6 @@ void PointCloud::draw()
         cloudGroup_->addChild(cloudGeode_);
     
         // the geometry will be created dynamically in updatePoints()
-    
-        /*
-        cloudGeode_ = new osg::Geode();
-		cloudGeometry_ = new osg::Geometry();
-        
-        switch (drawMode_)
-        {
-            case LINES:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES,0,maxPoints_));
-                break;
-            case LINE_STRIP:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,maxPoints_));
-                break;
-            case LINE_LOOP:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_LOOP,0,maxPoints_));
-                break;
-            case TRIANGLES:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES,0,maxPoints_));
-                break;
-            case TRIANGLE_STRIP:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP,0,maxPoints_));
-                break;
-            case TRIANGLE_FAN:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN,0,maxPoints_));
-                break;
-            case QUADS:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS,0,maxPoints_));
-                break;
-            case QUAD_STRIP:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUAD_STRIP,0,maxPoints_));
-                break;
-            case POLYGON:
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POLYGON,0,maxPoints_));
-                break;
-            default: // POINTS
-                cloudGeometry_->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,maxPoints_));
-                break;
-        }
-        
-        cloudGeode_->setName(std::string(id->s_name) + ".CloudGeode");
-        cloudGeode_->addDrawable( cloudGeometry_.get() );
-        //cloudGeometry_->setColorArray(color_);
-        //cloudGeometry_->setColorBinding(osg::Geometry::BIND_OVERALL);
-        cloudGeometry_->setDataVariance(osg::Object::DYNAMIC);
-        
-        osg::StateSet *ss = cloudGeode_->getOrCreateStateSet();
-		ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF);
-        
-        cloudGroup_->addChild(cloudGeode_);
-        */
     }
     
     else if (drawMode_ == LIGHTPOINTS)
@@ -557,6 +522,8 @@ void PointCloud::setURI(const char* filename)
         grabber_->stop();
         grabber_ = 0;
     }
+    cloudOrig_.reset();
+
     
     path_ = filename;
     maxPoints_ = 0;
