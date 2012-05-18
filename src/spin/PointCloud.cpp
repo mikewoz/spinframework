@@ -82,7 +82,7 @@ PointCloud::PointCloud (SceneManager *sceneManager, char *initID) : GroupNode(sc
 	this->setName(std::string(id->s_name) + ".PointCloud");
 	nodeType = "PointCloud";
 
-	drawMode_ = LIGHTPOINTS;
+	drawMode_ = POINTS;
     
     updateFlag_ = false;
     redrawFlag_ = false;
