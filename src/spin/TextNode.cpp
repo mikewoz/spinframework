@@ -524,7 +524,7 @@ void TextNode::updateText()
         
         
         // finally, set the actual text string:
-        textLabel_->setText(text_);
+        textLabel_->setText(text_, osgText::String::ENCODING_UTF8);
 	}
 
 	//pthread_mutex_unlock(&sceneMutex);
