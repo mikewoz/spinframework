@@ -76,6 +76,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          __void__setLighting__int,
 	          "",
 	          "");
+	I_Method1(void, setSingleSided, IN, int, singleSided,
+	          Properties::NON_VIRTUAL,
+	          __void__setSingleSided__int,
+	          "",
+	          "Specify whether both sides or only one side of the shape is rendered. ie, whether the backface is culled or not. ");
+	I_Method0(int, getSingleSided,
+	          Properties::NON_VIRTUAL,
+	          __int__getSingleSided,
+	          "",
+	          "");
 	I_Method0(void, updateStateSet,
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,
@@ -135,6 +145,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_SimpleProperty(int, Shape, 
 	                 __int__getShape, 
 	                 0);
+	I_SimpleProperty(int, SingleSided, 
+	                 __int__getSingleSided, 
+	                 __void__setSingleSided__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

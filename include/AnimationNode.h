@@ -177,7 +177,7 @@ public:
     /**
      * Clears the current animation sequence
      */
-    void clear() { _animationPath->clear(); }
+    void clear();
 
     /**
      * For each subclass of ReferencedNode, we override the getState() method to

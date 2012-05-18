@@ -1087,6 +1087,17 @@ int run(int argc, char **argv)
             (*iter)->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
             (*iter)->getProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
             (*iter)->setProjectionMatrixAsPerspective(fovy, aspectRatio, nearClipping, farClipping);
+            
+            // for point clouds, let's disable small feature culling:
+            /*
+            (*iter)->setCullingMode((*iter)->getCullingMode() & ~osg::CullSettings::SMALL_FEATURE_CULLING);
+            osg::View *v = (*iter)->getView();
+            for (unsigned int slaveNum=0; slaveNum<v->getNumSlaves(); slaveNum++)
+            {
+                osg::Camera *slaveCam = v->getSlave(slaveNum)._camera.get();
+                slaveCam->setCullingMode(slaveCam->getCullingMode() & ~osg::CullSettings::SMALL_FEATURE_CULLING);
+            }
+            */
         }
     }
 
@@ -1109,7 +1120,7 @@ int run(int argc, char **argv)
         }
         //viewer.getView(i)->setCameraManipulator(manipulator.get());
     }
-    
+        
 	// ***************************************************************************
 	// debug print camera info
 	

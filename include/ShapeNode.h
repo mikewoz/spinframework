@@ -111,6 +111,13 @@ public:
     void setRenderBin        (int i);
     void setLighting        (int i);
 
+    /**
+     * Specify whether both sides or only one side of the shape is rendered. ie,
+     * whether the backface is culled or not.
+     */
+    void setSingleSided (int singleSided);
+    int getSingleSided() const { return (int)singleSided_; }
+
     virtual void updateStateSet();
 
     int getShape() const { return (int)shape; }
@@ -147,6 +154,8 @@ public:
 
 protected:
     virtual void drawShape();
+    
+    bool singleSided_;
 
 };
 

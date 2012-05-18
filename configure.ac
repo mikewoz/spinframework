@@ -261,7 +261,7 @@ else
 fi
 AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
-PCL_PKGS="pcl_common-1.5 pcl_io-1.5 pcl_filters-1.5"
+PCL_PKGS="pcl_common-1.5 pcl_io-1.5 pcl_filters-1.5 pcl_octree-1.5"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])

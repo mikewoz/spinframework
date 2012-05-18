@@ -590,6 +590,7 @@
 		1CDDB293155224D700A45ADA /* libpcl_io.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDDB291155224D700A45ADA /* libpcl_io.1.5.1.dylib */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
+		1CEB2399156431A5009FD336 /* libpcl_octree.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CF8E9F91552E883004EDF18 /* libpcl_octree.1.5.1.dylib */; };
 		1CF8EA051552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CF8EA041552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
 		1CF94954151CD41F00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94953151CD41F00628872 /* ParticleSystem.cpp */; };
@@ -1394,6 +1395,7 @@
 				1CDDB292155224D700A45ADA /* libpcl_common.1.5.1.dylib in Frameworks */,
 				1CDDB293155224D700A45ADA /* libpcl_io.1.5.1.dylib in Frameworks */,
 				1CF8EA051552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib in Frameworks */,
+				1CEB2399156431A5009FD336 /* libpcl_octree.1.5.1.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

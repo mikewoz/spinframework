@@ -75,6 +75,7 @@ namespace spin
 #define AS_UNIT_SCALE  1.0f // 1m
 #define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
 
+double random(double min,double max);
 float random(float min,float max);
 int random(int min,int max);
 osg::Vec3 randomVec3();

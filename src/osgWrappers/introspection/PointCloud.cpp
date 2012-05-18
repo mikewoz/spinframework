@@ -77,6 +77,11 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          __void__grabberCallback__C5_pcl_PointCloudT1_pcl_PointXYZRGBA__ConstPtr_R1,
 	          "",
 	          "");
+	I_Method1(void, applyFilters, IN, const pcl::PointCloud< pcl::PointXYZRGBA >::ConstPtr &, rawCloud,
+	          Properties::NON_VIRTUAL,
+	          __void__applyFilters__C5_pcl_PointCloudT1_pcl_PointXYZRGBA__ConstPtr_R1,
+	          "",
+	          "");
 	I_Method1(osg::Vec3, getPos, IN, unsigned int, i,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getPos__unsigned_int,
