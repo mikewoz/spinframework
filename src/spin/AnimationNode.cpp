@@ -112,6 +112,7 @@ void AnimationNode::callbackUpdate()
 
 bool AnimationNode::doUpdate(double timestamp)
 {
+/*
     osg::Matrix myMatrix;
     if (_animationPath->getMatrix(timestamp, myMatrix))
     {
@@ -122,30 +123,32 @@ bool AnimationNode::doUpdate(double timestamp)
         myMatrix.decompose(myPos, myQuat, myScl, mySclOrientation);
         osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myQuat));
         
-        /*
-        osg::Vec3 myPos = myMatrix.getTrans();
-        osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
-        osg::Vec3 myScl = myMatrix.getScale();
-        */
         setTranslation(myPos.x(), myPos.y(), myPos.z());
         setOrientation(myRot.x(), myRot.y(), myRot.z());
         setScale(myScl.x(), myScl.y(), myScl.z());
-
         return true;
     }
+*/
+
+    if (_animationPath->empty()) return false;
 
 
-    /*
-    AnimationPath::ControlPoint cp;
-    if (_animationPath->getInterpolatedControlPoint(currentTime,cp))
-    {
-        mainTransform.setPosition(cp.getPosition());
-        mainTransform.setAttitude(cp.getRotation());
-        mainTransform.setScale(cp.getScale());
-    }
-    */
+    osg::AnimationPath::ControlPoint cp;
+    if ((timestamp==_animationPath->getLastTime()) && (!_animationPath->empty()))
+        cp = _animationPath->getTimeControlPointMap()[_animationPath->getLastTime()];
+    else
+        _animationPath->getInterpolatedControlPoint(timestamp,cp);
 
-    return false;
+    osg::Vec3 myPos = cp.getPosition();
+    osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(cp.getRotation()));
+    osg::Vec3 myScl = cp.getScale();
+
+    setTranslation(myPos.x(), myPos.y(), myPos.z());
+    setOrientation(myRot.x(), myRot.y(), myRot.z());
+    setScale(myScl.x(), myScl.y(), myScl.z());
+    
+    return true;
+
 }
 
 // *****************************************************************************
@@ -293,6 +296,12 @@ void AnimationNode::controlPoint (double timestamp, float x, float y, float z, f
 
     BROADCAST(this, "sdffffffffff", "controlPoint", timestamp, x, y, z, rotX, rotY, rotZ, rotW, scaleX, scaleY, scaleZ);
 
+}
+
+void AnimationNode::clear()
+{
+    _animationPath->clear();
+    BROADCAST(this, "s", "clear");
 }
 
 // *****************************************************************************

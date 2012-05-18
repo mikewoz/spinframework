@@ -51,6 +51,11 @@
 namespace spin
 {
 
+double random(double min,double max)
+{
+    return min + (max-min)*(double)rand()/(double)RAND_MAX;
+}
+
 float random(float min,float max)
 {
     return min + (max-min)*(float)rand()/(float)RAND_MAX;
