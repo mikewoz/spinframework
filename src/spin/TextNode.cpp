@@ -461,11 +461,16 @@ void TextNode::drawText()
         }
         else
         {
-            textLabel_ = new spinTextNode();
+            spinTextNode *n = new spinTextNode();
+            textLabel_ = n;
             //testLabel_ = new osgText::Text();
+            n->setEnableDepthWrites(true);
             // disable lighting effects on the text:
             labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
         }
+        
+        
+        
 		textGeode_->addDrawable(textLabel_.get());
         
         
@@ -477,6 +482,8 @@ void TextNode::drawText()
             labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
         else
             labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+        
+        labelStateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
         
 		labelStateSet->setRenderBinDetails( 100, "RenderBin");
 		textLabel_->setStateSet( labelStateSet );
