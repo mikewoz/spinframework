@@ -67,6 +67,7 @@ AttractorNode::AttractorNode (SceneManager *sceneManager, char *initID) : GroupN
 
     // keep a timer for update calculation:
     lastTick_ = osg::Timer::instance()->tick();
+    lastUpdate_ = osg::Timer::instance()->tick();
 }
 
 // ***********************************************************
@@ -82,102 +83,141 @@ void AttractorNode::callbackUpdate()
 {
 	GroupNode::callbackUpdate();
 
-    if ( spinApp::Instance().getContext()->isServer() )
+    osg::Timer_t tick = osg::Timer::instance()->tick();
+
+    if (force_ == 0)
     {
-    	// only update when dt is at least 0.05s (ie 20hz):
-        osg::Timer_t tick = osg::Timer::instance()->tick();
-        float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
-        //if (dt > 0.05) // 20 hz
-        if (dt > 0.0333) // 30hz
-        {
-        	if (force_ != 0)
-        	{
-        		osg::Matrixd thisMat = osg::computeLocalToWorld(this->currentNodePath);
-
-				// get direction of force by converting the AttractorNode's
-				// orientation to world coords:
-                // TODO: don't use getRoatate! it's not safe when matrix is scaled
-                // use matrix::decompose instead
-				osg::Quat thisQuat = thisMat.getRotate();
-				osg::Vec3 thisDir = thisQuat * osg::Y_AXIS;
-
-				// now cycle through each target and apply the force:
-				targetVector::iterator t;
-				for (t = targets_.begin(); t != targets_.end(); t++)
-				{
-					osg::Quat forceOrientation;
-
-					osg::Matrixd targetMat = osg::computeLocalToWorld((*t)->currentNodePath);
-					osg::Quat targetQuat = targetMat.getRotate();
-					osg::Vec3 targetDir = targetQuat * osg::Y_AXIS;
-
-					osg::Vec3 connection_vector = targetMat.getTrans() - thisMat.getTrans();
-
-
-					float incidence = AngleBetweenVectors(thisDir, connection_vector);
-					float distanceScalar = 1 / (1.0 + pow(connection_vector.length(), distanceDecay_));
-					double angularScalar = 1 / (1.0 + pow(incidence, angularDecay_));
-
-
-
-
-					// If the target and attractor are at the same location, the
-					// force direction is undefined. So, in that case, we choose
-					// the orientation of the attractor as the direction
-
-					osg::Vec3 delta;
-
-					if (connection_vector.length() == 0)
-					{
-						//forceOrientation = thisQuat;
-						if (force_ > 0) delta = thisQuat * osg::Y_AXIS;
-						else delta = thisQuat * -osg::Y_AXIS;
-					}
-					else {
-						//forceOrientation.makeRotate(targetMat.getRotate()*osg::Y_AXIS, connection_vector);
-						if (force_ > 0) delta = connection_vector;
-						else delta = -connection_vector;
-					}
-
-					delta.normalize();
-
-					/*
-					if (force_ > 0) delta = forceOrientation * osg::Y_AXIS;
-					else delta = forceOrientation * -osg::Y_AXIS;
-					*/
-
-					// We now apply the force, scaling by amount of time,
-					// and distance/angular decay factors:
-					delta *= fabs(force_) * dt * distanceScalar * angularScalar;
-
-					// if the force is an attraction (negative) and this update
-					// will bypass our location, then scale delta so the target
-					// doesn't pass by:
-					if (( connection_vector.length() - delta.length() < 0 ) && (force_ < 0))
-					{
-						delta *=  connection_vector.length() / delta.length();
-					}
-
-					if (delta.length() > EPSILON) // != osg::Vec3(0,0,0))
-					{
-						if (mode_ == AttractorNode::EXTRINSIC)
-						{
-							(*t)->translate( delta.x(), delta.y(), delta.z() );
-						}
-						else
-						{
-							osg::Vec3 v = (*t)->getVelocity();
-							(*t)->setVelocity( v.x()+delta.x(), v.y()+delta.y(), v.z()+delta.z() );
-						}
-
-					}
-
-				}
-        	}
-            lastTick_ = tick;
-        }
+        lastTick_ = tick;
+        return;
     }
 
+    
+    float maxUpdateDelta = 0.0333; // update when dt is at least 0.0333s (ie 30hz)
+    //float maxUpdateDelta = 0.05; // update when dt is at least 0.05s (ie 20hz)
+    //float maxUpdateDelta = 0.1; // update when dt is at least 0.1s (ie 10hz)
+    
+
+    
+    // We update state in the following situations:
+    // 1) this is a server (always needs to be up-to-date for interaction)
+    // 2) this is a client and the node is set to client-side computation.
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
+    {
+        float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
+
+        osg::Matrixd thisMat = osg::computeLocalToWorld(this->currentNodePath);
+
+        // get direction of force by converting the AttractorNode's
+        // orientation to world coords:
+        // TODO: don't use getRoatate! it's not safe when matrix is scaled
+        // use matrix::decompose instead
+        osg::Quat thisQuat = thisMat.getRotate();
+        osg::Vec3 thisDir = thisQuat * osg::Y_AXIS;
+
+        // now cycle through each target and apply the force:
+        targetVector::iterator t;
+        for (t = targets_.begin(); t != targets_.end(); t++)
+        {
+        
+            // Decide whether messages should be broadcasted from the target
+            // during this update:
+            if (spinApp::Instance().getContext()->isServer())
+            {
+                // if the target does computation on the client side, don't let
+                // the server broadcast any messages:
+                if (computationMode_==CLIENT_SIDE)
+                {
+                    (*t)->setBroadcastLock(true);
+                }
+                
+                // on the server-side, we want to throttle network messages, so
+                // only  allow broadcasting of messages if a threshold amount of
+                // time has passed:
+                else if (osg::Timer::instance()->delta_s(lastUpdate_,tick) > maxUpdateDelta)
+                {
+                    (*t)->setBroadcastLock(false);
+                    lastUpdate_ = tick;
+                }
+                else 
+                {
+                    (*t)->setBroadcastLock(true);
+                }
+            }
+        
+        
+        
+        
+            osg::Quat forceOrientation;
+
+            osg::Matrixd targetMat = osg::computeLocalToWorld((*t)->currentNodePath);
+            osg::Quat targetQuat = targetMat.getRotate();
+            osg::Vec3 targetDir = targetQuat * osg::Y_AXIS;
+
+            osg::Vec3 connection_vector = targetMat.getTrans() - thisMat.getTrans();
+
+
+            float incidence = AngleBetweenVectors(thisDir, connection_vector);
+            float distanceScalar = 1 / (1.0 + pow(connection_vector.length(), distanceDecay_));
+            double angularScalar = 1 / (1.0 + pow(incidence, angularDecay_));
+
+            // If the target and attractor are at the same location, the
+            // force direction is undefined. So, in that case, we choose
+            // the orientation of the attractor as the direction
+
+            osg::Vec3 delta;
+
+            if (connection_vector.length() == 0)
+            {
+                //forceOrientation = thisQuat;
+                if (force_ > 0) delta = thisQuat * osg::Y_AXIS;
+                else delta = thisQuat * -osg::Y_AXIS;
+            }
+            else {
+                //forceOrientation.makeRotate(targetMat.getRotate()*osg::Y_AXIS, connection_vector);
+                if (force_ > 0) delta = connection_vector;
+                else delta = -connection_vector;
+            }
+
+            delta.normalize();
+
+            /*
+            if (force_ > 0) delta = forceOrientation * osg::Y_AXIS;
+            else delta = forceOrientation * -osg::Y_AXIS;
+            */
+
+            // We now apply the force, scaling by amount of time,
+            // and distance/angular decay factors:
+            delta *= fabs(force_) * dt * distanceScalar * angularScalar;
+
+            // if the force is an attraction (negative) and this update
+            // will bypass our location, then scale delta so the target
+            // doesn't pass by:
+            if (( connection_vector.length() - delta.length() < 0 ) && (force_ < 0))
+            {
+                delta *=  connection_vector.length() / delta.length();
+            }
+
+            if (delta.length() > EPSILON) // != osg::Vec3(0,0,0))
+            {
+                if (mode_ == AttractorNode::EXTRINSIC)
+                {
+                    (*t)->translate( delta.x(), delta.y(), delta.z() );
+                }
+                else
+                {
+                    osg::Vec3 v = (*t)->getVelocity();
+                    (*t)->setVelocity( v.x()+delta.x(), v.y()+delta.y(), v.z()+delta.z() );
+                }
+
+            }
+
+            (*t)->setBroadcastLock(false);
+
+        } // for (t = targets_.begin() ...
+    }
+
+    lastTick_ = tick;
+    broadcastLock_ = false;
 }
 
 // *****************************************************************************

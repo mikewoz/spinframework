@@ -162,9 +162,9 @@ protected:
     targetVector targets_;
 
 private:
-
     osg::Timer_t lastTick_;
-
+    osg::Timer_t lastUpdate_;
+    
 };
 
 } // end of namespace spin

@@ -245,6 +245,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	           __void__setManipulatorMatrix__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float,
 	           "",
 	           "");
+	I_Method1(void, setBroadcastLock, IN, bool, lock,
+	          Properties::NON_VIRTUAL,
+	          __void__setBroadcastLock__bool,
+	          "",
+	          "");
 	I_Method0(int, getReportMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getReportMode,
@@ -354,6 +359,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                   __void__applyOrientationMode,
 	                   "",
 	                   "");
+	I_SimpleProperty(bool, BroadcastLock, 
+	                 0, 
+	                 __void__setBroadcastLock__bool);
 	I_SimpleProperty(osg::Vec3, Center, 
 	                 __osg_Vec3__getCenter, 
 	                 0);
