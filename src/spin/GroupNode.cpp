@@ -235,6 +235,7 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
 
     // keep a timer for velocity calculation:
     lastTick_ = osg::Timer::instance()->tick();
+    lastUpdate_ = osg::Timer::instance()->tick();
 }
 
 // ***********************************************************
@@ -258,69 +259,84 @@ void GroupNode::callbackUpdate()
     
     dumpGlobals(false); // never force globals here
 
-    // Now we need to update translation/orientation based on our velocity/spin.
-    // We find out how many seconds passed since the last time this was called,
-    // and move by velocity_*dt (ie, m/s) and rotate by spin_*dt (ie, deg/sec)
     
     osg::Timer_t tick = osg::Timer::instance()->tick();
-    float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
-    if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
-    //if (dt > 0.1) // only update when dt is at least 0.1s (ie 10hz):
+    
+    float maxUpdateDelta = 0.05; // update when dt is at least 0.05s (ie 20hz)
+    //float maxUpdateDelta = 0.1; // update when dt is at least 0.1s (ie 10hz)
+  
+    
+    // Decide whether messages should be broadcasted during this update:
+    if (spinApp::Instance().getContext()->isServer())
     {
-        // If this is the server but the node is to be updated on the client
-        // side, we just update the state, but DO NOT broadcast any messages!
-        if (spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE))
+        // if this node does computation on the client side, don't let the
+        // server broadcast any messages:
+        if (computationMode_==CLIENT_SIDE)
         {
             broadcastLock_ = true;
         }
         
-        // We update state on the server for any ComputationMode, because it
-        // needs to always be up-to-date for interaction. We also update on a
-        // client when the node is set to client-side computation:        
-        if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
+        // on the server-side, we want to throttle network messages, so only
+        // allow broadcasting of messages if a threshold amount of time has
+        // passed:
+        else if (osg::Timer::instance()->delta_s(lastUpdate_,tick) > maxUpdateDelta)
         {
-        
-            if (velocity_.length() > EPSILON)
-            {
-                if (this->velocityMode_==GroupNode::TRANSLATE)
-                {
-                    this->translate( velocity_.x()*dt, velocity_.y()*dt, velocity_.z()*dt );
-                }
-                else
-                {
-                    this->move( velocity_.x()*dt, velocity_.y()*dt, velocity_.z()*dt );
-                }
-                if (damping_ > EPSILON)
-                {
-                    double dv = 1 - (damping_*dt);
-                    this->setVelocity( velocity_.x()*dv, velocity_.y()*dv, velocity_.z()*dv );
-                }
-            }
-            else velocity_ = osg::Vec3(0,0,0);
-
-            if (spin_.length() > EPSILON)
-            {
-                this->rotate( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
-                    
-                if (damping_ > EPSILON)
-                {
-                    double ds = 1 - (damping_*dt);
-                    this->setSpin( spin_.x()*ds, spin_.y()*ds, spin_.z()*ds );
-                }
-            }
-            else spin_ = osg::Vec3(0,0,0);
-        
+            broadcastLock_ = false;
+            lastUpdate_ = tick;
         }
-        
-        else
+        else 
         {
-            // This is a client who will receive dynamic updates from the server
-            // so we should do nothing.
+            broadcastLock_ = true;
         }
-          
-        broadcastLock_ = false;
-        lastTick_ = tick;
     }
+    
+     
+    // We update state in the following situations:
+    // 1) this is a server (always needs to be up-to-date for interaction)
+    // 2) this is a client and the node is set to client-side computation.
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
+    {
+
+        // Now we need to update translation/orientation based on the current
+        // velocity/spin values. We find out how many seconds passed since the
+        // last time this was called, and move by velocity_*dt (ie, m/s) and 
+        // rotate by spin_*dt (ie, deg/sec)
+
+        float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
+
+        if (velocity_.length() > EPSILON)
+        {
+            if (this->velocityMode_==GroupNode::TRANSLATE)
+            {
+                this->translate( velocity_.x()*dt, velocity_.y()*dt, velocity_.z()*dt );
+            }
+            else
+            {
+                this->move( velocity_.x()*dt, velocity_.y()*dt, velocity_.z()*dt );
+            }
+            if (damping_ > EPSILON)
+            {
+                double dv = 1 - (damping_*dt);
+                this->setVelocity( velocity_.x()*dv, velocity_.y()*dv, velocity_.z()*dv );
+            }
+        }
+        else velocity_ = osg::Vec3(0,0,0);
+
+        if (spin_.length() > EPSILON)
+        {
+            this->rotate( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
+                
+            if (damping_ > EPSILON)
+            {
+                double ds = 1 - (damping_*dt);
+                this->setSpin( spin_.x()*ds, spin_.y()*ds, spin_.z()*ds );
+            }
+        }
+        else spin_ = osg::Vec3(0,0,0);
+    }
+    
+    lastTick_ = tick;
+    broadcastLock_ = false;
 }
 
 void GroupNode::updateNodePath(bool updateChildren)
@@ -540,6 +556,7 @@ void GroupNode::setComputationMode (ComputationMode mode)
     if (this->computationMode_ != mode)
     {
         this->computationMode_ = mode;
+        lastUpdate_ = lastTick_;
         BROADCAST(this, "si", "setComputationMode", getComputationMode());
     }
 }
@@ -848,7 +865,9 @@ void GroupNode::setScale (float x, float y, float z)
     {
         scale_ = newScale;
         updateMatrix();
-        BROADCAST(this, "sfff", "setScale", x, y, z);
+        
+        if (!broadcastLock_)
+            BROADCAST(this, "sfff", "setScale", x, y, z);
     }
 }
 
