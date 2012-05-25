@@ -267,8 +267,12 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	// with really big velocities (or small enclosures), and if the surface
 	// doesn't damp the velocity, it's possible to get see an infinite recursion
 	// occur. So, we keep a recursionCounter, and stop prevent this occurrence:
-	if (++recursionCounter > 10) return;
-
+	if (++recursionCounter > 10) 
+    {
+        //std::cout << "RECURSION" << std::endl;
+        return;
+    }
+    
 	/*
 	std::cout << std::endl << "checking for collisions" << std::endl;
 	std::cout << "start =  " << localPos.x()<<","<<localPos.y()<<","<<localPos.z() << std::endl;
@@ -468,7 +472,8 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// slightly beyond the surface, and when we bounce the
 						// node, we don't want to  intersect with the same
 						// surface again)
-						double HAIR = 0.0000001;
+						//double HAIR = 0.0000001;
+						double HAIR = 0.00001;
 						setTranslation(localHitPoint.x()-dirVec.x()*HAIR, localHitPoint.y()-dirVec.y()*HAIR, localHitPoint.z()-dirVec.z()*HAIR);
 						//setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
 
