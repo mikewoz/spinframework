@@ -169,13 +169,13 @@ void AttractorNode::callbackUpdate()
             if (connection_vector.length() == 0)
             {
                 //forceOrientation = thisQuat;
-                if (force_ > 0) delta = thisQuat * osg::Y_AXIS;
-                else delta = thisQuat * -osg::Y_AXIS;
+                if (force_ > 0) delta = thisQuat * -osg::Y_AXIS;
+                else delta = thisQuat * osg::Y_AXIS;
             }
             else {
                 //forceOrientation.makeRotate(targetMat.getRotate()*osg::Y_AXIS, connection_vector);
-                if (force_ > 0) delta = connection_vector;
-                else delta = -connection_vector;
+                if (force_ > 0) delta = -connection_vector;
+                else delta = connection_vector;
             }
 
             delta.normalize();
