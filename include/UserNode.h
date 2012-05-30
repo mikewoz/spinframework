@@ -73,7 +73,6 @@ class UserNode : public ConstraintsNode
         UserNode(SceneManager *sceneManager, char *initID);
         virtual ~UserNode();
 
-
         /**
          * The UserNode needs an update callback to check if ping messages are
          * still being received. If not, the node and it's subgraph should be

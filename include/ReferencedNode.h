@@ -125,7 +125,7 @@ public:
     ReferencedNode(SceneManager *sceneManager, char *initID);
     ~ReferencedNode();
 
-    void registerNode(SceneManager *s);
+    virtual void registerNode(SceneManager *s);
     //void registerNode(std::string sceneID);
 
     /**
