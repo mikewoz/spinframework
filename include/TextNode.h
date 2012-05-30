@@ -45,6 +45,7 @@
 #include "GroupNode.h"
 
 #include <osgText/Text>
+#include <osgText/Text3D>
 #include <osgText/String>
 #include <osgText/TextBase>
 /*
@@ -87,11 +88,16 @@ public:
 
     virtual void callbackUpdate();
 
+    enum DrawMode
+    {
+        GLYPH, /*!< characters are rendered to glyph textures */
+        TEXT3D /*!< render 3D text with depth */
+    };
+
     /**
      * The billboardType specifies how the text is oriented with respect to the
      * current camera position.
      */
-
     enum billboardType
     {
         RELATIVE,  /*!< No billboarding. */
@@ -131,45 +137,65 @@ public:
 						wireframe. */
     };
 
-    virtual void setContext    (const char *newvalue);
+    virtual void setContext (const char *newvalue);
+
+    /**
+     * Choose whether the text is drawn in 2D glyphs, or as 3D geometry.
+     */
+    void setDrawMode (DrawMode mode);
+    int  getDrawMode() const { return (int)drawMode_; }
 
     /**
      * Accepts user-entered string for the node's text.
      */
-    void setText        (const char* s);
+    void setText (const char* s);
+    const char *getText() const   { return text_.c_str(); }
+    std::string getTextString() const  { return text_; }
 
     /**
      * Deprecated method (here for backwards compatibility).
      */
-    void setTextValue        (const char* s) { setText(s); }
+    void setTextValue (const char* s) { setText(s); }
 
 
     /**
      * Sets the font for the text associated with this node.
      */
-    void setFont            (const char* s);
+    void setFont (const char* s);
+    const char *getFont() const { return font_.c_str(); }
 
     /**
      * Set the font resolution. eg, 128 will produce 128x128 textures
      */
-    void setFontResolution        (int resolution);
+    void setFontResolution (int resolution);
+    int  getFontResolution() const { return resolution_; }
 
     /**
      * Sets the size of text characters (in local coordinate system units)
      */
-    void setCharacterSize            (float s);
+    void  setCharacterSize (float s);
+    float getCharacterSize() const { return characterSize_; }
+
+    /**
+     * Set the thickness of 3D text
+     */
+    void setThickness (float thickness);
+    float getThickness() const { return thickness_; }
     
     /**
      * Sets the maximum size of the text box. Values of 0 in either dimension
      * means no maximum, so that the box will stretch to fit the text
      */
-    void setBoxSize            (float width, float height);
+    void setBoxSize (float width, float height);
 
     /**
      * Sets the line spacing, as a percentage of the character height. The
      * default is 0 
      */
     void setLineSpacing     (float spacing);
+    float getLineSpacing() const { return lineSpacing_; }
+    
+    
 
     /**
      * Sets the maximum size of the text box.
@@ -179,114 +205,50 @@ public:
     /**
      * Sets the color for the text associated to this node in RGBA values.
      */
-    void setColor           (float red, float green, float blue, float alpha);
-
+    void setColor (float red, float green, float blue, float alpha);
+    osg::Vec4     getColor() const        { return color_; };
+    
     /**
      * Sets the background color for this node.
      */
-    void setBgColor          (float red, float green, float blue, float alpha);
-
+    void setBgColor (float red, float green, float blue, float alpha);
+    osg::Vec4  getBgColor() const { return bgColor_; }
+    
     /**
      * Sets the margins for the text associated to this node.
      */
-    void setMargin           (float margin);
+    void  setMargin (float margin);
+    float getMargin() const { return margin_; }
 
     /**
      * Sets the type of billboarding asigned to this node (drawn from the enum
      * billboardType).
      */
-    void setBillboard        (billboardType t);
+    void setBillboard (billboardType t);
+    int  getBillboard()  const { return (int)billboard_; }
 
     /**
      * Sets the shadowing or outline type for this text node (drawn from the
      * decorationType enum).
      */
-    void setDecoration        (decorationType t);
-
+    void setDecoration (decorationType t);
+    int getDecoration() const { return (int)decoration_; }
+    
     /**
      * Sets a background type for the text box (drawn from the backgroundType
      * enum).
      */
-    void setBackground        (backgroundType t);
-
+    void setBackground (backgroundType t);
+    int  getBackround() const { return (int)background_; }
+ 
     /**
      * Specify whether both sides or only one side of the text is rendered. ie,
      * whether the backface is culled or not.
      */
-    void setSingleSided       (int singleSided);
+    void setSingleSided (int singleSided);
+    int  getSingleSided() const { return (int)singleSided_; }
 
 
-    /**
-     * Returns a string with the text associated to this node.
-     */
-    const char    *getText() const   { return text_.c_str(); }
-
-    /**
-     * Returns a string with the text associated to this node.
-     */
-    std::string     getTextString() const  { return text_; }
-
-    /**
-     * Returns a string indicating the font of the text associated to this node.
-     */
-    const char    *getFont() const        { return font_.c_str(); }
-
-    /**
-     * Returns the font resolution
-     */
-    int    getFontResolution() const        { return resolution_; }
-
-
-    /**
-     * Returns a float indicating the size of characters associated to this node.
-     */
-
-    float         getCharacterSize() const        { return characterSize_; }
-
-    /**
-     * Returns a float indicating the line spacing (as a percentage of character
-     * height).
-     */
-
-    float         getLineSpacing() const        { return _lineSpacing; }
-
-    /**
-     * Returns the color (in RGBA values) of the text associated to this node.
-     */
-    osg::Vec4     getColor() const        { return color_; };
-
-    /**
-     * Returns the background color of the text box in RGBA values.
-     */
-    osg::Vec4     getBgColor() const        { return bgColor_; }
-
-    /**
-     * Returns a float indicating the margin size of the text box.
-     */
-    float         getMargin() const        { return margin_; }
-
-    /**
-     * Returns the currently set billboarding type with respect to the
-     * billboardType enum.
-     */
-    int             getBillboard()  const { return (int)billboard_; }
-
-    /**
-     * Returns the currently set decoration type (shadows or outlines) with
-     * respect to the decorationType enum.
-     */
-    int             getDecoration() const { return (int)decoration_; }
-
-    /**
-     * Returns the currently set background type with respect to the choices
-     * in the backgroundType enum.
-     */
-    int             getBackround() const   { return (int)background_; }
-
-    /**
-     * Returns whether the text is drawn single-sided or not.
-     */
-    int             getSingleSided() const   { return (int)singleSided_; }
     
     /**
      * For each subclass of ReferencedNode, we override the getState() method to
@@ -300,9 +262,10 @@ private:
     bool updateFlag_;
     bool redrawFlag_;
 
+    DrawMode drawMode_;
     std::string font_;
     int resolution_;
-    float characterSize_, _lineSpacing;
+    float characterSize_, lineSpacing_, thickness_;
     osg::Vec4 color_, bgColor_;
     float margin_;
     osg::Vec2 boxSize_;
@@ -318,7 +281,8 @@ private:
     std::string text_; // we store this redundantly
 
     osg::ref_ptr<osg::Geode> textGeode_;
-    osg::ref_ptr<spinTextNode> textLabel_;
+    //osg::ref_ptr<spinTextNode> textLabel_;
+    osg::ref_ptr<osgText::TextBase> textLabel_;
     
     void drawText();
     void updateText();

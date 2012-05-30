@@ -81,8 +81,6 @@ UserNode::~UserNode()
     //std::cout << "Destroying UserNode: " << id->s_name << std::endl;
 }
 
-// *****************************************************************************
-
 void UserNode::callbackUpdate()
 {
 	ConstraintsNode::callbackUpdate();

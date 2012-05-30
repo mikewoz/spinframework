@@ -306,6 +306,7 @@ AC_CONFIG_FILES([
         doxyfile
         src/Makefile 
         src/tinyxml/Makefile 
+        src/osgPPU/Makefile 
         src/osgWrappers/introspection/Makefile 
         src/spin/Makefile
         src/Resources/Makefile

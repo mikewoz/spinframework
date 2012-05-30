@@ -2,6 +2,7 @@
 SUBDIRS = \
     tinyxml \
     osgWrappers/introspection \
+    osgPPU \
     spin \
     Resources \
     editor

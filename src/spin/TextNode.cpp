@@ -168,6 +168,7 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	//_text = "";
 	font_ = "arial.ttf";
 	characterSize_ = 0.1f;
+    thickness_ = 0.02f;
     resolution_ = 128;
 	color_ = osg::Vec4(1.0,1.0,1.0,1.0);
 	bgColor_ = osg::Vec4(1.0,0.0,0.0,0.5);
@@ -177,7 +178,6 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	decoration_ = DROP_SHADOW_BOTTOM_RIGHT;
 	background_ = NO_BACKGROUND;
 
-	textLabel_ = new spinTextNode(); //new osgText::Text();
 	
     updateFlag_ = false;
     redrawFlag_ = false;
@@ -226,6 +226,14 @@ void TextNode::setContext (const char *newvalue)
 	ReferencedNode::setContext(newvalue);
 	//drawText();
     redrawFlag_ = true;
+}
+
+void TextNode::setDrawMode (DrawMode mode)
+{
+	if (mode == drawMode_) return;
+	else drawMode_ = mode;
+    redrawFlag_ = true;
+	BROADCAST(this, "si", "setDrawMode", (int) drawMode_);
 }
 
 void TextNode::setText (const char *s)
@@ -288,6 +296,13 @@ void TextNode::setCharacterSize (float s)
 	BROADCAST(this, "sf", "setCharacterSize", getCharacterSize());
 }
 
+void TextNode::setThickness (float thickness)
+{
+	thickness_ = thickness;
+    updateFlag_ = true;
+	BROADCAST(this, "sf", "setThickness", getThickness());
+}
+
 void TextNode::setBoxSize (float width, float height)
 {
     /*
@@ -303,7 +318,7 @@ void TextNode::setBoxSize (float width, float height)
 
 void TextNode::setLineSpacing (float spacing)
 {
-    _lineSpacing = spacing;
+    lineSpacing_ = spacing;
     /*
     pthread_mutex_lock(&sceneMutex);
     textLabel_->setLineSpacing(spacing);
@@ -402,6 +417,7 @@ void TextNode::drawText()
 		this->getAttachmentNode()->removeChild(textGeode_.get());
 		textGeode_ = NULL;
 	}
+    if (textLabel_.valid()) textLabel_ = NULL;
 
 	//bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() && (this->getContext()==getHostname()));
 
@@ -436,12 +452,29 @@ void TextNode::drawText()
 		// attach geode and textLabel_:
 		this->getAttachmentNode()->addChild(textGeode_.get());
 		
+        osg::StateSet *labelStateSet = new osg::StateSet;
+        
+        if (drawMode_==TEXT3D)
+        {
+            textLabel_ = new osgText::Text3D();
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+        }
+        else
+        {
+            spinTextNode *n = new spinTextNode();
+            textLabel_ = n;
+            //testLabel_ = new osgText::Text();
+            n->setEnableDepthWrites(true);
+            // disable lighting effects on the text:
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        }
+        
+        
+        
 		textGeode_->addDrawable(textLabel_.get());
         
         
-		// disable lighting effects on the text, and allow transparency:
-		osg::StateSet *labelStateSet = new osg::StateSet;
-		labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+		// allow transparency:
 		labelStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
 		labelStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
         
@@ -449,6 +482,8 @@ void TextNode::drawText()
             labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
         else
             labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+        
+        labelStateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
         
 		labelStateSet->setRenderBinDetails( 100, "RenderBin");
 		textLabel_->setStateSet( labelStateSet );
@@ -476,10 +511,22 @@ void TextNode::updateText()
 		textLabel_->setBoundingBoxMargin(margin_);
 #endif
 #endif
-		textLabel_->setBackdropType((osgText::Text::BackdropType)decoration_);
+        if (drawMode_==GLYPH)
+        {
+            osgText::Text *t = dynamic_cast<osgText::Text*>(textLabel_.get());
+            if (t) t->setBackdropType((osgText::Text::BackdropType)decoration_);
+        }
+        
+        if (drawMode_==TEXT3D)
+        {
+            osgText::Text3D *t = dynamic_cast<osgText::Text3D*>(textLabel_.get());
+            if (t) t->setCharacterDepth(thickness_);
+        }
 
-        textLabel_->setMaximumWidth(boxSize_.x());
-        textLabel_->setMaximumHeight(boxSize_.y());
+        float boxScalar = 1.0;
+        if ((drawMode_==TEXT3D) && (characterSize_!=0)) boxScalar = 1/characterSize_;
+        textLabel_->setMaximumWidth(boxSize_.x() * boxScalar);
+        textLabel_->setMaximumHeight(boxSize_.y() * boxScalar);
 
 		// setDrawMode (background):
 		if (background_ == NO_BACKGROUND)
@@ -518,7 +565,7 @@ void TextNode::updateText()
 		//textLabel_->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS) * osg::Quat(osg::PI, osg::Z_AXIS));
 		textLabel_->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS));
 
-        textLabel_->setLineSpacing(_lineSpacing);
+        textLabel_->setLineSpacing(lineSpacing_);
 
 		
         
@@ -541,6 +588,10 @@ std::vector<lo_message> TextNode::getState () const
 	osg::Vec4 v4;
 
 	msg = lo_message_new();
+	lo_message_add(msg, "si", "setDrawMode", getDrawMode());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setText", getText());
 	ret.push_back(msg);
 
@@ -554,6 +605,10 @@ std::vector<lo_message> TextNode::getState () const
 
 	msg = lo_message_new();
 	lo_message_add(msg, "sf", "setCharacterSize", getCharacterSize());
+	ret.push_back(msg);
+    
+	msg = lo_message_new();
+	lo_message_add(msg, "sf", "setThickness", getThickness());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

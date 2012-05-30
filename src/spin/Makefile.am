@@ -9,7 +9,9 @@ AM_CPPFLAGS = \
     $(SPATOSC_CFLAGS) \
     $(BULLET_CFLAGS) \
     -I$(top_srcdir)/include \
-    -I$(top_srcdir)/src/tinyxml
+    -I$(top_srcdir)/src/tinyxml \
+    -I$(top_srcdir)/src/osgPPU
+
 
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
@@ -19,6 +21,7 @@ python_LTLIBRARIES = libSPINPyWrap.la
 
 libspin_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
+    $(top_builddir)/src/osgPPU/libosgPPU.la \
     $(top_builddir)/src/tinyxml/libtinyxml.la
 
 libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
@@ -44,6 +47,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     AnimationNode.cpp \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
+    CompositeViewer.cpp \
     Contour.cpp \
     DraggerTrackball.cpp \
     DraggerWith3Axes.cpp \
@@ -94,6 +98,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
     $(top_srcdir)/include/config.h \
+    $(top_srcdir)/include/CompositeViewer.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
     $(top_srcdir)/include/DraggerTrackball.h \
