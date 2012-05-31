@@ -1,4 +1,4 @@
-AM_CPPFLAGS = $(all_includes)
+AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src
 
 # use noinst_LIBRARIES to create a library that won't be installed
 noinst_LTLIBRARIES = libosgPPU.la
