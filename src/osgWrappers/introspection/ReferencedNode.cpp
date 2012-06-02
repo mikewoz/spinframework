@@ -59,7 +59,7 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	               "",
 	               "");
 	I_Method1(void, registerNode, IN, spin::SceneManager *, s,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__registerNode__SceneManager_P1,
 	          "",
 	          "");

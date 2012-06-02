@@ -40,6 +40,7 @@
 // -----------------------------------------------------------------------------
 
 #include <osgText/Text>
+#include <osgText/TextBase>
 #include <osg/Billboard>
 #include <osg/Version>
 #include <lo/lo_types.h>
@@ -55,6 +56,315 @@ extern pthread_mutex_t sceneMutex;
 namespace spin
 {
 
+void spinTextNode::computeGlyphRepresentation()
+{
+    using namespace osgText;
+
+    Font* activefont = getActiveFont();
+    if (!activefont) return;
+    
+    _textureGlyphQuadMap.clear();
+    _lineCount = 0;
+    
+    if (_text.empty()) 
+    {
+        _textBB.set(0,0,0,0,0,0);//no size text
+        TextBase::computePositions(); //to reset the origin
+        return;
+    }
+    
+    //OpenThreads::ScopedLock<Font::FontMutex> lock(*(activefont->getSerializeFontCallsMutex()));
+
+    // initialize bounding box, it will be expanded during glyph position calculation
+    _textBB.init();
+
+    osg::Vec2 startOfLine_coords(0.0f,0.0f);
+    osg::Vec2 cursor(startOfLine_coords);
+    osg::Vec2 local(0.0f,0.0f);
+    
+    unsigned int previous_charcode = 0;
+    unsigned int linelength = 0;
+    bool horizontal = _layout!=VERTICAL;
+    bool kerning = true;
+    
+    unsigned int lineNumber = 0;
+
+    float hr = _characterHeight;
+    float wr = hr/getCharacterAspectRatio();
+
+    for(String::iterator itr=_text.begin();
+        itr!=_text.end();
+        )
+    {
+        // record the start of the current line
+            String::iterator startOfLine_itr = itr;
+
+            // find the end of the current line.
+            osg::Vec2 endOfLine_coords(cursor);
+            String::iterator endOfLine_itr = computeLastCharacterOnLine(endOfLine_coords, itr,_text.end());
+            
+            linelength = endOfLine_itr - startOfLine_itr;
+
+            // Set line position to correct alignment.
+            switch(_layout)
+            {
+            case LEFT_TO_RIGHT:
+            {
+            switch(_alignment)
+            {
+              // nothing to be done for these
+              //case LEFT_TOP:
+              //case LEFT_CENTER:
+              //case LEFT_BOTTOM:
+              //case LEFT_BASE_LINE:
+              //case LEFT_BOTTOM_BASE_LINE:
+              //  break;
+              case CENTER_TOP:
+              case CENTER_CENTER:
+              case CENTER_BOTTOM:
+              case CENTER_BASE_LINE:
+              case CENTER_BOTTOM_BASE_LINE:
+                cursor.x() = (cursor.x() - endOfLine_coords.x()) * 0.5f;
+                break;
+              case RIGHT_TOP:
+              case RIGHT_CENTER:
+              case RIGHT_BOTTOM:
+              case RIGHT_BASE_LINE:
+              case RIGHT_BOTTOM_BASE_LINE:
+                cursor.x() = cursor.x() - endOfLine_coords.x();
+                break;
+              default:
+                break;
+              }
+            break;
+            }
+            case RIGHT_TO_LEFT:
+            {
+            switch(_alignment)
+            {
+              case LEFT_TOP:
+              case LEFT_CENTER:
+              case LEFT_BOTTOM:
+              case LEFT_BASE_LINE:
+              case LEFT_BOTTOM_BASE_LINE:
+                cursor.x() = 2*cursor.x() - endOfLine_coords.x();
+                break;
+              case CENTER_TOP:
+              case CENTER_CENTER:
+              case CENTER_BOTTOM:
+              case CENTER_BASE_LINE:
+              case CENTER_BOTTOM_BASE_LINE:
+                cursor.x() = cursor.x() + (cursor.x() - endOfLine_coords.x()) * 0.5f;
+                break;
+              // nothing to be done for these
+              //case RIGHT_TOP:
+              //case RIGHT_CENTER:
+              //case RIGHT_BOTTOM:
+              //case RIGHT_BASE_LINE:
+              //case RIGHT_BOTTOM_BASE_LINE:
+              //  break;
+              default:
+                break;
+            }
+            break;
+            }
+            case VERTICAL:
+            {
+            switch(_alignment)
+            {
+              // TODO: current behaviour top baselines lined up in both cases - need to implement
+              //       top of characters alignment - Question is this necessary?
+              // ... otherwise, nothing to be done for these 6 cases
+              //case LEFT_TOP:
+              //case CENTER_TOP:
+              //case RIGHT_TOP:
+              //  break;
+              //case LEFT_BASE_LINE:
+              //case CENTER_BASE_LINE:
+              //case RIGHT_BASE_LINE:
+              //  break;
+              case LEFT_CENTER:
+              case CENTER_CENTER:
+              case RIGHT_CENTER:
+                cursor.y() = cursor.y() + (cursor.y() - endOfLine_coords.y()) * 0.5f;
+                break;
+              case LEFT_BOTTOM_BASE_LINE:
+              case CENTER_BOTTOM_BASE_LINE:
+              case RIGHT_BOTTOM_BASE_LINE:
+                cursor.y() = cursor.y() - (linelength * _characterHeight);
+                break;
+              case LEFT_BOTTOM:
+              case CENTER_BOTTOM:
+              case RIGHT_BOTTOM:
+                cursor.y() = 2*cursor.y() - endOfLine_coords.y();
+                break;
+              default:
+                break;
+            }
+            break;
+          }
+        }
+
+        if (itr!=endOfLine_itr)
+        {
+
+            for(;itr!=endOfLine_itr;++itr)
+            {
+                unsigned int charcode = *itr;
+
+                Glyph* glyph = activefont->getGlyph(_fontSize, charcode);
+                if (glyph)
+                {
+                    float width = (float)(glyph->getWidth()) * wr;
+                    float height = (float)(glyph->getHeight()) * hr;
+
+                    if (_layout==RIGHT_TO_LEFT)
+                    {
+                        cursor.x() -= glyph->getHorizontalAdvance() * wr;
+                    }
+
+                    // adjust cursor position w.r.t any kerning.
+                    if (kerning && previous_charcode)
+                    {
+                        switch(_layout)
+                        {
+                          case LEFT_TO_RIGHT:
+                          {
+                            osg::Vec2 delta(activefont->getKerning(previous_charcode,charcode,_kerningType));
+                            cursor.x() += delta.x() * wr;
+                            cursor.y() += delta.y() * hr;
+                            break;
+                          }
+                          case RIGHT_TO_LEFT:
+                          {
+                            osg::Vec2 delta(activefont->getKerning(charcode,previous_charcode,_kerningType));
+                            cursor.x() -= delta.x() * wr;
+                            cursor.y() -= delta.y() * hr;
+                            break;
+                          }
+                          case VERTICAL:
+                            break; // no kerning when vertical.
+                        }
+                    }
+
+                    local = cursor;
+                    osg::Vec2 bearing(horizontal?glyph->getHorizontalBearing():glyph->getVerticalBearing());
+                    local.x() += bearing.x() * wr;
+                    local.y() += bearing.y() * hr;
+
+                    GlyphQuads& glyphquad = _textureGlyphQuadMap[glyph->getTexture()];
+
+                    glyphquad._glyphs.push_back(glyph);
+                    glyphquad._lineNumbers.push_back(lineNumber);
+
+                    // Adjust coordinates and texture coordinates to avoid
+                    // clipping the edges of antialiased characters.
+                    osg::Vec2 mintc = glyph->getMinTexCoord();
+                    osg::Vec2 maxtc = glyph->getMaxTexCoord();
+                    osg::Vec2 vDiff = maxtc - mintc;
+
+                    float fHorizTCMargin = 1.0f / glyph->getTexture()->getTextureWidth();
+                    float fVertTCMargin = 1.0f / glyph->getTexture()->getTextureHeight();
+                    float fHorizQuadMargin = vDiff.x() == 0.0f ? 0.0f : width * fHorizTCMargin / vDiff.x();
+                    float fVertQuadMargin = vDiff.y() == 0.0f ? 0.0f : height * fVertTCMargin / vDiff.y();
+
+                    mintc.x() -= fHorizTCMargin;
+                    mintc.y() -= fVertTCMargin;
+                    maxtc.x() += fHorizTCMargin;
+                    maxtc.y() += fVertTCMargin;
+
+                    // set up the coords of the quad
+                    osg::Vec2 upLeft = local+osg::Vec2(0.0f-fHorizQuadMargin,height+fVertQuadMargin);
+                    osg::Vec2 lowLeft = local+osg::Vec2(0.0f-fHorizQuadMargin,0.0f-fVertQuadMargin);
+                    osg::Vec2 lowRight = local+osg::Vec2(width+fHorizQuadMargin,0.0f-fVertQuadMargin);
+                    osg::Vec2 upRight = local+osg::Vec2(width+fHorizQuadMargin,height+fVertQuadMargin);
+                    glyphquad._coords.push_back(upLeft);
+                    glyphquad._coords.push_back(lowLeft);
+                    glyphquad._coords.push_back(lowRight);
+                    glyphquad._coords.push_back(upRight);
+
+                    // set up the tex coords of the quad
+                    glyphquad._texcoords.push_back(osg::Vec2(mintc.x(),maxtc.y()));
+                    glyphquad._texcoords.push_back(osg::Vec2(mintc.x(),mintc.y()));
+                    glyphquad._texcoords.push_back(osg::Vec2(maxtc.x(),mintc.y()));
+                    glyphquad._texcoords.push_back(osg::Vec2(maxtc.x(),maxtc.y()));
+
+                    // move the cursor onto the next character.
+                    // also expand bounding box
+                    switch(_layout)
+                    {
+                      case LEFT_TO_RIGHT:
+                          cursor.x() += glyph->getHorizontalAdvance() * wr;
+                          _textBB.expandBy(osg::Vec3(lowLeft.x(), lowLeft.y(), 0.0f)); //lower left corner
+                          _textBB.expandBy(osg::Vec3(upRight.x(), upRight.y(), 0.0f)); //upper right corner
+                          break;
+                      case VERTICAL:
+                          cursor.y() -= glyph->getVerticalAdvance() * hr;
+                          _textBB.expandBy(osg::Vec3(upLeft.x(),upLeft.y(),0.0f)); //upper left corner
+                          _textBB.expandBy(osg::Vec3(lowRight.x(),lowRight.y(),0.0f)); //lower right corner
+                          break;
+                      case RIGHT_TO_LEFT:
+                          _textBB.expandBy(osg::Vec3(lowRight.x(),lowRight.y(),0.0f)); //lower right corner
+                          _textBB.expandBy(osg::Vec3(upLeft.x(),upLeft.y(),0.0f)); //upper left corner
+                          break;
+                    }
+                    previous_charcode = charcode;
+
+                }
+            }
+
+            // skip over spaces and return.
+            while (itr != _text.end() && *itr==' ') ++itr;
+            if (itr != _text.end() && *itr=='\n') ++itr;
+        }
+        else
+        {
+            ++itr;
+        }
+                                
+                
+        // move to new line.
+        switch(_layout)
+        {
+          case LEFT_TO_RIGHT:
+          {
+            startOfLine_coords.y() -= _characterHeight * (1.0 + _lineSpacing);
+            cursor = startOfLine_coords;
+            previous_charcode = 0;
+            _lineCount++;
+            break;
+          }
+          case RIGHT_TO_LEFT:
+          {
+            startOfLine_coords.y() -= _characterHeight * (1.0 + _lineSpacing);
+            cursor = startOfLine_coords;
+            previous_charcode = 0;
+            _lineCount++;
+            break;
+          }
+          case VERTICAL:
+          {
+            startOfLine_coords.x() += _characterHeight/getCharacterAspectRatio() * (1.0 + _lineSpacing);
+            cursor = startOfLine_coords;
+            previous_charcode = 0;
+            // because _lineCount is the max vertical no. of characters....
+            _lineCount = (_lineCount >linelength)?_lineCount:linelength;
+          }
+          break;
+        }
+        
+        ++lineNumber;
+        
+        //std::cout << "cursor on line "<< lineNumber << " = " << stringify(cursor) << std::endl;
+
+    }
+   
+    TextBase::computePositions();
+    computeBackdropBoundingBox();
+    computeBoundingBoxMargin();
+    computeColorGradients();
+}
+
 osgText::String::iterator spinTextNode::computeLastCharacterOnLine(osg::Vec2& cursor, osgText::String::iterator first, osgText::String::iterator last)
 {
     using namespace osgText;
@@ -69,8 +379,6 @@ osgText::String::iterator spinTextNode::computeLastCharacterOnLine(osg::Vec2& cu
     unsigned int previous_charcode = 0;
 
     String::iterator lastChar = first;
-    
-    std::cout << "my computeLastCharacterOnLine" << std::endl;
 
     for(bool outOfSpace=false;lastChar!=last;++lastChar)
     {
@@ -177,6 +485,7 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	billboard_ = RELATIVE; // ie, no billboard
 	decoration_ = DROP_SHADOW_BOTTOM_RIGHT;
 	background_ = NO_BACKGROUND;
+    repetitions_ = 1;
 
 	
     updateFlag_ = false;
@@ -257,6 +566,16 @@ void TextNode::setText (const char *s)
 		//std::cout << "debug: setting text label to: " << s << ", getTextValue() reports: " << getTextValue() << std::endl;
 
 		BROADCAST(this, "ss", "setText", getText());
+	}
+}
+
+void TextNode::setRepetitions (int repetitions)
+{
+	if (repetitions_ != repetitions)
+	{
+        repetitions_ = repetitions;
+        updateFlag_ = true;
+		BROADCAST(this, "si", "setRepetitions", getRepetitions());
 	}
 }
 
@@ -372,7 +691,6 @@ void TextNode::setBillboard (billboardType t)
 {
 	if (t == billboard_) return;
 	else billboard_ = t;
-	//drawText();
     redrawFlag_ = true;
 	BROADCAST(this, "si", "setBillboard", (int) billboard_);
 }
@@ -381,7 +699,6 @@ void TextNode::setDecoration (decorationType t)
 {
 	decoration_ = t;
 	//textLabel_->setBackdropType((osgText::Text::BackdropType)decoration_);
-	//drawText();
     updateFlag_ = true;
 	BROADCAST(this, "si", "setDecoration", getDecoration());
 }
@@ -389,7 +706,6 @@ void TextNode::setDecoration (decorationType t)
 void TextNode::setBackground (backgroundType t)
 {
 	background_ = t;
-	//drawText();
     updateFlag_ = true;
 	BROADCAST(this, "si", "setBackground", getBackround());
 
@@ -469,7 +785,7 @@ void TextNode::drawText()
             labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
         }
         
-        
+        textLabel_->setLayout(osgText::TextBase::LEFT_TO_RIGHT);
         
 		textGeode_->addDrawable(textLabel_.get());
         
@@ -499,7 +815,8 @@ void TextNode::updateText()
 		// set some parameters for the text:
 		textLabel_->setCharacterSize(characterSize_);
 		//textLabel_->setFont(0); // inbuilt font (small)
-		textLabel_->setFont( sceneManager->resourcesPath + "/fonts/" + font_ );
+		//textLabel_->setFont( sceneManager->resourcesPath + "/fonts/" + font_ );
+		textLabel_->setFont( font_ );
 		//textLabel_->setFontResolution(40,40);
         //textLabel_->setFontResolution(80,80);
         textLabel_->setFontResolution(resolution_,resolution_);
@@ -571,7 +888,9 @@ void TextNode::updateText()
         
         
         // finally, set the actual text string:
-        textLabel_->setText(text_, osgText::String::ENCODING_UTF8);
+        std::string finalString;
+        for (int i=0; i<repetitions_; i++) finalString += text_;
+        textLabel_->setText(finalString, osgText::String::ENCODING_UTF8);
 	}
 
 	//pthread_mutex_unlock(&sceneMutex);
@@ -589,6 +908,10 @@ std::vector<lo_message> TextNode::getState () const
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setDrawMode", getDrawMode());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setRepetitions", getRepetitions());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

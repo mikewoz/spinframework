@@ -65,13 +65,14 @@ namespace spin
 class SceneManager;
 
 
+// I'm including these two functions from OSG 3.1.1 because the wrap on the last
+// line of text doesn't center properly in previous versions. When OSG packaging
+// moves to 3.1+, we can remove this stuff
 class spinTextNode : public osgText::Text
 {
 protected:
-    //spinTextNode();
-    //virtual spinTextNode();
     osgText::String::iterator computeLastCharacterOnLine(osg::Vec2& cursor, osgText::String::iterator first, osgText::String::iterator last);
-    void computeGlyphRepresentation() { osgText::Text::computeGlyphRepresentation(); }
+    void computeGlyphRepresentation();
 };
 
 
@@ -157,6 +158,12 @@ public:
      */
     void setTextValue (const char* s) { setText(s); }
 
+    /**
+     * Set the number of times the text should repeat
+     */
+    void setRepetitions (int repetitions);
+    int  getRepetitions() const { return repetitions_; }
+    
 
     /**
      * Sets the font for the text associated with this node.
@@ -269,6 +276,8 @@ private:
     osg::Vec4 color_, bgColor_;
     float margin_;
     osg::Vec2 boxSize_;
+    
+    int repetitions_;
     
     osgText::TextBase::AlignmentType alignment_;
 

@@ -26,12 +26,6 @@ BEGIN_VALUE_REFLECTOR(spin::spinTextNode)
 	I_Constructor0(____spinTextNode,
 	               "",
 	               "");
-	I_ProtectedMethod3(osgText::String::iterator, computeLastCharacterOnLine, IN, osg::Vec2 &, cursor, IN, osgText::String::iterator, first, IN, osgText::String::iterator, last,
-	                   Properties::NON_VIRTUAL,
-	                   Properties::NON_CONST,
-	                   __osgText_String_iterator__computeLastCharacterOnLine__osg_Vec2_R1__osgText_String_iterator__osgText_String_iterator,
-	                   "",
-	                   "");
 	I_ProtectedMethod0(void, computeGlyphRepresentation,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -122,6 +116,16 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          __void__setTextValue__C5_char_P1,
 	          "",
 	          "Deprecated method (here for backwards compatibility). ");
+	I_Method1(void, setRepetitions, IN, int, repetitions,
+	          Properties::NON_VIRTUAL,
+	          __void__setRepetitions__int,
+	          "",
+	          "Set the number of times the text should repeat ");
+	I_Method0(int, getRepetitions,
+	          Properties::NON_VIRTUAL,
+	          __int__getRepetitions,
+	          "",
+	          "");
 	I_Method1(void, setFont, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setFont__C5_char_P1,
@@ -299,6 +303,9 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_SimpleProperty(float, Margin, 
 	                 __float__getMargin, 
 	                 __void__setMargin__float);
+	I_SimpleProperty(int, Repetitions, 
+	                 __int__getRepetitions, 
+	                 __void__setRepetitions__int);
 	I_SimpleProperty(int, SingleSided, 
 	                 __int__getSingleSided, 
 	                 __void__setSingleSided__int);
