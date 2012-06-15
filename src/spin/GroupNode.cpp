@@ -946,9 +946,15 @@ void GroupNode::move (float x, float y, float z)
     setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
-void GroupNode::rotate (float p, float r, float y)
+void GroupNode::rotate (float dPitch, float dRoll, float dYaw)
 {
-    this->setOrientation(orientation_.x()+p, orientation_.y()+r, orientation_.z()+y);
+    this->setOrientation(orientation_.x()+dPitch, orientation_.y()+dRoll, orientation_.z()+dYaw);
+}
+
+void GroupNode::addRotation (float dPitch, float dRoll, float dYaw)
+{
+    osg::Quat newQuat = EulerToQuat(dPitch,dRoll,dYaw).inverse() * getOrientationQuat();
+    this->setOrientationQuat(newQuat.x(), newQuat.y(), newQuat.z(), newQuat.w());
 }
 
 // *****************************************************************************
