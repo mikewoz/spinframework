@@ -161,17 +161,14 @@ AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 AC_ARG_ENABLE([python],
     AS_HELP_STRING([--enable-python], [Enables the Python interpreter within SPIN (enabled by default)]),
     [enable_python=$enableval],
-    [enable_python=yes])
-#AM_CONDITIONAL(DISABLE_PYTHON, test "x$enable_python" = xno)
-#AC_SUBST(DISABLE_PYTHON)
-
-if test "x$enable_python" = xno; then
+    [enable_python=true])
+if test "x$enable_python" != xtrue; then
 AC_DEFINE([DISABLE_PYTHON],[1],[Disables python interpreter and thus all behaviours scripts in SPIN]) AC_MSG_NOTICE([Disabled Python scripts])
 fi
-AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xyes)
+AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xtrue)
 
 
-if test "x$enable_python" = xyes; then
+if test "x$enable_python" = xtrue; then
 
 # Check for Python:
 AM_PATH_PYTHON
@@ -196,22 +193,9 @@ BOOST_SYSTEM
 BOOST_FILESYSTEM
 #BOOST_THREAD
 BOOST_PROGRAM_OPTIONS
-if test "x$enable_python" = xyes; then
+if test "x$enable_python" = xtrue; then
 BOOST_PYTHON
 fi
-
-#AC_MSG_NOTICE([BOOST_LDFLAGS:        ${BOOST_LDFLAGS}])
-AC_MSG_NOTICE([BOOST_CPPFLAGS:             ${BOOST_CPPFLAGS}])
-AC_MSG_NOTICE([BOOST_SYSTEM_LIBS:          ${BOOST_SYSTEM_LIBS}])
-AC_MSG_NOTICE([BOOST_FILESYSTEM_LIBS:      ${BOOST_FILESYSTEM_LIBS}])
-AC_MSG_NOTICE([BOOST_PROGRAM_OPTIONS_LIBS: ${BOOST_PROGRAM_OPTIONS_LIBS}])
-if test "x$enable_python" = xyes; then
-AC_MSG_NOTICE([BOOST_PYTHON_LIBS:          ${BOOST_PYTHON_LIBS}])
-AC_MSG_NOTICE([BOOST_PYTHON_LDFLAGS:       ${BOOST_PYTHON_LDFLAGS}])
-else
-AC_MSG_NOTICE([BOOST_PYTHON_LIBS:          DISABLED])
-fi
-
 
 
 PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
@@ -237,7 +221,7 @@ else
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
 
-AC_CHECK_LIB([PocoFoundation], [main], [pototest=true POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
+AC_CHECK_LIB([PocoFoundation],[main],[pototest=true] [POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
 AM_CONDITIONAL(HAVE_POCO, [test x$pocotest = xtrue])
 AC_SUBST(POCO_LIBS)
 
@@ -273,6 +257,12 @@ fi
 AM_CONDITIONAL(PCL, test -n "$PCL_LIBS")
 
 
+#AC_CHECK_LIB([spnav],[spnav_open],[HAVE_SPNAV=1] [SPNAV_LIBS="-lspnav"],AC_MSG_WARN([missing package libspnav-dev]))
+AC_CHECK_HEADERS([spnav.h],[have_spnav=true] [SPNAV_LIBS="-lspnav"],AC_MSG_WARN([missing package libspnav-dev]))
+AM_CONDITIONAL(SPNAV, [test x$have_spnav = xtrue])
+AC_SUBST(SPNAV_LIBS)
+
+
 AC_ARG_ENABLE([editor],
     AS_HELP_STRING([--enable-editor], [Enables compilation of the graphical editor]),
     [with_editor=$enableval],
@@ -288,18 +278,6 @@ if test "x$with_editor" = xyes; then
         AC_MSG_ERROR([wxWidgets must be installed on your system. See README. Please check that wx-config is in path, the directory where wxWidgets libraries are installed (returned by 'wx-config --libs' or 'wx-config --static --libs' command) is in LD_LIBRARY_PATH or equivalent variable and wxWidgets version is $reqwx or above.])
     fi
 fi
-
-AC_MSG_NOTICE([============================================])
-#AS_IF([test "x$with_scenic" = "xyes"], AC_MSG_NOTICE([Using scenic]), AC_MSG_NOTICE([Not using scenic]))
-AC_MSG_NOTICE([PYTHON_LIB:          ${PYTHON_LIB}])
-AC_MSG_NOTICE([PYTHON_INCLUDE_DIR:  ${PYTHON_INCLUDE_DIR}])
-AC_MSG_NOTICE([PYTHON_CPPFLAGS:     ${PYTHON_CPPFLAGS}])
-AC_MSG_NOTICE([PYTHON_LDFLAGS:      ${PYTHON_LDFLAGS}])
-AC_MSG_NOTICE([WX_CPPFLAGS:         ${WX_CPPFLAGS}])
-AC_MSG_NOTICE([WX_LIBS:             ${WX_LIBS}])
-AC_MSG_NOTICE([pythondir:           ${pythondir}])
-AC_MSG_NOTICE([pythonexecdir:       ${pyexecdir}])
-AC_MSG_NOTICE([============================================])
 
 AC_CONFIG_FILES([
         Makefile 
@@ -323,3 +301,19 @@ AC_CONFIG_FILES([
         ])
 
 AC_OUTPUT
+
+[echo ""]
+[echo ""]
+[echo "======================================="]
+[echo "Configured spinframework v${SPIN_VERSION}"]
+[echo ""]
+[echo "Python interpreter?        ${enable_python}"]
+[echo "SpatOSC integration?       ${have_spatosc}"]
+[echo "Python interpreter?        ${enable_python}"]
+[echo "SpatOSC integration?       ${have_spatosc}"]
+[echo "libSharedVideo?            ${have_sharedvideo}"]
+[echo "PointCloud support?        ${have_pcl}"]
+[echo "Poco web server?           ${pocotest}"]
+[echo "Bullet Physics?            ${have_bullet}"]
+[echo "SpaceNavigator support?    ${have_spnav}"]
+[echo ""]

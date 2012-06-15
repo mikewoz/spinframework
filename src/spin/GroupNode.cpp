@@ -324,8 +324,11 @@ void GroupNode::callbackUpdate()
 
         if (spin_.length() > EPSILON)
         {
-            this->rotate( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
-                
+            if (this->velocityMode_==GroupNode::TRANSLATE)
+            	this->rotate( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
+            else
+            	this->addRotation( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
+
             if (damping_ > EPSILON)
             {
                 double ds = 1 - (damping_*dt);

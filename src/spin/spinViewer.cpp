@@ -71,7 +71,16 @@
 
 #include "CompositeViewer.h"
 
+#ifdef HAVE_SPNAV_H
+#include "spnav.h"
+#endif
+
 //#include "dofppu.h"
+
+//#define VELOCITY_SCALAR 0.005
+//#define SPIN_SCALAR 0.01
+#define VELOCITY_SCALAR 0.004
+#define SPIN_SCALAR 0.007
 
 extern pthread_mutex_t sceneMutex;
 
@@ -120,10 +129,13 @@ int run(int argc, char **argv)
 	bool mover = true;
     
     bool dof = false;
+	float speedScaleValue = 1.0;
+	float moving = false;
 	
     int multisamples = 4;
 	bool fullscreen = false;
 	bool hideCursor=false;
+	bool grid=false;
 
 	double maxFrameRate = 60;
 	
@@ -198,6 +210,7 @@ int run(int argc, char **argv)
 	while (arguments.read("--multisamples",multisamples)) {}
 	if (arguments.read("--disable-camera-controls")) mover=false;
 	if (arguments.read("--enable-mouse-picker")) picker=true;
+	if (arguments.read("--grid")) grid=true;
 
 
 	// For testing purposes, we allow loading a scene with a commandline arg:
@@ -239,6 +252,19 @@ int run(int argc, char **argv)
 	// *************************************************************************
 	// get details on keyboard and mouse bindings used by the viewer.
 	viewer.getUsage(*arguments.getApplicationUsage());
+
+	// *************************************************************************
+	// open a connection to the SpaceNavigator
+	#ifdef HAVE_SPNAV_H
+	spnav_event spnavevent;
+	if (spnav_open()==-1)
+	{
+         	std::cout << "Failed to connect to the space navigator" << std::endl;
+        } else
+	{
+         	std::cout << "Listening to space navigator... " << std::endl;
+	}
+	#endif
 
     // *************************************************************************
     // set up initial view:
@@ -484,6 +510,11 @@ int run(int argc, char **argv)
 		spin.sceneManager->worldNode->addChild(argScene.get());
 	}
 
+	if (grid)
+	{
+		spin.sceneManager->createNode("grid", "GridNode");
+	}
+
 	// *************************************************************************
 	// start threads:
 	viewer.realize();
@@ -495,9 +526,10 @@ int run(int argc, char **argv)
     spinListener.subscribe();
 
 	// ask for refresh:
-	spin.SceneMessage("s", "refresh", LO_ARGS_END);
+	spin.SceneMessage("s", "refresh", SPIN_ARGS_END);
 
 	osg::Timer_t lastFrameTick = osg::Timer::instance()->tick();
+	osg::Timer_t lastNavTick = osg::Timer::instance()->tick();
 
 	double minFrameTime = 1.0 / maxFrameRate;
 
@@ -521,7 +553,6 @@ int run(int argc, char **argv)
         // make it protected and override, so that it is done for the whole rendering pipeline
         spin.sceneManager->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
     }
-    
 
 	// program loop:
 	while(not viewer.done())
@@ -554,6 +585,94 @@ int run(int argc, char **argv)
 
 			if (dt >= minFrameTime)
 			{
+				// poll the space navigator:
+				#ifdef HAVE_SPNAV_H
+				int speventCount = 0;
+				osg::Vec3 spVel, spSpin;
+			
+				//std::cout << "delta = " << osg::Timer::instance()->delta_s(lastNavTick, osg::Timer::instance()->tick()) << std::endl;
+	
+				// if the last significant event was more than a second ago,
+				// assume the user has let go of the puck and reset speedScale
+				if ((float)(osg::Timer::instance()->delta_s(lastNavTick, osg::Timer::instance()->tick()) > 1.0) && moving)
+				{
+					//std::cout << "reset spacenavigator" << std::endl;
+					spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
+					spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setSpin", 0.0, 0.0, 0.0, SPIN_ARGS_END);
+					speedScaleValue = 1.0;
+					moving = false;
+				}
+
+				while (spnav_poll_event(&spnavevent))
+				{
+					if (spnavevent.type == SPNAV_EVENT_MOTION)
+                        		{
+						// just make note of the count; the latest motion data will be stored in spnavevent
+						
+						speventCount++;
+						//spPos = osg::Vec3(spnavevent.motion.x, spnavevent.motion.z, spnavevent.motion.y);
+						//spRot = osg::Vec3(spnavevent.motion.rx, spnavevent.motion.rz, spnavevent.motion.ry);
+                			}
+					else
+					{
+					        // SPNAV_EVENT_BUTTON
+						static bool button1, button2;
+						spin.NodeMessage(spin.getUserID().c_str(), "ssii", "event", "button", spnavevent.button.bnum, (int)spnavevent.button.press, SPIN_ARGS_END);
+						if (spnavevent.button.bnum==0) button1 = (bool)spnavevent.button.press;	
+						if (spnavevent.button.bnum==1) button2 = (bool)spnavevent.button.press;
+						if (button1 && button2)
+						{
+							spin.NodeMessage(spin.getUserID().c_str(), "s", "goHome", SPIN_ARGS_END);
+						}
+                			}
+				}
+
+				// if at least one update was received this frame
+				if (speventCount)
+				{
+					moving = true;
+
+					// note: y and z axis flipped:
+					float x = spnavevent.motion.x;
+					float y = spnavevent.motion.z;
+					float z = spnavevent.motion.y;
+					float rx = -spnavevent.motion.rx;
+					float ry = -spnavevent.motion.rz;
+					float rz = -spnavevent.motion.ry;
+
+					// if user is pushing beyond a threshold, inrement
+					// the speed over time
+					// NOTE: pulling up on the puch is harder to get ti to the max than pushing down, so we handle the up/down separately
+					float xyMagnitude = sqrt((x*x)+(y*y));
+					if ((xyMagnitude>190)||(z<-200)||(z>150))
+						speedScaleValue += 0.02;
+					else
+						speedScaleValue -= 0.04;
+						
+					// max out at 10x of speed scaling
+					if (speedScaleValue < 1) speedScaleValue = 1.0;
+					else if (speedScaleValue > 10) speedScaleValue = 10.0;
+					
+					// compute velocity vector:
+					speedScaleValue= 1.0;
+					spVel = osg::Vec3( pow(x * VELOCITY_SCALAR, 5) * speedScaleValue * 2,
+							   pow(y * VELOCITY_SCALAR, 5) * speedScaleValue * 2,
+							   pow(z * VELOCITY_SCALAR, 5) * speedScaleValue);
+					// rotate around the z-axis faster than the other two:
+					spSpin = osg::Vec3( pow(rx*SPIN_SCALAR,5),
+							    pow(ry*SPIN_SCALAR,5),
+							    pow(rz*SPIN_SCALAR,5));
+
+						
+					//std::cout << "spacenav x,y,z="<<x<<","<<y<<","<<z<<" rx,ry,rz="<<rx<<","<<ry<<","<<rz<<" computed speedScale="<<speedScaleValue<< ", spVel= " << stringify(spVel) << ", spSpin= " << stringify(spSpin) << std::endl;
+					spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", spVel.x(), spVel.y(), spVel.z(), SPIN_ARGS_END);
+					spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setSpin", spSpin.x(), spSpin.y(), spSpin.z(), SPIN_ARGS_END);
+				
+					lastNavTick = osg::Timer::instance()->tick();
+				}
+				#endif
+
+			
 				// we used to just call viewer.frame() within a mutex, but we
 				// only really need to apply the mutex to the update traversal
 				/*
@@ -601,6 +720,11 @@ int run(int argc, char **argv)
 			viewer.setDone(true);
 		}
 	}
+
+	
+	#ifdef HAVE_SPNAV_H
+	spnav_close();
+	#endif
 
     // make sure we're done in case we didn't quit via interrupt
 	spinListener.stop();
