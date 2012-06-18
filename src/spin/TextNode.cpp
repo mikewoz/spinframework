@@ -474,6 +474,7 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	nodeType = "TextNode";
 
 	//_text = "";
+    drawMode_ = GLYPH;
 	font_ = "arial.ttf";
 	characterSize_ = 0.1f;
     thickness_ = 0.02f;
@@ -485,6 +486,7 @@ TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneM
 	billboard_ = RELATIVE; // ie, no billboard
 	decoration_ = DROP_SHADOW_BOTTOM_RIGHT;
 	background_ = NO_BACKGROUND;
+    alignment_ = osgText::TextBase::LEFT_BASE_LINE;
     repetitions_ = 1;
 
 	

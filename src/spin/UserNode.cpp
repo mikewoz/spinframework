@@ -57,7 +57,8 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
     this->setName(string(id->s_name) + ".UserNode");
 
     description_ = string(initID);
-
+	computationMode_ = CLIENT_SIDE; 
+	velocityMode_ = MOVE;	
 	cameraOffsetNode_ = new osg::PositionAttitudeTransform();
 	cameraOffsetNode_->setName(string(id->s_name) + ".cameraOffset");
 	cameraAttachmentNode_ = new osg::PositionAttitudeTransform();
@@ -69,8 +70,10 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
     
     //setAttachmentNode(cameraAttachmentNode_.get());
 
-    setTranslation(0.0, -5.0, 0.5);
-    setReportMode(GroupNode::GLOBAL_6DOF);
+    	setReportMode(GroupNode::GLOBAL_6DOF);
+    
+	homePos_ = osg::Vec3(0.0, -5.0, 0.5);
+	goHome();
 
     ping_ = false;
 }
@@ -122,6 +125,19 @@ void UserNode::setDescription (const char *newvalue)
     using std::string;
     description_ = string(newvalue);
     BROADCAST(this, "ss", "setDescription", getDescription());
+}
+
+
+void UserNode::setHome(float x, float y, float z, float pitch, float roll, float yaw)
+{
+	homePos_ = osg::Vec3(x,y,z);
+	homeRot_ = osg::Vec3(pitch,roll,yaw);
+}
+
+void UserNode::goHome()
+{
+	setTranslation(homePos_.x(), homePos_.y(), homePos_.z());
+	setOrientation(homeRot_.x(), homeRot_.y(), homeRot_.z());
 }
 
 void UserNode::ping()

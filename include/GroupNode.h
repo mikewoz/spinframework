@@ -255,11 +255,15 @@ public:
     virtual void move (float x, float y, float z);
 
     /**
-     * The rotate command adds a relative rotation to the node's current
+     * The rotate command adds to the (absolute) orientation of the node
+     */
+    virtual void rotate (float dPitch, float dRoll, float dYaw);
+
+    /**
+     * The addRotation command adds a (relative) rotation to the node's current
      * orientation.
      */
-    virtual void rotate (float pitch, float roll, float yaw);
-
+    virtual void addRotation (float dPitch, float dRoll, float dYaw);
 
     virtual void setManipulator(const char *manipulatorType);
     const char* getManipulator() const { return manipulatorType_.c_str(); }

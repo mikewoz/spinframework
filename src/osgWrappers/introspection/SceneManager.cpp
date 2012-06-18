@@ -282,11 +282,6 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__setUpdateRate__float,
 	          "",
 	          "Sets the update delay for the physics engine (in seconds). The default is 0.02 seconds (ie, 50hz). ");
-	I_Method2(void, detectCollision, IN, bool &, lastColState, IN, btCollisionWorld *, cw,
-	          Properties::NON_VIRTUAL,
-	          __void__detectCollision__bool_R1__btCollisionWorld_P1,
-	          "",
-	          "");
 	I_SimpleProperty(std::vector< std::string >, AllNodeTypes, 
 	                 __std_vectorT1_std_string___getAllNodeTypes, 
 	                 0);
@@ -316,8 +311,6 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_PublicMemberProperty(bool, graphicalMode);
 	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);
-	I_PublicMemberProperty(bool, lastColState);
-	I_PublicMemberProperty(btDynamicsWorld *, dynamicsWorld_);
 END_REFLECTOR
 
 TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)

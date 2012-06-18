@@ -58,6 +58,16 @@ BEGIN_OBJECT_REFLECTOR(spin::UserNode)
 	          __osg_PositionAttitudeTransform_P1__getCameraOffsetNode,
 	          "",
 	          "");
+	I_Method6(void, setHome, IN, float, x, IN, float, y, IN, float, z, IN, float, pitch, IN, float, roll, IN, float, yaw,
+	          Properties::NON_VIRTUAL,
+	          __void__setHome__float__float__float__float__float__float,
+	          "",
+	          "The home position is the pose that the user returns to when sent home ");
+	I_Method0(void, goHome,
+	          Properties::NON_VIRTUAL,
+	          __void__goHome,
+	          "",
+	          "Send the user to his (or her) home position ");
 	I_Method3(void, setCameraOffset, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setCameraOffset__float__float__float,

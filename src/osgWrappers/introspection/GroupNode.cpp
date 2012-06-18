@@ -225,11 +225,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__move__float__float__float,
 	          "",
 	          "The move command adds a relative translation with respect to the node's current orientation. That is, the node will translate along it's direction vector by the supplied number of units. ");
-	I_Method3(void, rotate, IN, float, pitch, IN, float, roll, IN, float, yaw,
+	I_Method3(void, rotate, IN, float, dPitch, IN, float, dRoll, IN, float, dYaw,
 	          Properties::VIRTUAL,
 	          __void__rotate__float__float__float,
 	          "",
-	          "The rotate command adds a relative rotation to the node's current orientation. ");
+	          "The rotate command adds to the (absolute) orientation of the node ");
+	I_Method3(void, addRotation, IN, float, dPitch, IN, float, dRoll, IN, float, dYaw,
+	          Properties::VIRTUAL,
+	          __void__addRotation__float__float__float,
+	          "",
+	          "The addRotation command adds a (relative) rotation to the node's current orientation. ");
 	I_Method1(void, setManipulator, IN, const char *, manipulatorType,
 	          Properties::VIRTUAL,
 	          __void__setManipulator__C5_char_P1,

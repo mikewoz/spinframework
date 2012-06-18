@@ -324,8 +324,11 @@ void GroupNode::callbackUpdate()
 
         if (spin_.length() > EPSILON)
         {
-            this->rotate( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
-                
+            if (this->velocityMode_==GroupNode::TRANSLATE)
+            	this->rotate( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
+            else
+            	this->addRotation( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
+
             if (damping_ > EPSILON)
             {
                 double ds = 1 - (damping_*dt);
@@ -946,9 +949,15 @@ void GroupNode::move (float x, float y, float z)
     setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
-void GroupNode::rotate (float p, float r, float y)
+void GroupNode::rotate (float dPitch, float dRoll, float dYaw)
 {
-    this->setOrientation(orientation_.x()+p, orientation_.y()+r, orientation_.z()+y);
+    this->setOrientation(orientation_.x()+dPitch, orientation_.y()+dRoll, orientation_.z()+dYaw);
+}
+
+void GroupNode::addRotation (float dPitch, float dRoll, float dYaw)
+{
+    osg::Quat newQuat = EulerToQuat(dPitch,dRoll,dYaw).inverse() * getOrientationQuat();
+    this->setOrientationQuat(newQuat.x(), newQuat.y(), newQuat.z(), newQuat.w());
 }
 
 // *****************************************************************************

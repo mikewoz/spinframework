@@ -172,3 +172,7 @@ BEGIN_OBJECT_REFLECTOR(spin::Menu3D)
 	                 0);
 END_REFLECTOR
 
+TYPE_NAME_ALIAS(std::vector< osg::observer_ptr< spin::TextNode > >, spin::MenuVector)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::observer_ptr< spin::TextNode > >)
+
