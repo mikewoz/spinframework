@@ -148,7 +148,7 @@ void ReferencedNode::registerNode(SceneManager *s)
 
 }
 
-void ReferencedNode::callbackUpdate()
+void ReferencedNode::callbackUpdate(osg::NodeVisitor* nv)
 {
     callCronScripts();
 }

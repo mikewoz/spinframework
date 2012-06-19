@@ -509,9 +509,9 @@ TextNode::~TextNode()
 
 // ===================================================================
 
-void TextNode::callbackUpdate()
+void TextNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
     
     if (redrawFlag_)
     {

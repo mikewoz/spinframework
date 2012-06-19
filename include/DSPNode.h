@@ -78,7 +78,7 @@ public:
         DSPNode (SceneManager *sceneManager, char *initID);
         virtual ~DSPNode();
         
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
         
         /**
          * Returns the SoundConnection object that exists between the current

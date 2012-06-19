@@ -87,7 +87,7 @@ public:
     TextNode(SceneManager *sceneManager, char *initID);
     virtual ~TextNode();
 
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     enum DrawMode
     {

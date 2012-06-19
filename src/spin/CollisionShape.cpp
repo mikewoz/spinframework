@@ -214,9 +214,9 @@ CollisionShape::~CollisionShape()
 }
 
 // -----------------------------------------------------------------------------
-void CollisionShape::callbackUpdate()
+void CollisionShape::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ShapeNode::callbackUpdate();
+    ShapeNode::callbackUpdate(nv);
     
     
     // If this is the server, we update the position of the node based on info

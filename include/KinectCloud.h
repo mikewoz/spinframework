@@ -78,7 +78,7 @@ public:
     /**
      * update from kinect
      */
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * Sets the mode for drawing the point cloud, based on the types in the

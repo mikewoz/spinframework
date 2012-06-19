@@ -96,7 +96,7 @@ class PointerNode : public RayNode
         };
             
 
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
 
         /**
          * Get the first GroupNode encountered with interaction mode greater

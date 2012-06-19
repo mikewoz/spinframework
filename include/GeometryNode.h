@@ -66,7 +66,7 @@ public:
     GeometryNode(SceneManager *sceneManager, char *initID);
     virtual ~GeometryNode();
     
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     virtual void updateStateSet();
     
     void setNumVertices(int i);

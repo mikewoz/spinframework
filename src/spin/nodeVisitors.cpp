@@ -200,7 +200,7 @@ void UpdateSceneVisitor::apply(osg::Group &node)
     ReferencedNode *n;
     if ((n = dynamic_cast<ReferencedNode*>(&node)))
     {
-        n->callbackUpdate();
+        n->callbackUpdate(this);
     }
     traverse(node);
 }

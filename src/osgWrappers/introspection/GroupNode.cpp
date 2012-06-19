@@ -80,9 +80,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	               ____GroupNode__SceneManager_P1__char_P1,
 	               "",
 	               " param initID will be converted into a t_symbol  ");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,

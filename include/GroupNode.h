@@ -111,7 +111,7 @@ public:
         POINT_TO_ORIGIN
     };
     
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
 
     /**

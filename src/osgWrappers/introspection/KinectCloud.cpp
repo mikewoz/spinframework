@@ -45,9 +45,9 @@ BEGIN_OBJECT_REFLECTOR(spin::KinectCloud)
 	               ____KinectCloud__SceneManager_P1__char_P1,
 	               "",
 	               "");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "update from kinect ");
 	I_Method1(void, setDrawMode, IN, spin::KinectCloud::DrawMode, mode,

@@ -28,9 +28,9 @@ BEGIN_OBJECT_REFLECTOR(spin::UserNode)
 	               ____UserNode__SceneManager_P1__char_P1,
 	               "",
 	               "");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "The UserNode needs an update callback to check if ping messages are still being received. If not, the node and it's subgraph should be removed. Please note that if the user node NEVER sends a ping, not even once, then it will be excluded from this obligation. ");
 	I_Method1(void, updateNodePath, IN, bool, updateChildren,

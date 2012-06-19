@@ -218,9 +218,9 @@ ParticleSystem::~ParticleSystem()
 
 
 // *****************************************************************************
-void ParticleSystem::callbackUpdate()
+void ParticleSystem::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
     
     if (!attachedFlag_)
     {
