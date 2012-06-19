@@ -769,13 +769,10 @@ void TextNode::drawText()
 		
 		// attach geode and textLabel_:
 		this->getAttachmentNode()->addChild(textGeode_.get());
-		
-        osg::StateSet *labelStateSet = new osg::StateSet;
         
         if (drawMode_==TEXT3D)
         {
             textLabel_ = new osgText::Text3D();
-            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON );
         }
         else
         {
@@ -783,9 +780,16 @@ void TextNode::drawText()
             textLabel_ = n;
             //testLabel_ = new osgText::Text();
             n->setEnableDepthWrites(true);
-            // disable lighting effects on the text:
-            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
         }
+        
+        osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
+
+        // enable lighting effects only on 3D text:
+        if (drawMode_==TEXT3D)
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+        else 
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        
         
         textLabel_->setLayout(osgText::TextBase::LEFT_TO_RIGHT);
         
@@ -803,8 +807,7 @@ void TextNode::drawText()
         
         labelStateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
         
-		labelStateSet->setRenderBinDetails( 100, "RenderBin");
-		textLabel_->setStateSet( labelStateSet );
+        labelStateSet->setRenderBinDetails( 100, "RenderBin", osg::StateSet::OVERRIDE_RENDERBIN_DETAILS);
         
         updateText();
     }
