@@ -79,7 +79,7 @@ class UserNode : public ConstraintsNode
          * removed. Please note that if the user node NEVER sends a ping, not
          * even once, then it will be excluded from this obligation.
          */
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     
         /**

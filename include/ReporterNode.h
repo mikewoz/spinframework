@@ -96,7 +96,7 @@ public:
      * moved or not). If so, it updates the internal matrices, and calls
      * sendReports()
      */
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * sendReports checks which reportTypes are enabled, and actually performs

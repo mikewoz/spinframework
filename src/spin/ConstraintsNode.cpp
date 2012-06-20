@@ -81,9 +81,9 @@ ConstraintsNode::~ConstraintsNode()
 }
 
 
-void ConstraintsNode::callbackUpdate()
+void ConstraintsNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
 }
 
 // *****************************************************************************

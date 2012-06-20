@@ -67,7 +67,7 @@ public:
     ParticleSystem(SceneManager *sceneManager, char *initID);
     virtual ~ParticleSystem();
     
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     
     void setLifeTime(float seconds);
     float getLifeTime() { return (float) particle_.getLifeTime(); }

@@ -73,9 +73,9 @@ MeasurementNode::~MeasurementNode()
 
 }
 
-void MeasurementNode::callbackUpdate()
+void MeasurementNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
 
     osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(targetName_->s_thing);
     if (!targetNode.valid()) return;

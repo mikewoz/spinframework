@@ -43,9 +43,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ReporterNode)
 	          __void__debug,
 	          "",
 	          "Debug print (to log/console) ");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "The update callback for ReporterNode checks to see if a target or the the ReporterNode's global matrix has changed (ie, whether it has been moved or not). If so, it updates the internal matrices, and calls sendReports() ");
 	I_Method1(void, sendReports, IN, spin::reporterTarget *, target,

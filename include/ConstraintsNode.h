@@ -141,7 +141,7 @@ enum CollisionMode {   POINT,               /*!< When computing collisions with
                     };
 
         
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     
     /**
      * Sets a target whose properties can be used to limit movement of this

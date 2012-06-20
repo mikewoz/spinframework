@@ -143,9 +143,9 @@ void DSPNode::callbackUpdate()
 }
 */
 
-void DSPNode::callbackUpdate()
+void DSPNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
 }
 
 

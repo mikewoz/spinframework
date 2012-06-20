@@ -121,9 +121,9 @@ PointerNode::~PointerNode()
 
 }
 
-void PointerNode::callbackUpdate()
+void PointerNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    RayNode::callbackUpdate();
+    RayNode::callbackUpdate(nv);
     
     this->computeBound();
     

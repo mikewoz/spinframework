@@ -60,7 +60,7 @@ public:
     CollisionShape(SceneManager *sceneManager, char *initID);
     virtual ~CollisionShape();
     
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     virtual void debug();
     
     /**

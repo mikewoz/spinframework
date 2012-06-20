@@ -131,7 +131,7 @@ void PointCloud::debug()
 }
 
 // -----------------------------------------------------------------------------
-void PointCloud::callbackUpdate()
+void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 {
     // A "redraw" will destroy the current subgraph and re-create it.
     // This is done, for example, when the type of geometry is changed (eg, from
@@ -151,7 +151,7 @@ void PointCloud::callbackUpdate()
         updateFlag_ = false;
     }
     
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
 }
 
 

@@ -67,7 +67,7 @@ class SoundNode : public DSPNode
         SoundNode(SceneManager *sceneManager, char *initID);
         virtual ~SoundNode();
 
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
         
         // override some methods so that we can send them to SpatOSC:
         virtual void setParam (const char *paramName, const char *paramValue);

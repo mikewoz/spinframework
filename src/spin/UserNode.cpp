@@ -84,9 +84,9 @@ UserNode::~UserNode()
     //std::cout << "Destroying UserNode: " << id->s_name << std::endl;
 }
 
-void UserNode::callbackUpdate()
+void UserNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-	ConstraintsNode::callbackUpdate();
+	ConstraintsNode::callbackUpdate(nv);
 
 	if (ping_)
 	{

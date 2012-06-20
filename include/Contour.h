@@ -109,7 +109,7 @@ public:
 
     virtual void updateNodePath();
 
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * Updates the contour with respect to any new parameters recently set. This

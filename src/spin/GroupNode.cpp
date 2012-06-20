@@ -247,9 +247,9 @@ GroupNode::~GroupNode()
 
 #define EPSILON 0.0001
 
-void GroupNode::callbackUpdate()
+void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
     
     if (manipulatorUpdateFlag_)
     {

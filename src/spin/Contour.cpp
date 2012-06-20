@@ -139,10 +139,10 @@ void Contour::updateNodePath()
 	
 }
 
-void Contour::callbackUpdate()
+void Contour::callbackUpdate(osg::NodeVisitor* nv)
 {
 	if (_redrawFlag) draw();
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
 }
 
 

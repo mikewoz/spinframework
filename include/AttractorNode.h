@@ -75,7 +75,7 @@ public:
     					};
     
 
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * setDistanceDecay specifies how the attractive force decays as a function

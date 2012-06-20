@@ -142,9 +142,9 @@ KinectCloud::~KinectCloud()
 }
 
 // -----------------------------------------------------------------------------
-void KinectCloud::callbackUpdate()
+void KinectCloud::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
     
     if (getAttachmentNode()->containsNode(cloudGroup.get()))
     {

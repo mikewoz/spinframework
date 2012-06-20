@@ -68,7 +68,7 @@ public:
 
     
     
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     
     /**
      * Performs the actual update of translation, orientation, and scale given

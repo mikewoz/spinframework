@@ -127,9 +127,9 @@ GeometryNode::~GeometryNode()
     
     
 // -----------------------------------------------------------------------------
-void GeometryNode::callbackUpdate()
+void GeometryNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
     
     if (updateFlag_)
     {

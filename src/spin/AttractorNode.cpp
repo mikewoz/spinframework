@@ -79,9 +79,9 @@ AttractorNode::~AttractorNode()
 
 #define EPSILON 0.0001
 
-void AttractorNode::callbackUpdate()
+void AttractorNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-	GroupNode::callbackUpdate();
+	GroupNode::callbackUpdate(nv);
 
     osg::Timer_t tick = osg::Timer::instance()->tick();
 

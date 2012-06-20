@@ -96,9 +96,9 @@ void ReporterNode::debug()
     std::cout << std::endl;
 }
 
-void ReporterNode::callbackUpdate()
+void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
 
     // only report from the server
     if (spinApp::Instance().getContext()->isServer()) return;
@@ -260,6 +260,35 @@ void ReporterNode::sendReports(reporterTarget *target)
         }
         */
 
+        if (0) // debug print
+        {
+            std::cout << "checking intersections between " << stringify(srcTrans) << " and " << stringify(snkTrans) << std::endl;
+            if (intersector->containsIntersections())
+            {
+                osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
+                osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+
+                std::cout << std::endl;
+                std::cout << "GOT " << intersections.size() << " INTERSECTIONS:" << std::endl;
+
+                int count=1;
+                for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+                {
+                    const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
+                    std::cout << count++ << ") world pos: " << stringify(intersection.getWorldIntersectPoint()) << std::endl;
+                    //std::cout << "  nodepath:";
+                    for (int i=intersection.nodePath.size()-1; i>=0; i--)
+                    {
+                        if (intersection.nodePath[i]->getName().empty()) std::cout << " ?";
+                        else std::cout << " " << intersection.nodePath[i]->getName();
+                        osg::Node* n = dynamic_cast<osg::Node*>(intersection.nodePath[i]);
+                        if (n) std::cout << ",  bound: " << stringify(n->getBound().center()) << ", radius=" << n->getBound().radius() << std::endl;
+                    } std::cout << std::endl;
+                }
+            } else std::cout << "no intersections" << std::endl;
+        }
+
+        
         if (target->contained != (!intersector->containsIntersections()))
         {
         	target->contained = !intersector->containsIntersections();

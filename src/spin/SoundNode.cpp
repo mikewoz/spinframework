@@ -82,11 +82,11 @@ SoundNode::~SoundNode()
 }
 
 // ===================================================================
-void SoundNode::callbackUpdate()
+void SoundNode::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
     // which will update _globalMatrix (since reporting is on)
-    DSPNode::callbackUpdate();
+    DSPNode::callbackUpdate(nv);
 
     // now, we can get the global position and orientation, and we can forward
     // it to SpatOSC

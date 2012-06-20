@@ -138,7 +138,7 @@ public:
      * become corrupted. The technique is rather to enable a flag and then do
      * the actual change in the SceneManager::updateGraph() method.
      */
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * The attach() method is used to properly add a node to the scene graph.
@@ -371,10 +371,10 @@ class ReferencedNode_data : public osg::Referenced
     public:
         ReferencedNode_data(ReferencedNode *n) { node_ = n; }
         //~ReferencedNode_data();
-        void update()
+        void update(osg::NodeVisitor* nv)
         {
             if (node_.valid())
-                node_->callbackUpdate();
+                node_->callbackUpdate(nv);
         }
     private:
         osg::observer_ptr<ReferencedNode> node_;
@@ -390,7 +390,7 @@ class ReferencedNode_callback : public osg::NodeCallback
         {
             osg::ref_ptr<ReferencedNode_data> data = dynamic_cast<ReferencedNode_data*> (node->getUserData());
             if (data != NULL)
-                data->update();
+                data->update(nv);
             traverse(node, nv);
         }
 };

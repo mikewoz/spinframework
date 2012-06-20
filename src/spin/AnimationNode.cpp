@@ -89,10 +89,10 @@ AnimationNode::~AnimationNode()
 
 // *****************************************************************************
 
-void AnimationNode::callbackUpdate()
+void AnimationNode::callbackUpdate(osg::NodeVisitor* nv)
 {
 
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
 
     if ( spinApp::Instance().getContext()->isServer() and getPlay() 
             and not _animationPath->empty())

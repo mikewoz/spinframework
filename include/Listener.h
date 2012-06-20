@@ -64,7 +64,7 @@ class Listener : public DSPNode
         Listener(SceneManager *sceneManager, char *initID);
         virtual ~Listener();
         
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
 
         /**
          * For each subclass of ReferencedNode, we override the getState()
