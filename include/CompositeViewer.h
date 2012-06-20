@@ -81,9 +81,6 @@ class CompositeViewer : public osgViewer::CompositeViewer
         //! Setup the camera to do the render to texture
         void setupCamera(osg::Viewport* vp);
         
-        //! Handle resizing of the window
-        void resize(const int width, const int height);
-        
         //! Just setup some stuff
         void viewerInit();
 

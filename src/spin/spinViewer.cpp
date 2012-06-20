@@ -162,9 +162,8 @@ int run(int argc, char **argv)
    
 	frustum frust;
 	frust.valid = false;
-	while (arguments.read("--frustum", frust.left, frust.right, frust.bottom, frust.top)) {
-		frust.near = 1.0;
-		frust.far = 10000.0;
+	while (arguments.read("--frustum", frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far))
+    {
 		frust.valid = true;
 	}
 	while (arguments.read("--clipping",nearClipping,farClipping)) {}
@@ -275,7 +274,7 @@ int run(int argc, char **argv)
 	    osg::ref_ptr<osgViewer::View> view = new osgViewer::View;
         viewer.addView(view.get());
 
-        view->getCamera()->setClearColor(osg::Vec4(0.0, 0.0, 0.0, 0.0));
+        view->getCamera()->setClearColor(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
 
         if (fullscreen)
         {
@@ -288,7 +287,9 @@ int run(int argc, char **argv)
 
         if (frust.valid)
         {
-        	//view->getCamera()->getProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
+            double l,r,b,t,n,f; 
+        	view->getCamera()->getProjectionMatrixAsFrustum(l,r,b,t,n,f);
+            std::cout << "  Origin frustum:\t\t" <<l<<" "<<r<<" "<<b<<" "<<t<<" "<<n<<" "<<f<< std::endl;
         	std::cout << "  Custom frustum:\t\t" << frust.left<<" "<<frust.right<<" "<<frust.bottom<<" "<<frust.top<<" "<<frust.near<<" "<<frust.far << std::endl;
         	view->getCamera()->setProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
         }
