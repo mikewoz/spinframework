@@ -63,6 +63,8 @@ struct frustum
 	float far;
 };
 
+
+
 class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
 {
@@ -78,6 +80,9 @@ class CompositeViewer : public osgViewer::CompositeViewer
         
         //! Setup the camera to do the render to texture
         void setupCamera(osg::Viewport* vp);
+        
+        //! Handle resizing of the window
+        void resize(const int width, const int height);
         
         //! Just setup some stuff
         void viewerInit();
@@ -98,7 +103,38 @@ class CompositeViewer : public osgViewer::CompositeViewer
         float mOldTime;
         //DoFRendering mDoFSetup;
         bool mbInitialized;
+        
+        osg::ref_ptr<osg::Texture> colorTexture_;
+        osg::ref_ptr<osg::Texture> depthTexture_;
 };
+
+
+class CustomResizeHandler : public osgGA::GUIEventHandler
+{
+public:
+    CompositeViewer* viewer;
+
+    CustomResizeHandler(CompositeViewer* v) : viewer(v)
+    {
+    }
+
+    bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter&)
+    {
+        switch(ea.getEventType())
+        {
+            case (osgGA::GUIEventAdapter::RESIZE):
+            {
+                osgPPU::Camera::resizeViewport(0,0, ea.getWindowWidth(), ea.getWindowHeight(), viewer->getView(0)->getCamera());
+                viewer->getProcessor()->onViewportChange();
+                break;
+            }
+            default:
+                break;
+        }
+        return false;
+    }
+};
+
 
 osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, const osg::Vec3& widthVector, const osg::Vec3& heightVector, double sphere_radius, double collar_radius, double distance=0.0);
 

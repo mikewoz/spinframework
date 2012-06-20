@@ -138,8 +138,8 @@ void CompositeViewer::setupCamera(osg::Viewport* vp)
     
 
     // create texture to render to
-    osg::Texture* texture = createRenderTexture((int)vp->width(), (int)vp->height(), false);
-    osg::Texture* depthTexture = createRenderTexture((int)vp->width(), (int)vp->height(), true);
+    colorTexture_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
+    depthTexture_ = createRenderTexture((int)vp->width(), (int)vp->height(), true);
 
     // set up the background color and clear mask.
     camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
@@ -154,8 +154,39 @@ void CompositeViewer::setupCamera(osg::Viewport* vp)
     camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
     // attach the texture and use it as the color buffer.
-    camera->attach(osg::Camera::COLOR_BUFFER, texture);
-    camera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
+    camera->attach(osg::Camera::COLOR_BUFFER, colorTexture_);
+    camera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
+}
+
+void CompositeViewer::resize(const int width, const int height)
+{
+    std::cout << "CompositeViewer got resize "<<width<<"x"<<height<< std::endl;
+
+    // resize textures
+    if (colorTexture_.valid()) (dynamic_cast<osg::Texture2D*>(colorTexture_.get()))->setTextureSize(width, height);
+    if (depthTexture_.valid()) (dynamic_cast<osg::Texture2D*>(depthTexture_.get()))->setTextureSize(width, height);
+
+    // new viewport
+    osg::Viewport* vp = new osg::Viewport(0, 0, width, height);
+
+    // update camera
+    osg::Camera* camera = this->getView(0)->getCamera();
+    double fovy, aspect, znear, zfar;
+    camera->getProjectionMatrixAsPerspective(fovy, aspect, znear, zfar);
+    camera->setViewport(vp); // ???
+    camera->setProjectionMatrixAsPerspective(fovy, width / (double)height, znear, zfar);
+
+    // force processing pipeline to update
+    mProcessor->onViewportChange();
+    mProcessor->dirtyUnitSubgraph();
+    //_unitOut->setViewport(vp);
+    camera->setViewport(vp);
+
+    // update all units' viewports etc.
+    osg::NodeVisitor nv(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+    mProcessor->accept(nv); 
+
+
 }
 
 //! Just setup some stuff

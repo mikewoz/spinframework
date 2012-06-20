@@ -84,39 +84,6 @@
 
 extern pthread_mutex_t sceneMutex;
 
-/*
-struct frustum
-{
-	bool valid;
-	float left;
-	float right;
-	float bottom;
-	float top;
-	float near;
-	float far;
-};
-*/
-
-/*
-class SpinViewer : public osgViewer::Viewer
-{
-    private:
-        osg::ref_ptr<osgPPU::Processor> mProcessor;
-        float mOldTime;
-        DoFRendering mDoFSetup;
-        bool mbInitialized;
-    public:
-        //! Default constructor
-        //SpinViewer(osg::ArgumentParser& args) : osgViewer::getcsiteViewer(args)
-        SpinViewer(osg::ArgumentParser& args) : osgViewer::Viewer(args)
-        {
-            mbInitialized = false;
-            mOldTime = 0.0f;
-        }
-};
-*/
-
-
 int run(int argc, char **argv)
 {
 	//std::cout <<"\nspinViewer launching..." << std::endl;
@@ -213,12 +180,9 @@ int run(int argc, char **argv)
 	if (arguments.read("--grid")) grid=true;
 
 
+	// *************************************************************************
 	// For testing purposes, we allow loading a scene with a commandline arg:
-    //std::cout << "DYLD_LIBRARY_PATH= " << getenv("DYLD_LIBRARY_PATH") << std::endl;
-    //std::cout << "OSG_LIBRARY_PATH=  " << getenv("OSG_LIBRARY_PATH") << std::endl;
-	//setenv("OSG_PLUGIN_EXTENSION", ".so", 1);
     osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFiles(arguments);
-    
     
 	// *************************************************************************
 	// construct the viewer:
@@ -232,11 +196,10 @@ int run(int argc, char **argv)
 
 	viewer.getUsage(*arguments.getApplicationUsage());
 
+	// *************************************************************************
+    // multisampling / antialiasing:
+    
     osg::DisplaySettings::instance()->setNumMultiSamples( multisamples );
-
-
-
-
 
 	// *************************************************************************
 	// start the listener thread:
@@ -285,7 +248,7 @@ int run(int argc, char **argv)
 
 		// Load the XML file and verify:
 		if ( !doc.LoadFile() ) {
-			std::cout << "WARNING: failed to load " << camConfig << ". Invalid XML format." << std::endl;
+			std::cout << "WARNING: failed to load " << camConfig << "." << std::endl;
             return 1;
         }
 
@@ -352,6 +315,11 @@ int run(int argc, char **argv)
 	    view->addEventHandler(new osgViewer::StatsHandler);
 	    view->addEventHandler(new osgViewer::ThreadingHandler);
 	    view->addEventHandler(new osgViewer::WindowSizeHandler);
+        
+        if (dof)
+        {
+            view->addEventHandler(new CustomResizeHandler(&viewer));
+        }
 
 	    view->addEventHandler(new osgViewer::HelpHandler(arguments.getApplicationUsage()));
 	    view->addEventHandler( new osgGA::StateSetManipulator(view->getCamera()->getOrCreateStateSet()) );
