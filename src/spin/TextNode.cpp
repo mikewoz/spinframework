@@ -786,9 +786,9 @@ void TextNode::drawText()
 
         // enable lighting effects only on 3D text:
         if (drawMode_==TEXT3D)
-            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
         else 
-            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
         
         
         textLabel_->setLayout(osgText::TextBase::LEFT_TO_RIGHT);

@@ -138,8 +138,8 @@ void CompositeViewer::setupCamera(osg::Viewport* vp)
     
 
     // create texture to render to
-    osg::Texture* texture = createRenderTexture((int)vp->width(), (int)vp->height(), false);
-    osg::Texture* depthTexture = createRenderTexture((int)vp->width(), (int)vp->height(), true);
+    colorTexture_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
+    depthTexture_ = createRenderTexture((int)vp->width(), (int)vp->height(), true);
 
     // set up the background color and clear mask.
     camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
@@ -148,14 +148,14 @@ void CompositeViewer::setupCamera(osg::Viewport* vp)
     // set viewport
     camera->setViewport(vp);
     camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
+    //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
 
     // tell the camera to use OpenGL frame buffer object where supported.
     camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
     // attach the texture and use it as the color buffer.
-    camera->attach(osg::Camera::COLOR_BUFFER, texture);
-    camera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
+    camera->attach(osg::Camera::COLOR_BUFFER, colorTexture_);
+    camera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
 }
 
 //! Just setup some stuff
@@ -202,10 +202,16 @@ void CompositeViewer::initializePPU()
     // for the hdr rendering
     osgPPU::Unit* lastUnit = NULL;
 
+
+
     //osg::setNotifyLevel(osg::DEBUG_FP);
     dofPPU_ = new DoFRendering();
+
+    double left,right,bottom,top,near,far; 
+    this->getView(0)->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+
     //dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, 0.01, 100.0);
-    dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, 0.1, 100.0);
+    dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far);
     dofPPU_->setFocalLength(0.0);
     dofPPU_->setFocalRange(50.0);
     //osg::setNotifyLevel(osg::FATAL);
@@ -1105,6 +1111,15 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         {
             viewer->dofPPU_->setFar(floatArgs[0]);
         }
+        
+        return 0;
+    }
+    else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
+    {
+        viewer->getView(0)->getCamera()->setProjectionMatrixAsFrustum(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3], floatArgs[4], floatArgs[5]);
+        
+        viewer->dofPPU_->setNear(floatArgs[4]);
+        viewer->dofPPU_->setFar(floatArgs[5]);
         
         return 0;
     }
