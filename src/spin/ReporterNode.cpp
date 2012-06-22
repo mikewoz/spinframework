@@ -245,57 +245,66 @@ void ReporterNode::sendReports(reporterTarget *target)
 
     if (reporting_["CONTAINMENT"])
     {
-        osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector =
-            new osgUtil::LineSegmentIntersector(srcTrans, snkTrans);
-
-        osgUtil::IntersectionVisitor iv(intersector.get());
-
-        target->node->accept(iv);
-
-		// TODO: report distance (and normal?) to surface
-        /*
-        if (intersector->containsIntersections())
+        bool isContained = false;
+        
+        // only run the IntersectionVisitor if we are within the bounding radius
+        // of the target node:
+        if (connection_vector.length() < target->node->getBound().radius())
         {
-        	osg::Vec3 intersector->getFirstIntersection().getWorldIntersectPoint();
-        }
-        */
+            osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector =
+                new osgUtil::LineSegmentIntersector(srcTrans, snkTrans);
+            osgUtil::IntersectionVisitor intersectVisitor(intersector.get());
 
-        if (0) // debug print
-        {
-            std::cout << "checking intersections between " << stringify(srcTrans) << " and " << stringify(snkTrans) << std::endl;
+            // make sure to provide a nodemask so that DEBUG nodes (eg, rayNode)
+            // are not checked for intersections:
+            intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK|INTERACTIVE_NODE_MASK);
+            
+            sceneManager->rootNode->accept(intersectVisitor);
+
+            // If there are some intersections, they could be with some other
+            // objects within the target's hull, so we have to check all
+            // intersections. If we find ANY intersection with our target, it
+            // means we are still outside the hull (not contained).
             if (intersector->containsIntersections())
             {
+                isContained = true;
+                
                 osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
                 osgUtil::LineSegmentIntersector::Intersections::iterator itr;
 
-                std::cout << std::endl;
-                std::cout << "GOT " << intersections.size() << " INTERSECTIONS:" << std::endl;
-
-                int count=1;
                 for (itr = intersections.begin(); itr != intersections.end(); ++itr)
                 {
                     const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
-                    std::cout << count++ << ") world pos: " << stringify(intersection.getWorldIntersectPoint()) << std::endl;
-                    //std::cout << "  nodepath:";
                     for (int i=intersection.nodePath.size()-1; i>=0; i--)
                     {
-                        if (intersection.nodePath[i]->getName().empty()) std::cout << " ?";
-                        else std::cout << " " << intersection.nodePath[i]->getName();
-                        osg::Node* n = dynamic_cast<osg::Node*>(intersection.nodePath[i]);
-                        if (n) std::cout << ",  bound: " << stringify(n->getBound().center()) << ", radius=" << n->getBound().radius() << std::endl;
-                    } std::cout << std::endl;
+                        ReferencedNode* testNode = dynamic_cast<ReferencedNode*>(intersection.nodePath[i]);
+                        if (testNode==target->node.get())
+                        {
+                            // the linesegment intersected our target, so we are
+                            // outside the target's hull (not contained)
+                            isContained = false;
+                            break;
+                        }
+                    }
+                    if (!isContained) break;
                 }
-            } else std::cout << "no intersections" << std::endl;
+            } else
+            {
+                // if there are no intersections, it means that we are totally
+                // within the target's hull.
+                isContained = true;
+            }
+        }
+        
+        // check for change in containment, and if so, send a message:
+        if (target->contained != isContained)
+        {
+            target->contained = isContained;
+            msg = lo_message_new();
+            lo_message_add(msg, "ssi", "containedBy", target->node->id->s_name, (int)target->contained);
+            msgs.push_back(msg);
         }
 
-        
-        if (target->contained != (!intersector->containsIntersections()))
-        {
-        	target->contained = !intersector->containsIntersections();
-			msg = lo_message_new();
-			lo_message_add(msg, "ssi", "containedBy", target->node->id->s_name, (int)target->contained);
-			msgs.push_back(msg);
-        }
     }
 
     if (reporting_["OCCLUSION"])
