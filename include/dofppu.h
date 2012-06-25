@@ -38,8 +38,8 @@ class DoFRendering : virtual public osg::Referenced
             dofGaussSigma = 1.5f;
             dofGaussRadius = 5.0f;
 
-            dofFocalLength = 15.0f;
-            dofFocalRange = 13.0f;
+            dofFocalLength = 0.0f;
+            dofFocalRange = 50.0f;
 
         }
         
@@ -92,12 +92,13 @@ class DoFRendering : virtual public osg::Referenced
             parent->addChild(depthbypass);
 
             // we need to blur the output of the color texture to emulate
-            // the depth of field. Therefor first we just resample
+            // the depth of field. Therefore first we just resample
             osgPPU::UnitInResampleOut* resampleLight = new osgPPU::UnitInResampleOut();
             {
                 resampleLight->setName("ResampleLight");
-                resampleLight->setFactorX(0.5);
-                resampleLight->setFactorY(0.5);
+                // mikewoz: original factor was 0.5 here and 0.25 for the strong
+                resampleLight->setFactorX(0.9f);
+                resampleLight->setFactorY(0.9f);
             }
             bypass->addChild(resampleLight);
 
@@ -161,8 +162,9 @@ class DoFRendering : virtual public osg::Referenced
             osgPPU::UnitInResampleOut* resampleStrong = new osgPPU::UnitInResampleOut();
             {
                 resampleStrong->setName("ResampleStrong");
-                resampleStrong->setFactorX(0.25);
-                resampleStrong->setFactorY(0.25);
+                // mikewoz: original factor was 0.25 here and 0.5 for the light
+                resampleStrong->setFactorX(0.75f);
+                resampleStrong->setFactorY(0.75f);
             }
             bypass->addChild(resampleStrong);
 
