@@ -49,6 +49,7 @@
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>
+#include <osgAnimation/EaseMotion>
 #include <osg/Timer>
 #include <osg/ClipNode>
 #include <osgManipulator/Dragger>
@@ -247,6 +248,7 @@ public:
      */
     virtual void translate (float x, float y, float z);
     
+    
     /**
      * The move command adds a relative translation with respect to the
      * node's current orientation. That is, the node will translate along it's
@@ -264,6 +266,12 @@ public:
      * orientation.
      */
     virtual void addRotation (float dPitch, float dRoll, float dYaw);
+
+    /**
+     * Instead of instantaneous setTranslation, this method uses an ease motion
+     * to animate the node to the target position.
+     */
+    virtual void translateTo (float x, float y, float z, float time, const char *motion="Linear");
 
     virtual void setManipulator(const char *manipulatorType);
     const char* getManipulator() const { return manipulatorType_.c_str(); }
@@ -350,6 +358,9 @@ protected:
     osg::ref_ptr<osg::MatrixTransform> mainTransform_;
     
     osg::ref_ptr<osgManipulator::Dragger> dragger_;
+    
+    osg::ref_ptr<osgAnimation::Motion> motion_;
+    osg::Vec3 motionStart_, motionEnd_;
     
     InteractionMode interactionMode_;
     std::vector<osg::Vec4> trajectory_;

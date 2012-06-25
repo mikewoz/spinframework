@@ -235,6 +235,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__addRotation__float__float__float,
 	          "",
 	          "The addRotation command adds a (relative) rotation to the node's current orientation. ");
+	I_MethodWithDefaults5(void, translateTo, IN, float, x, , IN, float, y, , IN, float, z, , IN, float, time, , IN, const char *, motion, "Linear",
+	                      Properties::VIRTUAL,
+	                      __void__translateTo__float__float__float__float__C5_char_P1,
+	                      "",
+	                      "Instead of instantaneous setTranslation, this method uses an ease motion to animate the node to the target position. ");
 	I_Method1(void, setManipulator, IN, const char *, manipulatorType,
 	          Properties::VIRTUAL,
 	          __void__setManipulator__C5_char_P1,

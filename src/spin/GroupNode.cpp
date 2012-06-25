@@ -304,6 +304,22 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
 
         float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
 
+
+        if (motion_.valid())
+        {
+            motion_->update(dt);
+            float motionIndex = motion_->getValue();
+            osg::Vec3 newPos = motionStart_ + ((motionEnd_-motionStart_) * motionIndex);
+            this->setTranslation( newPos.x(), newPos.y(), newPos.z() );
+            
+            if (motion_->getTime() >= motion_->getDuration())
+            {
+                BROADCAST(this, "sss", "event", "translateTo", "done");
+                motion_ = NULL;
+            }
+        }
+
+
         if (velocity_.length() > EPSILON)
         {
             if (this->velocityMode_==GroupNode::TRANSLATE)
@@ -958,6 +974,90 @@ void GroupNode::addRotation (float dPitch, float dRoll, float dYaw)
 {
     osg::Quat newQuat = EulerToQuat(dPitch,dRoll,dYaw).inverse() * getOrientationQuat();
     this->setOrientationQuat(newQuat.x(), newQuat.y(), newQuat.z(), newQuat.w());
+}
+
+// *****************************************************************************
+
+
+
+void GroupNode::translateTo (float x, float y, float z, float duration, const char *motion)
+{
+
+    if (motion_.valid())
+    {
+        motion_ = NULL;
+    }
+
+    motionStart_ = getTranslation();
+    motionEnd_ = osg::Vec3(x,y,z);
+    
+    std::string motionType = std::string(motion);
+    
+    osgAnimation::Motion::TimeBehaviour tb = osgAnimation::Motion::CLAMP;
+    float init = 0.0f;
+    float d = 1.0f;
+
+    if (!motionType.compare("OutQuadMotion"))
+        motion_ = new osgAnimation::OutQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("InQuadMotion"))
+        motion_ = new osgAnimation::InQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutQuadMotion"))
+        motion_ = new osgAnimation::InOutQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutCubicMotion"))
+        motion_ = new osgAnimation::OutCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("InCubicMotion"))
+        motion_ = new osgAnimation::InCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutCubicMotion"))
+        motion_ = new osgAnimation::InOutCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutQuartMotion"))
+        motion_ = new osgAnimation::OutQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("InQuartMotion"))
+        motion_ = new osgAnimation::InQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutQuartMotion"))
+        motion_ = new osgAnimation::InOutQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutBounceMotion"))
+        motion_ = new osgAnimation::OutBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("InBounceMotion"))
+        motion_ = new osgAnimation::InBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutBounceMotion"))
+        motion_ = new osgAnimation::InOutBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutElasticMotion"))
+        motion_ = new osgAnimation::OutElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("InElasticMotion"))
+        motion_ = new osgAnimation::InElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutElasticMotion"))
+        motion_ = new osgAnimation::InOutElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutSineMotion"))
+        motion_ = new osgAnimation::OutSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("InSineMotion"))
+        motion_ = new osgAnimation::InSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutSineMotion"))
+        motion_ = new osgAnimation::InOutSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutBackMotion"))
+        motion_ = new osgAnimation::OutBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("InBackMotion"))
+        motion_ = new osgAnimation::InBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutBackMotion"))
+        motion_ = new osgAnimation::InOutBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutCircMotion"))
+        motion_ = new osgAnimation::OutCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("InCircMotion"))
+        motion_ = new osgAnimation::InCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutCircMotion"))
+        motion_ = new osgAnimation::InOutCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutExpoMotion"))
+        motion_ = new osgAnimation::OutExpoMotion(init, duration, d, tb);
+    else if (!motionType.compare("InExpoMotion"))
+        motion_ = new osgAnimation::InExpoMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutExpoMotion"))
+        motion_ = new osgAnimation::InOutExpoMotion(init, duration, d, tb);
+    else
+        motion_ = new osgAnimation::LinearMotion(init, duration, d, tb);
+
+    if (computationMode_==CLIENT_SIDE)
+    {
+        BROADCAST(this, "sffffs", "translateTo", x, y, z, duration, motion);
+    }
 }
 
 // *****************************************************************************
