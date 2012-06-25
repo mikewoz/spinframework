@@ -144,7 +144,7 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 {
     osg::Vec3 v = osg::Vec3(x,y,z);
 
-    if (!sceneManager->isGraphical())
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
 	{
 
 		if (constraintMode_ == DROP)

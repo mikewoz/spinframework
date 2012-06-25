@@ -820,45 +820,47 @@ void GroupNode::setOrientationTarget (const char* target)
 
 void GroupNode::applyOrientationMode()
 {
-    if (!spinApp::Instance().getContext()->isServer()) return;
-
-    osg::Vec3 targetPos;
-    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
-    
-    if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
-        ReferencedNode *target = dynamic_cast<ReferencedNode*>(orientationTarget_->s_thing);
-        if (target)
+    
+        osg::Vec3 targetPos;
+        osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+        
+        if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
         {
-            // TODO: verify if we really need to recompute the matrices and bound every time.
-            // Perhaps the matrix is already stored somewhere in certain cases?
-            
-            if (orientationMode_==POINT_TO_TARGET_CENTROID)
+            ReferencedNode *target = dynamic_cast<ReferencedNode*>(orientationTarget_->s_thing);
+            if (target)
             {
-                targetPos = target->computeBound().center();
-            }
-            else
-            {
-                osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath);
-                targetPos = targetMatrix.getTrans();
+                // TODO: verify if we really need to recompute the matrices and bound every time.
+                // Perhaps the matrix is already stored somewhere in certain cases?
+                
+                if (orientationMode_==POINT_TO_TARGET_CENTROID)
+                {
+                    targetPos = target->computeBound().center();
+                }
+                else
+                {
+                    osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath);
+                    targetPos = targetMatrix.getTrans();
+                }
             }
         }
-    }
-    else if (orientationMode_==POINT_TO_ORIGIN)
-    {
-        targetPos = osg::Vec3(0.0,0.0,0.0);
-    }
-    
-    osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
-    
-    // can't do this, because that function only does something for NORMAL mode
-    //setOrientation(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+        else if (orientationMode_==POINT_TO_ORIGIN)
+        {
+            targetPos = osg::Vec3(0.0,0.0,0.0);
+        }
+        
+        osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
+        
+        // can't do this, because that function only does something for NORMAL mode
+        //setOrientation(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
 
-    orientation_ = osg::Vec3(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
-    quat_ = osg::Quat( osg::DegreesToRadians(orientation_.x()), osg::Vec3d(1,0,0),
-                             osg::DegreesToRadians(orientation_.y()), osg::Vec3d(0,1,0),
-                             osg::DegreesToRadians(orientation_.z()), osg::Vec3d(0,0,1));
-    updateMatrix();
+        orientation_ = osg::Vec3(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+        quat_ = osg::Quat( osg::DegreesToRadians(orientation_.x()), osg::Vec3d(1,0,0),
+                                 osg::DegreesToRadians(orientation_.y()), osg::Vec3d(0,1,0),
+                                 osg::DegreesToRadians(orientation_.z()), osg::Vec3d(0,0,1));
+        updateMatrix();
+    }
     
     if (!broadcastLock_)
         BROADCAST(this, "sfff", "setOrientation", orientation_.x(), orientation_.y(),  orientation_.z());
