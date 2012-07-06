@@ -60,7 +60,7 @@ class AnimationNode : public GroupNode
 
 public:
 
-    AnimationNode(SceneManager *sceneManager, char *initID);
+    AnimationNode(SceneManager *sceneManager, const char* initID);
     virtual ~AnimationNode();
     
     

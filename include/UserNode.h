@@ -70,7 +70,7 @@ class UserNode : public ConstraintsNode
 
     public:
 
-        UserNode(SceneManager *sceneManager, char *initID);
+        UserNode(SceneManager *sceneManager, const char* initID);
         virtual ~UserNode();
 
         /**

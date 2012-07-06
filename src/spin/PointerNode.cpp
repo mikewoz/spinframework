@@ -59,8 +59,6 @@
 #include "osgUtil.h"
 #include "spinUtil.h"
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -68,10 +66,10 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-PointerNode::PointerNode (SceneManager *sceneManager, char *initID) : RayNode(sceneManager, initID)
+PointerNode::PointerNode (SceneManager *sceneManager, const char* initID) : RayNode(sceneManager, initID)
 {
-    this->setName(string(id->s_name) + ".PointerNode");
-    nodeType = "PointerNode";
+    this->setName(this->getID() + ".PointerNode");
+    this->setNodeType("PointerNode");
 
     lastManipulatorType_ = "TabBoxDragger";
     //draggerType = "TabPlaneDragger";
@@ -139,7 +137,7 @@ void PointerNode::callbackUpdate(osg::NodeVisitor* nv)
 
     // get line segment start and end points:
     
-    osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
+    osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath_);
 
     osg::Vec3 t;
     osg::Quat q;
@@ -163,7 +161,7 @@ void PointerNode::callbackUpdate(osg::NodeVisitor* nv)
     intersectVisitor.setTraversalMask(INTERACTIVE_NODE_MASK);
 
     // start the visitor:
-    sceneManager->worldNode->accept(intersectVisitor);
+    sceneManager_->worldNode->accept(intersectVisitor);
 
     //osg::Timer_t endTick = osg::Timer::instance()->tick();
     //std::cout<<"Intersection completed in "<<osg::Timer::instance()->delta_s(startTick,endTick)<<std::endl;
@@ -198,7 +196,7 @@ void PointerNode::applyGrab(osg::Matrix mat)
 
         /*
         std::cout << "Grabbed nodepath:" << std::endl;
-        for (osg::NodePath::iterator itr = grabbedNode->currentNodePath.begin(); itr != grabbedNode->currentNodePath.end(); ++itr)
+        for (osg::NodePath::iterator itr = grabbedNode->currentNodePath_.begin(); itr != grabbedNode->currentNodePath_.end(); ++itr)
         {
             std::cout << "   -> " << (*itr)->getName() << std::endl;
         }
@@ -211,20 +209,20 @@ void PointerNode::applyGrab(osg::Matrix mat)
         
         
         osg::Matrix grabbedLocalToWorld;
-        ReferencedNode *parentNode = grabbedNode->getParentNode();
+        ReferencedNode *parentNode = grabbedNode->getParentNode(0);
         if (parentNode)
         {
-            grabbedLocalToWorld = osg::computeWorldToLocal(parentNode->currentNodePath);
+            grabbedLocalToWorld = osg::computeWorldToLocal(parentNode->currentNodePath_);
         } else
         {
             grabbedLocalToWorld = osg::Matrix::identity();
-            //grabbedLocalToWorld = osg::computeWorldToLocal(grabbedNode->currentNodePath);
+            //grabbedLocalToWorld = osg::computeWorldToLocal(grabbedNode->currentNodePath_);
         }
          
          
         /*
         // NOTE: this is the test that work to fix parent offset
-        osg::NodePath newPath = grabbedNode->currentNodePath;
+        osg::NodePath newPath = grabbedNode->currentNodePath_;
         newPath.pop_back();
         newPath.pop_back();
         std::cout << "newpath:" << std::endl;
@@ -348,10 +346,10 @@ void PointerNode::reportIntersections()
 
     // Store and report our intersections:
 
-    std::vector<t_symbol*> newIntersectList;
+    std::vector<ReferencedNode*> newIntersectList;
     std::vector<osgUtil::LineSegmentIntersector::Intersection> newIntersectData;
     std::vector<osg::Vec3> newItersectListOffsets;
-    vector<t_symbol*>::iterator iter;
+    std::vector<ReferencedNode*>::iterator iter;
 
     if ( intersector->containsIntersections() )
     {
@@ -380,10 +378,10 @@ void PointerNode::reportIntersections()
                     // only add the hit if not already in the list (note that
                     // one node might have several intersections, for each face
                     // that instersects with the line segment)
-                    iter = std::find( newIntersectList.begin(), newIntersectList.end(), testNode->id );
+                    iter = std::find( newIntersectList.begin(), newIntersectList.end(), testNode );
                     if ( iter == newIntersectList.end() )
                     {
-                        newIntersectList.push_back(testNode->id);
+                        newIntersectList.push_back(testNode);
                         newIntersectData.push_back(intersection);
                         newItersectListOffsets.push_back(intersection.getLocalIntersectPoint());
                     }
@@ -484,7 +482,7 @@ void PointerNode::reportIntersections()
             {
                 ReferencedNode *n = getNodeFromIntersections(i);
                 if (n)
-                    lo_message_add_string(msg, (char*)n->id->s_name);
+                    lo_message_add_string(msg, (char*)n->getID().c_str());
             }
         }
         else
@@ -497,13 +495,13 @@ void PointerNode::reportIntersections()
             if (intersectList.size())
             {
                 for (int i=0; i<intersectList.size(); i++)
-                    std::cout << " " << (char*)intersectList[i]->s_name;
+                    std::cout << " " << intersectList[i]->getID();
             } else std::cout << " NULL";
             std::cout << std::endl;
         }
         // end debug
 
-        //sceneManager->sendNodeMessage(this->id, msg);
+        //sceneManager_->sendNodeMessage(this->id, msg);
         if (spinApp::Instance().getContext()->isServer())
             NODE_LO_MSG(sceneManager, this, msg);
     }
@@ -518,8 +516,7 @@ GroupNode *PointerNode::getNodeFromIntersections(int index)
     
     if ((index>=0) && (index < intersectList.size()))
     {
-        ReferencedNode *t = dynamic_cast<ReferencedNode*>(intersectList[index]->s_thing); // intersectList stores t_symbols
-
+        ReferencedNode *t = intersectList[index];
         while (t)
         {
             GroupNode *g = dynamic_cast<GroupNode*>(t);
@@ -527,7 +524,7 @@ GroupNode *PointerNode::getNodeFromIntersections(int index)
             {
                 return g; 
             }
-            t = dynamic_cast<ReferencedNode*>(t->parent->s_thing);
+            t = dynamic_cast<ReferencedNode*>(t->getParentNode(0));
         }
     }
     
@@ -566,12 +563,12 @@ void PointerNode::computeRT(t_symbol *src, t_symbol *dst, osg::Vec3 &R, osg::Vec
     if (src==gensym("world"))
         srcMatrix = osg::Matrix::identity();
     else
-        srcMatrix = osg::computeLocalToWorld(src->s_thing->currentNodePath);
+        srcMatrix = osg::computeLocalToWorld(src->s_thing->currentNodePath_);
 
     if (dst==gensym("world"))
         dstMatrix = osg::Matrix::identity();
     else
-        dstMatrix = osg::computeLocalToWorld(dst->s_thing->currentNodePath);
+        dstMatrix = osg::computeLocalToWorld(dst->s_thing->currentNodePath_);
 
     // find change in translation and orientation from src to dst:
 
@@ -601,14 +598,14 @@ void PointerNode::lockToTarget(const char *nodeToLock)
     if (!spinApp::Instance().getContext()->isServer())
         return;
         
-    GroupNode *node = dynamic_cast<GroupNode*>(sceneManager->getNode(nodeToLock));
+    GroupNode *node = dynamic_cast<GroupNode*>(sceneManager_->getNode(nodeToLock));
     if (node)
     {
         GroupNode *target = dynamic_cast<GroupNode*>(getNodeFromIntersections(0));        
         if (target)
         {
             node->setOrientationMode(GroupNode::POINT_TO_TARGET_CENTROID);
-            node->setOrientationTarget(target->id->s_name);
+            node->setOrientationTarget(target->getID().c_str());
         }
         else
         {
@@ -636,7 +633,7 @@ void PointerNode::setManipulator(const char *manipulatorType)
                 lastNode->setManipulator("NULL");
         
             n->setManipulator(manipulatorType);
-            lastManipulated = n->id;
+            lastManipulated = n->getNodeSymbol();
         }
         
         // if there was no intersection, load the manipulator on the last object
@@ -677,7 +674,7 @@ void PointerNode::manipulate (int b)
                 dragger_ = NULL;
                 if (lastNode) lastNode->setManipulator("NULL");
                 newNode->setManipulator(lastManipulatorType_.c_str());
-                lastManipulated = newNode->id;
+                lastManipulated = newNode->getNodeSymbol();
             }
         }
     }
@@ -718,8 +715,8 @@ void PointerNode::grab (int b)
             std::cout << "  localPt = " << stringify(localIntersectPt) << std::endl;
             std::cout << "  worldPt = " << stringify(worldIntersectPt) << std::endl;
             */
-            origPointerMatrix = osg::computeLocalToWorld(this->currentNodePath);
-            origGrabbedMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath);
+            origPointerMatrix = osg::computeLocalToWorld(this->currentNodePath_);
+            origGrabbedMatrix = osg::computeLocalToWorld(grabbedNode->currentNodePath_);
             
             slideIncrement_ = 0.0;
             
@@ -769,7 +766,7 @@ void PointerNode::translateOnPointer (float f)
         osg::ref_ptr<GroupNode> n = dynamic_cast<GroupNode*>(grabbedNode.get());
         osg::Vec3 T = n->getTranslation() + osg::Vec3(0,f,0);
 
-        // (TODO: use sceneManager->invokeMethod)
+        // (TODO: use sceneManager_->invokeMethod)
         n->setTranslation(T.x(), T.y(), T.z());
     }
     else

@@ -61,7 +61,7 @@ namespace spin
 class Listener : public DSPNode
 {
     public:
-        Listener(SceneManager *sceneManager, char *initID);
+        Listener(SceneManager *sceneManager, const char* initID);
         virtual ~Listener();
         
         virtual void callbackUpdate(osg::NodeVisitor* nv);

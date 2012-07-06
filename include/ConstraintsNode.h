@@ -72,7 +72,7 @@ class ConstraintsNode : public GroupNode
 public:
     
 
-    ConstraintsNode(SceneManager *sceneManager, char *initID);
+    ConstraintsNode(SceneManager *sceneManager, const char* initID);
     virtual ~ConstraintsNode();
     
     /**

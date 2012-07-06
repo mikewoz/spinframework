@@ -12,7 +12,6 @@
 
 #include <spinApp.h>
 #include <spinBaseContext.h>
-#include <spinUtil.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -98,9 +97,9 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	          __void__NodeMessage__C5_char_P1__lo_message,
 	          "",
 	          "");
-	I_MethodWithDefaults3(void, NodeBundle, IN, spin::t_symbol *, nodeSym, , IN, std::vector< lo_message >, msgs, , IN, lo_address, addr, 0,
+	I_MethodWithDefaults3(void, NodeBundle, IN, std::string, nodeId, , IN, std::vector< lo_message >, msgs, , IN, lo_address, addr, 0,
 	                      Properties::NON_VIRTUAL,
-	                      __void__NodeBundle__t_symbol_P1__std_vectorT1_lo_message___lo_address,
+	                      __void__NodeBundle__std_string__std_vectorT1_lo_message___lo_address,
 	                      "",
 	                      "");
 	I_MethodWithDefaults2(void, SceneBundle, IN, std::vector< lo_message >, msgs, , IN, lo_address, addr, 0,
@@ -174,6 +173,6 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	I_PublicMemberProperty(osg::ref_ptr< spin::UserNode >, userNode);
 	I_PublicMemberProperty(spatosc::Scene *, audioScene);
 	I_PublicMemberProperty(bool, hasAudioRenderer);
-	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
+	I_PublicMemberProperty(spin::SceneManager *, sceneManager_);
 END_REFLECTOR
 

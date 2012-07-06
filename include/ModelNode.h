@@ -70,7 +70,7 @@ class ModelNode : public GroupNode
 
 public:
 
-    ModelNode (SceneManager *sceneManager, char *initID);
+    ModelNode (SceneManager *sceneManager, const char* initID);
     virtual ~ModelNode();
 
     enum animationModeType { OFF, SWITCH, SEQUENCE };
@@ -78,7 +78,7 @@ public:
     /**
      * We change our attachmentNode (add attachment to the centroid), so we MUST
      * override updateNodePath(), and manually push the centroid transform onto
-     * the currentNodePath.
+     * the currentNodePath_.
      */
     virtual void updateNodePath(bool updateChildren = true);
 

@@ -30,8 +30,8 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::AttractorNode)
 	I_DeclaringFile("AttractorNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____AttractorNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____AttractorNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,

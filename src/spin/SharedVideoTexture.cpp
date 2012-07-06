@@ -64,7 +64,7 @@ namespace spin
 SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
     Shader(s, initID), killed_(true)
 {
-	classType = "SharedVideoTexture";
+	classType_ = "SharedVideoTexture";
 	
     width=640;
     height=480;
@@ -120,10 +120,10 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     // keep a timer for reload attempts:
     lastTick = 0;
 
-    std::cout << "created SharedVideoTexture with id: " << this->id->s_name << std::endl;
+    std::cout << "created SharedVideoTexture with id: " << this->getID() << std::endl;
 
     // set initial textureID:
-    //setTextureID(this->id->s_name);
+    //setTextureID(this->getID().c_str());
 
 }
 
@@ -147,7 +147,7 @@ void SharedVideoTexture::setTextureID (const char* newID)
     textureID = std::string(newID);
     this->setName("SharedVideoTexture("+textureID+")");
 
-    if (!sceneManager->isGraphical())
+    if (!sceneManager_->isGraphical())
     {
         BROADCAST(this, "ss", "setTextureID", getTextureID());
     }
@@ -191,7 +191,7 @@ void SharedVideoTexture::debug()
 
 void SharedVideoTexture::updateCallback()
 {
-    if (!sceneManager->isGraphical()) return;
+    if (!sceneManager_->isGraphical()) return;
 
     // do update here
     // FIXME: killed should be protected

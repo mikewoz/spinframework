@@ -48,22 +48,16 @@
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-
-
-
-using namespace std;
-
-
 namespace spin
 {
 
 
 // ***********************************************************
 // constructor:
-ConstraintsNode::ConstraintsNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+ConstraintsNode::ConstraintsNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-    nodeType = "ConstraintsNode";
-    this->setName(string(id->s_name) + ".ConstraintsNode");
+    this->setNodeType("ConstraintsNode");
+    this->setName(this->getID() + ".ConstraintsNode");
 
     target_= gensym("NULL");
     constraintMode_ = BASIC;
@@ -144,7 +138,7 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 {
     osg::Vec3 v = osg::Vec3(x,y,z);
 
-    if (!sceneManager->isGraphical())
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
 	{
 
 		if (constraintMode_ == DROP)
@@ -226,7 +220,7 @@ void ConstraintsNode::move (float x, float y, float z)
 // attempt at this: http://forum.openscenegraph.org/viewtopic.php?p=23242
 osg::Polytope ConstraintsNode::getPolytope()
 {
-    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath_);
     
     osg::Vec3 local
     
@@ -284,7 +278,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	if (targetNode.valid())
 	{
 		// get current position (including offset from previous bounces)
-		osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+		osg::Matrix thisMatrix = osg::computeLocalToWorld(currentNodePath_);
 
         
 		osg::Vec3 worldPos = thisMatrix.getTrans();
@@ -328,7 +322,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 				if (hitNode.valid())
 				{
 
-					//std::cout << id->s_name << " collision!!! with " << (*itr).drawable->getName() << "[" << (*itr).primitiveIndex << "] @ " << std::endl;
+					//std::cout << this->getID() << " collision!!! with " << (*itr).drawable->getName() << "[" << (*itr).primitiveIndex << "] @ " << std::endl;
 					//std::cout << "localHitPoint:\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
 					//std::cout << "localHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
@@ -391,7 +385,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// place the node at the collision point
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
 
-						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+						BROADCAST(this, "ssfff", "collide", hitNode->getID().c_str(), osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 
 						if (constraintMode_==COLLIDE)
@@ -478,7 +472,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						//setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
 
                         //std::cout << "rotEulers = " << osg::RadiansToDegrees(rotEulers.x())<<","<<osg::RadiansToDegrees(rotEulers.y())<<","<<osg::RadiansToDegrees(rotEulers.z()) << std::endl;
-                        BROADCAST(this, "ssfff", "bounce", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+                        BROADCAST(this, "ssfff", "bounce", hitNode->getID().c_str(), osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);

@@ -50,19 +50,18 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(sceneManager, initID)
+UserNode::UserNode (SceneManager *sceneManager, const char* initID) : ConstraintsNode(sceneManager, initID)
 {
-    using std::string;
-    nodeType = "UserNode";
-    this->setName(string(id->s_name) + ".UserNode");
+    this->setNodeType("UserNode");
+    this->setName(this->getID() + ".UserNode");
 
-    description_ = string(initID);
+    description_ = std::string(initID);
 	computationMode_ = CLIENT_SIDE; 
 	velocityMode_ = MOVE;	
 	cameraOffsetNode_ = new osg::PositionAttitudeTransform();
-	cameraOffsetNode_->setName(string(id->s_name) + ".cameraOffset");
+	cameraOffsetNode_->setName(this->getID() + ".cameraOffset");
 	cameraAttachmentNode_ = new osg::PositionAttitudeTransform();
-	cameraAttachmentNode_->setName(string(id->s_name) + ".cameraAttachmentNode");
+	cameraAttachmentNode_->setName(this->getID() + ".cameraAttachmentNode");
 
     // should we attach ourselves to GroupNode's mainTransform or clipNode?
 	getAttachmentNode()->addChild(cameraOffsetNode_.get());
@@ -81,7 +80,7 @@ UserNode::UserNode (SceneManager *sceneManager, char *initID) : ConstraintsNode(
 // destructor
 UserNode::~UserNode()
 {
-    //std::cout << "Destroying UserNode: " << id->s_name << std::endl;
+    //std::cout << "Destroying UserNode: " << getID() << std::endl;
 }
 
 void UserNode::callbackUpdate(osg::NodeVisitor* nv)
@@ -97,7 +96,7 @@ void UserNode::callbackUpdate(osg::NodeVisitor* nv)
 			// subgraph.
 
 			//uncomment when ready:
-			this->scheduleForDeletion = true;
+			this->scheduleForDeletion_ = true;
 		}
 	}
 
@@ -108,8 +107,8 @@ void UserNode::updateNodePath(bool updateChildren)
     ConstraintsNode::updateNodePath(false);
 
     /*
-    currentNodePath.push_back(cameraOffsetNode_.get());
-    currentNodePath.push_back(cameraAttachmentNode_.get());
+    currentNodePath_.push_back(cameraOffsetNode_.get());
+    currentNodePath_.push_back(cameraAttachmentNode_.get());
     */
     
     // now update NodePaths for all children:

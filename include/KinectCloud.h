@@ -67,7 +67,7 @@ class KinectCloud : public GroupNode
 
 public:
 
-    KinectCloud(SceneManager *sceneManager, char *initID);
+    KinectCloud(SceneManager *sceneManager, const char* initID);
     virtual ~KinectCloud();
     
     enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES,

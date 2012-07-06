@@ -71,8 +71,7 @@ class SoundConnection : virtual public osg::Node
         SoundConnection(SceneManager *s, osg::ref_ptr<DSPNode> src, osg::ref_ptr<DSPNode> snk);
         ~SoundConnection();
 
-        t_symbol *id;
-        
+        std::string getID() { return std::string(id_->s_name); }
         
         void setThru (int newvalue);
         void setDistanceEffect (float newvalue);
@@ -102,6 +101,8 @@ class SoundConnection : virtual public osg::Node
         
     private:
         
+        t_symbol *id_;
+
         // The modifiable parameters of the connection (allows for bending the rules
         // of physical modelling):
         bool thru;
@@ -111,7 +112,7 @@ class SoundConnection : virtual public osg::Node
         float diffractionEffect;
         
         
-        SceneManager *sceneManager;
+        SceneManager *sceneManager_;
 
 };
 

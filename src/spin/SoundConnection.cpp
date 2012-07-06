@@ -55,10 +55,10 @@ namespace spin
 SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, osg::ref_ptr<DSPNode> snk)
 {
 	
-	sceneManager = s;
+	sceneManager_ = s;
 	
-	id = gensym( (std::string(src->id->s_name) + "-" + std::string(snk->id->s_name) + ".conn" ).c_str() );
-	//id->s_thing = this; // can't do this because SoundConnection doesn't extend osg::Object
+	id_ = gensym( (src->getID() + "-" + snk->getID() + ".conn" ).c_str() );
+	//id_->s_thing = this; // can't do this because SoundConnection doesn't extend osg::Object
 
 	// set pointers:
 	source = src.get();
@@ -75,7 +75,7 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 
 	
 	// register with OSC parser:
-    std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
+    std::string oscPattern = "/SPIN/" + sceneManager_->sceneID + "/" + this->getID();
     std::vector<lo_server>::iterator it;
     for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
     {
@@ -89,11 +89,8 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	                     spinBaseContext::connectionCallback,
 	                     (void*)this);
 	
-	// store pointer to sceneManager
-	sceneManager = s;
-	
 	// broadcast the creation of this connection
-	SCENE_MSG("sss", "createNode", id->s_name, "SoundConnection");
+	SCENE_MSG("sss", "createNode", getID().c_str(), "SoundConnection");
 }
 
 
@@ -105,13 +102,13 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 
 SoundConnection::~SoundConnection()
 {	
-	//std::cout << "In SoundConnection destructor... id: " << this->id->s_name << std::endl;
+	//std::cout << "In SoundConnection destructor... id: " << this->getID() << std::endl;
 	
 	
 	// broadcast the delete message of this connection
-	SCENE_MSG("ss", "deleteNode", id->s_name);
+	SCENE_MSG("ss", "deleteNode", getID().c_str());
 
-    std::string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + std::string(id->s_name);
+    std::string oscPattern = "/SPIN/" + sceneManager_->sceneID + "/" + this->getID();
     std::vector<lo_server>::iterator it;
     for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
     {
@@ -120,7 +117,7 @@ SoundConnection::~SoundConnection()
 
 	lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
 	
-	//id->s_thing = 0;
+	//id_->s_thing = 0;
 
 }
 
@@ -150,7 +147,7 @@ void SoundConnection::updateSharedSpaces()
 				{
 					if ((*iter2)->source == this->source) // if the source node is the same as the node in this connection
 					{
-						conn = nodeManager->getConnection(source->id, (*iter1)->sink->id);
+						conn = nodeManager->getConnection(source->id_, (*iter1)->sink->id_);
 						conn->sharedSpaces.push_back( dynamic_cast<SoundSpace*>(sink.get()) ); // add the shared space
 						break;
 					}
@@ -168,7 +165,7 @@ void SoundConnection::updateSharedSpaces()
 				{
 					if ((*iter2)->sink == this->sink) // if any of those sink nodes is the same as this connection's sink
 					{
-						conn = nodeManager->getConnection( (*iter1)->source->id, sink->id );
+						conn = nodeManager->getConnection( (*iter1)->source->id_, sink->id_ );
 						conn->sharedSpaces.push_back( dynamic_cast<SoundSpace*>(source.get()) ); // add the shared space
 						break;
 					}
@@ -204,8 +201,8 @@ void SoundConnection::updateSharedSpaces()
 
 void SoundConnection::computeWorldMatrices()
 {
-	srcMatrix = osg::computeLocalToWorld(source->currentNodePath);
-	snkMatrix = osg::computeLocalToWorld(sink->currentNodePath);
+	srcMatrix = osg::computeLocalToWorld(source->currentNodePath_);
+	snkMatrix = osg::computeLocalToWorld(sink->currentNodePath_);
 }
 
 	
@@ -239,7 +236,7 @@ void SoundConnection::computeDistance()
 
 		// find distance by examining intersections:
 
-		//std::cout << "intersect test: " << source->id->s_name << "=(" << srcPos.x() << "," << srcPos.y() << "," << srcPos.z() << "), " << sink->id->s_name << "=(" << snkPos.x() << "," << snkPos.y() << "," << snkPos.z() << ")" << std::endl;
+		//std::cout << "intersect test: " << source->getID() << "=(" << srcPos.x() << "," << srcPos.y() << "," << srcPos.z() << "), " << sink->getID() << "=(" << snkPos.x() << "," << snkPos.y() << "," << snkPos.z() << ")" << std::endl;
 		
 		if (hits.empty()) // this means that the node is inside the space
 		{
@@ -276,7 +273,7 @@ void SoundConnection::computeDistance()
 void SoundConnection::computeRolloff()
 {
 	
-	//std::cout << " SoundConnection::computeRolloff (" << source->id->s_name << " - " << sink->id->s_name << ")" << std::endl;
+	//std::cout << " SoundConnection::computeRolloff (" << source->getID() << " - " << sink->getID() << ")" << std::endl;
 	// A rolloff table contains gain values for different angles of incidence.
 	//
 	// Incidence, for that matter, is the angular between an object's direction
@@ -348,7 +345,7 @@ void SoundConnection::computeRolloff()
 
 void SoundConnection::computeSeparation()
 {
-	//std::cout << " SoundConnection::computeSeparation (" << source->id->s_name << " - " << sink->id->s_name << ")" << std::endl;
+	//std::cout << " SoundConnection::computeSeparation (" << source->getID() << " - " << sink->getID() << ")" << std::endl;
 	// Here we go through the list of sharedSpaces, and see if the source and sink
 	// are on opposite sides of any space (ie, isInside flag is opposite). Hence,
 	// this should ideally be called AFTER the computeDistance() function.
@@ -358,18 +355,18 @@ void SoundConnection::computeSeparation()
 	vector< osg::ref_ptr<SoundSpace> >::iterator iter;
 	SoundConnection *space2node, *node2space;
 	
-	//std::cout << "testing " << sharedSpaces.size() << " spaces to see if source (" << source->id->s_name << ") is separated from sink (" << sink->id->s_name << ")" << std::endl;
+	//std::cout << "testing " << sharedSpaces.size() << " spaces to see if source (" << source->getID() << ") is separated from sink (" << sink->getID() << ")" << std::endl;
 	for (iter = sharedSpaces.begin(); iter != sharedSpaces.end(); iter++)
 	{
-		//std::cout << "testing space [" << (*iter)->id->s_name << "]:" << std::endl;
-		node2space = nodeManager->getConnection(source->id, (*iter)->id);
-		space2node = nodeManager->getConnection((*iter)->id, sink->id);
+		//std::cout << "testing space [" << (*iter)->getID() << "]:" << std::endl;
+		node2space = nodeManager->getConnection(source->id_, (*iter)->id_);
+		space2node = nodeManager->getConnection((*iter)->id_, sink->id_);
 		if ( (node2space!=NULL) && (space2node!=NULL) )
 		{
 			if (space2node->isInside != node2space->isInside)
 			{
 				isSeparated = 1.0;
-				occludingSpace = (*iter)->id;
+				occludingSpace = (*iter)->id_;
 				break;
 			}
 			//std::cout << "  sourceInside=" << node2space->isInside << ", sinkInside=" << space2node->isInside << ", thus separated=" << isSeparated << std::endl;
@@ -426,7 +423,7 @@ void SoundConnection::debug()
 	std::cout << "****************************************" << std::endl;
 	std::cout << "********** CONNECTION  DEBUG: **********" << std::endl;
 	
-	std::cout << "\nSoundConnection [" << this->id->s_name << "]:" << std::endl;
+	std::cout << "\nSoundConnection [" << this->getID() << "]:" << std::endl;
 	
     std::vector<lo_message> nodeState = this->getState();
     std::vector<lo_message>::iterator nodeStateIterator;
@@ -465,11 +462,11 @@ std::vector<lo_message> SoundConnection::getState () const
 	lo_message msg;
 	
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "src", source->id->s_name);
+	lo_message_add(msg, "ss", "src", source->getID().c_str());
 	ret.push_back(msg);
 	
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "snk", sink->id->s_name);
+	lo_message_add(msg, "ss", "snk", sink->getID().c_str());
 	ret.push_back(msg);
 	
 	msg = lo_message_new();
@@ -499,7 +496,7 @@ std::vector<lo_message> SoundConnection::getState () const
 void SoundConnection::stateDump ()
 {
 
-    spinApp::Instance().NodeBundle(this->id, this->getState());
+    spinApp::Instance().NodeBundle(this->getID(), this->getState());
 	
 	/*
 	vector<lo_message> nodeState = this->getState();
@@ -507,8 +504,8 @@ void SoundConnection::stateDump ()
 	vector<lo_message>::iterator iter = nodeState.begin();
 	while (iter != nodeState.end())
 	{
-		//sceneManager->sendNodeMessage(source->id, (*iter));
-		sceneManager->sendNodeMessage(this->id, (*iter));
+		//sceneManager_->sendNodeMessage(source->id_, (*iter));
+		sceneManager_->sendNodeMessage(this->id, (*iter));
 		nodeState.erase(iter); //note: iterator automatically advances after erase()
 	}
 	*/
@@ -517,7 +514,7 @@ void SoundConnection::stateDump ()
 
 void SoundConnection::stateDump (lo_address addr)
 {
-    spinApp::Instance().NodeBundle(this->id, this->getState(), addr);
+    spinApp::Instance().NodeBundle(this->getID(), this->getState(), addr);
 }
 
 } // end of namespace spin

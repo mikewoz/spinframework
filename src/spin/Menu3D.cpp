@@ -54,10 +54,10 @@ namespace spin
 
 // -----------------------------------------------------------------------------
 // constructor:
-Menu3D::Menu3D (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+Menu3D::Menu3D (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(std::string(id->s_name) + ".Menu3D");
-	nodeType = "Menu3D";
+	this->setName(this->getID() + ".Menu3D");
+	this->setNodeType("Menu3D");
 
 	highlighted_ = 0;
 	enabled_ = 1;
@@ -71,7 +71,7 @@ Menu3D::Menu3D (SceneManager *sceneManager, char *initID) : GroupNode(sceneManag
 
 	// create a switch node so we can easily enable/disable the menu:
 	switcher = new osg::Switch();
-	switcher->setName(std::string(id->s_name) + ".switcher");
+	switcher->setName(this->getID() + ".switcher");
 
 	// We inherit from GroupNode, so we must make sure to attach our osg Switch
 	// to the attachmentNode of GroupNode
@@ -92,7 +92,7 @@ Menu3D::~Menu3D()
 void Menu3D::updateNodePath()
 {
 	GroupNode::updateNodePath(false);
-	currentNodePath.push_back(switcher.get());
+	currentNodePath_.push_back(switcher.get());
 	updateChildNodePaths();
 }
 
@@ -114,16 +114,16 @@ void Menu3D::addItem (const char *itemText)
 	// create a new id for the item:
 	char itemID[256];
 	unsigned long long utick =  (unsigned long long) osg::Timer::instance()->tick();
-	//sprintf(itemID, "%s_item_%06d", this->id->s_name, ++COUNTER);
-	sprintf(itemID, "%s_item_%llx", this->id->s_name, utick);
+	//sprintf(itemID, "%s_item_%06d", this->getID(), ++COUNTER);
+	sprintf(itemID, "%s_item_%llx", this->getID().c_str(), utick);
 
 	std::cout << "adding item: " << itemID << ": '" << itemText << "'" << std::endl;
 
 	// get ReferencedNode for the ID:
-	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getOrCreateNode(itemID, "TextNode"));
+	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager_->getOrCreateNode(itemID, "TextNode"));
 	if (!n.valid())
 	{
-		std::cout << "WARNING: Menu3D '" << this->id->s_name << "' could not create TextNode: '" << itemID << "'" << std::endl;
+		std::cout << "WARNING: Menu3D '" << this->getID() << "' could not create TextNode: '" << itemID << "'" << std::endl;
 		return;
 	}
 
@@ -134,7 +134,7 @@ void Menu3D::addItem (const char *itemText)
 	n->setBillboard(billboardType_);
 	n->setInteractionMode(GroupNode::SELECT);
 	n->setText(itemText);
-	n->setParent(this->id->s_name);
+	n->attachTo(this->getID().c_str());
 
 	// add it to the list:
 	items_.push_back(n);
@@ -152,16 +152,16 @@ void Menu3D::removeItem (int itemIndex)
 	if ((itemIndex>=0) && (itemIndex<(int)items_.size()))
 	{
 		if (!doRemoveItem(items_[itemIndex]))
-			std::cout << "WARNING: Menu3D '" << this->id->s_name << "' failed to remove item " << itemIndex << std::endl;
+			std::cout << "WARNING: Menu3D '" << this->getID() << "' failed to remove item " << itemIndex << std::endl;
 	}
 }
 void Menu3D::removeItem (const char *itemID)
 {
 	if ( !spinApp::Instance().getContext()->isServer() ) return;
 	
-	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getNode(itemID));
+	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager_->getNode(itemID));
 	if (!doRemoveItem(n))
-		std::cout << "WARNING: Menu3D '" << this->id->s_name << "' failed to remove item '" << itemID << "'" << std::endl;
+		std::cout << "WARNING: Menu3D '" << this->getID() << "' failed to remove item '" << itemID << "'" << std::endl;
 }
 int Menu3D::doRemoveItem (osg::observer_ptr<TextNode> n)
 {
@@ -177,8 +177,8 @@ int Menu3D::doRemoveItem (osg::observer_ptr<TextNode> n)
 	{
 		if (n.get()==(*i).get())
 		{
-			BROADCAST(this, "ss", "removeItem", (*i)->id->s_name);
-			sceneManager->deleteNode((*i)->id->s_name);
+			BROADCAST(this, "ss", "removeItem", (*i)->getID().c_str());
+			sceneManager_->deleteNode((*i)->getID().c_str());
 			items_.erase(i); // iterator increments
 			redraw(); // will remedy the whole left by the missing item
 			return 1;
@@ -201,7 +201,7 @@ void Menu3D::clearItems()
    		// successful, so erase the item manually:
    		if ((*i).valid())
 		{
-   			sceneManager->deleteNode((*i)->id->s_name);
+   			sceneManager_->deleteNode((*i)->getID().c_str());
 		}
 		items_.erase(i);
 	}
@@ -283,7 +283,7 @@ void Menu3D::setHighlighted(int itemIndex)
 
 void Menu3D::setHighlighted(const char *itemID)
 {
-	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager->getNode(itemID));
+	osg::observer_ptr<TextNode> n = dynamic_cast<TextNode*>(sceneManager_->getNode(itemID));
 	doHighlight(n);
 }
 
@@ -400,7 +400,7 @@ std::vector<lo_message> Menu3D::getState () const
     	if ((*i).valid())
 		{
     		msg = lo_message_new();
-    		lo_message_add(msg, "sss", "addItem", (*i)->id->s_name, (*i)->getText());
+    		lo_message_add(msg, "sss", "addItem", (*i)->getID().c_str(), (*i)->getText());
     		ret.push_back(msg);
 		}
     }

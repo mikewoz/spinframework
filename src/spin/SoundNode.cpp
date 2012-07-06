@@ -51,15 +51,15 @@ namespace spin
 
 // ===================================================================
 // constructor:
-SoundNode::SoundNode (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
+SoundNode::SoundNode (SceneManager *sceneManager, const char* initID) : DSPNode(sceneManager, initID)
 {
-	nodeType = "SoundNode";
-	this->setName(std::string(id->s_name) + ".SoundNode");
+	this->setNodeType("SoundNode");
+	this->setName(this->getID() + ".SoundNode");
 
 #ifdef WITH_SPATOSC
 	if (spinApp::Instance().hasAudioRenderer)
 	{
-	    spatOSCSource = spinApp::Instance().audioScene->createSoundSource(std::string(id->s_name));
+	    spatOSCSource = spinApp::Instance().audioScene->createSoundSource(this->getID());
         std::cout << "Created SpatOSC Source:" << std::endl;
         //spinApp::Instance().audioScene->debugPrint();
 	}
@@ -69,7 +69,7 @@ SoundNode::SoundNode (SceneManager *sceneManager, char *initID) : DSPNode(sceneM
 // destructor
 SoundNode::~SoundNode()
 {
-	//std::cout << "In SoundNode destructor... node: " << this->id->s_name << std::endl;
+	//std::cout << "In SoundNode destructor... node: " << this->getID() << std::endl;
 #ifdef WITH_SPATOSC
 	if (spinApp::Instance().hasAudioRenderer)
 	{

@@ -67,10 +67,10 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-DSPNode::DSPNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+DSPNode::DSPNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
 
-	nodeType = "DSPNode";
+	this->setNodeType("DSPNode");
 	
 	// enable report of globals by default:
 	setReportMode(GroupNode::GLOBAL_6DOF);
@@ -112,13 +112,13 @@ DSPNode::~DSPNode()
 
 	while (connectTO.size())
 	{
-		this->disconnect(connectTO[0]->sink->id->s_name);	
+		this->disconnect(connectTO[0]->sink->getID().c_str());	
 	}
 	
 	while (connectFROM.size())
     {
         if (connectFROM[0]->source)
-            connectFROM[0]->source->disconnect(this->id->s_name);
+            connectFROM[0]->source->disconnect(this->getID().c_str());
 	}
 	
 }
@@ -130,7 +130,7 @@ DSPNode::~DSPNode()
 void DSPNode::callbackUpdate()
 {
 
-	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
+	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath_);
 	
 	if (this->_globalMatrix != myMatrix)
 	{
@@ -167,7 +167,7 @@ SoundConnection *DSPNode::getConnection(DSPNode *snk)
 
 SoundConnection *DSPNode::getConnection(const char *snk)
 {
-	return getConnection( dynamic_cast<DSPNode*>( sceneManager->getNode(snk) ) );
+	return getConnection( dynamic_cast<DSPNode*>( sceneManager_->getNode(snk) ) );
 }
 
 
@@ -177,26 +177,26 @@ void DSPNode::connect(DSPNode *snk)
 	// check if this connection already exists:
 	if (!this->getConnection(snk))
 	{
-		SoundConnection *conn = new SoundConnection(this->sceneManager, this, snk);
+		SoundConnection *conn = new SoundConnection(this->sceneManager_, this, snk);
 
 		// add to the connection lists for each node:
 		this->connectTO.push_back(conn);
 		conn->sink->connectFROM.push_back(conn);
 	}
 	
-	BROADCAST(this, "ss", "connect", snk->id->s_name);
+	BROADCAST(this, "ss", "connect", snk->getID().c_str());
 }
 
 // *****************************************************************************
 void DSPNode::connect(const char *snk)
 {
-	osg::ref_ptr<DSPNode> sinkNode = dynamic_cast<DSPNode*>( sceneManager->getNode(snk) );
+	osg::ref_ptr<DSPNode> sinkNode = dynamic_cast<DSPNode*>( sceneManager_->getNode(snk) );
 	if (sinkNode.valid()) this->connect(sinkNode.get());
 }
 
 void DSPNode::connectSource(const char *src)
 {
-	osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( sceneManager->getNode(src) );
+	osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( sceneManager_->getNode(src) );
 	if (srcNode.valid()) srcNode->connect(this);	
 }
 
@@ -245,7 +245,7 @@ void DSPNode::disconnect(const char *snk)
 
 		BROADCAST(this, "ss", "disconnect", snk);
 	} else { 
-        std::cout << "oops. couldn't find connection: " << this->id->s_name << " -> " << snk << std::endl;
+        std::cout << "oops. couldn't find connection: " << this->getID() << " -> " << snk << std::endl;
     }
 }
 
@@ -429,7 +429,7 @@ void DSPNode::drawVUmeter()
         // set the scale/color according to the current sound intensity:
         updateVUmeter();
 
-        VUmeterTransform->setName(std::string(id->s_name) + ".VUmeterTransform");
+        VUmeterTransform->setName(this->getID() + ".VUmeterTransform");
         this->getAttachmentNode()->addChild(VUmeterTransform.get());
    }
 
@@ -490,7 +490,7 @@ void DSPNode::drawDirectivity()
 
         directivityGeode->setStateSet(wireframeStateSet);
 
-        directivityGeode->setName(std::string(id->s_name) + ".directivityGeode");
+        directivityGeode->setName(this->getID() + ".directivityGeode");
         this->getAttachmentNode()->addChild(directivityGeode.get());
     }
 
@@ -510,7 +510,7 @@ void DSPNode::drawLaser()
     {
         // create geode to hold lase:
         laserGeode = new osg::Geode();
-        laserGeode->setName(std::string(id->s_name) + ".laserGeode");
+        laserGeode->setName(this->getID() + ".laserGeode");
 
         // draw laser as a cylinder:
         osg::Vec3 center;
@@ -563,7 +563,7 @@ std::vector<lo_message> DSPNode::getState() const
 		msg = lo_message_new();
 		lo_message_add_string(msg, "connectedTo");
 		for (int i=0; i<connectTO.size(); i++)
-			lo_message_add_string(msg, (char*)connectTO[i]->sink->id->s_name);
+			lo_message_add_string(msg, (char*)connectTO[i]->sink->getID().c_str());
 		ret.push_back(msg);
 	}
 	*/
@@ -571,7 +571,7 @@ std::vector<lo_message> DSPNode::getState() const
 	for (int i=0; i<connectTO.size(); i++)	
 	{
 		msg = lo_message_new();
-		lo_message_add(msg, "ss", "connect", (char*)connectTO[i]->sink->id->s_name);
+		lo_message_add(msg, "ss", "connect", (char*)connectTO[i]->sink->getID().c_str());
 		ret.push_back(msg);
 	}
 	

@@ -58,7 +58,7 @@ class AttractorNode : public GroupNode
 
 public:
 
-    AttractorNode(SceneManager *sceneManager, char *initID);
+    AttractorNode(SceneManager *sceneManager, const char* initID);
     virtual ~AttractorNode();
 
     /**

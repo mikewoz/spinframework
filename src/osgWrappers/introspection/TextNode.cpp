@@ -78,8 +78,8 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_DeclaringFile("TextNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____TextNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____TextNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
@@ -91,7 +91,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
 	          "",
-	          "A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
+	          "Returns the last stored nodepath (note: may have changed in current update traversal A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
 	I_Method1(void, setDrawMode, IN, spin::TextNode::DrawMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setDrawMode__DrawMode,

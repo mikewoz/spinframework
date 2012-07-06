@@ -132,7 +132,7 @@ class worldMatrixUpdater : public osg::NodeVisitor
             ss_soundNode *ourNode = dynamic_cast<ss_soundNode*>(node.getUserData());
             osg::Matrix mat = osg::computeWorldToLocal( getNodePath() );
             osg::Vec3 trans = mat.getTrans();
-            osg::notify(osg::NOTICE) << "global position of '" << ourNode->id->s_name << "' is (" << trans.x() << "," << trans.y() << "," << trans.z() << ")" << std::endl;
+            osg::notify(osg::NOTICE) << "global position of '" << ourNode->getID() << "' is (" << trans.x() << "," << trans.y() << "," << trans.z() << ")" << std::endl;
             //ourNode->worldMatrix = osg::computeWorldToLocal( getNodePath() );
             traverse(node);
 

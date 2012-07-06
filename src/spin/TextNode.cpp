@@ -466,12 +466,12 @@ osgText::String::iterator spinTextNode::computeLastCharacterOnLine(osg::Vec2& cu
 
 // ===================================================================
 // constructor:
-TextNode::TextNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+TextNode::TextNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
     using std::string;
 
-	this->setName(string(id->s_name) + ".TextNode");
-	nodeType = "TextNode";
+	this->setName(this->getID() + ".TextNode");
+	this->setNodeType("TextNode");
 
 	//_text = "";
     drawMode_ = GLYPH;
@@ -589,7 +589,7 @@ void TextNode::setFont (const char *s)
         this->font_ = string(s);
         /*
 		pthread_mutex_lock(&sceneMutex);
-		textLabel_->setFont( sceneManager->resourcesPath + "/fonts/" + font_ );
+		textLabel_->setFont( sceneManager_->resourcesPath + "/fonts/" + font_ );
 		pthread_mutex_unlock(&sceneMutex);
 		//drawText();
         */
@@ -765,7 +765,7 @@ void TextNode::drawText()
 		} else {
 			textGeode_ = new osg::Geode();
 		}
-		textGeode_->setName(string(id->s_name) + ".TextGeode");
+		textGeode_->setName(this->getID() + ".TextGeode");
 		
 		// attach geode and textLabel_:
 		this->getAttachmentNode()->addChild(textGeode_.get());
@@ -820,7 +820,7 @@ void TextNode::updateText()
 		// set some parameters for the text:
 		textLabel_->setCharacterSize(characterSize_);
 		//textLabel_->setFont(0); // inbuilt font (small)
-		//textLabel_->setFont( sceneManager->resourcesPath + "/fonts/" + font_ );
+		//textLabel_->setFont( sceneManager_->resourcesPath + "/fonts/" + font_ );
 		textLabel_->setFont( font_ );
 		//textLabel_->setFontResolution(40,40);
         //textLabel_->setFontResolution(80,80);

@@ -34,8 +34,8 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::ReporterNode)
 	I_DeclaringFile("ReporterNode.h");
 	I_BaseType(spin::ReferencedNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____ReporterNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____ReporterNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method0(void, debug,

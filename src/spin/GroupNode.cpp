@@ -189,9 +189,9 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
     
 // ***********************************************************
 // constructor:
-GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+GroupNode::GroupNode (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
 {
-    nodeType = "GroupNode";
+    this->setNodeType("GroupNode");
     this->setName(getID() + ".GroupNode");
 
     //_reportGlobals = false;
@@ -304,6 +304,22 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
 
         float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
 
+
+        if (motion_.valid())
+        {
+            motion_->update(dt);
+            float motionIndex = motion_->getValue();
+            osg::Vec3 newPos = motionStart_ + ((motionEnd_-motionStart_) * motionIndex);
+            this->setTranslation( newPos.x(), newPos.y(), newPos.z() );
+            
+            if (motion_->getTime() >= motion_->getDuration())
+            {
+                BROADCAST(this, "sss", "event", "translateTo", "done");
+                motion_ = NULL;
+            }
+        }
+
+
         if (velocity_.length() > EPSILON)
         {
             if (this->velocityMode_==GroupNode::TRANSLATE)
@@ -348,8 +364,8 @@ void GroupNode::updateNodePath(bool updateChildren)
     // are not updated yet:
 	ReferencedNode::updateNodePath(false);
 
-    currentNodePath.push_back(mainTransform_.get());    
-    currentNodePath.push_back(clipNode_.get());
+    currentNodePath_.push_back(mainTransform_.get());    
+    currentNodePath_.push_back(clipNode_.get());
     
     // now update NodePaths for all children:
     if (updateChildren) updateChildNodePaths();
@@ -365,7 +381,7 @@ void GroupNode::mouseEvent (int /*event*/, int keyMask, int buttonMask, float x,
 
 void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
 {
-    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager_->getNode(userString));
     if (!user.valid()) return;
 
     if (interactionMode_==DRAG || interactionMode_==THROW)
@@ -486,8 +502,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 if (!this->owner_.valid())
                 {
                     this->owner_ = user.get();
-                    //std::cout << "setting owner of " << id->s_name << " to " << owner_->id->s_name << std::endl;
-                    BROADCAST(this, "ss", "setOwner", owner_->id->s_name);
+                    //std::cout << "setting owner of " << getID() << " to " << owner_->getID() << std::endl;
+                    BROADCAST(this, "ss", "setOwner", owner_->getID().c_str());
                     BROADCAST(this, "ssi", "select", userString, 1);
                 }
                 break;
@@ -498,7 +514,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 // that he had ownership in the first place):
                 if (this->owner_ == user)
                 {
-                    //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
+                    //std::cout << "setting owner of " << getID() << " to NULL" << std::endl;
                     this->owner_ = NULL;
                     BROADCAST(this, "ss", "setOwner", "NULL");
                     BROADCAST(this, "ssi", "select", userString, 0);
@@ -514,7 +530,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
 void GroupNode::setLock(const char* userString, int lock)
 {
-    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager_->getNode(userString));
     if (!user.valid()) return;
 
     if (lock)
@@ -522,15 +538,15 @@ void GroupNode::setLock(const char* userString, int lock)
         if (owner_.valid())
         {
             this->owner_ = user.get();
-            //std::cout << "setting owner of " << id->s_name << " to " << owner_->id->s_name << std::endl;
-            BROADCAST(this, "ss", "setOwner", owner_->id->s_name);
+            //std::cout << "setting owner of " << getID() << " to " << owner_->getID() << std::endl;
+            BROADCAST(this, "ss", "setOwner", owner_->getID().c_str());
         }
     }
     else
     {
         if (this->owner_ == user)
         {
-            //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
+            //std::cout << "setting owner of " << getID() << " to NULL" << std::endl;
             this->owner_ = NULL;
             BROADCAST(this, "ss", "setOwner", "NULL");
         }
@@ -542,7 +558,7 @@ void GroupNode::debug()
     ReferencedNode::debug();
 
     std::cout << "   Manipulator: " << manipulatorType_ << std::endl;
-    if (owner_.valid()) std::cout << "   owner: " << owner_->id->s_name << std::endl;
+    if (owner_.valid()) std::cout << "   owner: " << owner_->getID() << std::endl;
     else std::cout << "   owner: NULL" << std::endl;
     
     std::cout << "   mainX pos: " << stringify(this->getTranslation()) << std::endl;
@@ -605,7 +621,8 @@ void GroupNode::setInteractionMode (InteractionMode mode)
         // now we need to travel up the scenegraph and set all parents to have
         // an InteractionMode of PASSTHRU, otherwise an intersection traversal
         // will never find this node:
-        GroupNode *parent = dynamic_cast<GroupNode*>(this->getParentNode());
+                
+        GroupNode *parent = dynamic_cast<GroupNode*>(this->getParentNode(0));
         while (parent)
         {
             if (!parent->getInteractionMode())
@@ -613,7 +630,7 @@ void GroupNode::setInteractionMode (InteractionMode mode)
                 parent->setInteractionMode(PASSTHRU);
                 continue; // rest of parents will be recursively called
             }
-            else parent = dynamic_cast<GroupNode*>(parent->getParentNode());
+            else parent = dynamic_cast<GroupNode*>(parent->getParentNode(0));
         }
         
     }
@@ -623,11 +640,11 @@ void GroupNode::setInteractionMode (InteractionMode mode)
 
 void GroupNode::setStateSetFromFile(const char* filename)
 {
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(filename);
 	if (ss.valid())
 	{
-		if (ss->id == stateset_) return; // we're already using that stateset
-		stateset_ = ss->id;
+		if (ss->getIDSymbol() == stateset_) return; // we're already using that stateset
+		stateset_ = ss->getIDSymbol();
 		updateStateSet();
 		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
 	}
@@ -637,10 +654,10 @@ void GroupNode::setStateSet (const char* s)
 {
 	if (gensym(s)==stateset_) return;
 
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->getStateSet(s);
 	if (ss.valid())
 	{
-		stateset_ = ss->id;
+		stateset_ = ss->getIDSymbol();
 		updateStateSet();
 		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
 	}
@@ -804,45 +821,47 @@ void GroupNode::setOrientationTarget (const char* target)
 
 void GroupNode::applyOrientationMode()
 {
-    if (!spinApp::Instance().getContext()->isServer()) return;
-
-    osg::Vec3 targetPos;
-    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
-    
-    if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
-        ReferencedNode *target = dynamic_cast<ReferencedNode*>(orientationTarget_->s_thing);
-        if (target)
+    
+        osg::Vec3 targetPos;
+        osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath_);
+        
+        if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
         {
-            // TODO: verify if we really need to recompute the matrices and bound every time.
-            // Perhaps the matrix is already stored somewhere in certain cases?
-            
-            if (orientationMode_==POINT_TO_TARGET_CENTROID)
+            ReferencedNode *target = dynamic_cast<ReferencedNode*>(orientationTarget_->s_thing);
+            if (target)
             {
-                targetPos = target->computeBound().center();
-            }
-            else
-            {
-                osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath);
-                targetPos = targetMatrix.getTrans();
+                // TODO: verify if we really need to recompute the matrices and bound every time.
+                // Perhaps the matrix is already stored somewhere in certain cases?
+                
+                if (orientationMode_==POINT_TO_TARGET_CENTROID)
+                {
+                    targetPos = target->computeBound().center();
+                }
+                else
+                {
+                    osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath_);
+                    targetPos = targetMatrix.getTrans();
+                }
             }
         }
-    }
-    else if (orientationMode_==POINT_TO_ORIGIN)
-    {
-        targetPos = osg::Vec3(0.0,0.0,0.0);
-    }
-    
-    osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
-    
-    // can't do this, because that function only does something for NORMAL mode
-    //setOrientation(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+        else if (orientationMode_==POINT_TO_ORIGIN)
+        {
+            targetPos = osg::Vec3(0.0,0.0,0.0);
+        }
+        
+        osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
+        
+        // can't do this, because that function only does something for NORMAL mode
+        //setOrientation(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
 
-    orientation_ = osg::Vec3(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
-    quat_ = osg::Quat( osg::DegreesToRadians(orientation_.x()), osg::Vec3d(1,0,0),
-                             osg::DegreesToRadians(orientation_.y()), osg::Vec3d(0,1,0),
-                             osg::DegreesToRadians(orientation_.z()), osg::Vec3d(0,0,1));
-    updateMatrix();
+        orientation_ = osg::Vec3(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+        quat_ = osg::Quat( osg::DegreesToRadians(orientation_.x()), osg::Vec3d(1,0,0),
+                                 osg::DegreesToRadians(orientation_.y()), osg::Vec3d(0,1,0),
+                                 osg::DegreesToRadians(orientation_.z()), osg::Vec3d(0,0,1));
+        updateMatrix();
+    }
     
     if (!broadcastLock_)
         BROADCAST(this, "sfff", "setOrientation", orientation_.x(), orientation_.y(),  orientation_.z());
@@ -958,6 +977,90 @@ void GroupNode::addRotation (float dPitch, float dRoll, float dYaw)
 {
     osg::Quat newQuat = EulerToQuat(dPitch,dRoll,dYaw).inverse() * getOrientationQuat();
     this->setOrientationQuat(newQuat.x(), newQuat.y(), newQuat.z(), newQuat.w());
+}
+
+// *****************************************************************************
+
+
+
+void GroupNode::translateTo (float x, float y, float z, float duration, const char *motion)
+{
+
+    if (motion_.valid())
+    {
+        motion_ = NULL;
+    }
+
+    motionStart_ = getTranslation();
+    motionEnd_ = osg::Vec3(x,y,z);
+    
+    std::string motionType = std::string(motion);
+    
+    osgAnimation::Motion::TimeBehaviour tb = osgAnimation::Motion::CLAMP;
+    float init = 0.0f;
+    float d = 1.0f;
+
+    if (!motionType.compare("OutQuadMotion"))
+        motion_ = new osgAnimation::OutQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("InQuadMotion"))
+        motion_ = new osgAnimation::InQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutQuadMotion"))
+        motion_ = new osgAnimation::InOutQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutCubicMotion"))
+        motion_ = new osgAnimation::OutCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("InCubicMotion"))
+        motion_ = new osgAnimation::InCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutCubicMotion"))
+        motion_ = new osgAnimation::InOutCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutQuartMotion"))
+        motion_ = new osgAnimation::OutQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("InQuartMotion"))
+        motion_ = new osgAnimation::InQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutQuartMotion"))
+        motion_ = new osgAnimation::InOutQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutBounceMotion"))
+        motion_ = new osgAnimation::OutBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("InBounceMotion"))
+        motion_ = new osgAnimation::InBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutBounceMotion"))
+        motion_ = new osgAnimation::InOutBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutElasticMotion"))
+        motion_ = new osgAnimation::OutElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("InElasticMotion"))
+        motion_ = new osgAnimation::InElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutElasticMotion"))
+        motion_ = new osgAnimation::InOutElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutSineMotion"))
+        motion_ = new osgAnimation::OutSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("InSineMotion"))
+        motion_ = new osgAnimation::InSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutSineMotion"))
+        motion_ = new osgAnimation::InOutSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutBackMotion"))
+        motion_ = new osgAnimation::OutBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("InBackMotion"))
+        motion_ = new osgAnimation::InBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutBackMotion"))
+        motion_ = new osgAnimation::InOutBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutCircMotion"))
+        motion_ = new osgAnimation::OutCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("InCircMotion"))
+        motion_ = new osgAnimation::InCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutCircMotion"))
+        motion_ = new osgAnimation::InOutCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutExpoMotion"))
+        motion_ = new osgAnimation::OutExpoMotion(init, duration, d, tb);
+    else if (!motionType.compare("InExpoMotion"))
+        motion_ = new osgAnimation::InExpoMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutExpoMotion"))
+        motion_ = new osgAnimation::InOutExpoMotion(init, duration, d, tb);
+    else
+        motion_ = new osgAnimation::LinearMotion(init, duration, d, tb);
+
+    if (computationMode_==CLIENT_SIDE)
+    {
+        BROADCAST(this, "sffffs", "translateTo", x, y, z, duration, motion);
+    }
 }
 
 // *****************************************************************************
@@ -1180,7 +1283,7 @@ osg::Matrix GroupNode::getGlobalMatrix()
     if (!this->reportMode_)
     {
         // might not be up-to-date, so force an update:
-        globalMatrix_ = osg::computeLocalToWorld(this->currentNodePath);
+        globalMatrix_ = osg::computeLocalToWorld(this->currentNodePath_);
     }
 
     return globalMatrix_;
@@ -1206,7 +1309,7 @@ bool GroupNode::dumpGlobals(bool forced)
     {
 
         // position & rotation: (should we get position from centre of boundingsphere?
-        osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
+        osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath_);
         if ((myMatrix != this->globalMatrix_) || forced)
         {
             this->globalMatrix_ = myMatrix;

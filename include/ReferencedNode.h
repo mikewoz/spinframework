@@ -69,6 +69,18 @@ namespace spin
 {
 
 class SceneManager;
+class ReferencedNode;
+class ReferencedStateSet;
+
+typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
+typedef std::map< std::string, nodeListType > nodeMapType;
+typedef std::pair< std::string, nodeListType > nodeMapPair;
+
+typedef std::vector< osg::ref_ptr<ReferencedStateSet> > ReferencedStateSetList;
+typedef std::map< std::string, ReferencedStateSetList > ReferencedStateSetMap;
+typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
+
+
 
 
     
@@ -122,7 +134,7 @@ typedef std::map< std::string, float > floatParamType;
 class ReferencedNode : virtual public osg::Group
 {
 public:
-    ReferencedNode(SceneManager *sceneManager, char *initID);
+    ReferencedNode(SceneManager *sceneManager, const char *initID);
     ~ReferencedNode();
 
     virtual void registerNode(SceneManager *s);
@@ -162,7 +174,7 @@ public:
      * and can also change their attachmentNode so that children are attached
      * anywhere in that subgraph. If that is the case, the updateNodePath()
      * function MUST be overridden, and extra nodes must be manually pushed onto
-     * currentNodePath.
+     * currentNodePath_.
      */
     virtual void updateNodePath(bool updateChildren = true);
 
@@ -184,22 +196,62 @@ public:
      * Internally, this method just sets the newParent property.
      */
     void setParent (const char *newvalue);
+    
+    /**
+     * Attach this node to the node with parentID (if found).
+     * 
+     */
+    void attachTo (const char* parentID);
+
+    void detachFrom(const char* parentID);
 
     /**
-     * Returns the current parent name (string)
+     * Returns the current parent name (char*)
      */
-    char* getParent() const { return parent->s_name; }
+    //char* getParent() const { return parent_->s_name; }
+
+    /**
+     * Returns the current parent id (string)
+     */
+    //std::string getParentID(int i) const { return std::string(parent_->s_name); }
 
     /**
      * Returns the current parent as an osg::Group
      */
-    osg::Group* getParent(int i) { return osg::Group::getParent(i); }
+    //osg::Group* getParent(int i) { return osg::Group::getParent(i); }
 
     /**
      * Returns the currently identified parent node:
      */
-    ReferencedNode* getParentNode() { return dynamic_cast<ReferencedNode*>(parent->s_thing); }
+    //ReferencedNode* getParentNode() { return dynamic_cast<ReferencedNode*>(parent_->s_thing); }
 
+    unsigned int getNumParents() const { return parentNodes_.size(); }
+
+    /**
+     * Returns the parent id (string)
+     */
+    std::string getParentID(int i) const;
+    
+    /**
+     * Returns the osg::Group that this node is directly attached to (this is
+     * either the world node or the attachmentNode of one of the parents. Note
+     * that the indices may NOT be the same as the getParentNode method
+     */
+    //osg::Group* getParentAttachmentNode(int i);
+    
+    /**
+     * Returns the current parent as an osg::Group
+     */
+    ReferencedNode* getParentNode(int i);
+    
+
+    std::vector<ReferencedNode*> getChildren();
+
+    /**
+     * Returns the last stored nodepath (note: may have changed in current
+     * update traversal
+     */
+    //osg::NodePath getNodePath();
 
     /**
      * A node can 'belong' to a certain host machine, allowing it to be rendered
@@ -218,8 +270,8 @@ public:
     /**
      * Returns the current host
      */
-    const char *getContext() const { return contextString.c_str(); }
-    std::string getContextString() const { return contextString; }
+    const char *getContext() const { return contextString_.c_str(); }
+    std::string getContextString() const { return contextString_; }
 
     virtual void setParam (const char *paramName, const char *paramValue);
     virtual void setParam (const char *paramName, float paramValue);
@@ -235,7 +287,6 @@ public:
      */
     virtual void updateStateSet();
 
-
     /**
      * subclasses of ReferencedNode may contain complicated subgraphs, and any
      * children get attached not to the node pointer itself, but to an
@@ -243,7 +294,7 @@ public:
      * local coordinate system of this node (according to the subgraph). This
      * function returns a pointer to this node.
      */
-    osg::Group *getAttachmentNode() const { return attachmentNode; }
+    osg::Group *getAttachmentNode() const { return attachmentNode_; }
 
     /**
      * Debug print (to log/console)
@@ -266,42 +317,14 @@ public:
      */
     virtual void stateDump(lo_address addr);
 
-    // ***********************************************************
-    // data:
-    // FIXME: Please make data members private.
 
-    t_symbol *id;
-    std::string nodeType;
-
-    std::string contextString;
-
-    int pd_mail_id;
-    lo_method oscHandler;
-
-    t_symbol *parent, *newParent;
-
-    bool scheduleForDeletion;
-
-    // debug
-
-    bool textFlag;
-
-    stringParamType stringParams;
-    floatParamType floatParams;
-
-    float subgraphAlpha_;
-
-    osg::NodePath currentNodePath;
-
-    std::vector<ReferencedNode*> children;
-
-    //osg::ref_ptr<osg::Geode> textGeode;
-
-    SceneManager *sceneManager;
-
-    //bool setScript( const std::string& s, const std::string& params );
-    //bool setScript( const char *scriptPath, double freq );  // freq is nb of calls per second
-    std::string getID() const;
+    /**
+     * Return the string id for this node
+     */
+    std::string getID() const { return std::string(id_->s_name); }
+    std::string getNodeType() const { return nodeType_; }
+    t_symbol* getNodeSymbol() { return id_; }
+    
 
     bool addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
                         double freq, const std::string& params );
@@ -316,34 +339,16 @@ public:
     bool enableEventScript( const char* label, int enable );
     bool removeEventScript( const char* label );
 
+
+    
+    // FIXME 
+    osg::NodePath currentNodePath_;
+    bool scheduleForDeletion_;
+
+    // ***********************************************************    
+    
  protected:
-
-    std::string _scriptFile;
-    #ifndef DISABLE_PYTHON
-    boost::python::object _scriptRun;
-#endif
-    EventScriptList _eventScriptList;
-    CronScriptList _cronScriptList;
-
- private:
-
-    /**
-     * TO BE DEPRECATED?
-     * It used to be that we wanted to keep a list of all child ReferencedNode
-     * nodes that are attached. Was this so that we could differentiate SPIN
-     * nodes from other scene graph node? That seems silly, since one can always
-     * try a dynamic_cast or use cppintrospection
-     */
-    ReferencedNode *as_getChild(ReferencedNode *child);
-    /**
-     * TO BE DEPRECATED?
-     */
-    void as_addChild(ReferencedNode *child);
-    /**
-     * TO BE DEPRECATED?
-     */
-    void as_removeChild(ReferencedNode *child);
-
+ 
     /**
      * TO BE DEPRECATED?
      * The idea is that one type of node can only be attached to certain types
@@ -352,15 +357,56 @@ public:
      */
     bool legalParent (t_symbol *newParent);
 
+    void setNodeType(std::string t) { nodeType_ = t; }
+
+
+    SceneManager *sceneManager_;
+
+
+ private:
+    t_symbol *id_;
+    std::string nodeType_;
+
+    std::string contextString_;
+
+    //lo_method oscHandler_;
+
+    //t_symbol *parent_, *newParent_;
+    
+    nodeListType parentNodes_;
+    
+    
+    
+
+
+    float subgraphAlpha_;
+
+
+    //std::vector<ReferencedNode*> children_;
+
+
     /**
      * The node that children get attached to:
      * We keep it private to force the use of setAttachmentNode(), which results
-     * in an update of the currentNodePath.
+     * in an update of the currentNodePath_.
      */
-    osg::Group *attachmentNode;
+    osg::Group *attachmentNode_;
+
+
+    stringParamType stringParams_;
+    floatParamType floatParams_;
 
 
     t_symbol* stateset_;
+    
+    
+    
+    std::string _scriptFile;
+#ifndef DISABLE_PYTHON
+    boost::python::object _scriptRun;
+#endif
+    EventScriptList _eventScriptList;
+    CronScriptList _cronScriptList;
 };
 
 /**

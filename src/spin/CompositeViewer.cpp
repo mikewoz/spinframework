@@ -1030,7 +1030,7 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
 
 	view->setLightingMode(osg::View::SKY_LIGHT);
 	view->addEventHandler(new osgViewer::StatsHandler);
-    view->setSceneData(spinApp::Instance().sceneManager->rootNode.get());
+    view->setSceneData(spinApp::Instance().sceneManager_->rootNode.get());
     viewer.addView(view.get());
 
     osgViewer::GraphicsWindow* gw = dynamic_cast<osgViewer::GraphicsWindow*>(gc.get());

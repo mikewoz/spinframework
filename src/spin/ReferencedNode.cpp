@@ -57,8 +57,6 @@
 #include <cppintrospection/Value>
 #include <cppintrospection/Type>
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -66,27 +64,26 @@ namespace spin
 
 // ***********************************************************
 // constructor (one arg required: the node ID)
-ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
-    contextString("NULL")
+ReferencedNode::ReferencedNode (SceneManager *sceneManager, const char *initID) :
+    contextString_("NULL")
 {
-    id = gensym(initID);
-    id->s_thing = this;
-    id->s_type = REFERENCED_NODE;
+    id_ = gensym(initID);
+    id_->s_thing = this;
+    id_->s_type = REFERENCED_NODE;
 
-    nodeType = "ReferencedNode";
+    nodeType_ = "ReferencedNode";
 
-    this->setName(string(id->s_name) + ".ReferencedNode");
+    this->setName(std::string(id_->s_name));
 
     // set some initial symbols:
-    parent = WORLD_SYMBOL;
-    newParent = WORLD_SYMBOL;
+    //parent_ = WORLD_SYMBOL;
+    //newParent_ = WORLD_SYMBOL;
 
-    textFlag = false;
-    scheduleForDeletion = false;
+    scheduleForDeletion_ = false;
     subgraphAlpha_ = 1.0;
 
     // When children are attached to this, they get added to the attachmentNode:
-    attachmentNode = this;
+    attachmentNode_ = this;
 
     // We need to set up a callback. This should be on the topmost node, so that during node
     // traversal, we update our parameters before anything is drawn.
@@ -98,17 +95,27 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, char *initID) :
     this->setDataVariance(osg::Object::DYNAMIC);
 
     // set initial nodepath:
-    currentNodePath.clear();
-    registerNode(sceneManager);
-    this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
-    attach();
+    currentNodePath_.clear();
+    
+    if (this->getID()=="world")
+    {
+        this->setNodeMask(INTERACTIVE_NODE_MASK);
+    }
+    else
+    {
+        registerNode(sceneManager);
+        this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
+        attachTo("world");
+    }
+    
+    
 }
 
 // ***********************************************************
 // destructor
 ReferencedNode::~ReferencedNode()
 {
-    string oscPattern = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + string(id->s_name);
+    std::string oscPattern = "/SPIN/" + spinApp::Instance().getSceneID() + "/" + this->getID();
 
     if (! spinBaseContext::signalStop)
     {
@@ -120,15 +127,15 @@ ReferencedNode::~ReferencedNode()
         }
 		lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
     }
-    id->s_thing = 0;
+    id_->s_thing = 0;
 }
 
 void ReferencedNode::registerNode(SceneManager *s)
 {
-    sceneManager = s;
+    sceneManager_ = s;
 
     // register with OSC parser:
-    string oscPattern = "/SPIN/" + sceneManager->sceneID + "/" + string(id->s_name);
+    std::string oscPattern = "/SPIN/" + sceneManager_->sceneID + "/" + this->getID();
     std::vector<lo_server>::iterator it;
     for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
     {
@@ -136,7 +143,7 @@ void ReferencedNode::registerNode(SceneManager *s)
 	                         oscPattern.c_str(),
 	                         NULL,
 	                         spinBaseContext::nodeCallback,
-	                         (void*)id);
+	                         (void*)id_);
     }
 
 	// and with the TCP receiver in the server case:
@@ -144,7 +151,7 @@ void ReferencedNode::registerNode(SceneManager *s)
 	                     oscPattern.c_str(),
 	                     NULL,
 	                     spinBaseContext::nodeCallback,
-	                     (void*)id);
+	                     (void*)id_);
 
 }
 
@@ -155,100 +162,239 @@ void ReferencedNode::callbackUpdate(osg::NodeVisitor* nv)
 
 void ReferencedNode::attach()
 {
-    if (this->newParent == NULL_SYMBOL)
+    std::cout << "something called ReferencedNode::attach()" << std::endl;
+    return;
+/*
+    if (this->newParent_ == NULL_SYMBOL)
         return;
 
     pthread_mutex_lock(&sceneMutex);
 	
-    osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent->s_thing);
+    osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent_->s_thing);
 
     // if the parent is invalid (which will be the case, for example, if the user
     // specified 'world' as the parent), we attach to the worldNode:
     if (! newParentNode.valid())
     {
-        if (! (sceneManager->worldNode->containsNode(this)))
-            sceneManager->worldNode->addChild(this);
-        this->newParent = WORLD_SYMBOL;
+        if (! (sceneManager_->worldNode->containsNode(this)))
+            sceneManager_->worldNode->addChild(this);
+        this->newParent_ = WORLD_SYMBOL;
     }
     // Otherwise attach to the parent:
     else
     {
-        if (! (newParentNode->attachmentNode->containsNode(this)))
+        if (! (newParentNode->attachmentNode_->containsNode(this)))
         {
-            newParentNode->attachmentNode->addChild(this);
-            newParentNode->as_addChild(this);
+            newParentNode->attachmentNode_->addChild(this);
         }
     }
 
     pthread_mutex_unlock(&sceneMutex);
 
     // remove node from current parent (make sure to release the mutex first!)
-    if (this->parent != this->newParent)
+    if (this->parent_ != this->newParent_)
     {
         this->detach();
     }
 
     // update the new parent symbols:
-    this->parent = this->newParent;
-    this->newParent = NULL_SYMBOL;
+    this->parent_ = this->newParent_;
+    this->newParent_ = NULL_SYMBOL;
 
-    // update currentNodePath:
+    // update currentNodePath_:
     this->updateNodePath();
 
     // broadcast this change to any remote clients:
-    BROADCAST(this, "ss", "setParent", this->parent->s_name);
+    BROADCAST(this, "ss", "setParent", this->parent_->s_name);
 
     // send a parentChange message to clients who are only listening to scene
     // messages (ie, they are not filtering every single node message).
     // TODO: do this via TCP?
-    SCENE_MSG("sss", "parentChange", this->id->s_name, this->parent->s_name);
+    SCENE_MSG("sss", "parentChange", this->id_->s_name, this->parent_->s_name);
+*/
 }
 
 // removes this node from the scenegraph:
 void ReferencedNode::detach()
 {
+    std::cout << "something called ReferencedNode::detach()" << std::endl;
+    return;
+/*
     pthread_mutex_lock(&sceneMutex);
 
-    if (parent == WORLD_SYMBOL)
+    if (parent_ == WORLD_SYMBOL)
     {
-        if (sceneManager->worldNode->containsNode(this))
-            sceneManager->worldNode->removeChild(this);
+        if (sceneManager_->worldNode->containsNode(this))
+            sceneManager_->worldNode->removeChild(this);
     }
     else
     {
-        osg::ref_ptr<ReferencedNode> pNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
+        osg::ref_ptr<ReferencedNode> pNode = dynamic_cast<ReferencedNode*>(parent_->s_thing);
         if (pNode.valid())
         {
-            if (pNode->attachmentNode->containsNode(this))
+            if (pNode->attachmentNode_->containsNode(this))
             {
-                pNode->attachmentNode->removeChild(this);
-                pNode->as_removeChild(this);
+                pNode->attachmentNode_->removeChild(this);
             }
         }
     }
     pthread_mutex_unlock(&sceneMutex);
+*/
 }
+
+void ReferencedNode::attachTo (const char* parentID)
+{
+    if ((getID()=="world") || (std::string(parentID) == "NULL"))
+        return;
+    
+    osg::ref_ptr<ReferencedNode> newParentNode = sceneManager_->getNode(parentID);
+
+    if (newParentNode.valid())
+    {
+        if (! (newParentNode->getAttachmentNode()->containsNode(this)))
+        {
+            pthread_mutex_lock(&sceneMutex);
+            newParentNode->getAttachmentNode()->addChild(this);
+            pthread_mutex_unlock(&sceneMutex);
+
+            // add to parent list:
+            this->parentNodes_.push_back(newParentNode);
+
+            // remove node from current parent (make sure to release the mutex first!)
+            /*
+            if (this->parent_ != this->newParent_)
+            {
+                this->detach();
+            }
+            */
+
+            // update currentNodePath:
+            this->updateNodePath();
+
+            // broadcast this change to any remote clients:
+            BROADCAST(this, "ss", "attachTo", parentID);
+
+            // send a parentChange message to clients who are only listening to scene
+            // messages (ie, they are not filtering every single node message).
+            // TODO: do this via TCP?
+            SCENE_MSG("ssss", "graphChange", "attach", this->getID().c_str(), parentID);
+        }
+    }
+}
+
+void ReferencedNode::detachFrom(const char* parentID)
+{
+    if (getID()=="world") return;
+
+    // detach from all parents if the "*" wildcard is specified:
+    if (std::string(parentID)=="*")
+    {
+        while (parentNodes_.size())
+        {
+            std::string pID = parentNodes_[0]->getID();
+            
+            if (parentNodes_[0]->attachmentNode_->containsNode(this))
+            {
+                pthread_mutex_lock(&sceneMutex);
+                parentNodes_[0]->attachmentNode_->removeChild(this);
+                pthread_mutex_unlock(&sceneMutex);
+            }
+            parentNodes_.erase(parentNodes_.begin());
+            
+            BROADCAST(this, "ss", "detachFrom", pID.c_str());
+            SCENE_MSG("ssss", "graphChange", "detach", this->getID().c_str(), pID.c_str());
+        }
+        
+        this->updateNodePath();
+    }
+    
+    // otherwise find the parent node and detach this from that parent:
+    else
+    {
+        osg::ref_ptr<ReferencedNode> pNode = sceneManager_->getNode(parentID);
+        if (pNode.valid())
+        {
+            if (pNode->attachmentNode_->containsNode(this))
+            {
+                pthread_mutex_lock(&sceneMutex);
+                pNode->attachmentNode_->removeChild(this);
+                pthread_mutex_unlock(&sceneMutex);
+            }
+            
+            // remove from parent list:
+            nodeListType::iterator iter;
+            for (iter=parentNodes_.begin(); iter!=parentNodes_.end(); ++iter)
+            {
+                if ((*iter).get() == pNode.get())
+                {
+                    parentNodes_.erase(iter);
+                    break;
+                }
+            }
+            
+            this->updateNodePath();
+            
+            BROADCAST(this, "ss", "detachFrom", parentID);
+            SCENE_MSG("ssss", "graphChange", "detach", this->getID().c_str(), parentID);
+        }
+    }
+}
+
+std::string ReferencedNode::getParentID(int i) const
+{
+    if (i>=0 && i<parentNodes_.size())
+        return parentNodes_[i]->getID();
+    else
+        return "NULL";
+}
+/*
+osg::Group* ReferencedNode::getParentOSGGroup(int i)
+{
+    return osg::Group::getParent(i);
+}
+*/
+ReferencedNode* ReferencedNode::getParentNode(int i)
+{
+    if (i>=0 && i<parentNodes_.size())
+        return parentNodes_[i].get();
+    else
+        return NULL;
+}
+
+std::vector<ReferencedNode*> ReferencedNode::getChildren()
+{
+    std::vector<ReferencedNode*> children;
+
+    for (int i=0; i < this->attachmentNode_->getNumChildren(); i++)
+    {
+        ReferencedNode *n = dynamic_cast<ReferencedNode*>(this->attachmentNode_->getChild(i));
+        if (n)
+        {
+            children.push_back(n);
+        }
+    }
+
+    return children;
+}
+
 
 // IMPORTANT:
 // subclasses of ReferencedNode are allowed to contain complicated subgraphs, and
 // can also change their attachmentNode so that children are attached anywhere
 // in this subgraph. If that is the case, the updateNodePath() function MUST be
-// overridden, and extra nodes must be manually pushed onto the currentNodePath.
+// overridden, and extra nodes must be manually pushed onto the currentNodePath_.
 
 void ReferencedNode::updateNodePath(bool updateChildren)
 {
-    currentNodePath.clear();
-    if ((parent != WORLD_SYMBOL) && (parent != NULL_SYMBOL))
+    currentNodePath_.clear();
+    osg::ref_ptr<ReferencedNode> p = parentNodes_[0];
+    if (p && (p->getID() != "world") && (p->getID() != "NULL"))
     {
-        osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
-        if (parentNode.valid())
-        {
-            currentNodePath = parentNode->currentNodePath; // this does a copy
-        }
+        currentNodePath_ = p->currentNodePath_; // this does a copy
     }
 
     // this nodePath only stores the path until this node (osg::Group).
-    currentNodePath.push_back(this);
+    currentNodePath_.push_back(this);
 
     // Now update NodePaths for all children if the updateChildren flag is set.
     // For some derived nodes, they may want to control how they control the 
@@ -260,7 +406,8 @@ void ReferencedNode::updateNodePath(bool updateChildren)
 
 void ReferencedNode::updateChildNodePaths()
 {
-    vector<ReferencedNode*>::iterator childIter;
+    std::vector<ReferencedNode*> children = this->getChildren();
+    std::vector<ReferencedNode*>::iterator childIter;
     for (childIter = children.begin(); childIter != children.end() ; childIter++)
     {
         (*childIter)->updateNodePath();
@@ -271,7 +418,7 @@ int ReferencedNode::setAttachmentNode(osg::Group *n)
 {
     if (n)
     {
-        attachmentNode = n;
+        attachmentNode_ = n;
 
         // update the nodepath now that we've defined a new attachmentNode
         this->updateNodePath();
@@ -280,74 +427,49 @@ int ReferencedNode::setAttachmentNode(osg::Group *n)
     return 0;
 }
 
-ReferencedNode *ReferencedNode::as_getChild(ReferencedNode *child)
-{
-    vector<ReferencedNode*>::iterator iter;
-    for (iter = children.begin(); iter != children.end() ; iter++)
-    {
-        if ((*iter) == child)
-            return (*iter);
-    }
-    return NULL;
-}
-
-void ReferencedNode::as_addChild(ReferencedNode *child)
-{
-    children.push_back(child);
-}
-
-void ReferencedNode::as_removeChild(ReferencedNode *child)
-{
-    vector<ReferencedNode*>::iterator iter;
-    for (iter = children.begin(); iter != children.end() ; iter++)
-    {
-        if ((*iter) == child)
-        {
-            children.erase(iter);
-            break;
-        }
-    }
-}
-
 bool ReferencedNode::legalParent (t_symbol *newParent)
 {
-    vector<ReferencedNode*>::iterator childIter;
-
-    if (newParent == this->id)
+    if (newParent == this->id_)
     {
         return false;
     }
     else
     {
+        std::vector<ReferencedNode*> children = this->getChildren();
+        std::vector<ReferencedNode*>::iterator childIter;
         for (childIter = children.begin(); childIter != children.end() ; childIter++)
         {
-            if ((*childIter)->id == newParent)
+            if ((*childIter)->id_ == newParent)
                 return false;
         }
     }
     return true;
 }
 
-void ReferencedNode::setParent (const char *newvalue)
+void ReferencedNode::setParent (const char* newvalue)
 {
-    t_symbol *s = gensym(newvalue);
-    if (parent != s)
+    this->detachFrom("*");
+    this->attachTo(newvalue);
+/*
+    t_symbol *s = gensym(newvalue.c_str());
+    if (parent_ != s)
     {
 		if (legalParent(s))
 		{
-			newParent = s;
+			newParent_ = s;
 			attach();
 		}
 		else
 		{
-			std::cout << "ERROR: Tried to setParent for node " << this->id->s_name << " to " << newvalue << ", but that parent is illegal (probably contained in the subgraph of this node)." << std::endl;
+			std::cout << "ERROR: Tried to setParent for node " << this->id_->s_name << " to " << newvalue << ", but that parent is illegal (probably contained in the subgraph of this node)." << std::endl;
 		}
 	}
+*/
 }
 
 void ReferencedNode::setContext (const char *newvalue)
 {
-    contextString = string(newvalue);
+    contextString_ = std::string(newvalue);
     BROADCAST(this, "ss", "setContext", getContext());
 }
 
@@ -398,19 +520,19 @@ void ReferencedNode::setAlpha (float alpha)
     ss->setAttributeAndModes(blendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     */
 
-	std::cout << "set alpha for " << this->id->s_name << " to " << subgraphAlpha_ << std::endl;
+	std::cout << "set alpha for " << this->id_->s_name << " to " << subgraphAlpha_ << std::endl;
 }
 
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)
 {
-    //std::cout << id->s_name << " got setParam: " << paramValue << std::endl;
-    stringParams[string(paramName)] = string(paramValue);
+    //std::cout << id_->s_name << " got setParam: " << paramValue << std::endl;
+    stringParams_[std::string(paramName)] = std::string(paramValue);
     BROADCAST(this, "sss", "setParam", paramName, paramValue);
 }
 
 void ReferencedNode::setParam (const char *paramName, float paramValue)
 {
-    floatParams[string(paramName)] = paramValue;
+    floatParams_[std::string(paramName)] = paramValue;
     BROADCAST(this, "ssf", "setParam", paramName, paramValue);
 }
 
@@ -418,11 +540,11 @@ void ReferencedNode::setParam (const char *paramName, float paramValue)
 
 void ReferencedNode::setStateSetFromFile(const char* filename)
 {
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(filename);
 	if (ss.valid())
 	{
-		if (ss->id == stateset_) return; // we're already using that stateset
-		stateset_ = ss->id;
+		if (ss->getIDSymbol() == stateset_) return; // we're already using that stateset
+		stateset_ = ss->getIDSymbol();
 		updateStateSet();
 		BROADCAST(this, "ss", "setStateSet", getStateSet());
 	}
@@ -432,19 +554,24 @@ void ReferencedNode::setStateSet (const char* s)
 {
 	if (gensym(s)==stateset_) return;
 
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->getStateSet(s);
 	if (ss.valid())
 	{
-		stateset_ = ss->id;
-		updateStateSet();
+		stateset_ = ss->getIDSymbol();
+		
 		BROADCAST(this, "ss", "setStateSet", getStateSet());
 	}
+    
+    updateStateSet();
 }
 
 void ReferencedNode::updateStateSet()
 {
 	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
 	if (ss.valid()) osg::Group::setStateSet( ss.get() );
+    
+    // if not valid, create a new (empty) stateset (ie, clear the previous state)
+    else osg::Group::setStateSet(new osg::StateSet());
 }
 
 // -----------------------------------------------------------------------------
@@ -458,10 +585,10 @@ void ReferencedNode::debug()
 
     std::cout << "****************************************" << std::endl;
     std::cout << "************* NODE  DEBUG: *************" << std::endl;
-    std::cout << "\nnode: " << id->s_name << ", type: " << nodeType << std::endl;
+    std::cout << "\nnode: " << getID() << ", type: " << getNodeType() << std::endl;
 
     std::cout << "   Node path:" << std::endl;
-    for (osg::NodePath::iterator itr = currentNodePath.begin(); itr != currentNodePath.end(); ++itr)
+    for (osg::NodePath::iterator itr = currentNodePath_.begin(); itr != currentNodePath_.end(); ++itr)
     {
         std::cout << "   -> " << (*itr)->getName() << std::endl;
     }
@@ -470,8 +597,8 @@ void ReferencedNode::debug()
     std::cout << "   Subgraph centroid: " << stringify(bs.center()) << std::endl;
     std::cout << "   Subgraph radius: " << bs.radius() << std::endl;
 
-    vector<lo_message> nodeState = this->getState();
-    vector<lo_message>::iterator nodeStateIterator;
+    std::vector<lo_message> nodeState = this->getState();
+    std::vector<lo_message>::iterator nodeStateIterator;
     for (nodeStateIterator = nodeState.begin(); nodeStateIterator != nodeState.end(); ++nodeStateIterator)
     {
         argTypes = lo_message_get_types(*nodeStateIterator);
@@ -497,13 +624,14 @@ void ReferencedNode::debug()
         std::cout << std::endl;
     }
 
-    if (! this->children.empty())
+    std::vector<ReferencedNode*> children = this->getChildren();
+    if (! children.empty())
     {
         std::cout << "   children:" << std::endl;
-        vector<ReferencedNode*>::iterator childIter;
-        for (childIter = this->children.begin(); childIter != this->children.end(); ++childIter)
+        std::vector<ReferencedNode*>::iterator childIter;
+        for (childIter = children.begin(); childIter != children.end(); ++childIter)
         {
-            std::cout << "      " << (*childIter)->id->s_name << std::endl;
+            std::cout << "      " << (*childIter)->getID() << std::endl;
         }
     }
     BROADCAST(this, "s", "debug");
@@ -515,10 +643,13 @@ std::vector<lo_message> ReferencedNode::getState() const
 
     lo_message msg;
 
-    msg = lo_message_new();
-    lo_message_add(msg, "ss", "setParent", this->getParent());
-    ret.push_back(msg);
-
+    for (int i=0; i<this->getNumParents(); i++)
+    {
+        msg = lo_message_new();
+        lo_message_add(msg, "ss", "attachTo", this->getParentID(i).c_str());
+        ret.push_back(msg);
+    }
+    
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setContext", this->getContext());
     ret.push_back(msg);
@@ -528,7 +659,7 @@ std::vector<lo_message> ReferencedNode::getState() const
     ret.push_back(msg);
 
     stringParamType::const_iterator stringIter;
-    for (stringIter = stringParams.begin(); stringIter != stringParams.end(); stringIter++ )
+    for (stringIter = stringParams_.begin(); stringIter != stringParams_.end(); stringIter++ )
     {
         msg = lo_message_new();
         lo_message_add(msg, "sss", "setParam", (*stringIter).first.c_str(), (const char*)(*stringIter).second.c_str());
@@ -536,7 +667,7 @@ std::vector<lo_message> ReferencedNode::getState() const
     }
 
     floatParamType::const_iterator floatIter;
-    for (floatIter = floatParams.begin(); floatIter != floatParams.end(); floatIter++ )
+    for (floatIter = floatParams_.begin(); floatIter != floatParams_.end(); floatIter++ )
     {
         msg = lo_message_new();
         lo_message_add(msg, "ssf", "setParam", (*floatIter).first.c_str(), (*floatIter).second);
@@ -578,17 +709,12 @@ std::vector<lo_message> ReferencedNode::getState() const
 
 void ReferencedNode::stateDump()
 {
-    spinApp::Instance().NodeBundle(this->id, this->getState());
+    spinApp::Instance().NodeBundle(this->getID(), this->getState());
 }
 
 void ReferencedNode::stateDump(lo_address txAddr)
 {
-    spinApp::Instance().NodeBundle(this->id, this->getState(), txAddr);
-}
-
-std::string ReferencedNode::getID() const
-{
-    return std::string(id->s_name);
+    spinApp::Instance().NodeBundle(this->getID(), this->getState(), txAddr);
 }
 
 bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
@@ -645,7 +771,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
         s = spin._pyNamespace[pyModule.c_str()];
         char* cls = boost::python::extract<char*>(s.attr("__spin_behavior_class__") );
 
-        sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id->s_name, params.c_str() );
+        sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id_->s_name, params.c_str() );
 
         //std::cout << "Python cmd: " << cmd << std::endl;
         exec( cmd, spin._pyNamespace, spin._pyNamespace );
@@ -683,7 +809,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
     return true;
     
 #else
-    std::cout << "Python interpreter is disabled. Could not addCronScript to " << nodeType << ": " << id->s_name << std::endl;
+    std::cout << "Python interpreter is disabled. Could not addCronScript to " << getNodeType() << ": " << getID() << std::endl;
     return false;
 #endif
 }
@@ -827,8 +953,8 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
         s = spin._pyNamespace[pyModule.c_str()];
         char* cls = boost::python::extract<char*>(s.attr("__spin_behavior_class__") );
 
-        //sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id->s_name, params.c_str() );
-        sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id->s_name, params.c_str() );
+        //sprintf( cmd, "script%llx = mod%llx.Script('%s' %s)", utick, utick, id_->s_name, params.c_str() );
+        sprintf( cmd, "%s = %s.%s('%s' %s)", pyScript.c_str(), pyModule.c_str(), cls, id_->s_name, params.c_str() );
         //std::cout << "Python cmd: " << cmd << std::endl;
         exec(cmd, spin._pyNamespace, spin._pyNamespace);
 
@@ -861,7 +987,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     return true;
     
 #else
-    std::cout << "Python interpreter is disabled. Could not addEventScript to " << nodeType << ": " << id->s_name << std::endl;
+    std::cout << "Python interpreter is disabled. Could not addEventScript to " << getNodeType() << ": " << id_->s_name << std::endl;
     return false;
 #endif
 }

@@ -105,7 +105,7 @@
             if (arguments[i][0]!='-')
             {
                 // not an option so assume string is a filename
-                spin::spinApp::Instance().sceneManager->loadXML(arguments[i]);
+                spin::spinApp::Instance().sceneManager_->loadXML(arguments[i]);
             } else i++;
         }
         
@@ -149,7 +149,7 @@
 
 - (IBAction)refresh:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->refreshAll();
+    spin::spinApp::Instance().sceneManager_->refreshAll();
 }
 - (IBAction)refreshSubscribers:(id)sender
 {
@@ -171,9 +171,9 @@
     switch(result)
     {
         case NSAlertDefaultReturn: // OK
-            spin::spinApp::Instance().sceneManager->clear();
-            spin::spinApp::Instance().sceneManager->clearUsers();
-            spin::spinApp::Instance().sceneManager->clearStates();
+            spin::spinApp::Instance().sceneManager_->clear();
+            spin::spinApp::Instance().sceneManager_->clearUsers();
+            spin::spinApp::Instance().sceneManager_->clearStates();
             break;
         case NSAlertAlternateReturn: // Cancel
             break;
@@ -183,29 +183,29 @@
 {
     if ([sender isSelected])
     {
-        spin::spinApp::Instance().sceneManager->deleteNode("grid");
+        spin::spinApp::Instance().sceneManager_->deleteNode("grid");
         //[sender setSelected:FALSE];
     }
     else {
-        spin::spinApp::Instance().sceneManager->getOrCreateNode("grid","GridNode");
+        spin::spinApp::Instance().sceneManager_->getOrCreateNode("grid","GridNode");
         //[sender setSelected:TRUE];       
     }
 }
 - (IBAction)debugContext:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugContext(); 
+    spin::spinApp::Instance().sceneManager_->debugContext(); 
 }
 - (IBAction)debugNodes:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugNodes(); 
+    spin::spinApp::Instance().sceneManager_->debugNodes(); 
 }
 - (IBAction)debugStateSets:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugStateSets(); 
+    spin::spinApp::Instance().sceneManager_->debugStateSets(); 
 }
 - (IBAction)debugSceneGraph:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugSceneGraph(); 
+    spin::spinApp::Instance().sceneManager_->debugSceneGraph(); 
 }
 
 

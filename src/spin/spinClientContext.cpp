@@ -243,7 +243,7 @@ void *spinClientContext::spinClientThread(void *arg)
 #ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
-    std::string cmd = "sys.path.append('" + spin.sceneManager->resourcesPath + "/scripts')";
+    std::string cmd = "sys.path.append('" + spin.sceneManager_->resourcesPath + "/scripts')";
     
     spin.execPython(cmd);
     spin.execPython("import spin");
@@ -500,7 +500,7 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
     else
     {
     	// node message:
-	    ReferencedNode* n = spinApp::Instance().sceneManager->getNode(nodeID);
+	    ReferencedNode* n = spinApp::Instance().sceneManager_->getNode(nodeID);
 	    if (n)
 	    {
 	    	spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);

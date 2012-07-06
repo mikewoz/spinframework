@@ -255,7 +255,7 @@ void *spinServerContext::spinServerThread(void *arg)
 #ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
-    std::string cmd = "sys.path.append('" + spin.sceneManager->resourcesPath + "/scripts')";
+    std::string cmd = "sys.path.append('" + spin.sceneManager_->resourcesPath + "/scripts')";
 
     spin.execPython(cmd);
     spin.execPython("import spin");
@@ -312,10 +312,10 @@ void *spinServerContext::spinServerThread(void *arg)
             lastTick = frameTick;
         }
 
-        spin.sceneManager->update();
+        spin.sceneManager_->update();
 
         pthread_mutex_lock(&sceneMutex);
-        visitor.apply(*(spin.sceneManager->rootNode.get())); // only server should do this
+        visitor.apply(*(spin.sceneManager_->rootNode.get())); // only server should do this
         pthread_mutex_unlock(&sceneMutex);
 
         int recv = 0; // bytes received (note: might not be accurate for TCP)
@@ -470,7 +470,7 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 
     else if (method == "getState")
     {
-    	osg::ref_ptr<ReferencedNode> n = spinApp::Instance().sceneManager->getNode(reinterpret_cast<const char*>(argv[1]));
+    	osg::ref_ptr<ReferencedNode> n = spinApp::Instance().sceneManager_->getNode(reinterpret_cast<const char*>(argv[1]));
 
     	if (n.valid())
     	{
@@ -500,12 +500,12 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     {
 		// OLD WAY (wildcards don't work)
 		/*
-	    ReferencedNode* n = spinApp::Instance().sceneManager->getNode(nodeID);
+	    ReferencedNode* n = spinApp::Instance().sceneManager_->getNode(nodeID);
 	    if (n) spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
 
 	    else
 	    {
-	    	ReferencedStateSet* s = spinApp::Instance().sceneManager->getStateSet(nodeID.c_str());
+	    	ReferencedStateSet* s = spinApp::Instance().sceneManager_->getStateSet(nodeID.c_str());
 	    	if (s) spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) s->id);
 	    }
 		*/
@@ -517,7 +517,7 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 		// The nodeString might have a wildcard, so here we call the method on
 		// any nodes (or statesets) that match:
 		/*
-		std::vector<t_symbol*> matched = spinApp::Instance().sceneManager->findNodes(nodeString.c_str());
+		std::vector<t_symbol*> matched = spinApp::Instance().sceneManager_->findNodes(nodeString.c_str());
 
 		std::vector<t_symbol*>::iterator iter;
 		for (iter = matched.begin(); iter != matched.end(); ++iter)
@@ -527,14 +527,14 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 
 
 		// connections are different:
-		std::vector<SoundConnection*> conns = spinApp::Instance().sceneManager->getConnections();
+		std::vector<SoundConnection*> conns = spinApp::Instance().sceneManager_->getConnections();
 		
 		std::vector<SoundConnection*>::iterator cIter;
 		for ( cIter=conns.begin(); cIter!=conns.end(); ++cIter )
 		{
-			if (wildcardMatch(nodeString.c_str(), (*cIter)->id->s_name))
+			if (wildcardMatch(nodeString.c_str(), (*cIter)->getID().c_str()))
 			{
-				std::cout << " ... matched connection: " << (*cIter)->id->s_name << std::endl;
+				std::cout << " ... matched connection: " << (*cIter)->getID() << std::endl;
 				spinBaseContext::connectionCallback(path, types, argv, argc, (void*) data, (void*) (*iter));
 			}
 		}
@@ -552,7 +552,7 @@ void spinServerContext::refreshSubscribers()
 	// other option: use ReferencedNode::stateDump, and SceneManager::refresh
 	// to send messages...
 
-    spinApp::Instance().sceneManager->refreshSubscribers(tcpClientAddrs_);
+    spinApp::Instance().sceneManager_->refreshSubscribers(tcpClientAddrs_);
 }
 
 } // end of namespace spin

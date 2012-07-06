@@ -75,7 +75,7 @@ class DSPNode : public GroupNode
 
 public:
         
-        DSPNode (SceneManager *sceneManager, char *initID);
+        DSPNode (SceneManager *sceneManager, const char* initID);
         virtual ~DSPNode();
         
         virtual void callbackUpdate(osg::NodeVisitor* nv);

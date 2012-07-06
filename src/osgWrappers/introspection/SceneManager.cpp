@@ -152,9 +152,14 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__setWorldStateSet__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(std::vector< spin::t_symbol * >, findNodes, IN, const char *, pattern,
+	I_Method1(std::vector< spin::ReferencedNode * >, findNodes, IN, const char *, pattern,
 	          Properties::NON_VIRTUAL,
-	          __std_vectorT1_t_symbol_P1___findNodes__C5_char_P1,
+	          __std_vectorT1_ReferencedNode_P1___findNodes__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(std::vector< spin::ReferencedStateSet * >, findStateSets, IN, const char *, pattern,
+	          Properties::NON_VIRTUAL,
+	          __std_vectorT1_ReferencedStateSet_P1___findStateSets__C5_char_P1,
 	          "",
 	          "");
 	I_Method0(std::vector< spin::SoundConnection * >, getConnections,
@@ -309,8 +314,8 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	                 0, 
 	                 __void__setWorldStateSet__C5_char_P1);
 	I_PublicMemberProperty(std::string, sceneID);
-	I_PublicMemberProperty(osg::ref_ptr< osg::Group >, rootNode);
-	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, worldNode);
+	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, rootNode);
+	I_PublicMemberProperty(osg::ref_ptr< spin::ReferencedNode >, worldNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, gridGeode);
 	I_PublicMemberProperty(spin::t_symbol *, worldStateSet_);
 	I_PublicMemberProperty(bool, graphicalMode);
@@ -320,29 +325,9 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_PublicMemberProperty(btDynamicsWorld *, dynamicsWorld_);
 END_REFLECTOR
 
-TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)
-
-TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::nodeListType >, spin::nodeMapType)
-
-TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::nodeListType >, spin::nodeMapPair)
-
-TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >, spin::ReferencedStateSetList)
-
-TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetMap)
-
-TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetPair)
-
 STD_MAP_REFLECTOR(std::map< std::string COMMA  lo_address >)
 
-STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::ReferencedStateSetList >)
-
-STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::nodeListType >)
-
-STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::ReferencedStateSetList >)
-
-STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::nodeListType >)
-
-STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedNode > >)
+STD_VECTOR_REFLECTOR(std::vector< spin::ReferencedStateSet * >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
 

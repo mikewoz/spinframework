@@ -64,7 +64,7 @@ class SoundNode : public DSPNode
     
     public:
         
-        SoundNode(SceneManager *sceneManager, char *initID);
+        SoundNode(SceneManager *sceneManager, const char* initID);
         virtual ~SoundNode();
 
         virtual void callbackUpdate(osg::NodeVisitor* nv);

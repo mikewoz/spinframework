@@ -64,7 +64,7 @@ class ParticleSystem : public GroupNode
 
 public:
 
-    ParticleSystem(SceneManager *sceneManager, char *initID);
+    ParticleSystem(SceneManager *sceneManager, const char* initID);
     virtual ~ParticleSystem();
     
     virtual void callbackUpdate(osg::NodeVisitor* nv);

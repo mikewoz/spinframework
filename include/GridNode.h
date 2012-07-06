@@ -58,7 +58,7 @@ namespace spin
 class GridNode : public ReferencedNode
 {
 public:
-    GridNode(SceneManager *sceneManager, char *initID);
+    GridNode(SceneManager *sceneManager, const char* initID);
     virtual ~GridNode();
 
     /**

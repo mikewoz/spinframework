@@ -77,10 +77,10 @@ namespace spin
 
 // -----------------------------------------------------------------------------
 // constructor:
-PointCloud::PointCloud (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(std::string(id->s_name) + ".PointCloud");
-	nodeType = "PointCloud";
+	this->setName(this->getID() + ".PointCloud");
+	this->setNodeType("PointCloud");
 
 	drawMode_ = POINTS;
     
@@ -398,7 +398,7 @@ void PointCloud::draw()
     // be drawn in a different way. If it's just positions, colors, spacing, etc
     // that is changing, then use updatePoints().
 
-    if (!sceneManager->isGraphical()) return;
+    if (!sceneManager_->isGraphical()) return;
     
     //std::cout << "PointCloud redraw. cloud_ size = " << cloud_->size() << " maxPoints=" << maxPoints_ << std::endl;
 
@@ -418,13 +418,13 @@ void PointCloud::draw()
 
     cloudGroup_ = new osg::PositionAttitudeTransform();
     cloudGroup_->setAttitude(osg::Quat(-osg::PI_2, osg::X_AXIS));
-    cloudGroup_->setName(std::string(id->s_name) + ".CloudGroup");
+    cloudGroup_->setName(this->getID() + ".CloudGroup");
 
     
     if ((drawMode_>=POINTS) && (drawMode_<=POLYGON))
     {
         cloudGeode_ = new osg::Geode();
-        cloudGeode_->setName(std::string(id->s_name) + ".CloudGeode");
+        cloudGeode_->setName(this->getID() + ".CloudGeode");
         osg::StateSet *ss = cloudGeode_->getOrCreateStateSet();
 		ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF);
         cloudGroup_->addChild(cloudGeode_);
@@ -505,7 +505,7 @@ void PointCloud::draw()
 void PointCloud::setURI(const char* filename)
 {
     // if this is the server, then just broadcast the path and return:
-    if (!sceneManager->isGraphical())
+    if (!sceneManager_->isGraphical())
     {
         BROADCAST(this, "ss", "setURI", filename);
         return;
@@ -678,7 +678,7 @@ void PointCloud::setURI(const char* filename)
 void PointCloud::setCustomNode(const char* nodeID)
 {
     
-    ReferencedNode *n = sceneManager->getNode(nodeID);
+    ReferencedNode *n = sceneManager_->getNode(nodeID);
     if (n)
     {
         customNode_ = gensym(nodeID);

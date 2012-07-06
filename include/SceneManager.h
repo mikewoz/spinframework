@@ -67,13 +67,6 @@ class btDynamicsWorld;
 namespace spin
 {
 
-typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
-typedef std::map< std::string, nodeListType > nodeMapType;
-typedef std::pair< std::string, nodeListType > nodeMapPair;
-
-typedef std::vector< osg::ref_ptr<ReferencedStateSet> > ReferencedStateSetList;
-typedef std::map< std::string, ReferencedStateSetList > ReferencedStateSetMap;
-typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
 
 // forward declarations:
 class GroupNode;
@@ -130,7 +123,9 @@ class SceneManager
         
         void setWorldStateSet(const char *s);
 
-        std::vector<t_symbol*> findNodes(const char *pattern);
+        std::vector<ReferencedNode*> findNodes(const char *pattern);
+        std::vector<ReferencedStateSet*> findStateSets(const char *pattern);
+        
         //nodeListType findNodes(const char *pattern);
         //ReferencedStateSetList findStateSet(const char *pattern);
             
@@ -199,8 +194,9 @@ class SceneManager
 
         std::string sceneID;
 
-        osg::ref_ptr<osg::Group> rootNode;
-        osg::ref_ptr<osg::ClearNode> worldNode;
+        osg::ref_ptr<osg::ClearNode> rootNode;
+        //osg::ref_ptr<osg::ClearNode> worldNode;
+        osg::ref_ptr<ReferencedNode> worldNode;
         osg::ref_ptr<osg::Geode> gridGeode;
         
         t_symbol* worldStateSet_;
@@ -276,6 +272,8 @@ class SceneManager
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
         nodeMapType nodeMap; // the nodeList arranged by type
         ReferencedStateSetMap stateMap;
+        
+        
         
         float dynamicsUpdateRate_; // in seconds
         osg::Timer_t lastTick_;

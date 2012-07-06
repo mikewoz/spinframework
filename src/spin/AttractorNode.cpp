@@ -55,10 +55,10 @@ namespace spin
 
 // ***********************************************************
 // constructor:
-AttractorNode::AttractorNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+AttractorNode::AttractorNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-    nodeType = "AttractorNode";
-    this->setName(string(id->s_name) + ".AttractorNode");
+    this->setNodeType("AttractorNode");
+    this->setName(this->getID() + ".AttractorNode");
 
     distanceDecay_ = 2.0; // exponential force
     angularDecay_ = 0.0; // omni-directional force
@@ -105,7 +105,7 @@ void AttractorNode::callbackUpdate(osg::NodeVisitor* nv)
     {
         float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
 
-        osg::Matrixd thisMat = osg::computeLocalToWorld(this->currentNodePath);
+        osg::Matrixd thisMat = osg::computeLocalToWorld(this->currentNodePath_);
 
         // get direction of force by converting the AttractorNode's
         // orientation to world coords:
@@ -149,7 +149,7 @@ void AttractorNode::callbackUpdate(osg::NodeVisitor* nv)
         
             osg::Quat forceOrientation;
 
-            osg::Matrixd targetMat = osg::computeLocalToWorld((*t)->currentNodePath);
+            osg::Matrixd targetMat = osg::computeLocalToWorld((*t)->currentNodePath_);
             osg::Quat targetQuat = targetMat.getRotate();
             osg::Vec3 targetDir = targetQuat * osg::Y_AXIS;
 
@@ -260,11 +260,11 @@ void AttractorNode::setAttractorMode (attractorMode m)
 void AttractorNode::addTarget (const char *targetID)
 {
 	// target must inherit from GroupNode:
-	osg::observer_ptr<GroupNode> n = dynamic_cast<GroupNode*>(sceneManager->getNode(targetID));
+	osg::observer_ptr<GroupNode> n = dynamic_cast<GroupNode*>(sceneManager_->getNode(targetID));
 
 	if (!n.valid())
 	{
-		std::cout << "WARNING: AttractorNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but node could be found, or is immovable" << std::endl;
+		std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but node could be found, or is immovable" << std::endl;
 		return;
 	}
 
@@ -274,7 +274,7 @@ void AttractorNode::addTarget (const char *targetID)
     {
     	if (n.get()==(*t).get())
     	{
-    		//std::cout << "WARNING: AttractorNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
+    		//std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
     		return;
     	}
     }
@@ -288,11 +288,11 @@ void AttractorNode::addTarget (const char *targetID)
 void AttractorNode::removeTarget (const char *targetID)
 {
 	// get ReferencedNode for the ID:
-	osg::ref_ptr<GroupNode> n =  dynamic_cast<GroupNode*>(sceneManager->getNode(targetID));
+	osg::ref_ptr<GroupNode> n =  dynamic_cast<GroupNode*>(sceneManager_->getNode(targetID));
 
 	if (!n.valid())
 	{
-		std::cout << "WARNING: AttractorNode '" << this->id->s_name << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+		std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
 		return;
 	}
 
@@ -307,7 +307,7 @@ void AttractorNode::removeTarget (const char *targetID)
     		return;
     	}
     }
-    std::cout << "WARNING: AttractorNode '" << this->id->s_name << "' tried to removeTarget '" << targetID << "', but that node was not in the target list" << std::endl;
+    std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but that node was not in the target list" << std::endl;
 }
 
 
@@ -328,7 +328,7 @@ std::vector<lo_message> AttractorNode::getState () const
     	if ((*t).valid())
 		{
     		msg = lo_message_new();
-    		lo_message_add(msg, "ss", "addTarget", (*t)->id->s_name);
+    		lo_message_add(msg, "ss", "addTarget", (*t)->getID().c_str());
     		ret.push_back(msg);
 		}
     }

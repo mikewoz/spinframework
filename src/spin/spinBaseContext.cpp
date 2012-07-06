@@ -168,7 +168,7 @@ void spinBaseContext::debugPrint()
 {
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager_->resourcesPath << std::endl;
     std::cout << "  SPIN version:\t\t\t" << PACKAGE_VERSION << "" << std::endl;
     std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC
@@ -765,7 +765,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     }
 
     spinApp &spin = spinApp::Instance();
-    SceneManager *sceneManager = spin.sceneManager;
+    SceneManager *sceneManager = spin.sceneManager_;
 
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;
@@ -833,9 +833,12 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             // may have detached it from the scenegraph:
             if (!sceneManager->worldNode->containsNode(spin.userNode.get()))
             {
+                spin.userNode->attachTo("world");
+                /*
                 std::cout << "calling attach on userNode (newparent=" << spin.userNode->newParent->s_name << std::endl;
                 spin.userNode->newParent = WORLD_SYMBOL;
                 spin.userNode->attach();
+                */
             }
             
             // if the server sends a userRefresh, it's possible that it has
@@ -963,7 +966,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         // FIXME: this used to rebroadcast messages that did not match command
 #if 0
         spinApp &spin = spinApp::Instance();
-        if (spin.sceneManager->isServer())
+        if (spin.sceneManager_->isServer())
         {
             lo_message msg = lo_message_new();
             for (int i=0; i<argc; i++)
@@ -975,7 +978,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
                     lo_message_add_string(msg, (const char*) argv[i] );
                 }
             }
-            lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+            lo_send_message_from(spin.sceneManager_->txAddr, spin.sceneManager_->txServ, path, msg);
             //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args), but forwarding the message anyway." << std::endl;
         } else {
             //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;

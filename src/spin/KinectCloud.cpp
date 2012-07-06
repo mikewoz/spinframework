@@ -61,17 +61,15 @@ double depth_data[240][320];
 
 pthread_mutex_t freenectMutex = PTHREAD_MUTEX_INITIALIZER;
 
-using namespace std;
-
 namespace spin
 {
 
 // -----------------------------------------------------------------------------
 // constructor:
-KinectCloud::KinectCloud (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+KinectCloud::KinectCloud (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".KinectCloud");
-	nodeType = "KinectCloud";
+	this->setName(this->getID() + ".KinectCloud");
+	this->setNodeType("KinectCloud");
 
 	drawMode_ = LIGHTPOINTS;
     
@@ -86,7 +84,7 @@ KinectCloud::KinectCloud (SceneManager *sceneManager, char *initID) : GroupNode(
             depth_data[i][j] = 0;
     
     
-    if (sceneManager->isGraphical())
+    if (sceneManager_->isGraphical())
     {
         
         osg::TessellationHints* hints = new osg::TessellationHints;
