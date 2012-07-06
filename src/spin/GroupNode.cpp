@@ -561,9 +561,22 @@ void GroupNode::debug()
     if (owner_.valid()) std::cout << "   owner: " << owner_->getID() << std::endl;
     else std::cout << "   owner: NULL" << std::endl;
     
-    std::cout << "   mainX pos: " << stringify(this->getTranslation()) << std::endl;
-    std::cout << "   mainX rot: " << stringify(this->getOrientationQuat()) << std::endl;
+    std::cout << "   mainX posn: " << stringify(this->getTranslation()) << std::endl;
+    std::cout << "   mainX qua: " << stringify(this->getOrientationQuat()) << std::endl;
+    std::cout << "   mainX ori: " << stringify(this->getOrientation()) << std::endl;
     std::cout << "   mainX scl: " << stringify(this->getScale()) << std::endl;
+    
+    const osg::Matrix tmpMatrix = this->getGlobalMatrix();
+    osg::Vec3 t;
+    osg::Quat q;
+    osg::Vec3 s;
+    osg::Quat so;
+    tmpMatrix.decompose(t, q, s, so);
+    std::cout << "   global pos: " << stringify(t) << std::endl;
+    std::cout << "   global qua: " << stringify(q) << std::endl;
+    std::cout << "   global ori: " << stringify(Vec3inDegrees(QuatToEuler(q))) << std::endl;
+    std::cout << "   global scl: " << stringify(s) << std::endl;
+
 }
 
 

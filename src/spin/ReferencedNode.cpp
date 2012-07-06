@@ -732,7 +732,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
     osg::Timer* timer = osg::Timer::instance();
 
     std::string sf = osgDB::findDataFile( scriptPath );
-    cout << "Loading script: " << sf << endl;
+    std::cout << "Loading script: " << sf << std::endl;
 
     boost::python::object s, p;
 
@@ -754,7 +754,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
         cs->enabled = false;
         cs->pyModule = "";
         cs->pyScript = "";
-        _cronScriptList.insert( pair<const std::string, CronScript*>( std::string(label), cs ) );
+        _cronScriptList.insert( std::pair<const std::string, CronScript*>( std::string(label), cs ) );
         return true;
     }
 
@@ -786,7 +786,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
         cs->pyModule = pyModule;
         cs->pyScript = pyScript;
 
-        _cronScriptList.insert( pair<const std::string, CronScript*>( std::string(label), cs ) );
+        _cronScriptList.insert( std::pair<const std::string, CronScript*>( std::string(label), cs ) );
 
     } 
     catch ( boost::python::error_already_set const & ) 
@@ -915,7 +915,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     osg::Timer* timer = osg::Timer::instance();
 
     std::string sf = osgDB::findDataFile( scriptPath );
-    cout << "Loading script: " << sf << endl;
+    std::cout << "Loading script: " << sf << std::endl;
 
     boost::python::object s, p;
     char cmd[512];
@@ -934,7 +934,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
         es->enabled = false;
         es->pyModule = "";
         es->pyScript = "";
-        _eventScriptList.insert( pair<const std::string, EventScript*>( std::string(label), es ) );
+        _eventScriptList.insert( std::pair<const std::string, EventScript*>( std::string(label), es ) );
         return true;
     }
 
@@ -968,7 +968,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
         es->pyModule = pyModule;
         es->pyScript = pyScript;
 
-        _eventScriptList.insert( pair<const std::string, EventScript*>( std::string(label), es ) );
+        _eventScriptList.insert( std::pair<const std::string, EventScript*>( std::string(label), es ) );
 
     } catch (boost::python::error_already_set const & ) {
         std::cout << "Python error: " << std::endl;
