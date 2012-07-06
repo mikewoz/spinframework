@@ -857,6 +857,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             server->refreshSubscribers();
         }
     }
+    else if (theMethod == "getNodeTypes")
+        sceneManager->sendNodeTypes();
+    else if (theMethod == "getStateTypes")
+        sceneManager->sendStateTypes();
+        
     else if (theMethod == "getNodeList")
         sceneManager->sendNodeList("*");
     else if ((theMethod == "nodeList") && (argc>2))

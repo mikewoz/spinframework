@@ -424,6 +424,52 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
     sendNodeList("*");
 }
 
+void SceneManager::sendNodeTypes(lo_address txAddr)
+{
+    if (! spinApp::Instance().getContext()->isServer())
+        return;
+    
+    if (nodeMap.size())
+    {
+        std::vector<lo_message> msgs;
+        lo_message msg = lo_message_new();;
+        lo_message_add_string(msg, "nodeTypes" );
+        
+        nodeMapType::iterator it;
+        for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
+        {
+            lo_message_add_string(msg, (*it).first.c_str() );
+        }
+        msgs.push_back(msg);
+        
+        // we use SceneBundle even though there is only one message because
+        // we need to be able to send via TCP
+        spinApp::Instance().SceneBundle(msgs, txAddr);
+    }
+}
+
+void SceneManager::sendStateTypes(lo_address txAddr)
+{    
+    if (! spinApp::Instance().getContext()->isServer())
+        return;
+
+    if (stateMap.size())
+    {
+        std::vector<lo_message> msgs;
+        lo_message msg = lo_message_new();;
+        lo_message_add_string(msg, "stateTypes" );
+        
+        ReferencedStateSetMap::iterator it;
+        for (it = stateMap.begin(); it != stateMap.end(); ++it)
+        {
+            lo_message_add_string(msg, (*it).first.c_str() );
+        }
+        msgs.push_back(msg);
+        
+        spinApp::Instance().SceneBundle(msgs, txAddr);
+    }
+}
+
 void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
 {
 	if (! spinApp::Instance().getContext()->isServer())

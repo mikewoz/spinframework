@@ -105,6 +105,8 @@ class SceneManager
         void registerStateSet(ReferencedStateSet *s);
         void unregisterStateSet(ReferencedStateSet *s);
 
+        void sendNodeTypes(lo_address txAddr = 0);
+        void sendStateTypes(lo_address txAddr = 0);
         void sendNodeList(std::string type, lo_address txAddr = 0);
         void sendConnectionList(lo_address txAddr = 0);
 
