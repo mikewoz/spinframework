@@ -63,7 +63,7 @@ class GeometryNode : public GroupNode
 {
 public:
 
-    GeometryNode(SceneManager *sceneManager, char *initID);
+    GeometryNode(SceneManager *sceneManager, const char* initID);
     virtual ~GeometryNode();
     
     virtual void callbackUpdate(osg::NodeVisitor* nv);

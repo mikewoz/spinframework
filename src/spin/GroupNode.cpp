@@ -189,9 +189,9 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
     
 // ***********************************************************
 // constructor:
-GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+GroupNode::GroupNode (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
 {
-    nodeType = "GroupNode";
+    this->setNodeType("GroupNode");
     this->setName(getID() + ".GroupNode");
 
     //_reportGlobals = false;
@@ -364,8 +364,8 @@ void GroupNode::updateNodePath(bool updateChildren)
     // are not updated yet:
 	ReferencedNode::updateNodePath(false);
 
-    currentNodePath.push_back(mainTransform_.get());    
-    currentNodePath.push_back(clipNode_.get());
+    currentNodePath_.push_back(mainTransform_.get());    
+    currentNodePath_.push_back(clipNode_.get());
     
     // now update NodePaths for all children:
     if (updateChildren) updateChildNodePaths();
@@ -381,7 +381,7 @@ void GroupNode::mouseEvent (int /*event*/, int keyMask, int buttonMask, float x,
 
 void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
 {
-    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager_->getNode(userString));
     if (!user.valid()) return;
 
     if (interactionMode_==DRAG || interactionMode_==THROW)
@@ -502,8 +502,8 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 if (!this->owner_.valid())
                 {
                     this->owner_ = user.get();
-                    //std::cout << "setting owner of " << id->s_name << " to " << owner_->id->s_name << std::endl;
-                    BROADCAST(this, "ss", "setOwner", owner_->id->s_name);
+                    //std::cout << "setting owner of " << getID() << " to " << owner_->getID() << std::endl;
+                    BROADCAST(this, "ss", "setOwner", owner_->getID().c_str());
                     BROADCAST(this, "ssi", "select", userString, 1);
                 }
                 break;
@@ -514,7 +514,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                 // that he had ownership in the first place):
                 if (this->owner_ == user)
                 {
-                    //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
+                    //std::cout << "setting owner of " << getID() << " to NULL" << std::endl;
                     this->owner_ = NULL;
                     BROADCAST(this, "ss", "setOwner", "NULL");
                     BROADCAST(this, "ssi", "select", userString, 0);
@@ -530,7 +530,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
 void GroupNode::setLock(const char* userString, int lock)
 {
-    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager_->getNode(userString));
     if (!user.valid()) return;
 
     if (lock)
@@ -538,15 +538,15 @@ void GroupNode::setLock(const char* userString, int lock)
         if (owner_.valid())
         {
             this->owner_ = user.get();
-            //std::cout << "setting owner of " << id->s_name << " to " << owner_->id->s_name << std::endl;
-            BROADCAST(this, "ss", "setOwner", owner_->id->s_name);
+            //std::cout << "setting owner of " << getID() << " to " << owner_->getID() << std::endl;
+            BROADCAST(this, "ss", "setOwner", owner_->getID().c_str());
         }
     }
     else
     {
         if (this->owner_ == user)
         {
-            //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
+            //std::cout << "setting owner of " << getID() << " to NULL" << std::endl;
             this->owner_ = NULL;
             BROADCAST(this, "ss", "setOwner", "NULL");
         }
@@ -558,7 +558,7 @@ void GroupNode::debug()
     ReferencedNode::debug();
 
     std::cout << "   Manipulator: " << manipulatorType_ << std::endl;
-    if (owner_.valid()) std::cout << "   owner: " << owner_->id->s_name << std::endl;
+    if (owner_.valid()) std::cout << "   owner: " << owner_->getID() << std::endl;
     else std::cout << "   owner: NULL" << std::endl;
     
     std::cout << "   mainX pos: " << stringify(this->getTranslation()) << std::endl;
@@ -621,7 +621,8 @@ void GroupNode::setInteractionMode (InteractionMode mode)
         // now we need to travel up the scenegraph and set all parents to have
         // an InteractionMode of PASSTHRU, otherwise an intersection traversal
         // will never find this node:
-        GroupNode *parent = dynamic_cast<GroupNode*>(this->getParentNode());
+                
+        GroupNode *parent = dynamic_cast<GroupNode*>(this->getParentNode(0));
         while (parent)
         {
             if (!parent->getInteractionMode())
@@ -629,7 +630,7 @@ void GroupNode::setInteractionMode (InteractionMode mode)
                 parent->setInteractionMode(PASSTHRU);
                 continue; // rest of parents will be recursively called
             }
-            else parent = dynamic_cast<GroupNode*>(parent->getParentNode());
+            else parent = dynamic_cast<GroupNode*>(parent->getParentNode(0));
         }
         
     }
@@ -639,11 +640,11 @@ void GroupNode::setInteractionMode (InteractionMode mode)
 
 void GroupNode::setStateSetFromFile(const char* filename)
 {
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(filename);
 	if (ss.valid())
 	{
-		if (ss->id == stateset_) return; // we're already using that stateset
-		stateset_ = ss->id;
+		if (ss->getIDSymbol() == stateset_) return; // we're already using that stateset
+		stateset_ = ss->getIDSymbol();
 		updateStateSet();
 		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
 	}
@@ -653,10 +654,10 @@ void GroupNode::setStateSet (const char* s)
 {
 	if (gensym(s)==stateset_) return;
 
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->getStateSet(s);
 	if (ss.valid())
 	{
-		stateset_ = ss->id;
+		stateset_ = ss->getIDSymbol();
 		updateStateSet();
 		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
 	}
@@ -824,7 +825,7 @@ void GroupNode::applyOrientationMode()
     {
     
         osg::Vec3 targetPos;
-        osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+        osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath_);
         
         if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
         {
@@ -840,7 +841,7 @@ void GroupNode::applyOrientationMode()
                 }
                 else
                 {
-                    osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath);
+                    osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath_);
                     targetPos = targetMatrix.getTrans();
                 }
             }
@@ -1282,7 +1283,7 @@ osg::Matrix GroupNode::getGlobalMatrix()
     if (!this->reportMode_)
     {
         // might not be up-to-date, so force an update:
-        globalMatrix_ = osg::computeLocalToWorld(this->currentNodePath);
+        globalMatrix_ = osg::computeLocalToWorld(this->currentNodePath_);
     }
 
     return globalMatrix_;
@@ -1308,7 +1309,7 @@ bool GroupNode::dumpGlobals(bool forced)
     {
 
         // position & rotation: (should we get position from centre of boundingsphere?
-        osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
+        osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath_);
         if ((myMatrix != this->globalMatrix_) || forced)
         {
             this->globalMatrix_ = myMatrix;

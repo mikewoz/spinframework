@@ -62,7 +62,7 @@ class SoundSpace : public DSPNode
     
   public:
         
-        SoundSpace(SceneManager *sceneManager, char *initID);
+        SoundSpace(SceneManager *sceneManager, const char* initID);
         virtual ~SoundSpace();
 
 

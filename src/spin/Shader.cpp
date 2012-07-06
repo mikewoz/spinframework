@@ -69,7 +69,7 @@ namespace spin
 // constructor:
 Shader::Shader (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 {
-	classType = "Shader";
+	classType_ = "Shader";
 
 	shaderPath_ = "NULL";
     updateRate_ = 1.0;
@@ -109,7 +109,7 @@ Shader::~Shader()
 
 void Shader::updateCallback()
 {
-    //if (!sceneManager->isGraphical()) return;
+    //if (!sceneManager_->isGraphical()) return;
 
     // do something every updateRate_ seconds:
     osg::Timer_t tick = osg::Timer::instance()->tick();
@@ -648,7 +648,7 @@ void Shader::setShader (const char* path)
     
     if (shaderPath_ == "NULL")
     {
-        std::cout << "Disabled shader '"<< this->id->s_name << "'" << std::endl;
+        std::cout << "Disabled shader '"<< this->getID() << "'" << std::endl;
     }
     else
     {

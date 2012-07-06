@@ -24,8 +24,8 @@
 BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	I_DeclaringFile("CollisionShape.h");
 	I_BaseType(spin::ShapeNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____CollisionShape__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____CollisionShape__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,

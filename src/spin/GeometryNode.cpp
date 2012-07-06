@@ -55,8 +55,6 @@
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -64,10 +62,10 @@ namespace spin
 
 // ===================================================================
 // constructor:
-GeometryNode::GeometryNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+GeometryNode::GeometryNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".GeometryNode");
-	nodeType = "GeometryNode";
+	this->setName(this->getID() + ".GeometryNode");
+	this->setNodeType("GeometryNode");
 
     updateFlag_ = false;
 
@@ -95,7 +93,7 @@ GeometryNode::GeometryNode (SceneManager *sceneManager, char *initID) : GroupNod
     
     geode_ = new osg::Geode();
     this->getAttachmentNode()->addChild(geode_.get());
-    geode_->setName(string(id->s_name) + ".geode");
+    geode_->setName(this->getID() + ".geode");
 
     geometry_ = new osg::Geometry();
     geometry_->setVertexArray(vertexArray_);

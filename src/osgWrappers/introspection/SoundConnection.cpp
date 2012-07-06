@@ -28,6 +28,11 @@ BEGIN_VALUE_REFLECTOR(spin::SoundConnection)
 	               ____SoundConnection__SceneManager_P1__osg_ref_ptrT1_DSPNode___osg_ref_ptrT1_DSPNode_,
 	               "",
 	               "");
+	I_Method0(std::string, getID,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getID,
+	          "",
+	          "");
 	I_Method1(void, setThru, IN, int, newvalue,
 	          Properties::NON_VIRTUAL,
 	          __void__setThru__int,
@@ -107,6 +112,9 @@ BEGIN_VALUE_REFLECTOR(spin::SoundConnection)
 	I_SimpleProperty(float, DopplerEffect, 
 	                 __float__getDopplerEffect, 
 	                 __void__setDopplerEffect__float);
+	I_SimpleProperty(std::string, ID, 
+	                 __std_string__getID, 
+	                 0);
 	I_SimpleProperty(float, RolloffEffect, 
 	                 __float__getRolloffEffect, 
 	                 __void__setRolloffEffect__float);
@@ -116,7 +124,6 @@ BEGIN_VALUE_REFLECTOR(spin::SoundConnection)
 	I_SimpleProperty(int, Thru, 
 	                 __int__getThru, 
 	                 __void__setThru__int);
-	I_PublicMemberProperty(spin::t_symbol *, id);
 	I_PublicMemberProperty(spin::DSPNode *, source);
 	I_PublicMemberProperty(spin::DSPNode *, sink);
 END_REFLECTOR

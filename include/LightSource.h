@@ -59,7 +59,7 @@ namespace spin
 class LightSource : public GroupNode
 {
 public:
-    LightSource(SceneManager *sceneManager, char *initID);
+    LightSource(SceneManager *sceneManager, const char* initID);
     virtual ~LightSource();
 
     /**

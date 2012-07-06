@@ -50,21 +50,16 @@
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-using namespace std;
-
-//extern SceneManager *sceneManager;
-
-
 namespace spin
 {
 
 
 // *****************************************************************************
 // constructor:
-Contour::Contour (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+Contour::Contour (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".Contour");
-	nodeType = "Contour";
+	this->setName(this->getID() + ".Contour");
+	this->setNodeType("Contour");
 
 	_vArray = new osg::Vec3Array;
 	_vArray->clear();
@@ -86,7 +81,7 @@ Contour::Contour (SceneManager *sceneManager, char *initID) : ReferencedNode(sce
 	//vArrayGeometry = NULL;
 
 	mainTransform = new osg::PositionAttitudeTransform();
-	mainTransform->setName(string(id->s_name) + ".mainTransform");
+	mainTransform->setName(this->getID() + ".mainTransform");
 	this->addChild(mainTransform.get());
 	
 	// When children are attached to this, they get added to the attachNode:
@@ -120,23 +115,16 @@ Contour::~Contour()
 
 void Contour::updateNodePath()
 {
-	currentNodePath.clear();
-	if ((parent!=WORLD_SYMBOL) && (parent!=NULL_SYMBOL))
-	{
-		osg::ref_ptr<ReferencedNode> parentNode = dynamic_cast<ReferencedNode*>(parent->s_thing);
-		if (parentNode.valid())
-		{
-			currentNodePath = parentNode->currentNodePath;
-		}
-	}
+	// get node path from parent class, but with the false flag so that children
+    // are not updated yet:
+	ReferencedNode::updateNodePath(false);
 	
 	// here, the nodePath includes the base osg::group, PLUS the mainTransform
-	currentNodePath.push_back(this);
-	currentNodePath.push_back(mainTransform.get());
+	currentNodePath_.push_back(this);
+	currentNodePath_.push_back(mainTransform.get());
 	
 	// now update NodePaths for all children:
 	updateChildNodePaths();
-	
 }
 
 void Contour::callbackUpdate(osg::NodeVisitor* nv)
@@ -267,7 +255,7 @@ void Contour::reset()
 	_vArray->clear();
 	updateTransforms();
 	
-	//std::cout << "cleared the Contour (" << this->id->s_name << ") size=" << _vArray->size() << std::endl;
+	//std::cout << "cleared the Contour (" << this->getID() << ") size=" << _vArray->size() << std::endl;
 	
 	BROADCAST(this, "s", "reset");
 	BROADCAST(this, "sf", "setIndex", _currentIndex);
@@ -502,7 +490,7 @@ void Contour::draw()
         else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 
 		
-		vArrayGeode->setName(string(id->s_name) + ".vArrayGeode");
+		vArrayGeode->setName(this->getID() + ".vArrayGeode");
 
 		this->addChild( vArrayGeode.get() );
 

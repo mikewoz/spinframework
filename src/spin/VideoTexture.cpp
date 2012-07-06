@@ -62,7 +62,7 @@ namespace spin
 // constructor:
 VideoTexture::VideoTexture (SceneManager *s, const char *initID) : Shader(s, initID)
 {
-	classType = "VideoTexture";
+	classType_ = "VideoTexture";
 
 	_useTextureRectangle = false;
 	lightingEnabled_ = false;
@@ -145,7 +145,7 @@ void VideoTexture::setPath (const char* newPath)
 	//debug
 	//osg::setNotifyLevel(osg::DEBUG_FP);
 	
-	if (sceneManager->isGraphical())
+	if (sceneManager_->isGraphical())
 	{
 		osg::ref_ptr<osg::ImageStream> test;
 		

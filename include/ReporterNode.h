@@ -85,7 +85,7 @@ class ReporterNode : public ReferencedNode
 
 public:
 
-    ReporterNode(SceneManager *sceneManager, char *initID);
+    ReporterNode(SceneManager *sceneManager, const char* initID);
     virtual ~ReporterNode();
 
     virtual void debug();

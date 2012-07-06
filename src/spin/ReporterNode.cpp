@@ -48,18 +48,15 @@
 #include <osgUtil/LineSegmentIntersector>
 #include <osgUtil/IntersectionVisitor>
 
-using namespace std;
-
-
 namespace spin
 {
 
 // *****************************************************************************
 // constructor:
-ReporterNode::ReporterNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+ReporterNode::ReporterNode (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
 {
-    this->setName(string(id->s_name) + ".ReporterNode");
-    nodeType = "ReporterNode";
+    this->setName(this->getID() + ".ReporterNode");
+    this->setNodeType("ReporterNode");
 
 	maxRate_ = 20.0;
 
@@ -91,7 +88,7 @@ void ReporterNode::debug()
     std::vector<reporterTarget>::const_iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
-    	if ((*t).node.valid()) std::cout << " " << (*t).node->id->s_name;
+    	if ((*t).node.valid()) std::cout << " " << (*t).node->getID();
     }
     std::cout << std::endl;
 }
@@ -110,7 +107,7 @@ void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
     {
         bool needReport = false;
 
-		osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath);
+		osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath_);
 		if (matrix_!=mthis)
 		{
 			needReport = true;
@@ -122,7 +119,7 @@ void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
 		{
 			if ((*t).node.valid())
 			{
-				osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath);
+				osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath_);
 
 				// if there is a change in this node's matrix or the target, we need
 				// to send an updated report:
@@ -187,7 +184,7 @@ void ReporterNode::sendReports(reporterTarget *target)
     if (reporting_["DISTANCE"])
     {
     	msg = lo_message_new();
-    	lo_message_add( msg, "ssf", "distance", target->node->id->s_name, connection_vector.length() );
+    	lo_message_add( msg, "ssf", "distance", target->node->getID().c_str(), connection_vector.length() );
     	msgs.push_back(msg);
     }
 
@@ -198,14 +195,14 @@ void ReporterNode::sendReports(reporterTarget *target)
         double incidence = AngleBetweenVectors(src_dir, connection_vector);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssf", "incidence", target->node->id->s_name, incidence );
+        lo_message_add( msg, "ssf", "incidence", target->node->getID().c_str(), incidence );
         msgs.push_back(msg);
 
         // direction: angle of connection_vector (projected on XY plane):
         float direction = AngleBetweenVectors(connection_vector, osg::Y_AXIS, 3);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssf", "direction", target->node->id->s_name, direction );
+        lo_message_add( msg, "ssf", "direction", target->node->getID().c_str(), direction );
         msgs.push_back(msg);
 
     }
@@ -224,21 +221,21 @@ void ReporterNode::sendReports(reporterTarget *target)
         float srcIncidenceAzim = AngleBetweenVectors(src_dir, connection_vector, 3);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssfff", "eulers", target->node->id->s_name, srcIncidenceElev, srcIncidenceRoll, srcIncidenceAzim);
+        lo_message_add( msg, "ssfff", "eulers", target->node->getID().c_str(), srcIncidenceElev, srcIncidenceRoll, srcIncidenceAzim);
         msgs.push_back(msg);
 
         osg::Quat rot;
         rot.makeRotate(connection_vector, src_dir);
 
         msg = lo_message_new();
-        lo_message_add(msg, "ssffff", "quaternion", target->node->id->s_name, rot.x(), rot.y(), rot.z(), rot.w());
+        lo_message_add(msg, "ssffff", "quaternion", target->node->getID().c_str(), rot.x(), rot.y(), rot.z(), rot.w());
         msgs.push_back(msg);
 
         /*
         osg::Vec3 rotEulers = QuatToEuler(rot);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssfff", "test", target->node->id->s_name, rotEulers.x(), rotEulers.y(), rotEulers.z());
+        lo_message_add( msg, "ssfff", "test", target->node->getID().c_str(), rotEulers.x(), rotEulers.y(), rotEulers.z());
         msgs.push_back(msg);
         */
     }
@@ -259,7 +256,7 @@ void ReporterNode::sendReports(reporterTarget *target)
             // are not checked for intersections:
             intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK|INTERACTIVE_NODE_MASK);
             
-            sceneManager->rootNode->accept(intersectVisitor);
+            sceneManager_->rootNode->accept(intersectVisitor);
 
             // If there are some intersections, they could be with some other
             // objects within the target's hull, so we have to check all
@@ -301,7 +298,7 @@ void ReporterNode::sendReports(reporterTarget *target)
         {
             target->contained = isContained;
             msg = lo_message_new();
-            lo_message_add(msg, "ssi", "containedBy", target->node->id->s_name, (int)target->contained);
+            lo_message_add(msg, "ssi", "containedBy", target->node->getID().c_str(), (int)target->contained);
             msgs.push_back(msg);
         }
 
@@ -313,18 +310,18 @@ void ReporterNode::sendReports(reporterTarget *target)
     }
 
     if (msgs.size())
-    	spinApp::Instance().NodeBundle(this->id, msgs);
+    	spinApp::Instance().NodeBundle(this->getID(), msgs);
 }
 
 // *****************************************************************************
 void ReporterNode::addTarget (const char *targetID)
 {
 	// get ReferencedNode for theat ID:
-	osg::ref_ptr<ReferencedNode> n = sceneManager->getNode(targetID);
+	osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
 
 	if (!n.valid())
 	{
-		std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+		std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but no node by that name could be found" << std::endl;
 		return;
 	}
 
@@ -334,7 +331,7 @@ void ReporterNode::addTarget (const char *targetID)
     {
     	if (n.get()==(*t).node.get())
     	{
-    		//std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
+    		//std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
     		return;
     	}
     }
@@ -342,7 +339,7 @@ void ReporterNode::addTarget (const char *targetID)
     // add it to the list:
     reporterTarget newTarget;
     newTarget.node = n.get();
-    newTarget.matrix = osg::computeLocalToWorld(n->currentNodePath);
+    newTarget.matrix = osg::computeLocalToWorld(n->currentNodePath_);
     newTarget.contained = false;
     targets_.push_back(newTarget);
 
@@ -356,11 +353,11 @@ void ReporterNode::addTarget (const char *targetID)
 void ReporterNode::removeTarget (const char *targetID)
 {
 	// get ReferencedNode for the ID:
-	osg::ref_ptr<ReferencedNode> n = sceneManager->getNode(targetID);
+	osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
 
 	if (!n.valid())
 	{
-		std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+		std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
 		return;
 	}
 
@@ -398,7 +395,7 @@ void ReporterNode::setReporting (const char *type, bool enabled)
 			{
 				if ((*t).node.valid())
 				{
-					(*t).matrix = osg::computeLocalToWorld((*t).node->currentNodePath);
+					(*t).matrix = osg::computeLocalToWorld((*t).node->currentNodePath_);
 					this->sendReports(&(*t));
 				}
 			}
@@ -436,7 +433,7 @@ std::vector<lo_message> ReporterNode::getState () const
     	if ((*t).node.valid())
 		{
     		msg = lo_message_new();
-    		lo_message_add(msg, "ss", "addTarget", (*t).node->id->s_name);
+    		lo_message_add(msg, "ss", "addTarget", (*t).node->getID().c_str());
     		ret.push_back(msg);
 		}
     }

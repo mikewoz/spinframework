@@ -55,8 +55,6 @@
 #include "SharedVideoTexture.h"
 #include "ShaderUtil.h"
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -64,10 +62,10 @@ namespace spin
 
 // ===================================================================
 // constructor:
-ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+ShapeNode::ShapeNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".ShapeNode");
-	nodeType = "ShapeNode";
+	this->setName(this->getID() + ".ShapeNode");
+	this->setNodeType("ShapeNode");
 
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);	
 
@@ -84,7 +82,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
         osg::Geode* geode = new osg::Geode();
         osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(1,1,1), 1));
         geode->addDrawable(drawable);
-        sceneManager->worldNode->addChild(geode);
+        sceneManager_->worldNode->addChild(geode);
 
         osg::Shader* vshader = new osg::Shader(osg::Shader::VERTEX, microshaderVertSource );
         osg::Shader* fshader = new osg::Shader(osg::Shader::FRAGMENT, microshaderFragSource );
@@ -102,7 +100,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 // destructor
 ShapeNode::~ShapeNode()
 {
-	//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+	//if (sceneManager_->sharedStateManager.valid()) sceneManager_->sharedStateManager->prune();
 }
 
 // ===================================================================
@@ -111,7 +109,7 @@ ShapeNode::~ShapeNode()
 
 void ShapeNode::setContext (const char *newvalue)
 {
-	if (this->contextString == string(newvalue)) return;
+	if (this->getContextString() == std::string(newvalue)) return;
 	// need to redraw after setContext() is called:
 	ReferencedNode::setContext(newvalue);
 	drawShape();
@@ -358,7 +356,7 @@ void ShapeNode::drawShape()
             ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
         
 		this->getAttachmentNode()->addChild(shapeGeode.get());
-		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
+		shapeGeode->setName(this->getID() + ".shapeGeode");
 		optimizer.optimize(shapeGeode.get()); // ?
 	}
 

@@ -84,7 +84,7 @@ class TextNode : public GroupNode
 
 public:
 
-    TextNode(SceneManager *sceneManager, char *initID);
+    TextNode(SceneManager *sceneManager, const char* initID);
     virtual ~TextNode();
 
     virtual void callbackUpdate(osg::NodeVisitor* nv);

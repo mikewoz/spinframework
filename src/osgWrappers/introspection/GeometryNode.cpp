@@ -24,8 +24,8 @@
 BEGIN_OBJECT_REFLECTOR(spin::GeometryNode)
 	I_DeclaringFile("GeometryNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____GeometryNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____GeometryNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,

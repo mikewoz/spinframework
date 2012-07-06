@@ -76,8 +76,8 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_DeclaringFile("GroupNode.h");
 	I_BaseType(spin::ReferencedNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____GroupNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____GroupNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               " param initID will be converted into a t_symbol  ");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
@@ -89,7 +89,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
 	                      "",
-	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath_. ");
 	I_Method5(void, mouseEvent, IN, int, event, IN, int, keyMask, IN, int, buttonMask, IN, float, x, IN, float, y,
 	          Properties::NON_VIRTUAL,
 	          __void__mouseEvent__int__int__int__float__float,

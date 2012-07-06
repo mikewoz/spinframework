@@ -53,10 +53,10 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-ParticleSystem::ParticleSystem (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(std::string(id->s_name) + ".ParticleSystem");
-	nodeType = "ParticleSystem";
+	this->setName(this->getID() + ".ParticleSystem");
+	this->setNodeType("ParticleSystem");
 
     imgPath_.clear();
     attachedFlag_ = false;

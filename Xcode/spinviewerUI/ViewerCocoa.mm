@@ -461,15 +461,15 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     osg::ref_ptr<osg::Node> argScene = osgDB::readNodeFile("/Users/mikewoz/src/3D_MODELS/cow/cow.osg");
     if (argScene.valid()) {
         std::cout << "Loading sample model" << std::endl;
-        spin::spinApp::Instance().sceneManager->worldNode->addChild(argScene.get());
+        spin::spinApp::Instance().sceneManager_->worldNode->addChild(argScene.get());
     }
     osg::setNotifyLevel(osg::FATAL);
     */
     // END TEST
     
-    theViewer->setSceneData(spin::spinApp::Instance().sceneManager->rootNode.get());
+    theViewer->setSceneData(spin::spinApp::Instance().sceneManager_->rootNode.get());
     
-    spin::spinApp::Instance().sceneManager->setGraphical(true);
+    spin::spinApp::Instance().sceneManager_->setGraphical(true);
     
     // start threads:
 	theViewer->realize();
@@ -1168,7 +1168,7 @@ static bool keyState_Super = false;
             theViewer->advance();
             theViewer->eventTraversal();
             pthread_mutex_lock(&sceneMutex);
-            spin::spinApp::Instance().sceneManager->update();
+            spin::spinApp::Instance().sceneManager_->update();
             theViewer->updateTraversal();
             theViewer->renderingTraversals();
             pthread_mutex_unlock(&sceneMutex);
@@ -1493,9 +1493,9 @@ static bool keyState_Super = false;
             
             // check if a node with this name already exists, and make a new 
             // node name by appending a number:
-            //spin::ReferencedNode *testNode = spin::spinApp::Instance().sceneManager->getNode(nodeStr);
+            //spin::ReferencedNode *testNode = spin::spinApp::Instance().sceneManager_->getNode(nodeStr);
             int i=1;
-            while (spin::spinApp::Instance().sceneManager->getNode(nodeID))
+            while (spin::spinApp::Instance().sceneManager_->getNode(nodeID))
             {
                 nodeID = osgDB::getStrippedName(fileStr)+"_"+spin::stringify(i++);
             }
@@ -1538,7 +1538,7 @@ static bool keyState_Super = false;
         std::string fileStr = [[file_url path] fileSystemRepresentation];
         std::string nodeID = osgDB::getStrippedName(fileStr);
         int i=1;
-        while (spin::spinApp::Instance().sceneManager->getNode(nodeID))
+        while (spin::spinApp::Instance().sceneManager_->getNode(nodeID))
         {
             nodeID = osgDB::getStrippedName(fileStr)+"_"+spin::stringify(i++);
         }
@@ -1764,7 +1764,7 @@ static bool keyState_Super = false;
 
 - (IBAction)refresh:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->refreshAll();
+    spin::spinApp::Instance().sceneManager_->refreshAll();
 }
 - (IBAction)refreshSubscribers:(id)sender
 {
@@ -1786,9 +1786,9 @@ static bool keyState_Super = false;
     switch(result)
     {
         case NSAlertDefaultReturn: // OK
-            spin::spinApp::Instance().sceneManager->clear();
-            spin::spinApp::Instance().sceneManager->clearUsers();
-            spin::spinApp::Instance().sceneManager->clearStates();
+            spin::spinApp::Instance().sceneManager_->clear();
+            spin::spinApp::Instance().sceneManager_->clearUsers();
+            spin::spinApp::Instance().sceneManager_->clearStates();
             break;
         case NSAlertAlternateReturn: // Cancel
             break;
@@ -1798,32 +1798,32 @@ static bool keyState_Super = false;
 {
     if (gridEnabled)
     {
-        //spin::spinApp::Instance().sceneManager->deleteNode("grid");
+        //spin::spinApp::Instance().sceneManager_->deleteNode("grid");
         spin::spinApp::Instance().SceneMessage("ss", "deleteNode", "grid", SPIN_ARGS_END);
         //[sender setSelected:FALSE];
         gridEnabled = FALSE;
     } else {
         spin::spinApp::Instance().SceneMessage("sss", "createNode", "grid", "GridNode", SPIN_ARGS_END);
-        //spin::spinApp::Instance().sceneManager->getOrCreateNode("grid","GridNode");
+        //spin::spinApp::Instance().sceneManager_->getOrCreateNode("grid","GridNode");
         //[sender setSelected:TRUE];    
         gridEnabled = TRUE;
     }
 }
 - (IBAction)debugContext:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugContext(); 
+    spin::spinApp::Instance().sceneManager_->debugContext(); 
 }
 - (IBAction)debugNodes:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugNodes(); 
+    spin::spinApp::Instance().sceneManager_->debugNodes(); 
 }
 - (IBAction)debugStateSets:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugStateSets(); 
+    spin::spinApp::Instance().sceneManager_->debugStateSets(); 
 }
 - (IBAction)debugSceneGraph:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugSceneGraph(); 
+    spin::spinApp::Instance().sceneManager_->debugSceneGraph(); 
 }
 
 

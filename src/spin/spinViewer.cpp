@@ -209,7 +209,7 @@ int run(int argc, char **argv)
         exit(EXIT_FAILURE);
 	}
 
-	spin.sceneManager->setGraphical(true);
+	spin.sceneManager_->setGraphical(true);
 
 	// *************************************************************************
 	// get details on keyboard and mouse bindings used by the viewer.
@@ -311,7 +311,7 @@ int run(int argc, char **argv)
             //} 
         }
 
-        view->setSceneData(spin.sceneManager->rootNode.get());
+        view->setSceneData(spin.sceneManager_->rootNode.get());
 
 	    view->addEventHandler(new osgViewer::StatsHandler);
 	    view->addEventHandler(new osgViewer::ThreadingHandler);
@@ -476,12 +476,12 @@ int run(int argc, char **argv)
 
 	if (argScene.valid()) {
 		std::cout << "Loading sample model" << std::endl;
-		spin.sceneManager->worldNode->addChild(argScene.get());
+		spin.sceneManager_->worldNode->addChild(argScene.get());
 	}
 
 	if (grid)
 	{
-		spin.sceneManager->createNode("grid", "GridNode");
+		spin.sceneManager_->createNode("grid", "GridNode");
 	}
 
 	// *************************************************************************
@@ -520,7 +520,7 @@ int run(int argc, char **argv)
         clamp->setClampReadColor(GL_FALSE);
 
         // make it protected and override, so that it is done for the whole rendering pipeline
-        spin.sceneManager->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+        spin.sceneManager_->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
     }
 
 	// program loop:
@@ -653,7 +653,7 @@ int run(int argc, char **argv)
 				viewer.advance();
 				viewer.eventTraversal();
 				pthread_mutex_lock(&sceneMutex);
-				spin.sceneManager->update();
+				spin.sceneManager_->update();
                 viewer.updateTraversal();
 				viewer.renderingTraversals();
 				pthread_mutex_unlock(&sceneMutex);

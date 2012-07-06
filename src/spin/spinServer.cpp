@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 		if (arguments[i][0]!='-')
 		{
 			// not an option so assume string is a filename
-			spinApp::Instance().sceneManager->loadXML(arguments[i]);
+			spinApp::Instance().sceneManager_->loadXML(arguments[i]);
 		} else i++;
 	}
 	 	

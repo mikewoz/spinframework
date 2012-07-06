@@ -69,7 +69,7 @@ class ShapeNode : public GroupNode
 {
 public:
 
-    ShapeNode(SceneManager *sceneManager, char *initID);
+    ShapeNode(SceneManager *sceneManager, const char* initID);
     virtual ~ShapeNode();
 
     /**

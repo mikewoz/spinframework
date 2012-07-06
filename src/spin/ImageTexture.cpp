@@ -62,7 +62,7 @@ namespace spin
 // constructor:
 ImageTexture::ImageTexture (SceneManager *s, const char *initID) : Shader(s, initID)
 {
-	classType = "ImageTexture";
+	classType_ = "ImageTexture";
 
 	_path = "NULL";
 	textureMode_ = TEXTURE_2D;
@@ -96,7 +96,7 @@ void ImageTexture::setPath (const char* newPath)
 	if (_path != std::string(newPath))
     {
         _path = std::string(newPath);
-        if (sceneManager->isGraphical()) this->draw();
+        if (sceneManager_->isGraphical()) this->draw();
         BROADCAST(this, "ss", "setPath", getPath());
     }
 }
@@ -106,7 +106,7 @@ void ImageTexture::setTextureMode(TextureMode mode)
     if (this->textureMode_ != (int)mode)
     {
         this->textureMode_ = mode;
-        if (sceneManager->isGraphical()) this->draw();
+        if (sceneManager_->isGraphical()) this->draw();
         BROADCAST(this, "si", "setTextureMode", getTextureMode());
     }
 }
@@ -116,7 +116,7 @@ void ImageTexture::setTextureResize(bool b)
     if (this->textureResize_ != (bool)b)
     {
         this->textureResize_ = b;
-        if (sceneManager->isGraphical()) this->draw();
+        if (sceneManager_->isGraphical()) this->draw();
         BROADCAST(this, "si", "setTextureResize", getTextureResize());
     }
 }

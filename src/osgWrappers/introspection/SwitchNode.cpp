@@ -24,15 +24,15 @@
 BEGIN_OBJECT_REFLECTOR(spin::SwitchNode)
 	I_DeclaringFile("SwitchNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____SwitchNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____SwitchNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method0(void, updateNodePath,
 	          Properties::VIRTUAL,
 	          __void__updateNodePath,
 	          "",
-	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	          "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath_. ");
 	I_Method2(void, setEnabled, IN, const char *, id, IN, int, enabled,
 	          Properties::NON_VIRTUAL,
 	          __void__setEnabled__C5_char_P1__int,

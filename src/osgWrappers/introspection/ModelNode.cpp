@@ -31,15 +31,15 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	I_DeclaringFile("ModelNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____ModelNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____ModelNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
 	                      "",
-	                      "We change our attachmentNode (add attachment to the centroid), so we MUST override updateNodePath(), and manually push the centroid transform onto the currentNodePath. ");
+	                      "We change our attachmentNode (add attachment to the centroid), so we MUST override updateNodePath(), and manually push the centroid transform onto the currentNodePath_. ");
 	I_Method1(void, setContext, IN, const char *, newvalue,
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,

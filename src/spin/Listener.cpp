@@ -48,24 +48,22 @@
 #include <spatosc/spatosc.h>
 #endif
 
-using namespace std;
-
 namespace spin
 {
 
 // ===================================================================
 // constructor:
-Listener::Listener (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
+Listener::Listener (SceneManager *sceneManager, const char* initID) : DSPNode(sceneManager, initID)
 {
-	nodeType = "Listener";
+	this->setNodeType("Listener");
 	this->setPlugin("listener-stereo~");
 	type = "listener-stereo.conn~";
-	this->setName(string(id->s_name) + ".Listener");
+	this->setName(this->getID() + ".Listener");
 
 #ifdef WITH_SPATOSC
 	if (spinApp::Instance().hasAudioRenderer)
 	{
-        spatOSCListener = spinApp::Instance().audioScene->createListener(std::string(id->s_name));
+        spatOSCListener = spinApp::Instance().audioScene->createListener(this->getID());
         std::cout << "Created SpatOSC Listener:" << std::endl;
         //spinApp::Instance().audioScene->debugPrint();
 	}

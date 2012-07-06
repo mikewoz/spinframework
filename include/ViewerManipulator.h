@@ -144,10 +144,12 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
     protected:
         //spinContext *spin;
         //osg::ref_ptr<UserNode> user;
-        t_symbol *user;
+        //t_symbol *user;
+        std::string userID;
         
         //t_symbol *selectedNode;
-        std::vector<t_symbol*> selectedNodes;
+        //std::vector<t_symbol*> selectedNodes;
+        std::vector<GroupNode*> selectedNodes;
         
         bool picker, mover, raw;
         float lastX, lastY;

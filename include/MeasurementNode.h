@@ -76,7 +76,7 @@ class MeasurementNode : public ReferencedNode
 
 public:
 
-    MeasurementNode(SceneManager *sceneManager, char *initID);
+    MeasurementNode(SceneManager *sceneManager, const char* initID);
     virtual ~MeasurementNode();
     
     /**

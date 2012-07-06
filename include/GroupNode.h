@@ -80,7 +80,7 @@ public:
      * @param initID will be converted into a t_symbol
      */
 
-    GroupNode(SceneManager *sceneManager, char *initID);
+    GroupNode(SceneManager *sceneManager, const char* initID);
     virtual ~GroupNode();
 
     enum InteractionMode
@@ -121,7 +121,7 @@ public:
      * and can also change their attachmentNode so that children are attached
      * anywhere in that subgraph. If that is the case, the updateNodePath()
      * function MUST be overridden, and extra nodes must be manually pushed onto
-     * currentNodePath.
+     * currentNodePath_.
      */
     virtual void updateNodePath(bool updateChildren = true);
 

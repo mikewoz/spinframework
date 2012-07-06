@@ -48,19 +48,15 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
-//extern SceneManager *sceneManager;
-
 namespace spin
 {
 
 // *****************************************************************************
 // constructor:
-LightSource::LightSource (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+LightSource::LightSource (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".LightSource");
-	nodeType = "LightSource";
+	this->setName(this->getID() + ".LightSource");
+	this->setNodeType("LightSource");
 	
 	_visible = true;
 	
@@ -79,14 +75,14 @@ LightSource::LightSource (SceneManager *sceneManager, char *initID) : GroupNode(
 // destructor
 LightSource::~LightSource()
 {
-	std::cout << "destroying lightsource: " << this->id->s_name << std::endl;
+	std::cout << "destroying lightsource: " << this->getID() << std::endl;
 	
 	osg::Light *light;
-	osg::StateSet* thisStateSet = sceneManager->rootNode->getOrCreateStateSet();
+	osg::StateSet* thisStateSet = sceneManager_->rootNode->getOrCreateStateSet();
 	if ( containsNode( lightSource.get() )) // kill light
 	{
 		light = lightSource->getLight();
-		sceneManager->activeLights[light->getLightNum()] = false;
+		sceneManager_->activeLights[light->getLightNum()] = false;
 		
 		if (thisStateSet)
 		{
@@ -175,17 +171,17 @@ void LightSource::setSpecular (float r, float g, float b, float a)
 // *****************************************************************************
 void LightSource::drawLight()
 {
-	if (!sceneManager->isGraphical()) return;
+	if (!sceneManager_->isGraphical()) return;
 
 	osg::Light *light;
-	osg::StateSet* thisStateSet = sceneManager->rootNode->getOrCreateStateSet();
+	osg::StateSet* thisStateSet = sceneManager_->rootNode->getOrCreateStateSet();
 	
 	if (!this->_visible && this->getAttachmentNode()->containsNode( lightSource.get() ))
 	{
 		// kill light:
 		
 		light = lightSource->getLight();
-		sceneManager->activeLights[light->getLightNum()] = false;
+		sceneManager_->activeLights[light->getLightNum()] = false;
 		
 		//std::cout << "killing light num " << light->getLightNum() << std::endl;
 		
@@ -207,7 +203,7 @@ void LightSource::drawLight()
 
 		// find next free spot
 		for (int i=0; i<OSG_NUM_LIGHTS; i++)
-			if (!sceneManager->activeLights[i]) {lightNum = i; break;}
+			if (!sceneManager_->activeLights[i]) {lightNum = i; break;}
 
 		//std::cout << "... activating light. found available lightNum: " << lightNum << std::endl;
 		
@@ -222,7 +218,7 @@ void LightSource::drawLight()
 			light = lightSource->getLight();
 		
 			light->setLightNum(lightNum);
-			sceneManager->activeLights[lightNum] = true;
+			sceneManager_->activeLights[lightNum] = true;
 
 			if (thisStateSet)
 			{
@@ -234,7 +230,7 @@ void LightSource::drawLight()
 			light->setDirection(osg::Vec3(0.0,1.0,0.0));
 			
 		} else {
-			std::cout << "ERROR: tried to activate lightbeam for " << this->id->s_name << ", but all " << OSG_NUM_LIGHTS << " lights are already in use." << std::endl;
+			std::cout << "ERROR: tried to activate lightbeam for " << this->getID() << ", but all " << OSG_NUM_LIGHTS << " lights are already in use." << std::endl;
 		}
 		
 	}

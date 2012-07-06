@@ -24,8 +24,8 @@
 BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	I_DeclaringFile("LightSource.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____LightSource__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____LightSource__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, setVisible, IN, int, visibilityFlag,

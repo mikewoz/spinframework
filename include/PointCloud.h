@@ -69,7 +69,7 @@ class PointCloud : public GroupNode
 
 public:
 
-    PointCloud(SceneManager *sceneManager, char *initID);
+    PointCloud(SceneManager *sceneManager, const char* initID);
     virtual ~PointCloud();
     
     enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON, LIGHTPOINTS, BOXES, CUSTOM };

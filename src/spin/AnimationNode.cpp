@@ -53,10 +53,10 @@ class SceneManager;
 
 // *****************************************************************************
 // constructor:
-AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+AnimationNode::AnimationNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-    this->setName(std::string(id->s_name) + ".AnimationNode");
-    nodeType = "AnimationNode";
+    this->setName(this->getID() + ".AnimationNode");
+    this->setNodeType("AnimationNode");
 
     _updateRate = 15; // hz
     _play = false;

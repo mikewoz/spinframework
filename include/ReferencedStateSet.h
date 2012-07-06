@@ -78,6 +78,13 @@ public:
     virtual void updateCallback();
 
     /**
+     * Return the string id for this stateset
+     */
+    std::string getID() const { return std::string(id_->s_name); }
+    t_symbol* getIDSymbol() { return id_; }
+    std::string getClassType() const { return classType_; }
+
+    /**
      * Abstract method getPath needs to be implemented
      */
     //virtual const char *getPath() const = 0;
@@ -157,19 +164,19 @@ public:
      */
     virtual int getRenderBin() const { return renderBin_; }
 
-	// TODO: these should at least be protected:
-    t_symbol *id;
-    std::string classType;
 
 protected:
     
-	osg::TexEnv::Mode textureBlend_;
+    t_symbol *id_;
+    std::string classType_;
+    
+    SceneManager *sceneManager_;
+    
+    osg::TexEnv::Mode textureBlend_;
 	bool textureRepeatS_;
 	bool textureRepeatT_;
 	bool lightingEnabled_;
     int  renderBin_;
-
-    SceneManager *sceneManager;
 
 };
 
