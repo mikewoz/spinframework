@@ -255,6 +255,12 @@ public:
     void setSingleSided (int singleSided);
     int  getSingleSided() const { return (int)singleSided_; }
 
+    /**
+     * Specify whether both sides or only one side of the text is rendered. ie,
+     * whether the backface is culled or not.
+     */
+    void setLighting (int lighting);
+    int  getLighting() const { return (int)lighting_; }
 
     
     /**
@@ -285,6 +291,7 @@ private:
     decorationType decoration_;
     backgroundType background_;
     bool singleSided_;
+    bool lighting_;
     
 
     std::string text_; // we store this redundantly

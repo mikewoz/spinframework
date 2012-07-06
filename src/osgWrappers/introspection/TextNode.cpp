@@ -262,6 +262,16 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          __int__getSingleSided,
 	          "",
 	          "");
+	I_Method1(void, setLighting, IN, int, lighting,
+	          Properties::NON_VIRTUAL,
+	          __void__setLighting__int,
+	          "",
+	          "Specify whether both sides or only one side of the text is rendered. ie, whether the backface is culled or not. ");
+	I_Method0(int, getLighting,
+	          Properties::NON_VIRTUAL,
+	          __int__getLighting,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -303,6 +313,9 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	I_SimpleProperty(int, FontResolution, 
 	                 __int__getFontResolution, 
 	                 __void__setFontResolution__int);
+	I_SimpleProperty(int, Lighting, 
+	                 __int__getLighting, 
+	                 __void__setLighting__int);
 	I_SimpleProperty(float, LineSpacing, 
 	                 __float__getLineSpacing, 
 	                 __void__setLineSpacing__float);

@@ -87,6 +87,16 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__unregisterStateSet__ReferencedStateSet_P1,
 	          "",
 	          "");
+	I_MethodWithDefaults1(void, sendNodeTypes, IN, lo_address, txAddr, 0,
+	                      Properties::NON_VIRTUAL,
+	                      __void__sendNodeTypes__lo_address,
+	                      "",
+	                      "");
+	I_MethodWithDefaults1(void, sendStateTypes, IN, lo_address, txAddr, 0,
+	                      Properties::NON_VIRTUAL,
+	                      __void__sendStateTypes__lo_address,
+	                      "",
+	                      "");
 	I_MethodWithDefaults2(void, sendNodeList, IN, std::string, type, , IN, lo_address, txAddr, 0,
 	                      Properties::NON_VIRTUAL,
 	                      __void__sendNodeList__std_string__lo_address,

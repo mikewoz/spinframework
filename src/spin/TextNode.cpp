@@ -488,7 +488,8 @@ TextNode::TextNode (SceneManager *sceneManager, const char* initID) : GroupNode(
 	background_ = NO_BACKGROUND;
     alignment_ = osgText::TextBase::LEFT_BASE_LINE;
     repetitions_ = 1;
-
+    singleSided_ = false;
+    lighting_ = false;
 	
     updateFlag_ = false;
     redrawFlag_ = false;
@@ -720,6 +721,22 @@ void TextNode::setSingleSided (int singleSided)
 	BROADCAST(this, "si", "setSingleSided", getSingleSided());
 }
 
+void TextNode::setLighting (int lighting)
+{
+    osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
+    lighting_ = lighting;
+    
+    if (lighting_)
+    {
+        labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+    } else
+    {
+        labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
+    }
+    
+    BROADCAST(this, "si", "setLighting", getLighting());
+}
+
 // =============================================================================
 void TextNode::drawText()
 {
@@ -783,12 +800,6 @@ void TextNode::drawText()
         }
         
         osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
-
-        // enable lighting effects only on 3D text:
-        if (drawMode_==TEXT3D)
-            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
-        else 
-            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
         
         
         textLabel_->setLayout(osgText::TextBase::LEFT_TO_RIGHT);
@@ -806,6 +817,14 @@ void TextNode::drawText()
             labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
         
         labelStateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
+        
+        if (lighting_)
+        {
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+        } else
+        {
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
+        }
         
         labelStateSet->setRenderBinDetails( 100, "RenderBin", osg::StateSet::OVERRIDE_RENDERBIN_DETAILS);
         
@@ -980,8 +999,11 @@ std::vector<lo_message> TextNode::getState () const
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setSingleSided", getSingleSided());
 	ret.push_back(msg);
-
-    
+ 
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setLighting", getLighting());
+	ret.push_back(msg);
+   
 	return ret;
 }
 
