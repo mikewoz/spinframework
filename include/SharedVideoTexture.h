@@ -47,15 +47,8 @@
 
 #include "Shader.h"
 
-#ifdef WITH_SHARED_VIDEO        
-#include <shared-video-0.6/sharedVideoBuffer.h>
-//#include <sharedVideoBuffer.h>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
-#include <boost/interprocess/mapped_region.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
+#ifdef WITH_SHARED_VIDEO 
+#include <shmdata/osg-reader.h>
 #endif
 
 namespace osg {
@@ -70,15 +63,10 @@ namespace spin
 {
 
 /**
- * \brief Allows sharing of a dynamc (video) GL texture from another process
+ * \brief Allows reception of video from an other process into an OSG texture.
  *
- * This is accomplished by the use of Miville's shared_video library, which in
- * turn uses boost/interprocess/shared_memory_object.
- *
- * Miville must be poperly installed for this to work, which really only works
- * in Linux. See the following URL for more info:
- *
- * https://svn.sat.qc.ca/trac/miville
+ * This is accomplished by the use of libshmdata. 
+ * http://code.sat.qc.ca/redmine/projects/libshmdata
  *
  * Note however, that this node will be available regardless of the library's
  * presence. This is because we still want to know about it on ALL servers or
@@ -105,12 +93,12 @@ public:
     std::vector<lo_message> getState () const;
     void debug();
     
-    void updateCallback();
     
-    void consumeFrame();
-    void signalKilled();
+    //void updateCallback();
+    //void consumeFrame();
+    //void signalKilled();
 
-    void start();
+    void start(); 
     void stop();
 
 private:
@@ -126,12 +114,13 @@ private:
         
     bool killed_;
     
-#ifdef WITH_SHARED_VIDEO        
-    boost::thread worker_;
-    boost::mutex displayMutex_;
-    boost::condition_variable textureUploadedCondition_;
-    SharedVideoBuffer *sharedBuffer;
-#endif
+#ifdef WITH_SHARED_VIDEO         
+    shmdata::OsgReader *reader_;
+/*     boost::thread worker_; */
+/*     boost::mutex displayMutex_; */
+/*     boost::condition_variable textureUploadedCondition_; */
+/*     SharedVideoBuffer *sharedBuffer; */
+#endif 
 	
 };
 

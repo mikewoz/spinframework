@@ -43,6 +43,11 @@
 
 #include <osg/Texture2D>
 #include <osg/Image>
+
+
+#include <osgDB/Registry>
+#include <osgDB/ReadFile>
+
 #include <iostream>
 #include "SharedVideoTexture.h"
 #include "SceneManager.h"
@@ -66,8 +71,8 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 {
 	classType_ = "SharedVideoTexture";
 	
-    width=640;
-    height=480;
+    // width=640;
+    // height=480;
 
     // placeholder image:
     img = new osg::Image;
@@ -75,25 +80,33 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     //img->setOrigin(osg::Image::BOTTOM_LEFT); 
 
     // setup texture:
+#ifdef WITH_SHARED_VIDEO
+    reader_.setDebug (true);
+    tex = reader_.getTexture ();
+    
+
+#else
     tex = new osg::Texture2D; //(img.get());
-    tex->setImage(img.get());
+#endif
+    
+    //tex->setImage(img.get());
     tex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
     tex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
 	
     //tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
     //tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-	if (textureRepeatS_)
-		tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
-	else
-		tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
-	if (textureRepeatT_)
-		tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
-	else
-		tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
+    if (textureRepeatS_)
+    	tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+    else
+    	tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+    if (textureRepeatT_)
+    	tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+    else
+    	tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
 
-	osg::TexEnv* texenv = new osg::TexEnv();
-	texenv->setMode(textureBlend_);
-	this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+    osg::TexEnv* texenv = new osg::TexEnv();
+    texenv->setMode(textureBlend_);
+    this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 	
     // It is important to disable resizing of this texture if
     // resolution is not a power of two. Othwerwise, there will
@@ -102,16 +115,16 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     tex->setResizeNonPowerOfTwoHint(false);
 
     // add the texture to this (StateSet)
-    this->setTextureAttributeAndModes(0, tex.get(), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+    this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
-	// set lighting:
-	if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-	else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    // set lighting:
+    if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+    else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 
-	// set renderbin:
-	this->setRenderBinDetails( renderBin_, "RenderBin");
+    // set renderbin:
+    this->setRenderBinDetails( renderBin_, "RenderBin");
 	
-	// enable blending:
+    // enable blending:
     this->setMode(GL_BLEND, osg::StateAttribute::ON);
     this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
     // disable depth test (FIXME)
@@ -120,7 +133,9 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
     // keep a timer for reload attempts:
     lastTick = 0;
 
-    std::cout << "created SharedVideoTexture with id: " << this->getID() << std::endl;
+    std::cout << "created shmdataVideoTexture with id: " << this->getID() << std::endl;
+
+    tex->setImage(osgDB::readImageFile("/home/nico/Pictures/chiotsballs.jpeg"));
 
     // set initial textureID:
     //setTextureID(this->getID().c_str());
@@ -140,17 +155,25 @@ SharedVideoTexture::~SharedVideoTexture()
 // ===================================================================
 void SharedVideoTexture::setTextureID (const char* newID)
 {
+  
 
     // only do this if the id has changed:
     if (textureID == std::string(newID)) return;
 
     textureID = std::string(newID);
-    this->setName("SharedVideoTexture("+textureID+")");
+    this->setName("shmdataVideoTexture("+textureID+")");
 
     if (!sceneManager_->isGraphical())
     {
         BROADCAST(this, "ss", "setTextureID", getTextureID());
     }
+
+ #ifdef WITH_SHARED_VIDEO
+    //start the shmdata
+    reader_.setPath (textureID.c_str());
+#endif  
+
+
 }
 
 // *****************************************************************************
@@ -172,11 +195,11 @@ void SharedVideoTexture::debug()
 {
 	Shader::debug();
 	std::cout << "   ---------" << std::endl;
-	std::cout << "   Type: SharedVideoTexture" << std::endl;
+	std::cout << "   Type: shmdataVideoTexture" << std::endl;
 	std::cout << "   Texture ID: " << getTextureID() << std::endl;
 	std::cout << "   Path: " << getPath() << std::endl;
 	std::cout << "   Render bin: " << getRenderBin() << std::endl;
-	std::cout << "   width/height: " << width << "x" << height << std::endl;
+	//std::cout << "   width/height: " << width << "x" << height << std::endl;
 	std::cout << "   Killed: " << killed_ << std::endl;
 	std::cout << "   Texture ID: " << textureID << std::endl;
 }
@@ -184,200 +207,40 @@ void SharedVideoTexture::debug()
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
-// The rest of this stuff is only valid if we are using the shared_video library
-// from Miville (configurable option in build)
+// The rest of this stuff is only valid if we are using the shmdata library
 
 #ifdef WITH_SHARED_VIDEO
 
-void SharedVideoTexture::updateCallback()
-{
-    if (!sceneManager_->isGraphical()) return;
-
-    // do update here
-    // FIXME: killed should be protected
-    if (not killed_)
-    {
-        if (img.valid())
-        {	
-            boost::mutex::scoped_lock displayLock(displayMutex_);
-            // update image from shared memory:
-            img->setImage(width, 
-                    height, 
-                    0, 
-                    GL_RGB, 
-                    GL_RGB, 
-                    PIXEL_TYPE, 
-                    sharedBuffer->pixelsAddress(), 
-                    osg::Image::NO_DELETE, 
-                    1);
-
-            // flip image from camera space:
-            //img->flipHorizontal();
-            //img->flipVertical();
-
-            // set texture:
-            tex->setImage(img.get());
-        }
-        //img->setOrigin(osg::Image::TOP_LEFT); 
-        textureUploadedCondition_.notify_one();
-    } 
-    else if (not textureID.empty()) 
-    {
-        // if the shared memory has not been set, we will recheck
-        // every 5 seconds or so
-
-        osg::Timer_t tick = osg::Timer::instance()->tick();
-        float dt = osg::Timer::instance()->delta_s(lastTick,tick);
-        if (dt > 5)
-        {
-            start();
-
-            // this is the last time we checked
-            lastTick = osg::Timer::instance()->tick();
-        }
-    }
-    //else
-    //    std::cerr << "texture id is empty and we're killed" << std::endl;
-}
-
-
-/// This function is executed in the worker thread
-void SharedVideoTexture::consumeFrame()
-{	
-    using boost::interprocess::scoped_lock;
-    using boost::interprocess::interprocess_mutex;
-    using boost::interprocess::shared_memory_object;
-
-    // get frames until the other process marks the end
-    bool end_loop = false;
-    using namespace boost::interprocess;
-    try
-    {
-        shared_memory_object shm(open_only, textureID.c_str(), read_write);
-        // map the whole shared memory in this process
-        mapped_region region(shm, read_write);
-
-        // get the address of the region
-        void *addr = region.get_address();
-
-        // cast to pointer of type of our shared structure
-        sharedBuffer = static_cast<SharedVideoBuffer*>(addr);
-
-        width = sharedBuffer->getWidth();
-        height = sharedBuffer->getHeight();
-
-#if 0
-        // make sure there's no sentinel
-        {
-            // Lock the mutex
-            scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
-            sharedBuffer->startPushing();   // tell appsink to give us buffers
-        }
-#endif
-        // reset the killed_ conditional
-        {
-            boost::mutex::scoped_lock displayLock(displayMutex_);
-            killed_ = false;
-        }
-
-        do
-        {
-            // Lock the mutex
-            scoped_lock<interprocess_mutex> lock(sharedBuffer->getMutex());
-
-            // wait for new buffer to be pushed if it's empty
-            if (not sharedBuffer->waitOnProducer(lock))
-            {
-                end_loop = true;
-                break;
-            }
-
-            // got a new buffer, wait until we upload it in gl thread before notifying producer
-            {
-                boost::mutex::scoped_lock displayLock(displayMutex_);
-
-                if (killed_)
-                {
-                    //sharedBuffer->stopPushing();   // tell appsink not to give us any more buffers
-                    end_loop = true;
-                    break;
-                }
-                else
-                {
-                    const boost::system_time timeout = boost::get_system_time() +
-                        boost::posix_time::milliseconds(100);
-                    textureUploadedCondition_.timed_wait(displayLock, timeout);
-                }
-            }
-
-            // Notify the other process that the buffer status has changed
-            sharedBuffer->notifyProducer();
-            // mutex is released (goes out of scope) here
-        }
-        while (!end_loop);
-
-
-        // erase shared memory
-        // No! we never do this... only the other process is allowed to
-        // destroy the memory
-        //shared_memory_object::remove(textureID.c_str());
-        // shouldn't we also destroy our shm and region objects?
-    }
-    catch(interprocess_exception &ex)
-    {
-        static const char *MISSING_ERROR = "No such file or directory";
-        if (strncmp(ex.what(), MISSING_ERROR, strlen(MISSING_ERROR)) != 0)
-        {
-            shared_memory_object::remove(textureID.c_str());
-            std::cout << "Unexpected exception: " << ex.what() << std::endl;
-        }
-        else
-        {
-            std::cerr << "Tried to loadSharedMemory, but shared buffer " << textureID << " doesn't exist yet\n";
-            //boost::this_thread::sleep(boost::posix_time::milliseconds(30)); 
-        }
-    }
-
-    signalKilled();
-}
-
-// ===================================================================
-void SharedVideoTexture::signalKilled ()
-{
-    boost::mutex::scoped_lock displayLock(displayMutex_);
-    killed_ = true;
-    textureUploadedCondition_.notify_one(); // in case we're waiting in consumeFrame
-}
 
 // ===================================================================
 void SharedVideoTexture::start()
 {
-    // first kill any existing thread:
-    stop();
+  std::cout << "shared video texture start " << std::endl;
 
-    std::cout << "SharedVideoTexture '" << textureID << "' starting thread" << std::endl;
+  reader_.play();
+  // first kill any existing thread:
+  //stop();
 
-    // start our consumer thread, which is a member function of this class
-    // and takes sharedBuffer as an argument
-    worker_ = boost::thread(boost::bind<void>(boost::mem_fn(&SharedVideoTexture::consumeFrame), boost::ref(*this)));
+  // std::cout << "SharedVideoTexture '" << textureID << "' starting" << std::endl;
+  // reader_.setPath (textureID.c_str());
+  // reader_.start ();
 }
 
 void SharedVideoTexture::stop()
 {
-    this->signalKilled();
-    worker_.join(); // wait here until thread exits
-    std::cout << "SharedVideoTexture '" << textureID << "' stopped thread" << std::endl;
+    std::cout << "SharedVideoTexture '" << textureID << "' stopped" << std::endl;
+    reader_.pause ();
 }
 
 #else
  
-void SharedVideoTexture::updateCallback() {}
+// void SharedVideoTexture::updateCallback() {}
 
-void SharedVideoTexture::consumeFrame() {}
-void SharedVideoTexture::signalKilled() {}
+// void SharedVideoTexture::consumeFrame() {}
+// void SharedVideoTexture::signalKilled() {}
 
-void SharedVideoTexture::start() {}
-void SharedVideoTexture::stop() {}
+    void SharedVideoTexture::start() { cout << "shmdata not enabled, not starting" << std::endl; }
+    void SharedVideoTexture::stop() { cout << "shmdata not enabled, not starting" << std::endl; }
     
 #endif
 

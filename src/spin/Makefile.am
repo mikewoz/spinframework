@@ -191,7 +191,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS += \
 endif
 
 if PCL
-AM_CPPFLAGS += $(PCL_CFLAGS) 
+AM_CPPFLAGS += $(PCL_CFLAGS)  
 libspin_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
 libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
 libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h

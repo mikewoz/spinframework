@@ -212,11 +212,11 @@ PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 #        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, have_sharedvideo=true, have_sharedvideo=false)
+PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.4, have_sharedvideo=true, have_sharedvideo=false)
 if test "x${have_sharedvideo}" = "xfalse" ; then
-    AC_MSG_WARN([missing package: libshared-video-0.6-dev ])
+    AC_MSG_WARN([missing package: libshmdata-0.4-dev ])
 else
-    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])
+    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
     AC_MSG_NOTICE([SHAREDVIDEO_CFLAGS:    ${SHAREDVIDEO_CFLAGS}])
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
@@ -245,6 +245,9 @@ else
 fi
 AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
+dnl PCL
+dnl FIXME: the line below is evil but required in order to get -lflann working
+export PKG_CONFIG_PATH=$PWD
 PCL_PKGS="pcl_common-1.5 pcl_io-1.5 pcl_filters-1.5 pcl_octree-1.5"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
