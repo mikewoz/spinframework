@@ -44,32 +44,25 @@
 #include <osg/Texture2D>
 #include <osg/Image>
 
-
-#include <osgDB/Registry>
-#include <osgDB/ReadFile>
-
 #include <iostream>
 #include "SharedVideoTexture.h"
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
-static const GLenum PIXEL_TYPE = GL_UNSIGNED_SHORT_5_6_5;
-
 using namespace std;
-
 
 namespace spin
 {
 
 
-// ===================================================================
-// constructor:
-//SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
-SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
+  // ===================================================================
+  // constructor:
+  //SharedVideoTexture::SharedVideoTexture (const char *initID) : osg::TextureRectangle()
+  SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) : 
     Shader(s, initID), killed_(true)
-{
-	classType_ = "SharedVideoTexture";
+  {
+    classType_ = "SharedVideoTexture";
 	
     // width=640;
     // height=480;
@@ -83,26 +76,25 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 #ifdef WITH_SHARED_VIDEO
     reader_.setDebug (true);
     tex = reader_.getTexture ();
-    
-
 #else
     tex = new osg::Texture2D; //(img.get());
 #endif
     
-    //tex->setImage(img.get());
+    tex->setImage(img.get());
+
     tex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
     tex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
 	
     //tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
     //tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
     if (textureRepeatS_)
-    	tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+      tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
     else
-    	tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+      tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
     if (textureRepeatT_)
-    	tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+      tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
     else
-    	tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
+      tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
 
     osg::TexEnv* texenv = new osg::TexEnv();
     texenv->setMode(textureBlend_);
@@ -135,26 +127,18 @@ SharedVideoTexture::SharedVideoTexture  (SceneManager *s, const char *initID) :
 
     std::cout << "created shmdataVideoTexture with id: " << this->getID() << std::endl;
 
-    tex->setImage(osgDB::readImageFile("/home/nico/Pictures/chiotsballs.jpeg"));
+  }
 
-    // set initial textureID:
-    //setTextureID(this->getID().c_str());
-
-}
-
-// ===================================================================
-// destructor
-SharedVideoTexture::~SharedVideoTexture()
-{
-#ifdef WITH_SHARED_VIDEO
-    stop();
-#endif
-}
+  // ===================================================================
+  // destructor
+  SharedVideoTexture::~SharedVideoTexture()
+  {
+  }
 
 
-// ===================================================================
-void SharedVideoTexture::setTextureID (const char* newID)
-{
+  // ===================================================================
+  void SharedVideoTexture::setTextureID (const char* newID)
+  {
   
 
     // only do this if the id has changed:
@@ -164,21 +148,21 @@ void SharedVideoTexture::setTextureID (const char* newID)
     this->setName("shmdataVideoTexture("+textureID+")");
 
     if (!sceneManager_->isGraphical())
-    {
+      {
         BROADCAST(this, "ss", "setTextureID", getTextureID());
-    }
+      }
 
- #ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHARED_VIDEO
     //start the shmdata
     reader_.setPath (textureID.c_str());
 #endif  
 
 
-}
+  }
 
-// *****************************************************************************
-std::vector<lo_message> SharedVideoTexture::getState () const
-{
+  // *****************************************************************************
+  std::vector<lo_message> SharedVideoTexture::getState () const
+  {
     // inherit state from base class
     std::vector<lo_message> ret = Shader::getState();
 
@@ -189,58 +173,53 @@ std::vector<lo_message> SharedVideoTexture::getState () const
     ret.push_back(msg);
 
     return ret;
-}
+  }
 
-void SharedVideoTexture::debug()
-{
-	Shader::debug();
-	std::cout << "   ---------" << std::endl;
-	std::cout << "   Type: shmdataVideoTexture" << std::endl;
-	std::cout << "   Texture ID: " << getTextureID() << std::endl;
-	std::cout << "   Path: " << getPath() << std::endl;
-	std::cout << "   Render bin: " << getRenderBin() << std::endl;
-	//std::cout << "   width/height: " << width << "x" << height << std::endl;
-	std::cout << "   Killed: " << killed_ << std::endl;
-	std::cout << "   Texture ID: " << textureID << std::endl;
-}
+  void SharedVideoTexture::debug()
+  {
+    Shader::debug();
+    std::cout << "   ---------" << std::endl;
+    std::cout << "   Type: shmdataVideoTexture" << std::endl;
+    std::cout << "   Texture ID: " << getTextureID() << std::endl;
+    std::cout << "   Path: " << getPath() << std::endl;
+    std::cout << "   Render bin: " << getRenderBin() << std::endl;
+#ifdef WITH_SHARED_VIDEO
+    std::cout << "   width/height: " << reader_.getWidth() << "x" << reader_.getHeight() << std::endl;
+#endif  
+    std::cout << "   Killed: " << killed_ << std::endl;
+    std::cout << "   Texture ID: " << textureID << std::endl;
+  }
 
-// *****************************************************************************
-// *****************************************************************************
-// *****************************************************************************
-// The rest of this stuff is only valid if we are using the shmdata library
+  // *****************************************************************************
+  // *****************************************************************************
+  // *****************************************************************************
+  // The rest of this stuff is only valid if we are using the shmdata library
 
 #ifdef WITH_SHARED_VIDEO
 
+  void SharedVideoTexture::play()
+  {
+    std::cout << "SharedVideoTexture '" << textureID << "' playing" << std::endl;
+    reader_.play();
+  }
 
-// ===================================================================
-void SharedVideoTexture::start()
-{
-  std::cout << "shared video texture start " << std::endl;
-
-  reader_.play();
-  // first kill any existing thread:
-  //stop();
-
-  // std::cout << "SharedVideoTexture '" << textureID << "' starting" << std::endl;
-  // reader_.setPath (textureID.c_str());
-  // reader_.start ();
-}
-
-void SharedVideoTexture::stop()
-{
-    std::cout << "SharedVideoTexture '" << textureID << "' stopped" << std::endl;
+  void SharedVideoTexture::pause()
+  {
+    std::cout << "SharedVideoTexture '" << textureID << "' paused" << std::endl;
     reader_.pause ();
-}
+  }
 
 #else
- 
-// void SharedVideoTexture::updateCallback() {}
 
-// void SharedVideoTexture::consumeFrame() {}
-// void SharedVideoTexture::signalKilled() {}
-
-    void SharedVideoTexture::start() { cout << "shmdata not enabled, not starting" << std::endl; }
-    void SharedVideoTexture::stop() { cout << "shmdata not enabled, not starting" << std::endl; }
+  void SharedVideoTexture::play() 
+  { 
+    cout << "shmdata not enabled during compilation, not starting" << std::endl; 
+  }
+  
+  void SharedVideoTexture::pause() 
+  { 
+    cout << "shmdata not enabled during compilation, not starting" << std::endl; 
+  }
     
 #endif
 

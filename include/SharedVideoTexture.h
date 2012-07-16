@@ -94,12 +94,8 @@ public:
     void debug();
     
     
-    //void updateCallback();
-    //void consumeFrame();
-    //void signalKilled();
-
-    void start(); 
-    void stop();
+    void play(); 
+    void pause();
 
 private:
     
@@ -115,7 +111,7 @@ private:
     bool killed_;
     
 #ifdef WITH_SHARED_VIDEO         
-    shmdata::OsgReader *reader_;
+    shmdata::OsgReader reader_;
 /*     boost::thread worker_; */
 /*     boost::mutex displayMutex_; */
 /*     boost::condition_variable textureUploadedCondition_; */

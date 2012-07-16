@@ -53,14 +53,14 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          __void__debug,
 	          "",
 	          "Print debug information to console. ");
-	I_Method0(void, start,
+	I_Method0(void, play,
 	          Properties::NON_VIRTUAL,
-	          __void__start,
+	          __void__play,
 	          "",
 	          "");
-	I_Method0(void, stop,
+	I_Method0(void, pause,
 	          Properties::NON_VIRTUAL,
-	          __void__stop,
+	          __void__pause,
 	          "",
 	          "");
 	I_SimpleProperty(const char *, Path, 
