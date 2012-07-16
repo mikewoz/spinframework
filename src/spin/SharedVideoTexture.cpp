@@ -63,9 +63,6 @@ namespace spin
     Shader(s, initID), killed_(true)
   {
     classType_ = "SharedVideoTexture";
-	
-    // width=640;
-    // height=480;
 
     // placeholder image:
     img = new osg::Image;
@@ -135,11 +132,9 @@ namespace spin
   {
   }
 
-
   // ===================================================================
   void SharedVideoTexture::setTextureID (const char* newID)
   {
-  
 
     // only do this if the id has changed:
     if (textureID == std::string(newID)) return;
@@ -153,8 +148,11 @@ namespace spin
       }
 
 #ifdef WITH_SHARED_VIDEO
-    //start the shmdata
-    reader_.setPath (textureID.c_str());
+   if (sceneManager_->isGraphical())
+      {
+	//start the shmdata
+	reader_.setPath (textureID.c_str());
+      }
 #endif  
 
 
@@ -199,14 +197,29 @@ namespace spin
 
   void SharedVideoTexture::play()
   {
-    std::cout << "SharedVideoTexture '" << textureID << "' playing" << std::endl;
-    reader_.play();
+    if (!sceneManager_->isGraphical())
+      {
+	BROADCAST(this, "s", "play");
+      }
+    else
+      {
+	std::cout << "SharedVideoTexture '" << textureID << "' playing" << std::endl;
+	reader_.play();
+      }
+
   }
 
   void SharedVideoTexture::pause()
   {
-    std::cout << "SharedVideoTexture '" << textureID << "' paused" << std::endl;
-    reader_.pause ();
+    if (!sceneManager_->isGraphical())
+      {
+	BROADCAST(this, "s", "pause");
+      }
+    else
+      {
+	std::cout << "SharedVideoTexture '" << textureID << "' paused" << std::endl;
+	reader_.pause ();
+      }
   }
 
 #else

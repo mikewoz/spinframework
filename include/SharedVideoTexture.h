@@ -56,9 +56,6 @@ namespace osg {
     class Image;
 }
 
-// forward declaration
-class SharedVideoBuffer;
-
 namespace spin
 {
 
@@ -104,18 +101,12 @@ private:
     osg::ref_ptr<osg::Texture2D> tex;
     osg::ref_ptr<osg::Image> img;
     
-    int width, height;
-        
     osg::Timer_t lastTick;
         
     bool killed_;
     
 #ifdef WITH_SHARED_VIDEO         
     shmdata::OsgReader reader_;
-/*     boost::thread worker_; */
-/*     boost::mutex displayMutex_; */
-/*     boost::condition_variable textureUploadedCondition_; */
-/*     SharedVideoBuffer *sharedBuffer; */
 #endif 
 	
 };
