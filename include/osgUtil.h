@@ -73,7 +73,7 @@ namespace spin
 #define GENERIC_SHAPE_RESOLUTION 10.0f
 
 #define AS_UNIT_SCALE  1.0f // 1m
-#define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
+#define AS_DEBUG_SCALE 1.0f // size of debug views (radiation/sensitivity/etc)
 
 double random(double min,double max);
 float random(float min,float max);

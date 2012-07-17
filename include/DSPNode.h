@@ -148,11 +148,12 @@ public:
         virtual void setLength (float newvalue);
         virtual void setRadius (float newvalue);
 
-        void setDirectivityColor(float r, float g, float b, float a);
+        void setDebugColor(float r, float g, float b, float a);
 
         void setVUmeterFlag (float newFlag);
         void setDirectivityFlag (float newFlag);
         void setLaserFlag (float newFlag);
+        void setRadiusFlag (float newFlag);
 
         //
         void setIntensity(float newvalue);
@@ -163,11 +164,12 @@ public:
         float getLength() const { return _length; }
         float getRadius() const { return _radius; }
 
-        osg::Vec4 getDirectivityColor() const { return directivityColor; }
+        osg::Vec4 getDebugColor() const { return debugColor; }
 
         float getVUmeterFlag() const { return VUmeterFlag; }
         float getDirectivityFlag() const { return directivityFlag; }
         float getLaserFlag() const { return laserFlag; }
+        float getRadiusFlag() const { return radiusFlag; }
 
         void updateVUmeter();
         void updateLaser();
@@ -177,6 +179,7 @@ public:
         void drawVUmeter();
         void drawDirectivity();
         void drawLaser();
+        void drawRadius();
         
 private:
     
@@ -205,7 +208,6 @@ private:
 							  //	(directivity) table
         float _spread; // propagation cone for source
         float _length; // the length of the laser and cone
-
         float _radius; // the radius 
 
         // TODO: add toggle for PRE/POST
@@ -214,6 +216,7 @@ private:
         float VUmeterFlag;
         float directivityFlag;
         float laserFlag;
+        float radiusFlag;
 
 
         // The following methods and parameters are for drawing aspects of the
@@ -221,7 +224,10 @@ private:
 
         // directivity patterns:
         osg::ref_ptr<osg::Geode> directivityGeode;
-        osg::Vec4 directivityColor;
+        osg::Vec4 debugColor;
+
+        osg::ref_ptr<osg::Geode> radiusGeode;
+        
 
         // laser beams:
         osg::ref_ptr<osg::Geode> laserGeode;

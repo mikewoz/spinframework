@@ -109,9 +109,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __void__setRadius__float,
 	          "",
 	          "");
-	I_Method4(void, setDirectivityColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
+	I_Method4(void, setDebugColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
 	          Properties::NON_VIRTUAL,
-	          __void__setDirectivityColor__float__float__float__float,
+	          __void__setDebugColor__float__float__float__float,
 	          "",
 	          "");
 	I_Method1(void, setVUmeterFlag, IN, float, newFlag,
@@ -127,6 +127,11 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_Method1(void, setLaserFlag, IN, float, newFlag,
 	          Properties::NON_VIRTUAL,
 	          __void__setLaserFlag__float,
+	          "",
+	          "");
+	I_Method1(void, setRadiusFlag, IN, float, newFlag,
+	          Properties::NON_VIRTUAL,
+	          __void__setRadiusFlag__float,
 	          "",
 	          "");
 	I_Method1(void, setIntensity, IN, float, newvalue,
@@ -154,9 +159,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __float__getRadius,
 	          "",
 	          "");
-	I_Method0(osg::Vec4, getDirectivityColor,
+	I_Method0(osg::Vec4, getDebugColor,
 	          Properties::NON_VIRTUAL,
-	          __osg_Vec4__getDirectivityColor,
+	          __osg_Vec4__getDebugColor,
 	          "",
 	          "");
 	I_Method0(float, getVUmeterFlag,
@@ -172,6 +177,11 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_Method0(float, getLaserFlag,
 	          Properties::NON_VIRTUAL,
 	          __float__getLaserFlag,
+	          "",
+	          "");
+	I_Method0(float, getRadiusFlag,
+	          Properties::NON_VIRTUAL,
+	          __float__getRadiusFlag,
 	          "",
 	          "");
 	I_Method0(void, updateVUmeter,
@@ -199,11 +209,16 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __void__drawLaser,
 	          "",
 	          "");
+	I_Method0(void, drawRadius,
+	          Properties::NON_VIRTUAL,
+	          __void__drawRadius,
+	          "",
+	          "");
 	I_SimpleProperty(int, Active, 
 	                 __int__getActive, 
 	                 __void__setActive__int);
-	I_SimpleProperty(osg::Vec4, DirectivityColor, 
-	                 __osg_Vec4__getDirectivityColor, 
+	I_SimpleProperty(osg::Vec4, DebugColor, 
+	                 __osg_Vec4__getDebugColor, 
 	                 0);
 	I_SimpleProperty(float, DirectivityFlag, 
 	                 __float__getDirectivityFlag, 
@@ -223,6 +238,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_SimpleProperty(float, Radius, 
 	                 __float__getRadius, 
 	                 __void__setRadius__float);
+	I_SimpleProperty(float, RadiusFlag, 
+	                 __float__getRadiusFlag, 
+	                 __void__setRadiusFlag__float);
 	I_SimpleProperty(const char *, Rolloff, 
 	                 __C5_char_P1__getRolloff, 
 	                 __void__setRolloff__C5_char_P1);

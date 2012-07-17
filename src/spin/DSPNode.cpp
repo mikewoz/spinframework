@@ -83,21 +83,24 @@ DSPNode::DSPNode (SceneManager *sceneManager, const char* initID) : GroupNode(sc
 	
 	plugin = "empty~";
 
-   _rolloff = "default";
+    _rolloff = "default";
     _spread = 1.0f;
-    _length = 10.0f;
+    _length = 1.0f;
+    _radius = 0.0f;
 
     directivityFlag = 0;
     laserFlag = 0;
     VUmeterFlag = 0;
+    radiusFlag = 0;
 
     currentSoundIntensity = 0.0;
     currentSoundColor = osg::Vec3(0.0,1.0,0.0); //green
 
-    directivityColor = osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0);
+    debugColor = osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0);
 
     // OSG Stuff:
     laserGeode = NULL;
+    radiusGeode = NULL;
     directivityGeode = NULL;
     VUmeterTransform = NULL;
 	
@@ -292,7 +295,7 @@ void DSPNode::setRadius (float newvalue)
 {
     _radius = newvalue;
     if (_radius < 0) _radius = 0;
-    if (_radius > 0) this->setLength(_radius/AS_DEBUG_SCALE);
+    drawRadius();
     BROADCAST(this, "sf", "setRadius", getRadius());
 }
 
@@ -317,12 +320,19 @@ void DSPNode::setVUmeterFlag (float newFlag)
     BROADCAST(this, "sf", "setVUmeterFlag", VUmeterFlag);
 }
 
-
-void DSPNode::setDirectivityColor(float r, float g, float b, float a)
+void DSPNode::setRadiusFlag (float newFlag)
 {
-    directivityColor = osg::Vec4(r,g,b,a);
+    radiusFlag = newFlag;
+    drawRadius();
+    BROADCAST(this, "sf", "setRadiusFlag", radiusFlag);
+}
+
+void DSPNode::setDebugColor(float r, float g, float b, float a)
+{
+    debugColor = osg::Vec4(r,g,b,a);
     drawDirectivity();
-    BROADCAST(this, "sffff", "setDirectivityColor", r,g,b,a);
+    drawRadius();
+    BROADCAST(this, "sffff", "setDebugColor", r,g,b,a);
 }
 
 void DSPNode::setIntensity (float newvalue)
@@ -441,13 +451,12 @@ static t_float cardioid_to_cone_map[] = {180.0, 155.047, 147.605, 140.163, 116.9
 
 void DSPNode::drawDirectivity()
 {
-    pthread_mutex_lock(&sceneMutex);
-
-
     if (this->getAttachmentNode()->containsNode(directivityGeode.get()))
     {
+        pthread_mutex_lock(&sceneMutex);
         this->getAttachmentNode()->removeChild(directivityGeode.get());
         directivityGeode = NULL;
+        pthread_mutex_unlock(&sceneMutex);
     }
 
     if (directivityFlag > 0)
@@ -457,7 +466,7 @@ void DSPNode::drawDirectivity()
         if ( (index < 0) || ((int)index >= 199) ) return;
         else val = cardioid_to_cone_map[(int)index];
 
-        //printf("drawing directivity: _spread=%.3f  index=%.3f  val=%.3f\n", _spread, index, val);
+        //printf("drawing directivity: _spread=%.3f  index=%.3f  val=%.3f  tan(val)=%.3f  cos(val)=%.3f  sin(val)=%.3f\n", _spread, index, val, tan(osg::DegreesToRadians(val)), cos(osg::DegreesToRadians(val)), sin(osg::DegreesToRadians(val)));
 
 
         // *** NEW METHOD (NOT WORKING YET):
@@ -468,13 +477,13 @@ void DSPNode::drawDirectivity()
         if (val < 90)
         {
             // Place a cone pointing along the +Y axis
-            directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), directivityColor );
+            directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
         } else if (val > 90 && val < 180) {
             // Place a cone pointing along the -Y axis
-            directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), directivityColor );
+            directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
         } else {
             // Sphere
-            directivityGeode= createHollowSphere(_length*AS_DEBUG_SCALE, directivityColor );
+            directivityGeode= createHollowSphere(_length*AS_DEBUG_SCALE, debugColor );
         }
 
         // ***
@@ -491,7 +500,41 @@ void DSPNode::drawDirectivity()
         directivityGeode->setStateSet(wireframeStateSet);
 
         directivityGeode->setName(this->getID() + ".directivityGeode");
+        
+        pthread_mutex_lock(&sceneMutex);
         this->getAttachmentNode()->addChild(directivityGeode.get());
+        pthread_mutex_unlock(&sceneMutex);
+    }
+
+}
+
+
+void DSPNode::drawRadius()
+{
+    pthread_mutex_lock(&sceneMutex);
+
+
+    if (this->getAttachmentNode()->containsNode(radiusGeode.get()))
+    {
+        this->getAttachmentNode()->removeChild(radiusGeode.get());
+        radiusGeode = NULL;
+    }
+
+    if (radiusFlag > 0)
+    {
+        radiusGeode= createHollowSphere(_radius, debugColor );
+    
+        osg::StateSet *wireframeStateSet = new osg::StateSet();
+        osg::PolygonMode *polymode = new osg::PolygonMode;
+        polymode->setMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
+        wireframeStateSet->setAttributeAndModes(polymode,osg::StateAttribute::ON);
+        wireframeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
+        wireframeStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+        radiusGeode->setStateSet(wireframeStateSet);
+
+        radiusGeode->setName(this->getID() + ".radiusGeode");
+        this->getAttachmentNode()->addChild(radiusGeode.get());
     }
 
     pthread_mutex_unlock(&sceneMutex);
@@ -596,7 +639,7 @@ std::vector<lo_message> DSPNode::getState() const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    lo_message_add(msg, "sffff", "setDirectivityColor", directivityColor.x(), directivityColor.y(), directivityColor.z(), directivityColor.w());
+    lo_message_add(msg, "sffff", "setDebugColor", debugColor.x(), debugColor.y(), debugColor.z(), debugColor.w());
     ret.push_back(msg);
 
     msg = lo_message_new();
@@ -605,6 +648,10 @@ std::vector<lo_message> DSPNode::getState() const
 
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setVUmeterFlag", VUmeterFlag);
+    ret.push_back(msg);
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setRadiusFlag", radiusFlag);
     ret.push_back(msg);
 
     // not doing this anymore (not supposed to be saved or refreshed)
