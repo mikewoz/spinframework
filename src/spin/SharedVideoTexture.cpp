@@ -161,6 +161,7 @@ namespace spin
   // *****************************************************************************
   std::vector<lo_message> SharedVideoTexture::getState () const
   {
+
     // inherit state from base class
     std::vector<lo_message> ret = Shader::getState();
 
@@ -175,6 +176,7 @@ namespace spin
 
   void SharedVideoTexture::debug()
   {
+
     Shader::debug();
     std::cout << "   ---------" << std::endl;
     std::cout << "   Type: shmdataVideoTexture" << std::endl;
@@ -182,7 +184,8 @@ namespace spin
     std::cout << "   Path: " << getPath() << std::endl;
     std::cout << "   Render bin: " << getRenderBin() << std::endl;
 #ifdef WITH_SHARED_VIDEO
-    std::cout << "   width/height: " << reader_.getWidth() << "x" << reader_.getHeight() << std::endl;
+    if (sceneManager_->isGraphical())
+      std::cout << "   width/height: " << reader_.getWidth() << "x" << reader_.getHeight() << std::endl;
 #endif  
     std::cout << "   Killed: " << killed_ << std::endl;
     std::cout << "   Texture ID: " << textureID << std::endl;
@@ -197,6 +200,7 @@ namespace spin
 
   void SharedVideoTexture::play()
   {
+
     if (!sceneManager_->isGraphical())
       {
 	BROADCAST(this, "s", "play");
@@ -211,6 +215,7 @@ namespace spin
 
   void SharedVideoTexture::pause()
   {
+
     if (!sceneManager_->isGraphical())
       {
 	BROADCAST(this, "s", "pause");
