@@ -53,9 +53,9 @@ m4_define([spin_binary_age], [m4_eval(100 * spin_minor_version + spin_micro_vers
 #AC_PREREQ([2.63])
 AC_INIT(SPINFRAMEWORK,
         [spin_version],
-        [http://www.spinframework.org],
+        [http://code.sat.qc.ca/redmine/projects/spinframework/issues/new],
         [spinframework],
-        [http://codered.sat.qc.ca/redmine/projects/spinframework])
+        [http://www.spinframework.org])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
