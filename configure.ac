@@ -114,6 +114,7 @@ fi
 case "$host" in *-darwin* | *-macos10*)
   #AC_LANG_DEFINES_PROVIDED # remove autogen.sh warnings on OSX
   LIBTOOL="glibtool"
+  SRCDIR=`pwd`
   #LIBTOOL="libtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
@@ -127,10 +128,17 @@ case "$host" in *-darwin* | *-macos10*)
   # OSX does not include /usr/local/lib/pkgconfig path, so we export it here
   # (for everyone, just in case)
   # TODO: also need to add the path for linux64
-  PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
-  export PKG_CONFIG_PATH
+  #PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH:$SRCDIR/pkgconfig/osx
+  #export PKG_CONFIG_PATH
   ;;
 esac
+
+# On OSX, /usr/local/lib/pkgconfig is not included, and the 64-bit linux path is
+# also often missing. We also provide some local .pc files since binary packages
+# of flann and OpenNI (downloaded from www.pointclouds.org) do not include .pc
+# files
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH:$PWD/pkgconfig
+
 
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
 LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
@@ -247,7 +255,7 @@ AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
 dnl PCL
 dnl FIXME: the line below is evil but required in order to get -lflann working
-export PKG_CONFIG_PATH=$PWD
+#export PKG_CONFIG_PATH=$PWD
 PCL_PKGS="pcl_common-1.5 pcl_io-1.5 pcl_filters-1.5 pcl_octree-1.5"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
