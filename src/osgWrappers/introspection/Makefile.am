@@ -41,6 +41,7 @@ libSPINwrappers_la_CPPFLAGS = \
     $(CPPINTROSPECTION_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
     $(PYTHON_CPPFLAGS) \
+    $(SHAREDVIDEO_CFLAGS) \
     $(SPATOSC_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src/spin \
