@@ -29,8 +29,8 @@
 				1C90C19B14CDCC4900C929AE /* PBXTargetDependency */,
 				1C90C19114CDCC4900C929AE /* PBXTargetDependency */,
 				1C90C19314CDCC4900C929AE /* PBXTargetDependency */,
-				1C90C19514CDCC4900C929AE /* PBXTargetDependency */,
 				1C90C19714CDCC4900C929AE /* PBXTargetDependency */,
+				1C90C19514CDCC4900C929AE /* PBXTargetDependency */,
 				1C90C19914CDCC4900C929AE /* PBXTargetDependency */,
 			);
 			name = ALL;
@@ -91,6 +91,117 @@
 		1C068B1F157552FE00BC6207 /* Visitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C068AF1157552FE00BC6207 /* Visitor.h */; };
 		1C068B211575532200BC6207 /* dofppu.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C068B201575532200BC6207 /* dofppu.h */; };
 		1C072ACB14D9F6A5003D669E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1C072AC914D9F6A5003D669E /* MainMenu.xib */; };
+		1C0A705A15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */; };
+		1C0A705B15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */; };
+		1C0A705C15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */; };
+		1C0A705D15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */; };
+		1C0A705E15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */; };
+		1C0A705F15B76A520032484A /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704B15B76A520032484A /* libosg.91.dylib */; };
+		1C0A706015B76A520032484A /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704B15B76A520032484A /* libosg.91.dylib */; };
+		1C0A706115B76A520032484A /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704B15B76A520032484A /* libosg.91.dylib */; };
+		1C0A706215B76A520032484A /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704B15B76A520032484A /* libosg.91.dylib */; };
+		1C0A706315B76A520032484A /* libosg.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704B15B76A520032484A /* libosg.91.dylib */; };
+		1C0A706415B76A520032484A /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */; };
+		1C0A706515B76A520032484A /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */; };
+		1C0A706615B76A520032484A /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */; };
+		1C0A706715B76A520032484A /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */; };
+		1C0A706815B76A530032484A /* libosgAnimation.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */; };
+		1C0A706915B76A530032484A /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704D15B76A520032484A /* libosgDB.91.dylib */; };
+		1C0A706A15B76A530032484A /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704D15B76A520032484A /* libosgDB.91.dylib */; };
+		1C0A706B15B76A530032484A /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704D15B76A520032484A /* libosgDB.91.dylib */; };
+		1C0A706C15B76A530032484A /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704D15B76A520032484A /* libosgDB.91.dylib */; };
+		1C0A706D15B76A530032484A /* libosgDB.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704D15B76A520032484A /* libosgDB.91.dylib */; };
+		1C0A706E15B76A530032484A /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704E15B76A520032484A /* libosgFX.91.dylib */; };
+		1C0A706F15B76A530032484A /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704E15B76A520032484A /* libosgFX.91.dylib */; };
+		1C0A707015B76A530032484A /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704E15B76A520032484A /* libosgFX.91.dylib */; };
+		1C0A707115B76A530032484A /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704E15B76A520032484A /* libosgFX.91.dylib */; };
+		1C0A707215B76A530032484A /* libosgFX.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704E15B76A520032484A /* libosgFX.91.dylib */; };
+		1C0A707315B76A530032484A /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704F15B76A520032484A /* libosgGA.91.dylib */; };
+		1C0A707415B76A530032484A /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704F15B76A520032484A /* libosgGA.91.dylib */; };
+		1C0A707515B76A530032484A /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704F15B76A520032484A /* libosgGA.91.dylib */; };
+		1C0A707615B76A530032484A /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704F15B76A520032484A /* libosgGA.91.dylib */; };
+		1C0A707715B76A530032484A /* libosgGA.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A704F15B76A520032484A /* libosgGA.91.dylib */; };
+		1C0A707815B76A530032484A /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705015B76A520032484A /* libosgManipulator.91.dylib */; };
+		1C0A707915B76A530032484A /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705015B76A520032484A /* libosgManipulator.91.dylib */; };
+		1C0A707A15B76A530032484A /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705015B76A520032484A /* libosgManipulator.91.dylib */; };
+		1C0A707B15B76A530032484A /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705015B76A520032484A /* libosgManipulator.91.dylib */; };
+		1C0A707C15B76A530032484A /* libosgManipulator.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705015B76A520032484A /* libosgManipulator.91.dylib */; };
+		1C0A707D15B76A530032484A /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705115B76A520032484A /* libosgParticle.91.dylib */; };
+		1C0A707E15B76A530032484A /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705115B76A520032484A /* libosgParticle.91.dylib */; };
+		1C0A707F15B76A530032484A /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705115B76A520032484A /* libosgParticle.91.dylib */; };
+		1C0A708015B76A530032484A /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705115B76A520032484A /* libosgParticle.91.dylib */; };
+		1C0A708115B76A530032484A /* libosgParticle.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705115B76A520032484A /* libosgParticle.91.dylib */; };
+		1C0A708715B76A530032484A /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705315B76A520032484A /* libosgShadow.91.dylib */; };
+		1C0A708815B76A530032484A /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705315B76A520032484A /* libosgShadow.91.dylib */; };
+		1C0A708915B76A530032484A /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705315B76A520032484A /* libosgShadow.91.dylib */; };
+		1C0A708A15B76A530032484A /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705315B76A520032484A /* libosgShadow.91.dylib */; };
+		1C0A708B15B76A530032484A /* libosgShadow.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705315B76A520032484A /* libosgShadow.91.dylib */; };
+		1C0A708C15B76A530032484A /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705415B76A520032484A /* libosgSim.91.dylib */; };
+		1C0A708D15B76A530032484A /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705415B76A520032484A /* libosgSim.91.dylib */; };
+		1C0A708E15B76A530032484A /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705415B76A520032484A /* libosgSim.91.dylib */; };
+		1C0A708F15B76A530032484A /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705415B76A520032484A /* libosgSim.91.dylib */; };
+		1C0A709015B76A530032484A /* libosgSim.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705415B76A520032484A /* libosgSim.91.dylib */; };
+		1C0A709615B76A530032484A /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705615B76A520032484A /* libosgText.91.dylib */; };
+		1C0A709715B76A530032484A /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705615B76A520032484A /* libosgText.91.dylib */; };
+		1C0A709815B76A530032484A /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705615B76A520032484A /* libosgText.91.dylib */; };
+		1C0A709915B76A530032484A /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705615B76A520032484A /* libosgText.91.dylib */; };
+		1C0A709A15B76A530032484A /* libosgText.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705615B76A520032484A /* libosgText.91.dylib */; };
+		1C0A709B15B76A530032484A /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705715B76A520032484A /* libosgUtil.91.dylib */; };
+		1C0A709C15B76A530032484A /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705715B76A520032484A /* libosgUtil.91.dylib */; };
+		1C0A709D15B76A530032484A /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705715B76A520032484A /* libosgUtil.91.dylib */; };
+		1C0A709E15B76A530032484A /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705715B76A520032484A /* libosgUtil.91.dylib */; };
+		1C0A709F15B76A530032484A /* libosgUtil.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705715B76A520032484A /* libosgUtil.91.dylib */; };
+		1C0A70A015B76A530032484A /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705815B76A520032484A /* libosgViewer.91.dylib */; };
+		1C0A70A115B76A530032484A /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705815B76A520032484A /* libosgViewer.91.dylib */; };
+		1C0A70A215B76A530032484A /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705815B76A520032484A /* libosgViewer.91.dylib */; };
+		1C0A70A315B76A530032484A /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705815B76A520032484A /* libosgViewer.91.dylib */; };
+		1C0A70A415B76A530032484A /* libosgViewer.91.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A705815B76A520032484A /* libosgViewer.91.dylib */; };
+		1C0A70AA15B76A6E0032484A /* libOpenThreads.12.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */; };
+		1C0A70AB15B76A6E0032484A /* libosg.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704B15B76A520032484A /* libosg.91.dylib */; };
+		1C0A70AC15B76A6E0032484A /* libosgAnimation.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */; };
+		1C0A70AD15B76A6E0032484A /* libosgDB.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704D15B76A520032484A /* libosgDB.91.dylib */; };
+		1C0A70AE15B76A6E0032484A /* libosgFX.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704E15B76A520032484A /* libosgFX.91.dylib */; };
+		1C0A70AF15B76A6E0032484A /* libosgGA.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704F15B76A520032484A /* libosgGA.91.dylib */; };
+		1C0A70B015B76A6E0032484A /* libosgManipulator.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705015B76A520032484A /* libosgManipulator.91.dylib */; };
+		1C0A70B115B76A6E0032484A /* libosgParticle.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705115B76A520032484A /* libosgParticle.91.dylib */; };
+		1C0A70B215B76A6E0032484A /* libosgShadow.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705315B76A520032484A /* libosgShadow.91.dylib */; };
+		1C0A70B315B76A6E0032484A /* libosgSim.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705415B76A520032484A /* libosgSim.91.dylib */; };
+		1C0A70B415B76A6E0032484A /* libosgText.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705615B76A520032484A /* libosgText.91.dylib */; };
+		1C0A70B515B76A6E0032484A /* libosgUtil.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705715B76A520032484A /* libosgUtil.91.dylib */; };
+		1C0A70B615B76A6E0032484A /* libosgViewer.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705815B76A520032484A /* libosgViewer.91.dylib */; };
+		1C0A70B715B76A760032484A /* libOpenThreads.12.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */; };
+		1C0A70B815B76A760032484A /* libosg.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704B15B76A520032484A /* libosg.91.dylib */; };
+		1C0A70B915B76A760032484A /* libosgAnimation.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */; };
+		1C0A70BA15B76A760032484A /* libosgDB.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704D15B76A520032484A /* libosgDB.91.dylib */; };
+		1C0A70BB15B76A760032484A /* libosgFX.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704E15B76A520032484A /* libosgFX.91.dylib */; };
+		1C0A70BC15B76A760032484A /* libosgGA.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A704F15B76A520032484A /* libosgGA.91.dylib */; };
+		1C0A70BD15B76A760032484A /* libosgManipulator.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705015B76A520032484A /* libosgManipulator.91.dylib */; };
+		1C0A70BE15B76A760032484A /* libosgParticle.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705115B76A520032484A /* libosgParticle.91.dylib */; };
+		1C0A70BF15B76A760032484A /* libosgShadow.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705315B76A520032484A /* libosgShadow.91.dylib */; };
+		1C0A70C015B76A760032484A /* libosgSim.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705415B76A520032484A /* libosgSim.91.dylib */; };
+		1C0A70C115B76A760032484A /* libosgText.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705615B76A520032484A /* libosgText.91.dylib */; };
+		1C0A70C215B76A760032484A /* libosgUtil.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705715B76A520032484A /* libosgUtil.91.dylib */; };
+		1C0A70C315B76A760032484A /* libosgViewer.91.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A705815B76A520032484A /* libosgViewer.91.dylib */; };
+		1C0A70D415B7730B0032484A /* libBulletCollision.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D015B7730B0032484A /* libBulletCollision.0.dylib */; };
+		1C0A70D615B7730B0032484A /* libBulletCollision.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D015B7730B0032484A /* libBulletCollision.0.dylib */; };
+		1C0A70D815B7730B0032484A /* libBulletCollision.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D015B7730B0032484A /* libBulletCollision.0.dylib */; };
+		1C0A70D915B7730B0032484A /* libBulletDynamics.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D115B7730B0032484A /* libBulletDynamics.0.dylib */; };
+		1C0A70DB15B7730B0032484A /* libBulletDynamics.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D115B7730B0032484A /* libBulletDynamics.0.dylib */; };
+		1C0A70DD15B7730B0032484A /* libBulletDynamics.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D115B7730B0032484A /* libBulletDynamics.0.dylib */; };
+		1C0A70DE15B7730B0032484A /* libBulletSoftBody.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D215B7730B0032484A /* libBulletSoftBody.0.dylib */; };
+		1C0A70E015B7730B0032484A /* libBulletSoftBody.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D215B7730B0032484A /* libBulletSoftBody.0.dylib */; };
+		1C0A70E215B7730B0032484A /* libBulletSoftBody.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D215B7730B0032484A /* libBulletSoftBody.0.dylib */; };
+		1C0A70E315B7730B0032484A /* libLinearMath.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D315B7730B0032484A /* libLinearMath.0.dylib */; };
+		1C0A70E515B7730B0032484A /* libLinearMath.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D315B7730B0032484A /* libLinearMath.0.dylib */; };
+		1C0A70E715B7730B0032484A /* libLinearMath.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0A70D315B7730B0032484A /* libLinearMath.0.dylib */; };
+		1C0A70E815B773290032484A /* libBulletCollision.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D015B7730B0032484A /* libBulletCollision.0.dylib */; };
+		1C0A70E915B773290032484A /* libBulletDynamics.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D115B7730B0032484A /* libBulletDynamics.0.dylib */; };
+		1C0A70EA15B773290032484A /* libBulletSoftBody.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D215B7730B0032484A /* libBulletSoftBody.0.dylib */; };
+		1C0A70EB15B773290032484A /* libLinearMath.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D315B7730B0032484A /* libLinearMath.0.dylib */; };
+		1C0A70EC15B7732F0032484A /* libBulletCollision.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D015B7730B0032484A /* libBulletCollision.0.dylib */; };
+		1C0A70ED15B7732F0032484A /* libBulletDynamics.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D115B7730B0032484A /* libBulletDynamics.0.dylib */; };
+		1C0A70EE15B7732F0032484A /* libBulletSoftBody.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D215B7730B0032484A /* libBulletSoftBody.0.dylib */; };
+		1C0A70EF15B7732F0032484A /* libLinearMath.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C0A70D315B7730B0032484A /* libLinearMath.0.dylib */; };
 		1C0EED7014F2F272001892A0 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */; };
 		1C0EED7114F2F272001892A0 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */; };
 		1C0EED7214F2F283001892A0 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */; };
@@ -524,92 +635,6 @@
 		1CA24E0314BE2D3D007A9C31 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 1CA24E0114BE2D3D007A9C31 /* Credits.rtf */; };
 		1CA24E0614BE2D3D007A9C31 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24E0514BE2D3D007A9C31 /* AppDelegate.mm */; };
 		1CA24E0914BE2D3E007A9C31 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CA24E0714BE2D3E007A9C31 /* MainMenu.xib */; };
-		1CC1074815332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
-		1CC1074915332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
-		1CC1074A15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
-		1CC1074B15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
-		1CC1074C15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */; };
-		1CC1074D15332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
-		1CC1074E15332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
-		1CC1074F15332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
-		1CC1075015332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
-		1CC1075115332A9800F0B1EA /* libosg.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073815332A9800F0B1EA /* libosg.dylib */; };
-		1CC1075215332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
-		1CC1075315332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
-		1CC1075415332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
-		1CC1075515332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
-		1CC1075615332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */; };
-		1CC1075715332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
-		1CC1075815332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
-		1CC1075915332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
-		1CC1075A15332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
-		1CC1075B15332A9800F0B1EA /* libosgDB.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073A15332A9800F0B1EA /* libosgDB.dylib */; };
-		1CC1075C15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
-		1CC1075D15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
-		1CC1075E15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
-		1CC1075F15332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
-		1CC1076015332A9800F0B1EA /* libosgFX.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073B15332A9800F0B1EA /* libosgFX.dylib */; };
-		1CC1076115332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
-		1CC1076215332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
-		1CC1076315332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
-		1CC1076415332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
-		1CC1076515332A9800F0B1EA /* libosgGA.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073C15332A9800F0B1EA /* libosgGA.dylib */; };
-		1CC1076615332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
-		1CC1076715332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
-		1CC1076815332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
-		1CC1076915332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
-		1CC1076A15332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */; };
-		1CC1076B15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
-		1CC1076C15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
-		1CC1076D15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
-		1CC1076E15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
-		1CC1076F15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */; };
-		1CC1077015332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
-		1CC1077115332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
-		1CC1077215332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
-		1CC1077315332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
-		1CC1077415332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */; };
-		1CC1077515332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
-		1CC1077615332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
-		1CC1077715332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
-		1CC1077815332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
-		1CC1077915332A9900F0B1EA /* libosgShadow.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074015332A9800F0B1EA /* libosgShadow.dylib */; };
-		1CC1077A15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
-		1CC1077B15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
-		1CC1077C15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
-		1CC1077D15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
-		1CC1077E15332A9900F0B1EA /* libosgSim.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074115332A9800F0B1EA /* libosgSim.dylib */; };
-		1CC1077F15332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
-		1CC1078015332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
-		1CC1078115332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
-		1CC1078215332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
-		1CC1078315332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */; };
-		1CC1078415332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
-		1CC1078515332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
-		1CC1078615332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
-		1CC1078715332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
-		1CC1078815332A9900F0B1EA /* libosgText.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074315332A9800F0B1EA /* libosgText.dylib */; };
-		1CC1078915332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
-		1CC1078A15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
-		1CC1078B15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
-		1CC1078C15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
-		1CC1078D15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074415332A9800F0B1EA /* libosgUtil.dylib */; };
-		1CC1078E15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
-		1CC1078F15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
-		1CC1079015332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
-		1CC1079115332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
-		1CC1079215332A9900F0B1EA /* libosgViewer.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074515332A9800F0B1EA /* libosgViewer.dylib */; };
-		1CC1079315332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
-		1CC1079415332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
-		1CC1079515332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
-		1CC1079615332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
-		1CC1079715332A9900F0B1EA /* libosgVolume.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074615332A9800F0B1EA /* libosgVolume.dylib */; };
-		1CC1079815332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
-		1CC1079915332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
-		1CC1079A15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
-		1CC1079B15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
-		1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC1074715332A9800F0B1EA /* libosgWidget.dylib */; };
-		1CC5D51615505575009C63A5 /* Syphon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CC5D51515505575009C63A5 /* Syphon.framework */; };
 		1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C9EE82C14BE2725000976A6 /* Cocoa.framework */; };
 		1CCCA0D514BE31AC00DCA0B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D314BE31AC00DCA0B7 /* InfoPlist.strings */; };
 		1CCCA0D714BE31AC00DCA0B7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D614BE31AC00DCA0B7 /* main.mm */; };
@@ -622,27 +647,16 @@
 		1CCCA0F614BE389B00DCA0B7 /* spinViewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */; };
 		1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
-		1CCDCCBE15386DC300B9D191 /* TextArea.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CCDCCBD15386DC300B9D191 /* TextArea.h */; };
-		1CCDCCC115386DE900B9D191 /* TextArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCDCCC015386DE900B9D191 /* TextArea.cpp */; };
-		1CCDCCC315389C5D00B9D191 /* TextArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCDCCC215389C5D00B9D191 /* TextArea.cpp */; };
 		1CD9411D1543BBB80075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9411C1543BBB80075A81C /* CollisionShape.cpp */; };
 		1CD941201543BC0A0075A81C /* CollisionShape.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD9411F1543BC0A0075A81C /* CollisionShape.h */; };
-		1CD941251543BD8F0075A81C /* libBulletCollision.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941211543BD8F0075A81C /* libBulletCollision.dylib */; };
-		1CD941261543BD8F0075A81C /* libBulletDynamics.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941221543BD8F0075A81C /* libBulletDynamics.dylib */; };
-		1CD941271543BD8F0075A81C /* libBulletSoftBody.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941231543BD8F0075A81C /* libBulletSoftBody.dylib */; };
-		1CD941281543BD8F0075A81C /* libLinearMath.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CD941241543BD8F0075A81C /* libLinearMath.dylib */; };
 		1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412A1543C77E0075A81C /* CollisionShape.cpp */; };
 		1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD9412C15448AFC0075A81C /* bulletUtil.h */; };
 		1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412E15448B0F0075A81C /* bulletUtil.cpp */; };
 		1CDDB28B1551AD7300A45ADA /* SyphonTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */; };
 		1CDDB28D1551AD8500A45ADA /* SyphonTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */; };
 		1CDDB28F1551AE2800A45ADA /* SyphonTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */; };
-		1CDDB292155224D700A45ADA /* libpcl_common.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDDB290155224D700A45ADA /* libpcl_common.1.5.1.dylib */; };
-		1CDDB293155224D700A45ADA /* libpcl_io.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDDB291155224D700A45ADA /* libpcl_io.1.5.1.dylib */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
-		1CEB2399156431A5009FD336 /* libpcl_octree.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CF8E9F91552E883004EDF18 /* libpcl_octree.1.5.1.dylib */; };
-		1CF8EA051552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CF8EA041552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib */; };
 		1CF94951151CD40500628872 /* ParticleSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* ParticleSystem.h */; };
 		1CF94954151CD41F00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94953151CD41F00628872 /* ParticleSystem.cpp */; };
 		1CF94956151CD43C00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94955151CD43C00628872 /* ParticleSystem.cpp */; };
@@ -835,6 +849,23 @@
 				1C66174D1513DC1C0059C56A /* libboost_filesystem-mt.dylib in CopyFiles */,
 				1C66174E1513DC1C0059C56A /* libboost_system-mt.dylib in CopyFiles */,
 				1C875F3F14C8EF4200A46EBC /* libboost_python.dylib in CopyFiles */,
+				1C0A70B715B76A760032484A /* libOpenThreads.12.dylib in CopyFiles */,
+				1C0A70B815B76A760032484A /* libosg.91.dylib in CopyFiles */,
+				1C0A70B915B76A760032484A /* libosgAnimation.91.dylib in CopyFiles */,
+				1C0A70BA15B76A760032484A /* libosgDB.91.dylib in CopyFiles */,
+				1C0A70BB15B76A760032484A /* libosgFX.91.dylib in CopyFiles */,
+				1C0A70BC15B76A760032484A /* libosgGA.91.dylib in CopyFiles */,
+				1C0A70BD15B76A760032484A /* libosgManipulator.91.dylib in CopyFiles */,
+				1C0A70BE15B76A760032484A /* libosgParticle.91.dylib in CopyFiles */,
+				1C0A70BF15B76A760032484A /* libosgShadow.91.dylib in CopyFiles */,
+				1C0A70C015B76A760032484A /* libosgSim.91.dylib in CopyFiles */,
+				1C0A70C115B76A760032484A /* libosgText.91.dylib in CopyFiles */,
+				1C0A70C215B76A760032484A /* libosgUtil.91.dylib in CopyFiles */,
+				1C0A70C315B76A760032484A /* libosgViewer.91.dylib in CopyFiles */,
+				1C0A70E815B773290032484A /* libBulletCollision.0.dylib in CopyFiles */,
+				1C0A70E915B773290032484A /* libBulletDynamics.0.dylib in CopyFiles */,
+				1C0A70EA15B773290032484A /* libBulletSoftBody.0.dylib in CopyFiles */,
+				1C0A70EB15B773290032484A /* libLinearMath.0.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -941,6 +972,23 @@
 				1C9C082B14CFEA24006ABC85 /* libfreenect.0.0.1.dylib in CopyFiles */,
 				1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C94DEB314BFBAA0006394AD /* liblo.7.dylib in CopyFiles */,
+				1C0A70AA15B76A6E0032484A /* libOpenThreads.12.dylib in CopyFiles */,
+				1C0A70AB15B76A6E0032484A /* libosg.91.dylib in CopyFiles */,
+				1C0A70AC15B76A6E0032484A /* libosgAnimation.91.dylib in CopyFiles */,
+				1C0A70AD15B76A6E0032484A /* libosgDB.91.dylib in CopyFiles */,
+				1C0A70AE15B76A6E0032484A /* libosgFX.91.dylib in CopyFiles */,
+				1C0A70AF15B76A6E0032484A /* libosgGA.91.dylib in CopyFiles */,
+				1C0A70B015B76A6E0032484A /* libosgManipulator.91.dylib in CopyFiles */,
+				1C0A70B115B76A6E0032484A /* libosgParticle.91.dylib in CopyFiles */,
+				1C0A70B215B76A6E0032484A /* libosgShadow.91.dylib in CopyFiles */,
+				1C0A70B315B76A6E0032484A /* libosgSim.91.dylib in CopyFiles */,
+				1C0A70B415B76A6E0032484A /* libosgText.91.dylib in CopyFiles */,
+				1C0A70B515B76A6E0032484A /* libosgUtil.91.dylib in CopyFiles */,
+				1C0A70B615B76A6E0032484A /* libosgViewer.91.dylib in CopyFiles */,
+				1C0A70EC15B7732F0032484A /* libBulletCollision.0.dylib in CopyFiles */,
+				1C0A70ED15B7732F0032484A /* libBulletDynamics.0.dylib in CopyFiles */,
+				1C0A70EE15B7732F0032484A /* libBulletSoftBody.0.dylib in CopyFiles */,
+				1C0A70EF15B7732F0032484A /* libLinearMath.0.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1007,6 +1055,26 @@
 		1C068AF1157552FE00BC6207 /* Visitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Visitor.h; path = ../src/osgPPU/Visitor.h; sourceTree = "<group>"; };
 		1C068B201575532200BC6207 /* dofppu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dofppu.h; path = ../include/dofppu.h; sourceTree = "<group>"; };
 		1C072ACA14D9F6A5003D669E /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenThreads.12.dylib; path = ../../../../../usr/local/lib/libOpenThreads.12.dylib; sourceTree = "<group>"; };
+		1C0A704B15B76A520032484A /* libosg.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.91.dylib; path = ../../../../../usr/local/lib/libosg.91.dylib; sourceTree = "<group>"; };
+		1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.91.dylib; path = ../../../../../usr/local/lib/libosgAnimation.91.dylib; sourceTree = "<group>"; };
+		1C0A704D15B76A520032484A /* libosgDB.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.91.dylib; path = ../../../../../usr/local/lib/libosgDB.91.dylib; sourceTree = "<group>"; };
+		1C0A704E15B76A520032484A /* libosgFX.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgFX.91.dylib; path = ../../../../../usr/local/lib/libosgFX.91.dylib; sourceTree = "<group>"; };
+		1C0A704F15B76A520032484A /* libosgGA.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgGA.91.dylib; path = ../../../../../usr/local/lib/libosgGA.91.dylib; sourceTree = "<group>"; };
+		1C0A705015B76A520032484A /* libosgManipulator.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgManipulator.91.dylib; path = ../../../../../usr/local/lib/libosgManipulator.91.dylib; sourceTree = "<group>"; };
+		1C0A705115B76A520032484A /* libosgParticle.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgParticle.91.dylib; path = ../../../../../usr/local/lib/libosgParticle.91.dylib; sourceTree = "<group>"; };
+		1C0A705215B76A520032484A /* libosgPresentation.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgPresentation.91.dylib; path = ../../../../../usr/local/lib/libosgPresentation.91.dylib; sourceTree = "<group>"; };
+		1C0A705315B76A520032484A /* libosgShadow.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgShadow.91.dylib; path = ../../../../../usr/local/lib/libosgShadow.91.dylib; sourceTree = "<group>"; };
+		1C0A705415B76A520032484A /* libosgSim.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgSim.91.dylib; path = ../../../../../usr/local/lib/libosgSim.91.dylib; sourceTree = "<group>"; };
+		1C0A705515B76A520032484A /* libosgTerrain.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgTerrain.91.dylib; path = ../../../../../usr/local/lib/libosgTerrain.91.dylib; sourceTree = "<group>"; };
+		1C0A705615B76A520032484A /* libosgText.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgText.91.dylib; path = ../../../../../usr/local/lib/libosgText.91.dylib; sourceTree = "<group>"; };
+		1C0A705715B76A520032484A /* libosgUtil.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgUtil.91.dylib; path = ../../../../../usr/local/lib/libosgUtil.91.dylib; sourceTree = "<group>"; };
+		1C0A705815B76A520032484A /* libosgViewer.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgViewer.91.dylib; path = ../../../../../usr/local/lib/libosgViewer.91.dylib; sourceTree = "<group>"; };
+		1C0A705915B76A520032484A /* libosgVolume.91.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.91.dylib; path = ../../../../../usr/local/lib/libosgVolume.91.dylib; sourceTree = "<group>"; };
+		1C0A70D015B7730B0032484A /* libBulletCollision.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletCollision.0.dylib; path = ../../../../../usr/local/lib/libBulletCollision.0.dylib; sourceTree = "<group>"; };
+		1C0A70D115B7730B0032484A /* libBulletDynamics.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletDynamics.0.dylib; path = ../../../../../usr/local/lib/libBulletDynamics.0.dylib; sourceTree = "<group>"; };
+		1C0A70D215B7730B0032484A /* libBulletSoftBody.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletSoftBody.0.dylib; path = ../../../../../usr/local/lib/libBulletSoftBody.0.dylib; sourceTree = "<group>"; };
+		1C0A70D315B7730B0032484A /* libLinearMath.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLinearMath.0.dylib; path = ../../../../../usr/local/lib/libLinearMath.0.dylib; sourceTree = "<group>"; };
 		1C0EED6E14F2F272001892A0 /* libboost_filesystem-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_filesystem-mt.dylib"; path = "../../../../../opt/local/lib/libboost_filesystem-mt.dylib"; sourceTree = "<group>"; };
 		1C0EED6F14F2F272001892A0 /* libboost_system-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_system-mt.dylib"; path = "../../../../../opt/local/lib/libboost_system-mt.dylib"; sourceTree = "<group>"; };
 		1C1ECB47150E4EC800CCBFF3 /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Shader.cpp; path = ../src/spin/Shader.cpp; sourceTree = "<group>"; };
@@ -1372,23 +1440,6 @@
 		1CA24E0414BE2D3D007A9C31 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1CA24E0514BE2D3D007A9C31 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		1CA24E0814BE2D3E007A9C31 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenThreads.dylib; path = ../../../../../usr/local/lib/libOpenThreads.dylib; sourceTree = "<group>"; };
-		1CC1073815332A9800F0B1EA /* libosg.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosg.dylib; path = ../../../../../usr/local/lib/libosg.dylib; sourceTree = "<group>"; };
-		1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgAnimation.dylib; path = ../../../../../usr/local/lib/libosgAnimation.dylib; sourceTree = "<group>"; };
-		1CC1073A15332A9800F0B1EA /* libosgDB.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgDB.dylib; path = ../../../../../usr/local/lib/libosgDB.dylib; sourceTree = "<group>"; };
-		1CC1073B15332A9800F0B1EA /* libosgFX.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgFX.dylib; path = ../../../../../usr/local/lib/libosgFX.dylib; sourceTree = "<group>"; };
-		1CC1073C15332A9800F0B1EA /* libosgGA.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgGA.dylib; path = ../../../../../usr/local/lib/libosgGA.dylib; sourceTree = "<group>"; };
-		1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgManipulator.dylib; path = ../../../../../usr/local/lib/libosgManipulator.dylib; sourceTree = "<group>"; };
-		1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgParticle.dylib; path = ../../../../../usr/local/lib/libosgParticle.dylib; sourceTree = "<group>"; };
-		1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgPresentation.dylib; path = ../../../../../usr/local/lib/libosgPresentation.dylib; sourceTree = "<group>"; };
-		1CC1074015332A9800F0B1EA /* libosgShadow.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgShadow.dylib; path = ../../../../../usr/local/lib/libosgShadow.dylib; sourceTree = "<group>"; };
-		1CC1074115332A9800F0B1EA /* libosgSim.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgSim.dylib; path = ../../../../../usr/local/lib/libosgSim.dylib; sourceTree = "<group>"; };
-		1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgTerrain.dylib; path = ../../../../../usr/local/lib/libosgTerrain.dylib; sourceTree = "<group>"; };
-		1CC1074315332A9800F0B1EA /* libosgText.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgText.dylib; path = ../../../../../usr/local/lib/libosgText.dylib; sourceTree = "<group>"; };
-		1CC1074415332A9800F0B1EA /* libosgUtil.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgUtil.dylib; path = ../../../../../usr/local/lib/libosgUtil.dylib; sourceTree = "<group>"; };
-		1CC1074515332A9800F0B1EA /* libosgViewer.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgViewer.dylib; path = ../../../../../usr/local/lib/libosgViewer.dylib; sourceTree = "<group>"; };
-		1CC1074615332A9800F0B1EA /* libosgVolume.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgVolume.dylib; path = ../../../../../usr/local/lib/libosgVolume.dylib; sourceTree = "<group>"; };
-		1CC1074715332A9800F0B1EA /* libosgWidget.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libosgWidget.dylib; path = ../../../../../usr/local/lib/libosgWidget.dylib; sourceTree = "<group>"; };
 		1CC5D51515505575009C63A5 /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Syphon.framework; path = ../../../Library/Developer/Frameworks/Syphon.framework; sourceTree = "<group>"; };
 		1CCCA0BF14BE315400DCA0B7 /* spinviewer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinviewer; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0CD14BE31AB00DCA0B7 /* spinviewerUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spinviewerUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1404,15 +1455,8 @@
 		1CCCA0F114BE361B00DCA0B7 /* spin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spin.icns; path = ../src/Resources/images/spin.icns; sourceTree = "<group>"; };
 		1CCCA0F314BE36CE00DCA0B7 /* spinViewer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spinViewer.icns; path = ../src/Resources/images/spinViewer.icns; sourceTree = "<group>"; };
 		1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinViewer.cpp; path = ../../src/spin/spinViewer.cpp; sourceTree = "<group>"; };
-		1CCDCCBD15386DC300B9D191 /* TextArea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextArea.h; path = ../include/TextArea.h; sourceTree = "<group>"; };
-		1CCDCCC015386DE900B9D191 /* TextArea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextArea.cpp; path = ../src/spin/TextArea.cpp; sourceTree = "<group>"; };
-		1CCDCCC215389C5D00B9D191 /* TextArea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextArea.cpp; path = ../src/osgWrappers/introspection/TextArea.cpp; sourceTree = "<group>"; };
 		1CD9411C1543BBB80075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = CollisionShape.cpp; path = ../src/spin/CollisionShape.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		1CD9411F1543BC0A0075A81C /* CollisionShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CollisionShape.h; path = ../include/CollisionShape.h; sourceTree = "<group>"; };
-		1CD941211543BD8F0075A81C /* libBulletCollision.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletCollision.dylib; path = usr/local/lib/libBulletCollision.dylib; sourceTree = SDKROOT; };
-		1CD941221543BD8F0075A81C /* libBulletDynamics.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletDynamics.dylib; path = usr/local/lib/libBulletDynamics.dylib; sourceTree = SDKROOT; };
-		1CD941231543BD8F0075A81C /* libBulletSoftBody.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libBulletSoftBody.dylib; path = usr/local/lib/libBulletSoftBody.dylib; sourceTree = SDKROOT; };
-		1CD941241543BD8F0075A81C /* libLinearMath.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libLinearMath.dylib; path = usr/local/lib/libLinearMath.dylib; sourceTree = SDKROOT; };
 		1CD9412A1543C77E0075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CollisionShape.cpp; path = ../src/osgWrappers/introspection/CollisionShape.cpp; sourceTree = "<group>"; };
 		1CD9412C15448AFC0075A81C /* bulletUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bulletUtil.h; path = ../include/bulletUtil.h; sourceTree = "<group>"; };
 		1CD9412E15448B0F0075A81C /* bulletUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bulletUtil.cpp; path = ../src/spin/bulletUtil.cpp; sourceTree = "<group>"; };
@@ -1464,10 +1508,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1CD941251543BD8F0075A81C /* libBulletCollision.dylib in Frameworks */,
-				1CD941261543BD8F0075A81C /* libBulletDynamics.dylib in Frameworks */,
-				1CD941271543BD8F0075A81C /* libBulletSoftBody.dylib in Frameworks */,
-				1CD941281543BD8F0075A81C /* libLinearMath.dylib in Frameworks */,
 				1C9C082514CFE988006ABC85 /* libfreenect.0.0.1.dylib in Frameworks */,
 				1C90C16F14CCCD0100C929AE /* libusb-1.0.0.dylib in Frameworks */,
 				1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
@@ -1476,29 +1516,25 @@
 				1C9C083014D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C0EED7014F2F272001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7114F2F272001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1CC1074815332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
-				1CC1074D15332A9800F0B1EA /* libosg.dylib in Frameworks */,
-				1CC1075215332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
-				1CC1075715332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
-				1CC1075C15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
-				1CC1076115332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
-				1CC1076615332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */,
-				1CC1076B15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
-				1CC1077015332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
-				1CC1077515332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
-				1CC1077A15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
-				1CC1077F15332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
-				1CC1078415332A9900F0B1EA /* libosgText.dylib in Frameworks */,
-				1CC1078915332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
-				1CC1078E15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
-				1CC1079315332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
-				1CC1079815332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
-				1CDDB292155224D700A45ADA /* libpcl_common.1.5.1.dylib in Frameworks */,
-				1CDDB293155224D700A45ADA /* libpcl_io.1.5.1.dylib in Frameworks */,
-				1CF8EA051552E8AF004EDF18 /* libpcl_filters.1.5.1.dylib in Frameworks */,
-				1CEB2399156431A5009FD336 /* libpcl_octree.1.5.1.dylib in Frameworks */,
 				1C068AC215754B7300BC6207 /* OpenGL.framework in Frameworks */,
 				1C068AC315754B7800BC6207 /* AGL.framework in Frameworks */,
+				1C0A705A15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */,
+				1C0A705F15B76A520032484A /* libosg.91.dylib in Frameworks */,
+				1C0A706415B76A520032484A /* libosgAnimation.91.dylib in Frameworks */,
+				1C0A706915B76A530032484A /* libosgDB.91.dylib in Frameworks */,
+				1C0A706E15B76A530032484A /* libosgFX.91.dylib in Frameworks */,
+				1C0A707315B76A530032484A /* libosgGA.91.dylib in Frameworks */,
+				1C0A707815B76A530032484A /* libosgManipulator.91.dylib in Frameworks */,
+				1C0A707D15B76A530032484A /* libosgParticle.91.dylib in Frameworks */,
+				1C0A708715B76A530032484A /* libosgShadow.91.dylib in Frameworks */,
+				1C0A708C15B76A530032484A /* libosgSim.91.dylib in Frameworks */,
+				1C0A709615B76A530032484A /* libosgText.91.dylib in Frameworks */,
+				1C0A709B15B76A530032484A /* libosgUtil.91.dylib in Frameworks */,
+				1C0A70A015B76A530032484A /* libosgViewer.91.dylib in Frameworks */,
+				1C0A70D415B7730B0032484A /* libBulletCollision.0.dylib in Frameworks */,
+				1C0A70D915B7730B0032484A /* libBulletDynamics.0.dylib in Frameworks */,
+				1C0A70DE15B7730B0032484A /* libBulletSoftBody.0.dylib in Frameworks */,
+				1C0A70E315B7730B0032484A /* libLinearMath.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1515,23 +1551,19 @@
 				1C9C082F14D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C0EED7214F2F283001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7314F2F283001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1CC1074915332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
-				1CC1074E15332A9800F0B1EA /* libosg.dylib in Frameworks */,
-				1CC1075315332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
-				1CC1075815332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
-				1CC1075D15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
-				1CC1076215332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
-				1CC1076715332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */,
-				1CC1076C15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
-				1CC1077115332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
-				1CC1077615332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
-				1CC1077B15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
-				1CC1078015332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
-				1CC1078515332A9900F0B1EA /* libosgText.dylib in Frameworks */,
-				1CC1078A15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
-				1CC1078F15332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
-				1CC1079415332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
-				1CC1079915332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
+				1C0A705B15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */,
+				1C0A706015B76A520032484A /* libosg.91.dylib in Frameworks */,
+				1C0A706515B76A520032484A /* libosgAnimation.91.dylib in Frameworks */,
+				1C0A706A15B76A530032484A /* libosgDB.91.dylib in Frameworks */,
+				1C0A706F15B76A530032484A /* libosgFX.91.dylib in Frameworks */,
+				1C0A707415B76A530032484A /* libosgGA.91.dylib in Frameworks */,
+				1C0A707915B76A530032484A /* libosgManipulator.91.dylib in Frameworks */,
+				1C0A707E15B76A530032484A /* libosgParticle.91.dylib in Frameworks */,
+				1C0A708815B76A530032484A /* libosgShadow.91.dylib in Frameworks */,
+				1C0A708D15B76A530032484A /* libosgSim.91.dylib in Frameworks */,
+				1C0A709715B76A530032484A /* libosgText.91.dylib in Frameworks */,
+				1C0A709C15B76A530032484A /* libosgUtil.91.dylib in Frameworks */,
+				1C0A70A115B76A530032484A /* libosgViewer.91.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1549,23 +1581,23 @@
 				1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0EED7414F2F284001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7514F2F284001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1CC1074A15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
-				1CC1074F15332A9800F0B1EA /* libosg.dylib in Frameworks */,
-				1CC1075415332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
-				1CC1075915332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
-				1CC1075E15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
-				1CC1076315332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
-				1CC1076815332A9800F0B1EA /* libosgManipulator.dylib in Frameworks */,
-				1CC1076D15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
-				1CC1077215332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
-				1CC1077715332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
-				1CC1077C15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
-				1CC1078115332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
-				1CC1078615332A9900F0B1EA /* libosgText.dylib in Frameworks */,
-				1CC1078B15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
-				1CC1079015332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
-				1CC1079515332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
-				1CC1079A15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
+				1C0A705C15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */,
+				1C0A706115B76A520032484A /* libosg.91.dylib in Frameworks */,
+				1C0A706615B76A520032484A /* libosgAnimation.91.dylib in Frameworks */,
+				1C0A706B15B76A530032484A /* libosgDB.91.dylib in Frameworks */,
+				1C0A707015B76A530032484A /* libosgFX.91.dylib in Frameworks */,
+				1C0A707515B76A530032484A /* libosgGA.91.dylib in Frameworks */,
+				1C0A707A15B76A530032484A /* libosgManipulator.91.dylib in Frameworks */,
+				1C0A707F15B76A530032484A /* libosgParticle.91.dylib in Frameworks */,
+				1C0A708915B76A530032484A /* libosgShadow.91.dylib in Frameworks */,
+				1C0A708E15B76A530032484A /* libosgSim.91.dylib in Frameworks */,
+				1C0A709815B76A530032484A /* libosgText.91.dylib in Frameworks */,
+				1C0A709D15B76A530032484A /* libosgUtil.91.dylib in Frameworks */,
+				1C0A70A215B76A530032484A /* libosgViewer.91.dylib in Frameworks */,
+				1C0A70D615B7730B0032484A /* libBulletCollision.0.dylib in Frameworks */,
+				1C0A70DB15B7730B0032484A /* libBulletDynamics.0.dylib in Frameworks */,
+				1C0A70E015B7730B0032484A /* libBulletSoftBody.0.dylib in Frameworks */,
+				1C0A70E515B7730B0032484A /* libLinearMath.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1582,23 +1614,19 @@
 				1C9C082D14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C0EED7614F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7714F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1CC1074B15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
-				1CC1075015332A9800F0B1EA /* libosg.dylib in Frameworks */,
-				1CC1075515332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
-				1CC1075A15332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
-				1CC1075F15332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
-				1CC1076415332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
-				1CC1076915332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */,
-				1CC1076E15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
-				1CC1077315332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
-				1CC1077815332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
-				1CC1077D15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
-				1CC1078215332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
-				1CC1078715332A9900F0B1EA /* libosgText.dylib in Frameworks */,
-				1CC1078C15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
-				1CC1079115332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
-				1CC1079615332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
-				1CC1079B15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
+				1C0A705D15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */,
+				1C0A706215B76A520032484A /* libosg.91.dylib in Frameworks */,
+				1C0A706715B76A520032484A /* libosgAnimation.91.dylib in Frameworks */,
+				1C0A706C15B76A530032484A /* libosgDB.91.dylib in Frameworks */,
+				1C0A707115B76A530032484A /* libosgFX.91.dylib in Frameworks */,
+				1C0A707615B76A530032484A /* libosgGA.91.dylib in Frameworks */,
+				1C0A707B15B76A530032484A /* libosgManipulator.91.dylib in Frameworks */,
+				1C0A708015B76A530032484A /* libosgParticle.91.dylib in Frameworks */,
+				1C0A708A15B76A530032484A /* libosgShadow.91.dylib in Frameworks */,
+				1C0A708F15B76A530032484A /* libosgSim.91.dylib in Frameworks */,
+				1C0A709915B76A530032484A /* libosgText.91.dylib in Frameworks */,
+				1C0A709E15B76A530032484A /* libosgUtil.91.dylib in Frameworks */,
+				1C0A70A315B76A530032484A /* libosgViewer.91.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1617,24 +1645,23 @@
 				1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0EED7814F2F285001892A0 /* libboost_filesystem-mt.dylib in Frameworks */,
 				1C0EED7914F2F285001892A0 /* libboost_system-mt.dylib in Frameworks */,
-				1CC1074C15332A9800F0B1EA /* libOpenThreads.dylib in Frameworks */,
-				1CC1075115332A9800F0B1EA /* libosg.dylib in Frameworks */,
-				1CC1075615332A9800F0B1EA /* libosgAnimation.dylib in Frameworks */,
-				1CC1075B15332A9800F0B1EA /* libosgDB.dylib in Frameworks */,
-				1CC1076015332A9800F0B1EA /* libosgFX.dylib in Frameworks */,
-				1CC1076515332A9800F0B1EA /* libosgGA.dylib in Frameworks */,
-				1CC1076A15332A9900F0B1EA /* libosgManipulator.dylib in Frameworks */,
-				1CC1076F15332A9900F0B1EA /* libosgParticle.dylib in Frameworks */,
-				1CC1077415332A9900F0B1EA /* libosgPresentation.dylib in Frameworks */,
-				1CC1077915332A9900F0B1EA /* libosgShadow.dylib in Frameworks */,
-				1CC1077E15332A9900F0B1EA /* libosgSim.dylib in Frameworks */,
-				1CC1078315332A9900F0B1EA /* libosgTerrain.dylib in Frameworks */,
-				1CC1078815332A9900F0B1EA /* libosgText.dylib in Frameworks */,
-				1CC1078D15332A9900F0B1EA /* libosgUtil.dylib in Frameworks */,
-				1CC1079215332A9900F0B1EA /* libosgViewer.dylib in Frameworks */,
-				1CC1079715332A9900F0B1EA /* libosgVolume.dylib in Frameworks */,
-				1CC1079C15332A9900F0B1EA /* libosgWidget.dylib in Frameworks */,
-				1CC5D51615505575009C63A5 /* Syphon.framework in Frameworks */,
+				1C0A705E15B76A520032484A /* libOpenThreads.12.dylib in Frameworks */,
+				1C0A706315B76A520032484A /* libosg.91.dylib in Frameworks */,
+				1C0A706815B76A530032484A /* libosgAnimation.91.dylib in Frameworks */,
+				1C0A706D15B76A530032484A /* libosgDB.91.dylib in Frameworks */,
+				1C0A707215B76A530032484A /* libosgFX.91.dylib in Frameworks */,
+				1C0A707715B76A530032484A /* libosgGA.91.dylib in Frameworks */,
+				1C0A707C15B76A530032484A /* libosgManipulator.91.dylib in Frameworks */,
+				1C0A708115B76A530032484A /* libosgParticle.91.dylib in Frameworks */,
+				1C0A708B15B76A530032484A /* libosgShadow.91.dylib in Frameworks */,
+				1C0A709015B76A530032484A /* libosgSim.91.dylib in Frameworks */,
+				1C0A709A15B76A530032484A /* libosgText.91.dylib in Frameworks */,
+				1C0A709F15B76A530032484A /* libosgUtil.91.dylib in Frameworks */,
+				1C0A70A415B76A530032484A /* libosgViewer.91.dylib in Frameworks */,
+				1C0A70D815B7730B0032484A /* libBulletCollision.0.dylib in Frameworks */,
+				1C0A70DD15B7730B0032484A /* libBulletDynamics.0.dylib in Frameworks */,
+				1C0A70E215B7730B0032484A /* libBulletSoftBody.0.dylib in Frameworks */,
+				1C0A70E715B7730B0032484A /* libLinearMath.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1811,7 +1838,6 @@
 				1C386CAA14BD3DF60065851F /* spinUtil.cpp */,
 				1C386CAB14BD3DF60065851F /* SwitchNode.cpp */,
 				1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */,
-				1CCDCCC015386DE900B9D191 /* TextArea.cpp */,
 				1C386CAC14BD3DF60065851F /* TextNode.cpp */,
 				1C386CAD14BD3DF60065851F /* UserNode.cpp */,
 				1C386CAE14BD3DF60065851F /* VideoTexture.cpp */,
@@ -1880,7 +1906,6 @@
 				1CA24D9E14BE2892007A9C31 /* spinWX.h */,
 				1CA24D9F14BE2892007A9C31 /* SwitchNode.h */,
 				1CDDB28C1551AD8500A45ADA /* SyphonTexture.h */,
-				1CCDCCBD15386DC300B9D191 /* TextArea.h */,
 				1CA24DA014BE2892007A9C31 /* TextNode.h */,
 				1CA24DA114BE2892007A9C31 /* UserNode.h */,
 				1CA24DA214BE2892007A9C31 /* util.h */,
@@ -1926,7 +1951,6 @@
 				1CA24D5114BE2875007A9C31 /* SoundSpace.cpp */,
 				1CA24D5214BE2875007A9C31 /* SwitchNode.cpp */,
 				1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */,
-				1CCDCCC215389C5D00B9D191 /* TextArea.cpp */,
 				1CA24D5314BE2875007A9C31 /* TextNode.cpp */,
 				1CA24D5414BE2875007A9C31 /* UserNode.cpp */,
 				1CA24D5514BE2875007A9C31 /* VideoTexture.cpp */,
@@ -1960,23 +1984,22 @@
 		1C82ACDB152D06180085D8F0 /* osg-3.1.1 */ = {
 			isa = PBXGroup;
 			children = (
-				1CC1073715332A9800F0B1EA /* libOpenThreads.dylib */,
-				1CC1073815332A9800F0B1EA /* libosg.dylib */,
-				1CC1073915332A9800F0B1EA /* libosgAnimation.dylib */,
-				1CC1073A15332A9800F0B1EA /* libosgDB.dylib */,
-				1CC1073B15332A9800F0B1EA /* libosgFX.dylib */,
-				1CC1073C15332A9800F0B1EA /* libosgGA.dylib */,
-				1CC1073D15332A9800F0B1EA /* libosgManipulator.dylib */,
-				1CC1073E15332A9800F0B1EA /* libosgParticle.dylib */,
-				1CC1073F15332A9800F0B1EA /* libosgPresentation.dylib */,
-				1CC1074015332A9800F0B1EA /* libosgShadow.dylib */,
-				1CC1074115332A9800F0B1EA /* libosgSim.dylib */,
-				1CC1074215332A9800F0B1EA /* libosgTerrain.dylib */,
-				1CC1074315332A9800F0B1EA /* libosgText.dylib */,
-				1CC1074415332A9800F0B1EA /* libosgUtil.dylib */,
-				1CC1074515332A9800F0B1EA /* libosgViewer.dylib */,
-				1CC1074615332A9800F0B1EA /* libosgVolume.dylib */,
-				1CC1074715332A9800F0B1EA /* libosgWidget.dylib */,
+				1C0A704A15B76A520032484A /* libOpenThreads.12.dylib */,
+				1C0A704B15B76A520032484A /* libosg.91.dylib */,
+				1C0A704C15B76A520032484A /* libosgAnimation.91.dylib */,
+				1C0A704D15B76A520032484A /* libosgDB.91.dylib */,
+				1C0A704E15B76A520032484A /* libosgFX.91.dylib */,
+				1C0A704F15B76A520032484A /* libosgGA.91.dylib */,
+				1C0A705015B76A520032484A /* libosgManipulator.91.dylib */,
+				1C0A705115B76A520032484A /* libosgParticle.91.dylib */,
+				1C0A705215B76A520032484A /* libosgPresentation.91.dylib */,
+				1C0A705315B76A520032484A /* libosgShadow.91.dylib */,
+				1C0A705415B76A520032484A /* libosgSim.91.dylib */,
+				1C0A705515B76A520032484A /* libosgTerrain.91.dylib */,
+				1C0A705615B76A520032484A /* libosgText.91.dylib */,
+				1C0A705715B76A520032484A /* libosgUtil.91.dylib */,
+				1C0A705815B76A520032484A /* libosgViewer.91.dylib */,
+				1C0A705915B76A520032484A /* libosgVolume.91.dylib */,
 				1C82AD43152D07360085D8F0 /* osgPlugins-3.1.1 */,
 			);
 			name = "osg-3.1.1";
@@ -2326,10 +2349,10 @@
 		1CD941291543BD9B0075A81C /* bullet */ = {
 			isa = PBXGroup;
 			children = (
-				1CD941211543BD8F0075A81C /* libBulletCollision.dylib */,
-				1CD941221543BD8F0075A81C /* libBulletDynamics.dylib */,
-				1CD941231543BD8F0075A81C /* libBulletSoftBody.dylib */,
-				1CD941241543BD8F0075A81C /* libLinearMath.dylib */,
+				1C0A70D015B7730B0032484A /* libBulletCollision.0.dylib */,
+				1C0A70D115B7730B0032484A /* libBulletDynamics.0.dylib */,
+				1C0A70D215B7730B0032484A /* libBulletSoftBody.0.dylib */,
+				1C0A70D315B7730B0032484A /* libLinearMath.0.dylib */,
 			);
 			name = bullet;
 			sourceTree = "<group>";
@@ -2399,7 +2422,6 @@
 				1C1ECB4A150E4EE200CCBFF3 /* Shader.h in Headers */,
 				1C1ECB50150E65B000CCBFF3 /* ShaderUtil.h in Headers */,
 				1CF94951151CD40500628872 /* ParticleSystem.h in Headers */,
-				1CCDCCBE15386DC300B9D191 /* TextArea.h in Headers */,
 				1CD941201543BC0A0075A81C /* CollisionShape.h in Headers */,
 				1CD9412D15448AFC0075A81C /* bulletUtil.h in Headers */,
 				1C4E06421548F3C30056BD10 /* DraggerWith3Axes.h in Headers */,
@@ -2550,7 +2572,7 @@
 				1CCCA0CB14BE31AB00DCA0B7 /* Resources */,
 				1C94DEA314BFBA6B006394AD /* CopyFiles */,
 				1C70F2CC14C3A5640054B0A1 /* CopyFiles */,
-				1C94DEB714BFBBF2006394AD /* ShellScript */,
+				1C94DEB714BFBBF2006394AD /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -2694,7 +2716,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib libBulletCollision.0.dylib libBulletDynamics.0.dylib libBulletSoftBody.0.dylib libLinearMath.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem-mt.dylib libboost_system-mt.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone";
 		};
 		1C87601C14CA023600A46EBC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2707,7 +2729,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libpcl_common.1.4.dylib libpcl_io.1.4.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libusb-1.0.0.dylib libBulletCollision.0.dylib libBulletDynamics.0.dylib libBulletSoftBody.0.dylib libLinearMath.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem-mt.dylib libboost_system-mt.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libpcl_common.1.4.dylib libpcl_io.1.4.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib libpcl_common.1.5.dylib libpcl_io.1.5.dylib libpcl_filters.1.5.dylib libpcl_octree.1.5.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone";
 		};
 		1C90C18214CCF82E00C929AE /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2722,18 +2744,19 @@
 			shellPath = /bin/sh;
 			shellScript = "#/Users/mikewoz/src/spinframework/buildWrappers.sh";
 		};
-		1C94DEB714BFBBF2006394AD /* ShellScript */ = {
+		1C94DEB714BFBBF2006394AD /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem.dylib libboost_system.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\n  install_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n  install_name_tool -change libusb-1.0.0.dylib $REL_PATH/libusb-1.0.0 $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`                          \nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone\n\n# special libs from Macports needed by plugins (jasper, ffmpeg, etc):\ninstall_name_tool -change /opt/local/lib/libjasper.1.dylib @rpath/libjasper.1.0.0.dylib ${PLUGINPATH}/osgdb_jp2.so\n";
+			shellScript = "REL_PATH=\"@rpath\"\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib libBulletCollision.0.dylib libBulletDynamics.0.dylib libBulletSoftBody.0.dylib libLinearMath.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem-mt.dylib libboost_system-mt.dylib libboost_python.dylib libusb-1.0.0.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.91.dylib libosgAnimation.91.dylib libosgDB.91.dylib libosgFX.91.dylib libosgGA.91.dylib libosgManipulator.91.dylib libosgParticle.91.dylib libosgPresentation.91.dylib libosgShadow.91.dylib libosgSim.91.dylib libosgTerrain.91.dylib libosgText.91.dylib libosgUtil.91.dylib libosgViewer.91.dylib libosgVolume.91.dylib libosgWidget.91.dylib\"\n\n#special case for freenect\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\n\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN $LIB:\"\n  for i in `otool -L ${LIBPATH}/${LIB}`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename ${i}`\n      cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/$LIB\"\n      echo \"$cmd\"\n      `${cmd}`\n    fi\n  done\n  install_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib $TARGET_BUILD_DIR/$EXECUTABLE_PATH\n  install_name_tool -change libusb-1.0.0.dylib $REL_PATH/libusb-1.0.0 $TARGET_BUILD_DIR/$EXECUTABLE_PATH\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls ${PLUGINPATH}/*.so`                          \nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L ${LIB}`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      cmd=\"install_name_tool -change ${x} @rpath/${x} ${LIB}\"\n      echo $cmd\n      `$cmd`\n    fi\n  done\ndone\n\n# special libs from Macports needed by plugins (jasper, ffmpeg, etc):\ninstall_name_tool -change /opt/local/lib/libjasper.1.dylib @rpath/libjasper.1.0.0.dylib ${PLUGINPATH}/osgdb_jp2.so\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2827,8 +2850,6 @@
 				1C1ECB4E150E659000CCBFF3 /* ShaderUtil.cpp in Sources */,
 				1CF94954151CD41F00628872 /* ParticleSystem.cpp in Sources */,
 				1CF94956151CD43C00628872 /* ParticleSystem.cpp in Sources */,
-				1CCDCCC115386DE900B9D191 /* TextArea.cpp in Sources */,
-				1CCDCCC315389C5D00B9D191 /* TextArea.cpp in Sources */,
 				1CD9411D1543BBB80075A81C /* CollisionShape.cpp in Sources */,
 				1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */,
 				1CD9412F15448B0F0075A81C /* bulletUtil.cpp in Sources */,
@@ -3143,6 +3164,15 @@
 					/opt/local/lib,
 					/opt/local/Library/Frameworks/Python.framework/Versions/2.6,
 				);
+				OTHER_LDFLAGS = (
+					"-headerpad_max_install_names",
+					"-lpthread",
+					"-ldl",
+					"-weak-lpcl_common.1.5.1",
+					"-weak-lpcl_io.1.5.1",
+					"-weak-lpcl_octree.1.5.1",
+					"-weak-lpcl_filters.1.5.1",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -3161,6 +3191,15 @@
 					"$(inherited)",
 					/opt/local/lib,
 					/opt/local/Library/Frameworks/Python.framework/Versions/2.6,
+				);
+				OTHER_LDFLAGS = (
+					"-headerpad_max_install_names",
+					"-lpthread",
+					"-ldl",
+					"-weak-lpcl_common.1.5.1",
+					"-weak-lpcl_io.1.5.1",
+					"-weak-lpcl_octree.1.5.1",
+					"-weak-lpcl_filters.1.5.1",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

@@ -275,6 +275,8 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     isUsingCtrlClick = NO;
     isUsingOptionClick = NO;
     isUsingMultithreadedOpenGLEngine = NO;
+
+    delayedFullscreen = FALSE;
     
     [self initSharedOpenGLContext];
 
@@ -425,7 +427,24 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
         osg::ArgumentParser arguments(&argc,argv);
         if (!spinListener.parseCommandLineOptions(&arguments))
             std::cout << "spinListener: error parsing arguments" << std::endl;
+        
+        if (arguments.read("--fullscreen"))
+        {
+            delayedFullscreen = true;
+        }
             
+        if (arguments.read("--hide-cursor"))
+        {
+            CGDisplayHideCursor(kCGDirectMainDisplay);
+            osgViewer::ViewerBase::Windows windows;
+            osgViewer::ViewerBase::Windows::iterator wIter;
+            theViewer->getWindows(windows);
+            for (wIter=windows.begin(); wIter!=windows.end(); wIter++)
+            {
+                (*wIter)->useCursor(false);
+            }            
+        }
+        
         arguments.reportRemainingOptionsAsUnrecognized();
         if (arguments.errors()) arguments.writeErrorMessages(std::cout);
     }
@@ -523,6 +542,7 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
 
 - (void) dealloc
 {
+    spin::spinApp::Instance().getContext()->stop();
     [animationTimer invalidate];
     [animationTimer release];
     delete theViewer;
@@ -532,6 +552,7 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
 
 - (void) finalize
 {
+    spin::spinApp::Instance().getContext()->stop();
     delete theViewer;
     theViewer = NULL;
     [super finalize];
@@ -1188,6 +1209,13 @@ static bool keyState_Super = false;
         
         [[self openGLContext] flushBuffer];
         
+                
+        if (delayedFullscreen)
+        {
+            delayedFullscreen = FALSE;
+            [self toggleFullScreen:nil];
+        }
+        
     }
     else // This is usually the print case
     {
@@ -1759,6 +1787,7 @@ static bool keyState_Super = false;
             [self enterFullScreenMode:[NSScreen mainScreen] withOptions:nil];
         }
     }
+    delayedFullscreen = FALSE;
 }
 
 
