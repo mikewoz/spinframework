@@ -175,11 +175,11 @@ void ModelNode::setAttachCentroid (int i)
         osg::BoundingSphere bound = model->computeBound();
         _centroid->setPosition(bound.center());
         osg::Vec3 c = bound.center();
-        std::cout << "setting centroid for model: " <<c.x()<<","<<c.y()<< ","<<c.z() << std::endl;
+        //std::cout << "setting centroid for model: " <<c.x()<<","<<c.y()<< ","<<c.z() << std::endl;
     }
     else
     {
-        std::cout << "setting centroid for model: 0,0,0" << std::endl;
+        //std::cout << "setting centroid for model: 0,0,0" << std::endl;
         _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
     }
     		

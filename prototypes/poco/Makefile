@@ -4,9 +4,9 @@ all: $(NAME)
 
 ###################################################################
 
-DEPS = cppintrospection-3.0
+DEPS = cppintrospection-3.0 liblo
 CPPFLAGS += -I/usr/local/include/spin-0.3 -g -I/usr/include/boost $(shell python-config --cflags) `pkg-config --cflags $(DEPS)`
-LDFLAGS +=  -llo -lspin_0.3 $(shell python-config --libs) `pkg-config --libs $(DEPS)`
+LDFLAGS +=  -lspin-0.3 $(shell python-config --libs) `pkg-config --libs $(DEPS)`
 LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
 		-losgManipulator -losgText -losgUtil \
 		-losgParticle -losgViewer

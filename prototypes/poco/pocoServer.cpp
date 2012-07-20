@@ -20,6 +20,9 @@
 #include <cppintrospection/Type>
 #include <cppintrospection/Value>
 
+#include <lo/lo_lowlevel.h>
+#include <lo/lo.h>
+
 
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -64,15 +67,107 @@ cppintrospection::MethodInfo introspect_getMethodInfo(const cppintrospection::Ty
 */
 
 bool introspect_invoke(std::string path, const Poco::Net::HTMLForm &form)
+{
+    using namespace spin;
+
+    std::cout << "introspect_invoke for path: " << path << std::endl;
+    
+
+    // WARNING: this method is meant to respond to ANY path, so we must manually
+    // check if it is within the /SPIN namespace, and if it matches the sceneID:
+
+    std::string spinToken, sceneString, nodeString;
+    std::istringstream pathstream(path);
+    pathstream.get(); // ignore leading slash
+    getline(pathstream, spinToken, '/');
+    getline(pathstream, sceneString, '/');
+    getline(pathstream, nodeString, '/');
+
+
+    if ((spinToken!="SPIN") || !wildcardMatch(sceneString.c_str(),spinApp::Instance().getSceneID().c_str()) )
+    {
+    	std::cout << "Warning: server is ignoring HTTP message: " << path << std::endl;
+    	return 0;
+    }
+
+
+    // Now, we look for the spin.call variable, which will contain the method 
+    // and all arguments in one string. We need to convert that to an argv array
+    // so that we can use the existing sceneCallback and nodeCallback methods
+
+    std::vector<std::string> methodAndArgs = tokenize(form["spin.call"]);
+
+    if (methodAndArgs.size())
+    {
+        lo_message msg = lo_message_new();
         
+        for (int index=0; index<methodAndArgs.size(); index++)
+        {
+            int i;
+            float f;
+            if (fromString<int>(i, methodAndArgs[index]))
+            {
+                std::cout << "converted " << methodAndArgs[index] << " to int" << std::endl;
+                lo_message_add(msg, "i", i);
+                typeString += "i";
+            }
+            else if (fromString<float>(f, methodAndArgs[index]))
+            {
+                std::cout << "converted " << methodAndArgs[index] << " to float" << std::endl;
+                lo_message_add(msg, "f", f);
+            }
+            else
+            {
+                std::cout << "converted " << methodAndArgs[index] << " to string" << std::endl;
+                lo_message_add(msg, "s", methodAndArgs[index].c_str());
+            }
+        }
+        
+    
+        // if the nodeString is empty, then this is a scene message
+        if (nodeString.empty())
+        {
+            spinApp::Instance().SceneMessage(msg);
+        }
+        else
+        {
+            // The nodeString might have a wildcard, so here we call the method on
+            // any nodes (or statesets) that match:
+            
+            std::vector<t_symbol*> matched;
+            std::vector<t_symbol*>::iterator iter;
+            
+            // first nodes:
+            matched = spinApp::Instance().sceneManager_->findNodes(nodeString.c_str());
+            for (iter = matched.begin(); iter != matched.end(); ++iter)
+            {
+                spinApp::Instance().NodeMessage((*iter)->s_name, msg);
+            }
+
+            // now statesets:
+            matched = spinApp::Instance().sceneManager_->findStateSets(nodeString.c_str());
+            for (iter = matched.begin(); iter != matched.end(); ++iter)
+            {
+                spinApp::Instance().NodeMessage((*iter)->s_name, msg);
+            }
+        }
+    }
+
+    return true;
+}
+
+bool introspect_invoke_old(std::string path, const Poco::Net::HTMLForm &form)
 {
     using namespace spin;
     
     // vars: request.getMethod(), form
     
+    
     t_symbol *s = gensym(form["nodeID"].c_str());
     //ReferencedNode *n = dynamic_cast<ReferencedNode*>(gensym(form["nodeID"].c_str())->s_thing);
     std::string method = form["method"];
+    
+    
     
     if (s->s_thing)
     {
