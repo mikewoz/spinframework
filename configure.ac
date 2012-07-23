@@ -320,8 +320,6 @@ AC_OUTPUT
 [echo ""]
 [echo "Python interpreter?        ${enable_python}"]
 [echo "SpatOSC integration?       ${have_spatosc}"]
-[echo "Python interpreter?        ${enable_python}"]
-[echo "SpatOSC integration?       ${have_spatosc}"]
 [echo "libSharedVideo?            ${have_sharedvideo}"]
 [echo "PointCloud support?        ${have_pcl}"]
 [echo "Poco web server?           ${pocotest}"]
