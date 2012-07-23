@@ -18,7 +18,10 @@ AM_CPPFLAGS = \
 
 # use lib_LTLIBRARIES to build a shared lib:
 lib_LTLIBRARIES = libspin-@SPIN_API_VERSION@.la
+
+if HAVE_PYTHON
 python_LTLIBRARIES = libSPINPyWrap.la
+endif
 
 libspin_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
