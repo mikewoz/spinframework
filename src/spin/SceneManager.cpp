@@ -1163,8 +1163,6 @@ std::vector<ReferencedNode*> SceneManager::findNodes(const char *pattern)
 	// and match with the id:
 	else
 	{
-		std::cout << "testing pattern" << pattern << std::endl;
-		
 		// nodes:
 		nodeMapType::iterator nIt;
 		nodeListType::iterator nIter;
@@ -1175,7 +1173,6 @@ std::vector<ReferencedNode*> SceneManager::findNodes(const char *pattern)
 				if (wildcardMatch(pattern, (*nIter)->getID().c_str()))
 				{
 					matches.push_back(*nIter);
-					std::cout << " ... matched node: " << (*nIter)->getID() << std::endl;
 				}
 		    }
 		}
@@ -1201,8 +1198,6 @@ std::vector<ReferencedStateSet*> SceneManager::findStateSets(const char *pattern
 	// and match with the id:
 	else
 	{
-		std::cout << "testing pattern" << pattern << std::endl;
-		
 		// statesets:
 		ReferencedStateSetMap::iterator sIt;
 		ReferencedStateSetList::iterator sIter;
@@ -1213,7 +1208,6 @@ std::vector<ReferencedStateSet*> SceneManager::findStateSets(const char *pattern
 				if (wildcardMatch(pattern, (*sIter)->getID().c_str()))
 				{
 					matches.push_back(*sIter);		
-					std::cout << " ... matched stateset: " << (*sIter)->getID() << std::endl;
 			    }
 			}
 		}
