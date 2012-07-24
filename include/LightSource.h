@@ -69,9 +69,29 @@ public:
     void setVisible        (int visibilityFlag);
 
 
-
+    /**
+     * Cutoff is an angle (in degrees), measured from the center of the cone to
+     * the outer edge. 0 would give us a single laser-point, while 90 degrees 
+     * will give us a hemisphere of light. Note that 0 is the min, and 90 is the
+     * max, but a special value of 180 degrees will turn the spotlight into an
+     * omnidirectional light.
+     */
     void setCutoff        (float cutoff);
+    
+    /**
+     * This value defines the intensity of the light towards the edges of the
+     * cone. As objects move from the center of the spotlight to the edges, we
+     * have the option of attenuating the intensity of the light on the surface
+     * of the objects
+     */
     void setExponent    (float exponent);
+
+    /**
+     * The attenuation parameter controls the amount of attenuation that occurs,
+     * as a light moves away from a surface. A value of 0 means no attenuation,
+     * so light intensity will be the same for any distance. A value of 1 means 
+     * full linear attenuation.
+     */
     void setAttenuation    (float attenuation);
 
     /**
