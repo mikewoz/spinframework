@@ -39,6 +39,10 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "config.h"
+
+#ifdef WITH_PCL
+
 #include <osg/Geode>
 #include <osg/BlendColor>
 #include <osg/MatrixTransform>
@@ -854,4 +858,6 @@ std::vector<lo_message> PointCloud::getState () const
 }
 
 } // end of namespace spin
+
+#endif // WITH_PCL
 

@@ -67,6 +67,7 @@ ImageTexture::ImageTexture (SceneManager *s, const char *initID) : Shader(s, ini
 	_path = "NULL";
 	textureMode_ = TEXTURE_2D;
     textureResize_ = true;
+    transparent_ = true;
 }
 
 // destructor
@@ -180,7 +181,8 @@ void ImageTexture::draw()
         this->setRenderBinDetails( renderBin_, "RenderBin");
 
         // if image has transparency, enable blending:
-        if (1)//(_imageStream->isImageTranslucent())
+        //if (1)//(_imageStream->isImageTranslucent())
+        if (transparent_)
         {
             this->setMode(GL_BLEND, osg::StateAttribute::ON);
             this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);

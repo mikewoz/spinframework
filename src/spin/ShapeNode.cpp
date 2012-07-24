@@ -396,6 +396,10 @@ std::vector<lo_message> ShapeNode::getState () const
 	ret.push_back(msg);
 
 	msg = lo_message_new();
+	lo_message_add(msg, "si", "setSingleSided", getSingleSided());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
 	lo_message_add(msg, "si", "setLighting", getLighting());
 	ret.push_back(msg);
 

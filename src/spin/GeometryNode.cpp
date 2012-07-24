@@ -90,6 +90,7 @@ GeometryNode::GeometryNode (SceneManager *sceneManager, const char* initID) : Gr
 	(*texcoordArray_)[2].set(1.0f,0.0f);
 	(*texcoordArray_)[3].set(1.0f,1.0f);
 
+    singleSided_ = false;
     
     geode_ = new osg::Geode();
     this->getAttachmentNode()->addChild(geode_.get());
@@ -233,6 +234,19 @@ void GeometryNode::setTexCoord(int index, float x, float y)
     }   
 }
 
+void GeometryNode::setSingleSided (int singleSided)
+{
+    singleSided_ = singleSided;
+    
+    osg::StateSet *ss = geode_->getOrCreateStateSet();
+    if (singleSided_)
+        ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+    else
+        ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+
+	BROADCAST(this, "si", "setSingleSided", getSingleSided());
+}
+
 // -----------------------------------------------------------------------------
 
 std::vector<lo_message> GeometryNode::getState () const
@@ -269,7 +283,6 @@ std::vector<lo_message> GeometryNode::getState () const
         ret.push_back(msg);
     }
     
-    
     osg::Vec2Array *tArray = dynamic_cast<osg::Vec2Array*>(geometry_->getTexCoordArray(0));
     for (unsigned int i=0; i<tArray->getNumElements(); i++)
     {
@@ -277,6 +290,11 @@ std::vector<lo_message> GeometryNode::getState () const
         lo_message_add(msg, "siff", "setTexCoord", i, (*tArray)[i].x(), (*tArray)[i].y());
         ret.push_back(msg);
     }
+    
+    msg = lo_message_new();
+	lo_message_add(msg, "si", "setSingleSided", getSingleSided());
+	ret.push_back(msg);
+
 
 	return ret;
 }

@@ -42,20 +42,30 @@ BEGIN_OBJECT_REFLECTOR(spin::GeometryNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setNumVertices__int,
 	          "",
-	          "");
+	          "Sets the number of vertices that this geometry is supposed to have.This should be a multiple of 3 if you want to draw using GL_TRIANGLES or amultiple of 4 if you want to draw using GL_QUADS. Anything else will draw using GL_LINES.If you grow the number of vertices, all new vertices will be created with default values: position of (0,0,0), full white color, and texcoords of (0,0). ");
 	I_Method4(void, setVertex, IN, int, index, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setVertex__int__float__float__float,
 	          "",
-	          "");
+	          "Update the position of one vertex in the geometry, using an index. ");
 	I_Method5(void, setColor, IN, int, index, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__int__float__float__float__float,
 	          "",
-	          "");
+	          "Update the color of one vertex in the geometry, using an index. ");
 	I_Method3(void, setTexCoord, IN, int, index, IN, float, x, IN, float, y,
 	          Properties::NON_VIRTUAL,
 	          __void__setTexCoord__int__float__float,
+	          "",
+	          "Update the texture coord of one vertex in the geometry, using an index. ");
+	I_Method1(void, setSingleSided, IN, int, singleSided,
+	          Properties::NON_VIRTUAL,
+	          __void__setSingleSided__int,
+	          "",
+	          "Specify whether both sides or only one side of the shape is rendered. ie, whether the backface is culled or not. ");
+	I_Method0(int, getSingleSided,
+	          Properties::NON_VIRTUAL,
+	          __int__getSingleSided,
 	          "",
 	          "");
 	I_Method0(std::vector< lo_message >, getState,
@@ -66,6 +76,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GeometryNode)
 	I_SimpleProperty(int, NumVertices, 
 	                 0, 
 	                 __void__setNumVertices__int);
+	I_SimpleProperty(int, SingleSided, 
+	                 __int__getSingleSided, 
+	                 __void__setSingleSided__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

@@ -65,6 +65,7 @@ ReferencedStateSet::ReferencedStateSet(SceneManager *s, const char *initID)
 
 	renderBin_ = 11;
 	lightingEnabled_ = true;
+    transparent_ = false;
 	textureBlend_ = osg::TexEnv::MODULATE;
 	textureRepeatS_ = false;
 	textureRepeatT_ = false;
@@ -321,6 +322,16 @@ void ReferencedStateSet::setLighting (int i)
 	BROADCAST(this, "si", "setLighting", getLighting());
 }
 
+void ReferencedStateSet::setTransparent (int i)
+{
+	transparent_ = (bool)i;
+
+	if (transparent_) this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+	else this->setRenderingHint(osg::StateSet::DEFAULT_BIN);
+
+	BROADCAST(this, "si", "setTransparent", getTransparent());
+}
+
 void ReferencedStateSet::setRenderBin (int i)
 {
 	renderBin_ = i;
@@ -347,6 +358,10 @@ std::vector<lo_message> ReferencedStateSet::getState () const
 	
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setLighting", getLighting());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setTransparent", getTransparent());
 	ret.push_back(msg);
 
 	msg = lo_message_new();

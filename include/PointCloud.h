@@ -49,6 +49,9 @@
 #include <osg/Timer>
 
 #include "GroupNode.h"
+#include "config.h"
+
+#ifdef WITH_PCL
 
 #include <pcl/pcl_config.h>
 #include <pcl/io/openni_grabber.h>
@@ -162,5 +165,7 @@ private:
 };
 
 } // end of namespace spin
+
+#endif // WITH_PCL
 
 #endif

@@ -149,8 +149,19 @@ public:
     /**
      * Returns a boolean indicating whether lighting affects the texture.
      */
-
     virtual int getLighting() const { return (int)lightingEnabled_; }
+
+    /**
+     * Set whether the stateset is rendered in the transparent bin or not (ie,
+     * this is a different rendering pass with different optimizations)
+     */
+    virtual void setTransparent(int i);
+
+    /**
+     * Returns a boolean indicating whether stateset is rendered in transparent
+     * bin
+     */
+    virtual int getTransparent() const { return (int)transparent_; }
 
     /**
      * Set the render bin for this texture. The higher the number, the later it
@@ -176,6 +187,7 @@ protected:
 	bool textureRepeatS_;
 	bool textureRepeatT_;
 	bool lightingEnabled_;
+    bool transparent_;
     int  renderBin_;
 
 };

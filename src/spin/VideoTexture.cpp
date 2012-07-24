@@ -66,6 +66,7 @@ VideoTexture::VideoTexture (SceneManager *s, const char *initID) : Shader(s, ini
 
 	_useTextureRectangle = false;
 	lightingEnabled_ = false;
+    transparent_ = true;
 	
 	_index = 0.0;
 	_loop = true;
@@ -266,7 +267,8 @@ void VideoTexture::setPath (const char* newPath)
 			this->setRenderBinDetails( renderBin_, "RenderBin");
 
 			// if image has transparency, enable blending:
-			if (1)//(_imageStream->isImageTranslucent())
+			//if (1)//(_imageStream->isImageTranslucent())
+            if (transparent_)
 			{
 				this->setMode(GL_BLEND, osg::StateAttribute::ON);
 				this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);

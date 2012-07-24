@@ -103,6 +103,16 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	          __int__getLighting,
 	          "",
 	          "Returns a boolean indicating whether lighting affects the texture. ");
+	I_Method1(void, setTransparent, IN, int, i,
+	          Properties::VIRTUAL,
+	          __void__setTransparent__int,
+	          "",
+	          "Set whether the stateset is rendered in the transparent bin or not (ie, this is a different rendering pass with different optimizations) ");
+	I_Method0(int, getTransparent,
+	          Properties::VIRTUAL,
+	          __int__getTransparent,
+	          "",
+	          "Returns a boolean indicating whether stateset is rendered in transparent bin ");
 	I_Method1(void, setRenderBin, IN, int, i,
 	          Properties::VIRTUAL,
 	          __void__setRenderBin__int,
@@ -134,6 +144,9 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	I_SimpleProperty(int, TextureBlend, 
 	                 __int__getTextureBlend, 
 	                 __void__setTextureBlend__int);
+	I_SimpleProperty(int, Transparent, 
+	                 __int__getTransparent, 
+	                 __void__setTransparent__int);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet_callback)
