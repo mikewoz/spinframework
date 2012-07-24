@@ -51,6 +51,9 @@
 
 #include "SoundConnection.h" // for TCP wildcard check
 
+#ifdef WITH_POCO
+#include "pocoUtil.h"
+#endif
 
 extern pthread_mutex_t sceneMutex;
 
@@ -70,6 +73,8 @@ spinServerContext::spinServerContext() : syncThreadID(0)
     //lo_rxAddrs_.push_back(lo_address_new(getMyIPaddress().c_str(), SERVER_RX_UDP_PORT));
     lo_rxAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_RX_UDP_PORT));
     lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT));
+    
+    httpPort = 9980;
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
@@ -100,6 +105,10 @@ void spinServerContext::debugPrint()
         std::cout << " TTL=" << lo_address_get_ttl(lo_syncAddr);
     std::cout << std::endl;
 
+#ifdef WITH_POCO
+    std::cout << "  Web server running on:\thttp://localhost:" << stringify(httpPort) << std::endl; 
+#endif
+
     if (autoCleanup_)
         std::cout << "  Auto-clean users:\t\tENABLED" << std::endl;
     else
@@ -129,6 +138,9 @@ void spinServerContext::addCommandLineOptions(osg::ArgumentParser *arguments)
     arguments->getApplicationUsage()->addCommandLineOption("--send-udp-sync <host> <port>", "Set the address/port for timecode (sync) messages (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SYNC_UDP_PORT) + ")");
     arguments->getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
     arguments->getApplicationUsage()->addCommandLineOption("--disable-auto-cleanup", "Disables the auto-cleanup of user nodes if they stop sending ping messages.");
+#ifdef WITH_POCO
+    arguments->getApplicationUsage()->addCommandLineOption("--http-port <port>", "Set the web service port where we listen for HTTP requests. (Default: " + stringify(httpPort) + ")");
+#endif
 
 }
 
@@ -162,6 +174,11 @@ int spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
 
 	while (arguments->read("--send-udp-sync", addr, port)) {
 		this->lo_syncAddr = lo_address_new(addr.c_str(), port.c_str());
+	}
+    
+    int httpPortArg;
+    while (arguments->read("--http-port", httpPortArg)) {
+		httpPort = (unsigned short)httpPortArg;
 	}
 
     int ttl=1;
@@ -272,6 +289,17 @@ void *spinServerContext::spinServerThread(void *arg)
     spinLog log(logFilename.c_str());
     log.enable_cout(false);
     context->setLog(log);
+    
+    // start web server:
+#ifdef WITH_POCO
+    // set-up a server socket
+	Poco::Net::ServerSocket svs(context->getHttpPort());
+	// set-up a HTTPServer instance
+	Poco::Net::HTTPServer pocoServer(new FormRequestHandlerFactory(), svs, new Poco::Net::HTTPServerParams);
+	// start the HTTPServer
+	pocoServer.start();
+    
+#endif
 
     std::string myIP = getMyIPaddress();
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
@@ -554,7 +582,7 @@ void spinServerContext::refreshSubscribers()
 
     spinApp::Instance().sceneManager_->refreshSubscribers(tcpClientAddrs_);
 }
-
+    
 } // end of namespace spin
 
 

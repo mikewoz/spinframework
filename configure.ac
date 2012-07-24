@@ -229,10 +229,14 @@ else
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
 
-AC_CHECK_LIB([PocoFoundation],[main],[pototest=true] [POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
-AM_CONDITIONAL(HAVE_POCO, [test x$pocotest = xtrue])
-AC_SUBST(POCO_LIBS)
-
+AC_CHECK_LIB([PocoFoundation],[main],[have_poco=true] [POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
+if test "x${have_poco}" = "xtrue" ; then
+    AC_DEFINE([WITH_POCO],[1],[Enables linking with the Poco and provides web services for SPIN]) AC_MSG_NOTICE([Enabled Poco for SPIN web services])
+    AM_CONDITIONAL(HAVE_POCO, [true])
+    AC_SUBST(POCO_LIBS)
+else
+    have_poco=false
+fi
 
 PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
@@ -324,7 +328,7 @@ AC_OUTPUT
 [echo "SpatOSC integration?       ${have_spatosc}"]
 [echo "libSharedVideo?            ${have_sharedvideo}"]
 [echo "PointCloud support?        ${have_pcl}"]
-[echo "Poco web server?           ${pocotest}"]
+[echo "Poco web server?           ${have_poco}"]
 [echo "Bullet Physics?            ${have_bullet}"]
 [echo "SpaceNavigator support?    ${have_spnav}"]
 [echo ""]

@@ -219,6 +219,12 @@
 		1C1ECB50150E65B000CCBFF3 /* ShaderUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C1ECB4F150E65B000CCBFF3 /* ShaderUtil.h */; };
 		1C25F51314E57CD2007F97E5 /* PointCloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C25F51214E57CD2007F97E5 /* PointCloud.h */; };
 		1C329CAD15BA0680002F845C /* spinServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C329CAC15BA0680002F845C /* spinServer.cpp */; };
+		1C329CAF15BEF306002F845C /* pocoUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C329CAE15BEF306002F845C /* pocoUtil.cpp */; };
+		1C329CB115BEF740002F845C /* pocoUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C329CB015BEF740002F845C /* pocoUtil.h */; };
+		1C329CB715BF119E002F845C /* libPocoFoundation.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C329CB315BF119E002F845C /* libPocoFoundation.12.dylib */; };
+		1C329CB815BF119E002F845C /* libPocoNet.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C329CB415BF119E002F845C /* libPocoNet.12.dylib */; };
+		1C329CB915BF119E002F845C /* libPocoUtil.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C329CB515BF119E002F845C /* libPocoUtil.12.dylib */; };
+		1C329CBA15BF119E002F845C /* libPocoXML.12.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C329CB615BF119E002F845C /* libPocoXML.12.dylib */; };
 		1C34AE4514DB32A8001DF418 /* GeometryNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C34AE4414DB32A8001DF418 /* GeometryNode.h */; };
 		1C34AE4714DB32BE001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */; };
 		1C34AE4914DB4A3B001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */; };
@@ -1082,6 +1088,12 @@
 		1C329C9B15BA03A4002F845C /* libpcl_surface.1.6.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_surface.1.6.0.dylib; path = ../../../../../usr/local/lib/libpcl_surface.1.6.0.dylib; sourceTree = "<group>"; };
 		1C329C9C15BA03A4002F845C /* libpcl_tracking.1.6.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_tracking.1.6.0.dylib; path = ../../../../../usr/local/lib/libpcl_tracking.1.6.0.dylib; sourceTree = "<group>"; };
 		1C329CAC15BA0680002F845C /* spinServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinServer.cpp; path = ../src/spin/spinServer.cpp; sourceTree = SOURCE_ROOT; };
+		1C329CAE15BEF306002F845C /* pocoUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pocoUtil.cpp; path = ../src/spin/pocoUtil.cpp; sourceTree = "<group>"; };
+		1C329CB015BEF740002F845C /* pocoUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pocoUtil.h; path = ../include/pocoUtil.h; sourceTree = "<group>"; };
+		1C329CB315BF119E002F845C /* libPocoFoundation.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libPocoFoundation.12.dylib; path = ../../../../../usr/local/lib/libPocoFoundation.12.dylib; sourceTree = "<group>"; };
+		1C329CB415BF119E002F845C /* libPocoNet.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libPocoNet.12.dylib; path = ../../../../../usr/local/lib/libPocoNet.12.dylib; sourceTree = "<group>"; };
+		1C329CB515BF119E002F845C /* libPocoUtil.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libPocoUtil.12.dylib; path = ../../../../../usr/local/lib/libPocoUtil.12.dylib; sourceTree = "<group>"; };
+		1C329CB615BF119E002F845C /* libPocoXML.12.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libPocoXML.12.dylib; path = ../../../../../usr/local/lib/libPocoXML.12.dylib; sourceTree = "<group>"; };
 		1C34AE4414DB32A8001DF418 /* GeometryNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeometryNode.h; path = ../include/GeometryNode.h; sourceTree = "<group>"; };
 		1C34AE4614DB32BE001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/spin/GeometryNode.cpp; sourceTree = "<group>"; };
 		1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeometryNode.cpp; path = ../src/osgWrappers/introspection/GeometryNode.cpp; sourceTree = "<group>"; };
@@ -1525,6 +1537,10 @@
 				1C0A70D915B7730B0032484A /* libBulletDynamics.2.80.dylib in Frameworks */,
 				1C0A70DE15B7730B0032484A /* libBulletSoftBody.2.80.dylib in Frameworks */,
 				1C0A70E315B7730B0032484A /* libLinearMath.2.80.dylib in Frameworks */,
+				1C329CB715BF119E002F845C /* libPocoFoundation.12.dylib in Frameworks */,
+				1C329CB815BF119E002F845C /* libPocoNet.12.dylib in Frameworks */,
+				1C329CB915BF119E002F845C /* libPocoUtil.12.dylib in Frameworks */,
+				1C329CBA15BF119E002F845C /* libPocoXML.12.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1754,6 +1770,17 @@
 			name = "pcl-1.6";
 			sourceTree = "<group>";
 		};
+		1C329CB215BF1159002F845C /* Poco */ = {
+			isa = PBXGroup;
+			children = (
+				1C329CB315BF119E002F845C /* libPocoFoundation.12.dylib */,
+				1C329CB415BF119E002F845C /* libPocoNet.12.dylib */,
+				1C329CB515BF119E002F845C /* libPocoUtil.12.dylib */,
+				1C329CB615BF119E002F845C /* libPocoXML.12.dylib */,
+			);
+			name = Poco;
+			sourceTree = "<group>";
+		};
 		1C386C7214BD3CBD0065851F = {
 			isa = PBXGroup;
 			children = (
@@ -1823,6 +1850,7 @@
 				1C386C9814BD3DF60065851F /* nodeVisitors.cpp */,
 				1C386C9914BD3DF60065851F /* osgUtil.cpp */,
 				1CF94953151CD41F00628872 /* ParticleSystem.cpp */,
+				1C329CAE15BEF306002F845C /* pocoUtil.cpp */,
 				1C7267B314EF43AE00E3FFAE /* PointCloud.cpp */,
 				1C386C9A14BD3DF60065851F /* PointerNode.cpp */,
 				1C386C9B14BD3DF60065851F /* python_wrappers.cpp */,
@@ -1887,6 +1915,7 @@
 				1CA24D8814BE2892007A9C31 /* oscParser.h */,
 				1CA24D8914BE2892007A9C31 /* osgUtil.h */,
 				1CF94950151CD40500628872 /* ParticleSystem.h */,
+				1C329CB015BEF740002F845C /* pocoUtil.h */,
 				1C25F51214E57CD2007F97E5 /* PointCloud.h */,
 				1CA24D8A14BE2892007A9C31 /* PointerNode.h */,
 				1CA24D8B14BE2892007A9C31 /* RayNode.h */,
@@ -2200,6 +2229,7 @@
 		1C9EE82B14BE2725000976A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1C329CB215BF1159002F845C /* Poco */,
 				1CD941291543BD9B0075A81C /* bullet */,
 				1C82ACDB152D06180085D8F0 /* osg-3.1.1 */,
 				1C329C8415B9FF6A002F845C /* pcl-1.6 */,
@@ -2455,6 +2485,7 @@
 				1C068B1D157552FE00BC6207 /* Utility.h in Headers */,
 				1C068B1F157552FE00BC6207 /* Visitor.h in Headers */,
 				1C068B211575532200BC6207 /* dofppu.h in Headers */,
+				1C329CB115BEF740002F845C /* pocoUtil.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2880,6 +2911,7 @@
 				1C068B1A157552FE00BC6207 /* UnitTexture.cpp in Sources */,
 				1C068B1C157552FE00BC6207 /* Utility.cpp in Sources */,
 				1C068B1E157552FE00BC6207 /* Visitor.cpp in Sources */,
+				1C329CAF15BEF306002F845C /* pocoUtil.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3064,6 +3096,7 @@
 					"WITH_SPATOSC=1",
 					"OSX_COCOA=1",
 					"DISABLE_PYTHON=1",
+					"WITH_POCO=1",
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -3091,6 +3124,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
+					"-DWITH_POCO",
 					"-DOSX_COCOA",
 					"-DDISABLE_PYTHON",
 					"-g",
@@ -3140,6 +3174,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
+					"-DWITH_POCO",
 					"-DOSX_COCOA",
 					"-DDISABLE_PYTHON",
 					"-g",

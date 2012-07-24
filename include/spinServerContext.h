@@ -42,9 +42,11 @@
 #ifndef __spinServerContext_H
 #define __spinServerContext_H
 
-#include "spinBaseContext.h"
 #include <map>
 #include <string>
+#include "spinBaseContext.h"
+#include "pocoUtil.h"
+
 
 namespace spin
 {
@@ -83,6 +85,11 @@ class spinServerContext : public spinBaseContext
         
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
+#ifdef WITH_POCO
+        bool applyHTTPMessage(std::string path, const Poco::Net::HTMLForm &form);
+#endif
+        unsigned short getHttpPort() { return httpPort; }
+    
     private:
 
         /**
@@ -121,10 +128,10 @@ class spinServerContext : public spinBaseContext
         std::map<std::string, lo_address> tcpClientAddrs_;
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
+    
+        unsigned short httpPort;
 };
 
-
 } // end of namespace spin
-
 
 #endif

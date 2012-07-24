@@ -42,7 +42,8 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHAREDVIDEO_LIBS) \
-    $(SPATOSC_LIBS) 
+    $(SPATOSC_LIBS) \
+    $(POCO_LIBS)
     
 #	$(BOOST_THREAD_LIBS) 
 
@@ -73,6 +74,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     nodeVisitors.cpp \
     osgUtil.cpp \
     ParticleSystem.cpp \
+    pocoUtil.cpp \
     PointerNode.cpp \
     RayNode.cpp \
     ReferencedNode.cpp \
@@ -128,6 +130,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/oscParser.h \
     $(top_srcdir)/include/osgUtil.h \
     $(top_srcdir)/include/ParticleSystem.h \
+    $(top_srcdir)/include/pocoUtil.h \
     $(top_srcdir)/include/PointerNode.h \
     $(top_srcdir)/include/RayNode.h \
     $(top_srcdir)/include/ReferencedNode.h \
