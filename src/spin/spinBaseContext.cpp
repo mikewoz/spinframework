@@ -966,9 +966,31 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         }
 #endif
     }
+    else if (theMethod == "event")
+    {
+	spinServerContext *context = dynamic_cast<spinServerContext*>(spin.getContext());
+	//if (spin.sceneManager_->isServer())
+	if (context)
+	{
+	    lo_message msg = lo_message_new();
+            for (int i=0; i<argc; i++)
+            {
+                if (lo_is_numerical_type((lo_type)types[i]))
+                {
+                    lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+                } else {
+                    lo_message_add_string(msg, (const char*) argv[i] );
+                }
+            }
+    	    std::vector<lo_address>::iterator addrIter;
+            for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+                lo_send_message((*addrIter), path, msg);
+
+	}	
+    }
     else
     {
-        // FIXME: this used to rebroadcast messages that did not match command
+        // FIXME: this used to rebroadcast messages that did not match any command
 #if 0
         spinApp &spin = spinApp::Instance();
         if (spin.sceneManager_->isServer())
