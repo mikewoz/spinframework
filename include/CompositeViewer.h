@@ -46,6 +46,7 @@
 #include <osgViewer/View>
 #include <osgViewer/ViewerEventHandlers>
 #include <osg/GraphicsContext>
+#include <osg/Timer>
 
 #include "dofppu.h"
 
@@ -63,6 +64,8 @@ struct frustum
 	float far;
 };
 
+#define VELOCITY_SCALAR 0.004
+#define SPIN_SCALAR 0.007
 
 
 class CompositeViewer : public osgViewer::CompositeViewer
@@ -89,7 +92,22 @@ class CompositeViewer : public osgViewer::CompositeViewer
 
         //! Update the frames
         void frame(double f = USE_REFERENCE_TIME);
-        
+      
+        //! Poll the SpaceNavigator for updates and send velocity/spin 
+        void updateSpaceNavigator();
+
+        /**
+         * Scale the velocity effect of navigational devices (for example,
+         * scale X and Z axes to zero so that only forward motion is allowed).
+	 */
+        void setVelocityScalars(osg::Vec3 v) { velocityScalars_ = v; }
+
+         /**
+         * Scale the spin effect of navigational devices (for example, disallow
+         * roll and allow only pitch and yaw by setting the scale to 1,0,1)
+	 */
+        void setSpinScalars(osg::Vec3 v) { spinScalars_ = v; }
+ 
         //int run();
 
         osg::ref_ptr<DoFRendering> dofPPU_;
@@ -100,7 +118,14 @@ class CompositeViewer : public osgViewer::CompositeViewer
         float mOldTime;
         //DoFRendering mDoFSetup;
         bool mbInitialized;
-        
+       
+	// navigation update stuff: 
+        osg::Timer_t lastNavTick_;
+	float speedScaleValue_;
+	float moving_;
+	osg::Vec3 velocityScalars_;
+	osg::Vec3 spinScalars_;
+
         osg::ref_ptr<osg::Texture> colorTexture_;
         osg::ref_ptr<osg::Texture> depthTexture_;
 };

@@ -555,7 +555,8 @@ int run(int argc, char **argv)
 			if (dt >= minFrameTime)
 			{
 				// poll the space navigator:
-				#ifdef HAVE_SPNAV_H
+				viewer.updateSpaceNavigator();
+				#ifdef HAVE_SPNAV_Hi_
 				int speventCount = 0;
 				osg::Vec3 spVel, spSpin;
 			
