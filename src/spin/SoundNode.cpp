@@ -64,6 +64,9 @@ SoundNode::SoundNode (SceneManager *sceneManager, const char* initID) : DSPNode(
         //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
+
+    // after the spatosc node is created, set some params:
+    
 }
 
 // destructor

@@ -110,16 +110,33 @@ public:
         void connectSource(const char *src);
 
         void disconnect(const char *snk);
-        virtual void setActive (int i);
+        
+        /**
+         * Set the media for the sound node using a URI pattern.
+         * 
+         * Examples:
+         * file://soundfilename.wav
+         * file:///home/johndoe/soundfilename.wav
+         * http://www.server.com/soundfile.wav
+         * adc://1:1
+         * adc://1
+         * content://media/external/audio/media/710
+         * mms://some_media_stream
+         * rtsp://127.0.0.1:12311
+         * pd_plugin://audio_plugin_patch.pd
+         */
         virtual void setURI (const char *uri);
-        
-       /**	for sending messages to the connections of this (source) node:
-        *	virtual void connectionMsg (char *snkName, char *method, float
-        * 	value);
-		*/
-        
-        int getActive() const { return (int)active; }
         const char* getURI() const { return uri_.c_str(); }
+        
+        // for sending messages to the connections of this (source) node:
+        // virtual void connectionMsg (char *snkName, char *method, float
+        // value);
+        
+        /**
+         * Activate or deactivate the DSP processing
+         */
+        virtual void setActive (int i);
+        int getActive() const { return (int)active; }
         
         /**
          * We maintain 2 lists of all SoundConnection for this node (it is

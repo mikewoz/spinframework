@@ -64,24 +64,19 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __void__disconnect__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(void, setActive, IN, int, i,
-	          Properties::VIRTUAL,
-	          __void__setActive__int,
-	          "",
-	          "");
 	I_Method1(void, setURI, IN, const char *, uri,
 	          Properties::VIRTUAL,
 	          __void__setURI__C5_char_P1,
 	          "",
 	          "");
-	I_Method0(int, getActive,
-	          Properties::NON_VIRTUAL,
-	          __int__getActive,
-	          "",
-	          "for sending messages to the connections of this (source) node: virtual void connectionMsg (char *snkName, char *method, float value); ");
 	I_Method0(const char *, getURI,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getURI,
+	          "",
+	          "");
+	I_Method0(int, getActive,
+	          Properties::NON_VIRTUAL,
+	          __int__getActive,
 	          "",
 	          "");
 	I_Method0(std::vector< lo_message >, getState,
@@ -216,7 +211,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          "");
 	I_SimpleProperty(int, Active, 
 	                 __int__getActive, 
-	                 __void__setActive__int);
+	                 0);
 	I_SimpleProperty(osg::Vec4, DebugColor, 
 	                 __osg_Vec4__getDebugColor, 
 	                 0);

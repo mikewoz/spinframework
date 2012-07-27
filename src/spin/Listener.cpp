@@ -56,8 +56,6 @@ namespace spin
 Listener::Listener (SceneManager *sceneManager, const char* initID) : DSPNode(sceneManager, initID)
 {
 	this->setNodeType("Listener");
-	this->setURI("plugin://listener-stereo~");
-	type = "listener-stereo.conn~";
 	this->setName(this->getID() + ".Listener");
 
 #ifdef WITH_SPATOSC
@@ -68,6 +66,10 @@ Listener::Listener (SceneManager *sceneManager, const char* initID) : DSPNode(sc
         //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
+
+    // after the spatosc node is created, set some params:
+	//this->setURI("plugin://listener-stereo~");
+
 }
 
 // ===================================================================
@@ -117,23 +119,11 @@ void Listener::setURI (const char *uri)
 #endif
 }
 
-void Listener::setType (const char* t)
-{
-	// only do this if the type has changed:
-	if (type == std::string(t)) return;
-	type = std::string(t);
-	
-    BROADCAST(this, "ss", "setType", getType());
-}
-
 std::vector<lo_message> Listener::getState () const
 {
 	// inherit state from base class
 	std::vector<lo_message> ret = DSPNode::getState();
 	
-	lo_message msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setType", getType());
-	ret.push_back(msg);
 	
 	return ret;
 }
