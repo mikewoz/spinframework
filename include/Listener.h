@@ -73,6 +73,7 @@ class Listener : public DSPNode
          */
         virtual std::vector<lo_message> getState() const;
         
+        virtual void setURI (const char *uri);
         void setType    (const char* t);
         const char* getType() const { return type.c_str(); }
         

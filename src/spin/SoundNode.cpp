@@ -176,6 +176,19 @@ void SoundNode::setRadius (float f)
 #endif
 }
 
+void SoundNode::setURI (const char *uri)
+{
+    DSPNode::setURI(uri);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCSource->setURI(this->getURI());
+    }
+#endif
+}
+
+
+
 std::vector<lo_message> SoundNode::getState () const
 {
 	// inherit state from base class

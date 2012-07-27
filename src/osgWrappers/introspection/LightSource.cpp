@@ -37,17 +37,17 @@ BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	          Properties::NON_VIRTUAL,
 	          __void__setCutoff__float,
 	          "",
-	          "");
+	          "Cutoff is an angle (in degrees), measured from the center of the cone to the outer edge. 0 would give us a single laser-point, while 90 degrees will give us a hemisphere of light. Note that 0 is the min, and 90 is the max, but a special value of 180 degrees will turn the spotlight into an omnidirectional light. ");
 	I_Method1(void, setExponent, IN, float, exponent,
 	          Properties::NON_VIRTUAL,
 	          __void__setExponent__float,
 	          "",
-	          "");
+	          "This value defines the intensity of the light towards the edges of the cone. As objects move from the center of the spotlight to the edges, we have the option of attenuating the intensity of the light on the surface of the objects ");
 	I_Method1(void, setAttenuation, IN, float, attenuation,
 	          Properties::NON_VIRTUAL,
 	          __void__setAttenuation__float,
 	          "",
-	          "");
+	          "The attenuation parameter controls the amount of attenuation that occurs, as a light moves away from a surface. A value of 0 means no attenuation, so light intensity will be the same for any distance. A value of 1 means full linear attenuation. ");
 	I_Method4(void, setAmbient, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setAmbient__float__float__float__float,

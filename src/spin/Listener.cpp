@@ -56,7 +56,7 @@ namespace spin
 Listener::Listener (SceneManager *sceneManager, const char* initID) : DSPNode(sceneManager, initID)
 {
 	this->setNodeType("Listener");
-	this->setPlugin("listener-stereo~");
+	this->setURI("plugin://listener-stereo~");
 	type = "listener-stereo.conn~";
 	this->setName(this->getID() + ".Listener");
 
@@ -102,6 +102,17 @@ void Listener::callbackUpdate(osg::NodeVisitor* nv)
 
         spatOSCListener->setPosition(myPos.x(), myPos.y(), myPos.z());
         spatOSCListener->setOrientation(myRot.x(), myRot.y(), myRot.z());
+    }
+#endif
+}
+
+void Listener::setURI (const char *uri)
+{
+    DSPNode::setURI(uri);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCListener->setURI(this->getURI());
     }
 #endif
 }

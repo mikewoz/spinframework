@@ -110,8 +110,8 @@ public:
         void connectSource(const char *src);
 
         void disconnect(const char *snk);
-        void setActive (int i);
-        void setPlugin (const char *filename);
+        virtual void setActive (int i);
+        virtual void setURI (const char *uri);
         
        /**	for sending messages to the connections of this (source) node:
         *	virtual void connectionMsg (char *snkName, char *method, float
@@ -119,7 +119,7 @@ public:
 		*/
         
         int getActive() const { return (int)active; }
-        const char* getPlugin() const { return plugin.c_str(); }
+        const char* getURI() const { return uri_.c_str(); }
         
         /**
          * We maintain 2 lists of all SoundConnection for this node (it is
@@ -185,10 +185,7 @@ private:
     
         bool active;
         
-        /**
-         * dsp name (this is the name of a pd abstraction that handles the dsp):
-         */
-        std::string plugin;
+        std::string uri_;
         
         /**
          * This node should always broadcast global position and orientation 
