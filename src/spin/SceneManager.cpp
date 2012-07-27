@@ -1603,6 +1603,14 @@ void SceneManager::refreshAll()
     {
         (*iter)->stateDump();
     }
+    
+#ifdef WITH_SPATOSC
+	if (spinApp::Instance().hasAudioRenderer)
+	{
+	    spinApp::Instance().audioScene->forceRefresh();
+	}
+#endif
+
 
     // Announce that a refresh has been completed
     SCENE_MSG("s", "refresh");
