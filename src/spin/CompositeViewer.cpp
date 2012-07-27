@@ -117,7 +117,7 @@ void CompositeViewer::setupCamera(osg::Viewport* vp)
 {
     // setup viewer's default camera
     //osg::Camera* camera = getCamera();
-    osg::Camera* camera = this->getView(0)->getCamera();
+    camera = this->getView(0)->getCamera();
     
     //camera->setViewport(0,0,(int)vp->width(), (int)vp->height()); 
     
@@ -138,7 +138,9 @@ void CompositeViewer::setupCamera(osg::Viewport* vp)
     
 
     // create texture to render to
-    colorTexture_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
+    colorTexture1_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
+    colorTexture2_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
+    colorTexture3_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
     depthTexture_ = createRenderTexture((int)vp->width(), (int)vp->height(), true);
 
     // set up the background color and clear mask.
@@ -148,13 +150,15 @@ void CompositeViewer::setupCamera(osg::Viewport* vp)
     // set viewport
     camera->setViewport(vp);
     camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
+    //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0); 
 
     // tell the camera to use OpenGL frame buffer object where supported.
     camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
     // attach the texture and use it as the color buffer.
-    camera->attach(osg::Camera::COLOR_BUFFER, colorTexture_);
+    camera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1_);
+    camera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2_);
+    camera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3_);
     camera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
 }
 
@@ -180,12 +184,17 @@ void CompositeViewer::viewerInit()
 }
 
 //! Setup osgppu for rendering
-void CompositeViewer::initializePPU()
+void CompositeViewer::initializePPU(unsigned int pEffect)
 {
+    std::cout << "Effect: " << pEffect << std::endl;
+
    // if already initialized then just do nothing
     if (mbInitialized == false)
         mbInitialized = true;
     else
+        return;
+    
+    if(pEffect == noEffect)
         return;
 
     mProcessor = new osgPPU::Processor();
@@ -201,24 +210,40 @@ void CompositeViewer::initializePPU()
     // we want to simulate hdr rendering, hence setup the pipeline
     // for the hdr rendering
     osgPPU::Unit* lastUnit = NULL;
+ 
 
 
+    if(pEffect == dofEffect)
+    {
+        //osg::setNotifyLevel(osg::DEBUG_FP);
+        dofPPU_ = new DoFRendering();
 
-    //osg::setNotifyLevel(osg::DEBUG_FP);
-    dofPPU_ = new DoFRendering();
+        double left,right,bottom,top,near,far; 
+        this->getView(0)->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
 
-    double left,right,bottom,top,near,far; 
-    this->getView(0)->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+        //dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, 0.01, 100.0);
+        dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far);
+        dofPPU_->setFocalLength(0.0);
+        dofPPU_->setFocalRange(50.0);
+        //osg::setNotifyLevel(osg::FATAL);
+    }
+    else if(pEffect == ssaoEffect)
+    {   
+        std::cout << "SSAO initialized!" << std::endl;
+        ssaoPPU_ = new SSAORendering();
+        // Gets the projection matrix
+        osg::Matrixf lProjectionMatrix = camera->getProjectionMatrix();
 
-    //dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, 0.01, 100.0);
-    dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far);
-    dofPPU_->setFocalLength(0.0);
-    dofPPU_->setFocalRange(50.0);
-    //osg::setNotifyLevel(osg::FATAL);
+        ssaoPPU_->createSSAOPipeline(mProcessor.get(), lastUnit,
+                                colorTexture1_, colorTexture2_, colorTexture3_,
+                                lProjectionMatrix);
+        ssaoPPU_->setPower(1.f);
+    }
 
 
     // add a text ppu after the pipeline is setted up
-    if (0){
+    if (0)
+    {
         osgPPU::UnitText* fpstext = new osgPPU::UnitText();
         fpstext->setName("FPSTextPPU");
         fpstext->setSize(44);
@@ -249,7 +274,7 @@ void CompositeViewer::frame(double f)
     osgViewer::CompositeViewer::frame(f);
     
     // initilize PPU if it was not done before
-    initializePPU();
+    //initializePPU();
 
     // compute frame time
     float frameTime = elapsedTime() - mOldTime;
