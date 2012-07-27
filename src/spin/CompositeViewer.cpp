@@ -51,7 +51,6 @@
 #include <osgGA/StateSetManipulator>
 
 #include <osgDB/ReadFile>
-#include <osg/Timer>
 
 #include <boost/algorithm/string.hpp>
 
@@ -67,6 +66,11 @@
 
 #include "CompositeViewer.h"
 
+#ifdef HAVE_SPNAV_H
+#include "spnav.h"
+#endif
+
+
 extern pthread_mutex_t sceneMutex;
 
 
@@ -80,6 +84,9 @@ CompositeViewer::CompositeViewer(osg::ArgumentParser& args) : osgViewer::Composi
 {
     mbInitialized = false;
     mOldTime = 0.0f;
+    lastNavTick_ = osg::Timer::instance()->tick();
+    velocityScalars_ = osg::Vec3(1,1,1);
+    spinScalars_ = osg::Vec3(1,1,1);
 }
 
 osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height, bool depth)
@@ -263,6 +270,105 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
     // write pipeline to a file
     //osgDB::writeObjectFile(*mProcessor, "dof.ppu");
 }
+
+void CompositeViewer::updateSpaceNavigator()
+{
+#ifdef HAVE_SPNAV_H
+    
+    spin::spinApp &spin = spin::spinApp::Instance();
+
+    // poll the space navigator:
+    int speventCount = 0;
+    osg::Vec3 spVel, spSpin;
+
+    //std::cout << "delta = " << osg::Timer::instance()->delta_s(lastNavTick_, osg::Timer::instance()->tick()) << std::endl;
+
+    // if the last significant event was more than a second ago,
+    // assume the user has let go of the puck and reset speedScale
+    if ((float)(osg::Timer::instance()->delta_s(lastNavTick_, osg::Timer::instance()->tick()) > 1.0) && moving_)
+    {
+        //std::cout << "reset spacenavigator" << std::endl;
+        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
+        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setSpin", 0.0, 0.0, 0.0, SPIN_ARGS_END);
+        speedScaleValue_ = 1.0;
+        moving_ = false;
+    }
+    
+    spnav_event spnavevent;
+    while (spnav_poll_event(&spnavevent))
+    {
+        if (spnavevent.type == SPNAV_EVENT_MOTION)
+        {
+            // just make note of the count; the latest motion data will be stored in spnavevent
+            
+            speventCount++;
+            //spPos = osg::Vec3(spnavevent.motion.x, spnavevent.motion.z, spnavevent.motion.y);
+            //spRot = osg::Vec3(spnavevent.motion.rx, spnavevent.motion.rz, spnavevent.motion.ry);
+        }
+        else
+        {
+            // SPNAV_EVENT_BUTTON
+            static bool button1, button2;
+            spin.NodeMessage(spin.getUserID().c_str(), "ssii", "event", "button", spnavevent.button.bnum, (int)spnavevent.button.press, SPIN_ARGS_END);
+            if (spnavevent.button.bnum==0) button1 = (bool)spnavevent.button.press;
+            if (spnavevent.button.bnum==1) button2 = (bool)spnavevent.button.press;
+            if (button1 && button2)
+            {
+                spin.NodeMessage(spin.getUserID().c_str(), "s", "goHome", SPIN_ARGS_END);
+            }
+        }
+    }
+
+    // if at least one update was received this frame
+    if (speventCount)
+    {
+        moving_ = true;
+
+        // note: y and z axis flipped:
+        float x = spnavevent.motion.x;
+        float y = spnavevent.motion.z;
+        float z = spnavevent.motion.y;
+        float rx = -spnavevent.motion.rx;
+        float ry = -spnavevent.motion.rz;
+        float rz = -spnavevent.motion.ry;
+
+        // if user is pushing beyond a threshold, inrement
+        // the speed over time
+        // NOTE: pulling up on the puch is harder to get ti to the max than pushing down, so we handle the up/down separately
+        float xyMagnitude = sqrt((x*x)+(y*y));
+        if ((xyMagnitude>190)||(z<-200)||(z>150))
+            speedScaleValue_ += 0.02;
+        else
+            speedScaleValue_ -= 0.04;
+
+        // max out at 10x of speed scaling
+        if (speedScaleValue_ < 1) speedScaleValue_ = 1.0;
+        else if (speedScaleValue_ > 10) speedScaleValue_ = 10.0;
+
+        // compute velocity vector:
+        speedScaleValue_= 1.0;
+        spVel = osg::Vec3( pow(x * VELOCITY_SCALAR, 5) * speedScaleValue_ * 2,
+        pow(y * VELOCITY_SCALAR, 5) * speedScaleValue_ * 2,
+        pow(z * VELOCITY_SCALAR, 5) * speedScaleValue_);
+        // rotate around the z-axis faster than the other two:
+        spSpin = osg::Vec3( pow(rx*SPIN_SCALAR,5),
+        pow(ry*SPIN_SCALAR,5),
+        pow(rz*SPIN_SCALAR,5));
+
+        // apply user-defined scalar values that scale the resulting vectors:
+        spVel = osg::componentMultiply(spVel, velocityScalars_);
+        spSpin = osg::componentMultiply(spSpin, spinScalars_);
+
+        //std::cout << "spacenav x,y,z="<<x<<","<<y<<","<<z<<" rx,ry,rz="<<rx<<","<<ry<<","<<rz<<" computed speedScale="<<speedScaleValue_<< ", spVel= " << stringify(spVel) << ", spSpin= " << stringify(spSpin) << std::endl;
+        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", spVel.x(), spVel.y(), spVel.z(), SPIN_ARGS_END);
+        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setSpin", spSpin.x(), spSpin.y(), spSpin.z(), SPIN_ARGS_END);
+
+        lastNavTick_ = osg::Timer::instance()->tick();
+    }
+
+#endif
+}
+
 
 //! Update the frames
 void CompositeViewer::frame(double f)
@@ -1147,6 +1253,16 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         viewer->dofPPU_->setFar(floatArgs[5]);
         
         return 0;
+    }
+    else if ((theMethod=="setVelocityScalars") && (floatArgs.size()==3))
+    {
+	viewer->setVelocityScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
+	return 0;
+    }
+    else if ((theMethod=="setSpinScalars") && (floatArgs.size()==3))
+    {
+	viewer->setSpinScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
+	return 0;
     }
     
     return 1;

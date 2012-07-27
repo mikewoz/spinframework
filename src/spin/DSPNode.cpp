@@ -81,7 +81,7 @@ DSPNode::DSPNode (SceneManager *sceneManager, const char* initID) : GroupNode(sc
 	
 	active = 1;
 	
-	plugin = "empty~";
+	uri_ = "plugin://empty~";
 
     _rolloff = "default";
     _spread = 1.0f;
@@ -262,10 +262,10 @@ void DSPNode::setActive (int i)
 	BROADCAST(this, "si", "setActive", (int)active);
 }
 
-void DSPNode::setPlugin (const char *newPlugin)
+void DSPNode::setURI (const char *newURI)
 {	
-	plugin = std::string(newPlugin);
-	BROADCAST(this, "ss", "setPlugin", plugin.c_str());
+	uri_ = std::string(newURI);
+	BROADCAST(this, "ss", "setURI", uri_.c_str());
 }
 
 void DSPNode::setRolloff (const char *newvalue)
@@ -597,7 +597,7 @@ std::vector<lo_message> DSPNode::getState() const
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setPlugin", plugin.c_str());
+	lo_message_add(msg, "ss", "setURI", uri_.c_str());
 	ret.push_back(msg);
 	
 	/*
@@ -661,7 +661,7 @@ std::vector<lo_message> DSPNode::getState() const
     ret.push_back(msg);
     */
 
-    // have to re-send setContext AFTER setPlugin, so that loaded plugins will
+    // have to re-send setContext AFTER setURI, so that loaded plugins will
     // have the up-to-date parameter
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setContext", getContext());

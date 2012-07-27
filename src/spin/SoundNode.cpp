@@ -64,6 +64,9 @@ SoundNode::SoundNode (SceneManager *sceneManager, const char* initID) : DSPNode(
         //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
+
+    // after the spatosc node is created, set some params:
+    
 }
 
 // destructor
@@ -175,6 +178,19 @@ void SoundNode::setRadius (float f)
     }
 #endif
 }
+
+void SoundNode::setURI (const char *uri)
+{
+    DSPNode::setURI(uri);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCSource->setURI(this->getURI());
+    }
+#endif
+}
+
+
 
 std::vector<lo_message> SoundNode::getState () const
 {

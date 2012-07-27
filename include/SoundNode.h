@@ -76,6 +76,7 @@ class SoundNode : public DSPNode
         virtual void setOrientation (float p, float r, float y);
         virtual void setOrientationQuat (float x, float y, float z, float w);
         virtual void setRadius (float f);
+        virtual void setURI (const char *uri);
 
         /**
          * For each subclass of ReferencedNode, we override the getState()

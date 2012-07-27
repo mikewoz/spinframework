@@ -73,11 +73,8 @@ class Listener : public DSPNode
          */
         virtual std::vector<lo_message> getState() const;
         
-        void setType    (const char* t);
-        const char* getType() const { return type.c_str(); }
+        virtual void setURI (const char *uri);
         
-        std::string type;
-
     private:
 
 #ifdef WITH_SPATOSC

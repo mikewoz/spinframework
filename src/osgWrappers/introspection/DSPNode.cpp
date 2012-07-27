@@ -64,24 +64,19 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __void__disconnect__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(void, setActive, IN, int, i,
-	          Properties::NON_VIRTUAL,
-	          __void__setActive__int,
+	I_Method1(void, setURI, IN, const char *, uri,
+	          Properties::VIRTUAL,
+	          __void__setURI__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(void, setPlugin, IN, const char *, filename,
+	I_Method0(const char *, getURI,
 	          Properties::NON_VIRTUAL,
-	          __void__setPlugin__C5_char_P1,
+	          __C5_char_P1__getURI,
 	          "",
 	          "");
 	I_Method0(int, getActive,
 	          Properties::NON_VIRTUAL,
 	          __int__getActive,
-	          "",
-	          "for sending messages to the connections of this (source) node: virtual void connectionMsg (char *snkName, char *method, float value); ");
-	I_Method0(const char *, getPlugin,
-	          Properties::NON_VIRTUAL,
-	          __C5_char_P1__getPlugin,
 	          "",
 	          "");
 	I_Method0(std::vector< lo_message >, getState,
@@ -216,7 +211,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          "");
 	I_SimpleProperty(int, Active, 
 	                 __int__getActive, 
-	                 __void__setActive__int);
+	                 0);
 	I_SimpleProperty(osg::Vec4, DebugColor, 
 	                 __osg_Vec4__getDebugColor, 
 	                 0);
@@ -232,9 +227,6 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_SimpleProperty(float, Length, 
 	                 __float__getLength, 
 	                 __void__setLength__float);
-	I_SimpleProperty(const char *, Plugin, 
-	                 __C5_char_P1__getPlugin, 
-	                 __void__setPlugin__C5_char_P1);
 	I_SimpleProperty(float, Radius, 
 	                 __float__getRadius, 
 	                 __void__setRadius__float);
@@ -250,6 +242,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(const char *, URI, 
+	                 __C5_char_P1__getURI, 
+	                 __void__setURI__C5_char_P1);
 	I_SimpleProperty(float, VUmeterFlag, 
 	                 __float__getVUmeterFlag, 
 	                 __void__setVUmeterFlag__float);
