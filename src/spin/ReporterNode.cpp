@@ -254,9 +254,12 @@ void ReporterNode::sendReports(reporterTarget *target)
 
             // make sure to provide a nodemask so that DEBUG nodes (eg, rayNode)
             // are not checked for intersections:
-            intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK|INTERACTIVE_NODE_MASK);
+            //intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK|INTERACTIVE_NODE_MASK);
+            //intersectVisitor.setTraversalMask(!DEBUGVIEW_NODE_MASK);
             
             sceneManager_->rootNode->accept(intersectVisitor);
+            
+            //std::cout << "checking containment with " << target->node->getID() << std::endl;
 
             // If there are some intersections, they could be with some other
             // objects within the target's hull, so we have to check all
@@ -274,9 +277,11 @@ void ReporterNode::sendReports(reporterTarget *target)
                     const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
                     for (int i=intersection.nodePath.size()-1; i>=0; i--)
                     {
+                        //std::cout << "testing node: " << intersection.nodePath[i]->getName() << std::endl;
                         ReferencedNode* testNode = dynamic_cast<ReferencedNode*>(intersection.nodePath[i]);
                         if (testNode==target->node.get())
                         {
+                            //std::cout << " yep. intersection. thus, NOT contained" << std::endl;
                             // the linesegment intersected our target, so we are
                             // outside the target's hull (not contained)
                             isContained = false;
@@ -287,6 +292,7 @@ void ReporterNode::sendReports(reporterTarget *target)
                 }
             } else
             {
+                //std::cout << "no intersections, so we are totally contained" << std::endl;
                 // if there are no intersections, it means that we are totally
                 // within the target's hull.
                 isContained = true;
