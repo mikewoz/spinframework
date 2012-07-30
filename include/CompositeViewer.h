@@ -49,6 +49,7 @@
 #include <osg/Timer>
 
 #include "dofppu.h"
+#include "ssaoppu.h"
 
 namespace spin
 {
@@ -72,6 +73,14 @@ class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
 {
     public:
+        // enum of the different PPU effects available
+        enum ppuEffect
+        {
+            noEffect = 0,
+            dofEffect,
+            ssaoEffect
+        };
+
         //! Default construcotr
         CompositeViewer(osg::ArgumentParser& args);
         
@@ -88,7 +97,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         void viewerInit();
 
         //! Setup osgppu for rendering
-        void initializePPU();
+        void initializePPU(unsigned int pEffect = noEffect);
 
         //! Update the frames
         void frame(double f = USE_REFERENCE_TIME);
@@ -111,6 +120,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         //int run();
 
         osg::ref_ptr<DoFRendering> dofPPU_;
+        osg::ref_ptr<SSAORendering> ssaoPPU_;
 
     private:
         osg::ref_ptr<osgPPU::Processor> mProcessor;
@@ -119,15 +129,24 @@ class CompositeViewer : public osgViewer::CompositeViewer
         //DoFRendering mDoFSetup;
         bool mbInitialized;
        
-	// navigation update stuff: 
+	    // navigation update stuff: 
         osg::Timer_t lastNavTick_;
-	float speedScaleValue_;
-	float moving_;
-	osg::Vec3 velocityScalars_;
-	osg::Vec3 spinScalars_;
+	    float speedScaleValue_;
+	    float moving_;
+	    osg::Vec3 velocityScalars_;
+	    osg::Vec3 spinScalars_;
 
+        osg::Camera* camera;
+ 
+        osg::ref_ptr<osg::Texture> colorTexture1_;
+        osg::ref_ptr<osg::Texture> colorTexture2_;
+        osg::ref_ptr<osg::Texture> colorTexture3_;
         osg::ref_ptr<osg::Texture> colorTexture_;
         osg::ref_ptr<osg::Texture> depthTexture_;
+
+        // Projection matrix from the first rendering,
+        // to be used in the PPU
+        osg::Matrixd mProjectionMatrix;
 };
 
 

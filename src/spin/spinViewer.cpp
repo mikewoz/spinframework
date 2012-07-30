@@ -94,7 +94,8 @@ int run(int argc, char **argv)
 	std::string userID;
 	bool picker = false;
 	bool mover = true;
-    
+   
+    bool ssao = false; 
     bool dof = false;
 	float speedScaleValue = 1.0;
 	float moving = false;
@@ -170,6 +171,7 @@ int run(int argc, char **argv)
     if (arguments.read("--fullscreen")) fullscreen=true;
     if (arguments.read("--hide-cursor")) hideCursor=true;
     if (arguments.read("--dof")) dof=true;
+    if (arguments.read("--ssao")) ssao=true;
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}
@@ -318,6 +320,10 @@ int run(int argc, char **argv)
 	    view->addEventHandler(new osgViewer::WindowSizeHandler);
         
         if (dof)
+        {
+            view->addEventHandler(new CustomResizeHandler(&viewer));
+        }
+        else if(ssao)
         {
             view->addEventHandler(new CustomResizeHandler(&viewer));
         }
@@ -511,8 +517,22 @@ int run(int argc, char **argv)
     if (dof)
     {
         viewer.frame();
-        viewer.initializePPU();
+        viewer.initializePPU(CompositeViewer::dofEffect);
         
+        // disable color clamping, because we want to work on real hdr values
+        osg::ClampColor* clamp = new osg::ClampColor();
+        clamp->setClampVertexColor(GL_FALSE);
+        clamp->setClampFragmentColor(GL_FALSE);
+        clamp->setClampReadColor(GL_FALSE);
+
+        // make it protected and override, so that it is done for the whole rendering pipeline
+        spin.sceneManager_->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+    }
+    else if(ssao)
+    {   
+        viewer.frame();
+        viewer.initializePPU(CompositeViewer::ssaoEffect);
+
         // disable color clamping, because we want to work on real hdr values
         osg::ClampColor* clamp = new osg::ClampColor();
         clamp->setClampVertexColor(GL_FALSE);
