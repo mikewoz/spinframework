@@ -58,6 +58,10 @@ namespace spin
 
 void spinTextNode::computeGlyphRepresentation()
 {
+
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
+
     using namespace osgText;
 
     Font* activefont = getActiveFont();
@@ -363,10 +367,19 @@ void spinTextNode::computeGlyphRepresentation()
     computeBackdropBoundingBox();
     computeBoundingBoxMargin();
     computeColorGradients();
+
+#else
+    osgText::Text::computeGlyphRepresentation();
+#endif
+#endif
+
 }
 
 osgText::String::iterator spinTextNode::computeLastCharacterOnLine(osg::Vec2& cursor, osgText::String::iterator first, osgText::String::iterator last)
 {
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
+
     using namespace osgText;
     
     Font* activefont = getActiveFont();
@@ -461,6 +474,11 @@ osgText::String::iterator spinTextNode::computeLastCharacterOnLine(osg::Vec2& cu
     }
     
     return lastChar;
+
+#else
+    return osgText::Text::computeLastCharacterOnLine(cursor, first, last);
+#endif
+#endif
 }
 
 
@@ -664,7 +682,16 @@ void TextNode::setAlignment (int alignment)
 void TextNode::setColor (float r, float g, float b, float a)
 {
 	color_ = osg::Vec4(r,g,b,a);
+
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
 	textLabel_->setColor( color_ );
+#else
+	osgText::Text* tt = dynamic_cast<osgText::Text*>(textLabel_.get());
+	if (tt) tt->setColor( color_ );
+#endif
+#endif
+
 	BROADCAST(this, "sffff", "setColor", r, g, b, a);
 }
 
@@ -796,7 +823,11 @@ void TextNode::drawText()
             spinTextNode *n = new spinTextNode();
             textLabel_ = n;
             //testLabel_ = new osgText::Text();
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
             n->setEnableDepthWrites(true);
+#endif
+#endif
         }
         
         osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
@@ -840,11 +871,28 @@ void TextNode::updateText()
 		textLabel_->setCharacterSize(characterSize_);
 		//textLabel_->setFont(0); // inbuilt font (small)
 		//textLabel_->setFont( sceneManager_->resourcesPath + "/fonts/" + font_ );
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
 		textLabel_->setFont( font_ );
+#else
+		osgText::Text* tt = dynamic_cast<osgText::Text*>(textLabel_.get());
+		if (tt) tt->setFont( font_ );
+#endif
+#endif
 		//textLabel_->setFontResolution(40,40);
         //textLabel_->setFontResolution(80,80);
         textLabel_->setFontResolution(resolution_,resolution_);
+
+#ifdef OSG_MIN_VERSION_REQUIRED
+#if OSG_MIN_VERSION_REQUIRED(3,0,0)
 		textLabel_->setColor( color_ );
+#else
+		tt = dynamic_cast<osgText::Text*>(textLabel_.get());
+		if (tt) tt->setColor( color_ );
+#endif
+#endif
+	
+
         
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(2,9,7)
