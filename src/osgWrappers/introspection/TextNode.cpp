@@ -91,7 +91,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
 	          "",
-	          "Returns the last stored nodepath (note: may have changed in current update traversal A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
+	          "A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
 	I_Method1(void, setDrawMode, IN, spin::TextNode::DrawMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setDrawMode__DrawMode,

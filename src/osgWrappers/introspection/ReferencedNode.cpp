@@ -69,16 +69,6 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
-	I_Method0(void, attach,
-	          Properties::NON_VIRTUAL,
-	          __void__attach,
-	          "",
-	          "The attach() method is used to properly add a node to the scene graph. Each node derived from ReferencedNode has an attachmentNode parameter that can be overridden in derived classes, but to keep code simple, this is the only this method that actually performs the attachment.In the default case, nodes should are attached directly to the parent ReferencedNode instance. ");
-	I_Method0(void, detach,
-	          Properties::NON_VIRTUAL,
-	          __void__detach,
-	          "",
-	          "The detach() method is removes a node from the scene graph, depending on it's attachment position (specified by attachmentNode). ");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
@@ -108,12 +98,17 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          Properties::NON_VIRTUAL,
 	          __void__detachFrom__C5_char_P1,
 	          "",
-	          "");
+	          "Detaches the node from the parentID (if found). Note: you can pass \"*\" for the parentID and the node will be detached from ALL parents. ");
+	I_Method0(bool, inGraph,
+	          Properties::NON_VIRTUAL,
+	          __bool__inGraph,
+	          "",
+	          "The inGraph method checks if the node is actually attached to the scene graph. There are cases (eg, SwitchNode or using detachFrom) that may cause a node to be orphaned (not attached anywhere). In these cases, reporters and pointers and anything that maintains a list of targets must check if the node is inGraph(). ");
 	I_Method0(unsigned int, getNumParents,
 	          Properties::NON_VIRTUAL,
 	          __unsigned_int__getNumParents,
 	          "",
-	          "Returns the current parent name (char*) Returns the current parent id (string) Returns the current parent as an osg::Group Returns the currently identified parent node: ");
+	          "");
 	I_Method1(std::string, getParentID, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __std_string__getParentID__int,
@@ -123,7 +118,7 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          Properties::NON_VIRTUAL,
 	          __ReferencedNode_P1__getParentNode__int,
 	          "",
-	          "Returns the osg::Group that this node is directly attached to (this is either the world node or the attachmentNode of one of the parents. Note that the indices may NOT be the same as the getParentNode method Returns the current parent as an osg::Group ");
+	          "Returns the current parent as an osg::Group ");
 	I_Method0(std::vector< spin::ReferencedNode * >, getChildren,
 	          Properties::NON_VIRTUAL,
 	          __std_vectorT1_ReferencedNode_P1___getChildren,
@@ -133,7 +128,7 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
 	          "",
-	          "Returns the last stored nodepath (note: may have changed in current update traversal A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
+	          "A node can 'belong' to a certain host machine, allowing it to be rendered or behave differently than on other machines.NOTE: the \"NULL\" string means that it belongs to no specific context.NOTE: a scene operating in SERVER_MODE will always create the node, so this feature is only really relevant for clients applications. ");
 	I_Method1(void, setAlpha, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setAlpha__float,

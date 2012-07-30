@@ -10,6 +10,7 @@
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
 
+#include <ReferencedNode.h>
 #include <SceneManager.h>
 #include <SwitchNode.h>
 
@@ -38,6 +39,11 @@ BEGIN_OBJECT_REFLECTOR(spin::SwitchNode)
 	          __void__setEnabled__C5_char_P1__int,
 	          "",
 	          "This enables/disables a child of a certain id ");
+	I_Method1(bool, isEnabled, IN, spin::ReferencedNode *, n,
+	          Properties::NON_VIRTUAL,
+	          __bool__isEnabled__ReferencedNode_P1,
+	          "",
+	          "Check if a particular node is a child and is enabled ");
 	I_Method1(void, setAll, IN, int, enabled,
 	          Properties::NON_VIRTUAL,
 	          __void__setAll__int,

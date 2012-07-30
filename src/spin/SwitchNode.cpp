@@ -51,6 +51,7 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "osgUtil.h"
+#include "ReporterNode.h"
 
 //extern SceneManager *sceneManager;
 
@@ -66,8 +67,6 @@ SwitchNode::SwitchNode (SceneManager *sceneManager, const char* initID) : GroupN
 
 	switcher = new osg::Switch();
 	switcher->setName(this->getID() + ".switcher");
-
-	std::cout << "creating switch node. attaching to " << this->getAttachmentNode()->getName() << std::endl;
 
 	// We inherit from GroupNode, so we must make sure to attach our osg Switch
 	// to the attachmentNode of GroupNode
@@ -110,6 +109,19 @@ void SwitchNode::setEnabled (const char* id, int enabled)
 			break;
 		}
 	}
+}
+
+
+bool SwitchNode::isEnabled (ReferencedNode* n)
+{
+    for (unsigned int i=0; i<switcher->getNumChildren(); i++)
+	{
+        osg::ref_ptr<ReferencedNode> test = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
+        if (n==test)
+        {
+            return (bool) switcher->getValue(i);
+        }
+    }
 }
 
 void SwitchNode::setAll(int enabled)

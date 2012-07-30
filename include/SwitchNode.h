@@ -78,12 +78,15 @@ public:
      */
     void setEnabled (const char* id, int enabled);
     
+    /**
+     * Check if a particular node is a child and is enabled
+     */
+    bool isEnabled (ReferencedNode* n);
 
     /**
      * Set all child noded to be either disabled or enabled
      */
     void setAll(int enabled);
-    
 
     /**
      * For each subclass of ReferencedNode, we override the getState() method to

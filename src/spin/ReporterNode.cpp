@@ -53,7 +53,7 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-ReporterNode::ReporterNode (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
+ReporterNode::ReporterNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
     this->setName(this->getID() + ".ReporterNode");
     this->setNodeType("ReporterNode");
@@ -98,36 +98,54 @@ void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
     ReferencedNode::callbackUpdate(nv);
 
     // only report from the server
-    if (spinApp::Instance().getContext()->isServer()) return;
+    if (!spinApp::Instance().getContext()->isServer()) return;
 
     // limit rate of updates:
     osg::Timer_t tick = osg::Timer::instance()->tick();
     float dt = osg::Timer::instance()->delta_s(lastTick,tick);
     if (dt > 1/maxRate_) // only update when dt is at least 0.05s (ie 20hz):
     {
-        bool needReport = false;
+		std::vector<reporterTarget>::iterator t;
 
 		osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath_);
 		if (matrix_!=mthis)
 		{
-			needReport = true;
+            for (t = targets_.begin(); t != targets_.end(); ++t)
+            {
+                if ((*t).node.valid())
+                    (*t).needReport = true;
+			}
 			matrix_ = mthis;
 		}
 
-		std::vector<reporterTarget>::iterator t;
 		for (t = targets_.begin(); t != targets_.end();)
 		{
 			if ((*t).node.valid())
 			{
 				osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath_);
 
-				// if there is a change in this node's matrix or the target, we need
-				// to send an updated report:
-				if (needReport || ((*t).matrix!=mtarget))
+				// if there is a change in this node's matrix or the target,
+                // we need to send an updated report:
+				if ((*t).matrix!=mtarget)
 				{
+					(*t).needReport = true;
 					(*t).matrix = mtarget;
-					sendReports(&(*t));
 				}
+                
+                // if the target is suddenly not in the graph anymore (or has
+                // re-appeared)... eg, because of SwitchNode, then we need to
+                // force a new report:
+                bool targetInGraph = (*t).node->inGraph();
+                if (targetInGraph != (*t).inGraph)
+                {
+                    (*t).needReport = true;
+                    (*t).inGraph = targetInGraph;
+                }
+                
+                // if anything flagged the need for a new report, let's do it:
+                if ((*t).needReport)
+                    sendReports(&(*t));
+                    
 				t++;
 			}
 
@@ -143,9 +161,18 @@ void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
 	}
 }
 
+void ReporterNode::forceAllReports()
+{
+    std::vector<reporterTarget>::iterator t;
+    for (t = targets_.begin(); t != targets_.end(); ++t)
+    {
+        sendReports(&(*t));
+    }
+}
+
 void ReporterNode::sendReports(reporterTarget *target)
 {
-	if (spinApp::Instance().getContext()->isServer()) return;
+	if (!spinApp::Instance().getContext()->isServer()) return;
 
 	// check that at least one report is required:
 	bool allDisabled = true;
@@ -154,7 +181,6 @@ void ReporterNode::sendReports(reporterTarget *target)
 	    if (i->second) allDisabled = false;
     }
 	if (allDisabled) return;
-
 
     std::vector<lo_message> msgs;
     lo_message msg;
@@ -177,9 +203,6 @@ void ReporterNode::sendReports(reporterTarget *target)
     osg::Vec3 snk_up    = snkQuat * osg::Z_AXIS;
 
     // NOTE: all output angles are in RADIANS!
-
-
-
 
     if (reporting_["DISTANCE"])
     {
@@ -243,10 +266,19 @@ void ReporterNode::sendReports(reporterTarget *target)
     if (reporting_["CONTAINMENT"])
     {
         bool isContained = false;
+
+        //std::cout << "checking containment with " << target->node->getID() << " inGraph? " << target->inGraph << ", radius=" << target->node->getBound().radius() << ", dist=" << connection_vector.length() << std::endl;
+
+        // if the target is not in the graph, then we are obviously not
+        // contained
+        if (!target->inGraph)
+        {
+            isContained = false;
+        }
         
-        // only run the IntersectionVisitor if we are within the bounding radius
+        // run the IntersectionVisitor if we are within the bounding radius
         // of the target node:
-        if (connection_vector.length() < target->node->getBound().radius())
+        else if (connection_vector.length() < target->node->getBound().radius())
         {
             osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector =
                 new osgUtil::LineSegmentIntersector(srcTrans, snkTrans);
@@ -259,7 +291,6 @@ void ReporterNode::sendReports(reporterTarget *target)
             
             sceneManager_->rootNode->accept(intersectVisitor);
             
-            //std::cout << "checking containment with " << target->node->getID() << std::endl;
 
             // If there are some intersections, they could be with some other
             // objects within the target's hull, so we have to check all
@@ -277,7 +308,6 @@ void ReporterNode::sendReports(reporterTarget *target)
                     const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
                     for (int i=intersection.nodePath.size()-1; i>=0; i--)
                     {
-                        //std::cout << "testing node: " << intersection.nodePath[i]->getName() << std::endl;
                         ReferencedNode* testNode = dynamic_cast<ReferencedNode*>(intersection.nodePath[i]);
                         if (testNode==target->node.get())
                         {
@@ -298,6 +328,7 @@ void ReporterNode::sendReports(reporterTarget *target)
                 isContained = true;
             }
         }
+
         
         // check for change in containment, and if so, send a message:
         if (target->contained != isContained)
@@ -307,9 +338,8 @@ void ReporterNode::sendReports(reporterTarget *target)
             lo_message_add(msg, "ssi", "containedBy", target->node->getID().c_str(), (int)target->contained);
             msgs.push_back(msg);
         }
-
     }
-
+    
     if (reporting_["OCCLUSION"])
     {
     	// TODO
@@ -317,6 +347,8 @@ void ReporterNode::sendReports(reporterTarget *target)
 
     if (msgs.size())
     	spinApp::Instance().NodeBundle(this->getID(), msgs);
+        
+    target->needReport = false;
 }
 
 // *****************************************************************************
@@ -347,6 +379,7 @@ void ReporterNode::addTarget (const char *targetID)
     newTarget.node = n.get();
     newTarget.matrix = osg::computeLocalToWorld(n->currentNodePath_);
     newTarget.contained = false;
+    newTarget.needReport = true;
     targets_.push_back(newTarget);
 
 

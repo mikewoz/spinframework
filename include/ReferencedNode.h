@@ -138,7 +138,6 @@ public:
     ~ReferencedNode();
 
     virtual void registerNode(SceneManager *s);
-    //void registerNode(std::string sceneID);
 
     /**
      * For nodes that require regular programmatic control, there is a callback
@@ -151,22 +150,6 @@ public:
      * the actual change in the SceneManager::updateGraph() method.
      */
     virtual void callbackUpdate(osg::NodeVisitor* nv);
-
-    /**
-     * The attach() method is used to properly add a node to the scene graph.
-     * Each node derived from ReferencedNode has an attachmentNode parameter that
-     * can be overridden in derived classes, but to keep code simple, this is
-     * the only this method that actually performs the attachment.
-     *
-     * In the default case, nodes should are attached directly to the parent
-     * ReferencedNode instance.
-     */
-    void attach();
-    /**
-     * The detach() method is removes a node from the scene graph, depending on
-     * it's attachment position (specified by attachmentNode).
-     */
-    void detach();
 
     /**
      * IMPORTANT:
@@ -203,27 +186,21 @@ public:
      */
     void attachTo (const char* parentID);
 
+    /**
+     * Detaches the node from the parentID (if found). Note: you can pass "*"
+     * for the parentID and the node will be detached from ALL parents.
+     */
     void detachFrom(const char* parentID);
-
+    
     /**
-     * Returns the current parent name (char*)
+     * The inGraph method checks if the node is actually attached to the scene
+     * graph. There are cases (eg, SwitchNode or using detachFrom) that may
+     * cause a node to be orphaned (not attached anywhere). In these cases, 
+     * reporters and pointers and anything that maintains a list of targets must
+     * check if the node is inGraph().
      */
-    //char* getParent() const { return parent_->s_name; }
-
-    /**
-     * Returns the current parent id (string)
-     */
-    //std::string getParentID(int i) const { return std::string(parent_->s_name); }
-
-    /**
-     * Returns the current parent as an osg::Group
-     */
-    //osg::Group* getParent(int i) { return osg::Group::getParent(i); }
-
-    /**
-     * Returns the currently identified parent node:
-     */
-    //ReferencedNode* getParentNode() { return dynamic_cast<ReferencedNode*>(parent_->s_thing); }
+    bool inGraph();
+    
 
     unsigned int getNumParents() const { return parentNodes_.size(); }
 
@@ -233,25 +210,12 @@ public:
     std::string getParentID(int i) const;
     
     /**
-     * Returns the osg::Group that this node is directly attached to (this is
-     * either the world node or the attachmentNode of one of the parents. Note
-     * that the indices may NOT be the same as the getParentNode method
-     */
-    //osg::Group* getParentAttachmentNode(int i);
-    
-    /**
      * Returns the current parent as an osg::Group
      */
     ReferencedNode* getParentNode(int i);
     
 
     std::vector<ReferencedNode*> getChildren();
-
-    /**
-     * Returns the last stored nodepath (note: may have changed in current
-     * update traversal
-     */
-    //osg::NodePath getNodePath();
 
     /**
      * A node can 'belong' to a certain host machine, allowing it to be rendered
@@ -359,31 +323,14 @@ public:
 
     void setNodeType(std::string t) { nodeType_ = t; }
 
-
     SceneManager *sceneManager_;
-
 
  private:
     t_symbol *id_;
     std::string nodeType_;
-
     std::string contextString_;
-
-    //lo_method oscHandler_;
-
-    //t_symbol *parent_, *newParent_;
-    
     nodeListType parentNodes_;
-    
-    
-    
-
-
     float subgraphAlpha_;
-
-
-    //std::vector<ReferencedNode*> children_;
-
 
     /**
      * The node that children get attached to:
@@ -392,14 +339,10 @@ public:
      */
     osg::Group *attachmentNode_;
 
-
     stringParamType stringParams_;
     floatParamType floatParams_;
 
-
     t_symbol* stateset_;
-    
-    
     
     std::string _scriptFile;
 #ifndef DISABLE_PYTHON

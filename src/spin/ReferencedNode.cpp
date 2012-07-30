@@ -53,6 +53,7 @@
 #include "spinServerContext.h"
 #include "SceneManager.h"
 #include "ReferencedNode.h"
+#include "SwitchNode.h"
 
 #include <cppintrospection/Value>
 #include <cppintrospection/Type>
@@ -160,88 +161,6 @@ void ReferencedNode::callbackUpdate(osg::NodeVisitor* nv)
     callCronScripts();
 }
 
-void ReferencedNode::attach()
-{
-    std::cout << "something called ReferencedNode::attach()" << std::endl;
-    return;
-/*
-    if (this->newParent_ == NULL_SYMBOL)
-        return;
-
-    pthread_mutex_lock(&sceneMutex);
-	
-    osg::ref_ptr<ReferencedNode> newParentNode = dynamic_cast<ReferencedNode*>(newParent_->s_thing);
-
-    // if the parent is invalid (which will be the case, for example, if the user
-    // specified 'world' as the parent), we attach to the worldNode:
-    if (! newParentNode.valid())
-    {
-        if (! (sceneManager_->worldNode->containsNode(this)))
-            sceneManager_->worldNode->addChild(this);
-        this->newParent_ = WORLD_SYMBOL;
-    }
-    // Otherwise attach to the parent:
-    else
-    {
-        if (! (newParentNode->attachmentNode_->containsNode(this)))
-        {
-            newParentNode->attachmentNode_->addChild(this);
-        }
-    }
-
-    pthread_mutex_unlock(&sceneMutex);
-
-    // remove node from current parent (make sure to release the mutex first!)
-    if (this->parent_ != this->newParent_)
-    {
-        this->detach();
-    }
-
-    // update the new parent symbols:
-    this->parent_ = this->newParent_;
-    this->newParent_ = NULL_SYMBOL;
-
-    // update currentNodePath_:
-    this->updateNodePath();
-
-    // broadcast this change to any remote clients:
-    BROADCAST(this, "ss", "setParent", this->parent_->s_name);
-
-    // send a parentChange message to clients who are only listening to scene
-    // messages (ie, they are not filtering every single node message).
-    // TODO: do this via TCP?
-    SCENE_MSG("sss", "parentChange", this->id_->s_name, this->parent_->s_name);
-*/
-}
-
-// removes this node from the scenegraph:
-void ReferencedNode::detach()
-{
-    std::cout << "something called ReferencedNode::detach()" << std::endl;
-    return;
-/*
-    pthread_mutex_lock(&sceneMutex);
-
-    if (parent_ == WORLD_SYMBOL)
-    {
-        if (sceneManager_->worldNode->containsNode(this))
-            sceneManager_->worldNode->removeChild(this);
-    }
-    else
-    {
-        osg::ref_ptr<ReferencedNode> pNode = dynamic_cast<ReferencedNode*>(parent_->s_thing);
-        if (pNode.valid())
-        {
-            if (pNode->attachmentNode_->containsNode(this))
-            {
-                pNode->attachmentNode_->removeChild(this);
-            }
-        }
-    }
-    pthread_mutex_unlock(&sceneMutex);
-*/
-}
-
 void ReferencedNode::attachTo (const char* parentID)
 {
     if ((getID()=="world") || (std::string(parentID) == "NULL"))
@@ -338,6 +257,34 @@ void ReferencedNode::detachFrom(const char* parentID)
             SCENE_MSG("ssss", "graphChange", "detach", this->getID().c_str(), parentID);
         }
     }
+}
+
+bool ReferencedNode::inGraph()
+{
+    // for each parent, do a recursive check:
+    nodeListType::iterator iter;
+    for (iter=parentNodes_.begin(); iter!=parentNodes_.end(); ++iter)
+    {
+        // if the parent is world, then this node is surely in the scene:
+        if ((*iter)->getID() == "world")
+            return true;
+            
+        // if the parent is a switch node, check if it is in the scene, but only
+        // if this node is enabled:
+        SwitchNode *sw = dynamic_cast<SwitchNode*>((*iter).get());
+        if (sw)
+        {
+            if ( (sw->isEnabled(this)) && (sw->inGraph()) )
+                return sw->inGraph();
+        }
+        
+        // for all other nodes, if the parent is in the scene, so are we:
+        else if ((*iter)->inGraph())
+            return true;
+    }
+
+    // no parents are in the scene, so we are not:
+    return false;
 }
 
 std::string ReferencedNode::getParentID(int i) const

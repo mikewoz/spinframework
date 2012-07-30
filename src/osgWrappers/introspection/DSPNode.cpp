@@ -68,12 +68,17 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::VIRTUAL,
 	          __void__setURI__C5_char_P1,
 	          "",
-	          "");
+	          "Set the media for the sound node using a URI pattern.Examples: file://soundfilename.wav file:///home/johndoe/soundfilename.wav http://www.server.com/soundfile.wav adc://1:1 adc://1 content://media/external/audio/media/710 mms://some_media_stream rtsp://127.0.0.1:12311 pd_plugin://audio_plugin_patch.pd ");
 	I_Method0(const char *, getURI,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getURI,
 	          "",
 	          "");
+	I_Method1(void, setActive, IN, int, i,
+	          Properties::VIRTUAL,
+	          __void__setActive__int,
+	          "",
+	          "Activate or deactivate the DSP processing ");
 	I_Method0(int, getActive,
 	          Properties::NON_VIRTUAL,
 	          __int__getActive,
@@ -211,7 +216,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          "");
 	I_SimpleProperty(int, Active, 
 	                 __int__getActive, 
-	                 0);
+	                 __void__setActive__int);
 	I_SimpleProperty(osg::Vec4, DebugColor, 
 	                 __osg_Vec4__getDebugColor, 
 	                 0);
