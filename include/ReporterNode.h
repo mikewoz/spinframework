@@ -42,7 +42,7 @@
 #ifndef ReporterNode_H_
 #define ReporterNode_H_
 
-#include "ReferencedNode.h"
+#include "GroupNode.h"
 #include <osg/Timer>
 
 namespace spin
@@ -51,7 +51,9 @@ namespace spin
 typedef struct _reporterTarget {
     osg::observer_ptr<ReferencedNode> node;
     osg::Matrix matrix;
-    bool contained;
+    bool contained; // is the target currently contained?
+    bool needReport; // has it changed and needs a report to be sent? 
+    bool inGraph; // is it attached to the scenegraph?
 } reporterTarget;
 
 /**
@@ -80,7 +82,7 @@ typedef struct _reporterTarget {
  *
  */
 
-class ReporterNode : public ReferencedNode
+class ReporterNode : public GroupNode
 {
 
 public:
@@ -97,6 +99,14 @@ public:
      * sendReports()
      */
     virtual void callbackUpdate(osg::NodeVisitor* nv);
+
+    /**
+     * Sometimes something happens in the scene that might not change the
+     * matrices of the reporter or the target (eg, a SwitchNode changes the
+     * visibility of the node). This method allows us to force a recomputation
+     * of all reports in such a case.
+     */
+    void forceAllReports();
 
     /**
      * sendReports checks which reportTypes are enabled, and actually performs
