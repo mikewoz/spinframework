@@ -113,6 +113,7 @@ fi
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
   #AC_LANG_DEFINES_PROVIDED # remove autogen.sh warnings on OSX
+  AM_CONDITIONAL([HAVE_OSX], true)
   LIBTOOL="glibtool"
   SRCDIR=`pwd`
   #LIBTOOL="libtool"

@@ -173,13 +173,15 @@ libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
 
-# # On OSX, we need the python module to have a .so extension, but the -shrext option
-# # doesn't work with glibtool, so we make a symbolic link in an install hook instead.
-# # On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
-# # do this only for OSX?
-# install-exec-hook:
-#     cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
-# 
+# On OSX, we need the python module to have a .so extension, but the -shrext option
+# doesn't work with glibtool, so we make a symbolic link in an install hook instead.
+# On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
+# do this only for OSX?
+if HAVE_OSX
+install-exec-hook:
+	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+endif
+
 # #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
 endif
 
