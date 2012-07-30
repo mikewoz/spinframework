@@ -323,6 +323,10 @@ int run(int argc, char **argv)
         {
             view->addEventHandler(new CustomResizeHandler(&viewer));
         }
+        else if(ssao)
+        {
+            view->addEventHandler(new CustomResizeHandler(&viewer));
+        }
 
 	    view->addEventHandler(new osgViewer::HelpHandler(arguments.getApplicationUsage()));
 	    view->addEventHandler( new osgGA::StateSetManipulator(view->getCamera()->getOrCreateStateSet()) );
@@ -526,7 +530,6 @@ int run(int argc, char **argv)
     }
     else if(ssao)
     {   
-        std::cout << "SSAO effect activated!" << std::endl;
         viewer.frame();
         viewer.initializePPU(CompositeViewer::ssaoEffect);
 

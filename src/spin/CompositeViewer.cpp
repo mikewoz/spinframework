@@ -193,9 +193,7 @@ void CompositeViewer::viewerInit()
 //! Setup osgppu for rendering
 void CompositeViewer::initializePPU(unsigned int pEffect)
 {
-    std::cout << "Effect: " << pEffect << std::endl;
-
-   // if already initialized then just do nothing
+    // if already initialized then just do nothing
     if (mbInitialized == false)
         mbInitialized = true;
     else
@@ -236,7 +234,6 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
     }
     else if(pEffect == ssaoEffect)
     {   
-        std::cout << "SSAO initialized!" << std::endl;
         ssaoPPU_ = new SSAORendering();
         // Gets the projection matrix
         osg::Matrixf lProjectionMatrix = camera->getProjectionMatrix();

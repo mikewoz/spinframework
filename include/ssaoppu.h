@@ -19,12 +19,21 @@
 class SSAORendering : virtual public osg::Referenced
 {
     private:
-        osgPPU::ShaderAttribute* ssaoShaderAttr;    
+        float dofGaussSigma;
+        float dofGaussRadius;
+
+        osgPPU::ShaderAttribute* ssaoShaderAttr;
+        osgPPU::ShaderAttribute* gaussx;
+        osgPPU::ShaderAttribute* gaussy;
+        osgPPU::ShaderAttribute* compositeAttr;
+    
 
     public:
         /********************/
         SSAORendering()
         {
+            dofGaussSigma = 1.5f;
+            dofGaussRadius = 3.0f;
         }
 
         /*******************/
@@ -40,8 +49,7 @@ class SSAORendering : virtual public osg::Referenced
         {
             double fovy, aspect, lNear, lFar;
             pProjMat.getPerspective(fovy, aspect, lNear, lFar);
-            std::cout << "zNear: " << lNear << " - zFar: " << lFar << std::endl;
-                        
+        
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
@@ -90,35 +98,110 @@ class SSAORendering : virtual public osg::Referenced
             pParent->addChild(lDepth);
 
             // And the unit to apply our shader
-            osgPPU::Unit* ssao = new osgPPU::UnitInOut();
+            osgPPU::UnitInOut* ssao = new osgPPU::UnitInOut();
             ssao->setName("ssao");
             
-            // Setup the shader
+            // Setup the ssao shader
             ssaoShaderAttr = new osgPPU::ShaderAttribute();
-            ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", vertexOptions.get()));
-            ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
-            ssaoShaderAttr->setName("ssaoShader");
+            {
+                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", vertexOptions.get()));
+                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
+                ssaoShaderAttr->setName("ssaoShader");
 
-            ssaoShaderAttr->add("vPower", osg::Uniform::FLOAT);
-            ssaoShaderAttr->add("vPixelSize", osg::Uniform::FLOAT);
-            ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
-            ssaoShaderAttr->add("vFar", osg::Uniform::FLOAT);
-            ssaoShaderAttr->add("vProjectionMatrix", osg::Uniform::FLOAT_MAT4);
+                ssaoShaderAttr->add("vPower", osg::Uniform::FLOAT);
+                ssaoShaderAttr->add("vPixelSize", osg::Uniform::FLOAT);
+                ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
+                ssaoShaderAttr->add("vFar", osg::Uniform::FLOAT);
+                ssaoShaderAttr->add("vProjectionMatrix", osg::Uniform::FLOAT_MAT4);
+                ssaoShaderAttr->add("vInvProjectionMatrix", osg::Uniform::FLOAT_MAT4);
 
-            ssaoShaderAttr->set("vPixelSize", 1.f);
-            ssaoShaderAttr->set("vNear", (float)lNear);
-            ssaoShaderAttr->set("vFar", (float)lFar);
-            ssaoShaderAttr->set("vProjectionMatrix", pProjMat);
+                ssaoShaderAttr->set("vPixelSize", 1.f);
+                ssaoShaderAttr->set("vNear", (float)lNear);
+                ssaoShaderAttr->set("vFar", (float)lFar);
+                ssaoShaderAttr->set("vProjectionMatrix", pProjMat);
+                ssaoShaderAttr->set("vInvProjectionMatrix", osg::Matrixf::inverse(pProjMat));
 
-            ssao->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);
-            ssao->setInputTextureIndexForViewportReference(0);
+                ssao->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);
+                ssao->setInputTextureIndexForViewportReference(0);
 
-            ssao->setInputToUniform(lColor1, "vColor1", true);
-            ssao->setInputToUniform(lColor2, "vColor2", true);
-            ssao->setInputToUniform(lColor3, "vColor3", true);
-            ssao->setInputToUniform(lNoise, "vNoiseMap", true);
-            ssao->setInputToUniform(lDepth, "vDepth", true);
+                //ssao->setInputToUniform(lColor1, "vColor1", true);
+                ssao->setInputToUniform(lColor2, "vColor2", true);
+                ssao->setInputToUniform(lColor3, "vColor3", true);
+                ssao->setInputToUniform(lNoise, "vNoiseMap", true);
+                ssao->setInputToUniform(lDepth, "vDepth", true);
+            }
 
-            pLastUnit = ssao;
+            // Now we will filter the ssao as it's quite noisy
+            gaussx = new osgPPU::ShaderAttribute();
+            gaussy = new osgPPU::ShaderAttribute();
+            {
+                // read shaders from file
+                osg::Shader* vshader = osgDB::readShaderFile("gauss_convolution_vp.glsl", vertexOptions.get());
+                osg::Shader* fhshader = osgDB::readShaderFile("gauss_convolution_1Dx_fp.glsl", fragmentOptions.get());
+                osg::Shader* fvshader = osgDB::readShaderFile("gauss_convolution_1Dy_fp.glsl", fragmentOptions.get());
+
+                // setup horizontal blur shaders
+                gaussx->addShader(vshader);
+                gaussx->addShader(fhshader);
+                gaussx->setName("BlurHorizontalShader");
+
+                gaussx->add("sigma", osg::Uniform::FLOAT);
+                gaussx->add("radius", osg::Uniform::FLOAT);
+                gaussx->add("texUnit0", osg::Uniform::SAMPLER_2D);
+
+                gaussx->set("sigma", dofGaussSigma);
+                gaussx->set("radius", dofGaussRadius);
+                gaussx->set("texUnit0", 0);
+
+                // setup vertical blur shaders
+                gaussy->addShader(vshader);
+                gaussy->addShader(fvshader);
+                gaussy->setName("BlurVerticalShader");
+
+                gaussy->add("sigma", osg::Uniform::FLOAT);
+                gaussy->add("radius", osg::Uniform::FLOAT);
+                gaussy->add("texUnit0", osg::Uniform::SAMPLER_2D);
+
+                gaussy->set("sigma", dofGaussSigma);
+                gaussy->set("radius", dofGaussRadius);
+                gaussy->set("texUnit0", 0);
+            }
+
+            osgPPU::UnitInOut* blurxlight = new osgPPU::UnitInOut();
+            osgPPU::UnitInOut* blurylight = new osgPPU::UnitInOut();
+            {
+                // set name and indicies
+                blurxlight->setName("BlurHorizontalLight");
+                blurylight->setName("BlurVerticalLight");
+
+                //blurxlight->setShader(gaussx);
+                //blurylight->setShader(gaussy);
+                blurxlight->getOrCreateStateSet()->setAttributeAndModes(gaussx);
+                blurylight->getOrCreateStateSet()->setAttributeAndModes(gaussy);
+            }
+            ssao->addChild(blurxlight);
+            blurxlight->addChild(blurylight);
+
+            // Last step: multiplication of the SSAO and the previous rendering
+            osgPPU::Unit* composite = new osgPPU::UnitInOut();
+            compositeAttr = new osgPPU::ShaderAttribute();
+            {
+                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_vp.glsl", vertexOptions.get()));
+                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_fp.glsl", fragmentOptions.get()));
+                compositeAttr->setName("compositeSSAO");
+
+                compositeAttr->add("vSSAO", osg::Uniform::SAMPLER_2D);
+                compositeAttr->add("vColor", osg::Uniform::SAMPLER_2D);
+
+                //compositeAttr->set("vSSAO", 0);
+                
+                composite->getOrCreateStateSet()->setAttributeAndModes(compositeAttr);
+
+                composite->setInputToUniform(blurylight, "vSSAO", true);
+                composite->setInputToUniform(lColor1, "vColor", true);
+            }
+            blurylight->addChild(composite);
+
+            pLastUnit = composite;
         }
 };
