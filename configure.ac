@@ -132,6 +132,9 @@ case "$host" in *-darwin* | *-macos10*)
   #PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH:$SRCDIR/pkgconfig/osx
   #export PKG_CONFIG_PATH
   ;;
+*)
+  AM_CONDITIONAL([HAVE_OSX], false)
+  ;;
 esac
 
 # On OSX, /usr/local/lib/pkgconfig is not included, and the 64-bit linux path is
