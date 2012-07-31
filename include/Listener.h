@@ -73,6 +73,10 @@ class Listener : public DSPNode
          */
         virtual std::vector<lo_message> getState() const;
         
+        // override some methods so that we can send them to SpatOSC:
+        virtual void setParam (const char *paramName, const char *paramValue);
+        virtual void setParam (const char *paramName, float paramValue);
+
         virtual void setURI (const char *uri);
         
     private:

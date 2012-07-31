@@ -38,6 +38,16 @@ BEGIN_OBJECT_REFLECTOR(spin::Listener)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_Method2(void, setParam, IN, const char *, paramName, IN, const char *, paramValue,
+	          Properties::VIRTUAL,
+	          __void__setParam__C5_char_P1__C5_char_P1,
+	          "",
+	          "");
+	I_Method2(void, setParam, IN, const char *, paramName, IN, float, paramValue,
+	          Properties::VIRTUAL,
+	          __void__setParam__C5_char_P1__float,
+	          "",
+	          "");
 	I_Method1(void, setURI, IN, const char *, uri,
 	          Properties::VIRTUAL,
 	          __void__setURI__C5_char_P1,
