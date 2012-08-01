@@ -223,6 +223,6 @@ spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG
 ###############################################################################
 # CUSTOM targets:
 
-doc:
+doc: spindocgenerator
 	./spindocgenerator
 	-cp *.html ../../doxygen/html
