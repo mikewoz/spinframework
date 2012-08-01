@@ -42,7 +42,7 @@ void main(void)
 {
     // Settings
     const float ssaoFocus = 6.0;
-    const float ssaoPower = 4.0;
+    const float ssaoPower = 2.0;
     const int ssaoLoops = 32;
     const float invSamples = 1.0/float(ssaoLoops);
 
@@ -101,7 +101,7 @@ void main(void)
             dist = 1.0/dist;
 
             vec3 lFragNorm = normalize(texture2D(vNormal, screenPos.xy).xyz * 2.0 - 1.0);
-            lWeight = smoothStep(-1.0, 1.0, dot(lFragNorm,lNormal));     
+            lWeight = smoothStep(-0.5, 1.0, dot(lFragNorm,lNormal));     
 
             float lDiff = linearizeDepth(lScreenDepth) - linearizeDepth(dist);
             // If the ray hits behind the fragment (from the camera position)

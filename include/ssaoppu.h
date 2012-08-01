@@ -149,10 +149,10 @@ class SSAORendering : virtual public osg::Referenced
                 ssao->setInputTextureIndexForViewportReference(0);
 
                 //ssao->setInputToUniform(lColor1, "vColor1", true); // We don't need this anymore
-                ssao->setInputToUniform(lNormal, "vNormal", true);
-                ssao->setInputToUniform(lPosition, "vPosition", true);
+                ssao->setInputToUniform(lResampleNormal, "vNormal", true);
+                ssao->setInputToUniform(lResamplePosition, "vPosition", true);
                 ssao->setInputToUniform(lNoise, "vNoiseMap", true);
-                ssao->setInputToUniform(lDepth, "vDepth", true);
+                ssao->setInputToUniform(lResampleDepth, "vDepth", true);
             }
 
             // Now we will filter the ssao as it's quite noisy
@@ -206,8 +206,18 @@ class SSAORendering : virtual public osg::Referenced
             ssao->addChild(blurxlight);
             blurxlight->addChild(blurylight);
 
+            // Resample to match the color FBO
+            osgPPU::UnitInResampleOut* lResampleSSAO = new osgPPU::UnitInResampleOut();
+            {
+                lResampleSSAO->setName("ResampleSSAO");
+                lResampleSSAO->setFactorX(2.0f);
+                lResampleSSAO->setFactorY(2.0f);
+            }
+            blurylight->addChild(lResampleSSAO);
+
+
             // Last step: multiplication of the SSAO and the previous rendering
-            osgPPU::Unit* composite = new osgPPU::UnitInOut();
+            osgPPU::UnitInOut* composite = new osgPPU::UnitInOut();
             compositeAttr = new osgPPU::ShaderAttribute();
             {
                 compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_vp.glsl", vertexOptions.get()));
@@ -221,10 +231,10 @@ class SSAORendering : virtual public osg::Referenced
                 
                 composite->getOrCreateStateSet()->setAttributeAndModes(compositeAttr);
 
-                composite->setInputToUniform(blurylight, "vSSAO", true);
+                composite->setInputToUniform(lResampleSSAO, "vSSAO", true);
                 composite->setInputToUniform(lColor1, "vColor", true);
             }
-            blurylight->addChild(composite);
+            lResampleSSAO->addChild(composite);
 
             pLastUnit = composite;
         }
