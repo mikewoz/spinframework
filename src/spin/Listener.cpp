@@ -108,6 +108,28 @@ void Listener::callbackUpdate(osg::NodeVisitor* nv)
 #endif
 }
 
+void Listener::setParam (const char *paramName, const char *paramValue)
+{
+    ReferencedNode::setParam(paramName,paramValue);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCListener->setStringProperty(paramName, paramValue);
+    }
+#endif
+}
+
+void Listener::setParam (const char *paramName, float paramValue)
+{
+    ReferencedNode::setParam(paramName,paramValue);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCListener->setFloatProperty(paramName, paramValue);
+    }
+#endif
+}
+
 void Listener::setURI (const char *uri)
 {
     DSPNode::setURI(uri);
