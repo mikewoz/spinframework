@@ -74,11 +74,45 @@ class PPUProcessor : public osgPPU::Processor
     public:
         void onViewportChange()
         {
+            ((osgPPU::Processor*)this)->onViewportChange();
+            
+            osgPPU::Unit* lUnit = NULL;
             // Looking for units which care about the projection matrix
-            if(findUnit("ssao") != NULL)
+            if((lUnit = findUnit("ssao")) != NULL)
             {
+                const osg::Camera* lCamera = getCamera();
+                if(lCamera == NULL)
+                    return;
+                std::cout << "Camera OK" << std::endl;
+
+                /*osgPPU::ShaderAttribute* ssaoShaderAttr = new osgPPU::ShaderAttribute();
+                ssaoShaderAttr->add(("vProjectionMatrix"), osg::Uniform::FLOAT_MAT4);
+                ssaoShaderAttr->add(("vInvProjectionMatrix"), osg::Uniform::FLOAT_MAT4);
+
+                ssaoShaderAttr->set("vProjectionMatrix", lCamera->getProjectionMatrix());
+                ssaoShaderAttr->set("vInvProjectionMatrix", osg::Matrixf::inverse(lCamera->getProjectionMatrix()));
+
+                lUnit->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);*/
                 
-            }
+                osg::StateSet* lStateSet = lUnit->getOrCreateStateSet();
+                if(lStateSet == NULL)
+                    return;
+                std::cout << "lStateSet OK" << std::endl;
+
+                /*osg::Uniform* lProjMat = lUnit->getOrCreateStateSet()->getUniform("vProjectionMatrix");
+                if(lProjMat == NULL)
+                    return;
+                std::cout << "lProjMat OK" << std::endl; 
+
+                lProjMat->setElement(0, lCamera->getProjectionMatrix());
+
+                osg::Uniform* lInvProjMat = lUnit->getOrCreateStateSet()->getUniform("vInvProjectionMatrix");
+                if(lInvProjMat == NULL)
+                    return;
+                std::cout << "lInvProjMat OK" << std::endl;                
+
+                lInvProjMat->setElement(0, osg::Matrixf::inverse(lCamera->getProjectionMatrix()));*/
+            } 
         }
 };
 
@@ -182,11 +216,44 @@ public:
                 osgPPU::Camera::resizeViewport(0,0, ea.getWindowWidth(), ea.getWindowHeight(), viewer->getView(0)->getCamera());
                 
                 // Get the previous projection matrix information
-                //double fovy, aspect, lNear, lFar;
-                //viewer->getView(0)->getCamera()->getProjectionMatrix().getPerspective(fovy, aspect, lNear, lFar);
-                //viewer->getView(0)->getCamera()->setProjectionMatrixAsPerspective(fovy, ea.getWindowWidth()/ea.getWindowHeight(), lNear, lFar);
+                double fovy, aspect, lNear, lFar;
+                viewer->getView(0)->getCamera()->getProjectionMatrixAsPerspective(fovy, aspect, lNear, lFar);
+                viewer->getView(0)->getCamera()->setProjectionMatrixAsPerspective(fovy, ea.getWindowWidth()/ea.getWindowHeight(), lNear, lFar);
 
-                viewer->getProcessor()->onViewportChange();
+                osgPPU::Processor* lProcessor = viewer->getProcessor();
+                lProcessor->onViewportChange();
+
+                osgPPU::Unit* lUnit = NULL;
+
+                lUnit = lProcessor->findUnit("ssao");
+                if(lUnit)
+                {
+                    osg::Matrixf lProjMat = viewer->getView(0)->getCamera()->getProjectionMatrix();
+
+                    osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
+                    osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
+
+                    osgPPU::ShaderAttribute* ssaoShaderAttr = new osgPPU::ShaderAttribute();
+
+                    ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", vertexOptions.get()));
+                    ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
+                    ssaoShaderAttr->setName("ssaoShader");
+
+                    ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
+                    ssaoShaderAttr->add("vFar", osg::Uniform::FLOAT);
+                    ssaoShaderAttr->add("vProjectionMatrix", osg::Uniform::FLOAT_MAT4);
+                    ssaoShaderAttr->add("vInvProjectionMatrix", osg::Uniform::FLOAT_MAT4);
+
+                    ssaoShaderAttr->set("vNear", (float)lNear);
+                    ssaoShaderAttr->set("vFar", (float)lFar);
+                    ssaoShaderAttr->set("vProjectionMatrix", lProjMat);
+                    ssaoShaderAttr->set("vInvProjectionMatrix", osg::Matrixf::inverse(lProjMat));
+
+                    lUnit->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);
+
+                    lProcessor->dirtyUnitSubgraph();
+                }
+                
                 break;
             }
             default:

@@ -16,19 +16,6 @@
 /**********************************************/
 // PPU setup for SSAO (ambient occlusion) rendering
 /**********************************************/
-class SSAOUnit : public osgPPU::UnitInOut
-{
-    protected:
-        void updateUniforms()
-        {
-            osg::Uniform* lProjMat = this->getOrCreateStateSet()->getUniform("vProjectionMatrix");
-            osg::Uniform* lInvProjMat = this->getOrCreateStateSet()->getUniform("vInvProjectionMatrix");
-        }
-
-    private:
-        osg::Matrixf mProjMatrix;
-};
-
 class SSAORendering : virtual public osg::Referenced
 {
     private:
@@ -148,14 +135,11 @@ class SSAORendering : virtual public osg::Referenced
                 ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
                 ssaoShaderAttr->setName("ssaoShader");
 
-                ssaoShaderAttr->add("vPower", osg::Uniform::FLOAT);
-                ssaoShaderAttr->add("vPixelSize", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vFar", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vProjectionMatrix", osg::Uniform::FLOAT_MAT4);
                 ssaoShaderAttr->add("vInvProjectionMatrix", osg::Uniform::FLOAT_MAT4);
 
-                ssaoShaderAttr->set("vPixelSize", 1.f);
                 ssaoShaderAttr->set("vNear", (float)lNear);
                 ssaoShaderAttr->set("vFar", (float)lFar);
                 ssaoShaderAttr->set("vProjectionMatrix", pProjMat);

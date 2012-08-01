@@ -5,7 +5,6 @@ uniform sampler2D vPosition;
 uniform sampler2D vNoiseMap;
 uniform sampler2D vDepth;
 
-uniform float vPixelSize;
 uniform float vNear;
 uniform float vFar;
 uniform mat4 vProjectionMatrix;
