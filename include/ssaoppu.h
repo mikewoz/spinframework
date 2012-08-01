@@ -16,6 +16,19 @@
 /**********************************************/
 // PPU setup for SSAO (ambient occlusion) rendering
 /**********************************************/
+class SSAOUnit : public osgPPU::UnitInOut
+{
+    protected:
+        void updateUniforms()
+        {
+            osg::Uniform* lProjMat = this->getOrCreateStateSet()->getUniform("vProjectionMatrix");
+            osg::Uniform* lInvProjMat = this->getOrCreateStateSet()->getUniform("vInvProjectionMatrix");
+        }
+
+    private:
+        osg::Matrixf mProjMatrix;
+};
+
 class SSAORendering : virtual public osg::Referenced
 {
     private:
@@ -44,7 +57,7 @@ class SSAORendering : virtual public osg::Referenced
 
         /*******************/
         void createSSAOPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit,
-                                osg::Texture* pColor1, osg::Texture* pColor2, osg::Texture* pColor3,
+                                osg::Texture* pColor1, osg::Texture* pNormal, osg::Texture* pPosition,
                                 osg::Matrixf pProjMat)
         {
             double fovy, aspect, lNear, lFar;
@@ -61,21 +74,39 @@ class SSAORendering : virtual public osg::Referenced
             // Now we are ready for the PPU
             // The first unit gets the first color buffer
             osgPPU::UnitTexture* lColor1 = new osgPPU::UnitTexture();
-            lColor1->setName("Color1");
+            lColor1->setName("Color");
             lColor1->setTexture(pColor1);
             pParent->addChild(lColor1);
 
             // The second unit gets the second color buffer
-            osgPPU::UnitTexture* lColor2 = new osgPPU::UnitTexture();
-            lColor2->setName("Color2");
-            lColor2->setTexture(pColor2);
-            pParent->addChild(lColor2);
+            osgPPU::UnitTexture* lNormal = new osgPPU::UnitTexture();
+            lNormal->setName("Normal");
+            lNormal->setTexture(pNormal);
+            pParent->addChild(lNormal);
+            
+            // We dowmsample the normals
+            osgPPU::UnitInResampleOut* lResampleNormal = new osgPPU::UnitInResampleOut();
+            {
+                lResampleNormal->setName("ResampleNormal");
+                lResampleNormal->setFactorX(0.5f);
+                lResampleNormal->setFactorY(0.5f);
+            }
+            lNormal->addChild(lResampleNormal);
 
             // The third unit gets the third color buffer
-            osgPPU::UnitTexture* lColor3 = new osgPPU::UnitTexture();
-            lColor3->setName("Color3");
-            lColor3->setTexture(pColor3);
-            pParent->addChild(lColor3);
+            osgPPU::UnitTexture* lPosition = new osgPPU::UnitTexture();
+            lPosition->setName("Position");
+            lPosition->setTexture(pPosition);
+            pParent->addChild(lPosition);
+
+            // As well as the position
+            osgPPU::UnitInResampleOut* lResamplePosition = new osgPPU::UnitInResampleOut();
+            {
+                lResamplePosition->setName("ResamplePosition");
+                lResamplePosition->setFactorX(0.5f);
+                lResamplePosition->setFactorY(0.5f);
+            }
+            lPosition->addChild(lResamplePosition);
 
             // The fourth unit gets the noise texture
             // It is read from an image file
@@ -96,6 +127,15 @@ class SSAORendering : virtual public osg::Referenced
             osgPPU::UnitDepthbufferBypass* lDepth = new osgPPU::UnitDepthbufferBypass();
             lDepth->setName("Depth");
             pParent->addChild(lDepth);
+
+            // As well as the position
+            osgPPU::UnitInResampleOut* lResampleDepth = new osgPPU::UnitInResampleOut();
+            {
+                lResampleDepth->setName("ResampleDepth");
+                lResampleDepth->setFactorX(0.5f);
+                lResampleDepth->setFactorY(0.5f);
+            }
+            lDepth->addChild(lResampleDepth);
 
             // And the unit to apply our shader
             osgPPU::UnitInOut* ssao = new osgPPU::UnitInOut();
@@ -124,9 +164,9 @@ class SSAORendering : virtual public osg::Referenced
                 ssao->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);
                 ssao->setInputTextureIndexForViewportReference(0);
 
-                //ssao->setInputToUniform(lColor1, "vColor1", true);
-                ssao->setInputToUniform(lColor2, "vColor2", true);
-                ssao->setInputToUniform(lColor3, "vColor3", true);
+                //ssao->setInputToUniform(lColor1, "vColor1", true); // We don't need this anymore
+                ssao->setInputToUniform(lNormal, "vNormal", true);
+                ssao->setInputToUniform(lPosition, "vPosition", true);
                 ssao->setInputToUniform(lNoise, "vNoiseMap", true);
                 ssao->setInputToUniform(lDepth, "vDepth", true);
             }

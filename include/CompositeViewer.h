@@ -68,6 +68,20 @@ struct frustum
 #define VELOCITY_SCALAR 0.004
 #define SPIN_SCALAR 0.007
 
+// Subclass of osgPPU::Processor
+class PPUProcessor : public osgPPU::Processor
+{
+    public:
+        void onViewportChange()
+        {
+            // Looking for units which care about the projection matrix
+            if(findUnit("ssao") != NULL)
+            {
+                
+            }
+        }
+};
+
 
 class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
@@ -166,6 +180,12 @@ public:
             case (osgGA::GUIEventAdapter::RESIZE):
             {
                 osgPPU::Camera::resizeViewport(0,0, ea.getWindowWidth(), ea.getWindowHeight(), viewer->getView(0)->getCamera());
+                
+                // Get the previous projection matrix information
+                //double fovy, aspect, lNear, lFar;
+                //viewer->getView(0)->getCamera()->getProjectionMatrix().getPerspective(fovy, aspect, lNear, lFar);
+                //viewer->getView(0)->getCamera()->setProjectionMatrixAsPerspective(fovy, ea.getWindowWidth()/ea.getWindowHeight(), lNear, lFar);
+
                 viewer->getProcessor()->onViewportChange();
                 break;
             }
