@@ -1,12 +1,10 @@
 #version 120
 
-//uniform sampler2D vColor1;
-uniform sampler2D vColor2;
-uniform sampler2D vColor3;
+uniform sampler2D vNormal;
+uniform sampler2D vPosition;
 uniform sampler2D vNoiseMap;
 uniform sampler2D vDepth;
 
-uniform float vPixelSize;
 uniform float vNear;
 uniform float vFar;
 uniform mat4 vProjectionMatrix;
@@ -25,7 +23,7 @@ float linearizeDepth(in float pDepth)
 /**********************************/
 vec3 GetViewPos (in vec2 texCoord)
 {
-    float depth = texture2D(vColor3, texCoord.st).x;
+    float depth = texture2D(vPosition, texCoord.st).x;
     vec4 pos = vec4(texCoord.x, texCoord.y, depth, 1.0);
     pos.xyz = pos.xyz * 2.0 - 1.0;
     pos = osg_ProjectionMatrixInverse * pos;
@@ -33,29 +31,40 @@ vec3 GetViewPos (in vec2 texCoord)
 }
 
 /**********************************/
+float smoothStep(in float edge0, in float edge1, in float x)
+{
+    float t = clamp((x-edge0)/(edge1-edge0), 0.0, 1.0);
+    return t*t*(3.0-2.0*t);
+}
+
+/**********************************/
 void main(void)
 {
     // Settings
-    const float ssaoFocus = 0.5;
-    const float ssaoPower = 2.0;
+    const float ssaoFocus = 6.0;
+    const float ssaoPower = 3.0;
     const int ssaoLoops = 32;
+    const float invSamples = 1.0/float(ssaoLoops);
 
-    // Depth from the real depth buffer
-    float lDepth = texture2D(vDepth, texcoord).r;
+    vec3 lBufferPos, lBufferNorm;
 
     // View space normal
-    vec3 lNormal = normalize(texture2D(vColor2, texcoord.st).xyz * 2.0 - 1.0);
+    lBufferNorm = texture2D(vNormal, texcoord.st).xyz;
+    vec3 lNormal = normalize(lBufferNorm * 2.0 - 1.0);
 
     // View space position of the pixel
-    vec3 lPos = texture2D(vColor3, texcoord.st).xyz; //GetViewPos(texcoord.st);
+    vec3 lPos = texture2D(vPosition, texcoord.st).xyz; //GetViewPos(texcoord.st);
 
-    float lOcclusion, lWeight;
-
-    if(lDepth == 1.0)
-        lOcclusion = 1.0;
+    // These values shouldn't be equal. If they are, it means
+    // that the vNormal and vPosition textures were not rendered for
+    // this pixel
+    if(lBufferNorm == lPos)
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     else
     {
-        lPos.z = 1.f/lPos.z; 
+        float lOcclusion, lWeight;
+
+        lPos.z = 1.f/lPos.z;
 
         // Random value from the noise map
         vec2 modifier = texture2D(vNoiseMap, texcoord.st).xy + (lPos.xy + lPos.z);
@@ -67,7 +76,7 @@ void main(void)
         {
             // Retrieve a new random vector from the texture
             random = texture2D(vNoiseMap, modifier);
-            random.xyz = normalize(random.xyz * 2.0 - 1.0);
+            random.xyz = random.xyz * 2.0 - 1.0;
 
             // Randomize the modifier for the next loop
             modifier += random.xy;
@@ -79,50 +88,65 @@ void main(void)
             // Calculate the randomly offset position's screen space coordinates -- second most expensive operation
             screenPos = vProjectionMatrix * vec4(lPos, 1.0); 
             // Offset the screen position
-            screenPos.xyz = screenPos.xyz + random.xyz*ssaoFocus;
+            screenPos.xyz = screenPos.xyz + random.xyz*ssaoFocus*(noise1(lPos.z)*0.5+0.5);
             // Store the depth of the new position
             float lScreenDepth = (vInvProjectionMatrix*screenPos).z;
             screenPos.xyz /= -screenPos.w;
 
             // Get the depth at the screen space coordinates -- this is the most expensive operation
-            /*vec4 lFragPos = texture2D(vColor3, screenPos.xy * 0.5 + 0.5);
+            /*vec4 lFragPos = texture2D(vPosition, screenPos.xy * 0.5 + 0.5);
             lFragPos.z = 1.0/lFragPos.z;
             lFragPos = vProjectionMatrix * lFragPos;
             lFragPos.z /= -lFragPos.w;*/
+            screenPos.xy = screenPos.xy*0.5+0.5;
 
-            dist = texture2D(vColor3, screenPos.xy * 0.5 + 0.5).z;
+            lBufferPos = texture2D(vPosition, screenPos.xy).xyz;
+            dist = lBufferPos.z;
+            dist = 1.0/dist;
 
-            /*vec3 lFragNorm = texture2D(vColor2, screenPos.xy * 0.5 + 0.5).xyz * 2.0 - 1.0;
-            lWeight = 1.0-dot(lFragNorm,lNormal);*/
+            lBufferNorm = texture2D(vNormal, screenPos.xy).xyz;
+            vec3 lFragNorm = normalize(lBufferNorm * 2.0 - 1.0);
 
-
-            dist = 1.f/dist;
-
-            float lDiff = linearizeDepth(lScreenDepth) - linearizeDepth(dist);
-            // If the ray hits behind the fragment (from the camera position)
-
-            if(lDiff > 0 && lDiff < ssaoFocus/(vFar-vNear))
-            {
-                visibility += lDiff/(ssaoFocus/(vFar-vNear));
-            }
-            // else, if the ray hits in front of the fragment
+            // Same as before, we detect if the shader should use the data from
+            // this pixel
+            if(lBufferPos == lBufferNorm)
+                visibility += 1.0;
             else
             {
-                visibility += 1.0;
+
+                lWeight = smoothStep(-0.5, 1.0, dot(lFragNorm,lNormal));     
+
+                float lDiff = linearizeDepth(lScreenDepth) - linearizeDepth(dist);
+                // If the ray hits behind the fragment (from the camera position)
+
+                //if(abs(linearizeDepth(lPos.z) - linearizeDepth(dist)) < ssaoFocus/(vFar-vNear))
+                //    visibility += (linearizeDepth(dist) >= linearizeDepth(lScreenDepth)) ? 1.0 : 0.0;
+
+                visibility += min(abs(lDiff/(ssaoFocus/(vFar-vNear))) + lWeight, 1.0);
+                
+                /*if(lDiff > 0 && lDiff < 2.0*ssaoFocus/(vFar-vNear))
+                {
+                    visibility += min(lDiff/(ssaoFocus/(vFar-vNear)) + lWeight, 1.0);
+                }
+                // else, if the ray hits in front of the fragment
+                else
+                {
+                    visibility += 1.0;
+                }*/
             }
         }
 
         // Final occlusion factor
         //visibility = max(0.0, min(1.0, (visibility/float(ssaoLoops) - ssaoRescale)*1.5+ssaoRescale));
-        lOcclusion = 1.0 - pow(1.0 - visibility/float(ssaoLoops), ssaoPower);
+        lOcclusion = pow(visibility*invSamples, ssaoPower);
+
+        //gl_FragColor.rgb = texture2D(vColor1, texcoord.st).rgb;
+        //gl_FragColor.rgb = texture2D(vNormal, texcoord.st).rgb;
+        //gl_FragColor.rgb = vec3(texture2D(vPosition, texcoord.st).rgb);
+        //gl_FragColor.rgb = texture2D(vNoiseMap, texcoord*2).rgb;
+
+        gl_FragColor.rgb = vec3(lOcclusion);
+
+        gl_FragColor.a = 1.f;
     }
-
-    //gl_FragColor.rgb = texture2D(vColor1, texcoord.st).rgb;
-    //gl_FragColor.rgb = texture2D(vColor2, texcoord.st).rgb*2.0-1.0;
-    //gl_FragColor.rgb = vec3(texture2D(vColor3, texcoord.st).rgb);
-    //gl_FragColor.rgb = texture2D(vNoiseMap, texcoord*2).rgb;
-
-    gl_FragColor.rgb = vec3(lOcclusion);
-
-    gl_FragColor.a = 1.f;
 }
