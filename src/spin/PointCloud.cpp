@@ -41,7 +41,6 @@
 
 #include "config.h"
 
-#ifdef WITH_PCL
 
 #include <osg/Geode>
 #include <osg/BlendColor>
@@ -55,6 +54,7 @@
 #include <osgSim/LightPointNode>
 #include <osgDB/FileNameUtils>
 
+#ifdef WITH_PCL
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
@@ -62,6 +62,7 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/compression/octree_pointcloud_compression.h>
+#endif
 
 #include "PointCloud.h"
 #include "SceneManager.h"
@@ -74,7 +75,9 @@
 extern pthread_mutex_t sceneMutex;
 
 // TODO: grabberMutex should be a member right? .. what if there are >1 devices?
+#ifdef WITH_PCL
 static boost::mutex grabberMutex;
+#endif
 
 namespace spin
 {
@@ -92,12 +95,12 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     redrawFlag_ = false;
     
     maxPoints_ = 0;
-    grabber_ = 0;
     framerate_ = 0;
     path_ = "NULL";
     customNode_ = gensym("NULL");
     
     color_ = osg::Vec4(1.0,1.0,1.0,1.0);
+    colorMode_ = NORMAL;
     spacing_ = 1.0;
     randomCoeff_ = 0.0;
     pointSize_ = 1.0;
@@ -105,23 +108,30 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     voxelSize_ = 0.01f;
     distCrop_ = osg::Vec2(0.0,10.0);
     
+#ifdef WITH_PCL
+    grabber_ = 0;
+#endif
+    
 }
 
 // destructor
 PointCloud::~PointCloud()
 {
+#ifdef WITH_PCL
     if (grabber_)
     {
         grabber_->stop();
         grabber_ = 0;
     }
+#endif
 }
 // -----------------------------------------------------------------------------
 
 void PointCloud::debug()
 {
     GroupNode::debug();
-
+    
+#ifdef WITH_PCL
     boost::mutex::scoped_lock lock(grabberMutex);
     if (cloud_)
     {
@@ -132,11 +142,16 @@ void PointCloud::debug()
     {
         std::cout << "   No valid point cloud loaded" << std::endl;
     }
+#else
+    std::cout << "   SPIN was not compiled with PointCloud support; rendering disabled." << std::endl;
+#endif
 }
 
 // -----------------------------------------------------------------------------
 void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 {
+
+#ifdef WITH_PCL
     // A "redraw" will destroy the current subgraph and re-create it.
     // This is done, for example, when the type of geometry is changed (eg, from
     // lightpoints to lines). Don't do this too often!
@@ -154,12 +169,14 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
         this->updatePoints();
         updateFlag_ = false;
     }
+#endif
     
     GroupNode::callbackUpdate(nv);
 }
 
 
 // -----------------------------------------------------------------------------
+#ifdef WITH_PCL
 //#if PCL_MAJOR_VERSION>1 && PCL_MINOR_VERSION>5
 void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
 //#else
@@ -504,10 +521,18 @@ void PointCloud::draw()
     this->getAttachmentNode()->addChild(cloudGroup_.get());
 }
 
+#endif
+
+
 // -----------------------------------------------------------------------------
 
 void PointCloud::setURI(const char* filename)
 {
+    // ignore this msg if we already have this filename:
+    if (std::string(filename)==path_) return;
+    
+    path_ = std::string(filename);
+
     // if this is the server, then just broadcast the path and return:
     if (!sceneManager_->isGraphical())
     {
@@ -515,11 +540,10 @@ void PointCloud::setURI(const char* filename)
         return;
     }
     
-    // this is a client (viewer), so:
-    
-    if (std::string(filename)==path_) return;
-    
-    
+    // otherwise, this is a client (viewer), so:
+
+#ifdef WITH_PCL
+
     // first, check if the old path was a kinect, and destroy it accordingly:
     if (grabber_)
     {
@@ -527,13 +551,12 @@ void PointCloud::setURI(const char* filename)
         grabber_ = 0;
     }
     cloudOrig_.reset();
-
-    
+            
     path_ = filename;
     maxPoints_ = 0;
     
     bool success = false;
-    
+
     
     if (path_ == "NULL")
     {
@@ -675,13 +698,14 @@ void PointCloud::setURI(const char* filename)
     {
         std::cout << "[PointCloud]: Couldn't read file " << path_ << std::endl;
     }
+    
+#endif
 }
 
 // -----------------------------------------------------------------------------
 
 void PointCloud::setCustomNode(const char* nodeID)
 {
-    
     ReferencedNode *n = sceneManager_->getNode(nodeID);
     if (n)
     {
@@ -690,19 +714,18 @@ void PointCloud::setCustomNode(const char* nodeID)
         
         redrawFlag_ = true;
     }
-    else
+    else if (std::string(nodeID)!="NULL")
     {
         std::cout << "[PointCloud]: Could not set custom node. " << nodeID << " does not exist." << std::endl;
     }
-    
 }
+
 const char* PointCloud::getCustomNode() const
 {
     ReferencedNode *n = dynamic_cast<ReferencedNode*>(customNode_->s_thing);
     if (n) return customNode_->s_name;
     return "NULL"; 
 }
-
 
 void PointCloud::setDrawMode (DrawMode mode)
 {
@@ -752,13 +775,15 @@ void PointCloud::setVoxelSize (float voxelSize)
         this->voxelSize_ = voxelSize;
         BROADCAST(this, "sf", "setVoxelSize", this->voxelSize_);
         
+#ifdef WITH_PCL
         if (cloudOrig_)
         {
             // if cloudOrig_ is valid, it means this point cloud was loaded
             // from file, and we need to apply filters:
             this->applyFilters(cloudOrig_);
         }
-        
+#endif
+
         updateFlag_ = true;
     }
 }
@@ -769,13 +794,15 @@ void PointCloud::setDistCrop (float min, float max)
     {
         distCrop_ = osg::Vec2(min,max);
         BROADCAST(this, "sff", "setDistCrop", min, max);
-        
+
+#ifdef WITH_PCL
         if (cloudOrig_)
         {
             // if cloudOrig_ is valid, it means this point cloud was loaded
             // from file, and we need to apply filters:
             this->applyFilters(cloudOrig_);
         }
+#endif
 
         updateFlag_ = true;
     }
@@ -846,8 +873,6 @@ std::vector<lo_message> PointCloud::getState () const
     msg = lo_message_new();
     lo_message_add(msg, "si", "setColorMode", getColorMode());
     ret.push_back(msg);
-
-   ret.push_back(msg);
     
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setURI", path_.c_str());
@@ -858,6 +883,3 @@ std::vector<lo_message> PointCloud::getState () const
 }
 
 } // end of namespace spin
-
-#endif // WITH_PCL
-
