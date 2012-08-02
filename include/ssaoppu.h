@@ -97,13 +97,21 @@ class SSAORendering : virtual public osg::Referenced
 
             // The fourth unit gets the noise texture
             // It is read from an image file
-            osg::ref_ptr<osg::Image> lNoiseImage = osgDB::readImageFile("ssao_noise.png");
             osg::Texture* lNoiseTex = new osg::Texture2D;
             lNoiseTex->setWrap(osg::Texture::WRAP_S, osg::Texture::MIRROR);
             lNoiseTex->setWrap(osg::Texture::WRAP_T, osg::Texture::MIRROR);
             lNoiseTex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
             lNoiseTex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-            lNoiseTex->setImage(0, lNoiseImage.get());
+
+            osg::ref_ptr<osg::Image> lNoiseImage = osgDB::readImageFile("ssao_noise.png");
+            if(lNoiseImage.valid())
+            {                
+                lNoiseTex->setImage(0, lNoiseImage.get());
+            }
+            else
+            {
+                std::cout << "File ssao_noise.png not found. Unexpected results are to be expected concerning SSAO." << std::endl;
+            }
 
             osgPPU::UnitTexture* lNoise = new osgPPU::UnitTexture();
             lNoise->setName("Noise");

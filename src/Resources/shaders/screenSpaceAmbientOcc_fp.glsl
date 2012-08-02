@@ -42,7 +42,7 @@ void main(void)
 {
     // Settings
     const float ssaoFocus = 6.0;
-    const float ssaoPower = 2.0;
+    const float ssaoPower = 3.0;
     const int ssaoLoops = 32;
     const float invSamples = 1.0/float(ssaoLoops);
 
