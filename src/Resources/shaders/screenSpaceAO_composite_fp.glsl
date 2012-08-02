@@ -11,5 +11,7 @@ void main(void)
     vec4 color = texture2D(vColor, texcoord);
 
     gl_FragColor.rgb = color.rgb * ssao.r;
+    //gl_FragColor.rgb = vec3(ssao.rgb);
+    //gl_FragColor.rgb = color.rgb;
     gl_FragColor.a = 1.0;
 }

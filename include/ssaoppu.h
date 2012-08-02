@@ -44,7 +44,7 @@ class SSAORendering : virtual public osg::Referenced
 
         /*******************/
         void createSSAOPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit,
-                                osg::Texture* pColor1, osg::Texture* pColor2, osg::Texture* pColor3,
+                                osg::Texture* pColor1, osg::Texture* pNormal, osg::Texture* pPosition,
                                 osg::Matrixf pProjMat)
         {
             double fovy, aspect, lNear, lFar;
@@ -61,31 +61,57 @@ class SSAORendering : virtual public osg::Referenced
             // Now we are ready for the PPU
             // The first unit gets the first color buffer
             osgPPU::UnitTexture* lColor1 = new osgPPU::UnitTexture();
-            lColor1->setName("Color1");
+            lColor1->setName("Color");
             lColor1->setTexture(pColor1);
             pParent->addChild(lColor1);
 
             // The second unit gets the second color buffer
-            osgPPU::UnitTexture* lColor2 = new osgPPU::UnitTexture();
-            lColor2->setName("Color2");
-            lColor2->setTexture(pColor2);
-            pParent->addChild(lColor2);
+            osgPPU::UnitTexture* lNormal = new osgPPU::UnitTexture();
+            lNormal->setName("Normal");
+            lNormal->setTexture(pNormal);
+            pParent->addChild(lNormal);
+            
+            // We dowmsample the normals
+            osgPPU::UnitInResampleOut* lResampleNormal = new osgPPU::UnitInResampleOut();
+            {
+                lResampleNormal->setName("ResampleNormal");
+                lResampleNormal->setFactorX(0.5f);
+                lResampleNormal->setFactorY(0.5f);
+            }
+            lNormal->addChild(lResampleNormal);
 
             // The third unit gets the third color buffer
-            osgPPU::UnitTexture* lColor3 = new osgPPU::UnitTexture();
-            lColor3->setName("Color3");
-            lColor3->setTexture(pColor3);
-            pParent->addChild(lColor3);
+            osgPPU::UnitTexture* lPosition = new osgPPU::UnitTexture();
+            lPosition->setName("Position");
+            lPosition->setTexture(pPosition);
+            pParent->addChild(lPosition);
+
+            // As well as the position
+            osgPPU::UnitInResampleOut* lResamplePosition = new osgPPU::UnitInResampleOut();
+            {
+                lResamplePosition->setName("ResamplePosition");
+                lResamplePosition->setFactorX(0.5f);
+                lResamplePosition->setFactorY(0.5f);
+            }
+            lPosition->addChild(lResamplePosition);
 
             // The fourth unit gets the noise texture
             // It is read from an image file
-            osg::ref_ptr<osg::Image> lNoiseImage = osgDB::readImageFile("ssao_noise.png");
             osg::Texture* lNoiseTex = new osg::Texture2D;
             lNoiseTex->setWrap(osg::Texture::WRAP_S, osg::Texture::MIRROR);
             lNoiseTex->setWrap(osg::Texture::WRAP_T, osg::Texture::MIRROR);
             lNoiseTex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
             lNoiseTex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-            lNoiseTex->setImage(0, lNoiseImage.get());
+
+            osg::ref_ptr<osg::Image> lNoiseImage = osgDB::readImageFile("ssao_noise.png");
+            if(lNoiseImage.valid())
+            {                
+                lNoiseTex->setImage(0, lNoiseImage.get());
+            }
+            else
+            {
+                std::cout << "File ssao_noise.png not found. Unexpected results are to be expected concerning SSAO." << std::endl;
+            }
 
             osgPPU::UnitTexture* lNoise = new osgPPU::UnitTexture();
             lNoise->setName("Noise");
@@ -96,6 +122,15 @@ class SSAORendering : virtual public osg::Referenced
             osgPPU::UnitDepthbufferBypass* lDepth = new osgPPU::UnitDepthbufferBypass();
             lDepth->setName("Depth");
             pParent->addChild(lDepth);
+
+            // As well as the position
+            osgPPU::UnitInResampleOut* lResampleDepth = new osgPPU::UnitInResampleOut();
+            {
+                lResampleDepth->setName("ResampleDepth");
+                lResampleDepth->setFactorX(0.5f);
+                lResampleDepth->setFactorY(0.5f);
+            }
+            lDepth->addChild(lResampleDepth);
 
             // And the unit to apply our shader
             osgPPU::UnitInOut* ssao = new osgPPU::UnitInOut();
@@ -108,14 +143,11 @@ class SSAORendering : virtual public osg::Referenced
                 ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
                 ssaoShaderAttr->setName("ssaoShader");
 
-                ssaoShaderAttr->add("vPower", osg::Uniform::FLOAT);
-                ssaoShaderAttr->add("vPixelSize", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vFar", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vProjectionMatrix", osg::Uniform::FLOAT_MAT4);
                 ssaoShaderAttr->add("vInvProjectionMatrix", osg::Uniform::FLOAT_MAT4);
 
-                ssaoShaderAttr->set("vPixelSize", 1.f);
                 ssaoShaderAttr->set("vNear", (float)lNear);
                 ssaoShaderAttr->set("vFar", (float)lFar);
                 ssaoShaderAttr->set("vProjectionMatrix", pProjMat);
@@ -124,11 +156,11 @@ class SSAORendering : virtual public osg::Referenced
                 ssao->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);
                 ssao->setInputTextureIndexForViewportReference(0);
 
-                //ssao->setInputToUniform(lColor1, "vColor1", true);
-                ssao->setInputToUniform(lColor2, "vColor2", true);
-                ssao->setInputToUniform(lColor3, "vColor3", true);
+                //ssao->setInputToUniform(lColor1, "vColor1", true); // We don't need this anymore
+                ssao->setInputToUniform(lResampleNormal, "vNormal", true);
+                ssao->setInputToUniform(lResamplePosition, "vPosition", true);
                 ssao->setInputToUniform(lNoise, "vNoiseMap", true);
-                ssao->setInputToUniform(lDepth, "vDepth", true);
+                ssao->setInputToUniform(lResampleDepth, "vDepth", true);
             }
 
             // Now we will filter the ssao as it's quite noisy
@@ -182,8 +214,18 @@ class SSAORendering : virtual public osg::Referenced
             ssao->addChild(blurxlight);
             blurxlight->addChild(blurylight);
 
+            // Resample to match the color FBO
+            osgPPU::UnitInResampleOut* lResampleSSAO = new osgPPU::UnitInResampleOut();
+            {
+                lResampleSSAO->setName("ResampleSSAO");
+                lResampleSSAO->setFactorX(2.0f);
+                lResampleSSAO->setFactorY(2.0f);
+            }
+            blurylight->addChild(lResampleSSAO);
+
+
             // Last step: multiplication of the SSAO and the previous rendering
-            osgPPU::Unit* composite = new osgPPU::UnitInOut();
+            osgPPU::UnitInOut* composite = new osgPPU::UnitInOut();
             compositeAttr = new osgPPU::ShaderAttribute();
             {
                 compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_vp.glsl", vertexOptions.get()));
@@ -197,10 +239,10 @@ class SSAORendering : virtual public osg::Referenced
                 
                 composite->getOrCreateStateSet()->setAttributeAndModes(compositeAttr);
 
-                composite->setInputToUniform(blurylight, "vSSAO", true);
+                composite->setInputToUniform(lResampleSSAO, "vSSAO", true);
                 composite->setInputToUniform(lColor1, "vColor", true);
             }
-            blurylight->addChild(composite);
+            lResampleSSAO->addChild(composite);
 
             pLastUnit = composite;
         }
