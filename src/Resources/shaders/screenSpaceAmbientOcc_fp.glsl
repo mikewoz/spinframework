@@ -46,21 +46,24 @@ void main(void)
     const int ssaoLoops = 32;
     const float invSamples = 1.0/float(ssaoLoops);
 
-    // Depth from the real depth buffer
-    float lDepth = texture2D(vDepth, texcoord).r;
+    vec3 lBufferPos, lBufferNorm;
 
     // View space normal
-    vec3 lNormal = normalize(texture2D(vNormal, texcoord.st).xyz * 2.0 - 1.0);
+    lBufferNorm = texture2D(vNormal, texcoord.st).xyz;
+    vec3 lNormal = normalize(lBufferNorm * 2.0 - 1.0);
 
     // View space position of the pixel
     vec3 lPos = texture2D(vPosition, texcoord.st).xyz; //GetViewPos(texcoord.st);
 
-    float lOcclusion, lWeight;
-
-    /*if(lDepth == 1.0)
-        lOcclusion = 1.0;
+    // These values shouldn't be equal. If they are, it means
+    // that the vNormal and vPosition textures were not rendered for
+    // this pixel
+    if(lBufferNorm == lPos)
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     else
-    {*/
+    {
+        float lOcclusion, lWeight;
+
         lPos.z = 1.f/lPos.z;
 
         // Random value from the noise map
@@ -97,42 +100,53 @@ void main(void)
             lFragPos.z /= -lFragPos.w;*/
             screenPos.xy = screenPos.xy*0.5+0.5;
 
-            dist = texture2D(vPosition, screenPos.xy).z;
+            lBufferPos = texture2D(vPosition, screenPos.xy).xyz;
+            dist = lBufferPos.z;
             dist = 1.0/dist;
 
-            vec3 lFragNorm = normalize(texture2D(vNormal, screenPos.xy).xyz * 2.0 - 1.0);
-            lWeight = smoothStep(-0.5, 1.0, dot(lFragNorm,lNormal));     
+            lBufferNorm = texture2D(vNormal, screenPos.xy).xyz;
+            vec3 lFragNorm = normalize(lBufferNorm * 2.0 - 1.0);
 
-            float lDiff = linearizeDepth(lScreenDepth) - linearizeDepth(dist);
-            // If the ray hits behind the fragment (from the camera position)
-
-            //if(abs(linearizeDepth(lPos.z) - linearizeDepth(dist)) < ssaoFocus/(vFar-vNear))
-            //    visibility += (linearizeDepth(dist) >= linearizeDepth(lScreenDepth)) ? 1.0 : 0.0;
-
-            visibility += min(abs(lDiff/(ssaoFocus/(vFar-vNear))) + lWeight, 1.0);
-            
-            /*if(lDiff > 0 && lDiff < 2.0*ssaoFocus/(vFar-vNear))
-            {
-                visibility += min(lDiff/(ssaoFocus/(vFar-vNear)) + lWeight, 1.0);
-            }
-            // else, if the ray hits in front of the fragment
+            // Same as before, we detect if the shader should use the data from
+            // this pixel
+            if(lBufferPos == lBufferNorm)
+                visibility += 1.0;
             else
             {
-                visibility += 1.0;
-            }*/
+
+                lWeight = smoothStep(-0.5, 1.0, dot(lFragNorm,lNormal));     
+
+                float lDiff = linearizeDepth(lScreenDepth) - linearizeDepth(dist);
+                // If the ray hits behind the fragment (from the camera position)
+
+                //if(abs(linearizeDepth(lPos.z) - linearizeDepth(dist)) < ssaoFocus/(vFar-vNear))
+                //    visibility += (linearizeDepth(dist) >= linearizeDepth(lScreenDepth)) ? 1.0 : 0.0;
+
+                visibility += min(abs(lDiff/(ssaoFocus/(vFar-vNear))) + lWeight, 1.0);
+                
+                /*if(lDiff > 0 && lDiff < 2.0*ssaoFocus/(vFar-vNear))
+                {
+                    visibility += min(lDiff/(ssaoFocus/(vFar-vNear)) + lWeight, 1.0);
+                }
+                // else, if the ray hits in front of the fragment
+                else
+                {
+                    visibility += 1.0;
+                }*/
+            }
         }
 
         // Final occlusion factor
         //visibility = max(0.0, min(1.0, (visibility/float(ssaoLoops) - ssaoRescale)*1.5+ssaoRescale));
         lOcclusion = pow(visibility*invSamples, ssaoPower);
-    //}
 
-    //gl_FragColor.rgb = texture2D(vColor1, texcoord.st).rgb;
-    //gl_FragColor.rgb = texture2D(vNormal, texcoord.st).rgb;
-    //gl_FragColor.rgb = vec3(texture2D(vPosition, texcoord.st).rgb);
-    //gl_FragColor.rgb = texture2D(vNoiseMap, texcoord*2).rgb;
+        //gl_FragColor.rgb = texture2D(vColor1, texcoord.st).rgb;
+        //gl_FragColor.rgb = texture2D(vNormal, texcoord.st).rgb;
+        //gl_FragColor.rgb = vec3(texture2D(vPosition, texcoord.st).rgb);
+        //gl_FragColor.rgb = texture2D(vNoiseMap, texcoord*2).rgb;
 
-    gl_FragColor.rgb = vec3(lOcclusion);
+        gl_FragColor.rgb = vec3(lOcclusion);
 
-    gl_FragColor.a = 1.f;
+        gl_FragColor.a = 1.f;
+    }
 }
