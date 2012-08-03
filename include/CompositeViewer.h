@@ -214,45 +214,28 @@ public:
             case (osgGA::GUIEventAdapter::RESIZE):
             {
                 osgPPU::Camera::resizeViewport(0,0, ea.getWindowWidth(), ea.getWindowHeight(), viewer->getView(0)->getCamera());
-                
+            
                 // Get the previous projection matrix information
                 double fovy, aspect, lNear, lFar;
                 viewer->getView(0)->getCamera()->getProjectionMatrixAsPerspective(fovy, aspect, lNear, lFar);
-                viewer->getView(0)->getCamera()->setProjectionMatrixAsPerspective(fovy, ea.getWindowWidth()/ea.getWindowHeight(), lNear, lFar);
+                // Update the ratio to match the new ratio of the window
+                viewer->getView(0)->getCamera()->setProjectionMatrixAsPerspective(fovy, (float)ea.getWindowWidth()/(float)ea.getWindowHeight(), lNear, lFar);
 
                 osgPPU::Processor* lProcessor = viewer->getProcessor();
                 lProcessor->onViewportChange();
 
-                osgPPU::Unit* lUnit = NULL;
-
-                lUnit = lProcessor->findUnit("ssao");
-                if(lUnit)
+                if(viewer->dofPPU_.valid())
                 {
-                    osg::Matrixf lProjMat = viewer->getView(0)->getCamera()->getProjectionMatrix();
-
-                    osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
-                    osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
-
-                    osgPPU::ShaderAttribute* ssaoShaderAttr = new osgPPU::ShaderAttribute();
-
-                    ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", vertexOptions.get()));
-                    ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
-                    ssaoShaderAttr->setName("ssaoShader");
-
-                    ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
-                    ssaoShaderAttr->add("vFar", osg::Uniform::FLOAT);
-                    ssaoShaderAttr->add("vProjectionMatrix", osg::Uniform::FLOAT_MAT4);
-                    ssaoShaderAttr->add("vInvProjectionMatrix", osg::Uniform::FLOAT_MAT4);
-
-                    ssaoShaderAttr->set("vNear", (float)lNear);
-                    ssaoShaderAttr->set("vFar", (float)lFar);
-                    ssaoShaderAttr->set("vProjectionMatrix", lProjMat);
-                    ssaoShaderAttr->set("vInvProjectionMatrix", osg::Matrixf::inverse(lProjMat));
-
-                    lUnit->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);
-
-                    lProcessor->dirtyUnitSubgraph();
+                    // Reset near and far, although there's no reason for them to have changed
+                    viewer->dofPPU_->setNear(lNear);
+                    viewer->dofPPU_->setFar(lFar);
                 }
+
+                if(viewer->ssaoPPU_.valid())
+                {
+                    osg::Matrixf lProjMat = viewer->getView(0)->getCamera()->getProjectionMatrix();                    
+                    viewer->ssaoPPU_->setProjectionMatrix(lProjMat);
+                }                
                 
                 break;
             }

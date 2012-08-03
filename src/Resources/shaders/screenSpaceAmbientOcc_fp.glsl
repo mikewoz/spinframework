@@ -10,6 +10,10 @@ uniform float vFar;
 uniform mat4 vProjectionMatrix;
 uniform mat4 vInvProjectionMatrix;
 
+uniform float vSsaoPower;
+uniform float vSsaoFocus;
+uniform int vSsaoSamples;
+
 uniform mat4 osg_ProjectionMatrixInverse;
 
 varying vec2 texcoord;
@@ -41,10 +45,7 @@ float smoothStep(in float edge0, in float edge1, in float x)
 void main(void)
 {
     // Settings
-    const float ssaoFocus = 6.0;
-    const float ssaoPower = 3.0;
-    const int ssaoLoops = 32;
-    const float invSamples = 1.0/float(ssaoLoops);
+    float invSamples = 1.0/float(vSsaoSamples);
 
     vec3 lBufferPos, lBufferNorm;
 
@@ -72,7 +73,7 @@ void main(void)
         float dist, visibility = 0.f;
         vec4 random, screenPos = vec4(1.f);
 
-        for(int i=0; i<ssaoLoops; i++)
+        for(int i=0; i<vSsaoSamples; i++)
         {
             // Retrieve a new random vector from the texture
             random = texture2D(vNoiseMap, modifier);
@@ -88,7 +89,7 @@ void main(void)
             // Calculate the randomly offset position's screen space coordinates -- second most expensive operation
             screenPos = vProjectionMatrix * vec4(lPos, 1.0); 
             // Offset the screen position
-            screenPos.xyz = screenPos.xyz + random.xyz*ssaoFocus*(noise1(lPos.z)*0.5+0.5);
+            screenPos.xyz = screenPos.xyz + random.xyz*vSsaoFocus*(noise1(lPos.z)*0.5+0.5);
             // Store the depth of the new position
             float lScreenDepth = (vInvProjectionMatrix*screenPos).z;
             screenPos.xyz /= -screenPos.w;
@@ -117,28 +118,17 @@ void main(void)
                 lWeight = smoothStep(-0.5, 1.0, dot(lFragNorm,lNormal));     
 
                 float lDiff = linearizeDepth(lScreenDepth) - linearizeDepth(dist);
-                // If the ray hits behind the fragment (from the camera position)
 
-                //if(abs(linearizeDepth(lPos.z) - linearizeDepth(dist)) < ssaoFocus/(vFar-vNear))
-                //    visibility += (linearizeDepth(dist) >= linearizeDepth(lScreenDepth)) ? 1.0 : 0.0;
-
-                visibility += min(abs(lDiff/(ssaoFocus/(vFar-vNear))) + lWeight, 1.0);
-                
-                /*if(lDiff > 0 && lDiff < 2.0*ssaoFocus/(vFar-vNear))
-                {
-                    visibility += min(lDiff/(ssaoFocus/(vFar-vNear)) + lWeight, 1.0);
-                }
-                // else, if the ray hits in front of the fragment
+                if(lDiff > 0)
+                    visibility += min(abs(lDiff/(vSsaoFocus/(vFar-vNear))) + lWeight, 1.0);
                 else
-                {
                     visibility += 1.0;
-                }*/
             }
         }
 
         // Final occlusion factor
-        //visibility = max(0.0, min(1.0, (visibility/float(ssaoLoops) - ssaoRescale)*1.5+ssaoRescale));
-        lOcclusion = pow(visibility*invSamples, ssaoPower);
+        //visibility = max(0.0, min(1.0, (visibility/float(vSsaoSamples) - ssaoRescale)*1.5+ssaoRescale));
+        lOcclusion = pow(visibility*invSamples, vSsaoPower);
 
         //gl_FragColor.rgb = texture2D(vColor1, texcoord.st).rgb;
         //gl_FragColor.rgb = texture2D(vNormal, texcoord.st).rgb;
