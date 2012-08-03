@@ -118,22 +118,11 @@ void main(void)
                 lWeight = smoothStep(-0.5, 1.0, dot(lFragNorm,lNormal));     
 
                 float lDiff = linearizeDepth(lScreenDepth) - linearizeDepth(dist);
-                // If the ray hits behind the fragment (from the camera position)
 
-                //if(abs(linearizeDepth(lPos.z) - linearizeDepth(dist)) < vSsaoFocus/(vFar-vNear))
-                //    visibility += (linearizeDepth(dist) >= linearizeDepth(lScreenDepth)) ? 1.0 : 0.0;
-
-                visibility += min(abs(lDiff/(vSsaoFocus/(vFar-vNear))) + lWeight, 1.0);
-                
-                /*if(lDiff > 0 && lDiff < 2.0*vSsaoFocus/(vFar-vNear))
-                {
-                    visibility += min(lDiff/(vSsaoFocus/(vFar-vNear)) + lWeight, 1.0);
-                }
-                // else, if the ray hits in front of the fragment
+                if(lDiff > 0)
+                    visibility += min(abs(lDiff/(vSsaoFocus/(vFar-vNear))) + lWeight, 1.0);
                 else
-                {
                     visibility += 1.0;
-                }*/
             }
         }
 
