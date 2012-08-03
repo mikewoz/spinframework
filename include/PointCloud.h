@@ -52,11 +52,12 @@
 #include "config.h"
 
 #ifdef WITH_PCL
-
 #include <pcl/pcl_config.h>
 #include <pcl/io/openni_grabber.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#endif WITH_PCL
+
 
 namespace spin
 {
@@ -82,8 +83,8 @@ public:
     
 
     void setURI(const char* filename);
-    virtual void draw();
 
+#ifdef WITH_PCL
     void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &cloud);
     void applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud);
 
@@ -91,6 +92,8 @@ public:
     osg::Vec4f getColor(unsigned int i);
 
     virtual void updatePoints();
+    virtual void draw();
+#endif
     
     void setCustomNode   (const char* nodeID);
     void setDrawMode     (DrawMode mode);
@@ -132,9 +135,11 @@ public:
 
 private:
     
+#ifdef WITH_PCL
     pcl::Grabber* grabber_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
+#endif
     
     t_symbol* customNode_;
     
@@ -166,6 +171,6 @@ private:
 
 } // end of namespace spin
 
-#endif // WITH_PCL
+
 
 #endif
