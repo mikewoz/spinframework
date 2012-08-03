@@ -26,6 +26,9 @@ class SSAORendering : virtual public osg::Referenced
         osgPPU::ShaderAttribute* gaussx;
         osgPPU::ShaderAttribute* gaussy;
         osgPPU::ShaderAttribute* compositeAttr;
+
+        osg::ref_ptr<osgDB::ReaderWriter::Options> mFragmentOptions;
+        osg::ref_ptr<osgDB::ReaderWriter::Options> mVertexOptions;
     
 
     public:
@@ -34,6 +37,9 @@ class SSAORendering : virtual public osg::Referenced
         {
             dofGaussSigma = 1.5f;
             dofGaussRadius = 3.0f;
+
+            mFragmentOptions = new osgDB::ReaderWriter::Options("fragment");
+            mVertexOptions = new osgDB::ReaderWriter::Options("vertex");
         }
 
         /*******************/
@@ -43,20 +49,51 @@ class SSAORendering : virtual public osg::Referenced
         }
 
         /*******************/
+        void setGaussSigma(float sigma)
+        {
+            gaussx->set("sigma", sigma);
+            gaussy->set("sigma", sigma);
+        }
+
+        /*******************/
+        void setGaussRadius(float radius)
+        {
+            gaussx->set("radius", radius);
+            gaussy->set("radius", radius);
+        }
+
+        /*******************/
+        void setProjectionMatrix(osg::Matrixf pProjMat)
+        {
+            ssaoShaderAttr->set("vProjectionMatrix", pProjMat);
+            ssaoShaderAttr->set("vInvProjectionMatrix", osg::Matrixf::inverse(pProjMat));
+        }
+    
+        /*******************/
+        void setSsaoPower(float pPower)
+        {
+            ssaoShaderAttr->set("vSsaoPower", pPower);
+        }
+        
+        /*******************/
+        void setSsaoFocus(float pFocus)
+        {
+            ssaoShaderAttr->set("vSsaoFocus", pFocus);
+        }
+
+        /*******************/
+        void setSsaoSamples(int pSamples)
+        {
+            ssaoShaderAttr->set("vSsaoSamples", pSamples);
+        }
+
+        /*******************/
         void createSSAOPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit,
                                 osg::Texture* pColor1, osg::Texture* pNormal, osg::Texture* pPosition,
                                 osg::Matrixf pProjMat)
         {
             double fovy, aspect, lNear, lFar;
             pProjMat.getPerspective(fovy, aspect, lNear, lFar);
-        
-            osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
-            osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
-
-            // We need to get the ptr to the texture attached to the camera
-            //osg::Camera::BufferAttachmentMap lBufferMap = pCamera->getBufferAttachmentMap();
-            //osg::Texture* lColorTexture1 = lBufferMap[osg::Camera::COLOR_BUFFER0]._texture;
-            //osg::Texture* lColorTexture2 = lBufferMap[osg::Camera::COLOR_BUFFER1]._texture;
 
             // Now we are ready for the PPU
             // The first unit gets the first color buffer
@@ -136,22 +173,31 @@ class SSAORendering : virtual public osg::Referenced
             osgPPU::UnitInOut* ssao = new osgPPU::UnitInOut();
             ssao->setName("ssao");
             
-            // Setup the ssao shader
             ssaoShaderAttr = new osgPPU::ShaderAttribute();
+            // Setup the ssao shader
             {
-                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", vertexOptions.get()));
-                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
+                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", mVertexOptions.get()));
+                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", mFragmentOptions.get())); 
                 ssaoShaderAttr->setName("ssaoShader");
 
                 ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vFar", osg::Uniform::FLOAT);
                 ssaoShaderAttr->add("vProjectionMatrix", osg::Uniform::FLOAT_MAT4);
                 ssaoShaderAttr->add("vInvProjectionMatrix", osg::Uniform::FLOAT_MAT4);
+                ssaoShaderAttr->add("vSsaoPower", osg::Uniform::FLOAT);
+                ssaoShaderAttr->add("vSsaoFocus", osg::Uniform::FLOAT);
+                ssaoShaderAttr->add("vSsaoSamples", osg::Uniform::INT);
+
+                double lFovy, lRatio, lNear, lFar;
+                pProjMat.getPerspective(lFovy, lRatio, lNear, lFar);
 
                 ssaoShaderAttr->set("vNear", (float)lNear);
                 ssaoShaderAttr->set("vFar", (float)lFar);
                 ssaoShaderAttr->set("vProjectionMatrix", pProjMat);
                 ssaoShaderAttr->set("vInvProjectionMatrix", osg::Matrixf::inverse(pProjMat));
+                ssaoShaderAttr->set("vSsaoPower", 3.f);
+                ssaoShaderAttr->set("vSsaoFocus", 6.f);
+                ssaoShaderAttr->set("vSsaoSamples", 32);
 
                 ssao->getOrCreateStateSet()->setAttributeAndModes(ssaoShaderAttr);
                 ssao->setInputTextureIndexForViewportReference(0);
@@ -168,9 +214,9 @@ class SSAORendering : virtual public osg::Referenced
             gaussy = new osgPPU::ShaderAttribute();
             {
                 // read shaders from file
-                osg::Shader* vshader = osgDB::readShaderFile("gauss_convolution_vp.glsl", vertexOptions.get());
-                osg::Shader* fhshader = osgDB::readShaderFile("gauss_convolution_1Dx_fp.glsl", fragmentOptions.get());
-                osg::Shader* fvshader = osgDB::readShaderFile("gauss_convolution_1Dy_fp.glsl", fragmentOptions.get());
+                osg::Shader* vshader = osgDB::readShaderFile("gauss_convolution_vp.glsl", mVertexOptions.get());
+                osg::Shader* fhshader = osgDB::readShaderFile("gauss_convolution_1Dx_fp.glsl", mFragmentOptions.get());
+                osg::Shader* fvshader = osgDB::readShaderFile("gauss_convolution_1Dy_fp.glsl", mFragmentOptions.get());
 
                 // setup horizontal blur shaders
                 gaussx->addShader(vshader);
@@ -228,8 +274,8 @@ class SSAORendering : virtual public osg::Referenced
             osgPPU::UnitInOut* composite = new osgPPU::UnitInOut();
             compositeAttr = new osgPPU::ShaderAttribute();
             {
-                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_vp.glsl", vertexOptions.get()));
-                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_fp.glsl", fragmentOptions.get()));
+                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_vp.glsl", mVertexOptions.get()));
+                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_fp.glsl", mFragmentOptions.get()));
                 compositeAttr->setName("compositeSSAO");
 
                 compositeAttr->add("vSSAO", osg::Uniform::SAMPLER_2D);

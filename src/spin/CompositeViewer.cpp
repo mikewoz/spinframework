@@ -1214,30 +1214,58 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     
     if ((theMethod=="setParam") && (stringArgs.size()==1) && (floatArgs.size()==1))
     {
-    
-        if (stringArgs[0] == "gaussSigma")
-        {
-            viewer->dofPPU_->setGaussSigma(floatArgs[0]);
+        // Params for the DoF PPU
+        if(viewer->dofPPU_.valid())
+        { 
+            if (stringArgs[0] == "gaussSigma")
+            {
+                viewer->dofPPU_->setGaussSigma(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "gaussRadius")
+            {
+                viewer->dofPPU_->setGaussRadius(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "focalLength")
+            {
+                viewer->dofPPU_->setFocalLength(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "focalRange")
+            {
+                viewer->dofPPU_->setFocalRange(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "near")
+            {
+                viewer->dofPPU_->setNear(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "far")
+            {
+                viewer->dofPPU_->setFar(floatArgs[0]);
+            }
         }
-        else if (stringArgs[0] == "gaussRadius")
+
+        // Params for the SSAO PPU
+        if(viewer->ssaoPPU_.valid())
         {
-            viewer->dofPPU_->setGaussRadius(floatArgs[0]);
-        }
-        else if (stringArgs[0] == "focalLength")
-        {
-            viewer->dofPPU_->setFocalLength(floatArgs[0]);
-        }
-        else if (stringArgs[0] == "focalRange")
-        {
-            viewer->dofPPU_->setFocalRange(floatArgs[0]);
-        }
-        else if (stringArgs[0] == "near")
-        {
-            viewer->dofPPU_->setNear(floatArgs[0]);
-        }
-        else if (stringArgs[0] == "far")
-        {
-            viewer->dofPPU_->setFar(floatArgs[0]);
+            if (stringArgs[0] == "ssaoGaussSigma")
+            {
+                viewer->ssaoPPU_->setGaussSigma(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "ssaoGaussRadius")
+            {
+                viewer->ssaoPPU_->setGaussRadius(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "ssaoPower")
+            {
+                viewer->ssaoPPU_->setSsaoPower(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "ssaoFocus")
+            {
+                viewer->ssaoPPU_->setSsaoFocus(floatArgs[0]);
+            }
+            else if (stringArgs[0] == "ssaoSamples")
+            {
+                viewer->ssaoPPU_->setSsaoSamples((int)floatArgs[0]);
+            }
         }
         
         return 0;
@@ -1245,9 +1273,17 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
     {
         viewer->getView(0)->getCamera()->setProjectionMatrixAsFrustum(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3], floatArgs[4], floatArgs[5]);
-        
-        viewer->dofPPU_->setNear(floatArgs[4]);
-        viewer->dofPPU_->setFar(floatArgs[5]);
+       
+        if(viewer->dofPPU_.valid())
+        { 
+            viewer->dofPPU_->setNear(floatArgs[4]);
+            viewer->dofPPU_->setFar(floatArgs[5]);
+        }
+
+        if(viewer->ssaoPPU_.valid())
+        {
+            viewer->ssaoPPU_->setProjectionMatrix(viewer->getView(0)->getCamera()->getProjectionMatrix());
+        }
         
         return 0;
     }
