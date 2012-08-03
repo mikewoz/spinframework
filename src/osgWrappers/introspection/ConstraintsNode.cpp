@@ -95,6 +95,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	          __void__setTranslation__float__float__float,
 	          "",
 	          "The local translation offset for this node with respect to it's parent ");
+	I_Method0(osg::Vec3, getTranslation,
+	          Properties::VIRTUAL,
+	          __osg_Vec3__getTranslation,
+	          "",
+	          "");
 	I_Method3(void, translate, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__translate__float__float__float,
@@ -130,5 +135,8 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	I_SimpleProperty(const char *, Target, 
 	                 __C5_char_P1__getTarget, 
 	                 __void__setTarget__C5_char_P1);
+	I_SimpleProperty(osg::Vec3, Translation, 
+	                 __osg_Vec3__getTranslation, 
+	                 0);
 END_REFLECTOR
 

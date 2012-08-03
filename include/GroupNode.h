@@ -296,9 +296,9 @@ public:
     osg::Vec3 getScale() const { return mainTransform_->getMatrix().getScale(); };
     */
     
-    osg::Vec3 getTranslation() const { return translation_; };
-    osg::Quat getOrientationQuat() const { return quat_; };
-    osg::Vec3 getScale() const { return scale_; };     
+    virtual osg::Vec3 getTranslation() const { return translation_; };
+    virtual osg::Quat getOrientationQuat() const { return quat_; };
+    virtual osg::Vec3 getScale() const { return scale_; };     
     
     osg::Vec3 getVelocity() const { return velocity_; };
     int getVelocityMode() const { return (int) velocityMode_; };

@@ -287,27 +287,42 @@ void AttractorNode::addTarget (const char *targetID)
 
 void AttractorNode::removeTarget (const char *targetID)
 {
-	// get ReferencedNode for the ID:
-	osg::ref_ptr<GroupNode> n =  dynamic_cast<GroupNode*>(sceneManager_->getNode(targetID));
 
-	if (!n.valid())
-	{
-		std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
-		return;
-	}
-
-	// find it in the list, and remove it:
-	targetVector::iterator t;
-    for (t = targets_.begin(); t != targets_.end(); t++)
+    if (string(targetID)=="*")
     {
-    	if (n.get()==(*t).get())
-    	{
-    		targets_.erase(t);
-    		BROADCAST(this, "ss", "removeTarget", targetID);
-    		return;
-    	}
+        targetVector::iterator t = targets_.begin();
+        while (t != targets_.end())
+        {
+            BROADCAST(this, "ss", "removeTarget", (*t)->getID().c_str());
+            targets_.erase(t);
+        }
+        BROADCAST(this, "ss", "removeTarget", "*"); // just in case
     }
-    std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but that node was not in the target list" << std::endl;
+    
+    else
+    {
+        // get ReferencedNode for the ID:
+        osg::ref_ptr<GroupNode> n =  dynamic_cast<GroupNode*>(sceneManager_->getNode(targetID));
+
+        if (!n.valid())
+        {
+            std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+            return;
+        }
+
+        // find it in the list, and remove it:
+        targetVector::iterator t;
+        for (t = targets_.begin(); t != targets_.end(); t++)
+        {
+            if (n.get()==(*t).get())
+            {
+                targets_.erase(t);
+                BROADCAST(this, "ss", "removeTarget", targetID);
+                return;
+            }
+        }
+        std::cout << "WARNING: AttractorNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but that node was not in the target list" << std::endl;
+    }
 }
 
 

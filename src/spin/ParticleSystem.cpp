@@ -39,24 +39,28 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-
-#include <osgParticle/AccelOperator>
-#include <osgParticle/FluidFrictionOperator>
-
 #include "ParticleSystem.h"
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
+#include "osgUtil.h"
 
 namespace spin
 {
 
 // *****************************************************************************
 // constructor:
-ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
+ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) : ConstraintsNode(sceneManager, initID)
 {
 	this->setName(this->getID() + ".ParticleSystem");
 	this->setNodeType("ParticleSystem");
+    
+    // A particle system and its placer has no osg::Group, so we create a fake
+    // node that set as our attachmentNode, and we copy the position of the 
+    // placer whenever it changes.
+    attachPAT = new osg::PositionAttitudeTransform();
+    this->addChild(attachPAT);
+    setAttachmentNode(attachPAT.get());
 
     imgPath_.clear();
     attachedFlag_ = false;
@@ -68,7 +72,6 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     mass_ = 0.05;
 
     freqRange_ = osg::Vec2(10.0, 30.0); // 10-30 particles/second
-    circularRange_ = osg::Vec2(0.0, 2.0); // circle of 0-2m
     angularRange_ = osg::Vec2(0.0, 2*osg::PI); // full circle
     speedRange_ = osg::Vec2(1.0, 2.0); // speed of 1-2 m/s
     alphaRange_ = osg::Vec2(0.0, 1.5); // alpha
@@ -135,11 +138,21 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     
 
     // set the placer:
-    placer_ = new osgParticle::SectorPlacer;
-    placer_->setCenter(0,0,0);
-    placer_->setRadiusRange(0, 0);
-    placer_->setPhiRange(0, 2 * osg::PI);
-    emitter_->setPlacer(placer_);
+    radialPlacer_ = new osgParticle::SectorPlacer;
+    radialPlacer_->setCenter(0,0,0);
+    radialPlacer_->setRadiusRange(0, 0);
+    radialPlacer_->setPhiRange(0, 2 * osg::PI);
+    emitter_->setPlacer(radialPlacer_);
+
+    cubicPlacer_ = new osgParticle::BoxPlacer;
+    cubicPlacer_->setXRange(-1,1);
+    cubicPlacer_->setYRange(-1,1);
+    cubicPlacer_->setZRange(-1,1);
+    
+    linearPlacer_ = new osgParticle::MultiSegmentPlacer;
+    linearPlacer_->addVertex(-1,0,0);
+    linearPlacer_->addVertex(1,0,0);
+    
 
 
     // create the shooter:
@@ -166,29 +179,28 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     // Program (and its descendants) should be placed *after* the instances
     // of Emitter objects in the scene graph.
     
-    osgParticle::ModularProgram *program = new osgParticle::ModularProgram;
-    program->setParticleSystem(system_);
+    program_ = new osgParticle::ModularProgram;
+    program_->setParticleSystem(system_);
 
-    // create an operator that simulates the gravity acceleration.
-    osgParticle::AccelOperator *op1 = new osgParticle::AccelOperator;
-    op1->setToGravity();
-    program->addOperator(op1);
+    // Create operators that act on the particles.
+    // (note: for now none of them are added to the program)
+    opOrbit_ = new osgParticle::OrbitOperator;
+    opAccel_ = new osgParticle::AccelOperator;
+    opAngularAccel_ = new osgParticle::AngularAccelOperator;
+    opAngularDamping_ = new osgParticle::AngularDampingOperator;
+    opDamping_ = new osgParticle::DampingOperator;
+    opFluidFriction_ = new osgParticle::FluidFrictionOperator;
+    opExplosion_ = new osgParticle::ExplosionOperator;
+    opForce_ = new osgParticle::ForceOperator;
+    opBounce_ = new osgParticle::BounceOperator;
 
-    // now create a custom operator, we have defined it above
-    /*
-    VortexOperator *op2 = new VortexOperator;
-    op2->setCenter(osg::Vec3(8, 0, 0));
-    program->addOperator(op2);
-    */
-
-    // let's add a fluid operator to simulate air friction.
-    osgParticle::FluidFrictionOperator *op3 = new osgParticle::FluidFrictionOperator;
-    op3->setFluidToAir();
-    program->addOperator(op3);
+    // some intial settings for operators:
+    opAccel_->setToGravity();
+    opFluidFriction_->setFluidToWater();
+    
 
     // add the program to the scene graph
-    this->getAttachmentNode()->addChild(program);
-    
+    this->getAttachmentNode()->addChild(program_);
     
     // all we still need is
     // to create a Geode and add the particle system to it, so it can be
@@ -220,7 +232,7 @@ ParticleSystem::~ParticleSystem()
 // *****************************************************************************
 void ParticleSystem::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate(nv);
+    ConstraintsNode::callbackUpdate(nv);
     
     if (!attachedFlag_)
     {
@@ -228,26 +240,392 @@ void ParticleSystem::callbackUpdate(osg::NodeVisitor* nv)
         attachedFlag_ = true;
     }
 }
+
+void ParticleSystem::updateNodePath(bool updateChildren)
+{
+	ConstraintsNode::updateNodePath(false);
+    currentNodePath_.push_back(attachPAT.get());
+    updateChildNodePaths();
+}
+
     
 // *****************************************************************************
+
+
+void ParticleSystem::debug()
+{
+    ConstraintsNode::debug();
+    std::cout << "   center: " << stringify(radialPlacer_->getCenter()) << std::endl;
+}
+
+void ParticleSystem::setTranslation (float x, float y, float z)
+{
+    //ConstraintsNode::setTranslation(x,y,z);
+    radialPlacer_->setCenter(x,y,z);
+    cubicPlacer_->setCenter(x,y,z);
+    //attachPAT->setPosition(osg::Vec3(x,y,z));
+    if (!broadcastLock_)
+        BROADCAST(this, "sfff", "setTranslation", x, y, z);
+}
+
+void ParticleSystem::setOrientation (float p, float r, float y)
+{
+    ConstraintsNode::setOrientation(p,r,y);
+
+}
+
+void ParticleSystem::setOrientationQuat (float x, float y, float z, float w)
+{
+    ConstraintsNode::setOrientationQuat(x,y,z,w);
+
+}
+
+// *****************************************************************************
+// placer properties:
+
+void ParticleSystem::setPlacerType(int type)
+{
+    switch ((PlacerType)type)
+    {
+        default:
+        case RADIAL:
+            emitter_->setPlacer(radialPlacer_);
+            break;
+        case CUBIC:
+            emitter_->setPlacer(cubicPlacer_);
+            break;
+        case LINEAR:
+            emitter_->setPlacer(linearPlacer_);
+            break;
+    }
+    BROADCAST(this, "si", "setPlacerType", type);
+}
+
+void ParticleSystem::setRadialRange(float min, float max)
+{
+    radialPlacer_->setRadiusRange(min, max);
+    BROADCAST(this, "sff", "setRadialRange", min, max);
+}
+osg::Vec2 ParticleSystem::getRadialRange()
+{
+    const osgParticle::rangef range = radialPlacer_->getRadiusRange();
+    return osg::Vec2(range.minimum, range.maximum);
+}
+
+void ParticleSystem::setRadialPhiRange(float min, float max)
+{
+    radialPlacer_->setPhiRange(min, max);
+    BROADCAST(this, "sff", "setRadialPhiRange", min, max);
+}
+
+void ParticleSystem::setCubicXRange(float min, float max)
+{
+    cubicPlacer_->setXRange(min, max);
+    BROADCAST(this, "sff", "setCubicXRange", min, max);
+}
+
+void ParticleSystem::setCubicYRange(float min, float max)
+{
+    cubicPlacer_->setYRange(min, max);
+    BROADCAST(this, "sff", "setCubicYRange", min, max);
+}
+
+void ParticleSystem::setCubicZRange(float min, float max)
+{
+    cubicPlacer_->setZRange(min, max);
+    BROADCAST(this, "sff", "setCubicZRange", min, max);
+}
+
+void ParticleSystem::addLinearPlacerVertex(float x, float y, float z)
+{
+    linearPlacer_->addVertex(osg::Vec3(x,y,z));
+    BROADCAST(this, "sfff", "addLinearPlacerVertex", x, y, z);
+}
+
+void ParticleSystem::removeLinearPlacerVertices()
+{
+    while (linearPlacer_->numVertices())
+    {
+        linearPlacer_->removeVertex(0);
+    }
+    BROADCAST(this, "s", "removeLinearPlacerVertices");
+}
+
+
+
+// *****************************************************************************
+
+void ParticleSystem::removeOperator(osgParticle::Operator *op)
+{
+    for (int i=0; i<program_->numOperators(); i++)
+    {
+        if (op==program_->getOperator(i))
+        {
+            program_->removeOperator(i);
+            break;
+        }
+    }
+}
+
+void ParticleSystem::enableOrbiter(int b)
+{
+    if (b) program_->addOperator(opOrbit_.get());
+    else removeOperator(opOrbit_.get());
+    BROADCAST(this, "si", "enableOrbiter", b);
+}
+
+void ParticleSystem::enableAccelerator(int b)
+{
+    if (b) program_->addOperator(opAccel_.get());
+    else removeOperator(opAccel_.get());
+    BROADCAST(this, "si", "enableAccelerator", b);
+}
+
+void ParticleSystem::enableAngularAccelerator(int b)
+{
+    if (b) program_->addOperator(opAngularAccel_.get());
+    else removeOperator(opAngularAccel_.get());
+    BROADCAST(this, "si", "enableAngularAccelerator", b);
+}
+
+void ParticleSystem::enableAngularDamping(int b)
+{
+    if (b) program_->addOperator(opAngularDamping_.get());
+    else removeOperator(opAngularDamping_.get());
+    BROADCAST(this, "si", "enableAngularDamping", b);
+}
+
+void ParticleSystem::enableDamping(int b)
+{
+    if (b) program_->addOperator(opDamping_.get());
+    else removeOperator(opDamping_.get());
+    BROADCAST(this, "si", "enableDamping", b);
+}
+
+void ParticleSystem::enableFluidFriction(int b)
+{
+    if (b) program_->addOperator(opFluidFriction_.get());
+    else removeOperator(opFluidFriction_.get());
+    BROADCAST(this, "si", "enableFluidFriction", b);
+}
+
+void ParticleSystem::enableExplosion(int b)
+{
+    if (b) program_->addOperator(opExplosion_.get());
+    else removeOperator(opExplosion_.get());
+    BROADCAST(this, "si", "enableExplosion", b);
+}
+
+void ParticleSystem::enableForce(int b)
+{
+    if (b) program_->addOperator(opForce_.get());
+    else removeOperator(opForce_.get());
+    BROADCAST(this, "si", "enableForce", b);
+}
+
+void ParticleSystem::enableBouncer(int b)
+{
+    if (b) program_->addOperator(opBounce_.get());
+    else removeOperator(opBounce_.get());
+    BROADCAST(this, "si", "enableBouncer", b);
+}
+
+
+
+// *****************************************************************************
+// operator properties:
+
+void ParticleSystem::setAccel(float x, float y, float z)
+{
+    opAccel_->setAcceleration(osg::Vec3(x,y,z));
+    BROADCAST(this, "sfff", "setAccel", x, y, z);
+}
+
+void ParticleSystem::setAngularAccel(float x, float y, float z)
+{
+    opAngularAccel_->setAngularAcceleration(osg::Vec3(x,y,z));
+    BROADCAST(this, "sfff", "setAngularAccel", x, y, z);
+}
+
+void ParticleSystem::setAngularDamping(float d)
+{
+    opAngularDamping_->setDamping(d);
+    BROADCAST(this, "sf", "setAngularDamping", d);
+}
+
+void ParticleSystem::setDamping(float d)
+{
+    opDamping_->setDamping(d);
+    BROADCAST(this, "sf", "setDamping", d);
+}
+
+void ParticleSystem::setOrbitCenter(float x, float y, float z)
+{
+    opOrbit_->setCenter(osg::Vec3(x,y,z));
+    BROADCAST(this, "sfff", "setOrbitCenter", x, y, z);
+}
+void ParticleSystem::setOrbitMagnitude(float mag)
+{
+    opOrbit_->setMagnitude(mag);
+    BROADCAST(this, "sf", "setOrbitMagnitude", mag);
+}
+void ParticleSystem::setOrbitEpsilon(float eps)
+{
+    opOrbit_->setEpsilon(eps);
+    BROADCAST(this, "sf", "setOrbitEpsilon", eps);
+}
+void ParticleSystem::setOrbitMaxRadius(float max)
+{
+    opOrbit_->setMaxRadius(max);
+    BROADCAST(this, "sf", "setOrbitMaxRadius", max);
+}
+
+
+void ParticleSystem::setExplosionCenter(float x, float y, float z)
+{
+    opExplosion_->setCenter(osg::Vec3(x,y,z));
+    BROADCAST(this, "sfff", "setExplosionCenter", x, y, z);
+}
+void ParticleSystem::setExplosionRadius(float r)
+{
+    opExplosion_->setRadius(r);
+    BROADCAST(this, "sf", "setExplosionRadius", r);
+}
+void ParticleSystem::setExplosionMagnitude(float mag)
+{
+    opExplosion_->setMagnitude(mag);
+    BROADCAST(this, "sf", "setExplosionMagnitude", mag);
+}
+void ParticleSystem::setExplosionEpsilon(float eps)
+{
+    opExplosion_->setEpsilon(eps);
+    BROADCAST(this, "sf", "setExplosionEpsilon", eps);
+}
+void ParticleSystem::setExplosionSigma(float s)
+{
+    opExplosion_->setSigma(s);
+    BROADCAST(this, "sf", "setExplosionSigma", s);
+}
+
+void ParticleSystem::setForce(float x, float y, float z)
+{
+    opForce_->setForce(osg::Vec3(x,y,z));
+    BROADCAST(this, "sfff", "setForce", x, y, z);
+}
+
+// *****************************************************************************
+
+void ParticleSystem::setFluidDensity(float d)
+{
+    opFluidFriction_->setFluidDensity(d);
+    BROADCAST(this, "sf", "setFluidDensity", d);
+}
+
+void ParticleSystem::setFluidViscosity(float v)
+{
+    opFluidFriction_->setFluidViscosity(v);
+    BROADCAST(this, "sf", "setFluidViscosity", v);
+}
+
+void ParticleSystem::setFluidDirection(float x, float y, float z)
+{
+    opFluidFriction_->setWind(osg::Vec3(x,y,z));
+    BROADCAST(this, "sfff", "setFluidDirection", x,y,z);
+}
+
+
+// *****************************************************************************
+void ParticleSystem::addBouncePlane(float normalX, float normalY, float normalZ, float x, float y, float z)
+{
+    opBounce_->addPlaneDomain(osg::Plane(osg::Vec3(normalX,normalY,normalZ), osg::Vec3(x,y,z)));
+    BROADCAST(this, "sffffff", "addBouncePlane", normalX,normalY,normalZ, x,y,z);
+}
+
+void ParticleSystem::addBounceBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
+{
+    opBounce_->addBoxDomain(osg::Vec3(minX,minY,minZ), osg::Vec3(maxX,maxY,maxZ));
+    BROADCAST(this, "sffffff", "addBounceBox", minX,minY,minZ, maxX,maxY,maxZ);
+}
+
+void ParticleSystem::addBounceSphere(float x, float y, float z, float radius)
+{
+    opBounce_->addSphereDomain(osg::Vec3(x,y,z), radius);
+    BROADCAST(this, "sffff", "addBounceSphere", x,y,z,radius);
+}
+
+void ParticleSystem::removeAllBouncers()
+{
+    opBounce_->removeAllDomains();
+    BROADCAST(this, "s", "removeAllBouncers");
+}
+
+void ParticleSystem::setBounceFriction(float f)
+{
+    opBounce_->setFriction(f);
+    BROADCAST(this, "sf", "setBounceFriction");
+}
+
+void ParticleSystem::setBounceResilience(float r)
+{
+    opBounce_->setResilience(r);
+    BROADCAST(this, "sf", "setBounceResilience");
+}
+
+void ParticleSystem::setBounceCutoff(float v)
+{
+    opBounce_->setCutoff(v);
+    BROADCAST(this, "sf", "setBounceCutoff");
+}
+
+
+// *****************************************************************************
+
+
+
+
+
+
+// *****************************************************************************
+// particle properties:
+
+void ParticleSystem::setParticleShape(int shp)
+{
+    particle_.setShape((osgParticle::Particle::Shape)shp);
+    system_->setDefaultParticleTemplate(particle_);
+    BROADCAST(this, "si", "setParticleShape", shp);
+}
 
 void ParticleSystem::setLifeTime(float seconds)
 {
     particle_.setLifeTime(seconds);
+    system_->setDefaultParticleTemplate(particle_);
     BROADCAST(this, "sf", "setLifeTime", getLifeTime());
 }
 
 void ParticleSystem::setRadius(float radius)
 {
     particle_.setRadius(radius);
+    system_->setDefaultParticleTemplate(particle_);
     BROADCAST(this, "sf", "setRadius", getRadius());
 }
 
 void ParticleSystem::setMass(float mass)
 {
     particle_.setMass(mass);
+    system_->setDefaultParticleTemplate(particle_);
     BROADCAST(this, "sf", "setMass", getMass());
 }
+
+void ParticleSystem::setParticleSizeRange(float x, float y)
+{
+    particle_.setSizeRange(osgParticle::rangef(x,y));
+    system_->setDefaultParticleTemplate(particle_);
+    BROADCAST(this, "sff", "setParticleSizeRange", x, y);
+}
+ 
+
+// *****************************************************************************
+// shooter & counter properties:
 
 void ParticleSystem::setFrequencyRange (float min, float max)
 {
@@ -268,30 +646,46 @@ void ParticleSystem::setFrequencyRange (float min, float max)
 	BROADCAST(this, "sff", "setFrequencyRange", freqRange_.x(), freqRange_.y());
 }
 
-void ParticleSystem::setCircularRange(float min, float max)
+/*
+This shooter computes the velocity vector of incoming particles by choosing a
+random direction and a random speed. Both direction and speed are chosen within
+specified ranges. The direction is defined by two angles: theta, which is the
+angle between the velocity vector and the Z axis, and phi, which is the angle
+between the X axis and the velocity vector projected onto the X-Y plane. 
+*/
+
+void ParticleSystem::setShooterThetaRange(float min, float max)
 {
-    placer_->setRadiusRange(min, max);
-    BROADCAST(this, "sff", "setFrequencyRange", min, max);
-    //BROADCAST(this, "sff", "setCircularRange", range.minimum, range.maximum);
-}
-osg::Vec2 ParticleSystem::getCircularRange()
-{
-    const osgParticle::rangef range = placer_->getRadiusRange();
-    return osg::Vec2(range.minimum, range.maximum);
+    shooter_->setThetaRange(min, max);
+    BROADCAST(this, "sff", "setShooterThetaRange", min, max);
 }
 
+void ParticleSystem::setShooterPhiRange(float min, float max)
+{
+    shooter_->setPhiRange(min, max);
+    BROADCAST(this, "sff", "setShooterPhiRange", min, max);
+}
 
-void ParticleSystem::setSpeedRange(float min, float max)
+void ParticleSystem::setShooterSpeedRange(float min, float max)
 {
     shooter_->setInitialSpeedRange(min, max);
-    BROADCAST(this, "sff", "setSpeedRange", min, max);
+    BROADCAST(this, "sff", "setShooterSpeedRange", min, max);
 }
-osg::Vec2 ParticleSystem::getSpeedRange()
+
+osg::Vec2 ParticleSystem::getShooterSpeedRange()
 {
     const osgParticle::rangef range = shooter_->getInitialSpeedRange();
     return osg::Vec2(range.minimum, range.maximum);
 }
 
+void ParticleSystem::setShootertRotationalSpeedRange(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
+{
+    shooter_->setInitialRotationalSpeedRange(osg::Vec3(minX, minY, minZ), osg::Vec3(maxX, maxY, maxZ));
+    BROADCAST(this, "sffffff", "setShooterRotationalSpeedRange", minX, minY, minZ, maxX, maxY, maxZ);
+}
+
+
+// *****************************************************************************
 
 void ParticleSystem::setImagePath (const char* path)
 {
@@ -327,7 +721,7 @@ void ParticleSystem::setLighting (int b)
 std::vector<lo_message> ParticleSystem::getState () const
 {
     // inherit state from base class
-	std::vector<lo_message> ret = GroupNode::getState();
+	std::vector<lo_message> ret = ConstraintsNode::getState();
 
     lo_message msg;
 

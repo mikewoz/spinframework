@@ -48,9 +48,21 @@
 #include <osgParticle/ModularEmitter>
 #include <osgParticle/RandomRateCounter>
 #include <osgParticle/SectorPlacer>
+#include <osgParticle/BoxPlacer>
+#include <osgParticle/MultiSegmentPlacer>
 #include <osgParticle/RadialShooter>
 
-#include "GroupNode.h"
+#include <osgParticle/OrbitOperator>
+#include <osgParticle/AccelOperator>
+#include <osgParticle/AngularAccelOperator>
+#include <osgParticle/AngularDampingOperator>
+#include <osgParticle/DampingOperator>
+#include <osgParticle/FluidFrictionOperator>
+#include <osgParticle/ExplosionOperator>
+#include <osgParticle/ForceOperator>
+#include <osgParticle/BounceOperator>
+
+#include "ConstraintsNode.h"
 
 namespace spin
 {
@@ -58,8 +70,9 @@ namespace spin
 /**
  * \brief A controller for a particle system
  *
- */
-class ParticleSystem : public GroupNode
+ * See http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ParticleEffects
+*/
+class ParticleSystem : public ConstraintsNode
 {
 
 public:
@@ -67,8 +80,139 @@ public:
     ParticleSystem(SceneManager *sceneManager, const char* initID);
     virtual ~ParticleSystem();
     
-    virtual void callbackUpdate(osg::NodeVisitor* nv);
+    enum PlacerType
+    {
+        RADIAL,     /*!< Places particles randomly within a radial disc. A range
+                    (minRadius,maxRadius) can be specified, as well as a range
+                    for the central angle (phi). */
+        CUBIC,      /*!< Places particles randomly within a cubic box. You can
+                    specify the x-range, y-range, and z-range. */
+        LINEAR      /*!< Places particles randomly along a series of line
+                    segments. */
+    };
     
+    
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
+    void updateNodePath(bool updateChildren);
+    
+    virtual void debug();
+    
+    
+    void setPlacerType(int type);
+    
+    void setRadialRange(float min, float max);
+    osg::Vec2 getRadialRange();
+    
+    void setRadialPhiRange(float min, float max);
+     
+    
+    void setCubicXRange(float min, float max);
+    void setCubicYRange(float min, float max);
+    void setCubicZRange(float min, float max);
+    
+    void addLinearPlacerVertex(float x, float y, float z);
+    void removeLinearPlacerVertices();
+
+    
+    
+    
+    /**
+     * The orbiter forces particles in the orbit around a point.
+     */
+    void enableOrbiter(int b);
+
+    /**
+     * Applies a constant acceleration to the particles (eg, gravity).
+     */
+    void enableAccelerator(int b);
+    
+    /**
+     * Applies a constant angular acceleration to the particles.
+     */
+    void enableAngularAccelerator(int b);
+
+    /**
+     * Applies damping constant to particle's angular velocity.
+     */
+    void enableAngularDamping(int b);
+
+    /**
+     * Applies damping constant to particle's velocity.
+     */
+    void enableDamping(int b);
+
+    /**
+     * Simulates the friction of a fluid.
+     *
+     * By using this operator you can let the particles move in a fluid of a
+     * given density and viscosity. There are two functions to quickly setup the
+     * parameters for pure water and air. You can decide whether to compute the
+     * forces using the particle's physical radius or another value, by calling
+     * the setOverrideRadius() method.
+     */
+    void enableFluidFriction(int b);
+   
+    /**
+     * Exerts force on each particle away from the explosion center.
+     */
+    void enableExplosion(int b);
+   
+    /**
+     * Applies a constant force to the particles. Remember that if the mass of
+     * particles is expressed in kg and the lengths are expressed in meters,
+     * then the force should be expressed in Newtons.
+     */
+    void enableForce(int b);
+   
+    /**
+     * Can affect the particle's velocity to make it rebound. 
+     */
+    void enableBouncer(int b);
+
+
+    
+    
+    // OPERATOR PARAMS:
+    
+    void setAccel(float x, float y, float z);
+    void setAngularAccel(float x, float y, float z);
+    void setAngularDamping(float d);
+    void setDamping(float d);
+    
+    void setOrbitCenter(float x, float y, float z);
+    void setOrbitMagnitude(float mag);
+    void setOrbitEpsilon(float eps);
+    void setOrbitMaxRadius(float max);
+    
+    void setExplosionCenter(float x, float y, float z);
+    void setExplosionRadius(float r);
+    void setExplosionMagnitude(float mag);
+    void setExplosionEpsilon(float eps);
+    void setExplosionSigma(float s);
+
+    void setForce(float x, float y, float z);
+    
+    void setFluidDensity(float d);
+    void setFluidViscosity(float v);
+    void setFluidDirection(float x, float y, float z);
+    
+    void addBouncePlane(float normalX, float normalY, float normalZ, float x, float y, float z);
+    void addBounceBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+    void addBounceSphere(float x, float y, float z, float radius);
+    void removeAllBouncers();
+    void setBounceFriction(float f);
+    void setBounceResilience(float r);
+    void setBounceCutoff(float v);
+    
+
+    // override some methods :
+    virtual void setTranslation (float x, float y, float z);
+    virtual void setOrientation (float p, float r, float y);
+    virtual void setOrientationQuat (float x, float y, float z, float w);
+    virtual osg::Vec3 getTranslation() const { return radialPlacer_->getCenter(); };
+
+    // particle properties:
+    void setParticleShape(int shp);
     void setLifeTime(float seconds);
     float getLifeTime() { return (float) particle_.getLifeTime(); }
 
@@ -77,6 +221,8 @@ public:
 
     void setMass(float mass);
     float getMass() { return (float) particle_.getMass(); }
+    
+    void setParticleSizeRange(float x, float y);
     
     void setEmissive(int emissiveFlag);
     int getEmissive() const { return (int) emissive_; }
@@ -90,16 +236,22 @@ public:
     void setFrequencyRange(float min, float max);
     osg::Vec2 getFrequencyRange() const { return freqRange_; }
 
-    void setCircularRange(float min, float max);
-    osg::Vec2 getCircularRange();
     
-    void setSpeedRange(float min, float max);
-    osg::Vec2 getSpeedRange();
+    
+ 
+    
+    void setShooterThetaRange(float min, float max);
+    void setShooterPhiRange(float min, float max);
+    void setShooterSpeedRange(float min, float max);
+    osg::Vec2 getShooterSpeedRange();
+    void setShootertRotationalSpeedRange(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
 
 
     virtual std::vector<lo_message> getState() const;
 
 private:
+
+    void removeOperator(osgParticle::Operator *op);
 
     bool attachedFlag_;
 
@@ -107,8 +259,24 @@ private:
     osg::ref_ptr<osgParticle::ParticleSystemUpdater> updater_;
     osg::ref_ptr<osgParticle::ModularEmitter> emitter_;
     osg::ref_ptr<osgParticle::RandomRateCounter> counter_;
-    osg::ref_ptr<osgParticle::SectorPlacer> placer_;
+    osg::ref_ptr<osgParticle::SectorPlacer> radialPlacer_;
+    osg::ref_ptr<osgParticle::BoxPlacer> cubicPlacer_;
+    osg::ref_ptr<osgParticle::MultiSegmentPlacer> linearPlacer_;
     osg::ref_ptr<osgParticle::RadialShooter> shooter_;
+    
+    // programs and their operators:
+    osg::ref_ptr<osgParticle::ModularProgram> program_;
+    osg::ref_ptr<osgParticle::OrbitOperator> opOrbit_;
+    osg::ref_ptr<osgParticle::AccelOperator> opAccel_;
+    osg::ref_ptr<osgParticle::AngularAccelOperator> opAngularAccel_;
+    osg::ref_ptr<osgParticle::AngularDampingOperator> opAngularDamping_;
+    osg::ref_ptr<osgParticle::DampingOperator> opDamping_;
+    osg::ref_ptr<osgParticle::FluidFrictionOperator> opFluidFriction_;
+    osg::ref_ptr<osgParticle::ExplosionOperator> opExplosion_;
+    osg::ref_ptr<osgParticle::ForceOperator> opForce_;
+    osg::ref_ptr<osgParticle::BounceOperator> opBounce_;
+    
+    osg::ref_ptr<osg::PositionAttitudeTransform> attachPAT;
     
     osgParticle::Particle particle_;
     
@@ -117,7 +285,6 @@ private:
     float mass_;
     
     osg::Vec2 freqRange_;
-    osg::Vec2 circularRange_;
     osg::Vec2 angularRange_;
     osg::Vec2 speedRange_;
     osg::Vec2 alphaRange_;

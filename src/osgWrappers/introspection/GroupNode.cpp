@@ -281,17 +281,17 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          "",
 	          "");
 	I_Method0(osg::Vec3, getTranslation,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __osg_Vec3__getTranslation,
 	          "",
 	          "");
 	I_Method0(osg::Quat, getOrientationQuat,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __osg_Quat__getOrientationQuat,
 	          "",
 	          "");
 	I_Method0(osg::Vec3, getScale,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __osg_Vec3__getScale,
 	          "",
 	          "");
