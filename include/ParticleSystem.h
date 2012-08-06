@@ -233,6 +233,8 @@ public:
     void setImagePath(const char* path);
     const char* getImagePath() const { return imgPath_.c_str(); }
     
+    void setImage (const char* path);
+    
     void setFrequencyRange(float min, float max);
     osg::Vec2 getFrequencyRange() const { return freqRange_; }
 

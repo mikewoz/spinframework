@@ -39,11 +39,19 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <osg/Texture2D>
+#include <osg/PointSprite>
+#include <osg/BlendFunc>
+#include <osgDB/FileUtils>
+#include <osgDB/ReadFile>
+
 #include "ParticleSystem.h"
 #include "SceneManager.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "osgUtil.h"
+
+#define USE_LOCAL_SHADERS
 
 namespace spin
 {
@@ -54,13 +62,6 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
 {
 	this->setName(this->getID() + ".ParticleSystem");
 	this->setNodeType("ParticleSystem");
-    
-    // A particle system and its placer has no osg::Group, so we create a fake
-    // node that set as our attachmentNode, and we copy the position of the 
-    // placer whenever it changes.
-    attachPAT = new osg::PositionAttitudeTransform();
-    this->addChild(attachPAT);
-    setAttachmentNode(attachPAT.get());
 
     imgPath_.clear();
     attachedFlag_ = false;
@@ -121,8 +122,7 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     // counts faster (more particles are emitted at each frame).
 
     emitter_ = new osgParticle::ModularEmitter;
-    emitter_->setName("particle emitter");
-    
+    emitter_->setName(getID()+".ParticleEmitter");
     
     // the first thing you *MUST* do after creating an emitter is to set the
     // destination particle system, otherwise it won't know where to create
@@ -207,7 +207,7 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     // displayed.
 
     osg::Geode *geode = new osg::Geode;
-    geode->setName("particle system");
+    geode->setName(getID()+".ParticleSystem");
     geode->addDrawable(system_);
 
     // add the geode to the scene graph
@@ -215,9 +215,18 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     
     
     updater_ = new osgParticle::ParticleSystemUpdater;
-    updater_->setName("particle updater");
+    updater_->setName(getID()+".ParticleUpdater");
     updater_->addParticleSystem(system_);
     //this->getAttachmentNode()->addChild(updater_);
+
+
+        
+    // A particle system and its placer has no osg::Group, so we create a fake
+    // node that set as our attachmentNode, and we copy the position of the 
+    // placer whenever it changes.
+    attachPAT = new osg::PositionAttitudeTransform();
+    this->addChild(attachPAT);
+    setAttachmentNode(attachPAT.get());
 
 }
 
@@ -692,8 +701,11 @@ void ParticleSystem::setImagePath (const char* path)
     if (imgPath_ != path)
     {
         imgPath_ = path;
-        system_->setDefaultAttributes(imgPath_, emissive_, lighting_);
-    
+        if (imgPath_=="NULL")
+            system_->setDefaultAttributesUsingShaders("", emissive_, lighting_);
+        else 
+            system_->setDefaultAttributesUsingShaders(imgPath_, emissive_, lighting_);
+        
         BROADCAST(this, "ss", "setImagePath", getImagePath());
     }
 }
@@ -714,6 +726,102 @@ void ParticleSystem::setLighting (int b)
 		lighting_ = (bool) b;
 		BROADCAST(this, "si", "setLighting", getLighting());
 	}
+}
+
+void ParticleSystem::setImage (const char* path)
+{
+    if (imgPath_ == path) return;
+    imgPath_ = path;
+
+    int texture_unit = 0;
+    
+    osg::StateSet *stateset = new osg::StateSet;
+    stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+    osg::PointSprite *sprite = new osg::PointSprite;
+    stateset->setTextureAttributeAndModes(texture_unit, sprite, osg::StateAttribute::ON);
+
+    #if !defined(OSG_GLES1_AVAILABLE) && !defined(OSG_GLES2_AVAILABLE)
+        stateset->setMode(GL_VERTEX_PROGRAM_POINT_SIZE, osg::StateAttribute::ON);
+    #else
+        OSG_NOTICE<<"Warning: ParticleSystem::setDefaultAttributesUsingShaders(..) not fully implemented."<<std::endl;
+    #endif
+
+    if (imgPath_!="NULL")
+    {
+        osg::Texture2D *texture = new osg::Texture2D;
+        texture->setImage(osgDB::readImageFile(imgPath_));
+        texture->setFilter(osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR);
+        texture->setFilter(osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR);
+        texture->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::MIRROR);
+        texture->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::MIRROR);
+        stateset->setTextureAttributeAndModes(texture_unit, texture, osg::StateAttribute::ON);
+    }
+
+    osg::BlendFunc *blend = new osg::BlendFunc;
+    if (emissive_)
+    {
+        blend->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE);
+    }
+    else
+    {
+        blend->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+    }
+    stateset->setAttributeAndModes(blend, osg::StateAttribute::ON);
+
+    osg::Program *program = new osg::Program;
+#ifdef USE_LOCAL_SHADERS
+    char vertexShaderSource[] =
+        "uniform float visibilityDistance;\n"
+        "varying vec3 basic_prop;\n"
+        "\n"
+        "void main(void)\n"
+        "{\n"
+        "    basic_prop = gl_MultiTexCoord0.xyz;\n"
+        "    \n"
+        "    vec4 ecPos = gl_ModelViewMatrix * gl_Vertex;\n"
+        "    float ecDepth = -ecPos.z;\n"
+        "    \n"
+        "    if (visibilityDistance > 0.0)\n"
+        "    {\n"
+        "        if (ecDepth <= 0.0 || ecDepth >= visibilityDistance)\n"
+        "            basic_prop.x = -1.0;\n"
+        "    }\n"
+        "    \n"
+        "    gl_Position = ftransform();\n"
+        "    gl_ClipVertex = ecPos;\n"
+        "    \n"
+        "    vec4 color = gl_Color;\n"
+        "    color.a *= basic_prop.z;\n"
+        "    gl_FrontColor = color;\n"
+        "    gl_BackColor = gl_FrontColor;\n"
+        "}\n";
+    char fragmentShaderSource[] =
+        "uniform sampler2D baseTexture;\n"
+        "varying vec3 basic_prop;\n"
+        "\n"
+        "void main(void)\n"
+        "{\n"
+        "    if (basic_prop.x < 0.0) discard;\n"
+        "    gl_FragColor = gl_Color * texture2D(baseTexture, gl_TexCoord[0].xy);\n"
+        "}\n";
+    program->addShader(new osg::Shader(osg::Shader::VERTEX, vertexShaderSource));
+    program->addShader(new osg::Shader(osg::Shader::FRAGMENT, fragmentShaderSource));
+#else
+    program->addShader(osg::Shader::readShaderFile(osg::Shader::VERTEX, osgDB::findDataFile("shaders/particle.vert")));
+    program->addShader(osg::Shader::readShaderFile(osg::Shader::FRAGMENT, osgDB::findDataFile("shaders/particle.frag")));
+#endif
+    stateset->setAttributeAndModes(program, osg::StateAttribute::ON);
+
+    stateset->addUniform(new osg::Uniform("visibilityDistance", (float)system_->getVisibilityDistance()));
+    stateset->addUniform(new osg::Uniform("baseTexture", texture_unit));
+    system_->setStateSet(stateset);
+
+    system_->setUseVertexArray(true);
+    system_->setUseShaders(true);
+             
+                                                                                                                                                                                                                                                             
+    BROADCAST(this, "ss", "setImage", getImagePath());
 }
 
 // *****************************************************************************

@@ -350,6 +350,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __C5_char_P1__getImagePath,
 	          "",
 	          "");
+	I_Method1(void, setImage, IN, const char *, path,
+	          Properties::NON_VIRTUAL,
+	          __void__setImage__C5_char_P1,
+	          "",
+	          "");
 	I_Method2(void, setFrequencyRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setFrequencyRange__float__float,
@@ -429,6 +434,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(osg::Vec2, FrequencyRange, 
 	                 __osg_Vec2__getFrequencyRange, 
 	                 0);
+	I_SimpleProperty(const char *, Image, 
+	                 0, 
+	                 __void__setImage__C5_char_P1);
 	I_SimpleProperty(const char *, ImagePath, 
 	                 __C5_char_P1__getImagePath, 
 	                 __void__setImagePath__C5_char_P1);
