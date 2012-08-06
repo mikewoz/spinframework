@@ -205,6 +205,7 @@ SceneManager::SceneManager(std::string id)
     fpl.push_back( resourcesPath + "/scripts/");
     fpl.push_back( resourcesPath + "/fonts/");
     fpl.push_back( resourcesPath + "/images/");
+    fpl.push_back( resourcesPath + "/models/");
     fpl.push_back( resourcesPath + "/shaders/");
     osgDB::setDataFilePathList( fpl );
 

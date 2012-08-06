@@ -308,6 +308,7 @@ AC_CONFIG_FILES([
         src/spin/Makefile
         src/Resources/Makefile
         src/Resources/images/Makefile
+        src/Resources/models/Makefile
         src/Resources/desktopentries/Makefile
         src/Resources/camconfig/Makefile
         src/Resources/fonts/Makefile

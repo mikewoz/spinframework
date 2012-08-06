@@ -1,0 +1,307 @@
+Geode {
+  DataVariance DYNAMIC
+  name "cube.osg"
+  nodeMask 0xffffffff
+  cullingActive TRUE
+  num_drawables 6
+  Geometry {
+    DataVariance DYNAMIC
+    StateSet {
+      DataVariance STATIC
+      rendering_hint OPAQUE_BIN
+      renderBinMode INHERIT
+      GL_CULL_FACE OFF
+      GL_LIGHTING ON
+      textureUnit 0 {
+        GL_TEXTURE_2D ON
+        Texture2D {
+          DataVariance STATIC
+          file "../images/osg_negz.jpg"
+          wrap_s CLAMP
+          wrap_t CLAMP
+          wrap_r CLAMP
+          min_filter LINEAR_MIPMAP_LINEAR
+          mag_filter LINEAR
+          maxAnisotropy 1
+          useHardwareMipMapGeneration TRUE
+          unRefImageDataAfterApply FALSE
+          internalFormatMode USE_IMAGE_DATA_FORMAT
+        }
+      }
+    }
+    useDisplayList TRUE
+    PrimitiveSets 1
+    {
+      DrawArrays QUADS 0 4
+    }
+    VertexArray Vec3Array 4
+    {
+      -1 1 -1
+      1 1 -1
+      1 -1 -1
+      -1 -1 -1
+    }
+    NormalBinding PER_PRIMITIVE
+    NormalArray Vec3Array 1
+    {
+      0 0 -1
+    }
+    TexCoordArray 0 Vec2Array 4
+    {
+      0 0
+      1 0
+      1 1
+      0 1
+    }
+  }
+  Geometry {
+    DataVariance DYNAMIC
+    StateSet {
+      DataVariance STATIC
+      rendering_hint OPAQUE_BIN
+      renderBinMode INHERIT
+      GL_CULL_FACE OFF
+      GL_LIGHTING ON
+      textureUnit 0 {
+        GL_TEXTURE_2D ON
+        Texture2D {
+          DataVariance STATIC
+          file "../images/osg_posz.jpg"
+          wrap_s CLAMP
+          wrap_t CLAMP
+          wrap_r CLAMP
+          min_filter LINEAR_MIPMAP_LINEAR
+          mag_filter LINEAR
+          maxAnisotropy 1
+          useHardwareMipMapGeneration TRUE
+          unRefImageDataAfterApply FALSE
+          internalFormatMode USE_IMAGE_DATA_FORMAT
+        }
+      }
+    }
+    useDisplayList TRUE
+    PrimitiveSets 1
+    {
+      DrawArrays QUADS 0 4
+    }
+    VertexArray Vec3Array 4
+    {
+      -1 -1 1
+      1 -1 1
+      1 1 1
+      -1 1 1
+    }
+    NormalBinding PER_PRIMITIVE
+    NormalArray Vec3Array 1
+    {
+      0 0 1
+    }
+    TexCoordArray 0 Vec2Array 4
+    {
+      0 0
+      1 0
+      1 1
+      0 1
+    }
+  }
+  Geometry {
+    DataVariance DYNAMIC
+    StateSet {
+      DataVariance STATIC
+      rendering_hint OPAQUE_BIN
+      renderBinMode INHERIT
+      GL_CULL_FACE OFF
+      GL_LIGHTING ON
+      textureUnit 0 {
+        GL_TEXTURE_2D ON
+        Texture2D {
+          DataVariance STATIC
+          file "../images/osg_posx.jpg"
+          wrap_s CLAMP
+          wrap_t CLAMP
+          wrap_r CLAMP
+          min_filter LINEAR_MIPMAP_LINEAR
+          mag_filter LINEAR
+          maxAnisotropy 1
+          useHardwareMipMapGeneration TRUE
+          unRefImageDataAfterApply FALSE
+          internalFormatMode USE_IMAGE_DATA_FORMAT
+        }
+      }
+    }
+    useDisplayList TRUE
+    PrimitiveSets 1
+    {
+      DrawArrays QUADS 0 4
+    }
+    VertexArray Vec3Array 4
+    {
+      1 1 -1
+      1 1 1
+      1 -1 1
+      1 -1 -1
+    }
+    NormalBinding PER_PRIMITIVE
+    NormalArray Vec3Array 1
+    {
+      1 0 0
+    }
+    TexCoordArray 0 Vec2Array 4
+    {
+      0 0
+      1 0
+      1 1
+      0 1
+    }
+  }
+  Geometry {
+    DataVariance DYNAMIC
+    StateSet {
+      DataVariance STATIC
+      rendering_hint OPAQUE_BIN
+      renderBinMode INHERIT
+      GL_CULL_FACE OFF
+      GL_LIGHTING ON
+      textureUnit 0 {
+        GL_TEXTURE_2D ON
+        Texture2D {
+          DataVariance STATIC
+          file "../images/osg_negx.jpg"
+          wrap_s CLAMP
+          wrap_t CLAMP
+          wrap_r CLAMP
+          min_filter LINEAR_MIPMAP_LINEAR
+          mag_filter LINEAR
+          maxAnisotropy 1
+          useHardwareMipMapGeneration TRUE
+          unRefImageDataAfterApply FALSE
+          internalFormatMode USE_IMAGE_DATA_FORMAT
+        }
+      }
+    }
+    useDisplayList TRUE
+    PrimitiveSets 1
+    {
+      DrawArrays QUADS 0 4
+    }
+    VertexArray Vec3Array 4
+    {
+      -1 -1 -1
+      -1 -1 1
+      -1 1 1
+      -1 1 -1
+    }
+    NormalBinding PER_PRIMITIVE
+    NormalArray Vec3Array 1
+    {
+      -1 0 0
+    }
+    TexCoordArray 0 Vec2Array 4
+    {
+      0 0
+      1 0
+      1 1
+      0 1
+    }
+  }
+  Geometry {
+    DataVariance DYNAMIC
+    StateSet {
+      DataVariance STATIC
+      rendering_hint OPAQUE_BIN
+      renderBinMode INHERIT
+      GL_CULL_FACE OFF
+      GL_LIGHTING ON
+      textureUnit 0 {
+        GL_TEXTURE_2D ON
+        Texture2D {
+          DataVariance STATIC
+          file "../images/osg_posy.jpg"
+          wrap_s CLAMP
+          wrap_t CLAMP
+          wrap_r CLAMP
+          min_filter LINEAR_MIPMAP_LINEAR
+          mag_filter LINEAR
+          maxAnisotropy 1
+          useHardwareMipMapGeneration TRUE
+          unRefImageDataAfterApply FALSE
+          internalFormatMode USE_IMAGE_DATA_FORMAT
+        }
+      }
+    }
+    useDisplayList TRUE
+    PrimitiveSets 1
+    {
+      DrawArrays QUADS 0 4
+    }
+    VertexArray Vec3Array 4
+    {
+      1 1 -1
+      -1 1 -1
+      -1 1 1
+      1 1 1
+    }
+    NormalBinding PER_PRIMITIVE
+    NormalArray Vec3Array 1
+    {
+      0 1 0
+    }
+    TexCoordArray 0 Vec2Array 4
+    {
+      0 0
+      1 0
+      1 1
+      0 1
+    }
+  }
+  Geometry {
+    DataVariance DYNAMIC
+    StateSet {
+      DataVariance STATIC
+      rendering_hint OPAQUE_BIN
+      renderBinMode INHERIT
+      GL_CULL_FACE OFF
+      GL_LIGHTING ON
+      textureUnit 0 {
+        GL_TEXTURE_2D ON
+        Texture2D {
+          DataVariance STATIC
+          file "../images/osg_negy.jpg"
+          wrap_s CLAMP
+          wrap_t CLAMP
+          wrap_r CLAMP
+          min_filter LINEAR_MIPMAP_LINEAR
+          mag_filter LINEAR
+          maxAnisotropy 1
+          useHardwareMipMapGeneration TRUE
+          unRefImageDataAfterApply FALSE
+          internalFormatMode USE_IMAGE_DATA_FORMAT
+        }
+      }
+    }
+    useDisplayList TRUE
+    PrimitiveSets 1
+    {
+      DrawArrays QUADS 0 4
+    }
+    VertexArray Vec3Array 4
+    {
+      1 -1 1
+      -1 -1 1
+      -1 -1 -1
+      1 -1 -1
+    }
+    NormalBinding PER_PRIMITIVE
+    NormalArray Vec3Array 1
+    {
+      0 -1 0
+    }
+    TexCoordArray 0 Vec2Array 4
+    {
+      0 0
+      1 0
+      1 1
+      0 1
+    }
+  }
+}

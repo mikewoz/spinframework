@@ -67,6 +67,36 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          __void__setURI__C5_char_P1,
 	          "",
 	          "");
+	I_Method1(void, grabberCallback, IN, const pcl::PointCloud< pcl::PointXYZRGBA >::ConstPtr &, cloud,
+	          Properties::NON_VIRTUAL,
+	          __void__grabberCallback__C5_pcl_PointCloudT1_pcl_PointXYZRGBA__ConstPtr_R1,
+	          "",
+	          "");
+	I_Method1(void, applyFilters, IN, const pcl::PointCloud< pcl::PointXYZRGBA >::ConstPtr &, rawCloud,
+	          Properties::NON_VIRTUAL,
+	          __void__applyFilters__C5_pcl_PointCloudT1_pcl_PointXYZRGBA__ConstPtr_R1,
+	          "",
+	          "");
+	I_Method1(osg::Vec3, getPos, IN, unsigned int, i,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec3__getPos__unsigned_int,
+	          "",
+	          "");
+	I_Method1(osg::Vec4f, getColor, IN, unsigned int, i,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec4f__getColor__unsigned_int,
+	          "",
+	          "");
+	I_Method0(void, updatePoints,
+	          Properties::VIRTUAL,
+	          __void__updatePoints,
+	          "",
+	          "");
+	I_Method0(void, draw,
+	          Properties::VIRTUAL,
+	          __void__draw,
+	          "",
+	          "");
 	I_Method1(void, setCustomNode, IN, const char *, nodeID,
 	          Properties::NON_VIRTUAL,
 	          __void__setCustomNode__C5_char_P1,
