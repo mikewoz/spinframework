@@ -225,7 +225,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         this->getView(0)->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
 
         //dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, 0.01, 100.0);
-        dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far, colorTexture1_);
+        dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far);
         dofPPU_->setFocalLength(0.0);
         dofPPU_->setFocalRange(50.0);
         //osg::setNotifyLevel(osg::FATAL);
@@ -236,9 +236,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // Gets the projection matrix
         osg::Matrixf lProjectionMatrix = camera->getProjectionMatrix();
 
-        ssaoPPU_->createSSAOPipeline(mProcessor.get(), lastUnit,
-                                colorTexture1_, colorTexture2_, colorTexture3_,
-                                lProjectionMatrix);
+        ssaoPPU_->createSSAOPipeline(mProcessor.get(), lastUnit, lProjectionMatrix);
         ssaoPPU_->setPower(1.f);
     }
 

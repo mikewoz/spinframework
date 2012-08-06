@@ -85,9 +85,7 @@ class SSAORendering : virtual public osg::Referenced
         }
 
         /*******************/
-        void createSSAOPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit,
-                                osg::Texture* pColor1, osg::Texture* pNormal, osg::Texture* pPosition,
-                                osg::Matrixf pProjMat)
+        void createSSAOPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Matrixf pProjMat)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");            
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
@@ -97,15 +95,15 @@ class SSAORendering : virtual public osg::Referenced
 
             // Now we are ready for the PPU
             // The first unit gets the first color buffer
-            osgPPU::UnitTexture* lColor1 = new osgPPU::UnitTexture();
+            osgPPU::UnitCameraAttachmentBypass* lColor1 = new osgPPU::UnitCameraAttachmentBypass();
+            lColor1->setBufferComponent(osg::Camera::COLOR_BUFFER0);
             lColor1->setName("Color");
-            lColor1->setTexture(pColor1);
             pParent->addChild(lColor1);
 
             // The second unit gets the second color buffer
-            osgPPU::UnitTexture* lNormal = new osgPPU::UnitTexture();
+            osgPPU::UnitCameraAttachmentBypass* lNormal = new osgPPU::UnitCameraAttachmentBypass();
+            lNormal->setBufferComponent(osg::Camera::COLOR_BUFFER1);
             lNormal->setName("Normal");
-            lNormal->setTexture(pNormal);
             pParent->addChild(lNormal);
             
             // We dowmsample the normals
@@ -118,9 +116,9 @@ class SSAORendering : virtual public osg::Referenced
             lNormal->addChild(lResampleNormal);
 
             // The third unit gets the third color buffer
-            osgPPU::UnitTexture* lPosition = new osgPPU::UnitTexture();
+            osgPPU::UnitCameraAttachmentBypass* lPosition = new osgPPU::UnitCameraAttachmentBypass();
+            lPosition->setBufferComponent(osg::Camera::COLOR_BUFFER2);
             lPosition->setName("Position");
-            lPosition->setTexture(pPosition);
             pParent->addChild(lPosition);
 
             // As well as the position
