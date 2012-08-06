@@ -97,6 +97,7 @@ void SoundNode::callbackUpdate(osg::NodeVisitor* nv)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
+        this->globalMatrix_ = getGlobalMatrix(); // in case reporting is off
         osg::Vec3 myPos = globalMatrix_.getTrans();
         osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
 
