@@ -512,9 +512,27 @@ int run(int argc, char **argv)
 	//std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
     std::cout << "\nspinviewer is READY" << std::endl;
 
+    if (dof || ssao)
+    {
+        unsigned int lEffects = 0x0000;
+        if(dof)
+            lEffects |= PPU_DOF;
+        if(ssao)
+            lEffects |= PPU_SSAO;
+
+        viewer.frame();
+        viewer.initializePPU(lEffects);
+
+        osg::ClampColor* clamp = new osg::ClampColor();
+        clamp->setClampVertexColor(GL_FALSE);
+        clamp->setClampFragmentColor(GL_FALSE);
+        clamp->setClampReadColor(GL_FALSE);
+
+        spin.sceneManager_->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);        
+    }
 
     // depth-of-field effect:
-    if (dof)
+    /*if (dof)
     {
         viewer.frame();
         viewer.initializePPU(CompositeViewer::dofEffect);
@@ -541,7 +559,7 @@ int run(int argc, char **argv)
 
         // make it protected and override, so that it is done for the whole rendering pipeline
         spin.sceneManager_->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
-    }
+    }*/
 
 	// program loop:
 	while(not viewer.done())

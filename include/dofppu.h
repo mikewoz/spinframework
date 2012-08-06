@@ -81,10 +81,19 @@ class DoFRendering : virtual public osg::Referenced
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
-            // the first unit will bypass the color output of the camera
-            osgPPU::UnitBypass* bypass = new osgPPU::UnitBypass();
-            bypass->setName("ColorBypass");
-            parent->addChild(bypass);
+            // If last unit is nullthe first unit will bypass the color output of the camera
+            osgPPU::Unit* bypass;
+            if(lastUnit == NULL)
+            {
+                bypass = new osgPPU::UnitCameraAttachmentBypass();
+                ((osgPPU::UnitCameraAttachmentBypass*)bypass)->setBufferComponent(osg::Camera::COLOR_BUFFER0);
+                ((osgPPU::UnitCameraAttachmentBypass*)bypass)->setName("ColorBypass");
+                parent->addChild(bypass);
+            }
+            else
+            {
+                bypass = lastUnit;
+            }
 
             // next unit will bypass the depth output of the camera
             osgPPU::UnitDepthbufferBypass* depthbypass = new osgPPU::UnitDepthbufferBypass();

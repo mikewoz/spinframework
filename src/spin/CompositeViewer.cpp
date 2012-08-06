@@ -199,7 +199,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
     else
         return;
     
-    if(pEffect == noEffect)
+    if(pEffect == PPU_NONE)
         return;
 
     mProcessor = new osgPPU::Processor();
@@ -215,35 +215,35 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
     // we want to simulate hdr rendering, hence setup the pipeline
     // for the hdr rendering
     osgPPU::Unit* lastUnit = NULL;
- 
 
+    // SSAO effect must be applied before any other effect, especially those
+    // which destroy information (such as DoF)
+    if((pEffect & PPU_SSAO) != 0)
+    //if(((int)pEffect & (int)ssaoEffect) == (int)ssaoEffect)
+    {  
+        ssaoPPU_ = new SSAORendering();
+        // Gets the projection matrix
+        osg::Matrixf lProjectionMatrix = camera->getProjectionMatrix();
 
-    if(pEffect == dofEffect)
+        ssaoPPU_->createSSAOPipeline(mProcessor.get(), lastUnit, lProjectionMatrix);
+        ssaoPPU_->setPower(1.f);
+    } 
+  
+    // DoF effect
+    if((pEffect & PPU_DOF) != 0)
+    //if(((int)pEffect & (int)dofEffect) == (int)dofEffect)
     {
         //osg::setNotifyLevel(osg::DEBUG_FP);
         dofPPU_ = new DoFRendering();
 
         double left,right,bottom,top,near,far; 
         this->getView(0)->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
-
-        //dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, 0.01, 100.0);
+ 
         dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far);
         dofPPU_->setFocalLength(0.0);
         dofPPU_->setFocalRange(50.0);
         //osg::setNotifyLevel(osg::FATAL);
     }
-    else if(pEffect == ssaoEffect)
-    {   
-        ssaoPPU_ = new SSAORendering();
-        // Gets the projection matrix
-        osg::Matrixf lProjectionMatrix = camera->getProjectionMatrix();
-
-        ssaoPPU_->createSSAOPipeline(mProcessor.get(), lastUnit,
-                                colorTexture1_, colorTexture2_, colorTexture3_,
-                                lProjectionMatrix);
-        ssaoPPU_->setPower(1.f);
-    }
-
 
     // add a text ppu after the pipeline is setted up
     if (0)
