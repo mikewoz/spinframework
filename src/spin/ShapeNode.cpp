@@ -388,10 +388,6 @@ std::vector<lo_message> ShapeNode::getState () const
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setTextureFromFile", texturePath.c_str());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 
