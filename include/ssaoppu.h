@@ -25,21 +25,18 @@ class SSAORendering : virtual public osg::Referenced
         osgPPU::ShaderAttribute* ssaoShaderAttr;
         osgPPU::ShaderAttribute* gaussx;
         osgPPU::ShaderAttribute* gaussy;
-        osgPPU::ShaderAttribute* compositeAttr;
-
-        osg::ref_ptr<osgDB::ReaderWriter::Options> mFragmentOptions;
-        osg::ref_ptr<osgDB::ReaderWriter::Options> mVertexOptions;
-    
+        osgPPU::ShaderAttribute* compositeAttr;    
 
     public:
         /********************/
         SSAORendering()
+            :ssaoShaderAttr(NULL),
+            gaussx(NULL),
+            gaussy(NULL),
+            compositeAttr(NULL)
         {
             dofGaussSigma = 1.5f;
             dofGaussRadius = 3.0f;
-
-            mFragmentOptions = new osgDB::ReaderWriter::Options("fragment");
-            mVertexOptions = new osgDB::ReaderWriter::Options("vertex");
         }
 
         /*******************/
@@ -92,6 +89,9 @@ class SSAORendering : virtual public osg::Referenced
                                 osg::Texture* pColor1, osg::Texture* pNormal, osg::Texture* pPosition,
                                 osg::Matrixf pProjMat)
         {
+            osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");            
+            osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
+
             double fovy, aspect, lNear, lFar;
             pProjMat.getPerspective(fovy, aspect, lNear, lFar);
 
@@ -176,8 +176,8 @@ class SSAORendering : virtual public osg::Referenced
             ssaoShaderAttr = new osgPPU::ShaderAttribute();
             // Setup the ssao shader
             {
-                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", mVertexOptions.get()));
-                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", mFragmentOptions.get())); 
+                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_vp.glsl", vertexOptions.get()));
+                ssaoShaderAttr->addShader(osgDB::readShaderFile("screenSpaceAmbientOcc_fp.glsl", fragmentOptions.get())); 
                 ssaoShaderAttr->setName("ssaoShader");
 
                 ssaoShaderAttr->add("vNear", osg::Uniform::FLOAT);
@@ -214,9 +214,9 @@ class SSAORendering : virtual public osg::Referenced
             gaussy = new osgPPU::ShaderAttribute();
             {
                 // read shaders from file
-                osg::Shader* vshader = osgDB::readShaderFile("gauss_convolution_vp.glsl", mVertexOptions.get());
-                osg::Shader* fhshader = osgDB::readShaderFile("gauss_convolution_1Dx_fp.glsl", mFragmentOptions.get());
-                osg::Shader* fvshader = osgDB::readShaderFile("gauss_convolution_1Dy_fp.glsl", mFragmentOptions.get());
+                osg::Shader* vshader = osgDB::readShaderFile("gauss_convolution_vp.glsl", vertexOptions.get());
+                osg::Shader* fhshader = osgDB::readShaderFile("gauss_convolution_1Dx_fp.glsl", fragmentOptions.get());
+                osg::Shader* fvshader = osgDB::readShaderFile("gauss_convolution_1Dy_fp.glsl", fragmentOptions.get());
 
                 // setup horizontal blur shaders
                 gaussx->addShader(vshader);
@@ -274,8 +274,8 @@ class SSAORendering : virtual public osg::Referenced
             osgPPU::UnitInOut* composite = new osgPPU::UnitInOut();
             compositeAttr = new osgPPU::ShaderAttribute();
             {
-                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_vp.glsl", mVertexOptions.get()));
-                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_fp.glsl", mFragmentOptions.get()));
+                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_vp.glsl", vertexOptions.get()));
+                compositeAttr->addShader(osgDB::readShaderFile("screenSpaceAO_composite_fp.glsl", fragmentOptions.get()));
                 compositeAttr->setName("compositeSSAO");
 
                 compositeAttr->add("vSSAO", osg::Uniform::SAMPLER_2D);

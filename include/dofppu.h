@@ -76,14 +76,18 @@ class DoFRendering : virtual public osg::Referenced
         }
 
         //------------------------------------------------------------------------
-        void createDoFPipeline(osgPPU::Processor* parent, osgPPU::Unit*& lastUnit, float zNear, float zFar)
+        void createDoFPipeline(osgPPU::Processor* parent, osgPPU::Unit*& lastUnit, float zNear, float zFar, osg::Texture* pColor)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
             // the first unit will bypass the color output of the camera
-            osgPPU::UnitBypass* bypass = new osgPPU::UnitBypass();
+            /*osgPPU::UnitBypass* bypass = new osgPPU::UnitBypass();
             bypass->setName("ColorBypass");
+            parent->addChild(bypass);*/
+            osgPPU::UnitTexture* bypass = new osgPPU::UnitTexture();
+            bypass->setName("Color");
+            bypass->setTexture(pColor);
             parent->addChild(bypass);
 
             // next unit will bypass the depth output of the camera

@@ -215,9 +215,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
     // we want to simulate hdr rendering, hence setup the pipeline
     // for the hdr rendering
     osgPPU::Unit* lastUnit = NULL;
- 
-
-
+    
     if(pEffect == dofEffect)
     {
         //osg::setNotifyLevel(osg::DEBUG_FP);
@@ -227,7 +225,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         this->getView(0)->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
 
         //dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, 0.01, 100.0);
-        dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far);
+        dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far, colorTexture1_);
         dofPPU_->setFocalLength(0.0);
         dofPPU_->setFocalRange(50.0);
         //osg::setNotifyLevel(osg::FATAL);
@@ -243,7 +241,6 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
                                 lProjectionMatrix);
         ssaoPPU_->setPower(1.f);
     }
-
 
     // add a text ppu after the pipeline is setted up
     if (0)
