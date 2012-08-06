@@ -116,17 +116,21 @@ class PPUProcessor : public osgPPU::Processor
         }
 };
 
+#define PPU_NONE 0x0000
+#define PPU_DOF  0x0001
+#define PPU_SSAO 0x0002
 
 class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
 {
     public:
         // enum of the different PPU effects available
+        // Use primes, to allow activation of multiple effects
         enum ppuEffect
         {
             noEffect = 0,
-            dofEffect,
-            ssaoEffect
+            dofEffect = 1,
+            ssaoEffect = 2
         };
 
         //! Default construcotr
