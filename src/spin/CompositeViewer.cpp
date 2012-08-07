@@ -284,15 +284,20 @@ void CompositeViewer::updateSpaceNavigator()
     
     spin::spinApp &spin = spin::spinApp::Instance();
 
+    float dt = (float)(osg::Timer::instance()->delta_s(lastNavTick_, osg::Timer::instance()->tick()) > 1.0);
+
+    // frequency limiter:
+    // (wait until at least 0.05 sec has transpired - ie, 20Hz)
+    if (dt < 0.05) return;
+
     // poll the space navigator:
     int speventCount = 0;
     osg::Vec3 spVel, spSpin;
 
-    //std::cout << "delta = " << osg::Timer::instance()->delta_s(lastNavTick_, osg::Timer::instance()->tick()) << std::endl;
 
     // if the last significant event was more than a second ago,
     // assume the user has let go of the puck and reset speedScale
-    if ((float)(osg::Timer::instance()->delta_s(lastNavTick_, osg::Timer::instance()->tick()) > 1.0) && moving_)
+    if (dt > 1.0) && moving_)
     {
         //std::cout << "reset spacenavigator" << std::endl;
         spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
