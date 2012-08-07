@@ -315,7 +315,7 @@ void CompositeViewer::updateSpaceNavigator()
 
     // if the last significant event was more than a second ago,
     // assume the user has let go of the puck and reset speedScale
-    if (dt > 1.0) && moving_)
+    if ((dt > 1.0) && moving_)
     {
         //std::cout << "reset spacenavigator" << std::endl;
         spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
