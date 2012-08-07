@@ -137,13 +137,13 @@ class CompositeViewer : public osgViewer::CompositeViewer
         CompositeViewer(osg::ArgumentParser& args);
         
         //! Get the ppu processor
-        osgPPU::Processor* getProcessor() { return mProcessor.get(); }
+        std::vector<osgPPU::Processor*> getProcessor() { return mProcessors; }
 
         //! Create camera resulting texture
         osg::Texture* createRenderTexture(int tex_width, int tex_height, bool depth);
         
         //! Setup the camera to do the render to texture
-        void setupCamera(osg::Viewport* vp);
+        void setupCamera();
         
         //! Just setup some stuff
         void viewerInit();
@@ -171,11 +171,13 @@ class CompositeViewer : public osgViewer::CompositeViewer
  
         //int run();
 
-        osg::ref_ptr<DoFRendering> dofPPU_;
-        osg::ref_ptr<SSAORendering> ssaoPPU_;
+        //osg::ref_ptr<DoFRendering> dofPPU_;
+        //osg::ref_ptr<SSAORendering> ssaoPPU_;
+        std::vector<DoFRendering*> mDofPPUs;
+        std::vector<SSAORendering*> mSsaoPPUs;
 
     private:
-        osg::ref_ptr<osgPPU::Processor> mProcessor;
+        std::vector<osgPPU::Processor*> mProcessors;
 
         float mOldTime;
         //DoFRendering mDoFSetup;
@@ -187,14 +189,6 @@ class CompositeViewer : public osgViewer::CompositeViewer
 	    float moving_;
 	    osg::Vec3 velocityScalars_;
 	    osg::Vec3 spinScalars_;
-
-        osg::Camera* camera;
- 
-        osg::ref_ptr<osg::Texture> colorTexture1_;
-        osg::ref_ptr<osg::Texture> colorTexture2_;
-        osg::ref_ptr<osg::Texture> colorTexture3_;
-        osg::ref_ptr<osg::Texture> colorTexture_;
-        osg::ref_ptr<osg::Texture> depthTexture_;
 
         // Projection matrix from the first rendering,
         // to be used in the PPU
@@ -217,28 +211,37 @@ public:
         {
             case (osgGA::GUIEventAdapter::RESIZE):
             {
-                osgPPU::Camera::resizeViewport(0,0, ea.getWindowWidth(), ea.getWindowHeight(), viewer->getView(0)->getCamera());
+                bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
+                bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
+
+                // For each view
+                for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+                {
+
+                    osgPPU::Camera::resizeViewport(0,0, ea.getWindowWidth(), ea.getWindowHeight(), viewer->getView(i)->getCamera());
             
-                // Get the previous projection matrix information
-                double fovy, aspect, lNear, lFar;
-                viewer->getView(0)->getCamera()->getProjectionMatrixAsPerspective(fovy, aspect, lNear, lFar);
-                // Update the ratio to match the new ratio of the window
-                viewer->getView(0)->getCamera()->setProjectionMatrixAsPerspective(fovy, (float)ea.getWindowWidth()/(float)ea.getWindowHeight(), lNear, lFar);
+                    // Get the previous projection matrix information
+                    double fovy, aspect, lNear, lFar;
+                    viewer->getView(i)->getCamera()->getProjectionMatrixAsPerspective(fovy, aspect, lNear, lFar);
+                    // Update the ratio to match the new ratio of the window
+                    viewer->getView(i)->getCamera()->setProjectionMatrixAsPerspective(fovy, (float)ea.getWindowWidth()/(float)ea.getWindowHeight(), lNear, lFar);
 
-                osgPPU::Processor* lProcessor = viewer->getProcessor();
-                lProcessor->onViewportChange();
+                    osgPPU::Processor* lProcessor = viewer->getProcessor()[i];
+                    lProcessor->onViewportChange();
 
-                if(viewer->dofPPU_.valid())
-                {
-                    // Reset near and far, although there's no reason for them to have changed
-                    viewer->dofPPU_->setNear(lNear);
-                    viewer->dofPPU_->setFar(lFar);
-                }
+                    if(lIsDof)
+                    {
+                        // Reset near and far, although there's no reason for them to have changed
+                        viewer->mDofPPUs[i]->setNear(lNear);
+                        viewer->mDofPPUs[i]->setFar(lFar);
+                    }
 
-                if(viewer->ssaoPPU_.valid())
-                {
-                    osg::Matrixf lProjMat = viewer->getView(0)->getCamera()->getProjectionMatrix();                    
-                    viewer->ssaoPPU_->setProjectionMatrix(lProjMat);
+                    if(lIsSSAO)
+                    {
+                        osg::Matrixf lProjMat = viewer->getView(i)->getCamera()->getProjectionMatrix();                    
+                        viewer->mSsaoPPUs[i]->setProjectionMatrix(lProjMat);
+                    }
+
                 }                
                 
                 break;

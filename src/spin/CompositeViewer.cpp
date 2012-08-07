@@ -120,53 +120,55 @@ osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height
     return texture2D;
 }
 
-void CompositeViewer::setupCamera(osg::Viewport* vp)
+void CompositeViewer::setupCamera()
 {
     // setup viewer's default camera
     //osg::Camera* camera = getCamera();
-    camera = this->getView(0)->getCamera();
+    //osg::Camera* camera = this->getView(0)->getCamera();
     
     //camera->setViewport(0,0,(int)vp->width(), (int)vp->height()); 
-    
-    // TODO: setup for all cameras:
-    /*
-    osgViewer::Viewer::Cameras cameras;
-    viewer.getCameras(cameras);
-    for (osgViewer::Viewer::Cameras::iterator iter = cameras.begin(); iter != cameras.end(); ++iter)
+
+    // We create texture buffers for the main camera of each view 
+    //osgViewer::ViewerBase::Cameras lCameras;
+    //this->getCameras(lCameras);
+    //for(osgViewer::ViewerBase::Cameras::iterator lIt = lCameras.begin();
+    //    lIt != lCameras.end();
+    //    lIt++)
+    for(unsigned int i=0; i<this->getNumViews(); ++i)
     {
-        //(*iter)->setNearFarRatio(0.0001f);
+        osg::Camera* lCamera = this->getView(i)->getCamera();
+        int lWidth = lCamera->getViewport()->width();
+        int lHeight = lCamera->getViewport()->height();
+
+        std::cout << std::endl;
+        std::cout << "---------------------------------------" << std::endl;
+        std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
         
+
+        // create texture to render to
+        osg::ref_ptr<osg::Texture> colorTexture1_ = createRenderTexture(lWidth, lHeight, false);
+        osg::ref_ptr<osg::Texture> colorTexture2_ = createRenderTexture(lWidth, lHeight, false);
+        osg::ref_ptr<osg::Texture> colorTexture3_ = createRenderTexture(lWidth, lHeight, false);
+        osg::ref_ptr<osg::Texture> depthTexture_ = createRenderTexture(lWidth, lHeight, true);
+
+        // set up the background color and clear mask.
+        lCamera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
+        lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // set viewport
+        lCamera->setViewport(lCamera->getViewport()); // Useful ??
+        lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+        //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0); 
+
+        // tell the camera to use OpenGL frame buffer object where supported.
+        lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+
+        // attach the texture and use it as the color buffer.
+        lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1_);
+        lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2_);
+        lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3_);
+        lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
     }
-    */
-    
-    std::cout << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "setting up camera with wxh=" << (int)vp->width()<<"x"<<(int)vp->height() << std::endl;
-    
-
-    // create texture to render to
-    colorTexture1_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
-    colorTexture2_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
-    colorTexture3_ = createRenderTexture((int)vp->width(), (int)vp->height(), false);
-    depthTexture_ = createRenderTexture((int)vp->width(), (int)vp->height(), true);
-
-    // set up the background color and clear mask.
-    camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
-    camera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // set viewport
-    camera->setViewport(vp);
-    camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0); 
-
-    // tell the camera to use OpenGL frame buffer object where supported.
-    camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
-
-    // attach the texture and use it as the color buffer.
-    camera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1_);
-    camera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2_);
-    camera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3_);
-    camera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
 }
 
 //! Just setup some stuff
@@ -178,7 +180,7 @@ void CompositeViewer::viewerInit()
 
     // setup data
     //setupCamera(getCamera()->getViewport());
-    setupCamera(this->getView(0)->getCamera()->getViewport());
+    setupCamera();
     
     // add ppu processor into the scene graph
     osg::Group* group = new osg::Group();
@@ -202,70 +204,79 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
     if(pEffect == PPU_NONE)
         return;
 
-    mProcessor = new osgPPU::Processor();
-    //dynamic_cast<osg::Group*>(getSceneData())->addChild(mProcessor.get());
-    dynamic_cast<osg::Group*>(getView(0)->getSceneData())->addChild(mProcessor.get());
-
-    // initialize the post process
-    //mProcessor->setCamera(getCamera());
-    mProcessor->setCamera(this->getView(0)->getCamera());
-    mProcessor->setName("Processor");
-    mProcessor->dirtyUnitSubgraph();
-
-    // we want to simulate hdr rendering, hence setup the pipeline
-    // for the hdr rendering
-    osgPPU::Unit* lastUnit = NULL;
-
-    // SSAO effect must be applied before any other effect, especially those
-    // which destroy information (such as DoF)
-    if((pEffect & PPU_SSAO) != 0)
-    //if(((int)pEffect & (int)ssaoEffect) == (int)ssaoEffect)
-    {  
-        ssaoPPU_ = new SSAORendering();
-        // Gets the projection matrix
-        osg::Matrixf lProjectionMatrix = camera->getProjectionMatrix();
-
-        ssaoPPU_->createSSAOPipeline(mProcessor.get(), lastUnit, lProjectionMatrix);
-        ssaoPPU_->setPower(1.f);
-    } 
-  
-    // DoF effect
-    if((pEffect & PPU_DOF) != 0)
-    //if(((int)pEffect & (int)dofEffect) == (int)dofEffect)
+    // For each view, we create a processor
+    for(unsigned int i=0; i<this->getNumViews(); ++i)
     {
-        //osg::setNotifyLevel(osg::DEBUG_FP);
-        dofPPU_ = new DoFRendering();
-
-        double left,right,bottom,top,near,far; 
-        this->getView(0)->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+        osgPPU::Processor* lProcessor;   // Don't forget to clean that in the destructor !!!
+        lProcessor = new osgPPU::Processor();
+        //mProcessor = new osgPPU::Processor();
+       
+        osgViewer::View* lView = getView(i);
  
-        dofPPU_->createDoFPipeline(mProcessor.get(), lastUnit, near, far);
-        dofPPU_->setFocalLength(0.0);
-        dofPPU_->setFocalRange(50.0);
-        //osg::setNotifyLevel(osg::FATAL);
+        dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
+
+        // initialize the post process
+        //mProcessor->setCamera(getCamera());
+        lProcessor->setCamera(lView->getCamera());
+        lProcessor->setName("Processor");
+        lProcessor->dirtyUnitSubgraph();
+
+        mProcessors.push_back(lProcessor);
+
+        // we want to simulate hdr rendering, hence setup the pipeline
+        // for the hdr rendering
+        osgPPU::Unit* lastUnit = NULL;
+
+        // SSAO effect must be applied before any other effect, especially those
+        // which destroy information (such as DoF)
+        if((pEffect & PPU_SSAO) != 0)
+        { 
+            SSAORendering* lSsao = new SSAORendering();
+            
+            //ssaoPPU_ = new SSAORendering();
+            // Gets the projection matrix
+            osg::Matrixf lProjectionMatrix = lView->getCamera()->getProjectionMatrix();
+            lSsao->createSSAOPipeline(lProcessor, lastUnit, lProjectionMatrix);
+
+            mSsaoPPUs.push_back(lSsao);
+        } 
+  
+        // DoF effect
+        if((pEffect & PPU_DOF) != 0)
+        {
+            DoFRendering* lDoF = new DoFRendering();
+
+            double left,right,bottom,top,near,far; 
+            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far); 
+            lDoF->createDoFPipeline(lProcessor, lastUnit, near, far);
+            lDoF->setFocalLength(0.0);
+            lDoF->setFocalRange(50.0);
+            
+            mDofPPUs.push_back(lDoF);
+        }
+
+        // add a text ppu after the pipeline is setted up
+        /*if (0)
+        {
+            osgPPU::UnitText* fpstext = new osgPPU::UnitText();
+            fpstext->setName("FPSTextPPU");
+            fpstext->setSize(44);
+            fpstext->setText("Example DoF-pipeline from a .ppu file");
+            fpstext->setPosition(0.01, 0.95);
+            lastUnit->addChild(fpstext);
+        }*/
+
+        // As a last step we setup a ppu which do render the content of the result
+        // on the screenbuffer. This ppu MUST be as one of the last, otherwise you
+        // will not be able to get results from the ppu pipeline
+        osgPPU::UnitOut* ppuout = new osgPPU::UnitOut();
+        ppuout->setName("PipelineResult");
+        ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
+        lastUnit->addChild(ppuout);
+
+        // write pipeline to a file
+        //osgDB::writeObjectFile(*mProcessor, "dof.ppu");
     }
-
-    // add a text ppu after the pipeline is setted up
-    if (0)
-    {
-        osgPPU::UnitText* fpstext = new osgPPU::UnitText();
-        fpstext->setName("FPSTextPPU");
-        fpstext->setSize(44);
-        fpstext->setText("Example DoF-pipeline from a .ppu file");
-        fpstext->setPosition(0.01, 0.95);
-        lastUnit->addChild(fpstext);
-    }
-
-    // As a last step we setup a ppu which do render the content of the result
-    // on the screenbuffer. This ppu MUST be as one of the last, otherwise you
-    // will not be able to get results from the ppu pipeline
-    osgPPU::UnitOut* ppuout = new osgPPU::UnitOut();
-    ppuout->setName("PipelineResult");
-    ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
-    lastUnit->addChild(ppuout);
-
-    // write pipeline to a file
-    //osgDB::writeObjectFile(*mProcessor, "dof.ppu");
 }
 
 void CompositeViewer::updateSpaceNavigator()
@@ -384,7 +395,7 @@ void CompositeViewer::frame(double f)
     mOldTime = elapsedTime();
 
     // print also some info about the fps number
-    if (0)
+    /*if (0)
     {
         osgPPU::UnitText* ppu = dynamic_cast<osgPPU::UnitText*>(mProcessor->findUnit("FPSTextPPU"));
         if (ppu)
@@ -393,7 +404,7 @@ void CompositeViewer::frame(double f)
             sprintf(txt, "FPS: %4.2f", 1.0 / frameTime);
             ppu->setText(txt);
         }
-    }
+    }*/
 }
 
 //int run()
@@ -1214,57 +1225,64 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     
     if ((theMethod=="setParam") && (stringArgs.size()==1) && (floatArgs.size()==1))
     {
-        // Params for the DoF PPU
-        if(viewer->dofPPU_.valid())
-        { 
-            if (stringArgs[0] == "gaussSigma")
-            {
-                viewer->dofPPU_->setGaussSigma(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "gaussRadius")
-            {
-                viewer->dofPPU_->setGaussRadius(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "focalLength")
-            {
-                viewer->dofPPU_->setFocalLength(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "focalRange")
-            {
-                viewer->dofPPU_->setFocalRange(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "near")
-            {
-                viewer->dofPPU_->setNear(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "far")
-            {
-                viewer->dofPPU_->setFar(floatArgs[0]);
-            }
-        }
+        bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
+        bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
 
-        // Params for the SSAO PPU
-        if(viewer->ssaoPPU_.valid())
+        // For each view
+        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
         {
-            if (stringArgs[0] == "ssaoGaussSigma")
-            {
-                viewer->ssaoPPU_->setGaussSigma(floatArgs[0]);
+            // Params for the DoF PPU
+            if(lIsDof)
+            { 
+                if (stringArgs[0] == "gaussSigma")
+                {
+                    viewer->mDofPPUs[i]->setGaussSigma(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "gaussRadius")
+                {
+                    viewer->mDofPPUs[i]->setGaussRadius(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "focalLength")
+                {
+                    viewer->mDofPPUs[i]->setFocalLength(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "focalRange")
+                {
+                    viewer->mDofPPUs[i]->setFocalRange(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "near")
+                {
+                    viewer->mDofPPUs[i]->setNear(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "far")
+                {
+                    viewer->mDofPPUs[i]->setFar(floatArgs[0]);
+                }
             }
-            else if (stringArgs[0] == "ssaoGaussRadius")
+
+            // Params for the SSAO PPU
+            if(lIsSSAO)
             {
-                viewer->ssaoPPU_->setGaussRadius(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "ssaoPower")
-            {
-                viewer->ssaoPPU_->setSsaoPower(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "ssaoFocus")
-            {
-                viewer->ssaoPPU_->setSsaoFocus(floatArgs[0]);
-            }
-            else if (stringArgs[0] == "ssaoSamples")
-            {
-                viewer->ssaoPPU_->setSsaoSamples((int)floatArgs[0]);
+                if (stringArgs[0] == "ssaoGaussSigma")
+                {
+                    viewer->mSsaoPPUs[i]->setGaussSigma(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "ssaoGaussRadius")
+                {
+                    viewer->mSsaoPPUs[i]->setGaussRadius(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "ssaoPower")
+                {
+                    viewer->mSsaoPPUs[i]->setSsaoPower(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "ssaoFocus")
+                {
+                    viewer->mSsaoPPUs[i]->setSsaoFocus(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "ssaoSamples")
+                {
+                    viewer->mSsaoPPUs[i]->setSsaoSamples((int)floatArgs[0]);
+                }
             }
         }
         
@@ -1272,17 +1290,24 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     }
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
     {
-        viewer->getView(0)->getCamera()->setProjectionMatrixAsFrustum(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3], floatArgs[4], floatArgs[5]);
-       
-        if(viewer->dofPPU_.valid())
-        { 
-            viewer->dofPPU_->setNear(floatArgs[4]);
-            viewer->dofPPU_->setFar(floatArgs[5]);
-        }
+        bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
+        bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
 
-        if(viewer->ssaoPPU_.valid())
+        // For each view
+        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
         {
-            viewer->ssaoPPU_->setProjectionMatrix(viewer->getView(0)->getCamera()->getProjectionMatrix());
+            viewer->getView(i)->getCamera()->setProjectionMatrixAsFrustum(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3], floatArgs[4], floatArgs[5]);
+       
+            if(lIsDof)
+            { 
+                viewer->mDofPPUs[i]->setNear(floatArgs[4]);
+                viewer->mDofPPUs[i]->setFar(floatArgs[5]);
+            }
+
+            if(lIsSSAO)
+            {
+                viewer->mSsaoPPUs[i]->setProjectionMatrix(viewer->getView(i)->getCamera()->getProjectionMatrix());
+            }
         }
         
         return 0;
