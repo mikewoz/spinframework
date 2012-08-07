@@ -92,7 +92,6 @@ int run(int argc, char **argv)
 	spinApp &spin = spinApp::Instance();
 
 	std::string userID;
-	bool picker = false;
 	bool mover = true;
    
     bool ssao = false; 
@@ -144,8 +143,8 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
 	arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
 	arguments.getApplicationUsage()->addCommandLineOption("--multisamples <num>", "Set the level of multisampling for antialiasing (Default: 4)");
-	arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-baed camera controls for this user. This is helpful when using a mouse picker.");
-	arguments.getApplicationUsage()->addCommandLineOption("--enable-mouse-picker", "Enable the mouse picker, and send events to the server");
+	arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-based camera controls for this user");
+	arguments.getApplicationUsage()->addCommandLineOption("--cache", "Enable caching for all models and textures. ie, disable automatic unloading of culled media");
 
 	// *************************************************************************
 	// PARSE ARGS:
@@ -177,7 +176,6 @@ int run(int argc, char **argv)
 	while (arguments.read("--framerate",maxFrameRate)) {}
 	while (arguments.read("--multisamples",multisamples)) {}
 	if (arguments.read("--disable-camera-controls")) mover=false;
-	if (arguments.read("--enable-mouse-picker")) picker=true;
 	if (arguments.read("--grid")) grid=true;
 
     if (arguments.read("--cache"))
@@ -376,18 +374,11 @@ int run(int argc, char **argv)
 
     // *************************************************************************
     // create a camera manipulator
-/*
-    manipulator = new ViewerManipulator();
-    manipulator->setPicker(picker);
-    manipulator->setMover(mover);
-*/
-    
     for (unsigned int i=0; i<viewer.getNumViews(); i++)
     {
         ViewerManipulator *vm = dynamic_cast<ViewerManipulator*>(viewer.getView(i)->getCameraManipulator());
         if (vm)
         {
-            vm->setPicker(picker);
             vm->setMover(mover);
         }
         //viewer.getView(i)->setCameraManipulator(manipulator.get());
