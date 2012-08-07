@@ -304,14 +304,16 @@ void CompositeViewer::updateSpaceNavigator()
 
     float dt = (float)(osg::Timer::instance()->delta_s(lastNavTick_, osg::Timer::instance()->tick()) > 1.0);
 
-    // frequency limiter:
+    // TODO: frequency limiter:
     // (wait until at least 0.05 sec has transpired - ie, 20Hz)
+    /*
     if (dt < 0.05)
     {
         spnav_remove_events(SPNAV_EVENT_MOTION);
         return;
     }
-
+    */
+    
     // poll the space navigator:
     int speventCount = 0;
     osg::Vec3 spVel, spSpin;
