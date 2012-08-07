@@ -63,7 +63,13 @@ ViewerManipulator::ViewerManipulator()
 	{
 		//this->user = spin.userNode->id;
         this->userID = spin.userNode->getID();
+        
+        // note: we set NotifySeverity to avoid a NodePath printout in OSG 3.1
+        osg::NotifySeverity tmp = osg::getNotifyLevel();
+        osg::setNotifyLevel(osg::FATAL);
         setTrackNode(spin.userNode->getCameraAttachmentNode());
+        osg::setNotifyLevel(tmp);
+        
 	} else {
 		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
 	}
