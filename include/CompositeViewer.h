@@ -135,6 +135,9 @@ class CompositeViewer : public osgViewer::CompositeViewer
 
         //! Default construcotr
         CompositeViewer(osg::ArgumentParser& args);
+
+        //! Destructor
+        ~CompositeViewer();
         
         //! Get the ppu processor
         std::vector<osgPPU::Processor*> getProcessor() { return mProcessors; }

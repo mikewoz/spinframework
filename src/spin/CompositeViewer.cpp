@@ -89,6 +89,25 @@ CompositeViewer::CompositeViewer(osg::ArgumentParser& args) : osgViewer::Composi
     spinScalars_ = osg::Vec3(1,1,1);
 }
 
+CompositeViewer::~CompositeViewer()
+{
+    bool lIsDof = (mDofPPUs.size() == getNumViews());
+    bool lIsSSAO = (mSsaoPPUs.size() == getNumViews());
+
+    if(mbInitialized)
+    {
+        for(unsigned int i=0; i<getNumViews(); ++i)
+        {
+            delete mProcessors[i];
+
+            if(lIsDof)
+                delete mDofPPUs[i];
+            if(lIsSSAO)
+                delete mSsaoPPUs[i];
+        }
+    }
+}
+
 osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height, bool depth)
 {
     // create simple 2D texture
@@ -183,48 +202,47 @@ void CompositeViewer::viewerInit()
     setupCamera();
     
     // add ppu processor into the scene graph
-    osg::Group* group = new osg::Group();
-    //group->addChild(getSceneData());
-    group->addChild(this->getView(0)->getSceneData());
+    osg::Node* lData = getView(0)->getSceneData();
+    for(unsigned int i=0; i<getNumViews(); ++i)
+    {
+        osg::Group* group = new osg::Group();
+        //group->addChild(getSceneData());
+        group->addChild(lData);
     
-    //setSceneData(group);
-    this->getView(0)->setSceneData(group);
-
+        //setSceneData(group); 
+        this->getView(i)->setSceneData(group);
+    }
 }
 
 //! Setup osgppu for rendering
 void CompositeViewer::initializePPU(unsigned int pEffect)
 {
+    if(pEffect == PPU_NONE)
+        return;
+
     // if already initialized then just do nothing
     if (mbInitialized == false)
         mbInitialized = true;
     else
-        return;
-    
-    if(pEffect == PPU_NONE)
-        return;
+        return; 
 
     // For each view, we create a processor
     for(unsigned int i=0; i<this->getNumViews(); ++i)
     {
-        osgPPU::Processor* lProcessor;   // Don't forget to clean that in the destructor !!!
+        osgPPU::Processor* lProcessor; 
         lProcessor = new osgPPU::Processor();
-        //mProcessor = new osgPPU::Processor();
        
         osgViewer::View* lView = getView(i);
  
         dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
 
         // initialize the post process
-        //mProcessor->setCamera(getCamera());
         lProcessor->setCamera(lView->getCamera());
         lProcessor->setName("Processor");
         lProcessor->dirtyUnitSubgraph();
 
         mProcessors.push_back(lProcessor);
 
-        // we want to simulate hdr rendering, hence setup the pipeline
-        // for the hdr rendering
         osgPPU::Unit* lastUnit = NULL;
 
         // SSAO effect must be applied before any other effect, especially those
