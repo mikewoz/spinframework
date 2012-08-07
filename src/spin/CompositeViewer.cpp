@@ -923,6 +923,7 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
                 frustum frust;
                 if (sscanf (val.c_str(),"%f %f %f %f %f %f",&frust.left,&frust.right,&frust.bottom,&frust.top,&frust.near,&frust.far))
                 {
+                    cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
                     cam->setProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
 		        }   
             }
