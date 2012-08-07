@@ -957,6 +957,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
                 bool updateExisting = (bool) lo_hires_val((lo_type)types[3], argv[3]);
                 spin.audioScene->setDefaultDopplerFactor(factor, updateExisting);
             }
+            if ((argc==3) && (std::string((char*)argv[1])=="setAutoConnect"))
+            {
+                bool enable = (bool) lo_hires_val((lo_type)types[2], argv[2]);
+                spin.audioScene->setAutoConnect(enable);
+            }
             if ((argc==4) && (std::string((char*)argv[1])=="setDefaultRolloffFactor"))
             {
                 double factor = (double) lo_hires_val((lo_type)types[2], argv[2]);
