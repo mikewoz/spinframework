@@ -233,7 +233,6 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         { 
             SSAORendering* lSsao = new SSAORendering();
             
-            //ssaoPPU_ = new SSAORendering();
             // Gets the projection matrix
             osg::Matrixf lProjectionMatrix = lView->getCamera()->getProjectionMatrix();
             lSsao->createSSAOPipeline(lProcessor, lastUnit, lProjectionMatrix);

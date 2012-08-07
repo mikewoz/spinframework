@@ -14,24 +14,12 @@ uniform float vSsaoPower;
 uniform float vSsaoFocus;
 uniform int vSsaoSamples;
 
-uniform mat4 osg_ProjectionMatrixInverse;
-
 varying vec2 texcoord;
 
 /**********************************/
 float linearizeDepth(in float pDepth)
 {
     return (pDepth-vNear)/(vFar-vNear);
-}
-
-/**********************************/
-vec3 GetViewPos (in vec2 texCoord)
-{
-    float depth = texture2D(vPosition, texCoord.st).x;
-    vec4 pos = vec4(texCoord.x, texCoord.y, depth, 1.0);
-    pos.xyz = pos.xyz * 2.0 - 1.0;
-    pos = osg_ProjectionMatrixInverse * pos;
-    return pos.xyz / pos.w;
 }
 
 /**********************************/
@@ -54,7 +42,7 @@ void main(void)
     vec3 lNormal = normalize(lBufferNorm * 2.0 - 1.0);
 
     // View space position of the pixel
-    vec3 lPos = texture2D(vPosition, texcoord.st).xyz; //GetViewPos(texcoord.st);
+    vec3 lPos = texture2D(vPosition, texcoord.st).xyz;
 
     // These values shouldn't be equal. If they are, it means
     // that the vNormal and vPosition textures were not rendered for
@@ -65,7 +53,7 @@ void main(void)
     {
         float lOcclusion, lWeight;
 
-        lPos.z = 1.f/lPos.z;
+        //lPos.z = 1.f/lPos.z;
 
         // Random value from the noise map
         vec2 modifier = texture2D(vNoiseMap, texcoord.st).xy + (lPos.xy + lPos.z);
@@ -87,12 +75,12 @@ void main(void)
                 random.xyz = -random.xyz;
 
             // Calculate the randomly offset position's screen space coordinates -- second most expensive operation
-            screenPos = vProjectionMatrix * vec4(lPos, 1.0); 
+            screenPos = vProjectionMatrix * vec4(lPos.x, lPos.y, -lPos.z, 1.0); 
             // Offset the screen position
             screenPos.xyz = screenPos.xyz + random.xyz*vSsaoFocus*(noise1(lPos.z)*0.5+0.5);
             // Store the depth of the new position
-            float lScreenDepth = (vInvProjectionMatrix*screenPos).z;
-            screenPos.xyz /= -screenPos.w;
+            float lScreenDepth = -(vInvProjectionMatrix*screenPos).z;
+            screenPos.xyz /= screenPos.w;
 
             // Get the depth at the screen space coordinates -- this is the most expensive operation
             /*vec4 lFragPos = texture2D(vPosition, screenPos.xy * 0.5 + 0.5);
@@ -103,7 +91,7 @@ void main(void)
 
             lBufferPos = texture2D(vPosition, screenPos.xy).xyz;
             dist = lBufferPos.z;
-            dist = 1.0/dist;
+            //dist = 1.0/dist;
 
             lBufferNorm = texture2D(vNormal, screenPos.xy).xyz;
             vec3 lFragNorm = normalize(lBufferNorm * 2.0 - 1.0);
@@ -131,12 +119,21 @@ void main(void)
         lOcclusion = pow(visibility*invSamples, vSsaoPower);
 
         //gl_FragColor.rgb = texture2D(vColor1, texcoord.st).rgb;
+
+        // Normal
         //gl_FragColor.rgb = texture2D(vNormal, texcoord.st).rgb;
-        //gl_FragColor.rgb = vec3(texture2D(vPosition, texcoord.st).rgb);
-        //gl_FragColor.rgb = texture2D(vNoiseMap, texcoord*2).rgb;
+        // Position in camera space
+        //gl_FragColor.rgb = vec3(texture2D(vPosition, texcoord.st).rg, 0.0) + vec3(1.5, 0.0, 0.0);
+
+        // Position in screen space
+        /*vec4 lScreenPos = vProjectionMatrix * vec4(lPos.x, lPos.y, -lPos.z, 1.0);
+        lScreenPos.xyz = lScreenPos.xyz / lScreenPos.w;
+        gl_FragColor.rgb = lScreenPos.xyz;*/
+
+        //gl_FragColor.rgb = texture2D(vNoiseMap, texcoord*2).rgb; 
+        //gl_FragColor.rgb = vec3(texcoord.xy, 0.0);
 
         gl_FragColor.rgb = vec3(lOcclusion);
-
         gl_FragColor.a = 1.f;
     }
 }
