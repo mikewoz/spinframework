@@ -156,7 +156,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_PublicMemberProperty(osg::Vec4, _color);
 	I_PublicMemberProperty(std::string, texturePath);
 	I_PublicMemberProperty(int, renderBin);
-	I_PublicMemberProperty(bool, lightingEnabled);
+	I_PublicMemberProperty(int, lightingEnabled);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, shapeGeode);
 	I_PublicMemberProperty(osgUtil::Optimizer, optimizer);
 END_REFLECTOR

@@ -72,8 +72,8 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, const char* initID) : GroupNod
 	shape = BOX;
 	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
-	renderBin = 11;
-	lightingEnabled = true;
+	renderBin = -1;
+	lightingEnabled = -1;
     singleSided_ = false;
     
     // quick shader test:
@@ -165,33 +165,56 @@ void ShapeNode::updateStateSet()
 // ===================================================================
 void ShapeNode::setRenderBin (int i)
 {
-	if (renderBin == i) return;
+    // This is a legacy method before we had referenced statesets
+    // in SPIN. Thus, if the user tries to set the renderbin here
+    // we will apply it to the stateset instead. And if there is
+    // no stateset, then we try to apply it directly to the
+    // shapeGeode
 
-	renderBin = i;
-
-	if (shapeGeode.valid())
-	{
-		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
-		ss->setRenderBinDetails( (int)renderBin, "RenderBin");
-		//setStateSet( shapeStateSet );
-	}
-
-	BROADCAST(this, "si", "setRenderBin", renderBin);
+    osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+    if (ss.valid() && (renderBin>0))
+    {
+        // no, it's not safe to change the stateset because it might
+        // shared with other nodes, and this might cause undesired
+        // effects
+        //ss->setRenderBin(i);
+        std::cout << "Cannot setRenderBin on '" << getID() << "' because that node has stateset '" << ss->getID() << "'. Change the RenderBin on the stateset instead." << std::endl;
+    }
+    else 
+    {
+        renderBin = i;
+        
+        if (shapeGeode.valid() && (renderBin>0))
+        {
+            osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+            ss->setRenderBinDetails( (int)renderBin, "RenderBin");
+        }
+        
+        BROADCAST(this, "si", "setRenderBin", renderBin);
+    }
 }
 
 void ShapeNode::setLighting (int i)
 {
-	if (lightingEnabled==(bool)i) return;
-	lightingEnabled = (bool)i;
-
-	if (shapeGeode.valid() && !stateset_->s_thing)
-	{
-		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
-		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-	}
-
-	BROADCAST(this, "si", "setLighting", getLighting());
+    osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+    if (ss.valid() && (lightingEnabled>=0))
+    {
+        //ss->setLighting(i);
+        std::cout << "Cannot setLighting on '" << getID() << "' because that node has stateset '" << ss->getID() << "'. Enable/disable lighting on the stateset instead." << std::endl;
+    }
+    else
+    {
+        lightingEnabled = (bool)i;
+        
+        if (shapeGeode.valid() && (lightingEnabled>=0))
+        {
+            osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+            if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+            else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        }
+        BROADCAST(this, "si", "setLighting", getLighting());
+    }
+	
 }
 
 void ShapeNode::setSingleSided (int singleSided)
@@ -387,17 +410,23 @@ std::vector<lo_message> ShapeNode::getState () const
 	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());
 	ret.push_back(msg);
 
+if (getRenderBin() > 0)
+{
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
+}
 
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setSingleSided", getSingleSided());
 	ret.push_back(msg);
 
+if (getLighting() >= 0)
+{
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setLighting", getLighting());
 	ret.push_back(msg);
+}
 
 	// put this one last:	
 	msg = lo_message_new();

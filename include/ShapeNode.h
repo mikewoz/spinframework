@@ -124,7 +124,7 @@ public:
     int getBillboard() const { return (int)billboard; }
     osg::Vec4 getColor() const { return _color; };
     int getRenderBin() const { return renderBin; }
-    int getLighting() const { return (int)lightingEnabled; }
+    int getLighting() const { return lightingEnabled; }
 
     
     /**
@@ -144,7 +144,7 @@ public:
     std::string texturePath;
 
     int renderBin;
-    bool lightingEnabled;
+    int lightingEnabled;
 
     //osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
 
