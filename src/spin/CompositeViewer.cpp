@@ -306,7 +306,11 @@ void CompositeViewer::updateSpaceNavigator()
 
     // frequency limiter:
     // (wait until at least 0.05 sec has transpired - ie, 20Hz)
-    if (dt < 0.05) return;
+    if (dt < 0.05)
+    {
+        spnav_remove_events(SPNAV_EVENT_MOTION);
+        return;
+    }
 
     // poll the space navigator:
     int speventCount = 0;
