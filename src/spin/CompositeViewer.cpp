@@ -1318,6 +1318,10 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 {
                     viewer->mSsaoPPUs[i]->setSsaoSamples((int)floatArgs[0]);
                 }
+                else if (stringArgs[0] == "ssaoResample")
+                {
+                    viewer->mSsaoPPUs[i]->setResampleFactor(floatArgs[0]);
+                }
             }
         }
         
