@@ -115,15 +115,16 @@ GeometryNode::GeometryNode (SceneManager *sceneManager, const char* initID) : Gr
 	geometry_->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,numVertices_));
 	
     geode_->addDrawable(geometry_);
+    
+    osgDB::Registry::instance()->getSharedStateManager()->share(this);
 }
 
 // -----------------------------------------------------------------------------
 // destructor
 GeometryNode::~GeometryNode()
 {
+    if (sceneManager_->sharedStateManager.valid()) sceneManager_->sharedStateManager->prune();
 }
-
-    
     
 // -----------------------------------------------------------------------------
 void GeometryNode::callbackUpdate(osg::NodeVisitor* nv)

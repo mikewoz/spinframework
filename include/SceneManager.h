@@ -233,7 +233,7 @@ class SceneManager
 
         std::string resourcesPath;
 
-        //osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
+        osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
         /**
          * The refreshAll method results in a broadcast of all nodelists so that

@@ -313,8 +313,8 @@ SceneManager::SceneManager(std::string id)
     // To prevent same external texture from being loaded multiple times,
     // we use the osgDB::SharedStateManager:
 
-    //sharedStateManager = new osgDB::SharedStateManager;
-	/*
+    sharedStateManager = new osgDB::SharedStateManager;
+	
     sharedStateManager = osgDB::Registry::instance()->getOrCreateSharedStateManager();
     if (sharedStateManager.valid())
     {
@@ -323,7 +323,7 @@ SceneManager::SceneManager(std::string id)
     } else {
         std::cout << "ERROR: Could not create sharedStateManager" << std::endl;
     }
-	*/
+	
 
     // then, when a node is created:
     //      osgDB::Registry::instance()->getSharedStateManager()->share(node);
