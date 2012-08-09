@@ -239,6 +239,7 @@ if test "x${have_poco}" = "xtrue" ; then
     AM_CONDITIONAL(HAVE_POCO, [true])
     AC_SUBST(POCO_LIBS)
 else
+    AM_CONDITIONAL(HAVE_POCO, [false])
     have_poco=false
 fi
 
