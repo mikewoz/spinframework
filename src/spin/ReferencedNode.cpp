@@ -395,23 +395,19 @@ bool ReferencedNode::legalParent (t_symbol *newParent)
 
 void ReferencedNode::setParent (const char* newvalue)
 {
+    // setParent is a legacy method but is still a useful command. We'll assume
+    // that the user wants to remove any previous attachments and ONLY attach
+    // the node to one parent. Thus, we first call detachFrom("*") to remove it
+    // from any existing parents, then we call attachTo.
+    //
+    // NOTE: if the node is attached to many places, some of the detachFrom
+    // broadcasts might get lost (due to UDP), so for extra redundancy, we 
+    // will also broadcast the setParent message and hope that the client gets
+    // it and calls an extra detachFrom("*") locally.
+
     this->detachFrom("*");
+    BROADCAST(this, "ss", "setParent", newvalue); // redundant
     this->attachTo(newvalue);
-/*
-    t_symbol *s = gensym(newvalue.c_str());
-    if (parent_ != s)
-    {
-		if (legalParent(s))
-		{
-			newParent_ = s;
-			attach();
-		}
-		else
-		{
-			std::cout << "ERROR: Tried to setParent for node " << this->id_->s_name << " to " << newvalue << ", but that parent is illegal (probably contained in the subgraph of this node)." << std::endl;
-		}
-	}
-*/
 }
 
 void ReferencedNode::setContext (const char *newvalue)
@@ -656,12 +652,33 @@ std::vector<lo_message> ReferencedNode::getState() const
 
 void ReferencedNode::stateDump()
 {
-    spinApp::Instance().NodeBundle(this->getID(), this->getState());
+    std::vector<lo_message> stateBundle = this->getState();
+
+    lo_message msg = lo_message_new();
+    lo_message_add_string(msg, "parentList");
+    for (int i=0; i<this->getNumParents(); i++)
+    {
+        lo_message_add_string(msg, this->getParentID(i).c_str());
+    }
+    stateBundle.push_back(msg);
+    
+    spinApp::Instance().NodeBundle(this->getID(), stateBundle);
 }
+ 
 
 void ReferencedNode::stateDump(lo_address txAddr)
 {
-    spinApp::Instance().NodeBundle(this->getID(), this->getState(), txAddr);
+    std::vector<lo_message> stateBundle = this->getState();
+
+    lo_message msg = lo_message_new();
+    lo_message_add_string(msg, "parentList");
+    for (int i=0; i<this->getNumParents(); i++)
+    {
+        lo_message_add_string(msg, this->getParentID(i).c_str());
+    }
+    stateBundle.push_back(msg);
+    
+    spinApp::Instance().NodeBundle(this->getID(), stateBundle, txAddr);
 }
 
 bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,

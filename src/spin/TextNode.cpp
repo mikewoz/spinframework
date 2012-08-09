@@ -683,14 +683,21 @@ void TextNode::setColor (float r, float g, float b, float a)
 {
 	color_ = osg::Vec4(r,g,b,a);
 
+	if (textLabel_.valid())
+	{
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(3,0,0)
-	textLabel_->setColor( color_ );
+		textLabel_->setColor( color_ );
 #else
-	osgText::Text* tt = dynamic_cast<osgText::Text*>(textLabel_.get());
-	if (tt) tt->setColor( color_ );
+		osgText::Text* tt = dynamic_cast<osgText::Text*>(textLabel_.get());
+		if (tt) tt->setColor( color_ );
 #endif
 #endif
+	}
+	else
+	{
+		redrawFlag_ = true;
+	}
 
 	BROADCAST(this, "sffff", "setColor", r, g, b, a);
 }
@@ -698,9 +705,15 @@ void TextNode::setColor (float r, float g, float b, float a)
 void TextNode::setBgColor (float r, float g, float b, float a)
 {
 	bgColor_ = osg::Vec4(r,g,b,a);
+	
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(2,9,7)
-	textLabel_->setBoundingBoxColor(bgColor_);
+	if (textLabel_.valid())
+	{
+		textLabel_->setBoundingBoxColor(bgColor_);
+	}
+	else
+		redrawFlag_ = true;
 #endif
 #endif
 	BROADCAST(this, "sffff", "setBgColor", r, g, b, a);
@@ -711,7 +724,12 @@ void TextNode::setMargin (float margin)
 	margin_ = margin;
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(2,9,7)
-	textLabel_->setBoundingBoxMargin(margin_);
+	if (textLabel_.valid())
+	{
+		textLabel_->setBoundingBoxMargin(margin_);
+	}
+	else
+		redrawFlag_ = true;
 #endif
 #endif
 	BROADCAST(this, "sf", "setMargin", getMargin());
@@ -750,16 +768,21 @@ void TextNode::setSingleSided (int singleSided)
 
 void TextNode::setLighting (int lighting)
 {
-    osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
     lighting_ = lighting;
     
-    if (lighting_)
+    if (textLabel_.valid())
     {
-        labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
-    } else
-    {
-        labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
+        osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
+        if (lighting_)
+        {
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+        } else
+        {
+            labelStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
+        }
     }
+    else
+        redrawFlag_ = true;
     
     BROADCAST(this, "si", "setLighting", getLighting());
 }

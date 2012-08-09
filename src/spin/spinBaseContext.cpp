@@ -477,7 +477,53 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     spinApp &spin = spinApp::Instance();
 
-    if (theMethod == "addCronScript")
+
+    if (theMethod == "parentList")
+    {
+        // The "parentList" message is a redundancy measure to ensure that
+        // refreshes work properly after setParent is used. The issue is that
+        // setParent invokes a detachFrom("*") followed by attachTo("parent").
+        // However, if any of the broadcasted detachFrom("oldParent") messages
+        // get lost, the client will have multiple attachTo nodes instead of
+        // just the one intended "parent".
+        //
+        // So in addition to the "attachTo" state that is dumped, we send a
+        // deterministic list of parents called "parentList", which we compare
+        // here to remove any undesired parents.
+
+        ReferencedNode *n = dynamic_cast<ReferencedNode*>(s->s_thing);
+        if (n)
+        {
+            std::vector<std::string> detachList;
+            for (int p=0; p < n->getNumParents(); p++)
+            {
+                for (int i=0; i < argc; i++)
+                {
+                    // the parent we have is supposed to be there. all good.
+                    break;
+                }
+                // oh oh. we have a parent that is not in the parentList.
+                // we will need to detach this
+                detachList.push_back(n->getParentID(p));
+            }
+
+            // now do the detach:
+            std::vector<std::string>::iterator it; 
+	    for (it=detachList.begin(); it!=detachList.end(); ++it)
+            {
+                n->detachFrom((*it).c_str());
+            }
+
+            // let's be certain that we have all the parents in the parentList:
+            for (int i=0; i < argc; i++)
+            {
+                n->attachTo((const char*)argv[i]);
+            }
+        }
+        return 1;
+    }
+
+    else if (theMethod == "addCronScript")
     {
         // client or server?
         if (! lo_is_numerical_type((lo_type)types[1]))

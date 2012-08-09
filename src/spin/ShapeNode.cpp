@@ -221,13 +221,20 @@ void ShapeNode::setSingleSided (int singleSided)
 {
     singleSided_ = singleSided;
     
-    osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
-    if (singleSided_)
-        ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+    if (shapeGeode.valid())
+    {
+        osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+        if (singleSided_)
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+        else
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+    }
     else
-        ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+    {
+        drawShape();
+    }
 
-	BROADCAST(this, "si", "setSingleSided", getSingleSided());
+    BROADCAST(this, "si", "setSingleSided", getSingleSided());
 }
 
 
