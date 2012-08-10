@@ -57,14 +57,15 @@ void main(void)
     float factor2 = 0.0;
     
     // compute blend factors 
+    blur = inTex.x;
     if (blur > 0.5)
         factor2 = (blur - 0.5) * 2.0;
     else
         factor1 = blur * 2.0;
-        
-    
+           
     // the resulting color value is the combination of blurred and non-blurred map 
     vec4 result = mix(colorValue, blurredValue1, factor1);
     gl_FragColor = mix(result, blurredValue2, factor2);
-    
+
+    //gl_FragColor = vec4(depth);
 }

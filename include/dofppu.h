@@ -100,110 +100,16 @@ class DoFRendering : virtual public osg::Referenced
             depthbypass->setName("DepthBypass");
             parent->addChild(depthbypass);
 
-            // we need to blur the output of the color texture to emulate
-            // the depth of field. Therefore first we just resample
-            osgPPU::UnitInResampleOut* resampleLight = new osgPPU::UnitInResampleOut();
+            // First we compute the blur value for each pixel
+            osgPPU::Unit* dof = new osgPPU::UnitInOut(); 
+            dofShaderAttr = new osgPPU::ShaderAttribute();
             {
-                resampleLight->setName("ResampleLight");
-                // mikewoz: original factor was 0.5 here and 0.25 for the strong
-                resampleLight->setFactorX(0.9f);
-                resampleLight->setFactorY(0.9f);
-            }
-            bypass->addChild(resampleLight);
-
-
-            // helper shader class to perform gauss blur
-            //osgPPU::ShaderAttribute* gaussx = new osgPPU::ShaderAttribute();
-            //osgPPU::ShaderAttribute* gaussy = new osgPPU::ShaderAttribute();
-            gaussx = new osgPPU::ShaderAttribute();
-            gaussy = new osgPPU::ShaderAttribute();
-            {
-                // read shaders from file
-                osg::Shader* vshader = osgDB::readShaderFile("gauss_convolution_vp.glsl", vertexOptions.get());
-                osg::Shader* fhshader = osgDB::readShaderFile("gauss_convolution_1Dx_fp.glsl", fragmentOptions.get());
-                osg::Shader* fvshader = osgDB::readShaderFile("gauss_convolution_1Dy_fp.glsl", fragmentOptions.get());
-
-                // setup horizontal blur shaders
-                gaussx->addShader(vshader);
-                gaussx->addShader(fhshader);
-                gaussx->setName("BlurHorizontalShader");
-
-                gaussx->add("sigma", osg::Uniform::FLOAT);
-                gaussx->add("radius", osg::Uniform::FLOAT);
-                gaussx->add("texUnit0", osg::Uniform::SAMPLER_2D);
-
-                gaussx->set("sigma", dofGaussSigma);
-                gaussx->set("radius", dofGaussRadius);
-                gaussx->set("texUnit0", 0);
-
-                // setup vertical blur shaders
-                gaussy->addShader(vshader);
-                gaussy->addShader(fvshader);
-                gaussy->setName("BlurVerticalShader");
-
-                gaussy->add("sigma", osg::Uniform::FLOAT);
-                gaussy->add("radius", osg::Uniform::FLOAT);
-                gaussy->add("texUnit0", osg::Uniform::SAMPLER_2D);
-
-                gaussy->set("sigma", dofGaussSigma);
-                gaussy->set("radius", dofGaussRadius);
-                gaussy->set("texUnit0", 0);
-            }
-
-            // now we perform a gauss blur on the downsampled data
-            osgPPU::UnitInOut* blurxlight = new osgPPU::UnitInOut();
-            osgPPU::UnitInOut* blurylight = new osgPPU::UnitInOut();
-            {
-                // set name and indicies
-                blurxlight->setName("BlurHorizontalLight");
-                blurylight->setName("BlurVerticalLight");
-
-                //blurxlight->setShader(gaussx);
-                //blurylight->setShader(gaussy);
-                blurxlight->getOrCreateStateSet()->setAttributeAndModes(gaussx);
-                blurylight->getOrCreateStateSet()->setAttributeAndModes(gaussy);
-            }
-            resampleLight->addChild(blurxlight);
-            blurxlight->addChild(blurylight);
-
-
-            // and also a stronger blurred/resampled texture is required
-            osgPPU::UnitInResampleOut* resampleStrong = new osgPPU::UnitInResampleOut();
-            {
-                resampleStrong->setName("ResampleStrong");
-                // mikewoz: original factor was 0.25 here and 0.5 for the light
-                resampleStrong->setFactorX(0.75f);
-                resampleStrong->setFactorY(0.75f);
-            }
-            bypass->addChild(resampleStrong);
-
-            // now we perform a gauss blur on the downsampled data
-            osgPPU::UnitInOut* blurxstrong = new osgPPU::UnitInOut();
-            osgPPU::UnitInOut* blurystrong = new osgPPU::UnitInOut();
-            {
-                // set name and indicies
-                blurxstrong->setName("BlurHorizontalStrong");
-                blurystrong->setName("BlurVerticalStrong");
-
-                //blurxstrong->setShader(gaussx);
-                //blurystrong->setShader(gaussy);
-                blurxstrong->getOrCreateStateSet()->setAttributeAndModes(gaussx);
-                blurystrong->getOrCreateStateSet()->setAttributeAndModes(gaussy);
-            }
-            resampleStrong->addChild(blurxstrong);
-            blurxstrong->addChild(blurystrong);
-
-
-            // And finally we add a ppu which do use all the computed results:
-            osgPPU::Unit* dof = new osgPPU::UnitInOut();
-            {
-                // setup inputs, name and index
-                dof->setName("DoF-Result");
-
-                // setup shader
-                dofShaderAttr = new osgPPU::ShaderAttribute();
-                dofShaderAttr->addShader(osgDB::readShaderFile("depth_of_field_fp.glsl", fragmentOptions.get()));
-                dofShaderAttr->setName("DoFResultShader");
+                osg::Shader* lVShader = osgDB::readShaderFile("dof_vp.glsl", vertexOptions.get());
+                osg::Shader* lFShader = osgDB::readShaderFile("dof_computeBlur_fp.glsl", fragmentOptions.get());
+                
+                dofShaderAttr->addShader(lVShader);
+                dofShaderAttr->addShader(lFShader);
+                dofShaderAttr->setName("BlurComputeShader");
 
                 dofShaderAttr->add("focalLength", osg::Uniform::FLOAT);
                 dofShaderAttr->add("focalRange", osg::Uniform::FLOAT);
@@ -215,19 +121,60 @@ class DoFRendering : virtual public osg::Referenced
                 dofShaderAttr->set("zNear", zNear);
                 dofShaderAttr->set("zFar", zFar);
 
-                //dof->setShader(sh);
                 dof->getOrCreateStateSet()->setAttributeAndModes(dofShaderAttr);
-                dof->setInputTextureIndexForViewportReference(0); // we want to setup viewport based on this input
 
-                // add inputs as uniform parameters
-                dof->setInputToUniform(bypass, "texColorMap", true);
-                dof->setInputToUniform(blurylight, "texBlurredColorMap", true);
-                dof->setInputToUniform(blurystrong, "texStrongBlurredColorMap", true);
                 dof->setInputToUniform(depthbypass, "texDepthMap", true);
             }
+            depthbypass->addChild(dof);
 
-            // this is the last unit
-            lastUnit = dof;
+            gaussx = new osgPPU::ShaderAttribute();
+            gaussy = new osgPPU::ShaderAttribute();
+            {
+                osg::Shader* lVShader = osgDB::readShaderFile("dof_vp.glsl", vertexOptions.get());
+                osg::Shader* lFHShader = osgDB::readShaderFile("dof_gauss_1Dx_fp.glsl", fragmentOptions.get());
+                osg::Shader* lFVShader = osgDB::readShaderFile("dof_gauss_1Dy_fp.glsl", fragmentOptions.get());
+
+                // Setup horizontal blur shader
+                gaussx->addShader(lVShader);
+                gaussx->addShader(lFHShader);
+                gaussx->setName("BlurHorizontalShader");
+
+                gaussx->add("sigma", osg::Uniform::FLOAT);
+                gaussx->add("radius", osg::Uniform::FLOAT);
+
+                gaussx->set("sigma", dofGaussSigma);
+                gaussx->set("radius", dofGaussRadius);
+                
+                // Setup vertical blur shader
+                gaussy->addShader(lVShader);
+                gaussy->addShader(lFVShader);
+                gaussy->setName("BlurVerticalShader");
+
+                gaussy->add("sigma", osg::Uniform::FLOAT);
+                gaussy->add("radius", osg::Uniform::FLOAT);
+            
+                gaussy->set("sigma", dofGaussSigma);
+                gaussy->set("radius", dofGaussRadius);
+            }
+
+            osgPPU::UnitInOut* blurx = new osgPPU::UnitInOut();
+            osgPPU::UnitInOut* blury = new osgPPU::UnitInOut();
+            {
+                blurx->setName("BlurHorizontal");
+                blury->setName("BlurVertical");
+
+                blurx->getOrCreateStateSet()->setAttributeAndModes(gaussx);
+                blurx->setInputToUniform(dof, "texBlurMap", true);
+                blurx->setInputToUniform(bypass, "texColorMap", true);
+
+                blury->getOrCreateStateSet()->setAttributeAndModes(gaussy);
+                blury->setInputToUniform(dof, "texBlurMap", true);
+                blury->setInputToUniform(blurx, "texColorMap", true);
+            }
+            bypass->addChild(blurx);
+            blurx->addChild(blury);
+
+            lastUnit = blury;
         }
 };
 
