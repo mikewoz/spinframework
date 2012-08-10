@@ -11,7 +11,7 @@ uniform float radius;
 varying float sigma2;
 varying float c;
 
-const float epsilon = 0.01;
+const float epsilon = 0.0001;
 
 void main(void)
 {
@@ -24,19 +24,24 @@ void main(void)
     // The real radius is dependant of this value
     float lRadius = lBlur * radius;
 
-    for(float i=-lRadius; i<lRadius; i+=1.0)
+    if(lRadius < 0.5)
+        lColor = texture2D(texColorMap, gl_TexCoord[0].st);
+    else
     {
-        float lWeight = c*exp(-(i*i)/sigma2);
-        vec2 lPixCoords = gl_TexCoord[0].st + vec2(0, i*lInputTexTexelHeight);
-        
-        // Radius of the blur created by the current offset pixel
-        float lPixBlurRadius = radius * texture2D(texBlurMap, lPixCoords).r;
+        for(float i=-lRadius; i<lRadius; i+=1.0)
+        {
+            float lWeight = c*exp(-(i*i)/sigma2);
+            vec2 lPixCoords = gl_TexCoord[0].st + vec2(0, i*lInputTexTexelHeight);
+            
+            // Radius of the blur created by the current offset pixel
+            float lPixBlurRadius = radius * texture2D(texBlurMap, lPixCoords).r;
 
-        float lIsInBlur = step(abs(i)-epsilon, lPixBlurRadius);
-        lTotalWeight += lWeight * lIsInBlur;
-        lColor += lIsInBlur * texture2D(texColorMap, lPixCoords) * lWeight;
+            float lIsInBlur = step(abs(i), lPixBlurRadius);
+            lTotalWeight += lWeight * lIsInBlur;
+            lColor += lIsInBlur * texture2D(texColorMap, lPixCoords) * lWeight;
+        }
+        lColor /= lTotalWeight;
     }
-    lColor /= lTotalWeight;
 
     gl_FragColor = lColor;
 }
