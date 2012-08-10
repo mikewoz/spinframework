@@ -90,6 +90,9 @@ class spinServerContext : public spinBaseContext
 #endif
         unsigned short getHttpPort() { return httpPort; }
     
+        // TODO: make private
+        std::map<std::string, lo_address> tcpClientAddrs_;
+    
     private:
 
         /**
@@ -125,7 +128,6 @@ class spinServerContext : public spinBaseContext
 
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
-        std::map<std::string, lo_address> tcpClientAddrs_;
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
     

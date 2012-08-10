@@ -207,6 +207,15 @@ class spinApp
             ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
             types, ##__VA_ARGS__, SPIN_ARGS_END)
 
+#define SCENE_MSG_TCP(types, ...) \
+    if (spinApp::Instance().getContext() && \
+        (spinApp::Instance().getContext()->isRunning()) && \
+        (spinApp::Instance().getContext()->isServer()) ) \
+            for (std::map<std::string,lo_address>::iterator addrIter=dynamic_cast<spinServerContext*>(spinApp::Instance().getContext())->tcpClientAddrs_.begin(); addrIter != dynamic_cast<spinServerContext*>(spinApp::Instance().getContext())->tcpClientAddrs_.end(); ++addrIter) \
+            lo_send(addrIter->second, \
+            ("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), \
+            types, ##__VA_ARGS__, SPIN_ARGS_END)
+
 #define SCENE_LO_MSG(msg) \
     if (spinApp::Instance().getContext() && \
         (spinApp::Instance().getContext()->isRunning()) && \
@@ -233,6 +242,16 @@ class spinApp
             pNode->getID()).c_str(), \
             types, ##__VA_ARGS__, SPIN_ARGS_END)
 
+#define NODE_MSG_TCP(pNode, types, ...) \
+    if (spinApp::Instance().getContext() && \
+        (spinApp::Instance().getContext()->isRunning()) && \
+        (spinApp::Instance().getContext()->isServer()) ) \
+            for (std::map<std::string,lo_address>::iterator addrIter=dynamic_cast<spinServerContext*>(spinApp::Instance().getContext())->tcpClientAddrs_.begin(); addrIter != dynamic_cast<spinServerContext*>(spinApp::Instance().getContext())->tcpClientAddrs_.end(); ++addrIter) \
+            lo_send(addrIter->second, \
+            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
+            pNode->getID()).c_str(), \
+            types, ##__VA_ARGS__, SPIN_ARGS_END)
+
 #define NODE_LO_MSG(s, pNode, msg) \
     if (spinApp::Instance().getContext() && \
         (spinApp::Instance().getContext()->isRunning()) && \
@@ -242,6 +261,14 @@ class spinApp
             ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
             pNode->getID()).c_str(), msg)
 
+#define NODE_LO_MSG_TCP(s, pNode, msg) \
+    if (spinApp::Instance().getContext() && \
+        (spinApp::Instance().getContext()->isRunning()) && \
+        (spinApp::Instance().getContext()->isServer()) ) \
+            for (std::map<std::string,lo_address>::iterator addrIter=dynamic_cast<spinServerContext*>(spinApp::Instance().getContext())->tcpClientAddrs_.begin(); addrIter != dynamic_cast<spinServerContext*>(spinApp::Instance().getContext())->tcpClientAddrs_.end(); ++addrIter) \
+            lo_send_message(addrIter->second, \
+            ("/SPIN/" + spinApp::Instance().getSceneID() + "/" + \
+            pNode->getID()).c_str(), msg)
 
 
 // This stuff is replaced by the tx_Addrs_ vector!!
