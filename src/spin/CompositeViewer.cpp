@@ -317,6 +317,12 @@ void CompositeViewer::updateSpaceNavigator()
     // poll the space navigator:
     int speventCount = 0;
     osg::Vec3 spVel, spSpin;
+    float x=0;
+    float y=0;
+    float z=0;
+    float rx=0;
+    float ry=0;
+    float rz=0;
 
 
     // if the last significant event was more than a second ago,
@@ -335,11 +341,15 @@ void CompositeViewer::updateSpaceNavigator()
     {
         if (spnavevent.type == SPNAV_EVENT_MOTION)
         {
-            // just make note of the count; the latest motion data will be stored in spnavevent
-            
+            // note: y and z axis flipped:
+            x += spnavevent.motion.x;
+            y += spnavevent.motion.z;
+            z += spnavevent.motion.y;
+            rx += -spnavevent.motion.rx;
+            ry += -spnavevent.motion.rz;
+            rz += -spnavevent.motion.ry;
+
             speventCount++;
-            //spPos = osg::Vec3(spnavevent.motion.x, spnavevent.motion.z, spnavevent.motion.y);
-            //spRot = osg::Vec3(spnavevent.motion.rx, spnavevent.motion.rz, spnavevent.motion.ry);
         }
         else
         {
@@ -360,13 +370,13 @@ void CompositeViewer::updateSpaceNavigator()
     {
         moving_ = true;
 
-        // note: y and z axis flipped:
-        float x = spnavevent.motion.x;
-        float y = spnavevent.motion.z;
-        float z = spnavevent.motion.y;
-        float rx = -spnavevent.motion.rx;
-        float ry = -spnavevent.motion.rz;
-        float rz = -spnavevent.motion.ry;
+        // make average of motion:
+        x /= speventCount;
+        y /= speventCount;
+        z /= speventCount;
+        rx /= speventCount;
+        ry /= speventCount;
+        rz /= speventCount;
 
         // if user is pushing beyond a threshold, inrement
         // the speed over time
@@ -396,8 +406,8 @@ void CompositeViewer::updateSpaceNavigator()
         spSpin = osg::componentMultiply(spSpin, spinScalars_);
 
         //std::cout << "spacenav x,y,z="<<x<<","<<y<<","<<z<<" rx,ry,rz="<<rx<<","<<ry<<","<<rz<<" computed speedScale="<<speedScaleValue_<< ", spVel= " << stringify(spVel) << ", spSpin= " << stringify(spSpin) << std::endl;
-        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", spVel.x(), spVel.y(), spVel.z(), SPIN_ARGS_END);
-        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setSpin", spSpin.x(), spSpin.y(), spSpin.z(), SPIN_ARGS_END);
+        spin.NodeMessage(spnavNodeID_.c_str(), "sfff", "setVelocity", spVel.x(), spVel.y(), spVel.z(), SPIN_ARGS_END);
+        spin.NodeMessage(spnavNodeID_.c_str(), "sfff", "setSpin", spSpin.x(), spSpin.y(), spSpin.z(), SPIN_ARGS_END);
 
         lastNavTick_ = osg::Timer::instance()->tick();
     }
@@ -613,7 +623,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // attach the texture and use it as the color buffer.
         camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_Y);
 
-        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd());
+        view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd());
     }
 
     // top face
@@ -633,7 +643,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // attach the texture and use it as the color buffer.
         camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_Z);
 
-        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(-90.0f), 1.0,0.0,0.0));
+        view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 1.0,0.0,0.0));
     }
 
     // left face
@@ -652,7 +662,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // attach the texture and use it as the color buffer.
         camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_X);
 
-        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,1.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,0.0,1.0));
+        view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,1.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,0.0,1.0));
     }
 
     // right face
@@ -671,7 +681,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // attach the texture and use it as the color buffer.
         camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_X);
 
-        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,1.0,0.0 ) * osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,0.0,1.0));
+        view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,1.0,0.0 ) * osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,0.0,1.0));
     }
 
     // bottom face
@@ -690,7 +700,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // attach the texture and use it as the color buffer.
         camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_Z);
 
-        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(90.0f), 1.0,0.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(180.0f), 0.0,0.0,1.0));
+        view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(90.0f), 1.0,0.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(180.0f), 0.0,0.0,1.0));
     }
 
     // back face
@@ -709,7 +719,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // attach the texture and use it as the color buffer.
         camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_Y);
 
-        view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd::rotate(osg::inDegrees(180.0f), 1.0,0.0,0.0));
+        view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(180.0f), 1.0,0.0,0.0));
     }
 
     //view->getCamera()->setProjectionMatrixAsPerspective(90.0f, 1.0, 1, 1000.0);
@@ -855,6 +865,7 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
         float crop = 0.0;
         float near = 1.0;
         float far = 1000.0; 
+        osg::Vec3 dirVec = osg::Vec3(0.0, 0.0, 1.0);
         for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
 	    {
 		    if (child->FirstChild())
@@ -883,6 +894,15 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
             {
                 sscanf(val.c_str(), "%f", &crop);
             }
+            else if (tag=="direction")
+            {
+                float x,y,z;
+                if (sscanf(val.c_str(), "%f %f %f", &x, &y, &z)==3)
+                    dirVec = osg::Vec3(x,y,z);
+                else
+                    std::cout << "Bad direction values: " << val << ". Need three values <x y z>" << std::endl;
+			
+            }
             else if (tag=="clipping")
             {
                 sscanf(val.c_str(), "%f %f", &near, &far);
@@ -899,8 +919,12 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
         
         osg::Matrixd projMatrix = osg::Matrixd::identity();
         //osg::Matrixd projMatrix = osg::Matrixd::translate(osg::Vec3(0,0,1.0));
+        //osg::Matrixd projMatrix = osg::Matrixd::rotate(osg::inDegrees(180.0f), 1.0,0.0,0.0);
+        
+        //projMatrix.makeLookAt(osg::Vec3(0,0,0), dirVec, osg::Vec3(0,0,1));
+        
  
-        std::cout << "creating spherical display with textureSize="<<textureSize<<", radius="<<radius<<", collar="<<collar<<", crop="<<crop<<std::endl;
+        std::cout << "creating spherical display with textureSize="<<textureSize<<", radius="<<radius<<", collar="<<collar<<", crop="<<crop<<", direction="<<stringify(dirVec)<<std::endl;
 
         //view->setUpViewFor3DSphericalDisplay(radius, collar, screenNum, intensityMap, projMatrix);
         makeDomeView(gc, traits, view, cam, textureSize, radius, collar, distance, crop, intensityMap, projMatrix);
@@ -1353,13 +1377,18 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     }
     else if ((theMethod=="setVelocityScalars") && (floatArgs.size()==3))
     {
-	viewer->setVelocityScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
-	return 0;
+        viewer->setVelocityScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
+        return 0;
     }
     else if ((theMethod=="setSpinScalars") && (floatArgs.size()==3))
     {
-	viewer->setSpinScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
-	return 0;
+        viewer->setSpinScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
+        return 0;
+    }
+    else if ((theMethod=="setSpaceNavigatorNode") && (stringArgs.size()==1))
+    {
+        viewer->setSpaceNavigatorNode(stringArgs[0]);
+        return 0;
     }
     
     return 1;

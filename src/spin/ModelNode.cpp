@@ -580,6 +580,8 @@ void ModelNode::drawModel()
             // Should we override our _renderBin value using ss->getBinNumber(),
             // or shoudld we apply our currently stored _renderBin to the model?
 			ss->setRenderBinDetails( (int)_renderBin, "RenderBin");
+            
+            ss->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
 			/*
 			if (sceneManager_->sharedStateManager.valid())

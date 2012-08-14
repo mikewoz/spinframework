@@ -159,6 +159,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
       
         //! Poll the SpaceNavigator for updates and send velocity/spin 
         void updateSpaceNavigator();
+        void setSpaceNavigatorNode(std::string nID) { spnavNodeID_ = nID; }
 
         /**
          * Scale the velocity effect of navigational devices (for example,
@@ -186,7 +187,8 @@ class CompositeViewer : public osgViewer::CompositeViewer
         //DoFRendering mDoFSetup;
         bool mbInitialized;
        
-	    // navigation update stuff: 
+	    // navigation update stuff:
+        std::string spnavNodeID_; 
         osg::Timer_t lastNavTick_;
 	    float speedScaleValue_;
 	    float moving_;
