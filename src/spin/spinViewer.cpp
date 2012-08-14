@@ -228,10 +228,10 @@ int run(int argc, char **argv)
 	spnav_event spnavevent;
 	if (spnav_open()==-1)
 	{
-         	std::cout << "Failed to connect to the space navigator" << std::endl;
-        } else
+         	std::cout << "Failed to connect to the Space Navigator" << std::endl;
+    } else
 	{
-         	std::cout << "Listening to space navigator... " << std::endl;
+            std::cout << "Space Navigator is enabled and sending messages to: " << spin.getUserID() << std::endl;
 	}
 	#endif
 
