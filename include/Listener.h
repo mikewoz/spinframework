@@ -65,6 +65,7 @@ class Listener : public DSPNode
         virtual ~Listener();
         
         virtual void callbackUpdate(osg::NodeVisitor* nv);
+        bool dumpGlobals(bool forced=false);
 
         /**
          * For each subclass of ReferencedNode, we override the getState()

@@ -151,6 +151,10 @@ void DSPNode::callbackUpdate(osg::NodeVisitor* nv)
     GroupNode::callbackUpdate(nv);
 }
 
+bool DSPNode::dumpGlobals(bool forced)
+{
+    GroupNode::dumpGlobals(forced);
+}
 
 // *****************************************************************************
 

@@ -51,7 +51,7 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          "",
 	          "A client interface that allows for setting the animation time using a normalized index in the range [0,1] ");
 	I_Method1(void, setUpdateRate, IN, float, hz,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__setUpdateRate__float,
 	          "Set the update rate (in Hz). ",
 	          " param hz Update rate in hz  ");

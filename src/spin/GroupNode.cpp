@@ -211,6 +211,9 @@ GroupNode::GroupNode (SceneManager *sceneManager, const char* initID) : Referenc
     this->addChild(mainTransform_.get());
 
     computationMode_ = SERVER_SIDE;
+    
+    maxUpdateDelta_ = 50; // update when dt is at least 0.05s (ie 20hz)
+    //maxUpdateDelta_ = 100; // update when dt is at least 0.1s (ie 10hz)
 
     stateset_ = gensym("NULL");
 
@@ -257,14 +260,11 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
         manipulatorUpdateFlag_ = false;
     }
     
-    dumpGlobals(false); // never force globals here
-
-    
     osg::Timer_t tick = osg::Timer::instance()->tick();
-    
-    float maxUpdateDelta = 0.05; // update when dt is at least 0.05s (ie 20hz)
-    //float maxUpdateDelta = 0.1; // update when dt is at least 0.1s (ie 10hz)
-  
+    float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
+
+    if (dt > maxUpdateDelta_*1000)
+        dumpGlobals(false); // never force globals here
     
     // Decide whether messages should be broadcasted during this update:
     if (spinApp::Instance().getContext()->isServer())
@@ -279,7 +279,7 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
         // on the server-side, we want to throttle network messages, so only
         // allow broadcasting of messages if a threshold amount of time has
         // passed:
-        else if (osg::Timer::instance()->delta_s(lastUpdate_,tick) > maxUpdateDelta)
+        else if (dt > maxUpdateDelta_*1000)
         {
             broadcastLock_ = false;
             lastUpdate_ = tick;
@@ -301,10 +301,6 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
         // velocity/spin values. We find out how many seconds passed since the
         // last time this was called, and move by velocity_*dt (ie, m/s) and 
         // rotate by spin_*dt (ie, deg/sec)
-
-        float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
-
-
         if (motion_.valid())
         {
             motion_->update(dt);
@@ -581,6 +577,13 @@ void GroupNode::debug()
 
 
 // -----------------------------------------------------------------------------
+
+void GroupNode::setUpdateRate(float milliseconds)
+{
+    maxUpdateDelta_ = milliseconds;
+    BROADCAST(this, "sf", "setUpdateRate", getUpdateRate());
+}
+
 
 void GroupNode::setComputationMode (ComputationMode mode)
 {
@@ -1395,6 +1398,10 @@ std::vector<lo_message> GroupNode::getState () const
 
     msg = lo_message_new();
     lo_message_add(msg, "si", "setComputationMode", getComputationMode());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setUpdateRate", getUpdateRate());
     ret.push_back(msg);
 
     msg = lo_message_new();

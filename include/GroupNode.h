@@ -114,6 +114,14 @@ public:
     
     virtual void callbackUpdate(osg::NodeVisitor* nv);
 
+    /**
+     * The update rate tells the server how fast to send both velocity updates
+     * and reporting. Generally, we want to throttle network messages on the
+     * server-side so that messages don't flood the network when there is a lot
+     * of activity.
+     */
+    virtual void setUpdateRate(float milliseconds);
+    float getUpdateRate() const { return maxUpdateDelta_; }
 
     /**
      * IMPORTANT:
@@ -320,7 +328,7 @@ public:
     * Note: the return value is only to fool wx so that it doesn't consider this
     * as an editable property.
     */
-    bool dumpGlobals(bool forced);
+    virtual bool dumpGlobals(bool forced=false);
 
     
     /**
@@ -375,6 +383,7 @@ protected:
     float globalRadius_;
 
     ComputationMode computationMode_;
+    float maxUpdateDelta_;
 
     enum OrientationMode orientationMode_;
     t_symbol* orientationTarget_;

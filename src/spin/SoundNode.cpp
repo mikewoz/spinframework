@@ -90,22 +90,24 @@ void SoundNode::callbackUpdate(osg::NodeVisitor* nv)
     // need to first call the superclass update method (specifically, GroupNode)
     // which will update _globalMatrix (since reporting is on)
     DSPNode::callbackUpdate(nv);
+}
 
-    // now, we can get the global position and orientation, and we can forward
-    // it to SpatOSC
-
+bool SoundNode::dumpGlobals(bool forced)
+{
+    DSPNode::dumpGlobals();
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
         this->globalMatrix_ = getGlobalMatrix(); // in case reporting is off
         osg::Vec3 myPos = globalMatrix_.getTrans();
-        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
+        osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(globalMatrix_.getRotate()));
 
         spatOSCSource->setPosition(myPos.x(), myPos.y(), myPos.z());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
     }
 #endif
-}
+    return 1;
+}   
 
 void SoundNode::setParam (const char *paramName, const char *paramValue)
 {
