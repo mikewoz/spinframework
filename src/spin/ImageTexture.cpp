@@ -55,6 +55,8 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
+extern pthread_mutex_t sceneMutex;
+
 namespace spin
 {
 
@@ -166,9 +168,11 @@ void ImageTexture::draw()
         tex->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
     
         // add texture to stateset:
+	pthread_mutex_lock(&sceneMutex);
         this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
-
-        // osg::TexEnv::REPLACE  osg::TexEnv::DECAL  osg::TexEnv::MODULATE osg::TexEnv::BLEND
+	pthread_mutex_unlock(&sceneMutex);
+        
+	// osg::TexEnv::REPLACE  osg::TexEnv::DECAL  osg::TexEnv::MODULATE osg::TexEnv::BLEND
         osg::TexEnv* texenv = new osg::TexEnv();
         texenv->setMode(textureBlend_);
         this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
