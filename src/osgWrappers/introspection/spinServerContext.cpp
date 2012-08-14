@@ -74,5 +74,6 @@ BEGIN_OBJECT_REFLECTOR(spin::spinServerContext)
 	I_SimpleProperty(unsigned short, HttpPort, 
 	                 __unsigned_short__getHttpPort, 
 	                 0);
+	I_PublicMemberProperty(std::map< std::string COMMA  lo_address >, tcpClientAddrs_);
 END_REFLECTOR
 

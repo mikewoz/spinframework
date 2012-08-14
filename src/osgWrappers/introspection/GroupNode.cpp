@@ -85,6 +85,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
+	I_Method1(void, setUpdateRate, IN, float, milliseconds,
+	          Properties::VIRTUAL,
+	          __void__setUpdateRate__float,
+	          "",
+	          "The update rate tells the server how fast to send both velocity updates and reporting. Generally, we want to throttle network messages on the server-side so that messages don't flood the network when there is a lot of activity. ");
+	I_Method0(float, getUpdateRate,
+	          Properties::NON_VIRTUAL,
+	          __float__getUpdateRate,
+	          "",
+	          "");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
@@ -320,11 +330,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __osg_Vec3__getCenter,
 	          "",
 	          "");
-	I_Method1(bool, dumpGlobals, IN, bool, forced,
-	          Properties::NON_VIRTUAL,
-	          __bool__dumpGlobals__bool,
-	          "",
-	          "The dumpGlobals method results in a broadcast of this node's translation and orientation. It is called by callbackUpdate() every frame, however the 'forced' flag will be set to false, so it will only send a message if the node's matrix has changed. If the 'forced' flag is set to true, it will definitely result in a message broadcast. This should only be used when necessary (eg, when a stateDump is requested).Note: the return value is only to fool wx so that it doesn't consider this as an editable property. ");
+	I_MethodWithDefaults1(bool, dumpGlobals, IN, bool, forced, false,
+	                      Properties::VIRTUAL,
+	                      __bool__dumpGlobals__bool,
+	                      "",
+	                      "The dumpGlobals method results in a broadcast of this node's translation and orientation. It is called by callbackUpdate() every frame, however the 'forced' flag will be set to false, so it will only send a message if the node's matrix has changed. If the 'forced' flag is set to true, it will definitely result in a message broadcast. This should only be used when necessary (eg, when a stateDump is requested).Note: the return value is only to fool wx so that it doesn't consider this as an editable property. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -429,6 +439,9 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_SimpleProperty(osg::Vec3, Translation, 
 	                 __osg_Vec3__getTranslation, 
 	                 0);
+	I_SimpleProperty(float, UpdateRate, 
+	                 __float__getUpdateRate, 
+	                 __void__setUpdateRate__float);
 	I_SimpleProperty(osg::Vec3, Velocity, 
 	                 __osg_Vec3__getVelocity, 
 	                 0);

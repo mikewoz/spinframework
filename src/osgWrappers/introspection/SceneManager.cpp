@@ -331,6 +331,7 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_PublicMemberProperty(bool, graphicalMode);
 	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);
+	I_PublicMemberProperty(osg::ref_ptr< osgDB::SharedStateManager >, sharedStateManager);
 	I_PublicMemberProperty(bool, lastColState);
 	I_PublicMemberProperty(btDynamicsWorld *, dynamicsWorld_);
 END_REFLECTOR

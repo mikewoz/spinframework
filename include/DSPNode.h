@@ -79,6 +79,7 @@ public:
         virtual ~DSPNode();
         
         virtual void callbackUpdate(osg::NodeVisitor* nv);
+        bool dumpGlobals(bool forced=false);
         
         /**
          * Returns the SoundConnection object that exists between the current

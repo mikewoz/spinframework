@@ -25,6 +25,11 @@ BEGIN_VALUE_REFLECTOR(spin::ViewerManipulator)
 	I_Constructor0(____ViewerManipulator,
 	               "",
 	               "");
+	I_Method1(void, setTrackNode, IN, osg::Node *, node,
+	          Properties::NON_VIRTUAL,
+	          __void__setTrackNode__osg_Node_P1,
+	          "",
+	          "");
 	I_Method1(void, setPicker, IN, bool, b,
 	          Properties::NON_VIRTUAL,
 	          __void__setPicker__bool,
@@ -64,5 +69,8 @@ BEGIN_VALUE_REFLECTOR(spin::ViewerManipulator)
 	I_SimpleProperty(bool, Raw, 
 	                 0, 
 	                 __void__setRaw__bool);
+	I_SimpleProperty(osg::Node *, TrackNode, 
+	                 0, 
+	                 __void__setTrackNode__osg_Node_P1);
 END_REFLECTOR
 
