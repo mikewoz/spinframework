@@ -79,6 +79,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         //ViewerManipulator(UserNode *u);
         ViewerManipulator();
         
+        void setTrackNode(osg::Node* node);
+        
         /**
          * Enables or disables use of the mouse to pick nodes.
          */
