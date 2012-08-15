@@ -134,12 +134,14 @@ bool ViewerManipulator::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActio
 		{
 			// if the userNode's nodepath has changed, we must call setTrackNode
 			// again to force NodeTrackerManipulator to store the proper nodePath
+			/*
 			if (spin.userNode->nodepathUpdate)
 			{
 				setTrackNode(spin.userNode->getCameraAttachmentNode());
 				spin.userNode->nodepathUpdate = false;
 			}
-			
+			*/
+
 			// update camera from NodeTrackerManipulator:
 			if (_thrown) aa.requestRedraw();
 		}

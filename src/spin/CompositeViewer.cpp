@@ -422,27 +422,45 @@ void CompositeViewer::frame(double f)
     // update default viewer
     // this should also update the post processing graph
     // since it is attached to the camera
-    //osgViewer::Viewer::frame(f);
-    osgViewer::CompositeViewer::frame(f);
+    //osgViewer::CompositeViewer::frame(f);
     
     // initilize PPU if it was not done before
     //initializePPU();
 
-    // compute frame time
-    float frameTime = elapsedTime() - mOldTime;
-    mOldTime = elapsedTime();
 
-    // print also some info about the fps number
-    /*if (0)
+    // poll the space navigator:
+    updateSpaceNavigator();
+
+    // we used to just call viewer.frame() within a mutex, but we
+    // only really need to apply the mutex to the update traversal
+    /*
+    pthread_mutex_lock(&sceneMutex);
+    viewer.frame();
+    pthread_mutex_unlock(&sceneMutex);
+    */
+
+    // if the userNode's nodepath has changed, we must call setTrackNode
+    // to force NodeTrackerManipulator to store the proper nodePath
+    if (spinApp::Instance().userNode->nodepathUpdate)
     {
-        osgPPU::UnitText* ppu = dynamic_cast<osgPPU::UnitText*>(mProcessor->findUnit("FPSTextPPU"));
-        if (ppu)
+        std::cout << "nodepathUpdate. " << this->getNumViews() << " views." << std::endl;
+        for (unsigned int i=0; i<this->getNumViews(); i++)
         {
-            char txt[64];
-            sprintf(txt, "FPS: %4.2f", 1.0 / frameTime);
-            ppu->setText(txt);
+            ViewerManipulator *vm = dynamic_cast<ViewerManipulator*>(this->getView(i)->getCameraManipulator());
+            if (vm) vm->setTrackNode(spinApp::Instance().userNode->getCameraAttachmentNode());
+            std::cout << "reattached viewer manipulator " << i << " to node: " << spinApp::Instance().userNode->getCameraAttachmentNode()->getName() << std::endl;
         }
-    }*/
+        spinApp::Instance().userNode->nodepathUpdate = false;
+    }
+
+    this->advance();
+    this->eventTraversal();
+    pthread_mutex_lock(&sceneMutex);
+    spinApp::Instance().sceneManager_->update();
+    this->updateTraversal();
+    this->renderingTraversals();
+    pthread_mutex_unlock(&sceneMutex);
+    
 }
 
 //int run()
@@ -1349,7 +1367,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
             }
         }
         
-        return 0;
+        return 1;
     }
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
     {
@@ -1373,22 +1391,22 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
             }
         }
         
-        return 0;
+        return 1;
     }
     else if ((theMethod=="setVelocityScalars") && (floatArgs.size()==3))
     {
         viewer->setVelocityScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
-        return 0;
+        return 1;
     }
     else if ((theMethod=="setSpinScalars") && (floatArgs.size()==3))
     {
         viewer->setSpinScalars(osg::Vec3(floatArgs[0], floatArgs[1], floatArgs[2]));
-        return 0;
+        return 1;
     }
     else if ((theMethod=="setSpaceNavigatorNode") && (stringArgs.size()==1))
     {
         viewer->setSpaceNavigatorNode(stringArgs[0]);
-        return 0;
+        return 1;
     }
     
     return 1;
