@@ -218,14 +218,31 @@ class SceneManager
         bool activeLights[OSG_NUM_LIGHTS];
 
         std::string getStateAsXML(std::vector<lo_message> nodeState);
-        std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
+        std::string getNodeAsXML(ReferencedNode *n, bool withUsers, bool withChildren);
 
         std::string getConnectionsAsXML();
         std::vector<t_symbol*> getSavableStateSets(ReferencedNode *n, bool withUsers);
 
+        /**
+         * Write the entire scene to an XML file. If no absolute path is
+         * specified, the file will be written to the ~/.spinFramework folder.
+         */
         bool saveXML(const char *filename, bool withUsers = false);
-        bool saveUsers(const char *s);
+        
+        /**
+         * Write exactly one node to an XML file, without it's subgraph
+         * (ie, children nodes) or statesets.
+         */
+        bool saveNode(const char *nodeID, const char *filename);
+        
+        /**
+         * Save all the UserNodes in a scene to an XML file.
+         */
+        bool saveUsers(const char *filename);
 
+        /**
+         * Loads any nodes or statesets from a file, and sets the parent node
+         */
         bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
         bool createStateSetFromXML(TiXmlElement *XMLnode);
         bool createConnectionsFromXML(TiXmlElement *XMLnode);
