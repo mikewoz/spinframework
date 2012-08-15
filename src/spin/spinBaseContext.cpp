@@ -932,6 +932,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->loadXML((char*) argv[1]);
     else if ((theMethod == "save") && (argc==2))
         sceneManager->saveXML((char*) argv[1]);
+    else if ((theMethod == "saveNode") && (argc==3))
+        sceneManager->saveNode((char*) argv[1], (char*) argv[2]);
     else if ((theMethod == "saveAll") && (argc==2))
         sceneManager->saveXML((char*) argv[1], true);
     else if ((theMethod == "saveUsers") && (argc==2))

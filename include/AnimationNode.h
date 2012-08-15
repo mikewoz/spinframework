@@ -42,7 +42,7 @@
 #ifndef __AnimationNode_H
 #define __AnimationNode_H
 
-#include "GroupNode.h"
+#include "ConstraintsNode.h"
 
 #include <osg/AnimationPath>
 
@@ -55,7 +55,7 @@ class SceneManager;
 /**
  * \brief Node for encapsulating 3D animation
  */
-class AnimationNode : public GroupNode
+class AnimationNode : public ConstraintsNode
 {
 
 public:

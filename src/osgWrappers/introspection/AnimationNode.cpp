@@ -30,7 +30,7 @@ END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	I_DeclaringFile("AnimationNode.h");
-	I_BaseType(spin::GroupNode);
+	I_BaseType(spin::ConstraintsNode);
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
 	               ____AnimationNode__SceneManager_P1__C5_char_P1,
 	               "",

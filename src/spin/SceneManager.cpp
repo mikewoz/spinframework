@@ -2079,7 +2079,7 @@ bool SceneManager::saveNode(const char *nodeID, const char *s)
     } else {
         // success!
         outfile.SaveFile();
-        std::cout << "Saved users to: " << filename << std::endl;
+        std::cout << "Saved node to: " << filename << std::endl;
         return true;
     }
 }

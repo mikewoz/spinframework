@@ -53,7 +53,7 @@ class SceneManager;
 
 // *****************************************************************************
 // constructor:
-AnimationNode::AnimationNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
+AnimationNode::AnimationNode (SceneManager *sceneManager, const char* initID) : ConstraintsNode(sceneManager, initID)
 {
     this->setName(this->getID() + ".AnimationNode");
     this->setNodeType("AnimationNode");
@@ -92,7 +92,7 @@ AnimationNode::~AnimationNode()
 void AnimationNode::callbackUpdate(osg::NodeVisitor* nv)
 {
 
-    GroupNode::callbackUpdate(nv);
+    ConstraintsNode::callbackUpdate(nv);
 
     if ( spinApp::Instance().getContext()->isServer() and getPlay() 
             and not _animationPath->empty())
@@ -238,7 +238,7 @@ void AnimationNode::setTranslation (float x, float y, float z)
     if (newTranslation != getTranslation())
     {
         // first, call the parent method
-        GroupNode::setTranslation(x,y,z);
+        ConstraintsNode::setTranslation(x,y,z);
 
         // now, if _record mode is set, store the updated position
         if (_record) storeCurrentPosition();
@@ -252,7 +252,7 @@ void AnimationNode::setOrientation (float p, float r, float y)
     if (newOrientation != getOrientation())
     {
         // first, call the parent method
-        GroupNode::setOrientation(p,r,y);
+        ConstraintsNode::setOrientation(p,r,y);
 
         // now, if _record mode is set, store the updated position
         if (_record) storeCurrentPosition();
@@ -266,7 +266,7 @@ void AnimationNode::setScale (float x, float y, float z)
     if (newScale != getScale())
     {
         // first, call the parent method
-        GroupNode::setScale(x,y,z);
+        ConstraintsNode::setScale(x,y,z);
 
         // now, if _record mode is set, store the updated position
         if (_record) storeCurrentPosition();
@@ -319,7 +319,7 @@ void AnimationNode::clear()
 std::vector<lo_message> AnimationNode::getState () const
 {
     // inherit state from base class
-    std::vector<lo_message> ret = GroupNode::getState();
+    std::vector<lo_message> ret = ConstraintsNode::getState();
 
     lo_message msg;
 
