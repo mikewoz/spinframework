@@ -330,8 +330,8 @@ void CompositeViewer::updateSpaceNavigator()
     if ((dt > 1.0) && moving_)
     {
         //std::cout << "reset spacenavigator" << std::endl;
-        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
-        spin.NodeMessage(spin.getUserID().c_str(), "sfff", "setSpin", 0.0, 0.0, 0.0, SPIN_ARGS_END);
+        spin.NodeMessage(spnavNodeID.c_str(), "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
+        spin.NodeMessage(spnavNodeID.c_str(), "sfff", "setSpin", 0.0, 0.0, 0.0, SPIN_ARGS_END);
         speedScaleValue_ = 1.0;
         moving_ = false;
     }
@@ -355,12 +355,12 @@ void CompositeViewer::updateSpaceNavigator()
         {
             // SPNAV_EVENT_BUTTON
             static bool button1, button2;
-            spin.NodeMessage(spin.getUserID().c_str(), "ssii", "event", "button", spnavevent.button.bnum, (int)spnavevent.button.press, SPIN_ARGS_END);
+            spin.NodeMessage(spnavNodeID.c_str(), "ssii", "event", "button", spnavevent.button.bnum, (int)spnavevent.button.press, SPIN_ARGS_END);
             if (spnavevent.button.bnum==0) button1 = (bool)spnavevent.button.press;
             if (spnavevent.button.bnum==1) button2 = (bool)spnavevent.button.press;
             if (button1 && button2)
             {
-                spin.NodeMessage(spin.getUserID().c_str(), "s", "goHome", SPIN_ARGS_END);
+                spin.NodeMessage(spnavNodeID_.c_str(), "s", "goHome", SPIN_ARGS_END);
             }
         }
     }
