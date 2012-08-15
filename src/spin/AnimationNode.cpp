@@ -58,7 +58,7 @@ AnimationNode::AnimationNode (SceneManager *sceneManager, const char* initID) : 
     this->setName(this->getID() + ".AnimationNode");
     this->setNodeType("AnimationNode");
 
-    _updateRate = 15; // hz
+    animationRate_ = 15; // hz
     _play = false;
     _record = false;
 
@@ -92,7 +92,7 @@ AnimationNode::~AnimationNode()
 void AnimationNode::callbackUpdate(osg::NodeVisitor* nv)
 {
 
-    ReferencedNode::callbackUpdate(nv);
+    GroupNode::callbackUpdate(nv);
 
     if ( spinApp::Instance().getContext()->isServer() and getPlay() 
             and not _animationPath->empty())
@@ -101,7 +101,7 @@ void AnimationNode::callbackUpdate(osg::NodeVisitor* nv)
         float dt = osg::Timer::instance()->delta_s(_lastTick,tick);
 
         //if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
-        if (dt > (1/_updateRate))
+        if (dt > (1/animationRate_))
         {
             doUpdate(osg::Timer::instance()->delta_s(_startTime,tick));
             _lastTick = tick;
@@ -139,13 +139,24 @@ bool AnimationNode::doUpdate(double timestamp)
     else
         _animationPath->getInterpolatedControlPoint(timestamp,cp);
 
-    osg::Vec3 myPos = cp.getPosition();
-    osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(cp.getRotation()));
-    osg::Vec3 myScl = cp.getScale();
+    osg::Vec3 newPos = cp.getPosition();
+    osg::Vec3 newRot = Vec3inDegrees(QuatToEuler(cp.getRotation()));
+    osg::Vec3 newScl = cp.getScale();
 
-    setTranslation(myPos.x(), myPos.y(), myPos.z());
-    setOrientation(myRot.x(), myRot.y(), myRot.z());
-    setScale(myScl.x(), myScl.y(), myScl.z());
+    // old way: directly set translation, rotation is bad because collisions
+    // don't get triggered. They need translate and rotate.
+    /*
+    setTranslation(newPos.x(), newPos.y(), newPos.z());
+    setOrientation(newRot.x(), newRot.y(), newRot.z());
+    setScale(newScl.x(), newScl.y(), newScl.z());
+    */
+    
+    osg::Vec3 dPos = newPos - this->getTranslation();
+    osg::Vec3 dRot = newRot - this->getOrientation();
+    
+    translate(dPos.x(), dPos.y(), dPos.z());
+    rotate(dRot.x(), dRot.y(), dRot.z());
+    setScale(newScl.x(), newScl.y(), newScl.z());
     
     return true;
 
@@ -171,10 +182,10 @@ void AnimationNode::setIndex (float index)
 }
 
 
-void AnimationNode::setUpdateRate (float hz)
+void AnimationNode::setAnimationRate (float hz)
 {
-    _updateRate = hz;
-    BROADCAST(this, "sf", "setUpdateRate", hz);
+    animationRate_ = hz;
+    BROADCAST(this, "sf", "setAnimationRate", hz);
 }
 
 void AnimationNode::setPlay (int p)
@@ -317,7 +328,7 @@ std::vector<lo_message> AnimationNode::getState () const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    lo_message_add(msg, "sf", "setUpdateRate", getUpdateRate());
+    lo_message_add(msg, "sf", "setAnimationRate", getAnimationRate());
     ret.push_back(msg);
 
     /*

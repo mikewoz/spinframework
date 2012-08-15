@@ -86,17 +86,17 @@ public:
     /**
      * \brief Set the update rate (in Hz).
      * 
-     * The animation will send setTranslation, setOrientation, and setScale
+     * The animation will send translate, rotate, and setScale
      * events at this rate (assuming there is a change). Values will be
      * interpolated in between control points.
-     * @param hz Update rate in hz
+     * @param hz Animation rate in hz
      */
-    void setUpdateRate (float hz);
+    void setAnimationRate (float hz);
     
     /**
-     * @return update rate in hz
+     * @return animation rate in hz
      */
-    float getUpdateRate() const { return _updateRate; }
+    float getAnimationRate() const { return animationRate_; }
     
     /**
     * Turns animation on/off.
@@ -189,7 +189,7 @@ protected:
     
     bool _play, _record;
     osg::Timer_t _startTime, _lastTick;
-    float _updateRate;
+    float animationRate_;
     
     osg::ref_ptr<osg::AnimationPath> _animationPath;
 };
