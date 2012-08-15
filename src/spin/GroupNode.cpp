@@ -212,8 +212,8 @@ GroupNode::GroupNode (SceneManager *sceneManager, const char* initID) : Referenc
 
     computationMode_ = SERVER_SIDE;
     
-    maxUpdateDelta_ = 50; // update when dt is at least 0.05s (ie 20hz)
-    //maxUpdateDelta_ = 100; // update when dt is at least 0.1s (ie 10hz)
+    maxUpdateDelta_ = 0.05; // update when dt is at least 0.05s (ie 20hz)
+    //maxUpdateDelta_ = 0.1; // update when dt is at least 0.1s (ie 10hz)
 
     stateset_ = gensym("NULL");
 
@@ -261,9 +261,9 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
     }
     
     osg::Timer_t tick = osg::Timer::instance()->tick();
-    float dt = osg::Timer::instance()->delta_s(lastTick_,tick);
+    float dt = osg::Timer::instance()->delta_s(lastUpdate_,tick);
 
-    if (dt > maxUpdateDelta_*1000)
+    if (dt > maxUpdateDelta_)
         dumpGlobals(false); // never force globals here
     
     // Decide whether messages should be broadcasted during this update:
@@ -279,7 +279,7 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
         // on the server-side, we want to throttle network messages, so only
         // allow broadcasting of messages if a threshold amount of time has
         // passed:
-        else if (dt > maxUpdateDelta_*1000)
+        else if (dt > maxUpdateDelta_)
         {
             broadcastLock_ = false;
             lastUpdate_ = tick;
@@ -296,6 +296,9 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
     // 2) this is a client and the node is set to client-side computation.
     if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
+	// now dt is the time since the "lastTick" (could be more recent than the
+        // last update
+    	dt = osg::Timer::instance()->delta_s(lastTick_,tick);
 
         // Now we need to update translation/orientation based on the current
         // velocity/spin values. We find out how many seconds passed since the
@@ -578,9 +581,9 @@ void GroupNode::debug()
 
 // -----------------------------------------------------------------------------
 
-void GroupNode::setUpdateRate(float milliseconds)
+void GroupNode::setUpdateRate(float seconds)
 {
-    maxUpdateDelta_ = milliseconds;
+    maxUpdateDelta_ = seconds;
     BROADCAST(this, "sf", "setUpdateRate", getUpdateRate());
 }
 

@@ -120,7 +120,7 @@ public:
      * server-side so that messages don't flood the network when there is a lot
      * of activity.
      */
-    virtual void setUpdateRate(float milliseconds);
+    virtual void setUpdateRate(float seconds);
     float getUpdateRate() const { return maxUpdateDelta_; }
 
     /**
