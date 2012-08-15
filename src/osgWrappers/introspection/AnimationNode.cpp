@@ -50,16 +50,16 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          __void__setIndex__float,
 	          "",
 	          "A client interface that allows for setting the animation time using a normalized index in the range [0,1] ");
-	I_Method1(void, setUpdateRate, IN, float, hz,
-	          Properties::VIRTUAL,
-	          __void__setUpdateRate__float,
-	          "Set the update rate (in Hz). ",
-	          " param hz Update rate in hz  ");
-	I_Method0(float, getUpdateRate,
+	I_Method1(void, setAnimationRate, IN, float, hz,
 	          Properties::NON_VIRTUAL,
-	          __float__getUpdateRate,
+	          __void__setAnimationRate__float,
+	          "Set the update rate (in Hz). ",
+	          " param hz Animation rate in hz  ");
+	I_Method0(float, getAnimationRate,
+	          Properties::NON_VIRTUAL,
+	          __float__getAnimationRate,
 	          "",
-	          "update rate in hz  ");
+	          "animation rate in hz  ");
 	I_Method1(void, setPlay, IN, int, p,
 	          Properties::NON_VIRTUAL,
 	          __void__setPlay__int,
@@ -130,6 +130,9 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(float, AnimationRate, 
+	                 __float__getAnimationRate, 
+	                 __void__setAnimationRate__float);
 	I_SimpleProperty(float, Index, 
 	                 0, 
 	                 __void__setIndex__float);
@@ -145,9 +148,6 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_SimpleProperty(float, UpdateRate, 
-	                 __float__getUpdateRate, 
-	                 __void__setUpdateRate__float);
 END_REFLECTOR
 
 STD_VECTOR_REFLECTOR(std::vector< lo_message >)

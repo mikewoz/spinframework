@@ -1819,7 +1819,7 @@ std::string SceneManager::getStateAsXML(std::vector<lo_message> nodeState)
     return output.str();
 }
 
-std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
+std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers, bool withChildren)
 {
     // we can ignore UserNodes, and their entire subgraphs:
     if (! withUsers && (n->getNodeType()=="spin::UserNode"))
@@ -1832,17 +1832,20 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers)
     output << getStateAsXML( n->getState() );
 
     // check for children:
-    std::vector<ReferencedNode*> children = n->getChildren();
-    if (!children.empty())
+    if (withChildren)
     {
-        output << "<subgraph>\n";
-        
-        std::vector<ReferencedNode*>::iterator childIter;
-        for (childIter = children.begin(); childIter != children.end(); childIter++)
+        std::vector<ReferencedNode*> children = n->getChildren();
+        if (!children.empty())
         {
-            output << getNodeAsXML(*childIter, withUsers);
+            output << "<subgraph>\n";
+            
+            std::vector<ReferencedNode*>::iterator childIter;
+            for (childIter = children.begin(); childIter != children.end(); childIter++)
+            {
+                output << getNodeAsXML(*childIter, withUsers, true);
+            }
+            output << "</subgraph>\n";
         }
-        output << "</subgraph>\n";
     }
 
     // remember to close tag:
@@ -2014,7 +2017,7 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
             {
                 if ((*iter)->getParentID(i) == "world")
                 {
-                    output << getNodeAsXML((*iter).get(), withUsers);
+                    output << getNodeAsXML((*iter).get(), withUsers, true);
                 }
             }
         }
@@ -2038,6 +2041,49 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
     }
 }
 
+bool SceneManager::saveNode(const char *nodeID, const char *s)
+{
+    ReferencedNode *n = getNode(nodeID);
+    if (!n)
+    {
+        std::cout << "ERROR: failed to save " << nodeID << ". Node does not exist" << std::endl;
+        return false;
+    }
+
+    // convert filename into valid path:
+    std::string filename = getSpinPath(s);
+    // and make sure that there is an .xml extension:
+    if (filename.substr(filename.length() - 4) != std::string(".xml"))
+        filename += ".xml";
+
+    // start with XML Header:
+    std::ostringstream output("");
+    output << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n"
+        << "<!DOCTYPE SPIN SYSTEM>\n"
+        << "<spinScene>\n";
+
+    // write node as XML:
+    output << getNodeAsXML(n, false, false);
+
+    // close XML:
+    output << "</spinScene>\n";
+
+    // now write to file:
+    TiXmlDocument outfile(filename.c_str());
+    outfile.Parse(output.str().c_str());
+    if (outfile.Error())
+    {
+        // error!
+        std::cout << "ERROR: failed to save " << filename << std::endl;
+        return false;
+    } else {
+        // success!
+        outfile.SaveFile();
+        std::cout << "Saved users to: " << filename << std::endl;
+        return true;
+    }
+}
+
 bool SceneManager::saveUsers(const char *s)
 {
     // convert filename into valid path:
@@ -2054,7 +2100,7 @@ bool SceneManager::saveUsers(const char *s)
 
     for (nodeListType::iterator iter = nodeMap["spin::UserNode"].begin(); iter != nodeMap["spin::UserNode"].end(); iter++)
     {
-        output << getNodeAsXML((*iter).get(), true);
+        output << getNodeAsXML((*iter).get(), true, true);
     }
     output << "</spinScene>\n";
 

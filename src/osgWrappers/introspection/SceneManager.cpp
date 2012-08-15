@@ -232,9 +232,9 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __std_string__getStateAsXML__std_vectorT1_lo_message_,
 	          "",
 	          "");
-	I_Method2(std::string, getNodeAsXML, IN, spin::ReferencedNode *, n, IN, bool, withUsers,
+	I_Method3(std::string, getNodeAsXML, IN, spin::ReferencedNode *, n, IN, bool, withUsers, IN, bool, withChildren,
 	          Properties::NON_VIRTUAL,
-	          __std_string__getNodeAsXML__ReferencedNode_P1__bool,
+	          __std_string__getNodeAsXML__ReferencedNode_P1__bool__bool,
 	          "",
 	          "");
 	I_Method0(std::string, getConnectionsAsXML,
@@ -251,17 +251,22 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	                      Properties::NON_VIRTUAL,
 	                      __bool__saveXML__C5_char_P1__bool,
 	                      "",
-	                      "");
-	I_Method1(bool, saveUsers, IN, const char *, s,
+	                      "Write the entire scene to an XML file. If no absolute path is specified, the file will be written to the ~/.spinFramework folder. ");
+	I_Method2(bool, saveNode, IN, const char *, nodeID, IN, const char *, filename,
+	          Properties::NON_VIRTUAL,
+	          __bool__saveNode__C5_char_P1__C5_char_P1,
+	          "",
+	          "Write exactly one node to an XML file, without it's subgraph (ie, children nodes) or statesets. ");
+	I_Method1(bool, saveUsers, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __bool__saveUsers__C5_char_P1,
 	          "",
-	          "");
+	          "Save all the UserNodes in a scene to an XML file. ");
 	I_Method2(bool, createNodeFromXML, IN, TiXmlElement *, XMLnode, IN, const char *, parentNode,
 	          Properties::NON_VIRTUAL,
 	          __bool__createNodeFromXML__TiXmlElement_P1__C5_char_P1,
 	          "",
-	          "");
+	          "Loads any nodes or statesets from a file, and sets the parent node ");
 	I_Method1(bool, createStateSetFromXML, IN, TiXmlElement *, XMLnode,
 	          Properties::NON_VIRTUAL,
 	          __bool__createStateSetFromXML__TiXmlElement_P1,
