@@ -158,6 +158,7 @@ void SoundNode::setOrientation (float p, float r, float y)
 #endif
 }
 
+    
 void SoundNode::setOrientationQuat (float x, float y, float z, float w)
 {
     GroupNode::setOrientationQuat(x,y,z,w);
@@ -194,6 +195,7 @@ void SoundNode::setURI (const char *uri)
 }
 
 
+    
 
 std::vector<lo_message> SoundNode::getState () const
 {
