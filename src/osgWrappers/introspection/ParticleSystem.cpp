@@ -21,6 +21,13 @@
 #undef OUT
 #endif
 
+BEGIN_VALUE_REFLECTOR(spin::NullOperator)
+	I_DeclaringFile("ParticleSystem.h");
+	I_Constructor0(____NullOperator,
+	               "",
+	               "");
+END_REFLECTOR
+
 BEGIN_ENUM_REFLECTOR(spin::ParticleSystem::PlacerType)
 	I_DeclaringFile("ParticleSystem.h");
 	I_EnumLabel(spin::ParticleSystem::RADIAL);
@@ -55,6 +62,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__setPlacerType__int,
 	          "",
 	          "");
+	I_Method0(int, getPlacerType,
+	          Properties::NON_VIRTUAL,
+	          __int__getPlacerType,
+	          "",
+	          "");
 	I_Method2(void, setRadialRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setRadialRange__float__float,
@@ -70,9 +82,19 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__setRadialPhiRange__float__float,
 	          "",
 	          "");
+	I_Method0(osg::Vec2, getRadialPhiRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getRadialPhiRange,
+	          "",
+	          "");
 	I_Method2(void, setCubicXRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setCubicXRange__float__float,
+	          "",
+	          "");
+	I_Method0(osg::Vec2, getCubicXRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getCubicXRange,
 	          "",
 	          "");
 	I_Method2(void, setCubicYRange, IN, float, min, IN, float, max,
@@ -80,9 +102,19 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__setCubicYRange__float__float,
 	          "",
 	          "");
+	I_Method0(osg::Vec2, getCubicYRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getCubicYRange,
+	          "",
+	          "");
 	I_Method2(void, setCubicZRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setCubicZRange__float__float,
+	          "",
+	          "");
+	I_Method0(osg::Vec2, getCubicZRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getCubicZRange,
 	          "",
 	          "");
 	I_Method3(void, addLinearPlacerVertex, IN, float, x, IN, float, y, IN, float, z,
@@ -100,46 +132,91 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__enableOrbiter__int,
 	          "",
 	          "The orbiter forces particles in the orbit around a point. ");
+	I_Method0(int, getEnabledOrbiter,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledOrbiter,
+	          "",
+	          "");
 	I_Method1(void, enableAccelerator, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableAccelerator__int,
 	          "",
 	          "Applies a constant acceleration to the particles (eg, gravity). ");
+	I_Method0(int, getEnabledAccelerator,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledAccelerator,
+	          "",
+	          "");
 	I_Method1(void, enableAngularAccelerator, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableAngularAccelerator__int,
 	          "",
 	          "Applies a constant angular acceleration to the particles. ");
+	I_Method0(int, getEnabledAngularAccelerator,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledAngularAccelerator,
+	          "",
+	          "");
 	I_Method1(void, enableAngularDamping, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableAngularDamping__int,
 	          "",
 	          "Applies damping constant to particle's angular velocity. ");
+	I_Method0(int, getEnabledAngularDamping,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledAngularDamping,
+	          "",
+	          "");
 	I_Method1(void, enableDamping, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableDamping__int,
 	          "",
 	          "Applies damping constant to particle's velocity. ");
+	I_Method0(int, getEnabledDamping,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledDamping,
+	          "",
+	          "");
 	I_Method1(void, enableFluidFriction, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableFluidFriction__int,
 	          "",
 	          "Simulates the friction of a fluid.By using this operator you can let the particles move in a fluid of a given density and viscosity. There are two functions to quickly setup the parameters for pure water and air. You can decide whether to compute the forces using the particle's physical radius or another value, by calling the setOverrideRadius() method. ");
+	I_Method0(int, getEnabledFluidFriction,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledFluidFriction,
+	          "",
+	          "");
 	I_Method1(void, enableExplosion, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableExplosion__int,
 	          "",
 	          "Exerts force on each particle away from the explosion center. ");
+	I_Method0(int, getEnabledExplosion,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledExplosion,
+	          "",
+	          "");
 	I_Method1(void, enableForce, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableForce__int,
 	          "",
 	          "Applies a constant force to the particles. Remember that if the mass of particles is expressed in kg and the lengths are expressed in meters, then the force should be expressed in Newtons. ");
+	I_Method0(int, getEnabledForce,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledForce,
+	          "",
+	          "");
 	I_Method1(void, enableBouncer, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__enableBouncer__int,
 	          "",
 	          "Can affect the particle's velocity to make it rebound. ");
+	I_Method0(int, getEnabledBouncer,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledBouncer,
+	          "",
+	          "");
 	I_Method3(void, setAccel, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setAccel__float__float__float,
@@ -280,9 +357,19 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __osg_Vec3__getTranslation,
 	          "",
 	          "");
+	I_Method0(void, updateStateSet,
+	          Properties::VIRTUAL,
+	          __void__updateStateSet,
+	          "",
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform_. ");
 	I_Method1(void, setParticleShape, IN, int, shp,
 	          Properties::NON_VIRTUAL,
 	          __void__setParticleShape__int,
+	          "",
+	          "");
+	I_Method0(int, getParticleShape,
+	          Properties::NON_VIRTUAL,
+	          __int__getParticleShape,
 	          "",
 	          "");
 	I_Method1(void, setLifeTime, IN, float, seconds,
@@ -407,12 +494,48 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(float, BounceResilience, 
 	                 0, 
 	                 __void__setBounceResilience__float);
+	I_SimpleProperty(osg::Vec2, CubicXRange, 
+	                 __osg_Vec2__getCubicXRange, 
+	                 0);
+	I_SimpleProperty(osg::Vec2, CubicYRange, 
+	                 __osg_Vec2__getCubicYRange, 
+	                 0);
+	I_SimpleProperty(osg::Vec2, CubicZRange, 
+	                 __osg_Vec2__getCubicZRange, 
+	                 0);
 	I_SimpleProperty(float, Damping, 
 	                 0, 
 	                 __void__setDamping__float);
 	I_SimpleProperty(int, Emissive, 
 	                 __int__getEmissive, 
 	                 __void__setEmissive__int);
+	I_SimpleProperty(int, EnabledAccelerator, 
+	                 __int__getEnabledAccelerator, 
+	                 0);
+	I_SimpleProperty(int, EnabledAngularAccelerator, 
+	                 __int__getEnabledAngularAccelerator, 
+	                 0);
+	I_SimpleProperty(int, EnabledAngularDamping, 
+	                 __int__getEnabledAngularDamping, 
+	                 0);
+	I_SimpleProperty(int, EnabledBouncer, 
+	                 __int__getEnabledBouncer, 
+	                 0);
+	I_SimpleProperty(int, EnabledDamping, 
+	                 __int__getEnabledDamping, 
+	                 0);
+	I_SimpleProperty(int, EnabledExplosion, 
+	                 __int__getEnabledExplosion, 
+	                 0);
+	I_SimpleProperty(int, EnabledFluidFriction, 
+	                 __int__getEnabledFluidFriction, 
+	                 0);
+	I_SimpleProperty(int, EnabledForce, 
+	                 __int__getEnabledForce, 
+	                 0);
+	I_SimpleProperty(int, EnabledOrbiter, 
+	                 __int__getEnabledOrbiter, 
+	                 0);
 	I_SimpleProperty(float, ExplosionEpsilon, 
 	                 0, 
 	                 __void__setExplosionEpsilon__float);
@@ -459,11 +582,14 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	                 0, 
 	                 __void__setOrbitMaxRadius__float);
 	I_SimpleProperty(int, ParticleShape, 
-	                 0, 
+	                 __int__getParticleShape, 
 	                 __void__setParticleShape__int);
 	I_SimpleProperty(int, PlacerType, 
-	                 0, 
+	                 __int__getPlacerType, 
 	                 __void__setPlacerType__int);
+	I_SimpleProperty(osg::Vec2, RadialPhiRange, 
+	                 __osg_Vec2__getRadialPhiRange, 
+	                 0);
 	I_SimpleProperty(osg::Vec2, RadialRange, 
 	                 __osg_Vec2__getRadialRange, 
 	                 0);

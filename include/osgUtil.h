@@ -110,6 +110,7 @@ osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle);
 osg::Quat EulerToQuat(float roll, float pitch, float yaw);
 osg::Vec3 QuatToEuler(osg::Quat q);
 osg::Vec3 QuatToEuler2(osg::Quat q);
+bool getPlaneLineIntersection(const osg::Vec4d& plane, const osg::Vec3d& lineStart, const osg::Vec3d& lineEnd, osg::Vec3d& isect);
 
 //osg::Geode*     createGrid(int radius, osg::Vec4 color);
 osg::Geometry*    createPlane(float halfLength, osg::Vec4 color);

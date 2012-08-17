@@ -305,6 +305,24 @@ osg::Vec3 QuatToEuler2(osg::Quat q)
 	return osg::Vec3(yaw,pitch,roll); // note order is messed up on purpose
 }
 
+bool getPlaneLineIntersection(const osg::Vec4d& plane, const osg::Vec3d& lineStart, const osg::Vec3d& lineEnd, osg::Vec3d& isect)
+{
+    const double deltaX = lineEnd.x() - lineStart.x();
+    const double deltaY = lineEnd.y() - lineStart.y();
+    const double deltaZ = lineEnd.z() - lineStart.z();
+
+    const double denominator = (plane[0]*deltaX + plane[1]*deltaY + plane[2]*deltaZ);
+    if (! denominator) return false;
+
+    const double C = (plane[0]*lineStart.x() + plane[1]*lineStart.y() + plane[2]*lineStart.z() + plane[3]) / denominator;
+
+    isect.x() = lineStart.x() - deltaX * C;
+    isect.y() = lineStart.y() - deltaY * C;
+    isect.z() = lineStart.z() - deltaZ * C;
+
+    return true;
+}
+
 /*
 osg::Geode* createGrid(int radius, osg::Vec4 color)
 {
