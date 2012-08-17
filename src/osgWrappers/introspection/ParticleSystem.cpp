@@ -23,9 +23,6 @@
 
 BEGIN_VALUE_REFLECTOR(spin::NullOperator)
 	I_DeclaringFile("ParticleSystem.h");
-	I_Constructor0(____NullOperator,
-	               "",
-	               "");
 END_REFLECTOR
 
 BEGIN_ENUM_REFLECTOR(spin::ParticleSystem::PlacerType)

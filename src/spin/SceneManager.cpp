@@ -402,6 +402,7 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
 	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
 	                     oscPattern.c_str(), NULL,
 	                     spinBaseContext::nodeCallback, (void*)s->getIDSymbol());
+    SCENE_MSG("sss", "registerState", s->getID().c_str(), s->getClassType().c_str());
     SCENE_MSG_TCP("sss", "registerState", s->getID().c_str(), s->getClassType().c_str());
     sendNodeList("*");
 }
@@ -420,6 +421,7 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
     itr = std::find( stateMap[s->getClassType()].begin(), stateMap[s->getClassType()].end(), s );
     if ( itr != stateMap[s->getClassType()].end() ) stateMap[s->getClassType()].erase(itr);
 
+    SCENE_MSG("ss", "unregisterState", s->getID().c_str());
     SCENE_MSG_TCP("ss", "unregisterState", s->getID().c_str());
 
     sendNodeList("*");
@@ -763,6 +765,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
     // Let's broadcast a createNode message BEFORE we actually do the creation.
     // Thus, if some messages are sent during instantiation, at least clients
     // will already have a placeholder for the node.
+    SCENE_MSG("sss", "createNode", id, type);
     SCENE_MSG_TCP("sss", "createNode", id, type);
 
     // check if a node with that name already exists:
@@ -883,6 +886,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         nodeMap[n->getNodeType()].push_back(n);
 
         // broadcast (only if this is the server):
+        SCENE_MSG("sss", "createNode", id, type);
         SCENE_MSG_TCP("sss", "createNode", id, type);
         sendNodeList(type);
         return n.get();
@@ -1013,6 +1017,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
         std::cout << "created new state: " << id << " of type " << type << std::endl;
         registerStateSet(n.get());
         // broadcast (only if this is the server):
+        SCENE_MSG("sss", "createStateSet", id, type);
         SCENE_MSG_TCP("sss", "createStateSet", id, type);
         sendNodeList("type");
         return n.get();
@@ -1331,6 +1336,7 @@ void SceneManager::deleteNode(const char *id)
         }
 
         doDelete(n);
+        SCENE_MSG("ss", "deleteNode", id);
         SCENE_MSG_TCP("ss", "deleteNode", id);
 
     }
@@ -1338,6 +1344,7 @@ void SceneManager::deleteNode(const char *id)
     {
 		doDelete(s);
         sendNodeList("*");
+        SCENE_MSG("ss", "deleteNode", id);
         SCENE_MSG_TCP("ss", "deleteNode", id);
     }
     else
@@ -1364,10 +1371,12 @@ void SceneManager::deleteGraph(const char *id)
         {
             std::string childID = (*childIter)->getID();
             doDelete(*childIter);
+            SCENE_MSG("ss", "deleteNode", childID.c_str());
             SCENE_MSG_TCP("ss", "deleteNode", childID.c_str());
         }
 
         doDelete(n);
+        SCENE_MSG("ss", "deleteNode", id);
         SCENE_MSG_TCP("ss", "deleteNode", id);
     }
     else
@@ -1515,9 +1524,7 @@ void SceneManager::clear()
        worldNode->accept(visitor);
      */
      
-     
-     
-
+    SCENE_MSG("s", "clear");
     SCENE_MSG_TCP("s", "clear");
     sendNodeList("*");
 
@@ -1537,6 +1544,7 @@ void SceneManager::clearUsers()
     {
         deleteGraph(nodeMap[std::string("UserNode")][0]->getID().c_str());
     }
+    SCENE_MSG("s", "clearUsers");
     SCENE_MSG_TCP("s", "clearUsers");
     sendNodeList("*");
     std::cout << "Cleared all users." << std::endl;
@@ -1564,6 +1572,7 @@ void SceneManager::clearStates()
         }
     }
     
+    SCENE_MSG("s", "clearStates");
     SCENE_MSG_TCP("s", "clearStates");
 
     // TODO: separate sendNodeList to sendStateList as well
@@ -1614,6 +1623,7 @@ void SceneManager::refreshAll()
 
 
     // Announce that a refresh has been completed
+    SCENE_MSG("s", "refresh");
     SCENE_MSG_TCP("s", "refresh");
 }
 

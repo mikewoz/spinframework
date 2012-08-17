@@ -1784,7 +1784,7 @@
 		1C386C7214BD3CBD0065851F = {
 			isa = PBXGroup;
 			children = (
-				1C875FA314C9BDAD00A46EBC /* Resources */,
+				1C875FA314C9BDAD00A46EBC /* Resources_old */,
 				1C386CF214BD3EF90065851F /* include */,
 				1C386C8414BD3DC80065851F /* src */,
 				1C57788C14BD6F4400632E46 /* spinserver */,
@@ -2124,12 +2124,12 @@
 			path = "../../../../../usr/local/lib/osgPlugins-3.1.1";
 			sourceTree = "<group>";
 		};
-		1C875FA314C9BDAD00A46EBC /* Resources */ = {
+		1C875FA314C9BDAD00A46EBC /* Resources_old */ = {
 			isa = PBXGroup;
 			children = (
 				1CA24C2C14BE52780023DD8B /* images */,
 			);
-			name = Resources;
+			name = Resources_old;
 			sourceTree = "<group>";
 		};
 		1C90C15C14CBB7EA00C929AE /* common */ = {
