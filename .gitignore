@@ -50,7 +50,7 @@ src/editor/spineditor
 src/osgWrappers/introspection/CompositeViewer.cpp
 src/osgWrappers/introspection/Users
 src/osgWrappers/introspection/dofppu.cpp
-src/osgWrappers/introspection/dssaoppu.cpp
+src/osgWrappers/introspection/ssaoppu.cpp
 src/osgWrappers/introspection/pocoUtil.cpp
 spinframework-*.*.*
 doxyfile

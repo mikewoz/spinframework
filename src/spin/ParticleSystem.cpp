@@ -41,17 +41,21 @@
 
 #include <osg/Texture2D>
 #include <osg/PointSprite>
+#include <osg/PolygonMode>
 #include <osg/BlendFunc>
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 
 #include "ParticleSystem.h"
 #include "SceneManager.h"
+#include "ShapeNode.h"
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-#define USE_LOCAL_SHADERS
+#define USE_LOCAL_SHADERS 1
+
+extern pthread_mutex_t sceneMutex;
 
 namespace spin
 {
@@ -196,7 +200,7 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     opAngularDamping_ = new osgParticle::AngularDampingOperator;
     opDamping_ = new osgParticle::DampingOperator;
     opExplosion_ = new osgParticle::ExplosionOperator;
-    opBouncer_ = new osgParticle::BounceOperator;
+    opBouncer_ = new BouncerOperator;
 #else
     opOrbit_ = new NullOperator;
     opAngularDamping_ = new NullOperator;
@@ -260,6 +264,74 @@ void ParticleSystem::callbackUpdate(osg::NodeVisitor* nv)
         this->getAttachmentNode()->addChild(updater_);
         attachedFlag_ = true;
     }
+    
+    // Here, we update the bouncer domains based on the position and size of
+    // the target node. For ShapeNode's we can do a good job in the case of a 
+    // PLANE or BOX, but for everything else, we just approximate the shape of
+    // the node with a SPHERE (updated from the BoundingSphere that is computed
+    // anyway during the cull traversal).
+    //
+    // TODO: figure out how to update these things ONLY when they change. The
+    // code below updates them every frame.
+    int i = 0;
+    std::vector< osg::observer_ptr<ReferencedNode> >::iterator it;
+    for (it=bounceTargets_.begin(); it!=bounceTargets_.end(); ++it)
+    {
+        osgParticle::DomainOperator::Domain* d = opBouncer_->getDomainPointer(i);
+        if ((*it).valid() && d)
+        {
+            ShapeNode *shp = dynamic_cast<ShapeNode*>((*it).get());
+            if (shp && shp->getShape()==ShapeNode::PLANE)
+            {
+                d->type = osgParticle::DomainOperator::Domain::PLANE_DOMAIN;
+                
+                // TODO: use global translation and rotation:
+                d->plane.set(osg::Plane(shp->getOrientationQuat()*osg::Y_AXIS,shp->getTranslation()));
+                
+                // this stuff tries to get the RECT_DOMAIN working:
+                /*
+                 d->type = osgParticle::DomainOperator::Domain::RECT_DOMAIN;
+                d->v1 = shp->getTranslation() - (shp->getScale()/2); //corner
+                d->v2 = shp->getOrientationQuat()*osg::X_AXIS*shp->getScale().x(); // w
+                d->v3 = shp->getOrientationQuat()*osg::Z_AXIS*shp->getScale().z(); // h
+                
+                //d->v2 = osg::X_AXIS * shp->getScale().x(); // w
+                //d->v3 = osg::Z_AXIS * shp->getScale().z(); // h
+              
+                opBouncer_->updatePlane(d);
+                */
+            }
+            else if (shp && shp->getShape()==ShapeNode::BOX)
+            {
+                d->type = osgParticle::DomainOperator::Domain::BOX_DOMAIN;
+                // min coord:
+                d->v1 = shp->getTranslation() - (shp->getScale()/2);
+                // max:
+                d->v2 = shp->getTranslation() + (shp->getScale()/2);
+            }
+            else
+            {
+                d->type = osgParticle::DomainOperator::Domain::SPHERE_DOMAIN;
+                osg::BoundingSphere bound = (*it)->getBound();
+                d->v1 = bound.center();
+                d->r1 = bound.radius();
+            }
+        }
+        // if the target has been removed, we need to remove it from our list:
+        else
+        {
+            if (!(*it).valid()) bounceTargets_.erase(it);
+            if (d) opBouncer_->removeDomain(i);
+            break;
+        }
+        
+        i++;
+    }
+    
+    if (opExplosionTarget_.valid())
+    {
+        opExplosion_->setCenter(opExplosionTarget_->getCenter());
+    }
 }
 
 void ParticleSystem::updateNodePath(bool updateChildren)
@@ -277,8 +349,14 @@ void ParticleSystem::debug()
 {
     ConstraintsNode::debug();
     std::cout << "   center: " << stringify(radialPlacer_->getCenter()) << std::endl;
+    
+    std::cout << "   " << bounceTargets_.size() << " Bouncer targets:" << std::endl;
+    for (unsigned int i=0; i<bounceTargets_.size(); i++)
+    {
+        std::cout << "   - " << bounceTargets_[i]->getID() << std::endl;
+    }
 }
-
+    
 void ParticleSystem::setTranslation (float x, float y, float z)
 {
     //ConstraintsNode::setTranslation(x,y,z);
@@ -531,6 +609,7 @@ int ParticleSystem::getEnabledBouncer() const
     return 0;
 }
 
+    
 
 
 
@@ -582,15 +661,80 @@ void ParticleSystem::setOrbitMaxRadius(float max)
     BROADCAST(this, "sf", "setOrbitMaxRadius", max);
 }
 
+void ParticleSystem::setExplosionTarget(const char* targetID)
+{
+    GroupNode* n = dynamic_cast<GroupNode*>(sceneManager_->getNode(targetID));
+    if (n)
+    {
+        opExplosionTarget_ = n;
+    }
+    else
+    {
+        std::cout << "ParticleSystem Error: Could not setExplosionTarget to '" << targetID << "' because that node could not be found" << std::endl;
+    }
 
+    BROADCAST(this, "ss", "setExplosionTarget", getExplosionTarget().c_str());
+}
+    
+void ParticleSystem::setExplosionDebugView(int b)
+{
+    if (b)
+    {
+        // if this is the first time this is turned on, we need to create it:
+        if (!opExplosionDebugView_.valid())
+        {
+            opExplosionDebugView_ = new osg::PositionAttitudeTransform();
+            opExplosionDebugView_->setPosition(opExplosion_->getCenter());
+            opExplosionDebugView_->setScale(osg::Vec3(1,1,1)*opExplosion_->getRadius());
+            
+            osg::TessellationHints* hints = new osg::TessellationHints;
+            hints->setDetailRatio(0.5);
+            osg::Geode *geode = new osg::Geode();
+            geode->addDrawable(new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(0.0f,0.0f,0.0f),1), hints));
+            
+            // wireframe:
+            osg::PolygonMode* polygonMode = new osg::PolygonMode;
+            polygonMode->setMode( osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE );
+            geode->getOrCreateStateSet()->setAttributeAndModes( polygonMode, osg::StateAttribute::OVERRIDE | osg::StateAttribute::ON );
+            
+            // disable lighting:
+            geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+            
+            opExplosionDebugView_->addChild(geode);
+        }
+        
+        if (!this->containsNode(opExplosionDebugView_.get()))
+        {
+            pthread_mutex_lock(&sceneMutex);
+            this->addChild(opExplosionDebugView_.get());
+            pthread_mutex_unlock(&sceneMutex);
+        }
+    }
+    else
+    {
+        if (this->containsNode(opExplosionDebugView_.get()))
+        {
+            pthread_mutex_lock(&sceneMutex);
+            this->removeChild(opExplosionDebugView_.get());
+            pthread_mutex_unlock(&sceneMutex);
+        }
+    }
+            
+    BROADCAST(this, "si", "setExplosionDebugView", b);
+}
+    
 void ParticleSystem::setExplosionCenter(float x, float y, float z)
 {
     opExplosion_->setCenter(osg::Vec3(x,y,z));
+    if (opExplosionDebugView_.valid())
+        opExplosionDebugView_->setPosition(osg::Vec3(x,y,z));
     BROADCAST(this, "sfff", "setExplosionCenter", x, y, z);
 }
 void ParticleSystem::setExplosionRadius(float r)
 {
     opExplosion_->setRadius(r);
+    if (opExplosionDebugView_.valid()) 
+        opExplosionDebugView_->setScale(osg::Vec3(1,1,1)*r);
     BROADCAST(this, "sf", "setExplosionRadius", r);
 }
 void ParticleSystem::setExplosionMagnitude(float mag)
@@ -605,7 +749,7 @@ void ParticleSystem::setExplosionEpsilon(float eps)
 }
 void ParticleSystem::setExplosionSigma(float s)
 {
-    opExplosion_->setSigma(s);
+    opExplosion_->setSigma(osg::DegreesToRadians(s));
     BROADCAST(this, "sf", "setExplosionSigma", s);
 }
 
@@ -637,6 +781,63 @@ void ParticleSystem::setFluidDirection(float x, float y, float z)
 
 
 // *****************************************************************************
+    
+void ParticleSystem::addBounceTarget(const char* nodeID)
+{
+    ReferencedNode* n = sceneManager_->getNode(nodeID);
+    if (!n)
+    {
+        std::cout << "ParticleSystem Error: Could not addBounceTarget because node '" << nodeID << "' was not found" << std::endl;
+        return;
+    }
+    
+    std::vector< osg::observer_ptr<ReferencedNode> >::iterator it;
+    for (it=bounceTargets_.begin(); it!=bounceTargets_.end(); ++it)
+    {
+        if ((*it).get() == n)
+        {
+            std::cout << "ParticleSystem Error: Node '" << nodeID << "' already exists in bounce targets" << std::endl;
+            return;
+        }
+    }
+    
+    bounceTargets_.push_back(n);
+    opBouncer_->addPlaneDomain(osg::Plane(osg::Z_AXIS, osg::Vec3(0,0,0)));
+    
+    BROADCAST(this, "ss", "addBounceTarget", nodeID);
+}
+    
+void ParticleSystem::removeBounceTarget(const char* nodeID)
+{
+    ReferencedNode* n = sceneManager_->getNode(nodeID);
+    if (!n)
+    {
+        std::cout << "ParticleSystem Error: Could not removeBounceTarget because node '" << nodeID << "' was not found" << std::endl;
+        return;
+    }
+        
+    int i = 0;
+    std::vector< osg::observer_ptr<ReferencedNode> >::iterator it;
+    for (it=bounceTargets_.begin(); it!=bounceTargets_.end(); ++it)
+    {
+        if ((*it).get() == n)
+        {
+            bounceTargets_.erase(it);
+            opBouncer_->removeDomain(i);
+            return;
+        }
+    }
+    
+    BROADCAST(this, "ss", "removeBounceTarget", nodeID);
+}
+
+void ParticleSystem::removeAllBounceTargets()
+{
+    bounceTargets_.clear();
+    opBouncer_->removeAllDomains();
+    BROADCAST(this, "s", "removeAllBounceTargets");
+}
+    
 void ParticleSystem::addBouncePlane(float normalX, float normalY, float normalZ, float x, float y, float z)
 {
     opBouncer_->addPlaneDomain(osg::Plane(osg::Vec3(normalX,normalY,normalZ), osg::Vec3(x,y,z)));
@@ -664,19 +865,19 @@ void ParticleSystem::removeAllBouncers()
 void ParticleSystem::setBounceFriction(float f)
 {
     opBouncer_->setFriction(f);
-    BROADCAST(this, "sf", "setBounceFriction");
+    BROADCAST(this, "sf", "setBounceFriction", f);
 }
 
 void ParticleSystem::setBounceResilience(float r)
 {
     opBouncer_->setResilience(r);
-    BROADCAST(this, "sf", "setBounceResilience");
+    BROADCAST(this, "sf", "setBounceResilience", r);
 }
 
 void ParticleSystem::setBounceCutoff(float v)
 {
     opBouncer_->setCutoff(v);
-    BROADCAST(this, "sf", "setBounceCutoff");
+    BROADCAST(this, "sf", "setBounceCutoff", v);
 }
 
 
@@ -791,14 +992,24 @@ void ParticleSystem::setShootertRotationalSpeedRange(float minX, float minY, flo
 
 void ParticleSystem::setImagePath (const char* path)
 {
-    if (imgPath_ != path)
+    std::string newPath = getRelativePath(std::string(path));
+    if (imgPath_ != newPath)
     {
-        imgPath_ = path;
+        imgPath_ = newPath;
         if (imgPath_=="NULL")
-            system_->setDefaultAttributesUsingShaders("", emissive_, lighting_);
+        {
+            if (getUseShaders())
+                system_->setDefaultAttributesUsingShaders("", emissive_, lighting_);
+            else
+                system_->setDefaultAttributes("", emissive_, lighting_);
+        }
         else 
-            system_->setDefaultAttributesUsingShaders(imgPath_, emissive_, lighting_);
-        
+        {
+            if (getUseShaders())
+                system_->setDefaultAttributesUsingShaders(getAbsolutePath(imgPath_), emissive_, lighting_);
+            else
+                system_->setDefaultAttributes(getAbsolutePath(imgPath_), emissive_, lighting_);
+        }
         BROADCAST(this, "ss", "setImagePath", getImagePath());
     }
 }
@@ -821,6 +1032,12 @@ void ParticleSystem::setLighting (int b)
 	}
 }
 
+void ParticleSystem::setUseShaders (int b)
+{
+    system_->setUseShaders((bool)b);
+    BROADCAST(this, "si", "setUseShaders", getUseShaders());
+}
+    
 void ParticleSystem::updateStateSet()
 {
 	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
@@ -896,15 +1113,17 @@ void ParticleSystem::updateStateSet()
     program->addShader(osg::Shader::readShaderFile(osg::Shader::VERTEX, osgDB::findDataFile("shaders/particle.vert")));
     program->addShader(osg::Shader::readShaderFile(osg::Shader::FRAGMENT, osgDB::findDataFile("shaders/particle.frag")));
 #endif
+    
+    // shader temporarilty disabled:
+    /*
     ss->setAttributeAndModes(program, osg::StateAttribute::ON);
 
     ss->addUniform(new osg::Uniform("visibilityDistance", (float)system_->getVisibilityDistance()));
     ss->addUniform(new osg::Uniform("baseTexture", texture_unit));
-    //system_->setStateSet(ss);
-
+    
     system_->setUseVertexArray(true);
     system_->setUseShaders(true);
-    
+    */
 }
 
 void ParticleSystem::setImage (const char* path)
@@ -1131,6 +1350,15 @@ std::vector<lo_message> ParticleSystem::getState () const
     ret.push_back(msg);
     
     // Explosion:
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setExplosionDebugView", getExplosionDebugView());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "ss", "setExplosionTarget", getExplosionTarget().c_str());
+    ret.push_back(msg);
+    
     msg = lo_message_new();
     v3 = opExplosion_->getCenter();
     lo_message_add(msg, "sfff", "setExplosionCenter", v3.x(), v3.y(), v3.z());
@@ -1149,7 +1377,7 @@ std::vector<lo_message> ParticleSystem::getState () const
     ret.push_back(msg);
     
     msg = lo_message_new();
-    lo_message_add(msg, "sf", "setExplosionSigma", opExplosion_->getSigma());
+    lo_message_add(msg, "sf", "setExplosionSigma", osg::RadiansToDegrees(opExplosion_->getSigma()));
     ret.push_back(msg);
 
     // Force:
@@ -1173,9 +1401,23 @@ std::vector<lo_message> ParticleSystem::getState () const
     ret.push_back(msg);
 
     // Bouncer:
+    /*
     msg = lo_message_new();
     lo_message_add(msg, "s", "removeAllBouncers");
     ret.push_back(msg);
+    */
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "s", "removeAllBounceTargets");
+    ret.push_back(msg);
+    
+    for (unsigned int i=0; i<bounceTargets_.size(); i++)
+    {
+        msg = lo_message_new();
+        lo_message_add(msg, "ss", "addBounceTarget", bounceTargets_[i]->getID().c_str());
+        ret.push_back(msg);
+    }
+    /*
     for (unsigned int i=0; i<opBouncer_->getNumDomains(); i++)
     {
         switch (opBouncer_->getDomain(i).type)
@@ -1213,7 +1455,7 @@ std::vector<lo_message> ParticleSystem::getState () const
                 break;
         }
     }
-
+    */
     
     msg = lo_message_new();
     lo_message_add(msg, "si", "setParticleShape", getParticleShape());
@@ -1242,6 +1484,10 @@ std::vector<lo_message> ParticleSystem::getState () const
 
     msg = lo_message_new();
     lo_message_add(msg, "si", "setLighting", getLighting());
+    ret.push_back(msg);
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setUseShaders", getUseShaders());
     ret.push_back(msg);
 
     msg = lo_message_new();

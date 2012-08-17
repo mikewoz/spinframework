@@ -443,12 +443,12 @@ void CompositeViewer::frame(double f)
     // to force NodeTrackerManipulator to store the proper nodePath
     if (spinApp::Instance().userNode->nodepathUpdate)
     {
-        std::cout << "nodepathUpdate. " << this->getNumViews() << " views." << std::endl;
+        //std::cout << "nodepathUpdate. " << this->getNumViews() << " views." << std::endl;
         for (unsigned int i=0; i<this->getNumViews(); i++)
         {
             ViewerManipulator *vm = dynamic_cast<ViewerManipulator*>(this->getView(i)->getCameraManipulator());
             if (vm) vm->setTrackNode(spinApp::Instance().userNode->getCameraAttachmentNode());
-            std::cout << "reattached viewer manipulator " << i << " to node: " << spinApp::Instance().userNode->getCameraAttachmentNode()->getName() << std::endl;
+            //std::cout << "reattached viewer manipulator " << i << " to node: " << spinApp::Instance().userNode->getCameraAttachmentNode()->getName() << std::endl;
         }
         spinApp::Instance().userNode->nodepathUpdate = false;
     }

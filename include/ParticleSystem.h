@@ -74,12 +74,47 @@
 namespace spin
 {
 
+/**
+ * A fake operator class in case the user doesn't have the most recent version
+ * of OSG (and is thus missing an operator class).
+ */
 class NullOperator : public osgParticle::Operator
 {
     NullOperator() : osgParticle::Operator() {}
     inline void operate(osgParticle::Particle* P, double dt) { (void(P)); (void(dt)); }
 };
 
+/**
+ * We override OSG's BounceOperator class so that we can get and dynamically
+ * update domains:
+ */
+class BouncerOperator : public osgParticle::BounceOperator
+{
+public:
+    BouncerOperator() : osgParticle::BounceOperator() {}
+    osgParticle::DomainOperator::Domain* getDomainPointer( unsigned int i )
+        { return &_domains[i]; }
+    void updatePlane(osgParticle::DomainOperator::Domain* d)
+        { computeNewBasis(d->v2, d->v3, d->s1, d->s2); }
+    
+};
+/*
+static void computeNewBasis( const osg::Vec3& u, const osg::Vec3& v, osg::Vec3& s1, osg::Vec3& s2 )
+{
+    // Copied from David McAllister's Particle System API (http://www.particlesystems.org), pDomain.h
+    osg::Vec3 w = u ^ v;
+    float det = w.z()*u.x()*v.y() - w.z()*u.y()*v.x() - u.z()*w.x()*v.y() -
+    u.x()*v.z()*w.y() + v.z()*w.x()*u.y() + u.z()*v.x()*w.y();
+    det = 1.0f / det;
+    
+    s1.set( v.y()*w.z() - v.z()*w.y(), v.z()*w.x() - v.x()*w.z(), v.x()*w.y() - v.y()*w.x() );
+    s1 = s1 * det;
+    s2.set( u.y()*w.z() - u.z()*w.y(), u.z()*w.x() - u.x()*w.z(), u.x()*w.y() - u.y()*w.x() );
+    s2 = s2 * (-det);
+}
+*/  
+
+    
 /**
  * \brief A controller for a particle system
  *
@@ -204,10 +239,19 @@ public:
     void setOrbitEpsilon(float eps);
     void setOrbitMaxRadius(float max);
     
+    void setExplosionTarget(const char* targetID);
+    std::string getExplosionTarget() const { if (opExplosionTarget_.valid()) return opExplosionTarget_->getID(); else return "NULL"; }
+    void setExplosionDebugView(int b);
+    int  getExplosionDebugView() const { return (int)this->containsNode(opExplosionDebugView_.get()); }
+    /// sets the center of the explosion (Note: an explosion target overrides this)
     void setExplosionCenter(float x, float y, float z);
+    /// radius defines how far away the shockwave peaks
     void setExplosionRadius(float r);
+    /// magnitude defines the amount of force exerted on the particles. Try 100+
     void setExplosionMagnitude(float mag);
+    /// epsilon sets the distance from the center
     void setExplosionEpsilon(float eps);
+    /// sigma (in degrees) determines the broadness of the explosion shockwave
     void setExplosionSigma(float s);
 
     void setForce(float x, float y, float z);
@@ -216,6 +260,11 @@ public:
     void setFluidViscosity(float v);
     void setFluidDirection(float x, float y, float z);
     
+    
+    void addBounceTarget(const char* nodeID);
+    void removeBounceTarget(const char* nodeID);
+    void removeAllBounceTargets();
+
     void addBouncePlane(float normalX, float normalY, float normalZ, float x, float y, float z);
     void addBounceBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
     void addBounceSphere(float x, float y, float z, float radius);
@@ -229,7 +278,7 @@ public:
     virtual void setTranslation (float x, float y, float z);
     virtual void setOrientation (float p, float r, float y);
     virtual void setOrientationQuat (float x, float y, float z, float w);
-    virtual osg::Vec3 getTranslation() const { return radialPlacer_->getCenter(); };
+    virtual osg::Vec3 getTranslation() const { return radialPlacer_->getCenter(); }
     virtual void updateStateSet();
 
     // particle properties:
@@ -253,6 +302,9 @@ public:
     void setLighting(int lightingFlag);
     int getLighting() const { return (int) lighting_; }
 
+    void setUseShaders(int shaderFlag);
+    int getUseShaders() const { return (int) system_->getUseShaders(); }
+    
     void setImagePath(const char* path);
     const char* getImagePath() const { return imgPath_.c_str(); }
     
@@ -300,7 +352,7 @@ private:
     osg::ref_ptr<osgParticle::AngularDampingOperator> opAngularDamping_;
     osg::ref_ptr<osgParticle::DampingOperator> opDamping_;
     osg::ref_ptr<osgParticle::ExplosionOperator> opExplosion_;
-    osg::ref_ptr<osgParticle::BounceOperator> opBouncer_;
+    osg::ref_ptr<BouncerOperator> opBouncer_;
 #else
     osg::ref_ptr<NullOperator> opOrbit_;
     osg::ref_ptr<NullOperator> opAngularDamping_;
@@ -309,6 +361,11 @@ private:
     osg::ref_ptr<NullOperator> opBouncer_;
 #endif
 #endif
+    
+    osg::ref_ptr<osg::PositionAttitudeTransform> opExplosionDebugView_;
+    
+    osg::observer_ptr<GroupNode> opExplosionTarget_;
+    std::vector< osg::observer_ptr<ReferencedNode> > bounceTargets_;
     
     osg::ref_ptr<osg::PositionAttitudeTransform> attachPAT;
     
