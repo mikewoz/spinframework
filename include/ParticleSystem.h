@@ -76,7 +76,8 @@ namespace spin
 
 class NullOperator : public osgParticle::Operator
 {
-    void operate(osgParticle::Particle* P, double dt) { (void(P)); (void(dt)); }
+    NullOperator() : osgParticle::Operator() {}
+    inline void operate(osgParticle::Particle* P, double dt) { (void(P)); (void(dt)); }
 };
 
 /**
