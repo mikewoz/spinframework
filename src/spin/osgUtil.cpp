@@ -532,8 +532,71 @@ osg::Geode* createWireframeRolloff(int /*rolloff*/, float /*distortion*/, float 
 }
 
 
+osg::Geometry* createCone(float length, float radius, osg::Vec4 color)
+{
+	int grain = 50; // level of detail
+	
+	osg::Geometry* triFan = new osg::Geometry();
+	osg::Vec3Array* normals = new osg::Vec3Array;
+	osg::Vec3* myCoords = new osg::Vec3[grain + 2];
+	osg::Vec4Array* colors = new osg::Vec4Array;
+    osg::Vec2Array* texcoords = new osg::Vec2Array;
+    
+	// tip
+	myCoords[0] = osg::Vec3(0.0, 0.0, 0.0);
+	colors->push_back(color);
+	normals->push_back(osg::Vec3(0.0, 1.0, 0.0) );
+    texcoords->push_back(osg::Vec2(0.5,0.5));
+	
+	for (int i = 0; i <= grain; i++)
+	{
+        float ratio = (float)i / (float)grain;
+		myCoords[i+1] = osg::Vec3(radius*cos(ratio*2*osg::PI), length, radius*sin(ratio*2*osg::PI));
+		normals->push_back(myCoords[i]^myCoords[i+1]);
+        texcoords->push_back(osg::Vec2((cos(ratio*2*osg::PI) / 2) + 0.5,(sin(ratio*2*osg::PI) / 2) + 0.5));
+		colors->push_back(color);
+	}
+	
+	colors->push_back(color);
+	
+	osg::Vec3Array* vertices = new osg::Vec3Array(grain + 2,myCoords);
+	
+	// pass the created vertex array to the points geometry object.
+	triFan->setVertexArray(vertices);
+	triFan->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN,0, grain + 2));
+	
+    // pass the texture coordinates:
+    triFan->setTexCoordArray(0,texcoords);
+    
+	// pass the color arry to points geometry, note the binding to tell the geometry
+	// that only use one color for the whole object.
+	triFan->setColorArray(colors);
+	triFan->setColorBinding(osg::Geometry::BIND_OVERALL);
+	
+	// create the normals
+	triFan->setNormalArray(normals);
+	triFan->setNormalBinding(osg::Geometry::BIND_OVERALL);
+	osgUtil::SmoothingVisitor::smooth(*triFan);
+	
+    
+    
+	return triFan;
+}
+
+
+
+    
 osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 {
+    osg::Geode* triGeode = new osg::Geode();
+    triGeode->addDrawable(createCone(length,radius,color));
+	
+	osgUtil::Optimizer optimizer;
+	optimizer.optimize(triGeode);
+	
+	return triGeode;
+
+    /*
 
 	int grain = 50; // level of detail
 	
@@ -580,6 +643,7 @@ osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 	optimizer.optimize(triGeode);
 	
 	return triGeode;
+    */
 
 }
 
