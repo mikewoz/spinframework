@@ -451,9 +451,19 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __float__getMass,
 	          "",
 	          "");
-	I_Method2(void, setParticleSizeRange, IN, float, x, IN, float, y,
+	I_Method2(void, setParticleSizeRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setParticleSizeRange__float__float,
+	          "",
+	          "");
+	I_Method2(void, setParticleAlphaRange, IN, float, min, IN, float, max,
+	          Properties::NON_VIRTUAL,
+	          __void__setParticleAlphaRange__float__float,
+	          "",
+	          "");
+	I_Method6(void, setParticleColorRange, IN, float, minR, IN, float, minG, IN, float, minB, IN, float, maxR, IN, float, maxG, IN, float, maxB,
+	          Properties::NON_VIRTUAL,
+	          __void__setParticleColorRange__float__float__float__float__float__float,
 	          "",
 	          "");
 	I_Method1(void, setEmissive, IN, int, emissiveFlag,
@@ -516,9 +526,19 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__setShooterThetaRange__float__float,
 	          "",
 	          "");
+	I_Method0(osg::Vec2, getShooterThetaRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getShooterThetaRange,
+	          "",
+	          "");
 	I_Method2(void, setShooterPhiRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setShooterPhiRange__float__float,
+	          "",
+	          "");
+	I_Method0(osg::Vec2, getShooterPhiRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getShooterPhiRange,
 	          "",
 	          "");
 	I_Method2(void, setShooterSpeedRange, IN, float, min, IN, float, max,
@@ -661,8 +681,14 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(float, Radius, 
 	                 __float__getRadius, 
 	                 __void__setRadius__float);
+	I_SimpleProperty(osg::Vec2, ShooterPhiRange, 
+	                 __osg_Vec2__getShooterPhiRange, 
+	                 0);
 	I_SimpleProperty(osg::Vec2, ShooterSpeedRange, 
 	                 __osg_Vec2__getShooterSpeedRange, 
+	                 0);
+	I_SimpleProperty(osg::Vec2, ShooterThetaRange, 
+	                 __osg_Vec2__getShooterThetaRange, 
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 

@@ -294,7 +294,10 @@ public:
     void setMass(float mass);
     float getMass() const { return (float) particle_.getMass(); }
     
-    void setParticleSizeRange(float x, float y);
+    void setParticleSizeRange(float min, float max);
+    void setParticleAlphaRange(float min, float max);
+    void setParticleColorRange(float minR, float minG, float minB, float maxR, float maxG, float maxB);
+    
     
     void setEmissive(int emissiveFlag);
     int getEmissive() const { return (int) emissive_; }
@@ -314,7 +317,9 @@ public:
     osg::Vec2 getFrequencyRange() const { return freqRange_; }
 
     void setShooterThetaRange(float min, float max);
+    osg::Vec2 getShooterThetaRange() const;
     void setShooterPhiRange(float min, float max);
+    osg::Vec2 getShooterPhiRange() const;
     void setShooterSpeedRange(float min, float max);
     osg::Vec2 getShooterSpeedRange() const;
     void setShootertRotationalSpeedRange(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);

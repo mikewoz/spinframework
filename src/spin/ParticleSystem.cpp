@@ -209,6 +209,16 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     opBouncer_ = new NullOperator;
 #endif
 #endif
+    
+    opAccel_->setName("ParticleSystem.opAccel");
+    opAngularAccel_->setName("ParticleSystem.opAngularAccel");
+    opFluidFriction_->setName("ParticleSystem.opFluidFriction");
+    opForce_->setName("ParticleSystem.opForce");
+    opOrbit_->setName("ParticleSystem.opOrbit");
+    opAngularDamping_->setName("ParticleSystem.opAngularDamping");
+    opDamping_->setName("ParticleSystem.opDamping");
+    opExplosion_->setName("ParticleSystem.opExplosion");
+    opBouncer_->setName("ParticleSystem.opBouncer");
 
     // some intial settings for operators:
     opAccel_->setToGravity();
@@ -309,6 +319,17 @@ void ParticleSystem::callbackUpdate(osg::NodeVisitor* nv)
                 // max:
                 d->v2 = shp->getTranslation() + (shp->getScale()/2);
             }
+            else if (shp && shp->getShape()==ShapeNode::DISC)
+            {
+                d->type = osgParticle::DomainOperator::Domain::DISK_DOMAIN;
+                d->v1 = shp->getTranslation();
+                d->v2 = shp->getOrientationQuat() * osg::Y_AXIS;
+                // we have to approximate the radius by taking the average of 
+                // the x and z scale (will be correct if uniform scale):
+                d->r1 = (shp->getScale().x()+shp->getScale().z()) / 4;
+                d->r2 = 0;
+                d->plane.set(d->v2, d->v1);
+            }
             else
             {
                 d->type = osgParticle::DomainOperator::Domain::SPHERE_DOMAIN;
@@ -354,6 +375,23 @@ void ParticleSystem::debug()
     for (unsigned int i=0; i<bounceTargets_.size(); i++)
     {
         std::cout << "   - " << bounceTargets_[i]->getID() << std::endl;
+        osgParticle::DomainOperator::Domain* d = opBouncer_->getDomainPointer(i);
+        std::cout << "     domain=" << d->type << std::endl;
+        std::cout << "     v1=" << stringify(d->v1) << std::endl;
+        std::cout << "     v2=" << stringify(d->v2) << std::endl;
+        std::cout << "     v3=" << stringify(d->v3) << std::endl;
+        std::cout << "     s1=" << stringify(d->v3) << std::endl;
+        std::cout << "     s2=" << stringify(d->v3) << std::endl;
+        std::cout << "     r1=" << d->r1 << std::endl;
+        std::cout << "     r2=" << d->r2 << std::endl;
+        std::cout << "     plane=" << stringify(d->plane.asVec4()) << std::endl;
+        std::cout << "     planeNorm=" << stringify(d->plane.getNormal()) << std::endl;
+    }
+    
+    std::cout << "   " << program_->numOperators() << " operators:" << std::endl;
+    for (unsigned int i=0; i<program_->numOperators(); i++)
+    {
+        std::cout << "   - " << program_->getOperator(i)->getName() << std::endl;
     }
 }
     
@@ -421,13 +459,13 @@ osg::Vec2 ParticleSystem::getRadialRange() const
 
 void ParticleSystem::setRadialPhiRange(float min, float max)
 {
-    radialPlacer_->setPhiRange(min, max);
+    radialPlacer_->setPhiRange(osg::DegreesToRadians(min), osg::DegreesToRadians(max));
     BROADCAST(this, "sff", "setRadialPhiRange", min, max);
 }
 osg::Vec2 ParticleSystem::getRadialPhiRange() const
 {
     const osgParticle::rangef range = radialPlacer_->getPhiRange();
-    return osg::Vec2(range.minimum, range.maximum);
+    return osg::Vec2(osg::RadiansToDegrees(range.minimum), osg::RadiansToDegrees(range.maximum));
 }
 
 void ParticleSystem::setCubicXRange(float min, float max)
@@ -494,8 +532,14 @@ void ParticleSystem::removeOperator(osgParticle::Operator *op)
 
 void ParticleSystem::enableOrbiter(int b)
 {
-    if (b) program_->addOperator(opOrbit_.get());
-    else removeOperator(opOrbit_.get());
+    if (b && !getEnabledOrbiter())
+        program_->addOperator(opOrbit_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opOrbit_.get())
+                removeOperator(opOrbit_.get());
+        }
     BROADCAST(this, "si", "enableOrbiter", b);
 }
 int ParticleSystem::getEnabledOrbiter() const
@@ -507,8 +551,15 @@ int ParticleSystem::getEnabledOrbiter() const
 
 void ParticleSystem::enableAccelerator(int b)
 {
-    if (b) program_->addOperator(opAccel_.get());
-    else removeOperator(opAccel_.get());
+    if (b && !getEnabledAccelerator())
+        program_->addOperator(opAccel_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opAccel_.get())
+                removeOperator(opAccel_.get());
+        }
+
     BROADCAST(this, "si", "enableAccelerator", b);
 }
 int ParticleSystem::getEnabledAccelerator() const
@@ -520,8 +571,14 @@ int ParticleSystem::getEnabledAccelerator() const
 
 void ParticleSystem::enableAngularAccelerator(int b)
 {
-    if (b) program_->addOperator(opAngularAccel_.get());
-    else removeOperator(opAngularAccel_.get());
+    if (b && !getEnabledAngularAccelerator())
+        program_->addOperator(opAngularAccel_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opAngularAccel_.get())
+                removeOperator(opAngularAccel_.get());
+        }
     BROADCAST(this, "si", "enableAngularAccelerator", b);
 }
 int ParticleSystem::getEnabledAngularAccelerator() const
@@ -533,8 +590,14 @@ int ParticleSystem::getEnabledAngularAccelerator() const
 
 void ParticleSystem::enableAngularDamping(int b)
 {
-    if (b) program_->addOperator(opAngularDamping_.get());
-    else removeOperator(opAngularDamping_.get());
+    if (b && !getEnabledAngularDamping())
+        program_->addOperator(opAngularDamping_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opAngularDamping_.get())
+                removeOperator(opAngularDamping_.get());
+        }
     BROADCAST(this, "si", "enableAngularDamping", b);
 }
 int ParticleSystem::getEnabledAngularDamping() const
@@ -546,8 +609,14 @@ int ParticleSystem::getEnabledAngularDamping() const
 
 void ParticleSystem::enableDamping(int b)
 {
-    if (b) program_->addOperator(opDamping_.get());
-    else removeOperator(opDamping_.get());
+    if (b && !getEnabledDamping())
+        program_->addOperator(opDamping_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opDamping_.get())
+                removeOperator(opDamping_.get());
+        }
     BROADCAST(this, "si", "enableDamping", b);
 }
 int ParticleSystem::getEnabledDamping() const
@@ -559,8 +628,14 @@ int ParticleSystem::getEnabledDamping() const
 
 void ParticleSystem::enableFluidFriction(int b)
 {
-    if (b) program_->addOperator(opFluidFriction_.get());
-    else removeOperator(opFluidFriction_.get());
+    if (b && !getEnabledFluidFriction())
+        program_->addOperator(opFluidFriction_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opFluidFriction_.get())
+                removeOperator(opFluidFriction_.get());
+        }
     BROADCAST(this, "si", "enableFluidFriction", b);
 }
 int ParticleSystem::getEnabledFluidFriction() const
@@ -572,8 +647,14 @@ int ParticleSystem::getEnabledFluidFriction() const
 
 void ParticleSystem::enableExplosion(int b)
 {
-    if (b) program_->addOperator(opExplosion_.get());
-    else removeOperator(opExplosion_.get());
+    if (b && !getEnabledExplosion())
+        program_->addOperator(opExplosion_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opExplosion_.get())
+                removeOperator(opExplosion_.get());
+        }
     BROADCAST(this, "si", "enableExplosion", b);
 }
 int ParticleSystem::getEnabledExplosion() const
@@ -585,8 +666,14 @@ int ParticleSystem::getEnabledExplosion() const
 
 void ParticleSystem::enableForce(int b)
 {
-    if (b) program_->addOperator(opForce_.get());
-    else removeOperator(opForce_.get());
+    if (b && !getEnabledForce())
+        program_->addOperator(opForce_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opForce_.get())
+                removeOperator(opForce_.get());
+        }
     BROADCAST(this, "si", "enableForce", b);
 }
 int ParticleSystem::getEnabledForce() const
@@ -598,8 +685,14 @@ int ParticleSystem::getEnabledForce() const
 
 void ParticleSystem::enableBouncer(int b)
 {
-    if (b) program_->addOperator(opBouncer_.get());
-    else removeOperator(opBouncer_.get());
+    if (b && !getEnabledBouncer())
+        program_->addOperator(opBouncer_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opBouncer_.get())
+                removeOperator(opBouncer_.get());
+        }
     BROADCAST(this, "si", "enableBouncer", b);
 }
 int ParticleSystem::getEnabledBouncer() const
@@ -919,14 +1012,27 @@ void ParticleSystem::setMass(float mass)
     BROADCAST(this, "sf", "setMass", getMass());
 }
 
-void ParticleSystem::setParticleSizeRange(float x, float y)
+void ParticleSystem::setParticleSizeRange(float min, float max)
 {
-    particle_.setSizeRange(osgParticle::rangef(x,y));
+    particle_.setSizeRange(osgParticle::rangef(min, max));
     system_->setDefaultParticleTemplate(particle_);
-    BROADCAST(this, "sff", "setParticleSizeRange", x, y);
+    BROADCAST(this, "sff", "setParticleSizeRange", min, max);
 }
+    
+void ParticleSystem::setParticleAlphaRange(float min, float max)
+{
+    particle_.setAlphaRange(osgParticle::rangef(min, max));
+    system_->setDefaultParticleTemplate(particle_);
+    BROADCAST(this, "sff", "setParticleAlphaRange", min, max);
+}    
  
-
+void ParticleSystem::setParticleColorRange(float minR, float minG, float minB, float maxR, float maxG, float maxB)
+{
+    particle_.setColorRange(osgParticle::rangev4(osg::Vec4(minR, minG, minB, particle_.getAlphaRange().minimum), osg::Vec4(maxR, maxG, maxB, particle_.getAlphaRange().maximum)));
+    system_->setDefaultParticleTemplate(particle_);
+    BROADCAST(this, "sffffff", "setParticleColorRange", minR, minG, minB, maxR, maxG, maxB);
+} 
+    
 // *****************************************************************************
 // shooter & counter properties:
 
@@ -959,22 +1065,31 @@ between the X axis and the velocity vector projected onto the X-Y plane.
 
 void ParticleSystem::setShooterThetaRange(float min, float max)
 {
-    shooter_->setThetaRange(min, max);
+    shooter_->setThetaRange(osg::DegreesToRadians(min), osg::DegreesToRadians(max));
     BROADCAST(this, "sff", "setShooterThetaRange", min, max);
+}
+osg::Vec2 ParticleSystem::getShooterThetaRange() const
+{
+    const osgParticle::rangef range = shooter_->getThetaRange();
+    return osg::Vec2(osg::RadiansToDegrees(range.minimum), osg::RadiansToDegrees(range.maximum));
 }
 
 void ParticleSystem::setShooterPhiRange(float min, float max)
 {
-    shooter_->setPhiRange(min, max);
+    shooter_->setPhiRange(osg::DegreesToRadians(min), osg::DegreesToRadians(max));
     BROADCAST(this, "sff", "setShooterPhiRange", min, max);
 }
-
+osg::Vec2 ParticleSystem::getShooterPhiRange() const
+{
+    const osgParticle::rangef range = shooter_->getPhiRange();
+    return osg::Vec2(osg::RadiansToDegrees(range.minimum), osg::RadiansToDegrees(range.maximum));
+}
+    
 void ParticleSystem::setShooterSpeedRange(float min, float max)
 {
     shooter_->setInitialSpeedRange(min, max);
     BROADCAST(this, "sff", "setShooterSpeedRange", min, max);
 }
-
 osg::Vec2 ParticleSystem::getShooterSpeedRange() const
 {
     const osgParticle::rangef range = shooter_->getInitialSpeedRange();
@@ -1025,11 +1140,24 @@ void ParticleSystem::setEmissive (int b)
 
 void ParticleSystem::setLighting (int b)
 {
+    /*
 	if (lighting_ != (bool)b)
 	{
 		lighting_ = (bool) b;
 		BROADCAST(this, "si", "setLighting", getLighting());
 	}
+    */
+    
+    // forward message to stateset if there is one:
+    osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+    if (ss.valid())
+        ss->setLighting(b);
+    else
+    {
+        lighting_ = (bool)b;
+        system_->setDefaultAttributes("", emissive_, lighting_);
+        BROADCAST(this, "si", "setLighting", getLighting());
+    }
 }
 
 void ParticleSystem::setUseShaders (int b)
@@ -1477,6 +1605,16 @@ std::vector<lo_message> ParticleSystem::getState () const
     range = particle_.getSizeRange();
     lo_message_add(msg, "sff", "setParticleRange", range.minimum, range.maximum);
     ret.push_back(msg);
+    
+    msg = lo_message_new();
+    range = particle_.getAlphaRange();
+    lo_message_add(msg, "sff", "setParticleAlphaRange", range.minimum, range.maximum);
+    ret.push_back(msg);
+    
+    msg = lo_message_new();
+    const osgParticle::rangev4 rv4 = particle_.getColorRange();
+    lo_message_add(msg, "sffffff", "setParticleColorRange", rv4.minimum.x(), rv4.minimum.y(), rv4.minimum.z(), rv4.maximum.x(), rv4.maximum.y(), rv4.maximum.z());
+    ret.push_back(msg);
 
     msg = lo_message_new();
     lo_message_add(msg, "si", "setEmissive", getEmissive());
@@ -1495,25 +1633,24 @@ std::vector<lo_message> ParticleSystem::getState () const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    osg::Vec2 v = getFrequencyRange();
-    lo_message_add(msg, "sff", "setFrequencyRange", v.x(), v.y());
+    v2 = getFrequencyRange();
+    lo_message_add(msg, "sff", "setFrequencyRange", v2.x(), v2.y());
     ret.push_back(msg);
 
     // shooter:
     msg = lo_message_new();
-    range = shooter_->getThetaRange();
-    lo_message_add(msg, "sff", "setShooterThetaRange", range.minimum, range.maximum);
+    v2 = getShooterThetaRange();
+    lo_message_add(msg, "sff", "setShooterThetaRange", v2.x(), v2.y());
     ret.push_back(msg);
 
     msg = lo_message_new();
-    range = shooter_->getPhiRange();
-    lo_message_add(msg, "sff", "setShooterPhiRange", range.minimum, range.maximum);
+    v2 = getShooterPhiRange();
+    lo_message_add(msg, "sff", "setShooterPhiRange", v2.x(), v2.y());
     ret.push_back(msg);
 
     msg = lo_message_new();
-    range = shooter_->getInitialSpeedRange();
-    lo_message_add(msg, "sff", "setShooterSpeedRange", range.minimum, range.maximum);
-    ret.push_back(msg);
+    v2 = getShooterSpeedRange();
+    lo_message_add(msg, "sff", "setShooterSpeedRange", v2.x(), v2.y());    ret.push_back(msg);
 
     msg = lo_message_new();
     const osgParticle::rangev3 rv3 = shooter_->getInitialRotationalSpeedRange();
