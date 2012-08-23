@@ -63,6 +63,9 @@
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
 
+#include "spinApp.h"
+#include "ReferencedNode.h"
+
 using namespace cppintrospection;
 using namespace std;
 
@@ -122,10 +125,6 @@ static bool IsGoodMethod(const MethodInfo& method)
 
 static void GenerateHTML(const cppintrospection::Type &classType, ofstream& output)
 {
-
-	
-	
-	
 	/*
 	output << "<code>\n";
 	output << "  /SPIN/{sceneID}/{nodeID} <strong>setParent</strong>  <<font color='gray'>(char *)</font> <strong>newParent</strong>>\n";
@@ -254,6 +253,9 @@ int main()
 	using namespace docgenerator;
 	//std::ostringstream output("");
 	
+	// loading an instance of spinApp will force the spin library to load:
+	spin::spinApp &spin = spin::spinApp::Instance();
+
 	ofstream output(OUTPUT_FILE);
 	if (!output.is_open())
 	{
