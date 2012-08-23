@@ -481,10 +481,17 @@ void DSPNode::drawDirectivity()
         if (val < 90)
         {
             // Place a cone pointing along the +Y axis
-            directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
+            directivityGeode = new osg::Geode();
+            directivityGeode->addDrawable( createCone(_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor) );
+            
+            //directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
         } else if (val > 90 && val < 180) {
             // Place a cone pointing along the -Y axis
-            directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
+            directivityGeode = new osg::Geode();
+            directivityGeode->addDrawable( createCone(-_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor) );
+
+            
+            //directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
         } else {
             // Sphere
             directivityGeode= createHollowSphere(_length*AS_DEBUG_SCALE, debugColor );

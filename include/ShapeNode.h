@@ -88,7 +88,8 @@ public:
         CYLINDER,
         CAPSULE,
         CONE,
-        PLANE
+        PLANE,
+        DISC
     };
     enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
     

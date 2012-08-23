@@ -298,7 +298,10 @@ void ShapeNode::drawShape()
 		{
 			shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
 		}
-
+        else if (shape==DISC)
+        {
+            shapeGeode->addDrawable(createCone(0, AS_UNIT_SCALE * .5, _color));
+        }
 		else {
 			osg::ShapeDrawable *shapeDrawable;
 			if (shape==SPHERE)

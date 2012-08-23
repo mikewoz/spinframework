@@ -21,6 +21,23 @@
 #undef OUT
 #endif
 
+BEGIN_VALUE_REFLECTOR(spin::BouncerOperator)
+	I_DeclaringFile("ParticleSystem.h");
+	I_Constructor0(____BouncerOperator,
+	               "",
+	               "");
+	I_Method1(osgParticle::DomainOperator::Domain *, getDomainPointer, IN, unsigned int, i,
+	          Properties::NON_VIRTUAL,
+	          __osgParticle_DomainOperator_Domain_P1__getDomainPointer__unsigned_int,
+	          "",
+	          "");
+	I_Method1(void, updatePlane, IN, osgParticle::DomainOperator::Domain *, d,
+	          Properties::NON_VIRTUAL,
+	          __void__updatePlane__osgParticle_DomainOperator_Domain_P1,
+	          "",
+	          "");
+END_REFLECTOR
+
 BEGIN_VALUE_REFLECTOR(spin::NullOperator)
 	I_DeclaringFile("ParticleSystem.h");
 END_REFLECTOR
@@ -254,30 +271,50 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__setOrbitMaxRadius__float,
 	          "",
 	          "");
+	I_Method1(void, setExplosionTarget, IN, const char *, targetID,
+	          Properties::NON_VIRTUAL,
+	          __void__setExplosionTarget__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(std::string, getExplosionTarget,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getExplosionTarget,
+	          "",
+	          "");
+	I_Method1(void, setExplosionDebugView, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setExplosionDebugView__int,
+	          "",
+	          "");
+	I_Method0(int, getExplosionDebugView,
+	          Properties::NON_VIRTUAL,
+	          __int__getExplosionDebugView,
+	          "",
+	          "");
 	I_Method3(void, setExplosionCenter, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setExplosionCenter__float__float__float,
-	          "",
+	          "sets the center of the explosion (Note: an explosion target overrides this) ",
 	          "");
 	I_Method1(void, setExplosionRadius, IN, float, r,
 	          Properties::NON_VIRTUAL,
 	          __void__setExplosionRadius__float,
-	          "",
+	          "radius defines how far away the shockwave peaks ",
 	          "");
 	I_Method1(void, setExplosionMagnitude, IN, float, mag,
 	          Properties::NON_VIRTUAL,
 	          __void__setExplosionMagnitude__float,
-	          "",
+	          "magnitude defines the amount of force exerted on the particles. Try 100+ ",
 	          "");
 	I_Method1(void, setExplosionEpsilon, IN, float, eps,
 	          Properties::NON_VIRTUAL,
 	          __void__setExplosionEpsilon__float,
-	          "",
+	          "epsilon sets the distance from the center ",
 	          "");
 	I_Method1(void, setExplosionSigma, IN, float, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setExplosionSigma__float,
-	          "",
+	          "sigma (in degrees) determines the broadness of the explosion shockwave ",
 	          "");
 	I_Method3(void, setForce, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
@@ -297,6 +334,21 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_Method3(void, setFluidDirection, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setFluidDirection__float__float__float,
+	          "",
+	          "");
+	I_Method1(void, addBounceTarget, IN, const char *, nodeID,
+	          Properties::NON_VIRTUAL,
+	          __void__addBounceTarget__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(void, removeBounceTarget, IN, const char *, nodeID,
+	          Properties::NON_VIRTUAL,
+	          __void__removeBounceTarget__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(void, removeAllBounceTargets,
+	          Properties::NON_VIRTUAL,
+	          __void__removeAllBounceTargets,
 	          "",
 	          "");
 	I_Method6(void, addBouncePlane, IN, float, normalX, IN, float, normalY, IN, float, normalZ, IN, float, x, IN, float, y, IN, float, z,
@@ -399,9 +451,19 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __float__getMass,
 	          "",
 	          "");
-	I_Method2(void, setParticleSizeRange, IN, float, x, IN, float, y,
+	I_Method2(void, setParticleSizeRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setParticleSizeRange__float__float,
+	          "",
+	          "");
+	I_Method2(void, setParticleAlphaRange, IN, float, min, IN, float, max,
+	          Properties::NON_VIRTUAL,
+	          __void__setParticleAlphaRange__float__float,
+	          "",
+	          "");
+	I_Method6(void, setParticleColorRange, IN, float, minR, IN, float, minG, IN, float, minB, IN, float, maxR, IN, float, maxG, IN, float, maxB,
+	          Properties::NON_VIRTUAL,
+	          __void__setParticleColorRange__float__float__float__float__float__float,
 	          "",
 	          "");
 	I_Method1(void, setEmissive, IN, int, emissiveFlag,
@@ -422,6 +484,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_Method0(int, getLighting,
 	          Properties::NON_VIRTUAL,
 	          __int__getLighting,
+	          "",
+	          "");
+	I_Method1(void, setUseShaders, IN, int, shaderFlag,
+	          Properties::NON_VIRTUAL,
+	          __void__setUseShaders__int,
+	          "",
+	          "");
+	I_Method0(int, getUseShaders,
+	          Properties::NON_VIRTUAL,
+	          __int__getUseShaders,
 	          "",
 	          "");
 	I_Method1(void, setImagePath, IN, const char *, path,
@@ -454,9 +526,19 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__setShooterThetaRange__float__float,
 	          "",
 	          "");
+	I_Method0(osg::Vec2, getShooterThetaRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getShooterThetaRange,
+	          "",
+	          "");
 	I_Method2(void, setShooterPhiRange, IN, float, min, IN, float, max,
 	          Properties::NON_VIRTUAL,
 	          __void__setShooterPhiRange__float__float,
+	          "",
+	          "");
+	I_Method0(osg::Vec2, getShooterPhiRange,
+	          Properties::NON_VIRTUAL,
+	          __osg_Vec2__getShooterPhiRange,
 	          "",
 	          "");
 	I_Method2(void, setShooterSpeedRange, IN, float, min, IN, float, max,
@@ -533,6 +615,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(int, EnabledOrbiter, 
 	                 __int__getEnabledOrbiter, 
 	                 0);
+	I_SimpleProperty(int, ExplosionDebugView, 
+	                 __int__getExplosionDebugView, 
+	                 __void__setExplosionDebugView__int);
 	I_SimpleProperty(float, ExplosionEpsilon, 
 	                 0, 
 	                 __void__setExplosionEpsilon__float);
@@ -545,6 +630,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(float, ExplosionSigma, 
 	                 0, 
 	                 __void__setExplosionSigma__float);
+	I_SimpleProperty(std::string, ExplosionTarget, 
+	                 __std_string__getExplosionTarget, 
+	                 0);
 	I_SimpleProperty(float, FluidDensity, 
 	                 0, 
 	                 __void__setFluidDensity__float);
@@ -593,8 +681,14 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(float, Radius, 
 	                 __float__getRadius, 
 	                 __void__setRadius__float);
+	I_SimpleProperty(osg::Vec2, ShooterPhiRange, 
+	                 __osg_Vec2__getShooterPhiRange, 
+	                 0);
 	I_SimpleProperty(osg::Vec2, ShooterSpeedRange, 
 	                 __osg_Vec2__getShooterSpeedRange, 
+	                 0);
+	I_SimpleProperty(osg::Vec2, ShooterThetaRange, 
+	                 __osg_Vec2__getShooterThetaRange, 
 	                 0);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
@@ -602,5 +696,8 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(osg::Vec3, Translation, 
 	                 __osg_Vec3__getTranslation, 
 	                 0);
+	I_SimpleProperty(int, UseShaders, 
+	                 __int__getUseShaders, 
+	                 __void__setUseShaders__int);
 END_REFLECTOR
 

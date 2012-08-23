@@ -30,6 +30,7 @@ BEGIN_ENUM_REFLECTOR(spin::ShapeNode::shapeType)
 	I_EnumLabel(spin::ShapeNode::CAPSULE);
 	I_EnumLabel(spin::ShapeNode::CONE);
 	I_EnumLabel(spin::ShapeNode::PLANE);
+	I_EnumLabel(spin::ShapeNode::DISC);
 END_REFLECTOR
 
 BEGIN_ENUM_REFLECTOR(spin::ShapeNode::billboardType)

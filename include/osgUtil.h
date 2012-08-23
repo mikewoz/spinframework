@@ -114,6 +114,7 @@ bool getPlaneLineIntersection(const osg::Vec4d& plane, const osg::Vec3d& lineSta
 
 //osg::Geode*     createGrid(int radius, osg::Vec4 color);
 osg::Geometry*    createPlane(float halfLength, osg::Vec4 color);
+osg::Geometry*    createCone(float length, float radius, osg::Vec4 color);
 osg::Geode*        createHollowSphere(float radius, osg::Vec4 color);
 osg::Geode*        createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color);
 osg::Geode*        createHollowCone(float length, float radius, osg::Vec4 color);

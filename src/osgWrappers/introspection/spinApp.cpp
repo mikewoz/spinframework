@@ -167,8 +167,6 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	I_SimpleProperty(std::string, UserID, 
 	                 __std_string__getUserID, 
 	                 __void__setUserID__C5_std_string_R1);
-	I_PublicMemberProperty(boost::python::object, _pyMainModule);
-	I_PublicMemberProperty(boost::python::object, _pyNamespace);
 	I_PublicMemberProperty(bool, _pyInitialized);
 	I_PublicMemberProperty(osg::ref_ptr< spin::UserNode >, userNode);
 	I_PublicMemberProperty(spatosc::Scene *, audioScene);
