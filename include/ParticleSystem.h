@@ -42,78 +42,11 @@
 #ifndef ParticleSystem_H_
 #define ParticleSystem_H_
 
-#include <osg/Version>
-#include <osgParticle/Particle>
-#include <osgParticle/ParticleSystem>
-#include <osgParticle/ConnectedParticleSystem>
-#include <osgParticle/ParticleSystemUpdater>
-#include <osgParticle/ModularEmitter>
-#include <osgParticle/RandomRateCounter>
-#include <osgParticle/SectorPlacer>
-#include <osgParticle/BoxPlacer>
-#include <osgParticle/MultiSegmentPlacer>
-#include <osgParticle/RadialShooter>
-
-#include <osgParticle/AccelOperator>
-#include <osgParticle/AngularAccelOperator>
-#include <osgParticle/FluidFrictionOperator>
-#include <osgParticle/ForceOperator>
-
-#ifdef OSG_MIN_VERSION_REQUIRED
-#if OSG_MIN_VERSION_REQUIRED(3,0,0)
-#include <osgParticle/OrbitOperator>
-#include <osgParticle/AngularDampingOperator>
-#include <osgParticle/DampingOperator>
-#include <osgParticle/ExplosionOperator>
-#include <osgParticle/BounceOperator>
-#endif
-#endif
-
+#include "ParticleSystemUtil.h"
 #include "ConstraintsNode.h"
 
 namespace spin
 {
-
-/**
- * A fake operator class in case the user doesn't have the most recent version
- * of OSG (and is thus missing an operator class).
- */
-class NullOperator : public osgParticle::Operator
-{
-    NullOperator() : osgParticle::Operator() {}
-    inline void operate(osgParticle::Particle* P, double dt) { (void(P)); (void(dt)); }
-};
-
-/**
- * We override OSG's BounceOperator class so that we can get and dynamically
- * update domains:
- */
-class BouncerOperator : public osgParticle::BounceOperator
-{
-public:
-    BouncerOperator() : osgParticle::BounceOperator() {}
-    osgParticle::DomainOperator::Domain* getDomainPointer( unsigned int i )
-        { return &_domains[i]; }
-    void updatePlane(osgParticle::DomainOperator::Domain* d)
-        { computeNewBasis(d->v2, d->v3, d->s1, d->s2); }
-    
-};
-/*
-static void computeNewBasis( const osg::Vec3& u, const osg::Vec3& v, osg::Vec3& s1, osg::Vec3& s2 )
-{
-    // Copied from David McAllister's Particle System API (http://www.particlesystems.org), pDomain.h
-    osg::Vec3 w = u ^ v;
-    float det = w.z()*u.x()*v.y() - w.z()*u.y()*v.x() - u.z()*w.x()*v.y() -
-    u.x()*v.z()*w.y() + v.z()*w.x()*u.y() + u.z()*v.x()*w.y();
-    det = 1.0f / det;
-    
-    s1.set( v.y()*w.z() - v.z()*w.y(), v.z()*w.x() - v.x()*w.z(), v.x()*w.y() - v.y()*w.x() );
-    s1 = s1 * det;
-    s2.set( u.y()*w.z() - u.z()*w.y(), u.z()*w.x() - u.x()*w.z(), u.x()*w.y() - u.y()*w.x() );
-    s2 = s2 * (-det);
-}
-*/  
-
     
 /**
  * \brief A controller for a particle system
@@ -171,6 +104,12 @@ public:
      */
     void enableOrbiter(int b);
     int getEnabledOrbiter() const;
+
+    /**
+     * Applies an attractive force towards a specific point.
+     */
+    void enableAttractor(int b);
+    int getEnabledAttractor() const;
 
     /**
      * Applies a constant acceleration to the particles (eg, gravity).
@@ -238,6 +177,11 @@ public:
     void setOrbitMagnitude(float mag);
     void setOrbitEpsilon(float eps);
     void setOrbitMaxRadius(float max);
+
+    void setAttractorCenter(float x, float y, float z);
+    void setAttractorMagnitude(float mag);
+    void setAttractorRatio(float ratio);
+    void setAttractorKillSink(int kill);
     
     void setExplosionTarget(const char* targetID);
     std::string getExplosionTarget() const { if (opExplosionTarget_.valid()) return opExplosionTarget_->getID(); else return "NULL"; }
@@ -322,7 +266,7 @@ public:
     osg::Vec2 getShooterPhiRange() const;
     void setShooterSpeedRange(float min, float max);
     osg::Vec2 getShooterSpeedRange() const;
-    void setShootertRotationalSpeedRange(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+    void setShooterRotationalSpeedRange(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
 
 
     virtual std::vector<lo_message> getState() const;
@@ -346,6 +290,7 @@ private:
     // programs and their operators:
     osg::ref_ptr<osgParticle::ModularProgram> program_;
 
+    osg::ref_ptr<AttractOperator> opAttract_;
     osg::ref_ptr<osgParticle::AccelOperator> opAccel_;
     osg::ref_ptr<osgParticle::AngularAccelOperator> opAngularAccel_;
     osg::ref_ptr<osgParticle::FluidFrictionOperator> opFluidFriction_;

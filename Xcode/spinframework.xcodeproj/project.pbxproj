@@ -628,6 +628,7 @@
 		1CA24E0314BE2D3D007A9C31 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 1CA24E0114BE2D3D007A9C31 /* Credits.rtf */; };
 		1CA24E0614BE2D3D007A9C31 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24E0514BE2D3D007A9C31 /* AppDelegate.mm */; };
 		1CA24E0914BE2D3E007A9C31 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1CA24E0714BE2D3E007A9C31 /* MainMenu.xib */; };
+		1CBD882815E5A8B9007ABACE /* ParticleSystemUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CBD882715E5A8B8007ABACE /* ParticleSystemUtil.h */; };
 		1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C9EE82C14BE2725000976A6 /* Cocoa.framework */; };
 		1CCCA0D514BE31AC00DCA0B7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D314BE31AC00DCA0B7 /* InfoPlist.strings */; };
 		1CCCA0D714BE31AC00DCA0B7 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0D614BE31AC00DCA0B7 /* main.mm */; };
@@ -1443,6 +1444,7 @@
 		1CA24E0414BE2D3D007A9C31 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1CA24E0514BE2D3D007A9C31 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		1CA24E0814BE2D3E007A9C31 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		1CBD882715E5A8B8007ABACE /* ParticleSystemUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ParticleSystemUtil.h; path = ../include/ParticleSystemUtil.h; sourceTree = "<group>"; };
 		1CC5D51515505575009C63A5 /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Syphon.framework; path = ../../../Library/Developer/Frameworks/Syphon.framework; sourceTree = "<group>"; };
 		1CCCA0BF14BE315400DCA0B7 /* spinviewer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinviewer; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0CD14BE31AB00DCA0B7 /* spinviewerUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = spinviewerUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1915,6 +1917,7 @@
 				1CA24D8814BE2892007A9C31 /* oscParser.h */,
 				1CA24D8914BE2892007A9C31 /* osgUtil.h */,
 				1CF94950151CD40500628872 /* ParticleSystem.h */,
+				1CBD882715E5A8B8007ABACE /* ParticleSystemUtil.h */,
 				1C329CB015BEF740002F845C /* pocoUtil.h */,
 				1C25F51214E57CD2007F97E5 /* PointCloud.h */,
 				1CA24D8A14BE2892007A9C31 /* PointerNode.h */,
@@ -2486,6 +2489,7 @@
 				1C068B1F157552FE00BC6207 /* Visitor.h in Headers */,
 				1C068B211575532200BC6207 /* dofppu.h in Headers */,
 				1C329CB115BEF740002F845C /* pocoUtil.h in Headers */,
+				1CBD882815E5A8B9007ABACE /* ParticleSystemUtil.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
