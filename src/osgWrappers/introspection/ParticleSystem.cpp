@@ -50,6 +50,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          __void__debug,
 	          "",
 	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
+	I_Method1(void, setConnected, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setConnected__int,
+	          "",
+	          "");
 	I_Method1(void, setPlacerType, IN, int, type,
 	          Properties::NON_VIRTUAL,
 	          __void__setPlacerType__int,
@@ -138,6 +143,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_Method0(int, getEnabledAttractor,
 	          Properties::NON_VIRTUAL,
 	          __int__getEnabledAttractor,
+	          "",
+	          "");
+	I_Method1(void, enableOscillator, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__enableOscillator__int,
+	          "",
+	          "Applies an oscilating motion. ");
+	I_Method0(int, getEnabledOscillator,
+	          Properties::NON_VIRTUAL,
+	          __int__getEnabledOscillator,
 	          "",
 	          "");
 	I_Method1(void, enableAccelerator, IN, int, b,
@@ -278,6 +293,21 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_Method1(void, setAttractorKillSink, IN, int, kill,
 	          Properties::NON_VIRTUAL,
 	          __void__setAttractorKillSink__int,
+	          "",
+	          "");
+	I_Method1(void, setOscillatorAmplitude, IN, float, amp,
+	          Properties::NON_VIRTUAL,
+	          __void__setOscillatorAmplitude__float,
+	          "",
+	          "");
+	I_Method1(void, setOscillatorFrequency, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setOscillatorFrequency__float,
+	          "",
+	          "");
+	I_Method1(void, setOscillatorLockAngle, IN, int, lock,
+	          Properties::NON_VIRTUAL,
+	          __void__setOscillatorLockAngle__int,
 	          "",
 	          "");
 	I_Method1(void, setExplosionTarget, IN, const char *, targetID,
@@ -591,6 +621,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(float, BounceResilience, 
 	                 0, 
 	                 __void__setBounceResilience__float);
+	I_SimpleProperty(int, Connected, 
+	                 0, 
+	                 __void__setConnected__int);
 	I_SimpleProperty(osg::Vec2, CubicXRange, 
 	                 __osg_Vec2__getCubicXRange, 
 	                 0);
@@ -635,6 +668,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	                 0);
 	I_SimpleProperty(int, EnabledOrbiter, 
 	                 __int__getEnabledOrbiter, 
+	                 0);
+	I_SimpleProperty(int, EnabledOscillator, 
+	                 __int__getEnabledOscillator, 
 	                 0);
 	I_SimpleProperty(int, ExplosionDebugView, 
 	                 __int__getExplosionDebugView, 
@@ -687,6 +723,15 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	I_SimpleProperty(float, OrbitMaxRadius, 
 	                 0, 
 	                 __void__setOrbitMaxRadius__float);
+	I_SimpleProperty(float, OscillatorAmplitude, 
+	                 0, 
+	                 __void__setOscillatorAmplitude__float);
+	I_SimpleProperty(float, OscillatorFrequency, 
+	                 0, 
+	                 __void__setOscillatorFrequency__float);
+	I_SimpleProperty(int, OscillatorLockAngle, 
+	                 0, 
+	                 __void__setOscillatorLockAngle__int);
 	I_SimpleProperty(int, ParticleShape, 
 	                 __int__getParticleShape, 
 	                 __void__setParticleShape__int);

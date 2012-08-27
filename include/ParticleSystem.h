@@ -78,6 +78,7 @@ public:
     
     virtual void debug();
     
+    void setConnected(int b);
     
     void setPlacerType(int type);
     int  getPlacerType() const;
@@ -110,7 +111,13 @@ public:
      */
     void enableAttractor(int b);
     int getEnabledAttractor() const;
-
+    
+    /**
+     * Applies an oscilating motion.
+     */
+    void enableOscillator(int b);
+    int getEnabledOscillator() const;
+    
     /**
      * Applies a constant acceleration to the particles (eg, gravity).
      */
@@ -182,6 +189,10 @@ public:
     void setAttractorMagnitude(float mag);
     void setAttractorRatio(float ratio);
     void setAttractorKillSink(int kill);
+    
+    void setOscillatorAmplitude(float amp);
+    void setOscillatorFrequency(float f);
+    void setOscillatorLockAngle(int lock);
     
     void setExplosionTarget(const char* targetID);
     std::string getExplosionTarget() const { if (opExplosionTarget_.valid()) return opExplosionTarget_->getID(); else return "NULL"; }
@@ -278,7 +289,8 @@ private:
     bool attachedFlag_;
 
     //osg::ref_ptr<osgParticle::ConnectedParticleSystem> system_;
-    osg::ref_ptr<osgParticle::ParticleSystem> system_;
+    //osg::ref_ptr<osgParticle::ParticleSystem> system_;
+    osg::ref_ptr<SwitchableParticleSystem> system_;
     osg::ref_ptr<osgParticle::ParticleSystemUpdater> updater_;
     osg::ref_ptr<osgParticle::ModularEmitter> emitter_;
     osg::ref_ptr<osgParticle::RandomRateCounter> counter_;
@@ -291,6 +303,7 @@ private:
     osg::ref_ptr<osgParticle::ModularProgram> program_;
 
     osg::ref_ptr<AttractOperator> opAttract_;
+    osg::ref_ptr<OscillatorOperator> opOscillator_;
     osg::ref_ptr<osgParticle::AccelOperator> opAccel_;
     osg::ref_ptr<osgParticle::AngularAccelOperator> opAngularAccel_;
     osg::ref_ptr<osgParticle::FluidFrictionOperator> opFluidFriction_;
@@ -320,6 +333,8 @@ private:
     osg::ref_ptr<osg::PositionAttitudeTransform> attachPAT;
     
     osgParticle::Particle particle_;
+    
+    bool connected_;
     
     float lifetime_;
     float radius_;

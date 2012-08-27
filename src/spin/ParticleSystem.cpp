@@ -88,7 +88,8 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     // our particles and expose the interface for managing them; this object
     // is a Drawable, so we'll have to add it to a Geode later.
     //system_ = new osgParticle::ConnectedParticleSystem();
-    system_ = new osgParticle::ParticleSystem();
+    //system_ = new osgParticle::ParticleSystem();
+    system_ = new SwitchableParticleSystem();
     
     
     // As for other Drawable classes, the aspect of graphical elements of
@@ -190,6 +191,7 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
     // Create operators that act on the particles.
     // (note: for now none of them are added to the program)
     opAttract_ = new AttractOperator;
+    opOscillator_ = new OscillatorOperator;
     opAccel_ = new osgParticle::AccelOperator;
     opAngularAccel_ = new osgParticle::AngularAccelOperator;
     opFluidFriction_ = new osgParticle::FluidFrictionOperator;
@@ -212,6 +214,7 @@ ParticleSystem::ParticleSystem (SceneManager *sceneManager, const char* initID) 
 #endif
     
     opAttract_->setName("ParticleSystem.opAttract");
+    opOscillator_->setName("ParticleSystem.opOscillator");
     opAccel_->setName("ParticleSystem.opAccel");
     opAngularAccel_->setName("ParticleSystem.opAngularAccel");
     opFluidFriction_->setName("ParticleSystem.opFluidFriction");
@@ -417,7 +420,18 @@ void ParticleSystem::setOrientationQuat (float x, float y, float z, float w)
     ConstraintsNode::setOrientationQuat(x,y,z,w);
 }
 
+    
+    
 // *****************************************************************************
+    
+
+void ParticleSystem::setConnected(int b)
+{
+    system_->setConnected((bool)b);
+    BROADCAST(this, "si", "setConnected", system_->getConnected());
+}
+    
+    
 // placer properties:
 
 void ParticleSystem::setPlacerType(int type)
@@ -551,7 +565,6 @@ int ParticleSystem::getEnabledOrbiter() const
     return 0;
 }
     
-    
 void ParticleSystem::enableAttractor(int b)
 {
     if (b && !getEnabledAttractor())
@@ -570,7 +583,25 @@ int ParticleSystem::getEnabledAttractor() const
         if (program_->getOperator(i)==opAttract_) return 1;
     return 0;
 }
-
+    
+void ParticleSystem::enableOscillator(int b)
+{
+    if (b && !getEnabledOscillator())
+        program_->addOperator(opOscillator_.get());
+    else if (!b)
+        for (unsigned int i=0; i<program_->numOperators(); i++)
+        {
+            if (program_->getOperator(i) == opOscillator_.get())
+                removeOperator(opOscillator_.get());
+        }
+    BROADCAST(this, "si", "enableOscillator", b);
+}
+int ParticleSystem::getEnabledOscillator() const
+{
+    for (int i=0; i<program_->numOperators(); i++)
+        if (program_->getOperator(i)==opOscillator_) return 1;
+    return 0;
+}
 
 void ParticleSystem::enableAccelerator(int b)
 {
@@ -777,7 +808,7 @@ void ParticleSystem::setOrbitMaxRadius(float max)
     BROADCAST(this, "sf", "setOrbitMaxRadius", max);
 }
 
-    
+// attractor operator:
 void ParticleSystem::setAttractorCenter(float x, float y, float z)
 {
     opAttract_->setCenter(osg::Vec3(x,y,z));
@@ -798,7 +829,27 @@ void ParticleSystem::setAttractorKillSink(int kill)
     opAttract_->setKillSink(kill);
     BROADCAST(this, "si", "setAttractorKillSink", kill);
 }
+
+// Oscillator operator:
+void ParticleSystem::setOscillatorAmplitude(float amp)
+{
+    opOscillator_->setAmplitude(amp);
+    BROADCAST(this, "sf", "setOscillatorAmplitude", amp);
+}
+void ParticleSystem::setOscillatorFrequency(float f)
+{
+    opOscillator_->setFrequency(f);
+    BROADCAST(this, "sf", "setOscillatorFrequency", f);
+}
+void ParticleSystem::setOscillatorLockAngle(int lock)
+{
+    opOscillator_->setAngleLock(lock);
+    BROADCAST(this, "si", "setOscillatorLockAngle", lock);
+}
+
     
+
+// explosion operator:
 void ParticleSystem::setExplosionTarget(const char* targetID)
 {
     GroupNode* n = dynamic_cast<GroupNode*>(sceneManager_->getNode(targetID));
@@ -1409,6 +1460,10 @@ std::vector<lo_message> ParticleSystem::getState () const
     lo_message msg;
 
     msg = lo_message_new();
+    lo_message_add(msg, "si", "setConnected", system_->getConnected());
+    ret.push_back(msg);
+    
+    msg = lo_message_new();
     lo_message_add(msg, "si", "setPlacerType", getPlacerType());
     ret.push_back(msg);
     
@@ -1454,6 +1509,10 @@ std::vector<lo_message> ParticleSystem::getState () const
     
     msg = lo_message_new();
     lo_message_add(msg, "si", "enableAttractor", getEnabledAttractor());
+    ret.push_back(msg);
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "enableOscillator", getEnabledOscillator());
     ret.push_back(msg);
 
     msg = lo_message_new();
@@ -1544,9 +1603,19 @@ std::vector<lo_message> ParticleSystem::getState () const
     lo_message_add(msg, "si", "setAttractorKillSink", (int)opAttract_->getKillSink());
     ret.push_back(msg);
     
+    // Oscillator:
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setOscillatorAmplitude", opOscillator_->getAmplitude());
+    ret.push_back(msg);
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setOscillatorFrequency", opOscillator_->getFrequency());
+    ret.push_back(msg);
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setOscillatorLockAngle", (int)opOscillator_->getAngleLock());
+    ret.push_back(msg);
 
     
-    // Explosion:
+    // Explosion:setOscillatorFrequency
     
     msg = lo_message_new();
     lo_message_add(msg, "si", "setExplosionDebugView", getExplosionDebugView());

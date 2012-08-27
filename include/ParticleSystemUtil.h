@@ -43,6 +43,7 @@
 #define ParticleSystemUtil_H_
 
 #include <osg/Version>
+#include <osgParticle/range>
 #include <osgParticle/Particle>
 #include <osgParticle/ParticleSystem>
 #include <osgParticle/ConnectedParticleSystem>
@@ -74,6 +75,55 @@ namespace spin
 {
 
     
+class SwitchableParticleSystem : public osgParticle::ConnectedParticleSystem
+{
+public:
+    SwitchableParticleSystem() : osgParticle::ConnectedParticleSystem(), connected_(false)
+    {
+        _maxNumberOfParticlesToSkip = 0;
+    }
+    SwitchableParticleSystem(const SwitchableParticleSystem& copy, const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY) {}
+    
+    META_Object(spin, SwitchableParticleSystem);
+    
+    // override some functions to allow switching between connected and non-connected mode:
+    virtual osgParticle::Particle* createParticle(const osgParticle::Particle* ptemplate)
+    {
+        if (connected_) return osgParticle::ConnectedParticleSystem::createParticle(ptemplate);
+        else return osgParticle::ParticleSystem::createParticle(ptemplate);
+    }
+    virtual void reuseParticle(int i)
+    {
+        if (connected_) osgParticle::ConnectedParticleSystem::reuseParticle(i);
+        else osgParticle::ParticleSystem::reuseParticle(i);
+    }
+    virtual void drawImplementation(osg::RenderInfo& renderInfo) const
+    {
+        if (connected_) osgParticle::ConnectedParticleSystem::drawImplementation(renderInfo);
+        else return osgParticle::ParticleSystem::drawImplementation(renderInfo);        
+    }
+    
+    void setConnected(bool b)
+    {
+        connected_ = b;
+        if (b)
+        {
+            _startParticle = osgParticle::Particle::INVALID_INDEX;
+            _lastParticleCreated = osgParticle::Particle::INVALID_INDEX;
+        }
+    }
+    bool getConnected() const { return connected_; }
+    
+protected:
+    virtual ~SwitchableParticleSystem() {}
+    
+    SwitchableParticleSystem& operator=(const SwitchableParticleSystem&) { return *this; }
+    
+    bool connected_;
+};
+    
+
+    
 /**
  * A fake operator class in case the user doesn't have the most recent version
  * of OSG (and is thus missing an operator class).
@@ -98,7 +148,6 @@ public:
     { computeNewBasis(d->v2, d->v3, d->s1, d->s2); }
     
 };
-    
 
 /**
  * Applies an attractive force towards a specific point.
@@ -201,6 +250,73 @@ inline void AttractOperator::beginOperate( osgParticle::Program* prg )
     else
     {
         _xf_center = _center;
+    }
+}
+
+    
+    
+/**
+ * Applies an attractive force towards a specific point.
+ */
+
+class OscillatorOperator : public osgParticle::Operator
+{
+public:
+    OscillatorOperator() : osgParticle::Operator(), _amplitude(1.0f), _frequency(1.0f), _angleLock(false)
+    {}
+    
+    OscillatorOperator( const OscillatorOperator& copy, const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY )
+    :   osgParticle::Operator(copy, copyop), _amplitude(copy._amplitude), _frequency(copy._frequency), _angleLock(copy._angleLock)
+    {}
+    
+    META_Object( spin, OscillatorOperator );
+    
+    /// Set the amplitude scalar
+    void setAmplitude( float amp ) { _amplitude = amp; }
+    /// Get the amplitude
+    float getAmplitude() const { return _amplitude; }
+    
+    /// Set frequency
+    void setFrequency( float f ) { _frequency = f; if (_frequency<0.0f) _frequency=0.0f; }
+    /// Get the frequency
+    float getFrequency() const { return _frequency; }
+    
+    /// Set whether the particle's angle is locked to the oscillation
+    void setAngleLock( bool lock ) { _angleLock = lock; }
+    /// Get whether the particle's angle is locked to the oscillation
+    bool getAngleLock() const { return _angleLock; }
+    
+    /// Apply attraction to a particle. Do not call this method manually.
+    inline void operate( osgParticle::Particle* P, double dt );
+    
+protected:
+    virtual ~OscillatorOperator() {}
+    OscillatorOperator& operator=( const OscillatorOperator& ) { return *this; }
+    
+    float _amplitude;
+    float _frequency;
+    bool _angleLock;
+    
+};
+
+
+inline void OscillatorOperator::operate( osgParticle::Particle* P, double dt )
+{
+    // try to get a vector orthogonal to the current velocity:
+    osg::Vec3 norm = P->getVelocity() ^ osg::Y_AXIS;
+    // check that norm is valid (ie, not parallel)
+    if (norm.length()<0.0001) norm = P->getVelocity() ^ osg::X_AXIS;
+    
+    norm.normalize();
+    
+    osg::Vec3 offset = norm * cos(P->getAge() * _frequency) * _amplitude/100;
+    
+    P->setPosition(P->getPosition() + offset);
+    
+    if (_angleLock)
+    {
+        //TODO
+        P->setAngle(norm);
     }
 }
 
