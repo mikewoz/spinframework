@@ -131,6 +131,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/oscParser.h \
     $(top_srcdir)/include/osgUtil.h \
     $(top_srcdir)/include/ParticleSystem.h \
+    $(top_srcdir)/include/ParticleSystemUtil.h \
     $(top_srcdir)/include/pocoUtil.h \
     $(top_srcdir)/include/PointerNode.h \
     $(top_srcdir)/include/RayNode.h \

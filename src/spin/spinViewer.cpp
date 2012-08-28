@@ -491,6 +491,7 @@ int run(int argc, char **argv)
 
 	// *************************************************************************
 	// start threads:
+    viewer.viewerInit(); // TODO: move this in a beter place
 	viewer.realize();
 
     // Try to subscribe with the current (default or manually specified) TCP
