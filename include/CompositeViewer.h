@@ -50,6 +50,7 @@
 
 #include "dofppu.h"
 #include "ssaoppu.h"
+#include "motionblurppu.h"
 
 namespace spin
 {
@@ -116,9 +117,10 @@ class PPUProcessor : public osgPPU::Processor
         }
 };
 
-#define PPU_NONE 0x0000
-#define PPU_DOF  0x0001
-#define PPU_SSAO 0x0002
+#define PPU_NONE        0x0000
+#define PPU_DOF         0x0001
+#define PPU_SSAO        0x0002
+#define PPU_MOTIONBLUR  0x0004
 
 class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
@@ -175,10 +177,9 @@ class CompositeViewer : public osgViewer::CompositeViewer
  
         //int run();
 
-        //osg::ref_ptr<DoFRendering> dofPPU_;
-        //osg::ref_ptr<SSAORendering> ssaoPPU_;
         std::vector<DoFRendering*> mDofPPUs;
         std::vector<SSAORendering*> mSsaoPPUs;
+        std::vector<MotionBlurRendering*> mMBlurPPUs;
 
     private:
         std::vector<osgPPU::Processor*> mProcessors;

@@ -93,6 +93,7 @@ CompositeViewer::~CompositeViewer()
 {
     bool lIsDof = (mDofPPUs.size() == getNumViews());
     bool lIsSSAO = (mSsaoPPUs.size() == getNumViews());
+    bool lIsMBlur = (mMBlurPPUs.size() == getNumViews());
 
     if(mbInitialized)
     {
@@ -104,6 +105,8 @@ CompositeViewer::~CompositeViewer()
                 delete mDofPPUs[i];
             if(lIsSSAO)
                 delete mSsaoPPUs[i];
+            if(lIsMBlur)
+                delete mMBlurPPUs[i];
         }
     }
 }
@@ -270,6 +273,15 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             lDoF->setFocalRange(50.0);
             
             mDofPPUs.push_back(lDoF);
+        }
+
+        // Motion blur effect
+        if((pEffect & PPU_MOTIONBLUR) != 0)
+        {
+            MotionBlurRendering* lMBlur = new MotionBlurRendering();
+            lMBlur->createMotionBlurPipeline(lProcessor, lastUnit);
+
+            mMBlurPPUs.push_back(lMBlur);
         }
 
         // add a text ppu after the pipeline is setted up
@@ -1304,6 +1316,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     {
         bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
         bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
+        bool lIsMBlur = (viewer->mMBlurPPUs.size() == viewer->getNumViews());
 
         // For each view
         for(unsigned int i=0; i<viewer->getNumViews(); ++i)
@@ -1363,6 +1376,15 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 else if (stringArgs[0] == "ssaoResample")
                 {
                     viewer->mSsaoPPUs[i]->setResampleFactor(floatArgs[0]);
+                }
+            }
+
+            // Params for the motion blur PPU
+            if(lIsMBlur)
+            {
+                if (stringArgs[0] == "motionBlurFactor")
+                {
+                    viewer->mMBlurPPUs[i]->setMotionBlurFactor(floatArgs[0]);
                 }
             }
         }

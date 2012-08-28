@@ -96,6 +96,7 @@ int run(int argc, char **argv)
    
     bool ssao = false; 
     bool dof = false;
+    bool mblur = false;
 	float speedScaleValue = 1.0;
 	float moving = false;
 	
@@ -145,6 +146,9 @@ int run(int argc, char **argv)
 	arguments.getApplicationUsage()->addCommandLineOption("--multisamples <num>", "Set the level of multisampling for antialiasing (Default: 4)");
 	arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-based camera controls for this user");
 	arguments.getApplicationUsage()->addCommandLineOption("--cache", "Enable caching for all models and textures. ie, disable automatic unloading of culled media");
+    arguments.getApplicationUsage()->addCommandLineOption("--dof", "Enables depth of field effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--ssao", "Enables screen space ambient occlusion effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--mblur", "Enables motion blur effect");
 
 	// *************************************************************************
 	// PARSE ARGS:
@@ -171,6 +175,7 @@ int run(int argc, char **argv)
     if (arguments.read("--hide-cursor")) hideCursor=true;
     if (arguments.read("--dof")) dof=true;
     if (arguments.read("--ssao")) ssao=true;
+    if (arguments.read("--mblur")) mblur=true;
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}
@@ -325,11 +330,7 @@ int run(int argc, char **argv)
 	    view->addEventHandler(new osgViewer::ThreadingHandler);
 	    view->addEventHandler(new osgViewer::WindowSizeHandler);
         
-        if (dof)
-        {
-            view->addEventHandler(new CustomResizeHandler(&viewer));
-        }
-        else if(ssao)
+        if (dof || ssao || mblur)
         {
             view->addEventHandler(new CustomResizeHandler(&viewer));
         }
@@ -491,9 +492,8 @@ int run(int argc, char **argv)
 
 	// *************************************************************************
 	// start threads:
-    viewer.viewerInit(); // TODO: move this in a beter place
 	viewer.realize();
-
+        
     // Try to subscribe with the current (default or manually specified) TCP
     // subscription information. If this fails, it's likely because the server
     // is not online, but when it comes online, it will send a userRefresh
@@ -512,15 +512,18 @@ int run(int argc, char **argv)
 	//std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
     std::cout << "\nspinviewer is READY" << std::endl;
 
-    if (dof || ssao)
+    if (dof || ssao || mblur)
     {
         unsigned int lEffects = 0x0000;
         if(dof)
             lEffects |= PPU_DOF;
         if(ssao)
             lEffects |= PPU_SSAO;
+        if(mblur)
+            lEffects |= PPU_MOTIONBLUR;
 
-        viewer.frame();
+        //viewer.frame();
+        viewer.viewerInit(); // TODO: move this in a better place
         viewer.initializePPU(lEffects);
 
         osg::ClampColor* clamp = new osg::ClampColor();
