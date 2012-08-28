@@ -131,6 +131,11 @@ ReferencedNode::~ReferencedNode()
     id_->s_thing = 0;
 }
 
+std::string ReferencedNode::getOSCPath() const
+{
+    return std::string("/SPIN/" + spinApp::Instance().getSceneID()+"/"+ getID());
+}
+
 void ReferencedNode::registerNode(SceneManager *s)
 {
     sceneManager_ = s;
@@ -196,7 +201,8 @@ void ReferencedNode::attachTo (const char* parentID)
             // send a parentChange message to clients who are only listening to scene
             // messages (ie, they are not filtering every single node message).
             // TODO: do this via TCP?
-            SCENE_MSG("ssss", "graphChange", "attach", this->getID().c_str(), parentID);
+            spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "attach", this->getID().c_str(), parentID, SPIN_ARGS_END);
+
         }
     }
 }
@@ -221,7 +227,8 @@ void ReferencedNode::detachFrom(const char* parentID)
             parentNodes_.erase(parentNodes_.begin());
             
             BROADCAST(this, "ss", "detachFrom", pID.c_str());
-            SCENE_MSG("ssss", "graphChange", "detach", this->getID().c_str(), pID.c_str());
+            spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "detach", this->getID().c_str(), pID.c_str(), SPIN_ARGS_END);
+
         }
         
         this->updateNodePath();
@@ -254,7 +261,8 @@ void ReferencedNode::detachFrom(const char* parentID)
             this->updateNodePath();
             
             BROADCAST(this, "ss", "detachFrom", parentID);
-            SCENE_MSG("ssss", "graphChange", "detach", this->getID().c_str(), parentID);
+            spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "detach", this->getID().c_str(), parentID, SPIN_ARGS_END);
+
         }
     }
 }

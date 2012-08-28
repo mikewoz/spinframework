@@ -183,7 +183,10 @@ void spinClientContext::createServers()
 
     lo_server_add_method(lo_infoServ_, NULL, NULL, infoCallback, this);
     lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
-
+    
+    // register sceneCallback for all receivers and for the one TCP subscription
+    // receiver as well:
+    lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, sceneCallback, this);
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
     	lo_server_add_method((*servIter),
@@ -277,7 +280,7 @@ void *spinClientContext::spinClientThread(void *arg)
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-        	spin.NodeMessage(spin.getUserID().c_str(), "s", "ping", LO_ARGS_END);
+        	spin.NodeMessage(spin.getUserID().c_str(), "s", "ping", SPIN_ARGS_END);
             lastTick = frameTick;
         }
     }

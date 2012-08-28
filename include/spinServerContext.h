@@ -82,7 +82,13 @@ class spinServerContext : public spinBaseContext
          */
         bool shouldAutoClean() { return autoCleanup_; }
 
-        
+        void setSecureBroadcast(bool b) { secureBroadcast_=b; }
+        bool hasSecureBroadcast() const { return secureBroadcast_; }
+
+        void setSecureEvents(bool b) { secureEvents_=b; }
+        bool hasSecureEvents() const { return secureEvents_; }
+    
+    
         //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 #ifdef WITH_POCO
@@ -128,6 +134,9 @@ class spinServerContext : public spinBaseContext
 
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
+        bool secureBroadcast_;
+        bool secureEvents_;
+    
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
     

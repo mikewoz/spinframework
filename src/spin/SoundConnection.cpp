@@ -90,7 +90,8 @@ SoundConnection::SoundConnection (SceneManager *s, osg::ref_ptr<DSPNode> src, os
 	                     (void*)this);
 	
 	// broadcast the creation of this connection
-	SCENE_MSG("sss", "createNode", getID().c_str(), "SoundConnection");
+    spinApp::Instance().BroadcastSceneMessage("sss", "createNode", getID().c_str(), "SoundConnection", SPIN_ARGS_END);
+
 }
 
 
@@ -106,7 +107,7 @@ SoundConnection::~SoundConnection()
 	
 	
 	// broadcast the delete message of this connection
-	SCENE_MSG("ss", "deleteNode", getID().c_str());
+    spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", getID().c_str(), SPIN_ARGS_END);
 
     std::string oscPattern = "/SPIN/" + sceneManager_->sceneID + "/" + this->getID();
     std::vector<lo_server>::iterator it;

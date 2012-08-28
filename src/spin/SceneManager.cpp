@@ -402,8 +402,8 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
 	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
 	                     oscPattern.c_str(), NULL,
 	                     spinBaseContext::nodeCallback, (void*)s->getIDSymbol());
-    SCENE_MSG("sss", "registerState", s->getID().c_str(), s->getClassType().c_str());
-    SCENE_MSG_TCP("sss", "registerState", s->getID().c_str(), s->getClassType().c_str());
+
+    spinApp::Instance().BroadcastSceneMessage("sss", "registerState", s->getID().c_str(), s->getClassType().c_str(), SPIN_ARGS_END);
     sendNodeList("*");
 }
 
@@ -421,8 +421,7 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
     itr = std::find( stateMap[s->getClassType()].begin(), stateMap[s->getClassType()].end(), s );
     if ( itr != stateMap[s->getClassType()].end() ) stateMap[s->getClassType()].erase(itr);
 
-    SCENE_MSG("ss", "unregisterState", s->getID().c_str());
-    SCENE_MSG_TCP("ss", "unregisterState", s->getID().c_str());
+    spinApp::Instance().BroadcastSceneMessage("ss", "unregisterState", s->getID().c_str(), SPIN_ARGS_END);
 
     sendNodeList("*");
 }
@@ -621,11 +620,14 @@ void SceneManager::sendConnectionList(lo_address txAddr)
 
     if (txAddr == 0)
     {
-        SCENE_LO_MSG(msg);
+        //SCENE_LO_MSG(msg);
+        spinApp::Instance().BroadcastMessage(std::string("/SPIN/"+spinApp::Instance().getSceneID()), msg);
     }
     else
     {
-        SCENE_LO_MSG_TCP(msg, txAddr);
+        //SCENE_LO_MSG_TCP(msg, txAddr);
+        std::cout << "WARNING: Should be sending connection list to subscriber but that is deprecated. Broadcasting instead." << std::endl;
+        spinApp::Instance().BroadcastMessage(std::string("/SPIN/"+spinApp::Instance().getSceneID()), msg);
     }
 }
 
@@ -765,8 +767,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
     // Let's broadcast a createNode message BEFORE we actually do the creation.
     // Thus, if some messages are sent during instantiation, at least clients
     // will already have a placeholder for the node.
-    SCENE_MSG("sss", "createNode", id, type);
-    SCENE_MSG_TCP("sss", "createNode", id, type);
+    spinApp::Instance().BroadcastSceneMessage("sss", "createNode", id, type, SPIN_ARGS_END);
 
     // check if a node with that name already exists:
     osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(nodeID->s_thing);
@@ -886,8 +887,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         nodeMap[n->getNodeType()].push_back(n);
 
         // broadcast (only if this is the server):
-        SCENE_MSG("sss", "createNode", id, type);
-        SCENE_MSG_TCP("sss", "createNode", id, type);
+        spinApp::Instance().BroadcastSceneMessage("sss", "createNode", id, type, SPIN_ARGS_END);
         sendNodeList(type);
         return n.get();
     }
@@ -1017,8 +1017,8 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
         std::cout << "created new state: " << id << " of type " << type << std::endl;
         registerStateSet(n.get());
         // broadcast (only if this is the server):
-        SCENE_MSG("sss", "createStateSet", id, type);
-        SCENE_MSG_TCP("sss", "createStateSet", id, type);
+        spinApp::Instance().BroadcastSceneMessage("sss", "createStateSet", id, type, SPIN_ARGS_END);
+
         sendNodeList("type");
         return n.get();
     }
@@ -1129,27 +1129,6 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 void SceneManager::setWorldStateSet(const char *s)
 {
     worldNode->setStateSet(s);
-
-    /*
-    if (std::string(s)=="NULL")
-    {
-        worldNode->setStateSet(new osg::StateSet());
-        SCENE_MSG("ss", "setWorldStateSet", "NULL");
-    }
-    else
-    {
-        ReferencedStateSet *ss = getStateSet(s);
-        if (ss)
-        {
-            if (ss->getIDSymbol() == worldStateSet_)
-                return; // we're already using that stateset
-        
-            worldStateSet_ = ss->getIDSymbol();
-            worldNode->setStateSet(ss);
-            SCENE_MSG("ss", "setWorldStateSet", s);
-        }
-	}
-    */
 }
 
 std::vector<ReferencedNode*> SceneManager::findNodes(const char *pattern)
@@ -1336,16 +1315,15 @@ void SceneManager::deleteNode(const char *id)
         }
 
         doDelete(n);
-        SCENE_MSG("ss", "deleteNode", id);
-        SCENE_MSG_TCP("ss", "deleteNode", id);
+        spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", id, SPIN_ARGS_END);
+
 
     }
     else if (ReferencedStateSet *s = getStateSet(id))
     {
 		doDelete(s);
         sendNodeList("*");
-        SCENE_MSG("ss", "deleteNode", id);
-        SCENE_MSG_TCP("ss", "deleteNode", id);
+        spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", id, SPIN_ARGS_END);
     }
     else
         std::cout << "ERROR: tried to delete " << id << ", but no node or state by that name exists." << std::endl;
@@ -1371,13 +1349,12 @@ void SceneManager::deleteGraph(const char *id)
         {
             std::string childID = (*childIter)->getID();
             doDelete(*childIter);
-            SCENE_MSG("ss", "deleteNode", childID.c_str());
-            SCENE_MSG_TCP("ss", "deleteNode", childID.c_str());
+            spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", childID.c_str(), SPIN_ARGS_END);
+
         }
 
         doDelete(n);
-        SCENE_MSG("ss", "deleteNode", id);
-        SCENE_MSG_TCP("ss", "deleteNode", id);
+        spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", id, SPIN_ARGS_END);
     }
     else
         std::cout << "ERROR: tried to deleteGraph " << id << ", but that node does not exist." << std::endl;
@@ -1519,13 +1496,7 @@ void SceneManager::clear()
     }
      */
 
-    /*
-       ClearSceneVisitor visitor;
-       worldNode->accept(visitor);
-     */
-     
-    SCENE_MSG("s", "clear");
-    SCENE_MSG_TCP("s", "clear");
+    spinApp::Instance().BroadcastSceneMessage("s", "clear", SPIN_ARGS_END);
     sendNodeList("*");
 
 #ifdef WITH_SPATOSC
@@ -1544,9 +1515,8 @@ void SceneManager::clearUsers()
     {
         deleteGraph(nodeMap[std::string("UserNode")][0]->getID().c_str());
     }
-    SCENE_MSG("s", "clearUsers");
-    SCENE_MSG_TCP("s", "clearUsers");
-    sendNodeList("*");
+    spinApp::Instance().BroadcastSceneMessage("s", "clearUsers", SPIN_ARGS_END);
+sendNodeList("*");
     std::cout << "Cleared all users." << std::endl;
 }
 
@@ -1572,8 +1542,7 @@ void SceneManager::clearStates()
         }
     }
     
-    SCENE_MSG("s", "clearStates");
-    SCENE_MSG_TCP("s", "clearStates");
+    spinApp::Instance().BroadcastSceneMessage("s", "clearStates", SPIN_ARGS_END);
 
     // TODO: separate sendNodeList to sendStateList as well
     sendNodeList("*");
@@ -1623,8 +1592,7 @@ void SceneManager::refreshAll()
 
 
     // Announce that a refresh has been completed
-    SCENE_MSG("s", "refresh");
-    SCENE_MSG_TCP("s", "refresh");
+    spinApp::Instance().BroadcastSceneMessage("s", "refresh", SPIN_ARGS_END);
 }
 
 void SceneManager::refreshSubscribers(const std::map<std::string, lo_address> &clients)

@@ -226,6 +226,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __t_symbol_P1__getNodeSymbol,
 	          "",
 	          "");
+	I_Method0(std::string, getOSCPath,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getOSCPath,
+	          "",
+	          "");
 	I_Method5(bool, addCronScript, IN, bool, serverSide, IN, const std::string &, label, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
 	          Properties::NON_VIRTUAL,
 	          __bool__addCronScript__bool__C5_std_string_R1__C5_std_string_R1__double__C5_std_string_R1,
@@ -301,6 +306,9 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	                 0);
 	I_SimpleProperty(std::string, NodeType, 
 	                 __std_string__getNodeType, 
+	                 0);
+	I_SimpleProperty(std::string, OSCPath, 
+	                 __std_string__getOSCPath, 
 	                 0);
 	I_SimpleProperty(const char *, Parent, 
 	                 0, 

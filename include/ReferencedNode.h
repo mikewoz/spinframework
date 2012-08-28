@@ -289,6 +289,7 @@ public:
     std::string getNodeType() const { return nodeType_; }
     t_symbol* getNodeSymbol() { return id_; }
     
+    std::string getOSCPath() const;
 
     bool addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
                         double freq, const std::string& params );

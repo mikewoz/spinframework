@@ -842,21 +842,32 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             else if (debugType=="spatosc")
             {
                 #ifdef WITH_SPATOSC
-                if (spinApp::Instance().hasAudioRenderer)
-                    spinApp::Instance().audioScene->debugPrint();
+                if (spin.hasAudioRenderer)
+                    spin.audioScene->debugPrint();
                 else
                     std::cout << "SpatOSC not enabled for this SPIN application" << std::endl;
                 #endif
             }
 
             // forward debug message to all clients:
-            SCENE_MSG("ss", "debug", (const char*)argv[1]);
+            spin.BroadcastSceneMessage("ss", "debug", (const char*)argv[1], SPIN_ARGS_END);
+
         }
         else
         {
             sceneManager->debug();
-            SCENE_MSG("s", "debug");
+            spin.BroadcastSceneMessage("s", "debug", SPIN_ARGS_END);
         }
+    }
+    else if ((theMethod == "setSecureBroadcast") && (argc==2))
+    {
+        spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
+        server->setSecureBroadcast((bool)lo_hires_val((lo_type)types[1], argv[1]));
+    }
+    else if ((theMethod == "setSecureEvents") && (argc==2))
+    {
+        spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
+        server->setSecureEvents((bool)lo_hires_val((lo_type)types[1], argv[1]));
     }
     else if (theMethod == "clear")
         sceneManager->clear();
@@ -868,11 +879,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     {
         if (spin.getContext()->isServer())
         {
-            SCENE_MSG("s", "userRefresh");
+            spin.BroadcastSceneMessage("s", "userRefresh", SPIN_ARGS_END);
         }
         else
         {
-            spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
+            spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", SPIN_ARGS_END);
             
             // In the case of a client, we also need to check if the current 
             // userNode is actually attached. The deleteNode / clear / whatever
@@ -967,7 +978,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             osg::setNotifyLevel((osg::NotifySeverity)lvl);
             std::cout << "setNotifyLevel " << osg::getNotifyLevel() << std::endl;
         }
-        SCENE_MSG("si", "setNotifyLevel", (int)osg::getNotifyLevel());
+        spin.BroadcastSceneMessage("si", "setNotifyLevel", (int)osg::getNotifyLevel(), SPIN_ARGS_END);
     }
     else if ((theMethod == "optimize") && (argc==2))
     {
@@ -986,7 +997,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             optimizer.optimize(sceneManager->worldNode.get());
             pthread_mutex_unlock(&sceneMutex); 
         }
-        SCENE_MSG("ss", "optimize", (char*)argv[1]);
+        spin.BroadcastSceneMessage("ss", "optimize", (char*)argv[1], SPIN_ARGS_END);
+
     }
     else if (theMethod == "spatosc")
     {

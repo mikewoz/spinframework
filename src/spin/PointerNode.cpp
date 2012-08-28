@@ -503,7 +503,10 @@ void PointerNode::reportIntersections()
 
         //sceneManager_->sendNodeMessage(this->id, msg);
         if (spinApp::Instance().getContext()->isServer())
-            NODE_LO_MSG(sceneManager, this, msg);
+        {
+            //NODE_LO_MSG(sceneManager, this, msg);
+            spinApp::Instance().BroadcastMessage(this->getOSCPath(), msg);
+        }
     }
 
 }

@@ -61,6 +61,26 @@ BEGIN_OBJECT_REFLECTOR(spin::spinServerContext)
 	          __bool__shouldAutoClean,
 	          "",
 	          "A flag that decides if user nodes should be automatically cleaned up (ie, their entire subgraph deleted) if they stop sending ping messages. This is set by the disable-auto-cleanup argument. ");
+	I_Method1(void, setSecureBroadcast, IN, bool, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setSecureBroadcast__bool,
+	          "",
+	          "");
+	I_Method0(bool, hasSecureBroadcast,
+	          Properties::NON_VIRTUAL,
+	          __bool__hasSecureBroadcast,
+	          "",
+	          "");
+	I_Method1(void, setSecureEvents, IN, bool, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setSecureEvents__bool,
+	          "",
+	          "");
+	I_Method0(bool, hasSecureEvents,
+	          Properties::NON_VIRTUAL,
+	          __bool__hasSecureEvents,
+	          "",
+	          "");
 	I_Method2(bool, applyHTTPMessage, IN, std::string, path, IN, const Poco::Net::HTMLForm &, form,
 	          Properties::NON_VIRTUAL,
 	          __bool__applyHTTPMessage__std_string__C5_Poco_Net_HTMLForm_R1,
@@ -74,6 +94,12 @@ BEGIN_OBJECT_REFLECTOR(spin::spinServerContext)
 	I_SimpleProperty(unsigned short, HttpPort, 
 	                 __unsigned_short__getHttpPort, 
 	                 0);
+	I_SimpleProperty(bool, SecureBroadcast, 
+	                 0, 
+	                 __void__setSecureBroadcast__bool);
+	I_SimpleProperty(bool, SecureEvents, 
+	                 0, 
+	                 __void__setSecureEvents__bool);
 	I_PublicMemberProperty(std::map< std::string COMMA  lo_address >, tcpClientAddrs_);
 END_REFLECTOR
 

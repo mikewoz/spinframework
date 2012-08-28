@@ -75,6 +75,9 @@ spinServerContext::spinServerContext() : syncThreadID(0)
     lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT));
     
     httpPort = 9980;
+    
+    secureBroadcast_ = false;
+    secureEvents_ = false;
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
@@ -113,6 +116,17 @@ void spinServerContext::debugPrint()
         std::cout << "  Auto-clean users:\t\tENABLED" << std::endl;
     else
         std::cout << "  Auto-clean users:\t\tDISABLED" << std::endl;
+
+    if (secureBroadcast_)
+        std::cout << "  Secure Broadcast:\t\tENABLED" << std::endl;
+    else
+        std::cout << "  Secure Broadcast:\t\tDISABLED" << std::endl;
+
+    if (secureEvents_)
+        std::cout << "  Secure Events:\t\tENABLED" << std::endl;
+    else
+        std::cout << "  Secure Events:\t\tDISABLED" << std::endl;
+
 
     if (tcpClientAddrs_.size())
     {
@@ -335,7 +349,7 @@ void *spinServerContext::spinServerThread(void *arg)
                              lo_address_get_hostname(context->lo_txAddrs_[0]), // server multicasting group
                              i_txPort,  // server multicast port
                              i_syncPort, // server multicast port for sync (timecode)
-                             LO_ARGS_END);
+                             SPIN_ARGS_END);
 
             lastTick = frameTick;
         }
@@ -474,26 +488,22 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 
         // send a message to the new client to indicate that subscription
         // request was successful:
-        //SCENE_MSG("si", "subscribed", 1);
-        lo_send(context->tcpClientAddrs_[clientID], ("/SPIN/"+spinApp::Instance().getSceneID()).c_str(), "si", "subscribed", 1, LO_ARGS_END);
+        lo_send(context->tcpClientAddrs_[clientID], ("/SPIN/"+spinApp::Instance().getSceneID()).c_str(), "si", "subscribed", 1, SPIN_ARGS_END);
     }
 
     else if (method == "optimize")
     {
-    	// TODO: we should really have a SCENE_MSG in spinApp that takes a
-    	// txaddr as an argument. For now, we are just using the bundle message
-    	std::map<std::string, lo_address>::const_iterator client;
+        std::map<std::string, lo_address>::const_iterator client;
         for (client = context->tcpClientAddrs_.begin();
              client != context->tcpClientAddrs_.end();
              ++client)
         {
-        	std::vector<lo_message> msgs;
-        	lo_message msg = lo_message_new();
-        	lo_message_add(msg, "ss", "optimize", reinterpret_cast<const char*>(argv[1]));
-        	msgs.push_back(msg);
-			spinApp::Instance().SceneBundle(msgs, client->second);
+            std::vector<lo_message> msgs;
+            lo_message msg = lo_message_new();
+            lo_message_add(msg, "ss", "optimize", reinterpret_cast<const char*>(argv[1]));
+            msgs.push_back(msg);
+            spinApp::Instance().SceneBundle(msgs, client->second);
         }
-
     }
 
     else if (method == "getState")
