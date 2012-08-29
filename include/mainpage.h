@@ -67,7 +67,7 @@
 * <a href="pdsheefa.html">Introduction to Pure Data Extended and pdsheefa</a>
 * <br><br>
 * <a href="console.html">Console Commands</a><br>
-* <a href="messaging.html">SPIN Messaging</a><br><br>
+* <a href="messaging.html">Technical Information on SPIN Messaging</a><br><br>
 * 
 *
 * @section API SPIN Framework API Documentation
@@ -771,16 +771,23 @@
  * of pdsheefa patches. Once these are all opened, open the first tutorial
  * pdsheefa patch through your File menu in Pure Data extended.
  * 
- * <br>
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/widgets.png
+ * 
+ * <br><br>
  * @section widgets 01.SpinWidgets.pd
  * 
  * "SPIN Widgets" is a collection of graphic interface widgets, which help to
  * accomplish common tasks in the SPIN environment. It is composed of three
  * indispensible tools, with which just about all basic functions can be done.
  * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/SPIN.Connect.png
+ * 
  * <br>
  * <b> SPIN.Connect</b>
  * 
+ * <br>
  * SPIN.Connect is an indispensible tool for verifying that you are connected
  * to the SPIN server, that you are viewing the correct scene and that it is
  * currently responsive in input.
@@ -804,6 +811,59 @@
  * 
  * msg-print: This toggles whether messages sent to spinserver will be displayed
  * in spinserver.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/NodeCreator.png
+ *
+ * <br>
+ * <b>SPIN.NodeCreator</b>
+ * 
+ * <br>
+ * NodeCreator is an object that facilitates the creation of nodes. It is quite
+ * simple to use. A field called "id" is available to write in the name of the
+ * node you wish to create. 
+ *
+ * Nodes are the basic object type in SPIN. Every entity in your scene,
+ * including the camera which you are using to navigate, is a sub-type of node.
+ * The most common nodes, after the UserNodes (cameras) which users can use to
+ * navigate scenes, are shapes, models, and the like.
+ * 
+ * All nodes must have unique names so that it is possible to send messages
+ * to them directly. Go ahead and enter the name Box into the id field. Now, to
+ * the right, you'll see a drop-down menu with the different types of possible
+ * nodes that you can create. Select ShapeNode from the list. If a list is not
+ * displayed, click the 'refresh' button to re-populate the list with the
+ * available node types. Lastly, push the 'go!' button to actually issue the
+ * command you have just set up.
+ * 
+ * You have just created a ShapeNode, which by default looks like a box. 
+ * (Most nodes are invisible by default until certain changes are made to them). 
+ * Now we will look at the Node.Chooser object to assign qualities to the 
+ * ShapeNode we have created.
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/NodeChooser.png
+ * 
+ * <br>
+ * <b>SPIN.NodeChooser</b>
+ * 
+ * The Node.Chooser is a tool that allows you to select from a list of all nodes
+ * existing in the scene, and then it displays information about the parameters
+ * of that node and allows you to change them directly.
+ * 
+ * Select your node, "Box" from the drop-down menu at top right. If it does
+ * not appear, verify that you are connected to the current scene with the 
+ * SPIN.Connect device at the top of this patch. Hit the refresh button.
+ * 
+ * Once your node is selected, you'll note that there are numerous modifiable
+ * parameters. The first is 'Parent,' which is familiar to users of many
+ * different kinds of computer applications. If you set another object to be
+ * the parent of Box, Box will always move whenever the parent is moved, will
+ * resize proportionately with the other object, and generally mimic any changes
+ * made to the "parent" item.
+ * 
+ * Next is "Shape," which is the principal parameter of a ShapeNode, for obvious
+ * reasons. 
  * 
  */
 
