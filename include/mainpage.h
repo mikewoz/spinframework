@@ -291,16 +291,28 @@
  * <b>STEP 4:</b> Tell Pd where to find pdsheefa
  * 
  * Open Pd-extended. From the dropdown menu at the top of the screen, select
- * Pd-extended > Preferences > Path
+ * Pd-extended > Preferences > Path (pictured below).
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/PD_Path_Selection_0.png
  * 
+ * <br>
  * A window will open which displays all of the locations that Pure Data looks
  * to find the information it needs when it loads up. We need to add the
  * pdsheefa tools to this list so that Pure Data can access them.
  * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/PD_path_addition_0.png
+ * 
+ * <br>
  * Select New. In the file browser that opens, select the location where you
  * have placed pdsheefa. These tools are now available through your Pure Data
  * interface.
  * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/select_pdsheefa_location_0.png
+ * 
+ * <br>
  * Select OK to close the window.
  * 
  * <br>
@@ -311,7 +323,16 @@
  * window called spinviewerUI. Open your Applications folder to find these
  * programs and open them.
  * 
- * Open spinserverUI. Also, open spinviewerUI.
+ * Open spinserverUI. 
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/open_spin_server_0.png
+ * 
+ * <br>
+ * Also, open spinviewerUI.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/open_spin_viewer_0.png
  * 
  * It is important here to verify that spinviewerUI and spinserverUI are
  * communicating to each other. When you open sinviewerUI, you should see a
@@ -320,14 +341,25 @@
  * 
  * Another test is to try to turn the grid on in the spin viewer. Click the
  * button "Toggle Grid," which is the rightmost button in the list of buttons at
- * the top left of your spin viewer window.
+ * the top left of your spin viewer window (see below).
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/open_pd_0.png
  * 
  * <br>
  * <b>STEP 6:</b> Try the examples
  * 
  * From with Pure Data, select File > Open from the dropdown menu at the top of
- * the screen. Using the file browser that opens, find the pdsheefa folder where
+ * the screen. 
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/pdsheefa_examples_0.png
+ * 
+ * Using the file browser that opens, find the pdsheefa folder where
  * you have placed it on the hard drive, and find the examples subfolder.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/spin_messaging_tool_in_pdsheefa_0.png
  * 
  * The files that begin with the numbers 01-99 are SPIN tools that come with
  * included explanations. Open the first one and begin learning SPIN!
@@ -732,7 +764,8 @@
  * fifth : clears the on-screen statistics
  * 
  * <br>
- * Next page, <a href=console.html>Console Commands</a><br><br>
+ * Next page, <a href=pdsheefa.html>Introduction to Pure Data Extended 
+ * and pdsheefa</a><br><br>
  * <a href=index.html>Return to Index</a>
  * 
  */
