@@ -863,7 +863,43 @@
  * made to the "parent" item.
  * 
  * Next is "Shape," which is the principal parameter of a ShapeNode, for obvious
- * reasons. 
+ * reasons.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/Box_Sphere.png
+ *
+ * The ShapeNode "Box" has been changed into a sphere and moved -1 units on the
+ * X axis, using Node.Chooser.
+ * 
+ * <br><br>
+ * There are a number of other useful tools in the Node.Chooser, and they differ
+ * for each node type, but let's go through the rest of what is here. We have a
+ * StateSet selector, set to Null. This is a feature that allows you to save
+ * information about every node into a complete set, which can then be returned
+ * to.
+ * 
+ * Then you have the X,Y, Z coordinates, which have been used in the example
+ * picture above to shift the shape one unit to the left. You can drag these
+ * values with the mouse, but the shape will quickly go off screen if you do
+ * not zoom to get a wider viewpoint.
+ * 
+ * Pitch, Yaw, Roll: change the angle of the object on the three axes.
+ * 
+ * Copy, Paste: function just like copy paste in any other application.
+ * 
+ * Scale X,Y,Z: Scale the object independently in each of the three dimensions.
+ * 
+ * Or, use uniform-scale to scale it without changing the proportions of the
+ * object.
+ * 
+ * There is an RGBA slider for setting the color and alpha channel of objects.
+ * 
+ * Three different "billboard" settings, normal, which is not billboarded.
+ * Billboard, which forces the image to always face the camera (this is
+ * especially useful for making 2d objects look like 3d objects). Z-up, which
+ * billboards the object but only on the XY plane (if you fly over it, you
+ * will see the top rather than the face, which will always turn to face you
+ * if you go around the object by any side at the same height).
  * 
  */
 
