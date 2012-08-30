@@ -183,6 +183,7 @@ spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(sp
 
 spinApp::~spinApp()
 {
+
 	if (userNode.valid())
 	{
 		sceneManager_->doDelete(userNode.get());
@@ -230,6 +231,7 @@ void spinApp::destroyScene()
 {
 	std::cout << "Cleaning up SceneManager..." << std::endl;
 	
+    
 	// Force a delete (and destructor call) for all nodes still in the scene:
     unsigned int i = 0;
     ReferencedNode *n;
@@ -379,7 +381,6 @@ void spinApp::registerUser()
         // (see the spinApp_sceneCallback method)
 
         SceneMessage("sss", "createNode", userNode->getID().c_str(), "UserNode", SPIN_ARGS_END);
-
     }
 
     if (!userNode.valid())

@@ -316,7 +316,7 @@ void *spinServerContext::spinServerThread(void *arg)
 #endif
 
     std::string myIP = getMyIPaddress();
-    osg::Timer_t lastTick = osg::Timer::instance()->tick();
+    osg::Timer_t lastTick = osg::Timer::instance()->tick() - 9999999; // force first tick to be old
     osg::Timer_t frameTick = lastTick;
 
     // convert ports to integers for sending:
@@ -382,6 +382,16 @@ void *spinServerContext::spinServerThread(void *arg)
         if (recv == 0)
         	usleep(1000);
     }
+    
+    // send disconnect message to clients that that they don't have to wait
+    // until pings end:
+    //spin.BroadcastSceneMessage("s", "disconnect", SPIN_ARGS_END);
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+    {
+        lo_send((*addrIter), std::string("/SPIN/"+spin.getSceneID()).c_str(), "s", "disconnect");
+    }
+    
     context->running = false;
     if (context->syncThreadID != 0)
        pthread_join(context->syncThreadID, NULL);
