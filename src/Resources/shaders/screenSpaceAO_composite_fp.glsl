@@ -1,3 +1,8 @@
+/*
+ * Screen space ambient occlusion - Applies the computed ssao to the color map
+ * Author: Emmanuel Durand - 2012
+*/
+
 #version 120
 
 uniform sampler2D vSSAO;

@@ -1,3 +1,9 @@
+/*
+ * Motion blur, with the possibility to specify a blur value to each object
+ * through vFactorMap. Otherwise it will use the vMotionBlurFactor
+ * Author: Emmanuel Durand - 2012
+*/
+
 #version 120
 
 uniform sampler2D vCurrentMap;
