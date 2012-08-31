@@ -1,3 +1,8 @@
+/*
+ * A simple passthrough shader for the motion blur effect
+ * Emmanuel Durand - 2012
+*/
+
 #version 120
 
 varying vec2 texcoord;

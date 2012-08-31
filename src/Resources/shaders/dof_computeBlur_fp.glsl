@@ -1,3 +1,8 @@
+/*
+ * Compute the blur for each fragment in the scene
+ * Author: Emmanuel Durand - 2012
+*/
+
 #version 120
 
 uniform sampler2D texDepthMap;

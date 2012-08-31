@@ -46,7 +46,7 @@
 *
 * This documentation is generated from source using Doxygen.
 *
-* <br><br>
+* <br>
 * 
 * @section welcome Welcome
 *
@@ -58,12 +58,16 @@
 * <a href="quickosx.html">Quick Start Guide (OSX)</a><br>
 * <a href="quickubuntu.html">Quick Start Guide (Ubuntu)</a><br><br>
 *
+* <a href="buildosx.html">Building from Source on OSX</a><br><br>
+*
 * @section manual SPIN Manual
 *
 * <a href="introtospin.html">Introduction to SPIN</a><br>
 * <a href="basicnavigation.html">Basic Navigation</a><br>
+* <a href="pdsheefa.html">Introduction to Pure Data Extended and pdsheefa</a>
+* <br><br>
 * <a href="console.html">Console Commands</a><br>
-* <a href="messaging.html">SPIN Messaging</a><br><br>
+* <a href="messaging.html">Technical Information on SPIN Messaging</a><br><br>
 * 
 *
 * @section API SPIN Framework API Documentation
@@ -74,6 +78,466 @@
 * For the full list of OSC messages accepted by SPIN, see the
 * <a href="oscprotocol.html">OSC Protocol Documentation</a>
 */
+
+/**
+ * @page buildosx Building from Source on OSX
+ * 
+ * For developes working on OSX, here are detailed instructions for setting up a
+ * development environment so that you can complile your own version of SPIN.
+ * 
+ * <br>
+ * <b>STEP 1:</b> Set up OSX development features
+ * 
+ * To build SPIN from source, you will need XCode, MacPorts, and XCode's command
+ * line tools.
+ * 
+ * 1. Download XCode from the 
+ * <a href=http://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12>
+ * Mac App Store</a>
+ * 2. Launch XCode, open the Preferences, select the Downloads tab and install
+ * "Command Line Tools."
+ * 3. Download and install the latest version of
+ * <a href=http://www.macports.org/install.php>MacPorts</a>.
+ * 
+ * <br>
+ * <b>STEP 2:</b> Install several dependency ports:
+ * 
+ * <tt>sudo port install automake cmake pkconfig doxygen wget select \ </tt>
+ * <tt>boost +python27 ffmpeg +universal freetype +universal liblo +univeral \ </tt>
+ * <tt>collada-dom +universal openvrml +universal jasper +universal \ </tt>
+ * <tt>bullet +universal gdal +universal </tt>
+ * 
+ * The +universal option after a library ensures that both i386 and 64 bit
+ * libraries are built. This is only needed if you plan to build OSG and SPIN in
+ * 64-bit mode (recommended). If you already have some installed libraries which
+ * were not built for 64 bit architecture, you may get errors during compilation
+ * of other ports. To upgrade an existing port (eg, freetype), do this:
+ *
+ * <tt>sudo port upgrade --enforce-variants freetype +universal </tt>
+ * 
+ * (optional) you may need to select the version of python to use.
+ *
+ * <tt> sudo port select --set pythong python27 (MacPorts 2.x) </tt><br>
+ * <tt> sudo python_select python27             (MacPorts 1.x) </tt>
+ * 
+ * To use web services in SPIN, you need <a href=http://pocoproject.org/>Poco
+ * </a>, but as of writing this, the port is broken. You need to download and
+ * compile it yourself:
+ * 
+ * <tt>cd ~/src </tt><br>
+ * <tt>wget --no-check-certificate
+ * <a href=https://sourceforge.net/projects/poco/files/sources/poco-1.4.3/poco-1.4.3p1.tar.gz>
+ * https://sourceforge.net/projects/poco/files/sources/poco-1.4.3/poco-1.4.3p1.tar.gz</a></tt>
+ * <br>
+ * <tt>tar zxvf poco-1.4.3p1.tar.gz</tt><br>
+ * <tt>./configure</tt><br>
+ * <tt>make</tt><br>
+ * <tt>sudo make install</tt>
+ * 
+ * <br>
+ * <b>STEP 3:</b> Get OpenSceneGraph (OSG)
+ *
+ * OSG is available through MacPorts, and you can install it like this:
+ * 
+ * <tt>sudo port install OpenSceneGraph-devel +universal </tt>
+ * 
+ * Assuming that you want the latest developer's release (3.1.1 at the time of
+ * this writing), follow these instructions:
+ * 
+ * <tt>cd ~/src </tt>
+ * <tt>svn co 
+ * <a href=http://www.openscenegraph.org/svn/osg/OpenSceneGraph/tags/OpenSceneGraph-3.1.1>
+ * http://www.openscenegraph.org/svn/osg/OpenSceneGraph/tags/OpenSceneGraph-3.1.1</a>
+ * </tt><br>
+ * <tt>mkdir OpenSceneGraph-3.1.1-build</tt><br>
+ * <tt>cd OpenSceneGraph-3.1.1-build</tt><br>
+ * <tt>ccmake ../OpenSceneGraph-3.1.1</tt><br>
+ * 
+ * - Press 'c' for initial configure
+ * - Press 'e' after reading notes
+ * - Set the following build options to "ON" (use cursor and key):
+ *
+ * <tt> BUILD_OSG_EXAMPLES : ON </tt><br>
+ * <tt> BUILD_OSG_PACKAGES : ON </tt><br>
+ * 
+ * - For OSX 10.6x
+ * 
+ * <tt>CMAKE_OSX_ARCHITECTURES :   x86_64;i386 </tt><br>
+ * 
+ * - For OSX 10.7+
+ * 
+ * <tt>OPENTHREADS_ATOMIC_USE_MUTEX : ON </tt><br>
+ * <tt>OSG_WINDOWING_SYSTEM : Cocoa </tt><br>
+ * 
+ * - Press 'c' to configure again (twice?)
+ * - Press 'g' to generate Makefiles
+ * - Now you can build and install OSG (will take some time):
+ * 
+ * <tt> make </tt><br>
+ * <tt> sudo make install </tt><br>
+ * 
+ * <br>
+ * <b>STEP 4:</b> Get SPIN's sister projects, build them, and install them.
+ * 
+ * NOTE: These instructions switch to the 'develop' branch (unstable). Skip this
+ * if you just want to compile the latest release build yourself.
+ * 
+ * <b>cppintrospection:</b><br>
+ * <tt>cd ~/src </tt><br>
+ * <tt>git clone git@github.com:sat-metalab/cppintrospection.git </tt><br>
+ * <tt>cd cppintrospection</tt><br>
+ * <tt>git checkout develop</tt><br>
+ * <tt>./one_step_build.sh</tt><br>
+ * <tt>sudo make install</tt><br><br>
+ * <b>spatosc:</b><br>
+ * <tt>cd ~/src</tt><br>
+ * <tt>git clone git@github.com:sat-metalab/spatosc.git</tt></b>
+ * <tt>cd spatosc</tt><br>
+ * <tt>git checkout develop</tt><br>
+ * <tt>./one_step_build.sh</tt><br>
+ * <tt>sudo make install</tt><br>
+ * 
+ * NOTE: For both cppintrospection and spatosc, if you want a universal build,
+ * instead of ./one_step_build.sh, you need to do:
+ * 
+ * <tt>./autogen.sh</tt><br>
+ * <tt>./configure --enable-universal --disable-dependency-tracking</tt><br>
+ * <tt>make</tt><br>
+ * 
+ * <br>
+ * <b>STEP 5:</b> Build SPIN
+ * 
+ * Download the source from the git repository:
+ * 
+ * <tt>sudo git clone git://code.sat.qc.ca/spinframework.git</tt><br>
+ * <tt>cd spinframework</tt><br>
+ * 
+ * If you want the bleeding edge (unstable) branch:
+ *
+ * <tt>git checkout develop</tt><br>
+ *
+ * Now build and install:
+ * 
+ * <tt>./one_step_build.sh</tt><br>
+ * <tt>sudo make install</tt><br>
+ * 
+ * The rest of the instructions are coming soon.
+ * 
+ * <br>
+ * Start learning, with an <a href=introtospin.html>Introduction to SPIN</a>
+ * <br><br>
+ * <a href=index.html>Return to Index</a> 
+ * 
+ */
+
+/**
+ * @page quickosx Quick Start Guide for OSX
+ * 
+ * This guide will show you how to get started using SPIN with
+ * <a href=http://puredata.info/>Pure Data</a> and the example patches from
+ * <a href=https://code.sat.qc.ca/trac/pdsheefa>pdsheefa</a>. You can use any
+ * other software that can send <a href=http://opensoundcontrol.org>OSC</a>
+ * messages, but then you won't have any examples to start with.
+ * 
+ * <br>
+ * <b>STEP 0:</b> (Optional) Get extra dependancies
+ *
+ * For advanced features, like video textures, SPIN requires libraries installed
+ * via MacPorts, which requires XCode command line tools. <b>Novice users should
+ * skip this step for now.</b>
+ * 
+ * 1. Downalod XCode from the
+ * <a href=http://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12>
+ * Mac App Store</a>.<br>
+ * 2. Launch XCode, open the preferences, select the Downloads tab and "Install
+ * command line tools."<br>
+ * 3. Download and install the latest version of
+ * <a href=http://www.macports.org/install.php>MacPorts</a>.<br>
+ * 4. Open the Terminal.app and install the desired ports:
+ * 
+ * <tt> sudo port install ffmpeg</tt><br>
+ * 
+ * <br>
+ * <b>STEP 1:</b> Get SPIN
+ * 
+ * Start by downloading the latest version of the SPIN Framework package and
+ * drag the "spinviewerUI" and "spinserverUI" .apps to your Applications folder:
+ * 
+ * <a href=http://spinframework.org/downloads>http://spinframework.org/downloads</a>
+ * 
+ * <br>
+ * <b>STEP 2:</b> Get Pd-Extended
+ * 
+ * Do the same for Pure Data Extended. Download the latest version and drag it
+ * to your Applications folder:
+ * 
+ * <a href=http://puredata.info/downloads/pd-extended>
+ * http://puredata.info/downloads/pd-extended</a>
+ * 
+ * <br>
+ * <b>STEP 3:</b> Get pdsheefa
+ * 
+ * Download pdsheefa:
+ * 
+ * <a href=http://code.sat.qc.ca/downloads/pdsheefa/osx>
+ * http://code.sat.qc.ca/downloads/pdsheefa/osx</a><br>
+ * 
+ * Unpack this package to some other place on your hard drive, for example:
+ * 
+ * <tt>~/Library/Pd/pdsheefa</tt><br>
+ * (This folder can be placed in any location you like, however)
+ *
+ * <br>
+ * <b>STEP 4:</b> Tell Pd where to find pdsheefa
+ * 
+ * Open Pd-extended. From the dropdown menu at the top of the screen, select
+ * Pd-extended > Preferences > Path (pictured below).
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/PD_Path_Selection_0.png
+ * 
+ * <br>
+ * A window will open which displays all of the locations that Pure Data looks
+ * to find the information it needs when it loads up. We need to add the
+ * pdsheefa tools to this list so that Pure Data can access them.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/PD_path_addition_0.png
+ * 
+ * <br>
+ * Select New. In the file browser that opens, select the location where you
+ * have placed pdsheefa. These tools are now available through your Pure Data
+ * interface.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/select_pdsheefa_location_0.png
+ * 
+ * <br>
+ * Select OK to close the window.
+ * 
+ * <br>
+ * <b>STEP 5:</b> Test the spinserver and spinviewer
+ * 
+ * Now we want to open up the two main SPIN framework applications themselves.
+ * One is a software server called spinserverUI, and the other is a graphical
+ * window called spinviewerUI. Open your Applications folder to find these
+ * programs and open them.
+ * 
+ * Open spinserverUI. 
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/open_spin_server_0.png
+ * 
+ * <br>
+ * Also, open spinviewerUI.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/open_spin_viewer_0.png
+ * 
+ * It is important here to verify that spinviewerUI and spinserverUI are
+ * communicating to each other. When you open sinviewerUI, you should see a
+ * message appear in your spinserverUI window that begins "Got new subscriber"
+ * and is followed with the name of your machine and its IP address.
+ * 
+ * Another test is to try to turn the grid on in the spin viewer. Click the
+ * button "Toggle Grid," which is the rightmost button in the list of buttons at
+ * the top left of your spin viewer window (see below).
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/open_pd_0.png
+ * 
+ * <br>
+ * <b>STEP 6:</b> Try the examples
+ * 
+ * From with Pure Data, select File > Open from the dropdown menu at the top of
+ * the screen. 
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/pdsheefa_examples_0.png
+ * 
+ * Using the file browser that opens, find the pdsheefa folder where
+ * you have placed it on the hard drive, and find the examples subfolder.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/spin_messaging_tool_in_pdsheefa_0.png
+ * 
+ * The files that begin with the numbers 01-99 are SPIN tools that come with
+ * included explanations. Open the first one and begin learning SPIN!
+ * 
+ * <br>
+ * Start learning, with an <a href=introtospin.html>Introduction to SPIN</a>
+ * <br><br>
+ * <a href=index.html>Return to Index</a>
+ * 
+ */
+
+ /**
+ * @page quickubuntu Quick Start Guide for Ubuntu Linux
+ * 
+ * NOTES:
+ * 
+ * - These instructions are intended for the latest LTR: Ubuntu 12.04 (Precise Pangolin)
+ * - Instructions are terminal commands. Use the CTRL-ALT-T shortcut to open a terminal.
+ * - This guide explains how to get started using SPIN with
+ * <a href=http://puredata.info/>Pure Data</a> and the example patches from
+ * pdsheefa. You can use any other software that can send 
+ * <a href=http://opensoundcontrol.org/>OSC</a> messages, but you will miss out
+ * on the example patches.
+ * 
+ * <br>
+ * <b>STEP 1:</b> Setup repositories
+ * 
+ * SPIN requires some packages not found in the default Ununtu repositories, so
+ * use the following commands to add some new PPAs to your system:
+ * 
+ * <tt> sudo apt-add-repository ppa:sat-metalab/metalab</tt>
+ * 
+ * Whenever you change repositories, you need to update your package list:
+ * 
+ * <tt>sudo apt-get update</tt>
+ * 
+ * <br>
+ * <b>STEP 2 (OPTIONAL):</b> Install dependancies
+ * 
+ * This step is optional, since the spinframework package will automatically
+ * require you to install these in step 3. However, this is here for general
+ * reference, and for those who may want to compile SPIN from source:
+ * 
+ * <tt>sudo apt-get install doxygen git git-core cmake-curses-gui build-essential \ </tt>
+ * <tt>automake libtool libxml++2.6-dev python-dev python-setuptools \ </tt>
+ * <tt>libboost-dev libboost-filesystem-dev libboost-python-dev \  </tt>
+ * <tt>libboost-regex-dev libboost-thread-dev liblo-dev help2man \ </tt>
+ * <tt>openscenegraph libopenscenegraph-dev libopenthreads-dev \ </tt>
+ * <tt>libboost-program-options-dev libboost-system-dev \ </tt>
+ * <tt>libcppintrospection-3.0-dev libspatosc-0.3-dev </tt>
+ * 
+ * These following dependancies are <b>not</b> required in order to build and
+ * run SPIN, but add optional support that will be included if the libraries are
+ * present:
+ * 
+ * For physics, we need <a href=http://bulletphysics.com/>Bullet Physics</a>:
+ * 
+ * <tt> sudo apt-add-repository ppa:openrave/release</tt>
+ * <tt>sudo apt-get update</tt>
+ * <tt>sudo apt-get install libbullet-dev</tt>
+ * 
+ * For web services, we use <a href=http://pocoproject.org/>Poco</a>:
+ * 
+ * <tt>sudo apt-get install libpoco-dev</tt>
+ * 
+ * For video textures, we need <a href=http://ffmpeg.org/>ffmpeg</a>:
+ *
+ * <tt>sudo apt-get install ffmpeg</tt>
+ * 
+ * If you have a 
+ * <a href=http://www.3dconnexion.com/products/spacenavigator.html>
+ * SpaceNavigator</a> device:
+ * 
+ * <tt>sudo apt-get install libspnav-dev spacenavd</tt>
+ * 
+ * For streaming video textures, we use GStreamer and
+ * <a href=http://code.sat.qc.ca/redmine/projects/libshmdata/wiki>libshmdata</a>:
+ * 
+ * <tt>sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-based0.10-dev</tt>
+ * <tt>sudo apt-get install libshmdata-0.4-dev</tt>
+ * 
+ * For point clouds (and support for Microsoft Kinect), we use
+ * <a href=http://pointclouds.org/>PointCloudLibrary</a>:
+ * 
+ * <tt>sudo apt-add-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl</tt>
+ * <tt>sudo apt-get update</tt>
+ * <tt>sudo apt-get install libpcl-1.6-all</tt>
+ * 
+ * <br>
+ * <b>STEP 3:</b> Install SPIN
+ * 
+ * <b>option a)</b> Use the package (may be slightly out of date):
+ *
+ * <tt>sudo apt-get install spinframework</tt>
+ * 
+ * <b>option b)</b> Build it from source:
+ * 
+ * Download the source from the git repository:
+ * 
+ * <tt>sudo git clone git://code.sat.qc.ca/spinframework.git</tt>
+ * <tt>cd spinframework</tt>
+ * 
+ * If you want the bleeding edge (unstable) branch:
+ *
+ * <tt> git checkout develop</tt>
+ * 
+ * Now build and install:
+ * 
+ * <tt>./one_step_build.sh</tt>
+ * <tt>sudo make install</tt>
+ * 
+ * <br>
+ * <b>STEP 4:</b> Install Pd-Extended
+ * 
+ * The most comprehensive examples for SPIN are written for Pure Data 
+ * (specifically, Pd-Extended), which is unfortunately not packaged very well.
+ *
+ * Try this first:
+ * 
+ * <tt>sudo apt-get install pd-extended</tt>
+ * 
+ * If you get an error that says "E: Couldn't find package pd-extended," try
+ * downloading the latest version from the Pd website:
+ * 
+ * <a href=http://puredata.info/downloads/pd-extended>
+ * http://puredata.info/downloads/pd-extended</a>
+ * 
+ * At the time of writing this, there was no 64-bit download for Precise, so
+ * we've put one here:
+ * <a href=http://code.sat.qc.ca/redmine/attachments/download/202/Pd-0.43.1-extended-20120430.deb>
+ * Pd-0.43.1-extended-20120430.deb</a>.
+ * 
+ * <br>
+ * <b>STEP 5:</b> Install pdsheefa
+ * 
+ * Download the latest version of pdsheefa from: 
+ * <a href=http://code.sat.qc.ca/downloads/pdsheefa>
+ * http://code.sat.qc.ca/downloads/pdsheefa</a>
+ * 
+ * The file will be compressed. Unpack the archive and move the contents to a
+ * place on your hard drive, for example: ~/pd-externals/ or some other location
+ * (in this example, you will need to create a 'pd-externals' folder).
+ *
+ * Then we will need to open <b>pd-extended</b> and add that path to Pd's list
+ * of search paths. For Pd versions 0.43+, select Edit > Preferences from the
+ * menu. For older versions, select File > Paths from the menu.
+ * 
+ * Click the "New" button and use the file browser to show Pd the location where
+ * you have placed the pdsheeda files.
+ * 
+ * <br>
+ * <b>STEP 6:</b> Test SPIN
+ * 
+ * Launch two applications: <b>spinserver</b> and <b>spinviewer</b>.
+ * 
+ * You can do this either by opening two terminals and typing one command in
+ * each window, or using the Dash.
+ * 
+ *  Launch <b>pd-extended</b>, and open the patch in the pdsheefa/examples
+ * folder called 02.SpinWidgets.pd. You will see a connect toggle under the
+ * first step, and it should get checked, indicating that the connections are
+ * all set up properly.
+ * 
+ * Toggle the grid on and off to ensure that OSC messages are in fact being
+ * transmitted.
+ * 
+ * <br>
+ * <b>STEP 7:</b>
+ * 
+ * Go through all the examples in the pdsheefa/examples that are numbered 01 to
+ * 99 and learn about various features of SPIN.
+ * 
+ * <br>
+ * Start learning, with an <a href=introtospin.html>Introduction to SPIN</a>
+ * <br><br>
+ * <a href=index.html>Return to Index</a>
+ *
+ */
 
 /**
  * @page overview Overview
@@ -99,7 +563,7 @@
  * <br>
  * @section virtual Networked Immersive Environments and Virtual Reality
  *
- * @image html spin-banners-immersive.png
+ * @image html http://spinframework.org/images/spin-banners-immersive.png
  *
  * The spinviewer application supports customizable screen configurations,
  * allowing for projection on domes, panoscopes, cylindrical displays, CAVEs,
@@ -111,7 +575,7 @@
  * <br>
  * @section kiosks Kiosks and Interactive Displays
  * 
- * @image html spin-banners-touch.png
+ * @image html http://spinframework.org/images/spin-banners-touch.png
  *
  * The SPIN Framework is well suited to the design and deployment of interactive
  * displays. Rich 3d graphics and unique interactivity features allow for a
@@ -122,7 +586,7 @@
  * <br>
  * @section immersive Immersive Telepresence
  *
- * @image html spin-banners-telepresence.png
+ * @image html http://spinframework.org/images/spin-banners-telepresence.png
  *
  * High fidelity telepresence integration using the <a href=http://scenic.sat.qc.ca/en/Scenic>Scenic</a>
  * library allows SPIN to integrate remote audio and video feeds into one 3d
@@ -133,7 +597,7 @@
  * <br>
  * @section installations Artistic Installations
  *
- * @image html spin-banners-installations.png
+ * @image html http://spinframework.org/images/spin-banners-installations.png
  * 
  * Artistics works developed with the SPIN framework have been presented in a
  * number of international festivals, conferences, and performances. See the
@@ -142,7 +606,7 @@
  * <br>
  * @section audio Rich support for 3d audio:
  *
- * @image html spin-banners-cyclo.png
+ * @image html http://spinframework.org/images/spin-banners-cyclo.png
  *
  * Along with <a href=https://github.com/sat-metalab/spatosc>SpatOSC</a> and
  * <a href=https://code.sat.qc.ca/trac/pdsheefa>Pdsheefa</a>, the framework can
@@ -151,13 +615,18 @@
  * <br>
  * @section prototype Rapid prototyping of 3d interaction:
  *
- * @image html spin-banners-wii.png
+ * @image html http://spinframework.org/images/spin-banners-wii.png
  *
  * Network communication for SPIN is based on OpenSoundControl (OSC), a standard
  * protocol used by rapid prototyping systems like Pure Data, Max/MSP,
  * OpenFrameWorks, Processing, etc. SPIN provides generica mechanisms for
  * spatial manipulation, based on geometric events (movement, intersection,
  * collisions, etc.) so a number of interaction paradigms can be explored.
+ *
+ * <br>
+ * Start learning, with an <a href=introtospin.html>Introduction to SPIN</a>
+ * <br><br>
+ * <a href=index.html>Return to Index</a>
  *
  */
 
@@ -167,7 +636,7 @@
 /** @page introtospin Introduction to SPIN
  * 
  * <br><br>
- * @image html SPIN_setup.png
+ * @image html http://spinframework.org/sites/default/files/SPIN_setup_0.png
  * 
  * <br><br>
  * @section SPIN SPIN:
@@ -239,7 +708,8 @@
  * <a href=index.html>Return to Index</a>
  */
 
- /** @page basicnavigation Basic Navigation
+ /** 
+ * @page basicnavigation Basic Navigation
  * 
  * @section controls UserNode controls
  * 
@@ -293,9 +763,176 @@
  * 
  * fifth : clears the on-screen statistics
  * 
- * 
- * Next page, <a href=console.html>Console Commands</a><br><br>
+ * <br>
+ * Next page, <a href=pdsheefa.html>Introduction to Pure Data Extended 
+ * and pdsheefa</a><br><br>
  * <a href=index.html>Return to Index</a>
+ * 
+ */
+
+ /**
+ * 
+ * @page pdsheefa Introduction to Pure Data and pdsheefa
+ * 
+ * @section pde Pure Data Extended
+ * 
+ * Pd (aka Pure Data) is a real-time graphical programming environment for
+ * audio, video, and graphical processing. It is the third major branch of the
+ * family of patcher programming languages known as Max (Max/FTS, ISPW Max, 
+ * Max/MSP, jMax, etc.) originally developed by 
+ * <a href=http://crca.ucsd.edu/~msp/>Miller Puckette</a> and company at
+ * IRCAM. The core of Pd is written and maintained by Miller Puckette and 
+ * includes the work of many developers, making the whole package very much a
+ * community effort.
+ * 
+ * Pd-extended is a community project that includes most of the libraries 
+ * from the pure-data source code repository. It is generally the most 
+ * complete assembly of all available libraries, extensions, and 
+ * documentation there is.
+ * 
+ * <br>
+ * @section pdsheefa pdsheefa
+ * 
+ * Pdsheefa is a collection of patches built in Pd-extended and explicitly
+ * intended as control mechanisms for SPIN. They are not the only way to
+ * interact with SPIN, but as of this moment it is probably the easiest and
+ * fastest, and it is certainly a good entry point to begin learning about how
+ * everything functions.
+ * 
+ * So, to start out, let's open a complete SPIN setup. We will need a
+ * spinserver application, a spinviewer, Pure Data extended and the colleciton
+ * of pdsheefa patches. Once these are all opened, open the first tutorial
+ * pdsheefa patch through your File menu in Pure Data extended.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/widgets.png
+ * 
+ * <br><br>
+ * @section widgets 01.SpinWidgets.pd
+ * 
+ * "SPIN Widgets" is a collection of graphic interface widgets, which help to
+ * accomplish common tasks in the SPIN environment. It is composed of three
+ * indispensible tools, with which just about all basic functions can be done.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/SPIN.Connect.png
+ * 
+ * <br>
+ * <b> SPIN.Connect</b>
+ * 
+ * <br>
+ * SPIN.Connect is an indispensible tool for verifying that you are connected
+ * to the SPIN server, that you are viewing the correct scene and that it is
+ * currently responsive in input.
+ * 
+ * First, at top right, you'll notice a drop-down menu where it is possible to
+ * find the names of all SPIN scenes available on the network. A checkbox next
+ * to the dropdown indicates whether you are currently connected to the scene
+ * whose name is displayed. Underneath that are a few basic commands:
+ * 
+ * clearScene: delete all nodes except for your own UserNode and clear the 
+ * state of the current scene.
+ * 
+ * clearUsers: kick all other users from the scene
+ * 
+ * refresh: Use this to force spinviewer to refresh the content visible in the
+ * scene (useful if you believe you have momentarily lost connection and are
+ * not seeing the scene up-to-date).
+ *
+ * grid: This little button toggles the world grid on or off in the scene. This
+ * is probably the easiest way to rapidly check connectivity to the scene.
+ * 
+ * msg-print: This toggles whether messages sent to spinserver will be displayed
+ * in spinserver.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/NodeCreator.png
+ *
+ * <br>
+ * <b>SPIN.NodeCreator</b>
+ * 
+ * <br>
+ * NodeCreator is an object that facilitates the creation of nodes. It is quite
+ * simple to use. A field called "id" is available to write in the name of the
+ * node you wish to create. 
+ *
+ * Nodes are the basic object type in SPIN. Every entity in your scene,
+ * including the camera which you are using to navigate, is a sub-type of node.
+ * The most common nodes, after the UserNodes (cameras) which users can use to
+ * navigate scenes, are shapes, models, and the like.
+ * 
+ * All nodes must have unique names so that it is possible to send messages
+ * to them directly. Go ahead and enter the name Box into the id field. Now, to
+ * the right, you'll see a drop-down menu with the different types of possible
+ * nodes that you can create. Select ShapeNode from the list. If a list is not
+ * displayed, click the 'refresh' button to re-populate the list with the
+ * available node types. Lastly, push the 'go!' button to actually issue the
+ * command you have just set up.
+ * 
+ * You have just created a ShapeNode, which by default looks like a box. 
+ * (Most nodes are invisible by default until certain changes are made to them). 
+ * Now we will look at the Node.Chooser object to assign qualities to the 
+ * ShapeNode we have created.
+ *
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/NodeChooser.png
+ * 
+ * <br>
+ * <b>SPIN.NodeChooser</b>
+ * 
+ * The Node.Chooser is a tool that allows you to select from a list of all nodes
+ * existing in the scene, and then it displays information about the parameters
+ * of that node and allows you to change them directly.
+ * 
+ * Select your node, "Box" from the drop-down menu at top right. If it does
+ * not appear, verify that you are connected to the current scene with the 
+ * SPIN.Connect device at the top of this patch. Hit the refresh button.
+ * 
+ * Once your node is selected, you'll note that there are numerous modifiable
+ * parameters. The first is 'Parent,' which is familiar to users of many
+ * different kinds of computer applications. If you set another object to be
+ * the parent of Box, Box will always move whenever the parent is moved, will
+ * resize proportionately with the other object, and generally mimic any changes
+ * made to the "parent" item.
+ * 
+ * Next is "Shape," which is the principal parameter of a ShapeNode, for obvious
+ * reasons.
+ * 
+ * <br><br>
+ * @image html http://spinframework.org/sites/default/files/images/Box_Sphere.png
+ *
+ * The ShapeNode "Box" has been changed into a sphere and moved -1 units on the
+ * X axis, using Node.Chooser.
+ * 
+ * <br><br>
+ * There are a number of other useful tools in the Node.Chooser, and they differ
+ * for each node type, but let's go through the rest of what is here. We have a
+ * StateSet selector, set to Null. This is a feature that allows you to save
+ * information about every node into a complete set, which can then be returned
+ * to.
+ * 
+ * Then you have the X,Y, Z coordinates, which have been used in the example
+ * picture above to shift the shape one unit to the left. You can drag these
+ * values with the mouse, but the shape will quickly go off screen if you do
+ * not zoom to get a wider viewpoint.
+ * 
+ * Pitch, Yaw, Roll: change the angle of the object on the three axes.
+ * 
+ * Copy, Paste: function just like copy paste in any other application.
+ * 
+ * Scale X,Y,Z: Scale the object independently in each of the three dimensions.
+ * 
+ * Or, use uniform-scale to scale it without changing the proportions of the
+ * object.
+ * 
+ * There is an RGBA slider for setting the color and alpha channel of objects.
+ * 
+ * Three different "billboard" settings, normal, which is not billboarded.
+ * Billboard, which forces the image to always face the camera (this is
+ * especially useful for making 2d objects look like 3d objects). Z-up, which
+ * billboards the object but only on the XY plane (if you fly over it, you
+ * will see the top rather than the face, which will always turn to face you
+ * if you go around the object by any side at the same height).
  * 
  */
 

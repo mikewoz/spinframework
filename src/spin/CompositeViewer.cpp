@@ -171,6 +171,7 @@ void CompositeViewer::setupCamera()
         osg::ref_ptr<osg::Texture> colorTexture1_ = createRenderTexture(lWidth, lHeight, false);
         osg::ref_ptr<osg::Texture> colorTexture2_ = createRenderTexture(lWidth, lHeight, false);
         osg::ref_ptr<osg::Texture> colorTexture3_ = createRenderTexture(lWidth, lHeight, false);
+        osg::ref_ptr<osg::Texture> colorTexture4_ = createRenderTexture(lWidth, lHeight, false);
         osg::ref_ptr<osg::Texture> depthTexture_ = createRenderTexture(lWidth, lHeight, true);
 
         // set up the background color and clear mask.
@@ -189,6 +190,7 @@ void CompositeViewer::setupCamera()
         lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1_);
         lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2_);
         lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3_);
+        lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4_);
         lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
     }
 }

@@ -1,3 +1,8 @@
+/*
+ * Prepares the data for the blurring due to depth of field
+ * Author: Emmanuel Durand - 2012
+*/
+
 #version 120
 
 uniform float sigma;

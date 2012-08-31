@@ -1,3 +1,8 @@
+/*
+ * Screen space ambient occlusion shader - Fragment pass
+ * Author: Emmanuel Durand - 2012
+*/
+
 #version 120
 
 uniform sampler2D vNormal;
