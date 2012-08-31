@@ -316,6 +316,8 @@ void ParticleSystem::callbackUpdate(osg::NodeVisitor* nv)
                 opBouncer_->updatePlane(d);
                 */
             }
+            //TODO: BOX_DOMAIN not implemented in OSG yet
+            /*
             else if (shp && shp->getShape()==ShapeNode::BOX)
             {
                 d->type = osgParticle::DomainOperator::Domain::BOX_DOMAIN;
@@ -324,6 +326,7 @@ void ParticleSystem::callbackUpdate(osg::NodeVisitor* nv)
                 // max:
                 d->v2 = shp->getTranslation() + (shp->getScale()/2);
             }
+            */
             else if (shp && shp->getShape()==ShapeNode::DISC)
             {
                 d->type = osgParticle::DomainOperator::Domain::DISK_DOMAIN;
