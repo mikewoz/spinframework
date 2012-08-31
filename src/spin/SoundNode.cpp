@@ -193,6 +193,79 @@ void SoundNode::setURI (const char *uri)
 #endif
 }
 
+void SoundNode::connect (const char* sinkNodeID)
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatosc::Listener *listener = spinApp::Instance().audioScene->getListener(sinkNodeID);
+        if (!listener)
+        {
+            std::cout << "ERROR: SoundNode::connect could not find sink: '" << sinkNodeID << "'" << std::endl;
+            return;
+        }
+        spinApp::Instance().audioScene->connect(spatOSCSource, listener);
+    }
+#endif
+}
+
+void SoundNode::disconnect (const char* sinkNodeID)
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatosc::Listener *listener = spinApp::Instance().audioScene->getListener(sinkNodeID);
+        if (!listener)
+        {
+            std::cout << "ERROR: SoundNode::disconnect could not find sink: '" << sinkNodeID << "'" << std::endl;
+            return;
+        }
+        spinApp::Instance().audioScene->disconnect(spatOSCSource, listener);
+    }
+#endif
+}
+
+void SoundNode::setConnectionParam (const char* sinkNodeID, const char* method, float value)
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatosc::Listener *listener = spinApp::Instance().audioScene->getListener(sinkNodeID);
+        if (!listener)
+        {
+            std::cout << "ERROR: SoundNode::setConnectionParam could not find sink: '" << sinkNodeID << "'" << std::endl;
+            return;
+        }
+        spatosc::Connection* conn = spinApp::Instance().audioScene->getConnection(spatOSCSource, listener);
+        if (!conn)
+        {
+            std::cout << "ERROR: SoundNode::setConnectionParam could not find connection between '" << getID() << "' and '" << sinkNodeID << "'" << std::endl;
+            return;        
+        }
+        
+        if (std::string(method)=="setDistanceFactor")
+        {
+            conn->setDistanceFactor(value);
+        }
+        else if (std::string(method)=="setDopplerFactor")
+        {
+            conn->setDopplerFactor(value);
+        }
+        else if (std::string(method)=="setRolloffFactor")
+        {
+            conn->setRolloffFactor(value);
+        }
+        else if (std::string(method)=="setConnectionMute")
+        {
+            if ((bool)value)
+                conn->mute();
+            else
+                conn->unmute();
+        }
+    }
+#endif
+}
+
 
 
 std::vector<lo_message> SoundNode::getState () const
