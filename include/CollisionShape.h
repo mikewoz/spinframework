@@ -57,10 +57,10 @@ class CollisionShape : public ShapeNode
 {
 public:
 
-    CollisionShape(SceneManager *sceneManager, char *initID);
+    CollisionShape(SceneManager *sceneManager, const char* initID);
     virtual ~CollisionShape();
     
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     virtual void debug();
     
     /**

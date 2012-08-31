@@ -45,17 +45,15 @@
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-using namespace std;
-
 namespace spin
 {
 
 // *****************************************************************************
 // constructor:
-MeasurementNode::MeasurementNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+MeasurementNode::MeasurementNode (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
 {
-    this->setName(string(id->s_name) + ".MeasurementNode");
-    nodeType = "MeasurementNode";
+    this->setName(this->getID() + ".MeasurementNode");
+    this->setNodeType("MeasurementNode");
 
     targetName_ = gensym("NULL");
     reportingLevel_ = MeasurementNode::REPORT_BASIC;
@@ -73,15 +71,15 @@ MeasurementNode::~MeasurementNode()
 
 }
 
-void MeasurementNode::callbackUpdate()
+void MeasurementNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
 
     osg::ref_ptr<ReferencedNode> targetNode = dynamic_cast<ReferencedNode*>(targetName_->s_thing);
     if (!targetNode.valid()) return;
 
-    osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath);
-    osg::Matrixd mtarget = osg::computeLocalToWorld(targetNode->currentNodePath);
+    osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath_);
+    osg::Matrixd mtarget = osg::computeLocalToWorld(targetNode->currentNodePath_);
 
     // check if there is a change in the matrices:
     if ((thisMatrix_==mthis) && (targetMatrix_==mtarget))
@@ -172,7 +170,7 @@ void MeasurementNode::sendMeasurements()
         lo_message_add( msg, "sfff", "test", rotEulers.x(), rotEulers.y(), rotEulers.z());
         msgs.push_back(msg);
     }
-    spinApp::Instance().NodeBundle(this->id, msgs);
+    spinApp::Instance().NodeBundle(this->getID().c_str(), msgs);
 }
 
 // *****************************************************************************

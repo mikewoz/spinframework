@@ -63,42 +63,58 @@ class GeometryNode : public GroupNode
 {
 public:
 
-    GeometryNode(SceneManager *sceneManager, char *initID);
+    GeometryNode(SceneManager *sceneManager, const char* initID);
     virtual ~GeometryNode();
     
-    virtual void callbackUpdate();
-
-    void setStateSetFromFile(const char* filename);
-    void setStateSet        (const char* s);
-    const char *getStateSet () const { return stateset->s_name; }
-    void updateStateSet        ();
-
-    int getRenderBin() const { return renderBin_; }
-    int getLighting() const { return (int)lightingEnabled_; }
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
+    virtual void updateStateSet();
     
-    void setRenderBin(int i);
-    void setLighting(int i);
-    
+    /**
+     * Sets the number of vertices that this geometry is supposed to have.
+     * 
+     * This should be a multiple of 3 if you want to draw using GL_TRIANGLES or
+     * amultiple of 4 if you want to draw using GL_QUADS. Anything else will
+     * draw using GL_LINES.
+     *
+     * If you grow the number of vertices, all new vertices will be created with
+     * default values: position of (0,0,0), full white color, and texcoords of
+     * (0,0).
+     */ 
     void setNumVertices(int i);
+    
+    /**
+     * Update the position of one vertex in the geometry, using an index.
+     */
     void setVertex(int index, float x, float y, float z);
+
+    /**
+     * Update the color of one vertex in the geometry, using an index.
+     */
     void setColor(int index, float red, float green, float blue, float alpha);
+
+    /**
+     * Update the texture coord of one vertex in the geometry, using an index.
+     */
     void setTexCoord(int index, float x, float y);
+    
+    /**
+     * Specify whether both sides or only one side of the shape is rendered. ie,
+     * whether the backface is culled or not.
+     */
+    void setSingleSided (int singleSided);
+    int getSingleSided() const { return (int)singleSided_; }
+
 
     virtual std::vector<lo_message> getState() const;
 
-    
 private:
     
     osg::ref_ptr<osg::Geode> geode_;
     osg::ref_ptr<osg::Geometry> geometry_;
     unsigned int numVertices_;
+    bool singleSided_;
     
-    t_symbol *stateset;
-    
-    int renderBin_;
-    bool lightingEnabled_;
     bool updateFlag_;
-    
 };
 
 } // end of namespace spin

@@ -25,15 +25,20 @@
 BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_DeclaringFile("DSPNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____DSPNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____DSPNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
+	I_MethodWithDefaults1(bool, dumpGlobals, IN, bool, forced, false,
+	                      Properties::VIRTUAL,
+	                      __bool__dumpGlobals__bool,
+	                      "",
+	                      "The dumpGlobals method results in a broadcast of this node's translation and orientation. It is called by callbackUpdate() every frame, however the 'forced' flag will be set to false, so it will only send a message if the node's matrix has changed. If the 'forced' flag is set to true, it will definitely result in a message broadcast. This should only be used when necessary (eg, when a stateDump is requested).Note: the return value is only to fool wx so that it doesn't consider this as an editable property. ");
 	I_Method1(spin::SoundConnection *, getConnection, IN, spin::DSPNode *, snk,
 	          Properties::NON_VIRTUAL,
 	          __SoundConnection_P1__getConnection__DSPNode_P1,
@@ -64,24 +69,24 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __void__disconnect__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(void, setActive, IN, int, i,
+	I_Method1(void, setURI, IN, const char *, uri,
+	          Properties::VIRTUAL,
+	          __void__setURI__C5_char_P1,
+	          "",
+	          "Set the media for the sound node using a URI pattern.Examples: file://soundfilename.wav file:///home/johndoe/soundfilename.wav http://www.server.com/soundfile.wav adc://1:1 adc://1 content://media/external/audio/media/710 mms://some_media_stream rtsp://127.0.0.1:12311 pd_plugin://audio_plugin_patch.pd ");
+	I_Method0(const char *, getURI,
 	          Properties::NON_VIRTUAL,
+	          __C5_char_P1__getURI,
+	          "",
+	          "");
+	I_Method1(void, setActive, IN, int, i,
+	          Properties::VIRTUAL,
 	          __void__setActive__int,
 	          "",
-	          "");
-	I_Method1(void, setPlugin, IN, const char *, filename,
-	          Properties::NON_VIRTUAL,
-	          __void__setPlugin__C5_char_P1,
-	          "",
-	          "");
+	          "Activate or deactivate the DSP processing ");
 	I_Method0(int, getActive,
 	          Properties::NON_VIRTUAL,
 	          __int__getActive,
-	          "",
-	          "for sending messages to the connections of this (source) node: virtual void connectionMsg (char *snkName, char *method, float value); ");
-	I_Method0(const char *, getPlugin,
-	          Properties::NON_VIRTUAL,
-	          __C5_char_P1__getPlugin,
 	          "",
 	          "");
 	I_Method0(std::vector< lo_message >, getState,
@@ -109,9 +114,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __void__setRadius__float,
 	          "",
 	          "");
-	I_Method4(void, setDirectivityColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
+	I_Method4(void, setDebugColor, IN, float, r, IN, float, g, IN, float, b, IN, float, a,
 	          Properties::NON_VIRTUAL,
-	          __void__setDirectivityColor__float__float__float__float,
+	          __void__setDebugColor__float__float__float__float,
 	          "",
 	          "");
 	I_Method1(void, setVUmeterFlag, IN, float, newFlag,
@@ -127,6 +132,11 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_Method1(void, setLaserFlag, IN, float, newFlag,
 	          Properties::NON_VIRTUAL,
 	          __void__setLaserFlag__float,
+	          "",
+	          "");
+	I_Method1(void, setRadiusFlag, IN, float, newFlag,
+	          Properties::NON_VIRTUAL,
+	          __void__setRadiusFlag__float,
 	          "",
 	          "");
 	I_Method1(void, setIntensity, IN, float, newvalue,
@@ -154,9 +164,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __float__getRadius,
 	          "",
 	          "");
-	I_Method0(osg::Vec4, getDirectivityColor,
+	I_Method0(osg::Vec4, getDebugColor,
 	          Properties::NON_VIRTUAL,
-	          __osg_Vec4__getDirectivityColor,
+	          __osg_Vec4__getDebugColor,
 	          "",
 	          "");
 	I_Method0(float, getVUmeterFlag,
@@ -172,6 +182,11 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_Method0(float, getLaserFlag,
 	          Properties::NON_VIRTUAL,
 	          __float__getLaserFlag,
+	          "",
+	          "");
+	I_Method0(float, getRadiusFlag,
+	          Properties::NON_VIRTUAL,
+	          __float__getRadiusFlag,
 	          "",
 	          "");
 	I_Method0(void, updateVUmeter,
@@ -199,11 +214,16 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          __void__drawLaser,
 	          "",
 	          "");
+	I_Method0(void, drawRadius,
+	          Properties::NON_VIRTUAL,
+	          __void__drawRadius,
+	          "",
+	          "");
 	I_SimpleProperty(int, Active, 
 	                 __int__getActive, 
 	                 __void__setActive__int);
-	I_SimpleProperty(osg::Vec4, DirectivityColor, 
-	                 __osg_Vec4__getDirectivityColor, 
+	I_SimpleProperty(osg::Vec4, DebugColor, 
+	                 __osg_Vec4__getDebugColor, 
 	                 0);
 	I_SimpleProperty(float, DirectivityFlag, 
 	                 __float__getDirectivityFlag, 
@@ -217,12 +237,12 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_SimpleProperty(float, Length, 
 	                 __float__getLength, 
 	                 __void__setLength__float);
-	I_SimpleProperty(const char *, Plugin, 
-	                 __C5_char_P1__getPlugin, 
-	                 __void__setPlugin__C5_char_P1);
 	I_SimpleProperty(float, Radius, 
 	                 __float__getRadius, 
 	                 __void__setRadius__float);
+	I_SimpleProperty(float, RadiusFlag, 
+	                 __float__getRadiusFlag, 
+	                 __void__setRadiusFlag__float);
 	I_SimpleProperty(const char *, Rolloff, 
 	                 __C5_char_P1__getRolloff, 
 	                 __void__setRolloff__C5_char_P1);
@@ -232,6 +252,9 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(const char *, URI, 
+	                 __C5_char_P1__getURI, 
+	                 __void__setURI__C5_char_P1);
 	I_SimpleProperty(float, VUmeterFlag, 
 	                 __float__getVUmeterFlag, 
 	                 __void__setVUmeterFlag__float);

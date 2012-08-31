@@ -54,8 +54,8 @@ namespace spin
 // constructor:
 Fog::Fog (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 {
-	classType = "Fog";
- 	this->setName(std::string(id->s_name) + ".Fog");
+	classType_ = "Fog";
+ 	this->setName(this->getID() + ".Fog");
 
 	fog_ = new osg::Fog();
 
@@ -66,7 +66,7 @@ Fog::Fog (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 	setFogColor(1.0, 1.0, 1.0, 0.0);
 	
 	
-	osg::StateSet *worldStateSet = sceneManager->worldNode->getOrCreateStateSet();
+	osg::StateSet *worldStateSet = sceneManager_->worldNode->getOrCreateStateSet();
     worldStateSet->setMode(GL_FOG, osg::StateAttribute::ON);
     worldStateSet->setAttribute(fog_, osg::StateAttribute::ON);
 }
@@ -74,7 +74,7 @@ Fog::Fog (SceneManager *s, const char *initID) : ReferencedStateSet(s, initID)
 // destructor
 Fog::~Fog()
 {
-	osg::StateSet *worldStateSet = sceneManager->worldNode->getOrCreateStateSet();
+	osg::StateSet *worldStateSet = sceneManager_->worldNode->getOrCreateStateSet();
     worldStateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
 }
 
@@ -91,7 +91,7 @@ void Fog::setFogColor (float r, float g, float b, float a)
 {
 	osg::Vec4 newColor = osg::Vec4(r, g, b, a);
 	fog_->setColor(newColor);
-	sceneManager->worldNode->setClearColor(newColor);
+	sceneManager_->rootNode->setClearColor(newColor);
 	BROADCAST(this, "sffff", "setFogColor", r, g, b, a);
 }
 

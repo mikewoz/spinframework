@@ -79,6 +79,8 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
         //ViewerManipulator(UserNode *u);
         ViewerManipulator();
         
+        void setTrackNode(osg::Node* node);
+        
         /**
          * Enables or disables use of the mouse to pick nodes.
          */
@@ -144,10 +146,12 @@ class ViewerManipulator : public osgGA::NodeTrackerManipulator
     protected:
         //spinContext *spin;
         //osg::ref_ptr<UserNode> user;
-        t_symbol *user;
+        //t_symbol *user;
+        std::string userID;
         
         //t_symbol *selectedNode;
-        std::vector<t_symbol*> selectedNodes;
+        //std::vector<t_symbol*> selectedNodes;
+        std::vector<GroupNode*> selectedNodes;
         
         bool picker, mover, raw;
         float lastX, lastY;

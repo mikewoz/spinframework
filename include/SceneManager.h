@@ -67,13 +67,6 @@ class btDynamicsWorld;
 namespace spin
 {
 
-typedef std::vector< osg::ref_ptr<ReferencedNode> > nodeListType;
-typedef std::map< std::string, nodeListType > nodeMapType;
-typedef std::pair< std::string, nodeListType > nodeMapPair;
-
-typedef std::vector< osg::ref_ptr<ReferencedStateSet> > ReferencedStateSetList;
-typedef std::map< std::string, ReferencedStateSetList > ReferencedStateSetMap;
-typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
 
 // forward declarations:
 class GroupNode;
@@ -112,6 +105,8 @@ class SceneManager
         void registerStateSet(ReferencedStateSet *s);
         void unregisterStateSet(ReferencedStateSet *s);
 
+        void sendNodeTypes(lo_address txAddr = 0);
+        void sendStateTypes(lo_address txAddr = 0);
         void sendNodeList(std::string type, lo_address txAddr = 0);
         void sendConnectionList(lo_address txAddr = 0);
 
@@ -130,7 +125,9 @@ class SceneManager
         
         void setWorldStateSet(const char *s);
 
-        std::vector<t_symbol*> findNodes(const char *pattern);
+        std::vector<ReferencedNode*> findNodes(const char *pattern);
+        std::vector<ReferencedStateSet*> findStateSets(const char *pattern);
+        
         //nodeListType findNodes(const char *pattern);
         //ReferencedStateSetList findStateSet(const char *pattern);
             
@@ -199,8 +196,9 @@ class SceneManager
 
         std::string sceneID;
 
-        osg::ref_ptr<osg::Group> rootNode;
-        osg::ref_ptr<osg::ClearNode> worldNode;
+        osg::ref_ptr<osg::ClearNode> rootNode;
+        //osg::ref_ptr<osg::ClearNode> worldNode;
+        osg::ref_ptr<ReferencedNode> worldNode;
         osg::ref_ptr<osg::Geode> gridGeode;
         
         t_symbol* worldStateSet_;
@@ -220,14 +218,31 @@ class SceneManager
         bool activeLights[OSG_NUM_LIGHTS];
 
         std::string getStateAsXML(std::vector<lo_message> nodeState);
-        std::string getNodeAsXML(ReferencedNode *n, bool withUsers);
+        std::string getNodeAsXML(ReferencedNode *n, bool withUsers, bool withChildren);
 
         std::string getConnectionsAsXML();
         std::vector<t_symbol*> getSavableStateSets(ReferencedNode *n, bool withUsers);
 
+        /**
+         * Write the entire scene to an XML file. If no absolute path is
+         * specified, the file will be written to the ~/.spinFramework folder.
+         */
         bool saveXML(const char *filename, bool withUsers = false);
-        bool saveUsers(const char *s);
+        
+        /**
+         * Write exactly one node to an XML file, without it's subgraph
+         * (ie, children nodes) or statesets.
+         */
+        bool saveNode(const char *nodeID, const char *filename);
+        
+        /**
+         * Save all the UserNodes in a scene to an XML file.
+         */
+        bool saveUsers(const char *filename);
 
+        /**
+         * Loads any nodes or statesets from a file, and sets the parent node
+         */
         bool createNodeFromXML(TiXmlElement *XMLnode, const char *parentNode);
         bool createStateSetFromXML(TiXmlElement *XMLnode);
         bool createConnectionsFromXML(TiXmlElement *XMLnode);
@@ -235,7 +250,7 @@ class SceneManager
 
         std::string resourcesPath;
 
-        //osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
+        osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
         /**
          * The refreshAll method results in a broadcast of all nodelists so that
@@ -276,6 +291,8 @@ class SceneManager
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;
         nodeMapType nodeMap; // the nodeList arranged by type
         ReferencedStateSetMap stateMap;
+        
+        
         
         float dynamicsUpdateRate_; // in seconds
         osg::Timer_t lastTick_;

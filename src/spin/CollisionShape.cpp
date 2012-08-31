@@ -143,7 +143,7 @@ struct btContactCallback : public btCollisionWorld::ContactResultCallback
         
         if (depth != lastBtHitDepth)
         {
-            BROADCAST(n0, "ssfff", "collide", n1->id->s_name, normal.x(), normal.y(), normal.z());
+            BROADCAST(n0, "ssfff", "collide", n1->getID().c_str(), normal.x(), normal.y(), normal.z());
         }
 
         lastBtHitDepth = depth;
@@ -157,10 +157,10 @@ struct btContactCallback : public btCollisionWorld::ContactResultCallback
 
 // -----------------------------------------------------------------------------
 // constructor:
-CollisionShape::CollisionShape (SceneManager *sceneManager, char *initID) : ShapeNode(sceneManager, initID)
+CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) : ShapeNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".CollisionShape");
-	nodeType = "CollisionShape";
+	this->setName(this->getID() + ".CollisionShape");
+	this->setNodeType("CollisionShape");
 
     mass_ = 1.0;
     isDynamic_ = false;
@@ -203,7 +203,7 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, char *initID) : Shap
 
   
   
-    sceneManager->dynamicsWorld_->addCollisionObject(body_);
+    sceneManager_->dynamicsWorld_->addCollisionObject(body_);
 
     this->setInteractionMode(GroupNode::DRAG);
 }
@@ -214,9 +214,9 @@ CollisionShape::~CollisionShape()
 }
 
 // -----------------------------------------------------------------------------
-void CollisionShape::callbackUpdate()
+void CollisionShape::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ShapeNode::callbackUpdate();
+    ShapeNode::callbackUpdate(nv);
     
     
     // If this is the server, we update the position of the node based on info
@@ -302,10 +302,10 @@ bool CollisionShape::checkCollisions(btTransform tranform)
         body_->getMotionState()->setWorldTransform(tranform);
         body_->setWorldTransform(tranform);
 
-        sceneManager->dynamicsWorld_->updateSingleAabb(body_);
+        sceneManager_->dynamicsWorld_->updateSingleAabb(body_);
 
         btContactCallback contactCallback(*body_, *this);
-        sceneManager->dynamicsWorld_->contactTest(body_,contactCallback);
+        sceneManager_->dynamicsWorld_->contactTest(body_,contactCallback);
         
         if (collisionOffset_.length()) return true;
         
@@ -339,11 +339,11 @@ void CollisionShape::setTranslation (float x, float y, float z)
         osg::Timer_t tick = osg::Timer::instance()->tick();
         double dt =osg::Timer::instance()->delta_s(lastTick_,tick);
         // we don't need to run collision detection on the whole world, right?:
-        //sceneManager->dynamicsWorld_->performDiscreteCollisionDetection();
-        //sceneManager->dynamicsWorld_->stepSimulation(dt);
-        //sceneManager->dynamicsWorld_->updateAabbs();
+        //sceneManager_->dynamicsWorld_->performDiscreteCollisionDetection();
+        //sceneManager_->dynamicsWorld_->stepSimulation(dt);
+        //sceneManager_->dynamicsWorld_->updateAabbs();
         
-        sceneManager->dynamicsWorld_->updateSingleAabb(body_);
+        sceneManager_->dynamicsWorld_->updateSingleAabb(body_);
 
         if (1)
         {
@@ -359,7 +359,7 @@ void CollisionShape::setTranslation (float x, float y, float z)
         //if (body_->checkCollideWithOverride(<#btCollisionObject *co#>)
 
         btContactCallback contactCallback(*body_, *this);
-        sceneManager->dynamicsWorld_->contactTest(body_,contactCallback);
+        sceneManager_->dynamicsWorld_->contactTest(body_,contactCallback);
         
         lastTick_ = tick;
     }

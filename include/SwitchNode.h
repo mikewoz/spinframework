@@ -60,7 +60,7 @@ class SwitchNode : public GroupNode
 
 public:
 
-    SwitchNode(SceneManager *sceneManager, char *initID);
+    SwitchNode(SceneManager *sceneManager, const char* initID);
     virtual ~SwitchNode();
 
     /**
@@ -69,7 +69,7 @@ public:
      * and can also change their attachmentNode so that children are attached
      * anywhere in that subgraph. If that is the case, the updateNodePath()
      * function MUST be overridden, and extra nodes must be manually pushed onto
-     * currentNodePath.
+     * currentNodePath_.
      */
     virtual void updateNodePath();
 
@@ -78,12 +78,15 @@ public:
      */
     void setEnabled (const char* id, int enabled);
     
+    /**
+     * Check if a particular node is a child and is enabled
+     */
+    bool isEnabled (ReferencedNode* n);
 
     /**
      * Set all child noded to be either disabled or enabled
      */
     void setAll(int enabled);
-    
 
     /**
      * For each subclass of ReferencedNode, we override the getState() method to

@@ -58,7 +58,7 @@ class AttractorNode : public GroupNode
 
 public:
 
-    AttractorNode(SceneManager *sceneManager, char *initID);
+    AttractorNode(SceneManager *sceneManager, const char* initID);
     virtual ~AttractorNode();
 
     /**
@@ -75,7 +75,7 @@ public:
     					};
     
 
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * setDistanceDecay specifies how the attractive force decays as a function
@@ -162,9 +162,9 @@ protected:
     targetVector targets_;
 
 private:
-
     osg::Timer_t lastTick_;
-
+    osg::Timer_t lastUpdate_;
+    
 };
 
 } // end of namespace spin

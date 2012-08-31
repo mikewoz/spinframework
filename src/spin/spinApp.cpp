@@ -39,6 +39,8 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "config.h"
+
 #include <string>
 #include <iostream>
 #include <pthread.h>
@@ -183,13 +185,13 @@ spinApp::~spinApp()
 {
 	if (userNode.valid())
 	{
-		sceneManager->doDelete(userNode.get());
+		sceneManager_->doDelete(userNode.get());
 		userNode = 0;
 	}
 #ifdef WITH_SPATOSC
 	delete audioScene;
 #endif
-	delete sceneManager;
+	delete sceneManager_;
     //spinBaseContext::signalStop = true;
 }
 
@@ -216,7 +218,7 @@ void spinApp::createScene()
 {
     if (context)
     {
-        sceneManager = new SceneManager(getSceneID());
+        sceneManager_ = new SceneManager(getSceneID());
     }
     else
     {
@@ -231,12 +233,12 @@ void spinApp::destroyScene()
 	// Force a delete (and destructor call) for all nodes still in the scene:
     unsigned int i = 0;
     ReferencedNode *n;
-    while (i < sceneManager->worldNode->getNumChildren())
+    while (i < sceneManager_->worldNode->getNumChildren())
     {
-        if ((n = dynamic_cast<ReferencedNode*>(sceneManager->worldNode->getChild(i))))
+        if ((n = dynamic_cast<ReferencedNode*>(sceneManager_->worldNode->getChild(i))))
         {
             // delete the graph of any ReferencedNode:
-            sceneManager->deleteGraph(n->id->s_name);
+            sceneManager_->deleteGraph(n->getID().c_str());
         }
         else
         {
@@ -247,7 +249,7 @@ void spinApp::destroyScene()
     }
 
     // clear any states that are left over:
-    sceneManager->clearStates();
+    sceneManager_->clearStates();
 }
 
 
@@ -273,7 +275,7 @@ bool spinApp::initPython()
         //exec("sys.path.append('/usr/local/lib')", _pyNamespace, _pyNamespace);
 
 
-        exec(std::string("sys.path.append('" + sceneManager->resourcesPath+  "')").c_str(), _pyNamespace, _pyNamespace);
+        exec(std::string("sys.path.append('" + sceneManager_->resourcesPath+  "')").c_str(), _pyNamespace, _pyNamespace);
 
         //exec("print sys.path", _pyNamespace, _pyNamespace);
 
@@ -361,14 +363,14 @@ std::string spinApp::getCurrentPyException()
 
 void spinApp::registerUser()
 {
-    if (sceneManager)
+    if (sceneManager_)
     {
         // Here we force the creation of a (local) UserNode, so that we are sure
         // to have one, even if a server is not running. This way, we can create
         // our ViewerManipulator, and tracker node before receiver the official
         // createNode message from the server.
 
-        userNode = dynamic_cast<UserNode*>(sceneManager->getOrCreateNode(userID_.c_str(), "UserNode"));
+        userNode = dynamic_cast<UserNode*>(sceneManager_->getOrCreateNode(userID_.c_str(), "UserNode"));
 
         // We then send a message to the server to create the node. If the
         // server doesn't exist yet, it doesn't really matter, since we are
@@ -376,7 +378,7 @@ void spinApp::registerUser()
         // it will send a 'userRefresh' method that will inform it of this node
         // (see the spinApp_sceneCallback method)
 
-        SceneMessage("sss", "createNode", userNode->id->s_name, "UserNode", LO_ARGS_END);
+        SceneMessage("sss", "createNode", userNode->getID().c_str(), "UserNode", LO_ARGS_END);
 
     }
 
@@ -519,18 +521,9 @@ void spinApp::SceneMessage(lo_message msg)
     lo_message_free(msg);
 }
 
-/*
-void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs)
+void spinApp::NodeBundle(std::string nodeId, std::vector<lo_message> msgs, lo_address addr)
 {
-    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
-    sendBundle(OSCpath, msgs);
-}
-*/
-
-
-void spinApp::NodeBundle(t_symbol *nodeSym, std::vector<lo_message> msgs, lo_address addr)
-{
-    std::string OSCpath = "/SPIN/" + sceneID + "/" + std::string(nodeSym->s_name);
+    std::string OSCpath = "/SPIN/" + sceneID + "/" + nodeId;
     sendBundle(OSCpath, msgs, addr);
 }
 

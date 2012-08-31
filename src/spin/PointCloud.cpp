@@ -39,17 +39,30 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "config.h"
+
+
 #include <osg/Geode>
 #include <osg/BlendColor>
 #include <osg/MatrixTransform>
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
 #include <osg/Geometry>
+#include <osg/Point>
+#include <osg/PolygonMode>
 #include <osgUtil/SmoothingVisitor>
 #include <osgSim/LightPointNode>
+#include <osgDB/FileNameUtils>
 
+#ifdef WITH_PCL
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#include <pcl/io/openni_grabber.h>
+#include <pcl/common/time.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/compression/octree_pointcloud_compression.h>
+#endif
 
 #include "PointCloud.h"
 #include "SceneManager.h"
@@ -59,276 +72,433 @@
 
 
 //using namespace std;
+extern pthread_mutex_t sceneMutex;
+
+// TODO: grabberMutex should be a member right? .. what if there are >1 devices?
+#ifdef WITH_PCL
+static boost::mutex grabberMutex;
+#endif
 
 namespace spin
 {
 
 // -----------------------------------------------------------------------------
 // constructor:
-PointCloud::PointCloud (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(std::string(id->s_name) + ".PointCloud");
-	nodeType = "PointCloud";
+	this->setName(this->getID() + ".PointCloud");
+	this->setNodeType("PointCloud");
 
-	drawMode_ = LIGHTPOINTS;
+	drawMode_ = POINTS;
     
+    updateFlag_ = false;
+    redrawFlag_ = false;
+    
+    maxPoints_ = 0;
+    framerate_ = 0;
     path_ = "NULL";
     customNode_ = gensym("NULL");
     
-	color_ = osg::Vec4(1.0,1.0,0.0,1.0);
-    spacing_ = 10.0;
+    color_ = osg::Vec4(1.0,1.0,1.0,1.0);
+    colorMode_ = NORMAL;
+    spacing_ = 1.0;
     randomCoeff_ = 0.0;
     pointSize_ = 1.0;
     
-    vertices_ = new osg::Vec3Array();
-    colors_ = new osg::Vec4Array();
+    voxelSize_ = 0.01f;
+    distCrop_ = osg::Vec2(0.0,10.0);
+    
+#ifdef WITH_PCL
+    grabber_ = 0;
+#endif
+    
 }
 
 // destructor
 PointCloud::~PointCloud()
 {
-    // TODO
+#ifdef WITH_PCL
+    if (grabber_)
+    {
+        grabber_->stop();
+        grabber_ = 0;
+    }
+#endif
 }
 // -----------------------------------------------------------------------------
 
 void PointCloud::debug()
 {
     GroupNode::debug();
-
-    std::cout << "   numPoints: " << vertices_->size() << std::endl;
-
+    
+#ifdef WITH_PCL
+    boost::mutex::scoped_lock lock(grabberMutex);
+    if (cloud_)
+    {
+        std::cout << "   " << (int)cloud_->points.size() << " of " << maxPoints_ << " displayed" << std::endl;
+        std::cout << "   Avg framerate: " << framerate_ << std::endl;
+    }
+    else
+    {
+        std::cout << "   No valid point cloud loaded" << std::endl;
+    }
+#else
+    std::cout << "   SPIN was not compiled with PointCloud support; rendering disabled." << std::endl;
+#endif
 }
 
 // -----------------------------------------------------------------------------
-void PointCloud::callbackUpdate()
+void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
-    
+
+#ifdef WITH_PCL
+    // A "redraw" will destroy the current subgraph and re-create it.
+    // This is done, for example, when the type of geometry is changed (eg, from
+    // lightpoints to lines). Don't do this too often!
     if (redrawFlag_)
     {
         this->draw();
         redrawFlag_ = false;
+        updateFlag_ = true;
+    }
+    
+    // an "update" will just update positions, colors, spacing, etc of the
+    // points (eg, when the grabberCallback gets a new frame from the Kinect)
+    if (updateFlag_)
+    {
+        this->updatePoints();
+        updateFlag_ = false;
+    }
+#endif
+    
+    GroupNode::callbackUpdate(nv);
+}
+
+
+// -----------------------------------------------------------------------------
+#ifdef WITH_PCL
+//#if PCL_MAJOR_VERSION>1 && PCL_MINOR_VERSION>5
+void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
+//#else
+//void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr &rawCloud)
+//#endif
+{
+
+
+    // DEBUG INFO
+    static unsigned count = 0;
+    static osg::Timer_t lastTick = osg::Timer::instance()->tick();
+    if (++count == 30)
+    {
+        osg::Timer_t tick = osg::Timer::instance()->tick();
+        framerate_ = count / osg::Timer::instance()->delta_s(lastTick,tick);
+        //float center = rawCloud->points[(rawCloud->width >> 1) * (rawCloud->height + 1)].z;
+        
+        //std::cout << rawCloud->points.size() << " points. Distance of center pixel=" << center << "mm. Average framerate: " << framerate_ << " Hz" <<  std::endl;
+        count = 0;
+        lastTick = tick;
+    }
+    
+    // If the redraw flag is set, our geometry is about to be destroyed anyway,
+    // so let's just exit and wait. The cloud needs to exist before we can
+    // update it.
+    if (redrawFlag_) return;
+    
+    
+    applyFilters(rawCloud);
+    /*
+    // First apply crop filter along depth (z) axis:
+    
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
+    pcl::PassThrough<pcl::PointXYZRGBA> pass;
+    pass.setInputCloud(rawCloud);
+    pass.setFilterFieldName ("z");
+    pass.setFilterLimits (distCrop_.x(), distCrop_.y());
+    //pass.setFilterLimitsNegative (true);
+    pass.filter(*cloudFiltered);
+    
+    // Now we apply a VoxelGrid filter to reduce the number of points
+    
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+    pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
+    sor.setInputCloud(cloudFiltered);
+    sor.setLeafSize(voxelSize_, voxelSize_, voxelSize_);
+    sor.filter(*cloud);
+    
+    // now set out member pointer with a mutex
+    {
+        boost::mutex::scoped_lock lock (grabberMutex);
+        cloud_.swap(cloud);
+    }
+    */
+    
+    // Set the flag so that we update during the next traversal:
+    updateFlag_ = true;
+}
+
+void PointCloud::applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
+{
+            
+    // First apply crop filter along depth (z) axis:
+    
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
+    pcl::PassThrough<pcl::PointXYZRGBA> pass;
+    pass.setInputCloud(rawCloud);
+    pass.setFilterFieldName ("z");
+    pass.setFilterLimits (distCrop_.x(), distCrop_.y());
+    //pass.setFilterLimitsNegative (true);
+    pass.filter(*cloudFiltered);
+    
+    // Now we apply a VoxelGrid filter to reduce the number of points
+    
+    if (voxelSize_>0)
+    {
+        pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+        pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
+        sor.setInputCloud(cloudFiltered);
+        sor.setLeafSize(voxelSize_, voxelSize_, voxelSize_);
+        sor.filter(*cloud);
+        
+        // now set out member pointer with a mutex
+        {
+            boost::mutex::scoped_lock lock (grabberMutex);
+            cloud_.swap(cloud);
+        }
+    }
+    else 
+    {
+        boost::mutex::scoped_lock lock (grabberMutex);
+        cloud_.swap(cloudFiltered);
     }
 }
 
-// -----------------------------------------------------------------------------
-
-void PointCloud::loadFile(const char* filename)
+osg::Vec3 PointCloud::getPos(unsigned int i)
 {
-    //path_ = getRelativePath(std::string(filename));
-    path_ = filename;
-    vertices_->clear();
-    colors_->clear();
-    //cloud_.clear();
-    
-    
-    if (!sceneManager->isGraphical())
-    {
-        BROADCAST(this, "ss", "loadFile", filename);
-        return;
-    }
-    
-    if (path_ == "NULL") return;
-    
-    
-    // load the file:
-    bool success = false;
-    pcl::PointCloud<pcl::PointXYZRGB> cloudXYZRGB;
-    pcl::PointCloud<pcl::PointXYZ> cloudXYZ;
+    return osg::Vec3 (cloud_->points[i].x*spacing_, cloud_->points[i].y*spacing_, cloud_->points[i].z*spacing_) + randomVec3()*randomCoeff_;
+}
 
-    try
-    {
-        //if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (path_, cloud_) == -1)  
-        if (pcl::io::loadPCDFile<pcl::PointXYZRGB>(path_, cloudXYZRGB) != -1)  
-        {            
-            std::cout << cloudXYZRGB.points.size() << " PointXYZRGB " << std::endl;
-            for (int i=0; i<cloudXYZRGB.points.size(); i++)
-            {
-                vertices_->push_back (osg::Vec3 (cloudXYZRGB.points[i].x, cloudXYZRGB.points[i].y, cloudXYZRGB.points[i].z));
-                uint32_t rgb_val_;
-                memcpy(&rgb_val_, &(cloudXYZRGB.points[i].rgb), sizeof(uint32_t));
-                
-                uint32_t red,green,blue;
-                blue=rgb_val_ & 0x000000ff;
-                rgb_val_ = rgb_val_ >> 8;
-                green=rgb_val_ & 0x000000ff;
-                rgb_val_ = rgb_val_ >> 8;
-                red=rgb_val_ & 0x000000ff;
-                
-                colors_->push_back (osg::Vec4f ((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f));
-                
-                success = true;
-            }
-        }
-    }
-    catch (pcl::InvalidConversionException e)
-    {
-        std::cout << "[PointCloud]: InvalidConversionException" << std::endl;
-    }
+osg::Vec4f PointCloud::getColor(unsigned int i)
+{
+    if (colorMode_==OVERRIDE) return color_;
 
-    if (!success)
-    try
-    {
-        if (pcl::io::loadPCDFile(path_, cloudXYZ) != -1)  
-        {              
-            for (int i=0; i<cloudXYZ.points.size(); i++)
-            {
-                vertices_->push_back (osg::Vec3 (cloudXYZ.points[i].x, cloudXYZ.points[i].y, cloudXYZ.points[i].z));
-                colors_->push_back(color_);
-            }
+    uint32_t rgba_val_;
+    memcpy(&rgba_val_, &(cloud_->points[i].rgba), sizeof(uint32_t));
+    
+    uint32_t red,green,blue;
+    blue=rgba_val_ & 0x000000ff;
+    rgba_val_ = rgba_val_ >> 8;
+    green=rgba_val_ & 0x000000ff;
+    rgba_val_ = rgba_val_ >> 8;
+    red=rgba_val_ & 0x000000ff;
+    
+    return osg::Vec4f ((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f);
+}
+
+void PointCloud::updatePoints()
+{
+    if (spinApp::Instance().getContext()->isServer()) return;
+    if (redrawFlag_ || !cloud_) return;
+    
+    boost::mutex::scoped_lock lock(grabberMutex);
+    
+    //std::cout << "doing update. cloudsize=" << cloud_->points.size() << " maxsize=" << maxPoints_ << std::endl;
+    //if (lightPointNode_.valid()) std::cout << "num lightpoints=" << lightPointNode_->getNumLightPoints() << std::endl;    
         
-            success = true;
-        }
-    }
-    catch (pcl::InvalidConversionException e)
+    if ((drawMode_>=POINTS) && (drawMode_<=POLYGON))
     {
-        std::cout << "[PointCloud]: InvalidConversionException" << std::endl;
+        cloudGeode_->removeDrawables(0,cloudGeode_->getNumDrawables());
+        
+        osg::Vec3Array* verts = new osg::Vec3Array();
+        osg::Vec4Array* colors = new osg::Vec4Array();
+        
+        for (unsigned int i=0; i<cloud_->points.size(); i++)
+        {
+            verts->push_back(this->getPos(i));
+            colors->push_back(this->getColor(i));
+        }
+        
+        osg::Geometry *geom = new osg::Geometry();
+        switch (drawMode_)
+        {
+            case LINES:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES,0,cloud_->points.size()));
+                break;
+            case LINE_STRIP:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,cloud_->points.size()));
+                break;
+            case LINE_LOOP:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_LOOP,0,cloud_->points.size()));
+                break;
+            case TRIANGLES:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES,0,cloud_->points.size()));
+                break;
+            case TRIANGLE_STRIP:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP,0,cloud_->points.size()));
+                break;
+            case TRIANGLE_FAN:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN,0,cloud_->points.size()));
+                break;
+            case QUADS:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS,0,cloud_->points.size()));
+                break;
+            case QUAD_STRIP:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUAD_STRIP,0,cloud_->points.size()));
+                break;
+            case POLYGON:
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POLYGON,0,cloud_->points.size()));
+                break;
+            default: // POINTS
+                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,cloud_->points.size()));
+                
+                osg::Point *point = new osg::Point();
+                point->setSize(pointSize_*2);
+                cloudGeode_->getOrCreateStateSet()->setAttribute(point);
+
+                break;
+        }
+        geom->setVertexArray(verts);
+        geom->setColorArray(colors);
+        geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+        cloudGeode_->addDrawable( geom );
+        
     }
     
-    if (success)
-    {
-        std::cout << "[PointCloud]: Loaded " << vertices_->size() << " data points from " << filename << std::endl;
-        redrawFlag_ = true;
-    } else
-    {
-        std::cout << "[PointCloud]: Couldn't read file " << path_ << std::endl;
+    else if ((drawMode_==LIGHTPOINTS) && lightPointNode_.valid() && lightPointNode_->getNumLightPoints())
+    {        
+        unsigned int i=0;
+        for (; i<cloud_->points.size(); i++)
+        {
+            osgSim::LightPoint& lp = lightPointNode_->getLightPoint(i);
+            lp._on = true;
+            lp._color = this->getColor(i);
+            lp._position = this->getPos(i);
+            lp._radius = pointSize_/1000.0;
+        }
+        for (; i<maxPoints_; i++)
+        {
+            // deactivate any filtered out light points (recall, we reserve the
+            // maximum for the camera resolution)
+            osgSim::LightPoint& lp = lightPointNode_->getLightPoint(i);
+            lp._on = false;
+        }
     }
-}        
+    
+    else if ( (drawMode_ == BOXES) || (drawMode_ == CUSTOM) )
+    {
+        unsigned int i=0;
+        for (; i<cloud_->points.size(); i++)
+        {
+            //xforms_[i]->setMatrix(osg::Matrix::translate(this->getPos(i)));
+            
+            float scale = pointSize_/200.0;
+            xforms_[i]->setMatrix(osg::Matrix::scale(osg::Vec3(scale,scale,scale))*osg::Matrix::translate(this->getPos(i)));
+            
+            xforms_[i]->setNodeMask(0xffffffff);
+            
+            // doesn't work:
+            //osg::BlendColor* bc = new osg::BlendColor(this->getColor(i));
+            //xform->getOrCreateStateSet()->setAttributeAndModes(bc, osg::StateAttribute::ON); 
+            //xform->getOrCreateStateSet()->setMode(osg::StateAttribute::BLENDCOLOR, osg::StateAttribute::ON); 
+        }
+        for (; i<maxPoints_; i++)
+        {
+            xforms_[i]->setNodeMask(0x0);
+        }            
+
+        // TODO: SmoothingVisitor? Optimizer?
+    }
+
+}
+
+
         
 void PointCloud::draw()
 {
-    if (!sceneManager->isGraphical()) return;
+    // Do NOT call this method too often. The only real time you want to call
+    // this is if the *number* of vertices changes, or if the geometry needs to
+    // be drawn in a different way. If it's just positions, colors, spacing, etc
+    // that is changing, then use updatePoints().
+
+    if (!sceneManager_->isGraphical()) return;
+    
+    //std::cout << "PointCloud redraw. cloud_ size = " << cloud_->size() << " maxPoints=" << maxPoints_ << std::endl;
 
     // remove previous pointcloud:
     if (cloudGroup_.valid() && getAttachmentNode()->containsNode(cloudGroup_.get()))
     {
         getAttachmentNode()->removeChild(cloudGroup_.get());
         cloudGroup_ = NULL;
+
+        if (lightPointNode_.valid()) lightPointNode_ = NULL;
+        if (cloudGeode_.valid()) cloudGeode_ = NULL;
+        xforms_.clear();
     }
+    
+    
+    if (maxPoints_<=0) return;
 
     cloudGroup_ = new osg::PositionAttitudeTransform();
     cloudGroup_->setAttitude(osg::Quat(-osg::PI_2, osg::X_AXIS));
-    cloudGroup_->setName(std::string(id->s_name) + ".CloudGroup");
+    cloudGroup_->setName(this->getID() + ".CloudGroup");
 
-    osg::TessellationHints* hints = new osg::TessellationHints;
-    hints->setDetailRatio(1);
-    hints->setCreateBackFace(false);
-
-    if ((drawMode_>POINTS) && (drawMode_<=POLYGON))
+    
+    if ((drawMode_>=POINTS) && (drawMode_<=POLYGON))
     {
-        osg::Geode* geode = new osg::Geode();
-		osg::Geometry* geom = new osg::Geometry();
-        geom->setVertexArray(vertices_);
-        
-        switch (drawMode_)
-        {
-            case LINES:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES,0,vertices_->size()));
-                break;
-            case LINE_STRIP:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,vertices_->size()));
-                break;
-            case LINE_LOOP:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_LOOP,0,vertices_->size()));
-                break;
-            case TRIANGLES:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES,0,vertices_->size()));
-                break;
-            case TRIANGLE_STRIP:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP,0,vertices_->size()));
-                break;
-            case TRIANGLE_FAN:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN,0,vertices_->size()));
-                break;
-            case QUADS:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS,0,vertices_->size()));
-                break;
-            case QUAD_STRIP:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUAD_STRIP,0,vertices_->size()));
-                break;
-            case POLYGON:
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POLYGON,0,vertices_->size()));
-                break;
-            default: // POINTS
-                geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,vertices_->size()));
-                break;
-        }
-        
-        geode->setName(std::string(id->s_name) + ".CloudGeode");
-        geode->addDrawable( geom );
-        geom->setColorArray(colors_);
-        geom->setColorBinding(osg::Geometry::BIND_OVERALL);
-        
-        osg::StateSet *ss = geode->getOrCreateStateSet();
+        cloudGeode_ = new osg::Geode();
+        cloudGeode_->setName(this->getID() + ".CloudGeode");
+        osg::StateSet *ss = cloudGeode_->getOrCreateStateSet();
 		ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF);
-        
-        cloudGroup_->addChild(geode);
+        cloudGroup_->addChild(cloudGeode_);
+    
+        // the geometry will be created dynamically in updatePoints()
     }
     
     else if (drawMode_ == LIGHTPOINTS)
     {
-        osgSim::LightPointNode* lpn = new osgSim::LightPointNode;
-        lpn->getLightPointList().reserve(vertices_->size());
+        lightPointNode_ = new osgSim::LightPointNode();
+        lightPointNode_->getLightPointList().reserve(maxPoints_);
         
-        for (unsigned int i=0; i<vertices_->size(); i++)
+        for (unsigned int i=0; i<maxPoints_; i++)
         {
             osgSim::LightPoint lp;
-            lp._color = colors_->at(i);
-            lp._position = vertices_->at(i);
-            lp._radius = pointSize_/1000.0;
-            lpn->addLightPoint(lp);
+            lp._on = false;
+            lightPointNode_->addLightPoint(lp);
         }
-        cloudGroup_->addChild(lpn);
+        
+        cloudGroup_->addChild(lightPointNode_);
     }
         
     else if (drawMode_ == BOXES)
     {
         osg::Geode* geode = new osg::Geode();
         
-        osg::Box* box = new osg::Box(osg::Vec3(0,0,0), pointSize_/500.0);
+        osg::TessellationHints* hints = new osg::TessellationHints;
+        hints->setDetailRatio(1);
+        hints->setCreateBackFace(false);
+        
+        //osg::Box* box = new osg::Box(osg::Vec3(0,0,0), pointSize_/500.0);
+        osg::Box* box = new osg::Box(osg::Vec3(0,0,0), pointSize_/2);
         osg::ShapeDrawable* boxDrawable = new osg::ShapeDrawable(box,hints);
-        //boxDrawable->setColor(colors_->at(i));
         geode->addDrawable(boxDrawable);
         
-        for (unsigned int i=0; i<vertices_->size(); i++)
+        for (unsigned int i=0; i<maxPoints_; i++)
         {
             osg::MatrixTransform *xform = new osg::MatrixTransform();
-            
-            /*
-            // doesn't work:
-            osg::BlendColor* bc = new osg::BlendColor(colors_->at(i));
-            xform->getOrCreateStateSet()->setAttributeAndModes(bc, osg::StateAttribute::ON); 
-            xform->getOrCreateStateSet()->setMode(osg::StateAttribute::BLENDCOLOR, osg::StateAttribute::ON); 
-            */
-            
-            //xform->setMatrix(osg::Matrix::scale(osg::Vec3(pointSize_,pointSize_,pointSize_))*osg::Matrix::translate(vertices_->at(i)));
-            xform->setMatrix(osg::Matrix::translate(vertices_->at(i)));
+
+            xform->setNodeMask(0x0);
             xform->addChild(geode);
             cloudGroup_->addChild(xform);
+            xforms_.push_back(xform);
         }
-        /*
-        for (unsigned int i=vertices_->size(); i<noStepsX*noStepsY; i++)
-        {
-            osg::MatrixTransform *xform = new osg::MatrixTransform();
-            xform->setMatrix(osg::Matrix::scale(osg::Vec3(0,0,0)));
-            xform->addChild(geode);
-            cloudGroup_->addChild(xform);
-        }
-        */
-            
-        /*
-        for (unsigned int i=0; i<vertexArray->size(); i++)
-        {
-            osg::Box* box = new osg::Box(vertexArray->at(i), pointSize_);
-            osg::ShapeDrawable* boxDrawable = new osg::ShapeDrawable(box,hints);
-            boxDrawable->setColor(colorArray->at(i));
-            geode->addDrawable(boxDrawable);
-        }
-        cloudGroup->addChild(geode);
-         */
-    
-        // TODO: SmoothingVisitor? Optimizer?
     }
+    
+    /*
+    else if (drawMode_ == SQUARES)
+    {
+        // TODO: Billboarded planes
+    
+    }
+    */
     
     else if (drawMode_ == CUSTOM)
     {
@@ -336,14 +506,14 @@ void PointCloud::draw()
 
         if (n)
         {
-            for (unsigned int i=0; i<vertices_->size(); i++)
+            for (unsigned int i=0; i<maxPoints_; i++)
             {
                 osg::MatrixTransform *xform = new osg::MatrixTransform();
                 
-                float scale = pointSize_/200.0;
-                xform->setMatrix(osg::Matrix::scale(osg::Vec3(scale,scale,scale))*osg::Matrix::translate(vertices_->at(i)));
+                xform->setNodeMask(0x0);
                 xform->addChild(n);
                 cloudGroup_->addChild(xform);
+                xforms_.push_back(xform);
             }
         }
     }
@@ -351,13 +521,192 @@ void PointCloud::draw()
     this->getAttachmentNode()->addChild(cloudGroup_.get());
 }
 
+#endif
+
+
+// -----------------------------------------------------------------------------
+
+void PointCloud::setURI(const char* filename)
+{
+    // ignore this msg if we already have this filename:
+    if (std::string(filename)==path_) return;
+    
+    path_ = std::string(filename);
+
+    // if this is the server, then just broadcast the path and return:
+    if (!sceneManager_->isGraphical())
+    {
+        BROADCAST(this, "ss", "setURI", filename);
+        return;
+    }
+    
+    // otherwise, this is a client (viewer), so:
+
+#ifdef WITH_PCL
+
+    // first, check if the old path was a kinect, and destroy it accordingly:
+    if (grabber_)
+    {
+        grabber_->stop();
+        grabber_ = 0;
+    }
+    cloudOrig_.reset();
+            
+    path_ = filename;
+    maxPoints_ = 0;
+    
+    bool success = false;
+
+    
+    if (path_ == "NULL")
+    {
+        // do nothing
+        return;
+    }
+    
+    else if (std::string(path_).find("kinect://") != std::string::npos)
+    {
+        // Kinect or any other dynamic point cloud needs to reserve a maximum
+        // number of points. These get added to the scenegraph only ONCE during
+        // the draw() method, which is thread-safe.
+        //
+        // In the callback from the Kinect, we should never ask for a redraw.
+        // that is too slow. Instead, we set the updateFlag to call
+        // updatePoints() method
+                
+        try
+        {
+            //std::string kinectID = "#1";
+            std::string kinectID = "#"+path_.substr(9);
+
+            std::cout << "Connecting to Kinect " << kinectID << ". This could take several seconds." << std::endl;
+            
+            grabber_ = new pcl::OpenNIGrabber(kinectID, pcl::OpenNIGrabber::OpenNI_QVGA_30Hz, pcl::OpenNIGrabber::OpenNI_QVGA_30Hz);
+
+            // make callback function from member function
+            boost::function<void (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr&)> f =
+              boost::bind (&PointCloud::grabberCallback, this, _1);
+
+            // connect callback function for desired signal
+            boost::signals2::connection c = grabber_->registerCallback (f);
+           
+            // For now, we're hardcoding OpenNI_QVGA_30Hz, which is 320x240
+            // so reserve 76800 points.
+            maxPoints_ = 76800;
+            
+            // need to set the redrawFlag_ befoe we start the grabber, since
+            // updates don't happen when the redrawFlag_ is set.
+            redrawFlag_ = true;
+        
+            // start receiving point clouds
+            grabber_->start();
+            
+            framerate_ = 0;
+            success = true;
+        }
+        catch (pcl::PCLIOException e)
+        {
+            std::cout << "[PointCloud]: Error connecting to Kinect; perhaps it is already being used? ... " << e.detailedMessage() << std::endl;
+        }
+    }
+    
+    else
+    {
+        // load the file:
+        std::string absPath = getAbsolutePath(std::string(path_));
+        std::string ext = osgDB::getLowerCaseFileExtension(absPath);
+        
+        try
+        {
+            if (ext=="cpc")
+            {
+                std::stringstream compressedData;
+                pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::octree::PointCloudCompression<pcl::PointXYZRGBA>();
+                pcl::PointCloud<pcl::PointXYZRGBA>::Ptr tmpCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+
+                std::ifstream readCompressedFile(absPath.c_str());
+                compressedData << readCompressedFile.rdbuf();
+                
+                pointCloudDecoder->decodePointCloud(compressedData, tmpCloud);
+                
+                {
+                    boost::mutex::scoped_lock lock (grabberMutex);
+                    cloudOrig_.swap(tmpCloud);
+                }
+                maxPoints_ = cloudOrig_->points.size();
+                success = true;
+            }
+            
+            else // if (ext=="pcd")
+            {
+                pcl::PointCloud<pcl::PointXYZRGBA> tmpCloud;
+                if (pcl::io::loadPCDFile<pcl::PointXYZRGBA>(absPath, tmpCloud) != -1)  
+                {            
+                    std::cout << tmpCloud.points.size() << " PointXYZRGBA " << std::endl;
+
+                    {
+                        boost::mutex::scoped_lock lock (grabberMutex);
+                        cloudOrig_ = tmpCloud.makeShared(); // note: deep copy (fix?)
+                    }
+                    maxPoints_ = cloudOrig_->points.size();
+                    success = true;
+                }
+            }
+        }
+        catch (pcl::InvalidConversionException e)
+        {
+            std::cout << "[PointCloud]: Couldn't load " << path_ <<  "in XYZRGBA format. Trying XYZ." << std::endl;
+        }
+
+        if (!success)
+        try
+        {
+            pcl::PointCloud<pcl::PointXYZ> tmpCloud;
+            if (pcl::io::loadPCDFile(absPath, tmpCloud) != -1)  
+            {     
+                // now we need to convert to XYZRGBA:
+                pcl::PointCloud<pcl::PointXYZRGBA>::Ptr converted(new pcl::PointCloud<pcl::PointXYZRGBA>);
+                converted->points.resize(tmpCloud.size());
+                for (size_t i = 0; i < tmpCloud.points.size(); i++)
+                {
+                    converted->points[i].x = tmpCloud.points[i].x;
+                    converted->points[i].y = tmpCloud.points[i].y;
+                    converted->points[i].z = tmpCloud.points[i].z;
+                }
+                
+                {
+                    boost::mutex::scoped_lock lock (grabberMutex);
+                    cloudOrig_.swap(converted);
+                }
+                maxPoints_ = cloudOrig_->points.size();
+                success = true;
+            }
+        }
+        catch (pcl::InvalidConversionException e)
+        {
+            std::cout << "[PointCloud]: Couldn't load .pcd ing XYZ format." << std::endl;
+        }
+    }
+    
+    
+    if (success)
+    {    
+        std::cout << "[PointCloud]: Loaded " << maxPoints_ << " data points from " << path_ << std::endl;
+        this->applyFilters(cloudOrig_);
+        redrawFlag_ = true;
+    } else
+    {
+        std::cout << "[PointCloud]: Couldn't read file " << path_ << std::endl;
+    }
+    
+#endif
+}
 
 // -----------------------------------------------------------------------------
 
 void PointCloud::setCustomNode(const char* nodeID)
 {
-    
-    ReferencedNode *n = sceneManager->getNode(nodeID);
+    ReferencedNode *n = sceneManager_->getNode(nodeID);
     if (n)
     {
         customNode_ = gensym(nodeID);
@@ -365,19 +714,18 @@ void PointCloud::setCustomNode(const char* nodeID)
         
         redrawFlag_ = true;
     }
-    else
+    else if (std::string(nodeID)!="NULL")
     {
         std::cout << "[PointCloud]: Could not set custom node. " << nodeID << " does not exist." << std::endl;
     }
-    
 }
+
 const char* PointCloud::getCustomNode() const
 {
     ReferencedNode *n = dynamic_cast<ReferencedNode*>(customNode_->s_thing);
     if (n) return customNode_->s_name;
     return "NULL"; 
 }
-
 
 void PointCloud::setDrawMode (DrawMode mode)
 {
@@ -396,8 +744,7 @@ void PointCloud::setSpacing (float spacing)
 	{
 		this->spacing_ = spacing;
 		BROADCAST(this, "sf", "setSpacing", this->spacing_);
-        redrawFlag_ = true;
-
+        updateFlag_ = true;
 	}
 }
 
@@ -407,8 +754,7 @@ void PointCloud::setRandomCoeff (float randomCoeff)
 	{
 		this->randomCoeff_ = randomCoeff;
 		BROADCAST(this, "sf", "setRandomCoeff", this->randomCoeff_);
-        redrawFlag_ = true;
-
+        updateFlag_ = true;
 	}
 }
     
@@ -418,8 +764,47 @@ void PointCloud::setPointSize (float size)
     {
         this->pointSize_ = size;
         BROADCAST(this, "sf", "setPointSize", this->pointSize_);
-        redrawFlag_ = true;
+        updateFlag_ = true;
+    }
+}
 
+void PointCloud::setVoxelSize (float voxelSize)
+{
+    if (this->voxelSize_ != voxelSize)
+    {
+        this->voxelSize_ = voxelSize;
+        BROADCAST(this, "sf", "setVoxelSize", this->voxelSize_);
+        
+#ifdef WITH_PCL
+        if (cloudOrig_)
+        {
+            // if cloudOrig_ is valid, it means this point cloud was loaded
+            // from file, and we need to apply filters:
+            this->applyFilters(cloudOrig_);
+        }
+#endif
+
+        updateFlag_ = true;
+    }
+}
+
+void PointCloud::setDistCrop (float min, float max)
+{
+    if ((min!=distCrop_.x()) || (max!=distCrop_.y()))
+    {
+        distCrop_ = osg::Vec2(min,max);
+        BROADCAST(this, "sff", "setDistCrop", min, max);
+
+#ifdef WITH_PCL
+        if (cloudOrig_)
+        {
+            // if cloudOrig_ is valid, it means this point cloud was loaded
+            // from file, and we need to apply filters:
+            this->applyFilters(cloudOrig_);
+        }
+#endif
+
+        updateFlag_ = true;
     }
 }
 
@@ -429,8 +814,18 @@ void PointCloud::setColor (float r, float g, float b, float a)
 	{
 		this->color_ = osg::Vec4(r,g,b,a);
 		BROADCAST(this, "sffff", "setColor", r, g, b, a);
-        redrawFlag_ = true;
+        updateFlag_ = true;
+	}
+}
 
+void PointCloud::setColorMode (ColorMode mode)
+{
+	if (this->colorMode_ != (int)mode)
+	{
+		this->colorMode_ = mode;
+		BROADCAST(this, "si", "setColorMode", getColorMode());
+        
+        updateFlag_ = true;
 	}
 }
 
@@ -463,12 +858,24 @@ std::vector<lo_message> PointCloud::getState () const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    osg::Vec4 v = this->getColor();
-    lo_message_add(msg, "sffff", "setColor", v.x(), v.y(), v.z(), v.w());
+    lo_message_add(msg, "sf", "setVoxelSize", getFilterSize());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    osg::Vec2 v2 = getDistCrop();
+    lo_message_add(msg, "sff", "setDistCrop", v2.x(), v2.y());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    osg::Vec4 v3 = this->getColor();
+    lo_message_add(msg, "sffff", "setColor", v3.x(), v3.y(), v3.z(), v3.w());
+ 
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setColorMode", getColorMode());
     ret.push_back(msg);
     
     msg = lo_message_new();
-    lo_message_add(msg, "ss", "loadFile", path_.c_str());
+    lo_message_add(msg, "ss", "setURI", path_.c_str());
     ret.push_back(msg);
 
 
@@ -476,4 +883,3 @@ std::vector<lo_message> PointCloud::getState () const
 }
 
 } // end of namespace spin
-

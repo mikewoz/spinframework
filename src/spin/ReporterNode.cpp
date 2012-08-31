@@ -48,18 +48,15 @@
 #include <osgUtil/LineSegmentIntersector>
 #include <osgUtil/IntersectionVisitor>
 
-using namespace std;
-
-
 namespace spin
 {
 
 // *****************************************************************************
 // constructor:
-ReporterNode::ReporterNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+ReporterNode::ReporterNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-    this->setName(string(id->s_name) + ".ReporterNode");
-    nodeType = "ReporterNode";
+    this->setName(this->getID() + ".ReporterNode");
+    this->setNodeType("ReporterNode");
 
 	maxRate_ = 20.0;
 
@@ -91,46 +88,64 @@ void ReporterNode::debug()
     std::vector<reporterTarget>::const_iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
-    	if ((*t).node.valid()) std::cout << " " << (*t).node->id->s_name;
+    	if ((*t).node.valid()) std::cout << " " << (*t).node->getID();
     }
     std::cout << std::endl;
 }
 
-void ReporterNode::callbackUpdate()
+void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
 
     // only report from the server
-    if (spinApp::Instance().getContext()->isServer()) return;
+    if (!spinApp::Instance().getContext()->isServer()) return;
 
     // limit rate of updates:
     osg::Timer_t tick = osg::Timer::instance()->tick();
     float dt = osg::Timer::instance()->delta_s(lastTick,tick);
     if (dt > 1/maxRate_) // only update when dt is at least 0.05s (ie 20hz):
     {
-        bool needReport = false;
+		std::vector<reporterTarget>::iterator t;
 
-		osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath);
+		osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath_);
 		if (matrix_!=mthis)
 		{
-			needReport = true;
+            for (t = targets_.begin(); t != targets_.end(); ++t)
+            {
+                if ((*t).node.valid())
+                    (*t).needReport = true;
+			}
 			matrix_ = mthis;
 		}
 
-		std::vector<reporterTarget>::iterator t;
 		for (t = targets_.begin(); t != targets_.end();)
 		{
 			if ((*t).node.valid())
 			{
-				osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath);
+				osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath_);
 
-				// if there is a change in this node's matrix or the target, we need
-				// to send an updated report:
-				if (needReport || ((*t).matrix!=mtarget))
+				// if there is a change in this node's matrix or the target,
+                // we need to send an updated report:
+				if ((*t).matrix!=mtarget)
 				{
+					(*t).needReport = true;
 					(*t).matrix = mtarget;
-					sendReports(&(*t));
 				}
+                
+                // if the target is suddenly not in the graph anymore (or has
+                // re-appeared)... eg, because of SwitchNode, then we need to
+                // force a new report:
+                bool targetInGraph = (*t).node->inGraph();
+                if (targetInGraph != (*t).inGraph)
+                {
+                    (*t).needReport = true;
+                    (*t).inGraph = targetInGraph;
+                }
+                
+                // if anything flagged the need for a new report, let's do it:
+                if ((*t).needReport)
+                    sendReports(&(*t));
+                    
 				t++;
 			}
 
@@ -146,9 +161,18 @@ void ReporterNode::callbackUpdate()
 	}
 }
 
+void ReporterNode::forceAllReports()
+{
+    std::vector<reporterTarget>::iterator t;
+    for (t = targets_.begin(); t != targets_.end(); ++t)
+    {
+        sendReports(&(*t));
+    }
+}
+
 void ReporterNode::sendReports(reporterTarget *target)
 {
-	if (spinApp::Instance().getContext()->isServer()) return;
+	if (!spinApp::Instance().getContext()->isServer()) return;
 
 	// check that at least one report is required:
 	bool allDisabled = true;
@@ -157,7 +181,6 @@ void ReporterNode::sendReports(reporterTarget *target)
 	    if (i->second) allDisabled = false;
     }
 	if (allDisabled) return;
-
 
     std::vector<lo_message> msgs;
     lo_message msg;
@@ -181,13 +204,10 @@ void ReporterNode::sendReports(reporterTarget *target)
 
     // NOTE: all output angles are in RADIANS!
 
-
-
-
     if (reporting_["DISTANCE"])
     {
     	msg = lo_message_new();
-    	lo_message_add( msg, "ssf", "distance", target->node->id->s_name, connection_vector.length() );
+    	lo_message_add( msg, "ssf", "distance", target->node->getID().c_str(), connection_vector.length() );
     	msgs.push_back(msg);
     }
 
@@ -198,14 +218,14 @@ void ReporterNode::sendReports(reporterTarget *target)
         double incidence = AngleBetweenVectors(src_dir, connection_vector);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssf", "incidence", target->node->id->s_name, incidence );
+        lo_message_add( msg, "ssf", "incidence", target->node->getID().c_str(), incidence );
         msgs.push_back(msg);
 
         // direction: angle of connection_vector (projected on XY plane):
         float direction = AngleBetweenVectors(connection_vector, osg::Y_AXIS, 3);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssf", "direction", target->node->id->s_name, direction );
+        lo_message_add( msg, "ssf", "direction", target->node->getID().c_str(), direction );
         msgs.push_back(msg);
 
     }
@@ -224,69 +244,122 @@ void ReporterNode::sendReports(reporterTarget *target)
         float srcIncidenceAzim = AngleBetweenVectors(src_dir, connection_vector, 3);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssfff", "eulers", target->node->id->s_name, srcIncidenceElev, srcIncidenceRoll, srcIncidenceAzim);
+        lo_message_add( msg, "ssfff", "eulers", target->node->getID().c_str(), srcIncidenceElev, srcIncidenceRoll, srcIncidenceAzim);
         msgs.push_back(msg);
 
         osg::Quat rot;
         rot.makeRotate(connection_vector, src_dir);
 
         msg = lo_message_new();
-        lo_message_add(msg, "ssffff", "quaternion", target->node->id->s_name, rot.x(), rot.y(), rot.z(), rot.w());
+        lo_message_add(msg, "ssffff", "quaternion", target->node->getID().c_str(), rot.x(), rot.y(), rot.z(), rot.w());
         msgs.push_back(msg);
 
         /*
         osg::Vec3 rotEulers = QuatToEuler(rot);
 
         msg = lo_message_new();
-        lo_message_add( msg, "ssfff", "test", target->node->id->s_name, rotEulers.x(), rotEulers.y(), rotEulers.z());
+        lo_message_add( msg, "ssfff", "test", target->node->getID().c_str(), rotEulers.x(), rotEulers.y(), rotEulers.z());
         msgs.push_back(msg);
         */
     }
 
     if (reporting_["CONTAINMENT"])
     {
-        osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector =
-            new osgUtil::LineSegmentIntersector(srcTrans, snkTrans);
+        bool isContained = false;
 
-        osgUtil::IntersectionVisitor iv(intersector.get());
+        //std::cout << "checking containment with " << target->node->getID() << " inGraph? " << target->inGraph << ", radius=" << target->node->getBound().radius() << ", dist=" << connection_vector.length() << std::endl;
 
-        target->node->accept(iv);
-
-		// TODO: report distance (and normal?) to surface
-        /*
-        if (intersector->containsIntersections())
+        // if the target is not in the graph, then we are obviously not
+        // contained
+        if (!target->inGraph)
         {
-        	osg::Vec3 intersector->getFirstIntersection().getWorldIntersectPoint();
+            isContained = false;
         }
-        */
-
-        if (target->contained != (!intersector->containsIntersections()))
+        
+        // run the IntersectionVisitor if we are within the bounding radius
+        // of the target node:
+        else if (connection_vector.length() < target->node->getBound().radius())
         {
-        	target->contained = !intersector->containsIntersections();
-			msg = lo_message_new();
-			lo_message_add(msg, "ssi", "containedBy", target->node->id->s_name, (int)target->contained);
-			msgs.push_back(msg);
+            osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector =
+                new osgUtil::LineSegmentIntersector(srcTrans, snkTrans);
+            osgUtil::IntersectionVisitor intersectVisitor(intersector.get());
+
+            // make sure to provide a nodemask so that DEBUG nodes (eg, rayNode)
+            // are not checked for intersections:
+            //intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK|INTERACTIVE_NODE_MASK);
+            //intersectVisitor.setTraversalMask(!DEBUGVIEW_NODE_MASK);
+            
+            sceneManager_->rootNode->accept(intersectVisitor);
+            
+
+            // If there are some intersections, they could be with some other
+            // objects within the target's hull, so we have to check all
+            // intersections. If we find ANY intersection with our target, it
+            // means we are still outside the hull (not contained).
+            if (intersector->containsIntersections())
+            {
+                isContained = true;
+                
+                osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
+                osgUtil::LineSegmentIntersector::Intersections::iterator itr;
+
+                for (itr = intersections.begin(); itr != intersections.end(); ++itr)
+                {
+                    const osgUtil::LineSegmentIntersector::Intersection& intersection = *itr;
+                    for (int i=intersection.nodePath.size()-1; i>=0; i--)
+                    {
+                        ReferencedNode* testNode = dynamic_cast<ReferencedNode*>(intersection.nodePath[i]);
+                        if (testNode==target->node.get())
+                        {
+                            //std::cout << " yep. intersection. thus, NOT contained" << std::endl;
+                            // the linesegment intersected our target, so we are
+                            // outside the target's hull (not contained)
+                            isContained = false;
+                            break;
+                        }
+                    }
+                    if (!isContained) break;
+                }
+            } else
+            {
+                //std::cout << "no intersections, so we are totally contained" << std::endl;
+                // if there are no intersections, it means that we are totally
+                // within the target's hull.
+                isContained = true;
+            }
+        }
+
+        
+        // check for change in containment, and if so, send a message:
+        if (target->contained != isContained)
+        {
+            target->contained = isContained;
+            msg = lo_message_new();
+            lo_message_add(msg, "ssi", "containedBy", target->node->getID().c_str(), (int)target->contained);
+            msgs.push_back(msg);
         }
     }
-
+    
     if (reporting_["OCCLUSION"])
     {
     	// TODO
     }
 
     if (msgs.size())
-    	spinApp::Instance().NodeBundle(this->id, msgs);
+    	spinApp::Instance().NodeBundle(this->getID(), msgs);
+        
+    target->needReport = false;
 }
 
 // *****************************************************************************
 void ReporterNode::addTarget (const char *targetID)
 {
 	// get ReferencedNode for theat ID:
-	osg::ref_ptr<ReferencedNode> n = sceneManager->getNode(targetID);
+	osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
 
 	if (!n.valid())
 	{
-		std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+		std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but no node by that name could be found" << std::endl;
 		return;
 	}
 
@@ -296,7 +369,7 @@ void ReporterNode::addTarget (const char *targetID)
     {
     	if (n.get()==(*t).node.get())
     	{
-    		//std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
+    		//std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
     		return;
     	}
     }
@@ -304,8 +377,9 @@ void ReporterNode::addTarget (const char *targetID)
     // add it to the list:
     reporterTarget newTarget;
     newTarget.node = n.get();
-    newTarget.matrix = osg::computeLocalToWorld(n->currentNodePath);
+    newTarget.matrix = osg::computeLocalToWorld(n->currentNodePath_);
     newTarget.contained = false;
+    newTarget.needReport = true;
     targets_.push_back(newTarget);
 
 
@@ -318,11 +392,11 @@ void ReporterNode::addTarget (const char *targetID)
 void ReporterNode::removeTarget (const char *targetID)
 {
 	// get ReferencedNode for the ID:
-	osg::ref_ptr<ReferencedNode> n = sceneManager->getNode(targetID);
+	osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
 
 	if (!n.valid())
 	{
-		std::cout << "WARNING: reporterNode '" << this->id->s_name << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+		std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
 		return;
 	}
 
@@ -360,7 +434,7 @@ void ReporterNode::setReporting (const char *type, bool enabled)
 			{
 				if ((*t).node.valid())
 				{
-					(*t).matrix = osg::computeLocalToWorld((*t).node->currentNodePath);
+					(*t).matrix = osg::computeLocalToWorld((*t).node->currentNodePath_);
 					this->sendReports(&(*t));
 				}
 			}
@@ -398,7 +472,7 @@ std::vector<lo_message> ReporterNode::getState () const
     	if ((*t).node.valid())
 		{
     		msg = lo_message_new();
-    		lo_message_add(msg, "ss", "addTarget", (*t).node->id->s_name);
+    		lo_message_add(msg, "ss", "addTarget", (*t).node->getID().c_str());
     		ret.push_back(msg);
 		}
     }

@@ -67,7 +67,7 @@ class KinectCloud : public GroupNode
 
 public:
 
-    KinectCloud(SceneManager *sceneManager, char *initID);
+    KinectCloud(SceneManager *sceneManager, const char* initID);
     virtual ~KinectCloud();
     
     enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES,
@@ -78,7 +78,7 @@ public:
     /**
      * update from kinect
      */
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * Sets the mode for drawing the point cloud, based on the types in the

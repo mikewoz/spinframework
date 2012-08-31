@@ -17,7 +17,7 @@
 
 - (IBAction)refresh:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->refreshAll();
+    spin::spinApp::Instance().sceneManager_->refreshAll();
 }
 - (IBAction)refreshSubscribers:(id)sender
 {
@@ -34,25 +34,25 @@
 
 - (IBAction)clearScene:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->clear();
-    spin::spinApp::Instance().sceneManager->clearUsers();
-    spin::spinApp::Instance().sceneManager->clearStates();
+    spin::spinApp::Instance().sceneManager_->clear();
+    spin::spinApp::Instance().sceneManager_->clearUsers();
+    spin::spinApp::Instance().sceneManager_->clearStates();
 }
 - (IBAction)debugContext:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugContext(); 
+    spin::spinApp::Instance().sceneManager_->debugContext(); 
 }
 - (IBAction)debugNodes:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugNodes(); 
+    spin::spinApp::Instance().sceneManager_->debugNodes(); 
 }
 - (IBAction)debugStateSets:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugStateSets(); 
+    spin::spinApp::Instance().sceneManager_->debugStateSets(); 
 }
 - (IBAction)debugSceneGraph:(id)sender
 {
-    spin::spinApp::Instance().sceneManager->debugSceneGraph(); 
+    spin::spinApp::Instance().sceneManager_->debugSceneGraph(); 
 }
 
 

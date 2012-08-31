@@ -53,29 +53,14 @@ BEGIN_OBJECT_REFLECTOR(spin::SharedVideoTexture)
 	          __void__debug,
 	          "",
 	          "Print debug information to console. ");
-	I_Method0(void, updateCallback,
-	          Properties::VIRTUAL,
-	          __void__updateCallback,
-	          "",
-	          "This callback occurs every frame to update the state with any parameter changes. ");
-	I_Method0(void, consumeFrame,
+	I_Method0(void, play,
 	          Properties::NON_VIRTUAL,
-	          __void__consumeFrame,
+	          __void__play,
 	          "",
 	          "");
-	I_Method0(void, signalKilled,
+	I_Method0(void, pause,
 	          Properties::NON_VIRTUAL,
-	          __void__signalKilled,
-	          "",
-	          "");
-	I_Method0(void, start,
-	          Properties::NON_VIRTUAL,
-	          __void__start,
-	          "",
-	          "");
-	I_Method0(void, stop,
-	          Properties::NON_VIRTUAL,
-	          __void__stop,
+	          __void__pause,
 	          "",
 	          "");
 	I_SimpleProperty(const char *, Path, 

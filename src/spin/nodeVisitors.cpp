@@ -180,7 +180,7 @@ void DebugVisitor::apply(osg::Group &node)
     ReferencedNode *n;
 
     if ((n=dynamic_cast<ReferencedNode*>(&node))) {
-        std::cout << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->nodeType << ", id=" << n->id->s_name << "  (" << node.getNumChildren () << " children)" << std::endl;
+        std::cout << leadingSpaces(getNodePath().size()) << "SPIN NODE: type=" << n->getNodeType() << ", id=" << n->getID() << "  (" << node.getNumChildren () << " children)" << std::endl;
     } else {
         std::cout << leadingSpaces(getNodePath().size()) << "GROUP: " << node.getName() << "  (" << node.getNumChildren () << " children)" << std::endl;
     }
@@ -200,7 +200,7 @@ void UpdateSceneVisitor::apply(osg::Group &node)
     ReferencedNode *n;
     if ((n = dynamic_cast<ReferencedNode*>(&node)))
     {
-        n->callbackUpdate();
+        n->callbackUpdate(this);
     }
     traverse(node);
 }

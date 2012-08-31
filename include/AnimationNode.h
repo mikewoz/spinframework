@@ -42,7 +42,7 @@
 #ifndef __AnimationNode_H
 #define __AnimationNode_H
 
-#include "GroupNode.h"
+#include "ConstraintsNode.h"
 
 #include <osg/AnimationPath>
 
@@ -55,12 +55,12 @@ class SceneManager;
 /**
  * \brief Node for encapsulating 3D animation
  */
-class AnimationNode : public GroupNode
+class AnimationNode : public ConstraintsNode
 {
 
 public:
 
-    AnimationNode(SceneManager *sceneManager, char *initID);
+    AnimationNode(SceneManager *sceneManager, const char* initID);
     virtual ~AnimationNode();
     
     
@@ -68,7 +68,7 @@ public:
 
     
     
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     
     /**
      * Performs the actual update of translation, orientation, and scale given
@@ -86,17 +86,17 @@ public:
     /**
      * \brief Set the update rate (in Hz).
      * 
-     * The animation will send setTranslation, setOrientation, and setScale
+     * The animation will send translate, rotate, and setScale
      * events at this rate (assuming there is a change). Values will be
      * interpolated in between control points.
-     * @param hz Update rate in hz
+     * @param hz Animation rate in hz
      */
-    void setUpdateRate (float hz);
+    void setAnimationRate (float hz);
     
     /**
-     * @return update rate in hz
+     * @return animation rate in hz
      */
-    float getUpdateRate() const { return _updateRate; }
+    float getAnimationRate() const { return animationRate_; }
     
     /**
     * Turns animation on/off.
@@ -177,7 +177,7 @@ public:
     /**
      * Clears the current animation sequence
      */
-    void clear() { _animationPath->clear(); }
+    void clear();
 
     /**
      * For each subclass of ReferencedNode, we override the getState() method to
@@ -189,7 +189,7 @@ protected:
     
     bool _play, _record;
     osg::Timer_t _startTime, _lastTick;
-    float _updateRate;
+    float animationRate_;
     
     osg::ref_ptr<osg::AnimationPath> _animationPath;
 };

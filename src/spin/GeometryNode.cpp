@@ -55,8 +55,6 @@
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -64,18 +62,13 @@ namespace spin
 
 // ===================================================================
 // constructor:
-GeometryNode::GeometryNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+GeometryNode::GeometryNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".GeometryNode");
-	nodeType = "GeometryNode";
+	this->setName(this->getID() + ".GeometryNode");
+	this->setNodeType("GeometryNode");
 
-
-	stateset = gensym("NULL");
-	renderBin_ = 11;
-	lightingEnabled_ = true;
     updateFlag_ = false;
 
-    
     numVertices_ = 4;
     osg::Vec3Array *vertexArray_ = new osg::Vec3Array(numVertices_);
     osg::Vec4Array *colorArray_ = new osg::Vec4Array(numVertices_);
@@ -97,10 +90,11 @@ GeometryNode::GeometryNode (SceneManager *sceneManager, char *initID) : GroupNod
 	(*texcoordArray_)[2].set(1.0f,0.0f);
 	(*texcoordArray_)[3].set(1.0f,1.0f);
 
+    singleSided_ = false;
     
     geode_ = new osg::Geode();
     this->getAttachmentNode()->addChild(geode_.get());
-    geode_->setName(string(id->s_name) + ".geode");
+    geode_->setName(this->getID() + ".geode");
 
     geometry_ = new osg::Geometry();
     geometry_->setVertexArray(vertexArray_);
@@ -121,20 +115,21 @@ GeometryNode::GeometryNode (SceneManager *sceneManager, char *initID) : GroupNod
 	geometry_->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,numVertices_));
 	
     geode_->addDrawable(geometry_);
+    
+    osgDB::Registry::instance()->getSharedStateManager()->share(this);
 }
 
 // -----------------------------------------------------------------------------
 // destructor
 GeometryNode::~GeometryNode()
 {
+    if (sceneManager_->sharedStateManager.valid()) sceneManager_->sharedStateManager->prune();
 }
-
-    
     
 // -----------------------------------------------------------------------------
-void GeometryNode::callbackUpdate()
+void GeometryNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
     
     if (updateFlag_)
     {
@@ -145,71 +140,12 @@ void GeometryNode::callbackUpdate()
     
 // -----------------------------------------------------------------------------
 
-
-void GeometryNode::setStateSetFromFile(const char* filename)
-{
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
-	if (ss.valid())
-	{
-		if (ss->id == stateset) return; // we're already using that stateset
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
-
-void GeometryNode::setStateSet (const char* s)
-{
-	if (gensym(s)==stateset) return;
-
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
-	if (ss.valid())
-	{
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
-
 void GeometryNode::updateStateSet()
 {
-	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset->s_thing);
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
 	if (geode_.valid() && ss.valid()) geode_->setStateSet( ss.get() );
 }
 
- 
-void GeometryNode::setRenderBin (int i)
-{
-	if (renderBin_ == i) return;
-
-	renderBin_ = i;
-
-	if (geode_.valid())
-	{
-		osg::StateSet *ss = geode_->getOrCreateStateSet();
-		ss->setRenderBinDetails( (int)renderBin_, "RenderBin");
-		//setStateSet( shapeStateSet );
-	}
-
-	BROADCAST(this, "si", "setRenderBin", renderBin_);
-}
-    
-void GeometryNode::setLighting (int i)
-{
-	if (lightingEnabled_==(bool)i) return;
-	lightingEnabled_ = (bool)i;
-
-	if (geode_.valid() && !stateset->s_thing)
-	{
-		osg::StateSet *ss = geode_->getOrCreateStateSet();
-		if (lightingEnabled_) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-	}
-
-	BROADCAST(this, "si", "setLighting", getLighting());
-
-}
-    
 void GeometryNode::setNumVertices(int i)
 {
     if (numVertices_ != i)
@@ -299,6 +235,19 @@ void GeometryNode::setTexCoord(int index, float x, float y)
     }   
 }
 
+void GeometryNode::setSingleSided (int singleSided)
+{
+    singleSided_ = singleSided;
+    
+    osg::StateSet *ss = geode_->getOrCreateStateSet();
+    if (singleSided_)
+        ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+    else
+        ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+
+	BROADCAST(this, "si", "setSingleSided", getSingleSided());
+}
+
 // -----------------------------------------------------------------------------
 
 std::vector<lo_message> GeometryNode::getState () const
@@ -309,18 +258,6 @@ std::vector<lo_message> GeometryNode::getState () const
 	lo_message msg;
 	osg::Vec3 v3;
 	osg::Vec4 v4;
-
-	msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setStateSet", getStateSet());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setLighting", getLighting());
-	ret.push_back(msg);
 
 	// put this one last:
 	/*
@@ -347,7 +284,6 @@ std::vector<lo_message> GeometryNode::getState () const
         ret.push_back(msg);
     }
     
-    
     osg::Vec2Array *tArray = dynamic_cast<osg::Vec2Array*>(geometry_->getTexCoordArray(0));
     for (unsigned int i=0; i<tArray->getNumElements(); i++)
     {
@@ -355,6 +291,11 @@ std::vector<lo_message> GeometryNode::getState () const
         lo_message_add(msg, "siff", "setTexCoord", i, (*tArray)[i].x(), (*tArray)[i].y());
         ret.push_back(msg);
     }
+    
+    msg = lo_message_new();
+	lo_message_add(msg, "si", "setSingleSided", getSingleSided());
+	ret.push_back(msg);
+
 
 	return ret;
 }

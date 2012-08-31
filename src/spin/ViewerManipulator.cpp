@@ -61,9 +61,10 @@ ViewerManipulator::ViewerManipulator()
 	
 	if (spin.userNode.valid())
 	{
-		this->user = spin.userNode->id;
-		setTrackNode(spin.userNode->getCameraAttachmentNode());
-	} else {
+        this->userID = spin.userNode->getID();
+        setTrackNode(spin.userNode->getCameraAttachmentNode());
+	}
+    else {
 		std::cout << "ERROR: Could not set up node tracker for ViewerManipulator. Perhaps user was registered before SPIN was started?" << std::endl;
 	}
 
@@ -81,6 +82,7 @@ ViewerManipulator::ViewerManipulator()
 	setMinimumDistance( 0.0 );
 	setHomePosition( osg::Vec3(0,-0.00001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 	//setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,0.0001,0), osg::Vec3(0,0,1), false );
+        std::cout << "after?" << std::endl;
 
 }
 
@@ -88,6 +90,15 @@ ViewerManipulator::~ViewerManipulator()
 {
 }
 
+void ViewerManipulator::setTrackNode(osg::Node* node)
+{
+    // note: we temporarily set NotifySeverity to avoid a 
+    // NodePath printout in OSG 3.1
+    osg::NotifySeverity tmp = osg::getNotifyLevel();
+    osg::setNotifyLevel(osg::FATAL);
+    NodeTrackerManipulator::setTrackNode(node);
+    osg::setNotifyLevel(tmp);
+}
 
 void ViewerManipulator::setPicker(bool b)
 {
@@ -123,12 +134,14 @@ bool ViewerManipulator::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActio
 		{
 			// if the userNode's nodepath has changed, we must call setTrackNode
 			// again to force NodeTrackerManipulator to store the proper nodePath
+			/*
 			if (spin.userNode->nodepathUpdate)
 			{
 				setTrackNode(spin.userNode->getCameraAttachmentNode());
 				spin.userNode->nodepathUpdate = false;
 			}
-			
+			*/
+
 			// update camera from NodeTrackerManipulator:
 			if (_thrown) aa.requestRedraw();
 		}
@@ -162,7 +175,7 @@ void ViewerManipulator::handleKeypress(const osgGA::GUIEventAdapter& ea)
 	if (ea.getKey()=='r')
 	{
         if (ea.getEventType()==osgGA::GUIEventAdapter::KEYUP)
-            sendEvent(user->s_name, "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
+            sendEvent(spinApp::Instance().userNode->getID().c_str(), "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
 	}
     else if (ea.getKey()=='a')
     {
@@ -223,6 +236,7 @@ std::vector<GroupNode*> ViewerManipulator::getNodesFromIntersections(osgUtil::Li
 
 void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEventAdapter& ea)
 {
+
     using namespace osgGA;
 
 	osg::ref_ptr<GroupNode> hitNode, drawNode;
@@ -235,6 +249,8 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 
 	unsigned int buttonMask = ea.getButtonMask();
 	unsigned int modkeyMask = ea.getModKeyMask();
+    
+    const char* userID = spinApp::Instance().userNode->getID().c_str();
 
 	// adjust modkeyMask to ignore numlock and capslock:
 	if (modkeyMask>=GUIEventAdapter::MODKEY_CAPS_LOCK) modkeyMask -= GUIEventAdapter::MODKEY_CAPS_LOCK;
@@ -270,7 +286,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 		std::cout << " currently selected nodes:";
 		for (unsigned j = 0; j < selectedNodes.size(); ++j)
 		{
-			std::cout << " " << selectedNodes[j]->s_name;
+			std::cout << " " << selectedNodes[j]->getID();
 		}
 		std::cout << std::endl;
     }
@@ -385,15 +401,14 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 		if (selectedNodes.size())
 		{
 			//for (j=0; j<selectedNodes.size(); j++)
-			for (std::vector<t_symbol*>::iterator it=selectedNodes.begin(); it!=selectedNodes.end();)
+			for (std::vector<GroupNode*>::iterator it=selectedNodes.begin(); it!=selectedNodes.end();)
 			{	
 				bool found = false;
-				GroupNode *n = dynamic_cast<GroupNode*>((*it)->s_thing);
 				for (unsigned i = 0; i < hitNodes.size(); i++)
 				{
-					if (hitNodes[i] == n)
+					if (hitNodes[i] == (*it))
 					{
-						sendPick(n, ea.getEventType(), modkeyMask, buttonMask,
+						sendPick((*it), ea.getEventType(), modkeyMask, buttonMask,
 								scrollX, scrollY, dX, dY, hitPoints[i]);
 						found = true;
 						break;
@@ -404,7 +419,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				// send the event (eg, a RELEASE), but we set the hitpoint to 0,0,0
 				if (!found)
 				{
-					sendPick(n, ea.getEventType(), modkeyMask, buttonMask,
+					sendPick((*it), ea.getEventType(), modkeyMask, buttonMask,
 							scrollX, scrollY, dX, dY, osg::Vec3(0.0,0.0,0.0));
 				}
 
@@ -441,7 +456,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 						
 						// add it to the selectedNodes in the case of a PUSH
 						if (ea.getEventType()==GUIEventAdapter::PUSH)
-							selectedNodes.push_back(hitNodes[i]->id);
+							selectedNodes.push_back(hitNodes[i]);
 						
 						foundDrawable = true;
 					}
@@ -460,7 +475,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 						
 						// add it to the selectedNodes in the case of a PUSH
 						if (ea.getEventType()==GUIEventAdapter::PUSH)
-							selectedNodes.push_back(hitNodes[i]->id);
+							selectedNodes.push_back(hitNodes[i]);
 						
 						foundSelectable = true;
 					}
@@ -499,9 +514,9 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				clickY = ea.getYnormalized();
 				
 				
-				sendEvent(user->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(userID, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
 				if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
-					sendEvent(user->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+					sendEvent(userID, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 
 				
 				break;
@@ -529,17 +544,17 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// pan forward/back & left/right:
-				    	sendEvent(user->s_name, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
+				    	sendEvent(userID, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// pan up/down & left/right:
-				    	sendEvent(user->s_name, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
+				    	sendEvent(userID, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
 				    }
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-				    	sendEvent(user->s_name, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
+				    	sendEvent(userID, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
 				    }
 				}
 			
@@ -557,26 +572,26 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// drive forward/back & left/right:
-			    		sendEvent(user->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
+			    		sendEvent(userID, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
 			    		
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// drive up/down & left/right:
-			    		sendEvent(user->s_name, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
+			    		sendEvent(userID, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
 			    	}
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-			    		sendEvent(user->s_name, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
+			    		sendEvent(userID, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
 				    }
 			    }
 
 				break;
 				
 			case(GUIEventAdapter::RELEASE):
-				sendEvent(user->s_name, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
-				sendEvent(user->s_name, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(userID, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(userID, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
 				break;
 				
 			case(GUIEventAdapter::SCROLL):
@@ -591,7 +606,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 	// send raw events if user requests them
 	if (this->raw)
 	{
-		sendEvent(user->s_name,
+		sendEvent(userID,
 		    "siiiff",
 		    "mouseEvent",
 			(int)ea.getEventType(),
@@ -609,15 +624,17 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, unsigned int modKeyMask, unsigned int buttonMask, float scrollX, float scrollY, float dX, float dY, osg::Vec3 hitPoint)
 {
 
+    const char* userID = spinApp::Instance().userNode->getID().c_str();
+    
 	switch (eventType)
 	{
 		// send MOVE events (eg, for drawing on nodes)
 		case(osgGA::GUIEventAdapter::MOVE):
-			sendEvent(hitNode->id->s_name,
+			sendEvent(hitNode->getID().c_str(),
 					  "sisfffff",
 					  "event",
 					  (int)eventType,
-					  user->s_name,
+					  userID,
 					  dX,
 					  dY,
 					  hitPoint.x(),
@@ -630,11 +647,11 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 		// and rolls onto this node, so we shouldn't send
 		// anything, should we?
 		case(osgGA::GUIEventAdapter::DRAG):
-			sendEvent(hitNode->id->s_name,
+			sendEvent(hitNode->getID().c_str(),
 					  "sisfffff",
 					  "event",
 					  (int)eventType,
-					  user->s_name,
+					  userID,
 					  dX,
 					  dY,
 					  hitPoint.x(),
@@ -648,11 +665,11 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 		// However, just to be safe, we'll also ensure that
 		// there is no selected node anymore:
 		case(osgGA::GUIEventAdapter::RELEASE):
-			sendEvent(hitNode->id->s_name,
+			sendEvent(hitNode->getID().c_str(),
 					"sisfffff",
 					"event",
 					(int)eventType,
-					user->s_name,
+					userID,
 					(float) modKeyMask,
 					(float) buttonMask,
 					hitPoint.x(),
@@ -660,7 +677,7 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 					hitPoint.z(),
 					LO_ARGS_END);
 			/*
-			for (std::vector<t_symbol*>::iterator it=selectedNodes.begin(); it!=selectedNodes.end(); ++it)
+			for (std::vector<GroupNode*>::iterator it=selectedNodes.begin(); it!=selectedNodes.end(); ++it)
 			{
 				if ((*it)==hitNode->id)
 				{
@@ -674,11 +691,11 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 		// SCROLLING (with the mouse wheel) is cool. It
 		// could be used to scale for example.
 		case(osgGA::GUIEventAdapter::SCROLL):
-			sendEvent(hitNode->id->s_name,
+			sendEvent(hitNode->getID().c_str(),
 					"sisfffff",
 					"event",
 					(int)eventType,
-					user->s_name,
+					userID,
 					scrollX,
 					scrollY,
 					hitPoint.x(),
@@ -690,26 +707,26 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 		// In the case of a PUSH, we both send the
 		// event, and set the selectedNode
 		case(osgGA::GUIEventAdapter::PUSH):
-			sendEvent(hitNode->id->s_name,
+			sendEvent(hitNode->getID().c_str(),
 					"sisfffff",
 					"event",
 					(int)eventType,
-					user->s_name,
+					userID,
 					(float) modKeyMask,
 					(float) buttonMask,
 					hitPoint.x(),
 					hitPoint.y(),
 					hitPoint.z(),
 					LO_ARGS_END);
-			//selectedNodes.push_back(hitNode->id);
+			//selectedNodes.push_back(hitNode);
 			break;
 
 		case(osgGA::GUIEventAdapter::DOUBLECLICK):
-			sendEvent(hitNode->id->s_name,
+			sendEvent(hitNode->getID().c_str(),
 					"sisfffff",
 					"event",
 					(int)eventType,
-					user->s_name,
+					userID,
 					(float) modKeyMask,
 					(float) buttonMask,
 					hitPoint.x(),

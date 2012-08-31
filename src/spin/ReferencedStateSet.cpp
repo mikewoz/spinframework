@@ -58,25 +58,23 @@ namespace spin
 // constructor:
 ReferencedStateSet::ReferencedStateSet(SceneManager *s, const char *initID)
 {
-	// concatenate
-	//string thisID = string(n->id->s_name)+"/"+initID;
 
-	
-	id = gensym(initID);
-	id->s_thing = this;
-	id->s_type = REFERENCED_STATESET;
+	id_ = gensym(initID);
+	id_->s_thing = this;
+	id_->s_type = REFERENCED_STATESET;
 
 	renderBin_ = 11;
 	lightingEnabled_ = true;
+    transparent_ = false;
 	textureBlend_ = osg::TexEnv::MODULATE;
 	textureRepeatS_ = false;
 	textureRepeatT_ = false;
 	
-	sceneManager = s;
+	sceneManager_ = s;
 	
-	classType = "ReferencedStateSet";
+	classType_ = "ReferencedStateSet";
 	
-	this->setName(std::string(id->s_name) + ".ReferencedStateSet");
+	this->setName(std::string(id_->s_name) + ".ReferencedStateSet");
 	
 	// We need to set up a callback. This should be on the topmost node, so that during node
 	// traversal, we update our parameters before anything is drawn.
@@ -201,7 +199,7 @@ void ReferencedStateSet::debug()
 	std::cout << "****************************************" << std::endl;
 	std::cout << "************* STATE DEBUG: *************" << std::endl;
 
-	std::cout << "\nReferencedStateSet: " << id->s_name << ", type: " << classType << std::endl;
+	std::cout << "\nReferencedStateSet: " << id_->s_name << ", type: " << classType_ << std::endl;
 
 	
 	std::cout << "   Shared by:";
@@ -324,6 +322,16 @@ void ReferencedStateSet::setLighting (int i)
 	BROADCAST(this, "si", "setLighting", getLighting());
 }
 
+void ReferencedStateSet::setTransparent (int i)
+{
+	transparent_ = (bool)i;
+
+	if (transparent_) this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+	else this->setRenderingHint(osg::StateSet::DEFAULT_BIN);
+
+	BROADCAST(this, "si", "setTransparent", getTransparent());
+}
+
 void ReferencedStateSet::setRenderBin (int i)
 {
 	renderBin_ = i;
@@ -353,6 +361,10 @@ std::vector<lo_message> ReferencedStateSet::getState () const
 	ret.push_back(msg);
 
 	msg = lo_message_new();
+	lo_message_add(msg, "si", "setTransparent", getTransparent());
+	ret.push_back(msg);
+
+	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 
@@ -364,13 +376,13 @@ std::vector<lo_message> ReferencedStateSet::getState () const
 
 void ReferencedStateSet::stateDump()
 {
-    spinApp::Instance().NodeBundle(this->id, this->getState());
+    spinApp::Instance().NodeBundle(this->getID(), this->getState());
 }
 
 
 void ReferencedStateSet::stateDump(lo_address addr)
 {
-    spinApp::Instance().NodeBundle(this->id, this->getState(), addr);
+    spinApp::Instance().NodeBundle(this->getID(), this->getState(), addr);
 }
 
 } // end of namespace spin

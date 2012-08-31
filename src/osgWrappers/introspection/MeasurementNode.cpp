@@ -31,13 +31,13 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::MeasurementNode)
 	I_DeclaringFile("MeasurementNode.h");
 	I_BaseType(spin::ReferencedNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____MeasurementNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____MeasurementNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "The update callback for MeasurementNode checks to see if the target's or the MeasurementNode's global matrix has changed (ie, whether it has been moved or not). If so, it updates the internal matrices, and calls sendMeasurements() ");
 	I_Method0(void, sendMeasurements,

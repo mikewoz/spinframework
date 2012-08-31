@@ -51,6 +51,7 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 #include "osgUtil.h"
+#include "ReporterNode.h"
 
 //extern SceneManager *sceneManager;
 
@@ -59,16 +60,13 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-SwitchNode::SwitchNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+SwitchNode::SwitchNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-    using std::string;
-	this->setName(string(id->s_name) + ".SwitchNode");
-	nodeType = "SwitchNode";
+	this->setName(this->getID() + ".SwitchNode");
+	this->setNodeType("SwitchNode");
 
 	switcher = new osg::Switch();
-	switcher->setName(string(id->s_name) + ".switcher");
-
-	std::cout << "creating switch node. attaching to " << this->getAttachmentNode()->getName() << std::endl;
+	switcher->setName(this->getID() + ".switcher");
 
 	// We inherit from GroupNode, so we must make sure to attach our osg Switch
 	// to the attachmentNode of GroupNode
@@ -90,7 +88,7 @@ void SwitchNode::updateNodePath()
 	// call GroupNode's method, which will update all the way from the root, and
 	// we just need to add the Switch node:
 	GroupNode::updateNodePath(false);
-	currentNodePath.push_back(switcher.get());
+	currentNodePath_.push_back(switcher.get());
 
 	// now update NodePaths for all children:
 	updateChildNodePaths();
@@ -103,7 +101,7 @@ void SwitchNode::setEnabled (const char* id, int enabled)
 	for (unsigned int i=0; i<switcher->getNumChildren(); i++)
 	{
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
-		if (n.valid() && (n->id==gensym(id)))
+		if (n.valid() && (n->getID()==std::string(id)))
 		{
 			// found the node in question
 			switcher->setValue(i, (bool)enabled);
@@ -111,6 +109,19 @@ void SwitchNode::setEnabled (const char* id, int enabled)
 			break;
 		}
 	}
+}
+
+
+bool SwitchNode::isEnabled (ReferencedNode* n)
+{
+    for (unsigned int i=0; i<switcher->getNumChildren(); i++)
+	{
+        osg::ref_ptr<ReferencedNode> test = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
+        if (n==test)
+        {
+            return (bool) switcher->getValue(i);
+        }
+    }
 }
 
 void SwitchNode::setAll(int enabled)
@@ -125,7 +136,7 @@ void SwitchNode::setAll(int enabled)
 		osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(switcher->getChild(i));
 		if (n.valid())
 		{
-			BROADCAST(this, "ssi", "setEnabled", n->id->s_name, (int)switcher->getValue(i));
+			BROADCAST(this, "ssi", "setEnabled", n->getID().c_str(), (int)switcher->getValue(i));
 		}
 	}
 }
@@ -144,7 +155,7 @@ std::vector<lo_message> SwitchNode::getState () const
 		if (n.valid())
 		{
 			msg = lo_message_new();
-			lo_message_add(msg, "ssi", "setEnabled", n->id->s_name, (int)switcher->getValue(i));
+			lo_message_add(msg, "ssi", "setEnabled", n->getID().c_str(), (int)switcher->getValue(i));
 			ret.push_back(msg);
 		}
 	}

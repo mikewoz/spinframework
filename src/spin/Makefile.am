@@ -9,16 +9,23 @@ AM_CPPFLAGS = \
     $(SPATOSC_CFLAGS) \
     $(BULLET_CFLAGS) \
     -I$(top_srcdir)/include \
-    -I$(top_srcdir)/src/tinyxml
+    -I$(top_srcdir)/src \
+    -I$(top_srcdir)/src/tinyxml \
+    -I$(top_srcdir)/src/osgPPU
+
 
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
 lib_LTLIBRARIES = libspin-@SPIN_API_VERSION@.la
+
+if HAVE_PYTHON
 python_LTLIBRARIES = libSPINPyWrap.la
+endif
 
 libspin_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
+    $(top_builddir)/src/osgPPU/libosgPPU.la \
     $(top_builddir)/src/tinyxml/libtinyxml.la
 
 libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
@@ -35,7 +42,9 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(OPENTHREADS_LIBS) \
     $(OSG_LIBS) \
     $(SHAREDVIDEO_LIBS) \
-    $(SPATOSC_LIBS) 
+    $(SPATOSC_LIBS) \
+    $(SPNAV_LIBS) \
+    $(POCO_LIBS)
     
 #	$(BOOST_THREAD_LIBS) 
 
@@ -44,6 +53,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     AnimationNode.cpp \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
+    CompositeViewer.cpp \
     Contour.cpp \
     DraggerTrackball.cpp \
     DraggerWith3Axes.cpp \
@@ -65,6 +75,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     nodeVisitors.cpp \
     osgUtil.cpp \
     ParticleSystem.cpp \
+    pocoUtil.cpp \
     PointerNode.cpp \
     RayNode.cpp \
     ReferencedNode.cpp \
@@ -94,6 +105,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
     $(top_srcdir)/include/config.h \
+    $(top_srcdir)/include/CompositeViewer.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
     $(top_srcdir)/include/DraggerTrackball.h \
@@ -119,6 +131,8 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/oscParser.h \
     $(top_srcdir)/include/osgUtil.h \
     $(top_srcdir)/include/ParticleSystem.h \
+    $(top_srcdir)/include/ParticleSystemUtil.h \
+    $(top_srcdir)/include/pocoUtil.h \
     $(top_srcdir)/include/PointerNode.h \
     $(top_srcdir)/include/RayNode.h \
     $(top_srcdir)/include/ReferencedNode.h \
@@ -151,6 +165,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
 
 # $(top_srcdir)/include/videoSize.h
 
+if HAVE_PYTHON
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 #libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
 libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
@@ -159,14 +174,18 @@ libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
 
-# # On OSX, we need the python module to have a .so extension, but the -shrext option
-# # doesn't work with glibtool, so we make a symbolic link in an install hook instead.
-# # On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
-# # do this only for OSX?
-# install-exec-hook:
-#     cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
-# 
+# On OSX, we need the python module to have a .so extension, but the -shrext option
+# doesn't work with glibtool, so we make a symbolic link in an install hook instead.
+# On Linux, this will fail because the .dylip doesn't exist. Is there any way we can
+# do this only for OSX?
+if HAVE_OSX
+install-exec-hook:
+	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+endif
+
 # #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
+endif
+
 
 if BULLET
 AM_CPPFLAGS += \
@@ -182,7 +201,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS += \
 endif
 
 if PCL
-AM_CPPFLAGS += $(PCL_CFLAGS) 
+AM_CPPFLAGS += $(PCL_CFLAGS)  
 libspin_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
 libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
 libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h
@@ -192,19 +211,17 @@ endif
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS)
-
+spinserver_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS)
-
+spinviewer_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(SPNAV_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS)
+spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
 
 ###############################################################################
 # CUSTOM targets:
 
-doc:
+doc: spindocgenerator
 	./spindocgenerator
-	-cp *.html ../../doxygen/html
+	-cp *.html ../../html

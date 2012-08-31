@@ -61,7 +61,7 @@ class RayNode : public GroupNode
 
 public:
 
-    RayNode(SceneManager *sceneManager, char *initID);
+    RayNode(SceneManager *sceneManager, const char* initID);
     virtual ~RayNode();
 
     void setVisible        (int visibilityFlag);

@@ -41,13 +41,13 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	I_DeclaringFile("ConstraintsNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____ConstraintsNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____ConstraintsNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
 	I_Method1(void, setTarget, IN, const char *, id,
@@ -95,6 +95,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	          __void__setTranslation__float__float__float,
 	          "",
 	          "The local translation offset for this node with respect to it's parent ");
+	I_Method0(osg::Vec3, getTranslation,
+	          Properties::VIRTUAL,
+	          __osg_Vec3__getTranslation,
+	          "",
+	          "");
 	I_Method3(void, translate, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__translate__float__float__float,
@@ -130,5 +135,8 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	I_SimpleProperty(const char *, Target, 
 	                 __C5_char_P1__getTarget, 
 	                 __void__setTarget__C5_char_P1);
+	I_SimpleProperty(osg::Vec3, Translation, 
+	                 __osg_Vec3__getTranslation, 
+	                 0);
 END_REFLECTOR
 

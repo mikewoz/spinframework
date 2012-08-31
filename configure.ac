@@ -17,7 +17,7 @@ AC_PREREQ([2.61])
 # - increase spin_interface_version to the next odd number
 m4_define([spin_major_version], [0])
 m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [16])
+m4_define([spin_micro_version], [18])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -53,9 +53,9 @@ m4_define([spin_binary_age], [m4_eval(100 * spin_minor_version + spin_micro_vers
 #AC_PREREQ([2.63])
 AC_INIT(SPINFRAMEWORK,
         [spin_version],
-        [http://www.spinframework.org],
+        [http://code.sat.qc.ca/redmine/projects/spinframework/issues/new],
         [spinframework],
-        [http://codered.sat.qc.ca/redmine/projects/spinframework])
+        [http://www.spinframework.org])
 AC_MSG_NOTICE([Configuring the SPIN Framework])
 AM_INIT_AUTOMAKE([subdir-objects -Wno-portability])
 #AC_CONFIG_SRCDIR([include/ModelNode.h])
@@ -86,7 +86,6 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 
-AC_LANG_DEFINES_PROVIDED # remove autogen.sh warnings on OSX
 AC_PROG_LIBTOOL
 # LT_INIT should be used instead of AC_PROG_LIBTOOL
 #LT_PREREQ([2.4])
@@ -113,7 +112,10 @@ fi
 
 # Special cases
 case "$host" in *-darwin* | *-macos10*)
+  #AC_LANG_DEFINES_PROVIDED # remove autogen.sh warnings on OSX
+  AM_CONDITIONAL([HAVE_OSX], true)
   LIBTOOL="glibtool"
+  SRCDIR=`pwd`
   #LIBTOOL="libtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
@@ -127,10 +129,20 @@ case "$host" in *-darwin* | *-macos10*)
   # OSX does not include /usr/local/lib/pkgconfig path, so we export it here
   # (for everyone, just in case)
   # TODO: also need to add the path for linux64
-  PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
-  export PKG_CONFIG_PATH
+  #PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH:$SRCDIR/pkgconfig/osx
+  #export PKG_CONFIG_PATH
+  ;;
+*)
+  AM_CONDITIONAL([HAVE_OSX], false)
   ;;
 esac
+
+# On OSX, /usr/local/lib/pkgconfig is not included, and the 64-bit linux path is
+# also often missing. We also provide some local .pc files since binary packages
+# of flann and OpenNI (downloaded from www.pointclouds.org) do not include .pc
+# files
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH:$PWD/pkgconfig
+
 
 CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
 LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
@@ -157,6 +169,19 @@ AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
+# Method to disable Python (note the negative: DISable)
+AC_ARG_ENABLE([python],
+    AS_HELP_STRING([--enable-python], [Enables the Python interpreter within SPIN (enabled by default)]),
+    [enable_python=$enableval],
+    [enable_python=true])
+if test "x$enable_python" != xtrue; then
+AC_DEFINE([DISABLE_PYTHON],[1],[Disables python interpreter and thus all behaviours scripts in SPIN]) AC_MSG_NOTICE([Disabled Python scripts])
+fi
+AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xtrue)
+
+
+if test "x$enable_python" = xtrue; then
+
 # Check for Python:
 AM_PATH_PYTHON
 
@@ -172,7 +197,7 @@ case "$host" in *-darwin* | *-macos10*)
   pythondir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
   pyexecdir=`python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 esac
-
+fi
 
 BOOST_REQUIRE([1.35])
 BOOST_REGEX
@@ -180,17 +205,9 @@ BOOST_SYSTEM
 BOOST_FILESYSTEM
 #BOOST_THREAD
 BOOST_PROGRAM_OPTIONS
+if test "x$enable_python" = xtrue; then
 BOOST_PYTHON
-
-#AC_MSG_NOTICE([BOOST_LDFLAGS:        ${BOOST_LDFLAGS}])
-AC_MSG_NOTICE([BOOST_CPPFLAGS:             ${BOOST_CPPFLAGS}])
-AC_MSG_NOTICE([BOOST_SYSTEM_LIBS:          ${BOOST_SYSTEM_LIBS}])
-AC_MSG_NOTICE([BOOST_FILESYSTEM_LIBS:      ${BOOST_FILESYSTEM_LIBS}])
-AC_MSG_NOTICE([BOOST_PROGRAM_OPTIONS_LIBS: ${BOOST_PROGRAM_OPTIONS_LIBS}])
-AC_MSG_NOTICE([BOOST_PYTHON_LIBS:          ${BOOST_PYTHON_LIBS}])
-AC_MSG_NOTICE([BOOST_PYTHON_LDFLAGS:       ${BOOST_PYTHON_LDFLAGS}])
-
-
+fi
 
 
 PKG_CHECK_MODULES(OSG, openscenegraph >= 2.8.0, , AC_MSG_ERROR([missing OpenSceneGraph]))
@@ -207,19 +224,24 @@ PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 #        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shared-video-0.6, have_sharedvideo=true, have_sharedvideo=false)
+PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6, have_sharedvideo=true, have_sharedvideo=false)
 if test "x${have_sharedvideo}" = "xfalse" ; then
-    AC_MSG_WARN([missing package: libshared-video-0.6-dev ])
+    AC_MSG_WARN([missing package: libshmdata-0.6-dev ])
 else
-    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shared_video library from Scenic]) AC_MSG_NOTICE([Using scenic shared video library])
+    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
     AC_MSG_NOTICE([SHAREDVIDEO_CFLAGS:    ${SHAREDVIDEO_CFLAGS}])
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
 fi
 
-AC_CHECK_LIB([PocoFoundation], [main], [pototest=true POCO_LIBS="-lPocoUtild -lPocoNetd -lPocoXMLd -lPocoFoundationd"], AC_MSG_WARN([missing Poco]))
-AM_CONDITIONAL(HAVE_POCO, [test x$pocotest = xtrue])
-AC_SUBST(POCO_LIBS)
-
+AC_CHECK_LIB([PocoFoundation],[main],[have_poco=true] [POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
+if test "x${have_poco}" = "xtrue" ; then
+    AC_DEFINE([WITH_POCO],[1],[Enables linking with the Poco and provides web services for SPIN]) AC_MSG_NOTICE([Enabled Poco for SPIN web services])
+    AM_CONDITIONAL(HAVE_POCO, [true])
+    AC_SUBST(POCO_LIBS)
+else
+    AM_CONDITIONAL(HAVE_POCO, [false])
+    have_poco=false
+fi
 
 PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
@@ -240,7 +262,10 @@ else
 fi
 AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
-PCL_PKGS="pcl_common-1.4 pcl_io-1.4"
+dnl PCL
+dnl FIXME: the line below is evil but required in order to get -lflann working
+#export PKG_CONFIG_PATH=$PWD
+PCL_PKGS="pcl_common-1.6 pcl_io-1.6 pcl_filters-1.6 pcl_octree-1.6"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])
@@ -250,6 +275,12 @@ else
     AC_MSG_NOTICE([PCL_LIBS:             ${PCL_LIBS}])
 fi
 AM_CONDITIONAL(PCL, test -n "$PCL_LIBS")
+
+
+#AC_CHECK_LIB([spnav],[spnav_open],[HAVE_SPNAV=1] [SPNAV_LIBS="-lspnav"],AC_MSG_WARN([missing package libspnav-dev]))
+AC_CHECK_HEADERS([spnav.h],[have_spnav=true] [SPNAV_LIBS="-lspnav"],AC_MSG_WARN([missing package libspnav-dev]))
+AM_CONDITIONAL(SPNAV, [test x$have_spnav = xtrue])
+AC_SUBST(SPNAV_LIBS)
 
 
 AC_ARG_ENABLE([editor],
@@ -268,31 +299,22 @@ if test "x$with_editor" = xyes; then
     fi
 fi
 
-AC_MSG_NOTICE([============================================])
-#AS_IF([test "x$with_scenic" = "xyes"], AC_MSG_NOTICE([Using scenic]), AC_MSG_NOTICE([Not using scenic]))
-AC_MSG_NOTICE([PYTHON_LIB:          ${PYTHON_LIB}])
-AC_MSG_NOTICE([PYTHON_INCLUDE_DIR:  ${PYTHON_INCLUDE_DIR}])
-AC_MSG_NOTICE([PYTHON_CPPFLAGS:     ${PYTHON_CPPFLAGS}])
-AC_MSG_NOTICE([PYTHON_LDFLAGS:      ${PYTHON_LDFLAGS}])
-AC_MSG_NOTICE([WX_CPPFLAGS:         ${WX_CPPFLAGS}])
-AC_MSG_NOTICE([WX_LIBS:             ${WX_LIBS}])
-AC_MSG_NOTICE([pythondir:           ${pythondir}])
-AC_MSG_NOTICE([pythonexecdir:       ${pyexecdir}])
-AC_MSG_NOTICE([============================================])
-
 AC_CONFIG_FILES([
         Makefile 
         doxyfile
         src/Makefile 
         src/tinyxml/Makefile 
+        src/osgPPU/Makefile 
         src/osgWrappers/introspection/Makefile 
         src/spin/Makefile
         src/Resources/Makefile
         src/Resources/images/Makefile
+        src/Resources/models/Makefile
         src/Resources/desktopentries/Makefile
         src/Resources/camconfig/Makefile
         src/Resources/fonts/Makefile
         src/Resources/scripts/Makefile
+        src/Resources/shaders/Makefile
         src/editor/Makefile
         tests/Makefile
         spin-${SPIN_API_VERSION}.pc:spin.pc.in
@@ -300,3 +322,17 @@ AC_CONFIG_FILES([
         ])
 
 AC_OUTPUT
+
+[echo ""]
+[echo ""]
+[echo "======================================="]
+[echo "Configured spinframework v${SPIN_VERSION}"]
+[echo ""]
+[echo "Python interpreter?        ${enable_python}"]
+[echo "SpatOSC integration?       ${have_spatosc}"]
+[echo "libSharedVideo?            ${have_sharedvideo}"]
+[echo "PointCloud support?        ${have_pcl}"]
+[echo "Poco web server?           ${have_poco}"]
+[echo "Bullet Physics?            ${have_bullet}"]
+[echo "SpaceNavigator support?    ${have_spnav}"]
+[echo ""]

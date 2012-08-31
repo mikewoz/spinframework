@@ -45,8 +45,18 @@
 #include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>
 #include <osg/ShapeDrawable>
+#include <osgSim/LightPointNode>
+#include <osg/Timer>
 
 #include "GroupNode.h"
+#include "config.h"
+
+#ifdef WITH_PCL
+#include <pcl/pcl_config.h>
+#include <pcl/io/openni_grabber.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#endif WITH_PCL
 
 
 namespace spin
@@ -63,16 +73,27 @@ class PointCloud : public GroupNode
 
 public:
 
-    PointCloud(SceneManager *sceneManager, char *initID);
+    PointCloud(SceneManager *sceneManager, const char* initID);
     virtual ~PointCloud();
     
     enum DrawMode { NONE, POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON, LIGHTPOINTS, BOXES, CUSTOM };
-    
+    enum ColorMode { NORMAL, OVERRIDE };
     virtual void debug();
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
+    
 
-    void loadFile(const char* filename);
+    void setURI(const char* filename);
+
+#ifdef WITH_PCL
+    void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &cloud);
+    void applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud);
+
+    osg::Vec3 getPos(unsigned int i);
+    osg::Vec4f getColor(unsigned int i);
+
+    virtual void updatePoints();
     virtual void draw();
+#endif
     
     void setCustomNode   (const char* nodeID);
     void setDrawMode     (DrawMode mode);
@@ -80,44 +101,76 @@ public:
     void setRandomCoeff  (float randomCoeff);
     void setPointSize    (float pointsize);
     void setColor        (float red, float green, float blue, float alpha);
+    void setColorMode    (ColorMode mode);
+
+    /**
+     * Set the voxelSize for the pcl::VoxelGrid filter, which downsamples points
+     * to the nearest voxel in a 3D voxel grid. Think about a voxel grid as a
+     * set of tiny 3D boxes in space.
+     *
+     * @param voxelSize in metres (default is 0.01, ie, 1cm). A value of 0 will
+     * disable the VoxelGrid filter.
+     */
+    void setVoxelSize   (float voxelSize);
+    
+    /**
+     * Set the minimum and maximum distance of valid points (in metres)
+     */
+    void setDistCrop   (float min, float max);
+
 
     const char* getCustomNode() const;
-    int getDrawMode()      const { return (int)this->drawMode_; };
-    float getSpacing()     const { return this->spacing_; };
-    float getRandomCoeff() const { return this->randomCoeff_; };
-    float getPointSize()   const { return this->pointSize_; };
-    osg::Vec4 getColor()   const { return this->color_;  };
+    int getDrawMode()       const { return (int)this->drawMode_; };
+    float getSpacing()      const { return this->spacing_; };
+    float getRandomCoeff()  const { return this->randomCoeff_; };
+    float getPointSize()    const { return this->pointSize_; };
+    osg::Vec4 getColor()    const { return this->color_;  };
+    int getColorMode()      const { return (int)this->colorMode_; };
+    float getFilterSize()   const { return this->voxelSize_; };
+    osg::Vec2 getDistCrop() const { return this->distCrop_; };
 
     virtual std::vector<lo_message> getState() const;
+    
 
 
 private:
     
-    //double depth_data[240][320];
-    //pcl::PointCloud<pcl::PointXYZRGB> cloud_;
-    //pcl::PointCloud cloud_;
+#ifdef WITH_PCL
+    pcl::Grabber* grabber_;
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
+    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
+#endif
     
     t_symbol* customNode_;
     
-    osg::ref_ptr<osg::Vec3Array> vertices_;
-    osg::ref_ptr<osg::Vec4Array> colors_;
-    
     osg::ref_ptr<osg::PositionAttitudeTransform> cloudGroup_;
-
+    osg::ref_ptr<osgSim::LightPointNode> lightPointNode_;
+    osg::ref_ptr<osg::Geode> cloudGeode_;
+    std::vector<osg::MatrixTransform*> xforms_;
+    
     DrawMode drawMode_;
     
     std::string path_;
     
+    int maxPoints_; // for kinect, or any time you need to reserve points
     
     float spacing_;
     float randomCoeff_;
     float pointSize_;
     osg::Vec4 color_;
+    ColorMode colorMode_;
+    float voxelSize_;
+    osg::Vec2 distCrop_;
     
     bool redrawFlag_;
+    bool updateFlag_;
+    
+    float framerate_;
 
 };
 
 } // end of namespace spin
+
+
 
 #endif

@@ -86,7 +86,7 @@ class PointerNode : public RayNode
 
     public:
 
-        PointerNode(SceneManager *sceneManager, char *initID);
+        PointerNode(SceneManager *sceneManager, const char* initID);
         virtual ~PointerNode();
         
         enum GrabMode
@@ -96,7 +96,7 @@ class PointerNode : public RayNode
         };
             
 
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
 
         /**
          * Get the first GroupNode encountered with interaction mode greater
@@ -200,7 +200,7 @@ class PointerNode : public RayNode
 
         // intersector stuff:
         osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector;
-        std::vector<t_symbol*> intersectList;
+        std::vector<ReferencedNode*> intersectList;
         std::vector<osg::Vec3> intersectListOffsets;
         std::vector<osgUtil::LineSegmentIntersector::Intersection> intersectData;
 

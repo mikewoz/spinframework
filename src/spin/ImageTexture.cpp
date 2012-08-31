@@ -55,6 +55,8 @@
 #include "spinApp.h"
 #include "spinBaseContext.h"
 
+extern pthread_mutex_t sceneMutex;
+
 namespace spin
 {
 
@@ -62,10 +64,12 @@ namespace spin
 // constructor:
 ImageTexture::ImageTexture (SceneManager *s, const char *initID) : Shader(s, initID)
 {
-	classType = "ImageTexture";
+	classType_ = "ImageTexture";
 
 	_path = "NULL";
-	_useTextureRectangle = false;
+	textureMode_ = TEXTURE_2D;
+    textureResize_ = true;
+    transparent_ = true;
 }
 
 // destructor
@@ -92,88 +96,111 @@ void ImageTexture::debug()
 // *****************************************************************************
 void ImageTexture::setPath (const char* newPath)
 {
-	// only do this if the id has changed:
-	if (_path == std::string(newPath)) return;
+	if (_path != std::string(newPath))
+    {
+        _path = std::string(newPath);
+        if (sceneManager_->isGraphical()) this->draw();
+        BROADCAST(this, "ss", "setPath", getPath());
+    }
+}
 
-	_path = std::string(newPath);
-	
-	if (sceneManager->isGraphical())
-	{
+void ImageTexture::setTextureMode(TextureMode mode)
+{
+    if (this->textureMode_ != (int)mode)
+    {
+        this->textureMode_ = mode;
+        if (sceneManager_->isGraphical()) this->draw();
+        BROADCAST(this, "si", "setTextureMode", getTextureMode());
+    }
+}
 
-		std::string fullPath = getAbsolutePath(_path);
+void ImageTexture::setTextureResize(bool b)
+{
+    if (this->textureResize_ != (bool)b)
+    {
+        this->textureResize_ = b;
+        if (sceneManager_->isGraphical()) this->draw();
+        BROADCAST(this, "si", "setTextureResize", getTextureResize());
+    }
+}
 
-		std::cout << "Loading image: " << fullPath << std::endl;
+void ImageTexture::draw()
+{
+    std::string fullPath = getAbsolutePath(_path);
+    std::cout << "Loading image: " << fullPath << std::endl;
 
-		//osg::setNotifyLevel(osg::DEBUG_FP);
-		osg::ref_ptr<osg::Image> test = osgDB::readImageFile(fullPath);
-		//osg::setNotifyLevel(osg::FATAL);
-		
-		if (test.valid())
-		{
-			this->setName("ImageTexture("+_path+")");
+    //osg::setNotifyLevel(osg::DEBUG_FP);
+    osg::ref_ptr<osg::Image> test = osgDB::readImageFile(fullPath);
+    //osg::setNotifyLevel(osg::FATAL);
+    
+    if (test.valid())
+    {
+        this->setName("ImageTexture("+_path+")");
 
-			// create a texture object
-			osg::Texture *tex;
-			if (_useTextureRectangle)
-			{
-				tex = new osg::TextureRectangle;
-			} else {
-				tex = new osg::Texture2D;
-			}
-		
-			tex->setResizeNonPowerOfTwoHint(false);
-			tex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
-			//tex->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-			//tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
-			if (textureRepeatS_)
-				tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
-			else
-				tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
-			if (textureRepeatT_)
-				tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
-			else
-				tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
+        // create a texture object
+        osg::Texture *tex;
+        if (textureMode_==TEXTURE_RECTANGLE)
+        {
+            tex = new osg::TextureRectangle;
+        } else {
+            tex = new osg::Texture2D;
+            
+        }
+    
+        tex->setResizeNonPowerOfTwoHint(textureResize_);
+                   
+        tex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+        //tex->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+        //tex->setWrap(osg::Texture::WRAP_R, osg::Texture::REPEAT);
+        if (textureRepeatS_)
+            tex->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+        else
+            tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+        if (textureRepeatT_)
+            tex->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+        else
+            tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
 
-			// set the image:
-			tex->setImage(0,test.get());
-			
-			// set transparent border:
-			tex->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-		
-			// add texture to stateset:
-			this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+        // set the image:
+        tex->setImage(0,test.get());
+        
+        // set transparent border:
+        tex->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
+    
+        // add texture to stateset:
+	pthread_mutex_lock(&sceneMutex);
+        this->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+	pthread_mutex_unlock(&sceneMutex);
+        
+	// osg::TexEnv::REPLACE  osg::TexEnv::DECAL  osg::TexEnv::MODULATE osg::TexEnv::BLEND
+        osg::TexEnv* texenv = new osg::TexEnv();
+        texenv->setMode(textureBlend_);
+        this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
 
-			// osg::TexEnv::REPLACE  osg::TexEnv::DECAL  osg::TexEnv::MODULATE osg::TexEnv::BLEND
-			osg::TexEnv* texenv = new osg::TexEnv();
-			texenv->setMode(textureBlend_);
-			this->setTextureAttribute(0, texenv, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
-	
-			// set lighting:
-			if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-			else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        // set lighting:
+        if (lightingEnabled_) this->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+        else this->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 
-			// set renderbin:
-			this->setRenderBinDetails( renderBin_, "RenderBin");
+        // set renderbin:
+        this->setRenderBinDetails( renderBin_, "RenderBin");
 
-			// if image has transparency, enable blending:
-			if (1)//(_imageStream->isImageTranslucent())
-			{
-				this->setMode(GL_BLEND, osg::StateAttribute::ON);
-				this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-			} else
-            {
-                this->setMode(GL_BLEND, osg::StateAttribute::OFF);
-				this->setRenderingHint(osg::StateSet::DEFAULT_BIN);
-            }
-		
-		}
+        // if image has transparency, enable blending:
+        //if (1)//(_imageStream->isImageTranslucent())
+        if (transparent_)
+        {
+            this->setMode(GL_BLEND, osg::StateAttribute::ON);
+            this->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+        } else
+        {
+            this->setMode(GL_BLEND, osg::StateAttribute::OFF);
+            this->setRenderingHint(osg::StateSet::DEFAULT_BIN);
+        }
+    
+    }
 
-		else {
-			std::cout << "ImageTexture ERROR. Bad format?: " << _path << std::endl;
-		}
-	}
-
-	BROADCAST(this, "ss", "setPath", getPath());
+    else {
+        std::cout << "ImageTexture ERROR. Bad format?: " << _path << std::endl;
+    }
 }
 
 
@@ -185,6 +212,14 @@ std::vector<lo_message> ImageTexture::getState () const
 	std::vector<lo_message> ret = Shader::getState();
 		
 	lo_message msg;
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setTextureMode", getTextureMode());
+	ret.push_back(msg);
+	
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setTextureResize", getTextureResize());
+	ret.push_back(msg);
 	
 	msg = lo_message_new();
 	lo_message_add(msg, "ss", "setPath", getPath());

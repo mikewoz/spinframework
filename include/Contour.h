@@ -95,7 +95,7 @@ class Contour : public ReferencedNode
 
 public:
 
-    Contour(SceneManager *sceneManager, char *initID);
+    Contour(SceneManager *sceneManager, const char* initID);
     virtual ~Contour();
         
     /**
@@ -104,12 +104,12 @@ public:
      * and can also change their attachmentNode so that children are attached
      * anywhere in this subgraph. If that is the case, the updateNodePath()
      * function MUST be overridden, and extra nodes must be manually pushed onto
-     * the currentNodePath.
+     * the currentNodePath_.
      */
 
     virtual void updateNodePath();
 
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * Updates the contour with respect to any new parameters recently set. This

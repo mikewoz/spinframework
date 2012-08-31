@@ -70,9 +70,8 @@ class UserNode : public ConstraintsNode
 
     public:
 
-        UserNode(SceneManager *sceneManager, char *initID);
+        UserNode(SceneManager *sceneManager, const char* initID);
         virtual ~UserNode();
-
 
         /**
          * The UserNode needs an update callback to check if ping messages are
@@ -80,7 +79,7 @@ class UserNode : public ConstraintsNode
          * removed. Please note that if the user node NEVER sends a ping, not
          * even once, then it will be excluded from this obligation.
          */
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     
         /**
@@ -127,6 +126,16 @@ class UserNode : public ConstraintsNode
         osg::PositionAttitudeTransform *getCameraOffsetNode() const
         { return cameraOffsetNode_.get(); }
         
+
+	/**
+	 * The home position is the pose that the user returns to when sent home
+	 */
+	void setHome(float x, float y, float z, float pitch, float roll, float yaw);
+
+	/**
+	 * Send the user to his (or her) home position
+	 */
+	void goHome();
 
         /**
          * Set the camera offset (from the UserNode's local origin). The default
@@ -177,7 +186,8 @@ class UserNode : public ConstraintsNode
         bool ping_;
         osg::Timer_t lastPing_;
         std::string description_;
-        
+	osg::Vec3 homePos_, homeRot_;       	
+ 
         osg::ref_ptr<osg::PositionAttitudeTransform> cameraAttachmentNode_;
         osg::ref_ptr<osg::PositionAttitudeTransform> cameraOffsetNode_;
 

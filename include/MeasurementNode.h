@@ -76,7 +76,7 @@ class MeasurementNode : public ReferencedNode
 
 public:
 
-    MeasurementNode(SceneManager *sceneManager, char *initID);
+    MeasurementNode(SceneManager *sceneManager, const char* initID);
     virtual ~MeasurementNode();
     
     /**
@@ -99,7 +99,7 @@ public:
      * moved or not). If so, it updates the internal matrices, and calls
      * sendMeasurements()
      */
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
 
     /**
      * sendMeasurements is where the actual computation takes place, and,

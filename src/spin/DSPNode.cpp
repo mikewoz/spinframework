@@ -67,10 +67,10 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-DSPNode::DSPNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+DSPNode::DSPNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
 
-	nodeType = "DSPNode";
+	this->setNodeType("DSPNode");
 	
 	// enable report of globals by default:
 	setReportMode(GroupNode::GLOBAL_6DOF);
@@ -81,23 +81,26 @@ DSPNode::DSPNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneMan
 	
 	active = 1;
 	
-	plugin = "empty~";
+	uri_ = "plugin://empty~";
 
-   _rolloff = "default";
+    _rolloff = "default";
     _spread = 1.0f;
-    _length = 10.0f;
+    _length = 1.0f;
+    _radius = 0.0f;
 
     directivityFlag = 0;
     laserFlag = 0;
     VUmeterFlag = 0;
+    radiusFlag = 0;
 
     currentSoundIntensity = 0.0;
     currentSoundColor = osg::Vec3(0.0,1.0,0.0); //green
 
-    directivityColor = osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0);
+    debugColor = osg::Vec4(DEFAULT_DIRECTIVITY_COLOR,1.0);
 
     // OSG Stuff:
     laserGeode = NULL;
+    radiusGeode = NULL;
     directivityGeode = NULL;
     VUmeterTransform = NULL;
 	
@@ -112,13 +115,13 @@ DSPNode::~DSPNode()
 
 	while (connectTO.size())
 	{
-		this->disconnect(connectTO[0]->sink->id->s_name);	
+		this->disconnect(connectTO[0]->sink->getID().c_str());	
 	}
 	
 	while (connectFROM.size())
     {
         if (connectFROM[0]->source)
-            connectFROM[0]->source->disconnect(this->id->s_name);
+            connectFROM[0]->source->disconnect(this->getID().c_str());
 	}
 	
 }
@@ -130,7 +133,7 @@ DSPNode::~DSPNode()
 void DSPNode::callbackUpdate()
 {
 
-	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
+	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath_);
 	
 	if (this->_globalMatrix != myMatrix)
 	{
@@ -143,11 +146,15 @@ void DSPNode::callbackUpdate()
 }
 */
 
-void DSPNode::callbackUpdate()
+void DSPNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
 }
 
+bool DSPNode::dumpGlobals(bool forced)
+{
+    GroupNode::dumpGlobals(forced);
+}
 
 // *****************************************************************************
 
@@ -167,7 +174,7 @@ SoundConnection *DSPNode::getConnection(DSPNode *snk)
 
 SoundConnection *DSPNode::getConnection(const char *snk)
 {
-	return getConnection( dynamic_cast<DSPNode*>( sceneManager->getNode(snk) ) );
+	return getConnection( dynamic_cast<DSPNode*>( sceneManager_->getNode(snk) ) );
 }
 
 
@@ -177,26 +184,26 @@ void DSPNode::connect(DSPNode *snk)
 	// check if this connection already exists:
 	if (!this->getConnection(snk))
 	{
-		SoundConnection *conn = new SoundConnection(this->sceneManager, this, snk);
+		SoundConnection *conn = new SoundConnection(this->sceneManager_, this, snk);
 
 		// add to the connection lists for each node:
 		this->connectTO.push_back(conn);
 		conn->sink->connectFROM.push_back(conn);
 	}
 	
-	BROADCAST(this, "ss", "connect", snk->id->s_name);
+	BROADCAST(this, "ss", "connect", snk->getID().c_str());
 }
 
 // *****************************************************************************
 void DSPNode::connect(const char *snk)
 {
-	osg::ref_ptr<DSPNode> sinkNode = dynamic_cast<DSPNode*>( sceneManager->getNode(snk) );
+	osg::ref_ptr<DSPNode> sinkNode = dynamic_cast<DSPNode*>( sceneManager_->getNode(snk) );
 	if (sinkNode.valid()) this->connect(sinkNode.get());
 }
 
 void DSPNode::connectSource(const char *src)
 {
-	osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( sceneManager->getNode(src) );
+	osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( sceneManager_->getNode(src) );
 	if (srcNode.valid()) srcNode->connect(this);	
 }
 
@@ -245,7 +252,7 @@ void DSPNode::disconnect(const char *snk)
 
 		BROADCAST(this, "ss", "disconnect", snk);
 	} else { 
-        std::cout << "oops. couldn't find connection: " << this->id->s_name << " -> " << snk << std::endl;
+        std::cout << "oops. couldn't find connection: " << this->getID() << " -> " << snk << std::endl;
     }
 }
 
@@ -259,10 +266,10 @@ void DSPNode::setActive (int i)
 	BROADCAST(this, "si", "setActive", (int)active);
 }
 
-void DSPNode::setPlugin (const char *newPlugin)
+void DSPNode::setURI (const char *newURI)
 {	
-	plugin = std::string(newPlugin);
-	BROADCAST(this, "ss", "setPlugin", plugin.c_str());
+	uri_ = std::string(newURI);
+	BROADCAST(this, "ss", "setURI", uri_.c_str());
 }
 
 void DSPNode::setRolloff (const char *newvalue)
@@ -292,7 +299,7 @@ void DSPNode::setRadius (float newvalue)
 {
     _radius = newvalue;
     if (_radius < 0) _radius = 0;
-    if (_radius > 0) this->setLength(_radius/AS_DEBUG_SCALE);
+    drawRadius();
     BROADCAST(this, "sf", "setRadius", getRadius());
 }
 
@@ -317,12 +324,19 @@ void DSPNode::setVUmeterFlag (float newFlag)
     BROADCAST(this, "sf", "setVUmeterFlag", VUmeterFlag);
 }
 
-
-void DSPNode::setDirectivityColor(float r, float g, float b, float a)
+void DSPNode::setRadiusFlag (float newFlag)
 {
-    directivityColor = osg::Vec4(r,g,b,a);
+    radiusFlag = newFlag;
+    drawRadius();
+    BROADCAST(this, "sf", "setRadiusFlag", radiusFlag);
+}
+
+void DSPNode::setDebugColor(float r, float g, float b, float a)
+{
+    debugColor = osg::Vec4(r,g,b,a);
     drawDirectivity();
-    BROADCAST(this, "sffff", "setDirectivityColor", r,g,b,a);
+    drawRadius();
+    BROADCAST(this, "sffff", "setDebugColor", r,g,b,a);
 }
 
 void DSPNode::setIntensity (float newvalue)
@@ -429,7 +443,7 @@ void DSPNode::drawVUmeter()
         // set the scale/color according to the current sound intensity:
         updateVUmeter();
 
-        VUmeterTransform->setName(std::string(id->s_name) + ".VUmeterTransform");
+        VUmeterTransform->setName(this->getID() + ".VUmeterTransform");
         this->getAttachmentNode()->addChild(VUmeterTransform.get());
    }
 
@@ -441,13 +455,12 @@ static t_float cardioid_to_cone_map[] = {180.0, 155.047, 147.605, 140.163, 116.9
 
 void DSPNode::drawDirectivity()
 {
-    pthread_mutex_lock(&sceneMutex);
-
-
     if (this->getAttachmentNode()->containsNode(directivityGeode.get()))
     {
+        pthread_mutex_lock(&sceneMutex);
         this->getAttachmentNode()->removeChild(directivityGeode.get());
         directivityGeode = NULL;
+        pthread_mutex_unlock(&sceneMutex);
     }
 
     if (directivityFlag > 0)
@@ -457,7 +470,7 @@ void DSPNode::drawDirectivity()
         if ( (index < 0) || ((int)index >= 199) ) return;
         else val = cardioid_to_cone_map[(int)index];
 
-        //printf("drawing directivity: _spread=%.3f  index=%.3f  val=%.3f\n", _spread, index, val);
+        //printf("drawing directivity: _spread=%.3f  index=%.3f  val=%.3f  tan(val)=%.3f  cos(val)=%.3f  sin(val)=%.3f\n", _spread, index, val, tan(osg::DegreesToRadians(val)), cos(osg::DegreesToRadians(val)), sin(osg::DegreesToRadians(val)));
 
 
         // *** NEW METHOD (NOT WORKING YET):
@@ -468,13 +481,20 @@ void DSPNode::drawDirectivity()
         if (val < 90)
         {
             // Place a cone pointing along the +Y axis
-            directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), directivityColor );
+            directivityGeode = new osg::Geode();
+            directivityGeode->addDrawable( createCone(_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor) );
+            
+            //directivityGeode = createHollowCone( _length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
         } else if (val > 90 && val < 180) {
             // Place a cone pointing along the -Y axis
-            directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*tan(osg::DegreesToRadians(val)), directivityColor );
+            directivityGeode = new osg::Geode();
+            directivityGeode->addDrawable( createCone(-_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor) );
+
+            
+            //directivityGeode = createHollowCone( -_length*AS_DEBUG_SCALE, AS_DEBUG_SCALE*_length*sin(osg::DegreesToRadians(val)), debugColor );
         } else {
             // Sphere
-            directivityGeode= createHollowSphere(_length*AS_DEBUG_SCALE, directivityColor );
+            directivityGeode= createHollowSphere(_length*AS_DEBUG_SCALE, debugColor );
         }
 
         // ***
@@ -490,8 +510,42 @@ void DSPNode::drawDirectivity()
 
         directivityGeode->setStateSet(wireframeStateSet);
 
-        directivityGeode->setName(std::string(id->s_name) + ".directivityGeode");
+        directivityGeode->setName(this->getID() + ".directivityGeode");
+        
+        pthread_mutex_lock(&sceneMutex);
         this->getAttachmentNode()->addChild(directivityGeode.get());
+        pthread_mutex_unlock(&sceneMutex);
+    }
+
+}
+
+
+void DSPNode::drawRadius()
+{
+    pthread_mutex_lock(&sceneMutex);
+
+
+    if (this->getAttachmentNode()->containsNode(radiusGeode.get()))
+    {
+        this->getAttachmentNode()->removeChild(radiusGeode.get());
+        radiusGeode = NULL;
+    }
+
+    if (radiusFlag > 0)
+    {
+        radiusGeode= createHollowSphere(_radius, debugColor );
+    
+        osg::StateSet *wireframeStateSet = new osg::StateSet();
+        osg::PolygonMode *polymode = new osg::PolygonMode;
+        polymode->setMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
+        wireframeStateSet->setAttributeAndModes(polymode,osg::StateAttribute::ON);
+        wireframeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
+        wireframeStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+
+        radiusGeode->setStateSet(wireframeStateSet);
+
+        radiusGeode->setName(this->getID() + ".radiusGeode");
+        this->getAttachmentNode()->addChild(radiusGeode.get());
     }
 
     pthread_mutex_unlock(&sceneMutex);
@@ -510,7 +564,7 @@ void DSPNode::drawLaser()
     {
         // create geode to hold lase:
         laserGeode = new osg::Geode();
-        laserGeode->setName(std::string(id->s_name) + ".laserGeode");
+        laserGeode->setName(this->getID() + ".laserGeode");
 
         // draw laser as a cylinder:
         osg::Vec3 center;
@@ -554,7 +608,7 @@ std::vector<lo_message> DSPNode::getState() const
 	ret.push_back(msg);
 
 	msg = lo_message_new();
-	lo_message_add(msg, "ss", "setPlugin", plugin.c_str());
+	lo_message_add(msg, "ss", "setURI", uri_.c_str());
 	ret.push_back(msg);
 	
 	/*
@@ -563,7 +617,7 @@ std::vector<lo_message> DSPNode::getState() const
 		msg = lo_message_new();
 		lo_message_add_string(msg, "connectedTo");
 		for (int i=0; i<connectTO.size(); i++)
-			lo_message_add_string(msg, (char*)connectTO[i]->sink->id->s_name);
+			lo_message_add_string(msg, (char*)connectTO[i]->sink->getID().c_str());
 		ret.push_back(msg);
 	}
 	*/
@@ -571,7 +625,7 @@ std::vector<lo_message> DSPNode::getState() const
 	for (int i=0; i<connectTO.size(); i++)	
 	{
 		msg = lo_message_new();
-		lo_message_add(msg, "ss", "connect", (char*)connectTO[i]->sink->id->s_name);
+		lo_message_add(msg, "ss", "connect", (char*)connectTO[i]->sink->getID().c_str());
 		ret.push_back(msg);
 	}
 	
@@ -596,7 +650,7 @@ std::vector<lo_message> DSPNode::getState() const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    lo_message_add(msg, "sffff", "setDirectivityColor", directivityColor.x(), directivityColor.y(), directivityColor.z(), directivityColor.w());
+    lo_message_add(msg, "sffff", "setDebugColor", debugColor.x(), debugColor.y(), debugColor.z(), debugColor.w());
     ret.push_back(msg);
 
     msg = lo_message_new();
@@ -606,6 +660,10 @@ std::vector<lo_message> DSPNode::getState() const
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setVUmeterFlag", VUmeterFlag);
     ret.push_back(msg);
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setRadiusFlag", radiusFlag);
+    ret.push_back(msg);
 
     // not doing this anymore (not supposed to be saved or refreshed)
     /*
@@ -614,7 +672,7 @@ std::vector<lo_message> DSPNode::getState() const
     ret.push_back(msg);
     */
 
-    // have to re-send setContext AFTER setPlugin, so that loaded plugins will
+    // have to re-send setContext AFTER setURI, so that loaded plugins will
     // have the up-to-date parameter
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setContext", getContext());

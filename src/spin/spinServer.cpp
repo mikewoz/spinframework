@@ -55,7 +55,7 @@
 #include "spinLog.h"
 #include "config.h"
 
-#ifdef HAVE_POCO
+#ifdef WITH_POCO
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 		if (arguments[i][0]!='-')
 		{
 			// not an option so assume string is a filename
-			spinApp::Instance().sceneManager->loadXML(arguments[i]);
+			spinApp::Instance().sceneManager_->loadXML(arguments[i]);
 		} else i++;
 	}
 	 	
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 	// *************************************************************************
     // launch webserver:
     
-#ifdef HAVE_POCO
+#ifdef WITH_POCO
     //unsigned short port = 9980;
 			
     // set-up a server socket

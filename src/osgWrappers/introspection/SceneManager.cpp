@@ -87,6 +87,16 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__unregisterStateSet__ReferencedStateSet_P1,
 	          "",
 	          "");
+	I_MethodWithDefaults1(void, sendNodeTypes, IN, lo_address, txAddr, 0,
+	                      Properties::NON_VIRTUAL,
+	                      __void__sendNodeTypes__lo_address,
+	                      "",
+	                      "");
+	I_MethodWithDefaults1(void, sendStateTypes, IN, lo_address, txAddr, 0,
+	                      Properties::NON_VIRTUAL,
+	                      __void__sendStateTypes__lo_address,
+	                      "",
+	                      "");
 	I_MethodWithDefaults2(void, sendNodeList, IN, std::string, type, , IN, lo_address, txAddr, 0,
 	                      Properties::NON_VIRTUAL,
 	                      __void__sendNodeList__std_string__lo_address,
@@ -152,9 +162,14 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__setWorldStateSet__C5_char_P1,
 	          "",
 	          "");
-	I_Method1(std::vector< spin::t_symbol * >, findNodes, IN, const char *, pattern,
+	I_Method1(std::vector< spin::ReferencedNode * >, findNodes, IN, const char *, pattern,
 	          Properties::NON_VIRTUAL,
-	          __std_vectorT1_t_symbol_P1___findNodes__C5_char_P1,
+	          __std_vectorT1_ReferencedNode_P1___findNodes__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(std::vector< spin::ReferencedStateSet * >, findStateSets, IN, const char *, pattern,
+	          Properties::NON_VIRTUAL,
+	          __std_vectorT1_ReferencedStateSet_P1___findStateSets__C5_char_P1,
 	          "",
 	          "");
 	I_Method0(std::vector< spin::SoundConnection * >, getConnections,
@@ -217,9 +232,9 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __std_string__getStateAsXML__std_vectorT1_lo_message_,
 	          "",
 	          "");
-	I_Method2(std::string, getNodeAsXML, IN, spin::ReferencedNode *, n, IN, bool, withUsers,
+	I_Method3(std::string, getNodeAsXML, IN, spin::ReferencedNode *, n, IN, bool, withUsers, IN, bool, withChildren,
 	          Properties::NON_VIRTUAL,
-	          __std_string__getNodeAsXML__ReferencedNode_P1__bool,
+	          __std_string__getNodeAsXML__ReferencedNode_P1__bool__bool,
 	          "",
 	          "");
 	I_Method0(std::string, getConnectionsAsXML,
@@ -236,17 +251,22 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	                      Properties::NON_VIRTUAL,
 	                      __bool__saveXML__C5_char_P1__bool,
 	                      "",
-	                      "");
-	I_Method1(bool, saveUsers, IN, const char *, s,
+	                      "Write the entire scene to an XML file. If no absolute path is specified, the file will be written to the ~/.spinFramework folder. ");
+	I_Method2(bool, saveNode, IN, const char *, nodeID, IN, const char *, filename,
+	          Properties::NON_VIRTUAL,
+	          __bool__saveNode__C5_char_P1__C5_char_P1,
+	          "",
+	          "Write exactly one node to an XML file, without it's subgraph (ie, children nodes) or statesets. ");
+	I_Method1(bool, saveUsers, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __bool__saveUsers__C5_char_P1,
 	          "",
-	          "");
+	          "Save all the UserNodes in a scene to an XML file. ");
 	I_Method2(bool, createNodeFromXML, IN, TiXmlElement *, XMLnode, IN, const char *, parentNode,
 	          Properties::NON_VIRTUAL,
 	          __bool__createNodeFromXML__TiXmlElement_P1__C5_char_P1,
 	          "",
-	          "");
+	          "Loads any nodes or statesets from a file, and sets the parent node ");
 	I_Method1(bool, createStateSetFromXML, IN, TiXmlElement *, XMLnode,
 	          Properties::NON_VIRTUAL,
 	          __bool__createStateSetFromXML__TiXmlElement_P1,
@@ -309,40 +329,21 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	                 0, 
 	                 __void__setWorldStateSet__C5_char_P1);
 	I_PublicMemberProperty(std::string, sceneID);
-	I_PublicMemberProperty(osg::ref_ptr< osg::Group >, rootNode);
-	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, worldNode);
+	I_PublicMemberProperty(osg::ref_ptr< osg::ClearNode >, rootNode);
+	I_PublicMemberProperty(osg::ref_ptr< spin::ReferencedNode >, worldNode);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, gridGeode);
 	I_PublicMemberProperty(spin::t_symbol *, worldStateSet_);
 	I_PublicMemberProperty(bool, graphicalMode);
 	I_PublicMemberProperty(osg::ref_ptr< spin::GroupNode >, globalObserver);
 	I_PublicMemberProperty(std::string, resourcesPath);
+	I_PublicMemberProperty(osg::ref_ptr< osgDB::SharedStateManager >, sharedStateManager);
 	I_PublicMemberProperty(bool, lastColState);
 	I_PublicMemberProperty(btDynamicsWorld *, dynamicsWorld_);
 END_REFLECTOR
 
-TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)
-
-TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::nodeListType >, spin::nodeMapType)
-
-TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::nodeListType >, spin::nodeMapPair)
-
-TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >, spin::ReferencedStateSetList)
-
-TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetMap)
-
-TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetPair)
-
 STD_MAP_REFLECTOR(std::map< std::string COMMA  lo_address >)
 
-STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::ReferencedStateSetList >)
-
-STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::nodeListType >)
-
-STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::ReferencedStateSetList >)
-
-STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::nodeListType >)
-
-STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedNode > >)
+STD_VECTOR_REFLECTOR(std::vector< spin::ReferencedStateSet * >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
 

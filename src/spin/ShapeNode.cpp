@@ -55,8 +55,6 @@
 #include "SharedVideoTexture.h"
 #include "ShaderUtil.h"
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -64,19 +62,19 @@ namespace spin
 
 // ===================================================================
 // constructor:
-ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+ShapeNode::ShapeNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".ShapeNode");
-	nodeType = "ShapeNode";
+	this->setName(this->getID() + ".ShapeNode");
+	this->setNodeType("ShapeNode");
 
 	_color = osg::Vec4(1.0,1.0,1.0,1.0);	
 
 	shape = BOX;
 	billboard = RELATIVE; // ie, no billboard
 	texturePath = "NULL";
-	stateset = gensym("NULL");
-	renderBin = 11;
-	lightingEnabled = true;
+	renderBin = -1;
+	lightingEnabled = -1;
+    singleSided_ = false;
     
     // quick shader test:
     if (0)
@@ -84,7 +82,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
         osg::Geode* geode = new osg::Geode();
         osg::ShapeDrawable* drawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(1,1,1), 1));
         geode->addDrawable(drawable);
-        sceneManager->worldNode->addChild(geode);
+        sceneManager_->worldNode->addChild(geode);
 
         osg::Shader* vshader = new osg::Shader(osg::Shader::VERTEX, microshaderVertSource );
         osg::Shader* fshader = new osg::Shader(osg::Shader::FRAGMENT, microshaderFragSource );
@@ -102,7 +100,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 // destructor
 ShapeNode::~ShapeNode()
 {
-	//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+	//if (sceneManager_->sharedStateManager.valid()) sceneManager_->sharedStateManager->prune();
 }
 
 // ===================================================================
@@ -111,7 +109,7 @@ ShapeNode::~ShapeNode()
 
 void ShapeNode::setContext (const char *newvalue)
 {
-	if (this->contextString == string(newvalue)) return;
+	if (this->getContextString() == std::string(newvalue)) return;
 	// need to redraw after setContext() is called:
 	ReferencedNode::setContext(newvalue);
 	drawShape();
@@ -157,82 +155,88 @@ void ShapeNode::setColor (float r, float g, float b, float a)
 }
 
 // ===================================================================
-void ShapeNode::setTextureFromFile (const char* s)
-{
-	string path = getRelativePath(string(s));
-	
-	// don't do anything if the current texture is already loaded:
-	if (path==texturePath) return;
-	else texturePath=path;
-	
-	//drawTexture();
-
-	BROADCAST(this, "ss", "setTextureFromFile", texturePath.c_str());
-}
-
-void ShapeNode::setStateSetFromFile(const char* filename)
-{
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(filename);
-	if (ss.valid())
-	{
-		if (ss->id == stateset) return; // we're already using that stateset
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
-
-void ShapeNode::setStateSet (const char* s)
-{
-	if (gensym(s)==stateset) return;
-
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager->getStateSet(s);
-	if (ss.valid())
-	{
-		stateset = ss->id;
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-}
 
 void ShapeNode::updateStateSet()
 {
-	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset->s_thing);
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
 	if (shapeGeode.valid() && ss.valid()) shapeGeode->setStateSet( ss.get() );
 }
 
 // ===================================================================
 void ShapeNode::setRenderBin (int i)
 {
-	if (renderBin == i) return;
+    // This is a legacy method before we had referenced statesets
+    // in SPIN. Thus, if the user tries to set the renderbin here
+    // we will apply it to the stateset instead. And if there is
+    // no stateset, then we try to apply it directly to the
+    // shapeGeode
 
-	renderBin = i;
-
-	if (shapeGeode.valid())
-	{
-		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
-		ss->setRenderBinDetails( (int)renderBin, "RenderBin");
-		//setStateSet( shapeStateSet );
-	}
-
-	BROADCAST(this, "si", "setRenderBin", renderBin);
+    osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+    if (ss.valid() && (renderBin>0))
+    {
+        // no, it's not safe to change the stateset because it might
+        // shared with other nodes, and this might cause undesired
+        // effects
+        //ss->setRenderBin(i);
+        std::cout << "Cannot setRenderBin on '" << getID() << "' because that node has stateset '" << ss->getID() << "'. Change the RenderBin on the stateset instead." << std::endl;
+    }
+    else 
+    {
+        renderBin = i;
+        
+        if (shapeGeode.valid() && (renderBin>0))
+        {
+            osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+            ss->setRenderBinDetails( (int)renderBin, "RenderBin");
+        }
+        
+        BROADCAST(this, "si", "setRenderBin", renderBin);
+    }
 }
 
 void ShapeNode::setLighting (int i)
 {
-	if (lightingEnabled==(bool)i) return;
-	lightingEnabled = (bool)i;
-
-	if (shapeGeode.valid() && !stateset->s_thing)
-	{
-		osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
-		if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
-		else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-	}
-
-	BROADCAST(this, "si", "setLighting", getLighting());
-
+    osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+    if (ss.valid() && (lightingEnabled>=0))
+    {
+        //ss->setLighting(i);
+        std::cout << "Cannot setLighting on '" << getID() << "' because that node has stateset '" << ss->getID() << "'. Enable/disable lighting on the stateset instead." << std::endl;
+    }
+    else
+    {
+        lightingEnabled = (bool)i;
+        
+        if (shapeGeode.valid() && (lightingEnabled>=0))
+        {
+            osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+            if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
+            else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        }
+        BROADCAST(this, "si", "setLighting", getLighting());
+    }
+	
 }
+
+void ShapeNode::setSingleSided (int singleSided)
+{
+    singleSided_ = singleSided;
+    
+    if (shapeGeode.valid())
+    {
+        osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
+        if (singleSided_)
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+        else
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+    }
+    else
+    {
+        drawShape();
+    }
+
+    BROADCAST(this, "si", "setSingleSided", getSingleSided());
+}
+
 
 // ===================================================================
 void ShapeNode::drawShape()
@@ -294,7 +298,10 @@ void ShapeNode::drawShape()
 		{
 			shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
 		}
-
+        else if (shape==DISC)
+        {
+            shapeGeode->addDrawable(createCone(0, AS_UNIT_SCALE * .5, _color));
+        }
 		else {
 			osg::ShapeDrawable *shapeDrawable;
 			if (shape==SPHERE)
@@ -370,154 +377,26 @@ void ShapeNode::drawShape()
 
 		// if this shape has a stateset, then lighting is defined there.
 		// Otherwise, we have an internal lighting parameter for the shape:
-		if (!stateset->s_thing)
+		if (!stateset_->s_thing)
 		{
 			if (lightingEnabled) ss->setMode( GL_LIGHTING, osg::StateAttribute::ON );
 			else ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 		}
 		
+        if (singleSided_)
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+        else
+            ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+        
 		this->getAttachmentNode()->addChild(shapeGeode.get());
-		shapeGeode->setName(string(id->s_name) + ".shapeGeode");
+		shapeGeode->setName(this->getID() + ".shapeGeode");
 		optimizer.optimize(shapeGeode.get()); // ?
 	}
 
 	pthread_mutex_unlock(&sceneMutex);
 
 	
-	//drawTexture();
 	updateStateSet();
-
-}
-
-
-// ===================================================================
-void ShapeNode::drawTexture()
-{
-	
-
-	//std::cout << "debug texturepath: " << texturePath <<  std::endl;
-
-
-	if (texturePath==string("NULL"))
-	{
-		// remove current texture
-		//shapeGeode->setStateSet( new osg::StateSet() );
-		//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
-	}
-
-	else if (shapeGeode.valid())
-	{
-		pthread_mutex_lock(&sceneMutex);
-		
-		std::string fullPath = getAbsolutePath(texturePath);
-		
-		// if filename contains "shared_video_texture", then replace
-		// current TextureAttribute with a SharedVideoTexture
-		
-		size_t pos;
-
-		if ((pos=fullPath.find("shared_video_texture")) != string::npos)
-		{
-			// find the shared memory id from the filename:
-			std::string shID = "shvid_"+fullPath.substr(pos+20, fullPath.rfind(".")-(pos+20));
-			osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->createStateSet(shID.c_str(), "SharedVideoTexture"));
-			if (shvid.valid())
-			{
-				shapeGeode->setStateSet( shvid.get() );
-			} else {
-				std::cout << "ERROR creating SharedVideoTexture '" << shID << "' for ShapeNode: " << id->s_name << std::endl;
-			}
-
-		}
-
-		else if (isVideoPath(fullPath))
-		{
-			osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/VideoTexture").c_str(), "VideoTexture"));
-			if (vid.valid())
-			{
-				vid->setPath(fullPath.c_str());
-				shapeGeode->setStateSet( vid.get() );
-			} else {
-				std::cout << "ERROR creating VideoTexture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
-			}
-		}
-		
-		else
-		{
-			//addImageTexture(shapeGeode.get(), fullPath);
-			osg::ref_ptr<ImageTexture> tex = dynamic_cast<ImageTexture*>(sceneManager->createStateSet((string(id->s_name)+"/Texture").c_str(), "ImageTexture"));
-			if (tex.valid())
-			{
-				tex->setPath(fullPath.c_str());
-				shapeGeode->setStateSet( tex.get() );
-			} else {
-				std::cout << "ERROR creating ImageTexture '" << texturePath << "' for ShapeNode: " << id->s_name << std::endl;
-			}
-
-		}
-
-		pthread_mutex_unlock(&sceneMutex);
-	}
-}
-			
-			
-void ShapeNode::addImageTexture(osg::Node *n, std::string path)
-{
-	if (!sceneManager->isGraphical()) return;
-	
-	osg::StateSet *ss = n->getOrCreateStateSet();
-		
-	//osg::ref_ptr<osg::Image> image;
-	osg::ref_ptr<osg::Image> textureImage = osgDB::readImageFile( path.c_str() );
-	if (textureImage.valid())
-	{
-
-		// old:
-		/*
-		shapeStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
-		osg::Texture2D* shapeTexture = new osg::Texture2D();
-		shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-		shapeTexture->setImage(textureImage.get());
-		shapeStateSet->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
-		shapeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-		*/
-
-
-		osg::Texture2D* shapeTexture = new osg::Texture2D();
-		shapeTexture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,0.0f));
-		shapeTexture->setImage(textureImage.get());
-
-		//osg::StateSet *ss = new osg::StateSet();
-		//osg::StateSet *ss = shapeGeode->getOrCreateStateSet();
-
-		// Turn blending on:
-		ss->setMode( GL_BLEND, osg::StateAttribute::ON );
-		ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-
-		// Disable depth testing so geometry is drawn regardless of depth values
-		// of geometry already draw.
-		//ss->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-
-		// Disable lighting:
-		//ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-
-		// Need to make sure this geometry is draw last. RenderBins are handled
-		// in numerical order.
-		ss->setRenderBinDetails( renderBin, "RenderBin");
-
-		// Set Texture:
-		ss->setTextureAttributeAndModes(0,shapeTexture,osg::StateAttribute::ON);
-
-		//n->setStateSet( shapeStateSet );
-
-		/*
-		if (sceneManager->sharedStateManager.valid())
-				sceneManager->sharedStateManager->share(n);
-		*/
-	} else {
-		std::cout << "ERROR (setTexture): The file " << path << " is not a valid texture." << std::endl;
-	}
-
 
 }
 
@@ -541,21 +420,23 @@ std::vector<lo_message> ShapeNode::getState () const
 	lo_message_add(msg, "sffff", "setColor", v4.x(), v4.y(), v4.z(), v4.w());
 	ret.push_back(msg);
 
-	msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setTextureFromFile", texturePath.c_str());
-	ret.push_back(msg);
-
-	msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setStateSet", getStateSet());
-	ret.push_back(msg);
-
+if (getRenderBin() > 0)
+{
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
+}
 
+	msg = lo_message_new();
+	lo_message_add(msg, "si", "setSingleSided", getSingleSided());
+	ret.push_back(msg);
+
+if (getLighting() >= 0)
+{
 	msg = lo_message_new();
 	lo_message_add(msg, "si", "setLighting", getLighting());
 	ret.push_back(msg);
+}
 
 	// put this one last:	
 	msg = lo_message_new();

@@ -1,0 +1,79 @@
+# 
+# Wavefront material file
+# Created with Kaydara FBX
+# 
+
+newmtl guideBackText
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+illum 1
+Tr 1.000000
+
+newmtl guide180Material
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 1.000000
+illum 1
+Tr 1.000000
+
+newmtl guide210Material
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 1.000000 0.000000
+illum 1
+Tr 1.000000
+
+newmtl guide230Material
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.000000 0.000000
+illum 1
+Tr 1.000000
+
+newmtl guideWhiteText
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+illum 1
+Tr 1.000000
+
+newmtl guideBusMaterial
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 1.000000 0.000000
+illum 1
+Tr 1.000000
+
+newmtl default1
+illum 2
+
+newmtl guideTopMaterial
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.000000 1.000000
+illum 1
+Tr 1.000000
+
+newmtl guideRightMaterial
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 1.000000 1.000000
+illum 1
+Tr 1.000000
+
+newmtl guideBackMaterial
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.000000 0.000000
+illum 1
+Tr 1.000000
+
+newmtl guideLeftMaterial
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 1.000000
+illum 1
+Tr 1.000000
+
+newmtl guideWireMaterial
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.981100 0.995300
+illum 1
+Tr 1.000000
+
+newmtl guideFrontMaterial
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 0.000000
+illum 1
+Tr 1.000000

@@ -12,6 +12,7 @@
 
 #include <ReferencedNode.h>
 #include <SceneManager.h>
+#include <spinUtil.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -52,37 +53,34 @@ BEGIN_VALUE_REFLECTOR(spin::EventScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
+BEGIN_VALUE_REFLECTOR(boost::python::object)
+	I_DeclaringFile("ReferencedNode.h");
+	I_Constructor0(____object,
+	               "",
+	               "");
+END_REFLECTOR
+
 BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_DeclaringFile("ReferencedNode.h");
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____ReferencedNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____ReferencedNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, registerNode, IN, spin::SceneManager *, s,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __void__registerNode__SceneManager_P1,
 	          "",
 	          "");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
-	I_Method0(void, attach,
-	          Properties::NON_VIRTUAL,
-	          __void__attach,
-	          "",
-	          "The attach() method is used to properly add a node to the scene graph. Each node derived from ReferencedNode has an attachmentNode parameter that can be overridden in derived classes, but to keep code simple, this is the only this method that actually performs the attachment.In the default case, nodes should are attached directly to the parent ReferencedNode instance. ");
-	I_Method0(void, detach,
-	          Properties::NON_VIRTUAL,
-	          __void__detach,
-	          "",
-	          "The detach() method is removes a node from the scene graph, depending on it's attachment position (specified by attachmentNode). ");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
 	                      "",
-	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs, and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath_. ");
 	I_Method1(int, setAttachmentNode, IN, osg::Group *, n,
 	          Properties::NON_VIRTUAL,
 	          __int__setAttachmentNode__osg_Group_P1,
@@ -98,21 +96,41 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __void__setParent__C5_char_P1,
 	          "",
 	          "This method schedules a change in parent for this node. The setParent() does not immediately change the scenegraph, since it can be called at any time, even while in a traversal. The graph is updated later using the attach() method, which is called by SceneManager->updateGraph() when there is a legal time to re-order the scenegraph.Internally, this method just sets the newParent property. ");
-	I_Method0(char *, getParent,
+	I_Method1(void, attachTo, IN, const char *, parentID,
 	          Properties::NON_VIRTUAL,
-	          __char_P1__getParent,
+	          __void__attachTo__C5_char_P1,
 	          "",
-	          "Returns the current parent name (string) ");
-	I_Method1(osg::Group *, getParent, IN, int, i,
+	          "Attach this node to the node with parentID (if found). ");
+	I_Method1(void, detachFrom, IN, const char *, parentID,
 	          Properties::NON_VIRTUAL,
-	          __osg_Group_P1__getParent__int,
+	          __void__detachFrom__C5_char_P1,
+	          "",
+	          "Detaches the node from the parentID (if found). Note: you can pass \"*\" for the parentID and the node will be detached from ALL parents. ");
+	I_Method0(bool, inGraph,
+	          Properties::NON_VIRTUAL,
+	          __bool__inGraph,
+	          "",
+	          "The inGraph method checks if the node is actually attached to the scene graph. There are cases (eg, SwitchNode or using detachFrom) that may cause a node to be orphaned (not attached anywhere). In these cases, reporters and pointers and anything that maintains a list of targets must check if the node is inGraph(). ");
+	I_Method0(unsigned int, getNumParents,
+	          Properties::NON_VIRTUAL,
+	          __unsigned_int__getNumParents,
+	          "",
+	          "");
+	I_Method1(std::string, getParentID, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getParentID__int,
+	          "",
+	          "Returns the parent id (string) ");
+	I_Method1(spin::ReferencedNode *, getParentNode, IN, int, i,
+	          Properties::NON_VIRTUAL,
+	          __ReferencedNode_P1__getParentNode__int,
 	          "",
 	          "Returns the current parent as an osg::Group ");
-	I_Method0(spin::ReferencedNode *, getParentNode,
+	I_Method0(std::vector< spin::ReferencedNode * >, getChildren,
 	          Properties::NON_VIRTUAL,
-	          __ReferencedNode_P1__getParentNode,
+	          __std_vectorT1_ReferencedNode_P1___getChildren,
 	          "",
-	          "Returns the currently identified parent node: ");
+	          "");
 	I_Method1(void, setContext, IN, const char *, newvalue,
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
@@ -197,6 +215,16 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          Properties::NON_VIRTUAL,
 	          __std_string__getID,
 	          "",
+	          "Return the string id for this node ");
+	I_Method0(std::string, getNodeType,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getNodeType,
+	          "",
+	          "");
+	I_Method0(spin::t_symbol *, getNodeSymbol,
+	          Properties::NON_VIRTUAL,
+	          __t_symbol_P1__getNodeSymbol,
+	          "",
 	          "");
 	I_Method5(bool, addCronScript, IN, bool, serverSide, IN, const std::string &, label, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
 	          Properties::NON_VIRTUAL,
@@ -238,12 +266,27 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __bool__removeEventScript__C5_char_P1,
 	          "",
 	          "");
+	I_ProtectedMethod1(bool, legalParent, IN, spin::t_symbol *, newParent,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __bool__legalParent__t_symbol_P1,
+	                   "",
+	                   "TO BE DEPRECATED? The idea is that one type of node can only be attached to certain types of other nodes, but that has not been implemented. Currently, the only illegal parents include the node itself, or any children. ");
+	I_ProtectedMethod1(void, setNodeType, IN, std::string, t,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__setNodeType__std_string,
+	                   "",
+	                   "");
 	I_SimpleProperty(float, Alpha, 
 	                 __float__getAlpha, 
 	                 __void__setAlpha__float);
 	I_SimpleProperty(osg::Group *, AttachmentNode, 
 	                 __osg_Group_P1__getAttachmentNode, 
 	                 __int__setAttachmentNode__osg_Group_P1);
+	I_SimpleProperty(std::vector< spin::ReferencedNode * >, Children, 
+	                 __std_vectorT1_ReferencedNode_P1___getChildren, 
+	                 0);
 	I_SimpleProperty(const char *, Context, 
 	                 __C5_char_P1__getContext, 
 	                 __void__setContext__C5_char_P1);
@@ -253,12 +296,15 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(std::string, ID, 
 	                 __std_string__getID, 
 	                 0);
-	I_SimpleProperty(char *, Parent, 
-	                 __char_P1__getParent, 
+	I_SimpleProperty(spin::t_symbol *, NodeSymbol, 
+	                 __t_symbol_P1__getNodeSymbol, 
 	                 0);
-	I_SimpleProperty(spin::ReferencedNode *, ParentNode, 
-	                 __ReferencedNode_P1__getParentNode, 
+	I_SimpleProperty(std::string, NodeType, 
+	                 __std_string__getNodeType, 
 	                 0);
+	I_SimpleProperty(const char *, Parent, 
+	                 0, 
+	                 __void__setParent__C5_char_P1);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
@@ -268,21 +314,8 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(const char *, StateSetFromFile, 
 	                 0, 
 	                 __void__setStateSetFromFile__C5_char_P1);
-	I_PublicMemberProperty(spin::t_symbol *, id);
-	I_PublicMemberProperty(std::string, nodeType);
-	I_PublicMemberProperty(std::string, contextString);
-	I_PublicMemberProperty(int, pd_mail_id);
-	I_PublicMemberProperty(lo_method, oscHandler);
-	I_PublicMemberProperty(spin::t_symbol *, parent);
-	I_PublicMemberProperty(spin::t_symbol *, newParent);
-	I_PublicMemberProperty(bool, scheduleForDeletion);
-	I_PublicMemberProperty(bool, textFlag);
-	I_PublicMemberProperty(spin::stringParamType, stringParams);
-	I_PublicMemberProperty(spin::floatParamType, floatParams);
-	I_PublicMemberProperty(float, subgraphAlpha_);
-	I_PublicMemberProperty(osg::NodePath, currentNodePath);
-	I_PublicMemberProperty(std::vector< spin::ReferencedNode * >, children);
-	I_PublicMemberProperty(spin::SceneManager *, sceneManager);
+	I_PublicMemberProperty(osg::NodePath, currentNodePath_);
+	I_PublicMemberProperty(bool, scheduleForDeletion_);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_callback)
@@ -299,12 +332,24 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode_data)
 	               ____ReferencedNode_data__ReferencedNode_P1,
 	               "",
 	               "");
-	I_Method0(void, update,
+	I_Method1(void, update, IN, osg::NodeVisitor *, nv,
 	          Properties::NON_VIRTUAL,
-	          __void__update,
+	          __void__update__osg_NodeVisitor_P1,
 	          "",
 	          "");
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedNode > >, spin::nodeListType)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::nodeListType >, spin::nodeMapType)
+
+TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::nodeListType >, spin::nodeMapPair)
+
+TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >, spin::ReferencedStateSetList)
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetMap)
+
+TYPE_NAME_ALIAS(std::pair< std::string COMMA  spin::ReferencedStateSetList >, spin::ReferencedStateSetPair)
 
 TYPE_NAME_ALIAS(std::map< const std::string COMMA  spin::CronScript * >, spin::CronScriptList)
 
@@ -320,5 +365,19 @@ STD_MAP_REFLECTOR(std::map< const std::string COMMA  spin::EventScript * >)
 
 STD_MAP_REFLECTOR(std::map< std::string COMMA  float >)
 
+STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::ReferencedStateSetList >)
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  spin::nodeListType >)
+
 STD_MAP_REFLECTOR(std::map< std::string COMMA  std::string >)
+
+STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::ReferencedStateSetList >)
+
+STD_PAIR_REFLECTOR(std::pair< std::string COMMA  spin::nodeListType >)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedNode > >)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >)
+
+STD_VECTOR_REFLECTOR(std::vector< spin::ReferencedNode * >)
 

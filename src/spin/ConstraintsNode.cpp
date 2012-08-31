@@ -48,22 +48,16 @@
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-
-
-
-using namespace std;
-
-
 namespace spin
 {
 
 
 // ***********************************************************
 // constructor:
-ConstraintsNode::ConstraintsNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+ConstraintsNode::ConstraintsNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-    nodeType = "ConstraintsNode";
-    this->setName(string(id->s_name) + ".ConstraintsNode");
+    this->setNodeType("ConstraintsNode");
+    this->setName(this->getID() + ".ConstraintsNode");
 
     target_= gensym("NULL");
     constraintMode_ = BASIC;
@@ -81,9 +75,9 @@ ConstraintsNode::~ConstraintsNode()
 }
 
 
-void ConstraintsNode::callbackUpdate()
+void ConstraintsNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    GroupNode::callbackUpdate();
+    GroupNode::callbackUpdate(nv);
 }
 
 // *****************************************************************************
@@ -144,7 +138,7 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 {
     osg::Vec3 v = osg::Vec3(x,y,z);
 
-    if (!sceneManager->isGraphical())
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
 	{
 
 		if (constraintMode_ == DROP)
@@ -184,7 +178,7 @@ void ConstraintsNode::setTranslation (float x, float y, float z)
 void ConstraintsNode::translate (float x, float y, float z)
 {
 
-    if ( !sceneManager->isGraphical() )
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
     	if ((constraintMode_==BOUNCE)||(constraintMode_==COLLIDE)||(constraintMode_==COLLIDE_THRU)||(constraintMode_==STICK))
     	{
@@ -204,7 +198,7 @@ void ConstraintsNode::translate (float x, float y, float z)
 
 void ConstraintsNode::move (float x, float y, float z)
 {
-    if ( !sceneManager->isGraphical() )
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
     	osg::Vec3 v = this->getOrientationQuat() * osg::Vec3(x,y,z);
 
@@ -226,7 +220,7 @@ void ConstraintsNode::move (float x, float y, float z)
 // attempt at this: http://forum.openscenegraph.org/viewtopic.php?p=23242
 osg::Polytope ConstraintsNode::getPolytope()
 {
-    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath_);
     
     osg::Vec3 local
     
@@ -267,8 +261,12 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	// with really big velocities (or small enclosures), and if the surface
 	// doesn't damp the velocity, it's possible to get see an infinite recursion
 	// occur. So, we keep a recursionCounter, and stop prevent this occurrence:
-	if (++recursionCounter > 10) return;
-
+	if (++recursionCounter > 10) 
+    {
+        //std::cout << "RECURSION" << std::endl;
+        return;
+    }
+    
 	/*
 	std::cout << std::endl << "checking for collisions" << std::endl;
 	std::cout << "start =  " << localPos.x()<<","<<localPos.y()<<","<<localPos.z() << std::endl;
@@ -280,7 +278,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 	if (targetNode.valid())
 	{
 		// get current position (including offset from previous bounces)
-		osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
+		osg::Matrix thisMatrix = osg::computeLocalToWorld(currentNodePath_);
 
         
 		osg::Vec3 worldPos = thisMatrix.getTrans();
@@ -324,7 +322,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 				if (hitNode.valid())
 				{
 
-					//std::cout << id->s_name << " collision!!! with " << (*itr).drawable->getName() << "[" << (*itr).primitiveIndex << "] @ " << std::endl;
+					//std::cout << this->getID() << " collision!!! with " << (*itr).drawable->getName() << "[" << (*itr).primitiveIndex << "] @ " << std::endl;
 					//std::cout << "localHitPoint:\t" << localHitPoint.x()<<","<<localHitPoint.y()<<","<<localHitPoint.z() << std::endl;
 					//std::cout << "localHitNormal:\t" << localHitNormal.x()<<","<<localHitNormal.y()<<","<<localHitNormal.z() << std::endl;
 
@@ -387,7 +385,7 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// place the node at the collision point
 						setTranslation(collisionPoint.x(), collisionPoint.y(), collisionPoint.z());
 
-						BROADCAST(this, "ssfff", "collide", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+						BROADCAST(this, "ssfff", "collide", hitNode->getID().c_str(), osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 
 						if (constraintMode_==COLLIDE)
@@ -444,16 +442,16 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// in node is translating (ie, changing position
 						// independently from it's orientatino), then we need to
 						// flip the velocity vector.
-						if (_velocityMode == GroupNode::TRANSLATE)
+						if (velocityMode_ == GroupNode::TRANSLATE)
 						{
-							osg::Vec3 newVel = newDir * _velocity.length();
+							osg::Vec3 newVel = newDir * velocity_.length();
 							setVelocity(newVel.x(), newVel.y(), newVel.z());
 						}
 
 						// if the node is moving along it's orientation vector,
 						// we need to update the orientation of so that it
 						// points in 'bounced' direction
-						else if (_velocityMode == GroupNode::MOVE)
+						else if (velocityMode_ == GroupNode::MOVE)
 						{
 							osg::Quat newQuat;
 							newQuat.makeRotate(osg::Vec3(0,1,0),  newDir);
@@ -468,12 +466,13 @@ void ConstraintsNode::applyConstrainedTranslation(osg::Vec3 v)
 						// slightly beyond the surface, and when we bounce the
 						// node, we don't want to  intersect with the same
 						// surface again)
-						double HAIR = 0.0000001;
+						//double HAIR = 0.0000001;
+						double HAIR = 0.00001;
 						setTranslation(localHitPoint.x()-dirVec.x()*HAIR, localHitPoint.y()-dirVec.y()*HAIR, localHitPoint.z()-dirVec.z()*HAIR);
 						//setTranslation(localHitPoint.x(), localHitPoint.y(), localHitPoint.z());
 
                         //std::cout << "rotEulers = " << osg::RadiansToDegrees(rotEulers.x())<<","<<osg::RadiansToDegrees(rotEulers.y())<<","<<osg::RadiansToDegrees(rotEulers.z()) << std::endl;
-                        BROADCAST(this, "ssfff", "bounce", hitNode->id->s_name, osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
+                        BROADCAST(this, "ssfff", "bounce", hitNode->getID().c_str(), osg::RadiansToDegrees(rotEulers.x()), osg::RadiansToDegrees(rotEulers.y()), osg::RadiansToDegrees(rotEulers.z()));
 
 						// pseudo-recursively apply remainder of bounce:
 						applyConstrainedTranslation(newDir*dist);

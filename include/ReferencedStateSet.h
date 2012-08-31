@@ -78,6 +78,13 @@ public:
     virtual void updateCallback();
 
     /**
+     * Return the string id for this stateset
+     */
+    std::string getID() const { return std::string(id_->s_name); }
+    t_symbol* getIDSymbol() { return id_; }
+    std::string getClassType() const { return classType_; }
+
+    /**
      * Abstract method getPath needs to be implemented
      */
     //virtual const char *getPath() const = 0;
@@ -142,8 +149,19 @@ public:
     /**
      * Returns a boolean indicating whether lighting affects the texture.
      */
-
     virtual int getLighting() const { return (int)lightingEnabled_; }
+
+    /**
+     * Set whether the stateset is rendered in the transparent bin or not (ie,
+     * this is a different rendering pass with different optimizations)
+     */
+    virtual void setTransparent(int i);
+
+    /**
+     * Returns a boolean indicating whether stateset is rendered in transparent
+     * bin
+     */
+    virtual int getTransparent() const { return (int)transparent_; }
 
     /**
      * Set the render bin for this texture. The higher the number, the later it
@@ -157,19 +175,20 @@ public:
      */
     virtual int getRenderBin() const { return renderBin_; }
 
-	// TODO: these should at least be protected:
-    t_symbol *id;
-    std::string classType;
 
 protected:
     
-	osg::TexEnv::Mode textureBlend_;
+    t_symbol *id_;
+    std::string classType_;
+    
+    SceneManager *sceneManager_;
+    
+    osg::TexEnv::Mode textureBlend_;
 	bool textureRepeatS_;
 	bool textureRepeatT_;
 	bool lightingEnabled_;
+    bool transparent_;
     int  renderBin_;
-
-    SceneManager *sceneManager;
 
 };
 

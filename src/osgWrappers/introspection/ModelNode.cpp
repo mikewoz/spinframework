@@ -31,20 +31,20 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	I_DeclaringFile("ModelNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____ModelNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____ModelNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
 	                      "",
-	                      "We change our attachmentNode (add attachment to the centroid), so we MUST override updateNodePath(), and manually push the centroid transform onto the currentNodePath. ");
+	                      "We change our attachmentNode (add attachment to the centroid), so we MUST override updateNodePath(), and manually push the centroid transform onto the currentNodePath_. ");
 	I_Method1(void, setContext, IN, const char *, newvalue,
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
 	          "",
-	          "The context is an arbitrary keyword that associates this node with a particular behaviour. Currently, it is used to *prevent* display if the context matches the name of a machine. ie, allowing it to be seen on all machines except for the one that is named by setContext. ");
+	          "The context is an arbitrary keyword that associates this node with a particular behaviour. Currently, it is used to prevent display if the context matches the name of a machine. ie, allowing it to be seen on all machines except for the one that is named by setContext. ");
 	I_Method1(void, setModelFromFile, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __void__setModelFromFile__C5_char_P1,
@@ -115,6 +115,11 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          __void__setStateSet__int__C5_char_P1,
 	          "",
 	          "For statesets embedded in the model, it is possible to swap with some other (already existing) stateset.Note: for this to work, stateRegistration must be enabled. ");
+	I_Method0(void, updateStateSet,
+	          Properties::VIRTUAL,
+	          __void__updateStateSet,
+	          "",
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform_. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

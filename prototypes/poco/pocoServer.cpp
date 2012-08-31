@@ -20,6 +20,9 @@
 #include <cppintrospection/Type>
 #include <cppintrospection/Value>
 
+#include <lo/lo_lowlevel.h>
+#include <lo/lo.h>
+
 
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -64,15 +67,116 @@ cppintrospection::MethodInfo introspect_getMethodInfo(const cppintrospection::Ty
 */
 
 bool introspect_invoke(std::string path, const Poco::Net::HTMLForm &form)
+{
+    using namespace spin;
+
+
+    // WARNING: this method is meant to respond to ANY path, so we must manually
+    // check if it is within the /SPIN namespace, and if it matches the sceneID:
+
+    std::string spinToken, sceneString, nodeString;
+    std::istringstream pathstream(path);
+    pathstream.get(); // ignore leading slash
+    getline(pathstream, spinToken, '/');
+    getline(pathstream, sceneString, '/');
+    getline(pathstream, nodeString, '?');
+    
+    std::cout << "introspect_invoke for path: " << path << std::endl;
+    std::cout << "spinToken?:  " << spinToken << std::endl;
+    std::cout << "sceneString: " << sceneString << std::endl;
+    std::cout << "nodeString:  " << nodeString << std::endl;
+    std::cout << "args:        " << form["args"] << std::endl;
+
+
+    if ((spinToken!="SPIN") || !wildcardMatch(sceneString.c_str(),spinApp::Instance().getSceneID().c_str()) )
+    {
+    	std::cout << "Warning: server is ignoring HTTP message: " << path << std::endl;
+    	return 0;
+    }
+
+
+    // Now, we look for the args variable, which will contain the method 
+    // and all arguments in one string. We need to convert that to an argv array
+    // so that we can use the existing sceneCallback and nodeCallback methods
+
+    std::vector<std::string> methodAndArgs = tokenize(form["args"]);
+    std::string typeString = "";
+    if (methodAndArgs.size())
+    {
+        lo_message msg = lo_message_new();
         
+        std::cout << methodAndArgs.size() << " args:" << std::endl;
+        for (int index=0; index<methodAndArgs.size(); index++)
+        {
+            int i;
+            float f;
+            /*
+            if (fromString<int>(i, methodAndArgs[index]))
+            {
+                std::cout << "converted " << methodAndArgs[index] << " to int" << std::endl;
+                lo_message_add(msg, "i", i);
+                typeString += "i";
+            }
+            else */if (fromString<float>(f, methodAndArgs[index]))
+            {
+                std::cout << "converted " << methodAndArgs[index] << " to float" << std::endl;
+                lo_message_add(msg, "f", f);
+            }
+            else
+            {
+                std::cout << "converted " << methodAndArgs[index] << " to string" << std::endl;
+                lo_message_add(msg, "s", methodAndArgs[index].c_str());
+            }
+        }
+        
+    
+        // if the nodeString is empty, then this is a scene message
+        if (nodeString.empty())
+        {
+            spinApp::Instance().SceneMessage(msg);
+        }
+        else
+        {
+            // The nodeString might have a wildcard, so here we call the method on
+            // any nodes (or statesets) that match:
+            
+            
+            // first nodes:
+            std::vector<ReferencedNode*> matchedNodes;
+            std::vector<ReferencedNode*>::iterator iter;
+            matchedNodes = spinApp::Instance().sceneManager_->findNodes(nodeString.c_str());
+            for (iter = matchedNodes.begin(); iter != matchedNodes.end(); ++iter)
+            {
+                spinApp::Instance().NodeMessage((*iter)->getID().c_str(), msg);
+            }
+
+            // now statesets:
+            std::vector<ReferencedStateSet*> matchedStateSets;
+            std::vector<ReferencedStateSet*>::iterator sIter;
+
+            matchedStateSets = spinApp::Instance().sceneManager_->findStateSets(nodeString.c_str());
+            for (sIter = matchedStateSets.begin(); sIter != matchedStateSets.end(); ++sIter)
+            {
+                spinApp::Instance().NodeMessage((*sIter)->getID().c_str(), msg);
+            }
+        }
+    }
+
+    return true;
+}
+
+bool introspect_invoke_old(std::string path, const Poco::Net::HTMLForm &form)
 {
     using namespace spin;
     
     // vars: request.getMethod(), form
     
+    
     t_symbol *s = gensym(form["nodeID"].c_str());
     //ReferencedNode *n = dynamic_cast<ReferencedNode*>(gensym(form["nodeID"].c_str())->s_thing);
     std::string method = form["method"];
+    
+    
     
     if (s->s_thing)
     {
@@ -211,100 +315,133 @@ public:
 		//app.logger().information("Request from " + request.clientAddress().toString());
         std::cout << "Request from " << request.clientAddress().toString() << std::endl;
 
-		MyPartHandler partHandler;
-		Poco::Net::HTMLForm form(request, request.stream(), partHandler);
+        MyPartHandler partHandler;
+        Poco::Net::HTMLForm form(request, request.stream(), partHandler);
 
-		response.setChunkedTransferEncoding(true);
-		response.setContentType("text/html");
-
-		std::ostream& ostr = response.send();
+        std::string spinToken, sceneString, nodeString, args;
+        std::istringstream pathstream(request.getURI());
+        pathstream.get(); // ignore leading slash
+        getline(pathstream, spinToken, '/');
+        getline(pathstream, sceneString, '/');
+        getline(pathstream, nodeString, '?');
+        
+        if (sceneString.empty()) sceneString = "default";
+        //if (nodeString.empty()) nodeString = "shp";
+        if (form.empty()) args = "createNode shp ShapeNode";
+        else args = form["args"];
 		
-		ostr <<
-			"<html>\n"
-			"<head>\n"
-			"<title>SPIN Web Server Sample</title>\n"
-			"</head>\n"
-			"<body>\n"
-			"<h1>SPIN Web Server Sample</h1>\n"
-			"<h2>Tests:</h2>\n"
-			"<form name=\"spinform\" method=\"GET\" action=\"null\">\n"
-			"/SPIN/default/"
+        response.setChunkedTransferEncoding(true);
+        response.setContentType("text/html");
+        
+        std::ostream& ostr = response.send();
+        
+        ostr <<
+        "<html>\n"
+        "<head>\n"
+        "<title>SPIN Web Service</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>SPIN Web Service</h1>\n"
+        "<h3>Enter a SPIN command in the form below:</h3>\n"
+        "<table><tr><td nowrap=\"nowrap\">\n"
+        "<form name=\"urlForm\" method=\"GET\" action=\"null\">\n"
+        "/SPIN/"
+        "<input type=\"text\" name=\"sceneID\" value=\"" << sceneString << "\" size=\"10\">\n"
+        "/<input type=\"text\" name=\"nodeID\" value=\"" << nodeString << "\" size=\"10\">"
+        "</form></td>\n"
+        "<td nowrap=\"nowrap\">\n"
+        "<form name=\"spinform\" method=\"GET\" action=\"null\">\n"
+        "<input type=\"text\" name=\"args\" value=\"" << args << "\" size=\"20\">\n"
+        "<input type=\"submit\" value=\"GO\" onclick=\"this.form.action='/SPIN/'+document.forms['urlForm']['sceneID'].value+'/'+document.forms['urlForm']['nodeID'].value\">\n"
+        "</form>\n"
+        "</tr></table>\n"
+        "<p>(NOTE: you can send scene messages by leaving the node name blank)</p>\n"
+        "\n";
+        /*
+        ostr <<
+            "<html>\n"
+            "<head>\n"
+            "<title>SPIN Web Server Sample</title>\n"
+            "</head>\n"
+            "<body>\n"
+            "<h1>SPIN Web Server Sample</h1>\n"
+            "<h2>Tests:</h2>\n"
+            "<form name=\"spinform\" method=\"GET\" action=\"null\">\n"
+            "/SPIN/default/"
             "<input type=\"text\" name=\"nodeID\" value=\"shp\" size=\"15\">"
             "&nbsp;&nbsp;&nbsp;"
             "<input type=\"text\" name=\"method\" value=\"rotate\" size=\"15\">"
             " move<input type=\"text\" name=\"x\" value=\"0\" size=\"3\">"
             " <input type=\"text\" name=\"y\" value=\"0\" size=\"3\">"
             " <input type=\"text\" name=\"z\" value=\"10\" size=\"3\">\n"
-			" <input type=\"submit\" value=\"GO\" onclick=\"this.form.action='/SPIN/default/'+this.form.nodeID.value\">\n"
-			"</form>\n"
+            " <input type=\"submit\" value=\"GO\" onclick=\"this.form.action='/SPIN/default/'+this.form.nodeID.value\">\n"
+            "</form>\n"
             "\n";
-        /*    
         ostr <<
-			"<html>\n"
-			"<head>\n"
-			"<title>SPIN Web Server Sample</title>\n"
-			"</head>\n"
-			"<body>\n"
-			"<h1>SPIN Web Server Sample</h1>\n"
-			"<h2>GET Form</h2>\n"
-			"<form method=\"GET\" action=\"/form\">\n"
-			"<input type=\"text\" name=\"text\" size=\"31\">\n"
-			"<input type=\"submit\" value=\"GET\">\n"
-			"</form>\n"
-			"<h2>POST Form</h2>\n"
-			"<form method=\"POST\" action=\"/form\">\n"
-			"<input type=\"text\" name=\"text\" size=\"31\">\n"
-			"<input type=\"submit\" value=\"POST\">\n"
-			"</form>\n"
-			"<h2>File Upload</h2>\n"
-			"<form method=\"POST\" action=\"/form\" enctype=\"multipart/form-data\">\n"
-			"<input type=\"file\" name=\"file\" size=\"31\"> \n"
-			"<input type=\"submit\" value=\"Upload\">\n"
-			"</form>\n";
+            "<html>\n"
+            "<head>\n"
+            "<title>SPIN Web Server Sample</title>\n"
+            "</head>\n"
+            "<body>\n"
+            "<h1>SPIN Web Server Sample</h1>\n"
+            "<h2>GET Form</h2>\n"
+            "<form method=\"GET\" action=\"/form\">\n"
+            "<input type=\"text\" name=\"text\" size=\"31\">\n"
+            "<input type=\"submit\" value=\"GET\">\n"
+            "</form>\n"
+            "<h2>POST Form</h2>\n"
+            "<form method=\"POST\" action=\"/form\">\n"
+            "<input type=\"text\" name=\"text\" size=\"31\">\n"
+            "<input type=\"submit\" value=\"POST\">\n"
+            "</form>\n"
+            "<h2>File Upload</h2>\n"
+            "<form method=\"POST\" action=\"/form\" enctype=\"multipart/form-data\">\n"
+            "<input type=\"file\" name=\"file\" size=\"31\"> \n"
+            "<input type=\"submit\" value=\"Upload\">\n"
+            "</form>\n";
             */
-			
-		ostr << "<h2>Request</h2><p>\n";
-		ostr << "Method: " << request.getMethod() << "<br>\n";
-		ostr << "URI: " << request.getURI() << "<br>\n";
-		Poco::Net::NameValueCollection::ConstIterator it = request.begin();
-		Poco::Net::NameValueCollection::ConstIterator end = request.end();
-		for (; it != end; ++it)
-		{
-			ostr << it->first << ": " << it->second << "<br>\n";
-		}
-		ostr << "</p>";
-
-		if (!form.empty())
-		{
-			ostr << "<h2>Result</h2><p>\n";
-			it = form.begin();
-			end = form.end();
-			for (; it != end; ++it)
-			{
-				ostr << it->first << ": " << it->second << "<br>\n";
-			}
-			ostr << "</p>";
-		}
+            
+        ostr << "<h2>Result</h2><p>\n";
+        ostr << "Method: " << request.getMethod() << "<br>\n";
+        ostr << "URI: " << request.getURI() << "<br>\n";
+        Poco::Net::NameValueCollection::ConstIterator it = request.begin();
+        Poco::Net::NameValueCollection::ConstIterator end = request.end();
+        for (; it != end; ++it)
+        {
+            ostr << it->first << ": " << it->second << "<br>\n";
+        }
+        ostr << "</p>";
+        /*
+        if (!form.empty())
+        {
+            ostr << "<h2>Result</h2><p>\n";
+            it = form.begin();
+            end = form.end();
+            for (; it != end; ++it)
+            {
+                ostr << it->first << ": " << it->second << "<br>\n";
+            }
+            ostr << "</p>";
+        }
+        */
         
         // --------parse
-        
-        std::cout << "checking nodeID" << form["nodeID"] << std::endl;
         
         introspect_invoke(request.getURI(), form);
         
         // ---------------
-		
-		if (!partHandler.name().empty())
-		{
-			ostr << "<h2>Upload</h2><p>\n";
-			ostr << "Name: " << partHandler.name() << "<br>\n";
-			ostr << "File Name: " << partHandler.fileName() << "<br>\n";
-			ostr << "Type: " << partHandler.contentType() << "<br>\n";
-			ostr << "Size: " << partHandler.length() << "<br>\n";
-			ostr << "</p>";
-		}
-		ostr << "</body>\n";
-	}
+        
+        if (!partHandler.name().empty())
+        {
+            ostr << "<h2>Upload</h2><p>\n";
+            ostr << "Name: " << partHandler.name() << "<br>\n";
+            ostr << "File Name: " << partHandler.fileName() << "<br>\n";
+            ostr << "Type: " << partHandler.contentType() << "<br>\n";
+            ostr << "Size: " << partHandler.length() << "<br>\n";
+            ostr << "</p>";
+        }
+        ostr << "</body>\n";
+    }
 };
 
 
@@ -382,7 +519,7 @@ int main(int argc, char **argv)
 		if (arguments[i][0]!='-')
 		{
 			// not an option so assume string is a filename
-			spinApp::Instance().sceneManager->loadXML(arguments[i]);
+			spinApp::Instance().sceneManager_->loadXML(arguments[i]);
 		} else i++;
 	}
 	 	

@@ -64,10 +64,11 @@ class SoundNode : public DSPNode
     
     public:
         
-        SoundNode(SceneManager *sceneManager, char *initID);
+        SoundNode(SceneManager *sceneManager, const char* initID);
         virtual ~SoundNode();
 
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
+        bool dumpGlobals(bool forced=false);
         
         // override some methods so that we can send them to SpatOSC:
         virtual void setParam (const char *paramName, const char *paramValue);
@@ -76,6 +77,7 @@ class SoundNode : public DSPNode
         virtual void setOrientation (float p, float r, float y);
         virtual void setOrientationQuat (float x, float y, float z, float w);
         virtual void setRadius (float f);
+        virtual void setURI (const char *uri);
 
         /**
          * For each subclass of ReferencedNode, we override the getState()

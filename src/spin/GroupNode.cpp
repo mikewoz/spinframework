@@ -189,14 +189,14 @@ bool DraggerCallback::receive(const osgManipulator::MotionCommand& command)
     
 // ***********************************************************
 // constructor:
-GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+GroupNode::GroupNode (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
 {
-    nodeType = "GroupNode";
+    this->setNodeType("GroupNode");
     this->setName(getID() + ".GroupNode");
 
     //_reportGlobals = false;
-    _reportMode = GroupNode::NONE;
-    _interactionMode = GroupNode::STATIC;
+    reportMode_ = GroupNode::NONE;
+    interactionMode_ = GroupNode::STATIC;
     orientationMode_ = GroupNode::NORMAL;
     
     orientationTarget_ = gensym("NULL");
@@ -204,33 +204,41 @@ GroupNode::GroupNode (SceneManager *sceneManager, char *initID) : ReferencedNode
     manipulatorUpdateFlag_ = false;
     manipulatorShadowCopy_ = true;
 
-    mainTransform = new osg::MatrixTransform();
-    mainTransform->setName(getID() + ".mainTransform");
-    //mainTransform->setAttitude(osg::Quat(0.0,0.0,0.0,0.0));
-    //mainTransform->setPosition(osg::Vec3(0.0,0.0,0.0));
-    this->addChild(mainTransform.get());
+    mainTransform_ = new osg::MatrixTransform();
+    mainTransform_->setName(getID() + ".MainTransform");
+    //mainTransform_->setAttitude(osg::Quat(0.0,0.0,0.0,0.0));
+    //mainTransform_->setPosition(osg::Vec3(0.0,0.0,0.0));
+    this->addChild(mainTransform_.get());
 
+    computationMode_ = SERVER_SIDE;
     
+    maxUpdateDelta_ = 0.05; // update when dt is at least 0.05s (ie 20hz)
+    //maxUpdateDelta_ = 0.1; // update when dt is at least 0.1s (ie 10hz)
 
-    clipNode = new osg::ClipNode();
-    clipNode->setCullingActive(false);
-    clipNode->setName(getID() + ".clipNode");
-    mainTransform->addChild(clipNode.get());
+    stateset_ = gensym("NULL");
+
+    clipNode_ = new osg::ClipNode();
+    clipNode_->setCullingActive(false);
+    clipNode_->setName(getID() + ".ClipNode");
+    mainTransform_->addChild(clipNode_.get());
     
     scale_ = osg::Vec3(1.0,1.0,1.0);
-    _velocity = osg::Vec3(0.0,0.0,0.0);
-    _velocityMode = GroupNode::TRANSLATE;
-    _spin = osg::Vec3(0.0,0.0,0.0);
-    _damping = 0.0;
+    velocity_ = osg::Vec3(0.0,0.0,0.0);
+    velocityMode_ = GroupNode::TRANSLATE;
+    spin_ = osg::Vec3(0.0,0.0,0.0);
+    damping_ = 0.0;
+    
+    broadcastLock_ = false;
     
     updateMatrix();
 
     // When children are attached to this, they get added to the attachNode:
     // NOTE: by changing this, we MUST override the updateNodePath() method!
-    setAttachmentNode(clipNode.get());
+    setAttachmentNode(clipNode_.get());
 
     // keep a timer for velocity calculation:
-    lastTick = osg::Timer::instance()->tick();
+    lastTick_ = osg::Timer::instance()->tick();
+    lastUpdate_ = osg::Timer::instance()->tick();
 }
 
 // ***********************************************************
@@ -242,60 +250,111 @@ GroupNode::~GroupNode()
 
 #define EPSILON 0.0001
 
-void GroupNode::callbackUpdate()
+void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
 {
-    ReferencedNode::callbackUpdate();
+    ReferencedNode::callbackUpdate(nv);
     
     if (manipulatorUpdateFlag_)
     {
         drawManipulator();
         manipulatorUpdateFlag_ = false;
     }
+    
+    osg::Timer_t tick = osg::Timer::instance()->tick();
+    float dt = osg::Timer::instance()->delta_s(lastUpdate_,tick);
 
-    //printf("GroupNode: damping = %f\n", _damping);
-
-    dumpGlobals(false); // never force globals here
-
-    // Now we need to update translation/orientation based on our velocity/spin.
-    // We find out how many seconds passed since the last time this was called,
-    // and move by _velocity*dt (ie, m/s) and rotate by _spin*dt (ie, deg/sec)
-    if ( spinApp::Instance().getContext()->isServer() )
+    if (dt > maxUpdateDelta_)
+        dumpGlobals(false); // never force globals here
+    
+    // Decide whether messages should be broadcasted during this update:
+    if (spinApp::Instance().getContext()->isServer())
     {
-        osg::Timer_t tick = osg::Timer::instance()->tick();
-        float dt = osg::Timer::instance()->delta_s(lastTick,tick);
-        if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
-        //if (dt > 0.1) // only update when dt is at least 0.1s (ie 10hz):
+        // if this node does computation on the client side, don't let the
+        // server broadcast any messages:
+        if (computationMode_==CLIENT_SIDE)
         {
-
-            if (_velocity.length() > EPSILON) // != osg::Vec3(0,0,0))
-            {
-            	if (this->_velocityMode==GroupNode::TRANSLATE)
-            		this->translate( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
-            	else
-            		this->move( _velocity.x()*dt, _velocity.y()*dt, _velocity.z()*dt );
-
-                if (_damping > EPSILON)
-                {
-                    double dv = 1 - (_damping*dt);
-                    this->setVelocity(_velocity.x()*dv, _velocity.y()*dv, _velocity.z()*dv);
-                }
-            }
-            else _velocity = osg::Vec3(0,0,0);
-
-            if (_spin.length() > EPSILON) // != osg::Vec3(0,0,0))
-            {
-                this->rotate( _spin.x()*dt, _spin.y()*dt, _spin.z()*dt );
-                if (_damping > EPSILON)
-                {
-                    double ds = 1 - (_damping*dt);
-                    this->setSpin(_spin.x()*ds, _spin.y()*ds, _spin.z()*ds);
-                }
-            }
-            else _spin = osg::Vec3(0,0,0);
-
-            lastTick = tick;
+            broadcastLock_ = true;
+        }
+        
+        // on the server-side, we want to throttle network messages, so only
+        // allow broadcasting of messages if a threshold amount of time has
+        // passed:
+        else if (dt > maxUpdateDelta_)
+        {
+            broadcastLock_ = false;
+            lastUpdate_ = tick;
+        }
+        else 
+        {
+            broadcastLock_ = true;
         }
     }
+    
+     
+    // We update state in the following situations:
+    // 1) this is a server (always needs to be up-to-date for interaction)
+    // 2) this is a client and the node is set to client-side computation.
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
+    {
+	// now dt is the time since the "lastTick" (could be more recent than the
+        // last update
+    	dt = osg::Timer::instance()->delta_s(lastTick_,tick);
+
+        // Now we need to update translation/orientation based on the current
+        // velocity/spin values. We find out how many seconds passed since the
+        // last time this was called, and move by velocity_*dt (ie, m/s) and 
+        // rotate by spin_*dt (ie, deg/sec)
+        if (motion_.valid())
+        {
+            motion_->update(dt);
+            float motionIndex = motion_->getValue();
+            osg::Vec3 newPos = motionStart_ + ((motionEnd_-motionStart_) * motionIndex);
+            this->setTranslation( newPos.x(), newPos.y(), newPos.z() );
+            
+            if (motion_->getTime() >= motion_->getDuration())
+            {
+                BROADCAST(this, "sss", "event", "translateTo", "done");
+                motion_ = NULL;
+            }
+        }
+
+
+        if (velocity_.length() > EPSILON)
+        {
+            if (this->velocityMode_==GroupNode::TRANSLATE)
+            {
+                this->translate( velocity_.x()*dt, velocity_.y()*dt, velocity_.z()*dt );
+            }
+            else
+            {
+                this->move( velocity_.x()*dt, velocity_.y()*dt, velocity_.z()*dt );
+            }
+            if (damping_ > EPSILON)
+            {
+                double dv = 1 - (damping_*dt);
+                this->setVelocity( velocity_.x()*dv, velocity_.y()*dv, velocity_.z()*dv );
+            }
+        }
+        else velocity_ = osg::Vec3(0,0,0);
+
+        if (spin_.length() > EPSILON)
+        {
+            if (this->velocityMode_==GroupNode::TRANSLATE)
+            	this->rotate( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
+            else
+            	this->addRotation( spin_.x()*dt, spin_.y()*dt, spin_.z()*dt );
+
+            if (damping_ > EPSILON)
+            {
+                double ds = 1 - (damping_*dt);
+                this->setSpin( spin_.x()*ds, spin_.y()*ds, spin_.z()*ds );
+            }
+        }
+        else spin_ = osg::Vec3(0,0,0);
+    }
+    
+    lastTick_ = tick;
+    broadcastLock_ = false;
 }
 
 void GroupNode::updateNodePath(bool updateChildren)
@@ -304,19 +363,11 @@ void GroupNode::updateNodePath(bool updateChildren)
     // are not updated yet:
 	ReferencedNode::updateNodePath(false);
 
-    /*
-    if (dragger.valid())
-        currentNodePath.push_back(manipulatorTransform.get());
-    else
-        currentNodePath.push_back(mainTransform.get());
-    */
-    currentNodePath.push_back(mainTransform.get());
-    
-    currentNodePath.push_back(clipNode.get());
+    currentNodePath_.push_back(mainTransform_.get());    
+    currentNodePath_.push_back(clipNode_.get());
     
     // now update NodePaths for all children:
     if (updateChildren) updateChildNodePaths();
-
 }
 
 // *****************************************************************************
@@ -329,32 +380,32 @@ void GroupNode::mouseEvent (int /*event*/, int keyMask, int buttonMask, float x,
 
 void GroupNode::event (int event, const char* userString, float eData1, float eData2, float x, float y, float z)
 {
-    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager_->getNode(userString));
     if (!user.valid()) return;
 
-    if (_interactionMode==DRAG || _interactionMode==THROW)
+    if (interactionMode_==DRAG || interactionMode_==THROW)
     {
         switch(event)
         {
             case(osgGA::GUIEventAdapter::PUSH):
 
-                if (!this->owner.valid())
+                if (!this->owner_.valid())
                 {
                     this->setVelocity(0,0,0);
                     this->setSpin(0,0,0);
-                    _trajectory.clear();
+                    trajectory_.clear();
                 }
 
                 break;
 
             case(osgGA::GUIEventAdapter::RELEASE):
 
-                if (this->owner == user)
+                if (this->owner_ == user)
                 {
-                    if (_interactionMode==THROW)
+                    if (interactionMode_==THROW)
                     {
                         // Take average of stored motion vectors, and set velocity in
-                        // that direction. Note: _damping should be set so that node
+                        // that direction. Note: damping_ should be set so that node
                         // gradually stops:
 
                         double currentTime = osg::Timer::instance()->time_m();
@@ -363,7 +414,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
                         int count = 0;
 
                         std::vector<osg::Vec4>::iterator it;
-                        for (it=_trajectory.begin(); it!=_trajectory.end(); ++it)
+                        for (it=trajectory_.begin(); it!=trajectory_.end(); ++it)
                         {
                             if (currentTime - (*it).w() < 500)
                             {
@@ -385,7 +436,7 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
             case(osgGA::GUIEventAdapter::DRAG):
 
-                if (this->owner == user)
+                if (this->owner_ == user)
                 {
 
                     // if this node is owned by the event's user, then we apply the
@@ -408,9 +459,9 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
                     // save last N motion vectors, so we can setVelocity on RELEASE:
                     // (note, we use a vec4, and store a time in ms as the 4th value
-                    _trajectory.insert(_trajectory.begin(), osg::Vec4(motionVec, osg::Timer::instance()->time_m()));
-                    if (_trajectory.size() > 5) {
-                        _trajectory.pop_back();
+                    trajectory_.insert(trajectory_.begin(), osg::Vec4(motionVec, osg::Timer::instance()->time_m()));
+                    if (trajectory_.size() > 5) {
+                        trajectory_.pop_back();
                     }
                 }
 
@@ -422,24 +473,24 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
     }
 
-    else if (_interactionMode==DRAW)
+    else if (interactionMode_==DRAW)
     {
         if ((event==osgGA::GUIEventAdapter::PUSH) || (event==osgGA::GUIEventAdapter::RELEASE))
         {
-            if ((int)eData2==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) _drawMod = 1;
-            else if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) _drawMod = 2;
-            else _drawMod = 0;
+            if ((int)eData2==osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) drawMod_ = 1;
+            else if ((int)eData2==osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) drawMod_ = 2;
+            else drawMod_ = 0;
 
-            BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
+            BROADCAST(this, "ssifff", "draw", userString, drawMod_, x, y, z);
         }
         else if (event==osgGA::GUIEventAdapter::DRAG)
         {
-            BROADCAST(this, "ssifff", "draw", userString, _drawMod, x, y, z);
+            BROADCAST(this, "ssifff", "draw", userString, drawMod_, x, y, z);
         }
     }
 
     // after all is done, we update ownership (if this was a PUSH or RELEASE)
-    if (_interactionMode==SELECT || _interactionMode==DRAG || _interactionMode==THROW)
+    if (interactionMode_==SELECT || interactionMode_==DRAG || interactionMode_==THROW)
     {
         switch(event)
         {
@@ -447,11 +498,11 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
                 // on push, we check if the current node is owned by anyone,
                 // and if not, we give ownnerhip to the event's user:
-                if (!this->owner.valid())
+                if (!this->owner_.valid())
                 {
-                    this->owner = user.get();
-                    //std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
-                    BROADCAST(this, "ss", "setOwner", owner->id->s_name);
+                    this->owner_ = user.get();
+                    //std::cout << "setting owner of " << getID() << " to " << owner_->getID() << std::endl;
+                    BROADCAST(this, "ss", "setOwner", owner_->getID().c_str());
                     BROADCAST(this, "ssi", "select", userString, 1);
                 }
                 break;
@@ -460,10 +511,10 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
                 // on release, the user gives up ownership of the node (assuming
                 // that he had ownership in the first place):
-                if (this->owner == user)
+                if (this->owner_ == user)
                 {
-                    //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
-                    this->owner = NULL;
+                    //std::cout << "setting owner of " << getID() << " to NULL" << std::endl;
+                    this->owner_ = NULL;
                     BROADCAST(this, "ss", "setOwner", "NULL");
                     BROADCAST(this, "ssi", "select", userString, 0);
                }
@@ -478,24 +529,24 @@ void GroupNode::event (int event, const char* userString, float eData1, float eD
 
 void GroupNode::setLock(const char* userString, int lock)
 {
-    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager->getNode(userString));
+    osg::ref_ptr<UserNode> user = dynamic_cast<UserNode*>(sceneManager_->getNode(userString));
     if (!user.valid()) return;
 
     if (lock)
     {
-        if (owner.valid())
+        if (owner_.valid())
         {
-            this->owner = user.get();
-            //std::cout << "setting owner of " << id->s_name << " to " << owner->id->s_name << std::endl;
-            BROADCAST(this, "ss", "setOwner", owner->id->s_name);
+            this->owner_ = user.get();
+            //std::cout << "setting owner of " << getID() << " to " << owner_->getID() << std::endl;
+            BROADCAST(this, "ss", "setOwner", owner_->getID().c_str());
         }
     }
     else
     {
-        if (this->owner == user)
+        if (this->owner_ == user)
         {
-            //std::cout << "setting owner of " << id->s_name << " to NULL" << std::endl;
-            this->owner = NULL;
+            //std::cout << "setting owner of " << getID() << " to NULL" << std::endl;
+            this->owner_ = NULL;
             BROADCAST(this, "ss", "setOwner", "NULL");
         }
     }
@@ -506,71 +557,91 @@ void GroupNode::debug()
     ReferencedNode::debug();
 
     std::cout << "   Manipulator: " << manipulatorType_ << std::endl;
-    if (owner.valid()) std::cout << "   owner: " << owner->id->s_name << std::endl;
+    if (owner_.valid()) std::cout << "   owner: " << owner_->getID() << std::endl;
     else std::cout << "   owner: NULL" << std::endl;
     
-    std::cout << "   mainX pos: " << stringify(this->getTranslation()) << std::endl;
-    std::cout << "   mainX rot: " << stringify(this->getOrientationQuat()) << std::endl;
+    std::cout << "   mainX posn: " << stringify(this->getTranslation()) << std::endl;
+    std::cout << "   mainX qua: " << stringify(this->getOrientationQuat()) << std::endl;
+    std::cout << "   mainX ori: " << stringify(this->getOrientation()) << std::endl;
     std::cout << "   mainX scl: " << stringify(this->getScale()) << std::endl;
+    
+    const osg::Matrix tmpMatrix = this->getGlobalMatrix();
+    osg::Vec3 t;
+    osg::Quat q;
+    osg::Vec3 s;
+    osg::Quat so;
+    tmpMatrix.decompose(t, q, s, so);
+    std::cout << "   global pos: " << stringify(t) << std::endl;
+    std::cout << "   global qua: " << stringify(q) << std::endl;
+    std::cout << "   global ori: " << stringify(Vec3inDegrees(QuatToEuler(q))) << std::endl;
+    std::cout << "   global scl: " << stringify(s) << std::endl;
+
 }
 
 
-// ***********************************************************
-// ***********************************************************
+// -----------------------------------------------------------------------------
 
-/*
-void GroupNode::reportGlobals (int b)
+void GroupNode::setUpdateRate(float seconds)
 {
-    if (this->_reportGlobals != (bool)b)
+    maxUpdateDelta_ = seconds;
+    BROADCAST(this, "sf", "setUpdateRate", getUpdateRate());
+}
+
+
+void GroupNode::setComputationMode (ComputationMode mode)
+{
+
+    if (this->computationMode_ != mode)
     {
-        this->_reportGlobals = (bool) b;
-        BROADCAST(this, "si", "reportGlobals", (int) this->_reportGlobals);
+        this->computationMode_ = mode;
+        lastUpdate_ = lastTick_;
+        BROADCAST(this, "si", "setComputationMode", getComputationMode());
     }
 }
-*/
 
 void GroupNode::setReportMode (globalsReportMode mode)
 {
-    if (this->_reportMode != (int)mode)
+    if (this->reportMode_ != mode)
     {
-        this->_reportMode = mode;
-        BROADCAST(this, "si", "setReportMode", (int) this->_reportMode);
+        this->reportMode_ = mode;
+        BROADCAST(this, "si", "setReportMode", getReportMode());
     }
 }
 
 void GroupNode::setInteractionMode (InteractionMode mode)
 {
-    if (this->_interactionMode != (int)mode)
+    if (this->interactionMode_ != mode)
     {
 
         // if this node previously had an owner, it will be lost with the change
         // of mode
-        if (this->owner.valid())
+        if (this->owner_.valid())
         {
-            this->owner = NULL;
+            this->owner_ = NULL;
             BROADCAST(this, "ss", "owner", "NULL");
-        } else if (_interactionMode == DRAW)
+        } else if (interactionMode_ == DRAW)
         {
             BROADCAST(this, "ssifff", "draw", "NULL", 0, 0.0f, 0.0f, 0.0f);
         }
 
-        this->_interactionMode = mode;
+        this->interactionMode_ = mode;
 
 
 
         // set the node mask so that an intersection visitor will only test
         // for interactive nodes (note: nodemask info in spinUtil.h)
-        if ((int)_interactionMode > 0)
+        if ((int)interactionMode_ > 0)
             this->setNodeMask(INTERACTIVE_NODE_MASK);
         else
             this->setNodeMask(GEOMETRIC_NODE_MASK);
 
-        BROADCAST(this, "si", "setInteractionMode", (int) this->_interactionMode);
+        BROADCAST(this, "si", "setInteractionMode", getInteractionMode());
         
         // now we need to travel up the scenegraph and set all parents to have
         // an InteractionMode of PASSTHRU, otherwise an intersection traversal
         // will never find this node:
-        GroupNode *parent = dynamic_cast<GroupNode*>(this->getParentNode());
+                
+        GroupNode *parent = dynamic_cast<GroupNode*>(this->getParentNode(0));
         while (parent)
         {
             if (!parent->getInteractionMode())
@@ -578,27 +649,80 @@ void GroupNode::setInteractionMode (InteractionMode mode)
                 parent->setInteractionMode(PASSTHRU);
                 continue; // rest of parents will be recursively called
             }
-            else parent = dynamic_cast<GroupNode*>(parent->getParentNode());
+            else parent = dynamic_cast<GroupNode*>(parent->getParentNode(0));
         }
         
     }
 }
 
+// -----------------------------------------------------------------------------
+
+void GroupNode::setStateSetFromFile(const char* filename)
+{
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(filename);
+	if (ss.valid())
+	{
+		if (ss->getIDSymbol() == stateset_) return; // we're already using that stateset
+		stateset_ = ss->getIDSymbol();
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
+	}
+}
+
+void GroupNode::setStateSet (const char* s)
+{
+	if (gensym(s)==stateset_) return;
+
+	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->getStateSet(s);
+	if (ss.valid())
+	{
+		stateset_ = ss->getIDSymbol();
+		updateStateSet();
+		BROADCAST(this, "ss", "setStateSet", getStateSetSymbol()->s_name);
+	}
+}
+
+void GroupNode::updateStateSet()
+{
+	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+	if (mainTransform_.valid() && ss.valid()) mainTransform_->setStateSet( ss.get() );
+}
+
+
+
+// -----------------------------------------------------------------------------
+
 void GroupNode::setClipping(float x, float y, float z)
 {
-    _clipping = osg::Vec3d(x,y,z);
+    clipping_ = osg::Vec3d(x,y,z);
 
     // remove existing clipping planes:
-    while (clipNode->getNumClipPlanes()) clipNode->removeClipPlane((unsigned int)0);
+    while (clipNode_->getNumClipPlanes()) clipNode_->removeClipPlane((unsigned int)0);
 
     // add this one:
-    if ( (_clipping.x()>0) && (_clipping.y()>0) && (_clipping.z()>0) )
+    if ( (clipping_.x()>0) && (clipping_.y()>0) && (clipping_.z()>0) )
     {
-        osg::BoundingBox bb(-_clipping.x(),-_clipping.y(),-_clipping.z(),_clipping.x(),_clipping.y(),_clipping.z());
-        clipNode->createClipBox(bb);
+        osg::BoundingBox bb(-clipping_.x(),-clipping_.y(),-clipping_.z(),clipping_.x(),clipping_.y(),clipping_.z());
+        clipNode_->createClipBox(bb);
     }
 
-    BROADCAST(this, "sfff", "setClipping", _clipping.x(), _clipping.y(), _clipping.z());
+    BROADCAST(this, "sfff", "setClipping", clipping_.x(), clipping_.y(), clipping_.z());
+}
+
+void GroupNode::updateQuat()
+{
+    quat_ = osg::Quat( osg::DegreesToRadians(orientation_.x()), osg::Vec3d(1,0,0),
+                       osg::DegreesToRadians(orientation_.y()), osg::Vec3d(0,1,0), 
+                       osg::DegreesToRadians(orientation_.z()), osg::Vec3d(0,0,1));
+            
+    // fix numerical imprecision:
+    float epsilon = 0.0000001;
+    if (fabs(quat_.x())<epsilon) quat_ = osg::Quat(0.0,quat_.y(),quat_.z(),quat_.w());
+    if (fabs(quat_.y())<epsilon) quat_ = osg::Quat(quat_.x(),0.0,quat_.z(),quat_.w());
+    if (fabs(quat_.z())<epsilon) quat_ = osg::Quat(quat_.x(),quat_.y(),0.0,quat_.w());
+    if (fabs(quat_.w())<epsilon) quat_ = osg::Quat(quat_.x(),quat_.y(),quat_.z(),0.0);
+
+    updateMatrix();
 }
 
 void GroupNode::updateMatrix()
@@ -621,7 +745,7 @@ void GroupNode::updateMatrix()
             * osg::Matrix::scale(scale_)
             * osg::Matrix::rotate(quat_);
     */
-    mainTransform->setMatrix(matrix);
+    mainTransform_->setMatrix(matrix);
  
 }
 
@@ -629,8 +753,8 @@ void GroupNode::updateDraggerMatrix()
 {
     osg::Matrix matrix;
     matrix.preMultTranslate(translation_);
-    matrix.preMultScale(dragger->getMatrix().getScale());
-    dragger->setMatrix(matrix);
+    matrix.preMultScale(dragger_->getMatrix().getScale());
+    dragger_->setMatrix(matrix);
 }
 
 void GroupNode::setTranslation (float x, float y, float z)
@@ -642,9 +766,10 @@ void GroupNode::setTranslation (float x, float y, float z)
         translation_ = newTranslation;
         updateMatrix();
 
-        //if (dragger.valid()) updateDraggerMatrix();
+        //if (dragger_.valid()) updateDraggerMatrix();
         
-        BROADCAST(this, "sfff", "setTranslation", x, y, z);
+        if (!broadcastLock_)
+            BROADCAST(this, "sfff", "setTranslation", x, y, z);
     }
     
     // if we've moved and the orientationMode requires us to point to a target
@@ -665,9 +790,10 @@ void GroupNode::setOrientationQuat (float x, float y, float z, float w)
         {
             quat_ = newQuat;
             updateMatrix();
-            _orientation = Vec3inDegrees(QuatToEuler(newQuat));
+            orientation_ = Vec3inDegrees(QuatToEuler(newQuat));
 
-            BROADCAST(this, "sffff", "setOrientationQuat", x, y, z, w);
+            if (!broadcastLock_)
+                BROADCAST(this, "sffff", "setOrientationQuat", x, y, z, w);
         }
     }
 }
@@ -682,22 +808,12 @@ void GroupNode::setOrientation (float p, float r, float y)
     {
         osg::Vec3 newOrientation = osg::Vec3(p, r, y);
 
-        if (newOrientation != _orientation)
+        if (newOrientation != orientation_)
         {
-            _orientation = newOrientation;
-            quat_ = osg::Quat( osg::DegreesToRadians(p), osg::Vec3d(1,0,0),
-                                     osg::DegreesToRadians(r), osg::Vec3d(0,1,0),
-                                     osg::DegreesToRadians(y), osg::Vec3d(0,0,1));
-            
-            // fix numerical imprecision:
-            float epsilon = 0.0000001;
-            if (fabs(quat_.x())<epsilon) quat_ = osg::Quat(0.0,quat_.y(),quat_.z(),quat_.w());
-            if (fabs(quat_.y())<epsilon) quat_ = osg::Quat(quat_.x(),0.0,quat_.z(),quat_.w());
-            if (fabs(quat_.z())<epsilon) quat_ = osg::Quat(quat_.x(),quat_.y(),0.0,quat_.w());
-            if (fabs(quat_.w())<epsilon) quat_ = osg::Quat(quat_.x(),quat_.y(),quat_.z(),0.0);
-    
-            updateMatrix();
-            BROADCAST(this, "sfff", "setOrientation", p, r, y);
+            orientation_ = newOrientation;
+            updateQuat();
+            if (!broadcastLock_)
+                BROADCAST(this, "sfff", "setOrientation", p, r, y);
         }
     }
 }
@@ -724,46 +840,50 @@ void GroupNode::setOrientationTarget (const char* target)
 
 void GroupNode::applyOrientationMode()
 {
-    if (!spinApp::Instance().getContext()->isServer()) return;
-
-    osg::Vec3 targetPos;
-    osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath);
-    
-    if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
+    if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
-        ReferencedNode *target = dynamic_cast<ReferencedNode*>(orientationTarget_->s_thing);
-        if (target)
+    
+        osg::Vec3 targetPos;
+        osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath_);
+        
+        if ((orientationMode_==POINT_TO_TARGET)||(orientationMode_==POINT_TO_TARGET_CENTROID))
         {
-            // TODO: verify if we really need to recompute the matrices and bound every time.
-            // Perhaps the matrix is already stored somewhere in certain cases?
-            
-            if (orientationMode_==POINT_TO_TARGET_CENTROID)
+            ReferencedNode *target = dynamic_cast<ReferencedNode*>(orientationTarget_->s_thing);
+            if (target)
             {
-                targetPos = target->computeBound().center();
-            }
-            else
-            {
-                osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath);
-                targetPos = targetMatrix.getTrans();
+                // TODO: verify if we really need to recompute the matrices and bound every time.
+                // Perhaps the matrix is already stored somewhere in certain cases?
+                
+                if (orientationMode_==POINT_TO_TARGET_CENTROID)
+                {
+                    targetPos = target->computeBound().center();
+                }
+                else
+                {
+                    osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath_);
+                    targetPos = targetMatrix.getTrans();
+                }
             }
         }
-    }
-    else if (orientationMode_==POINT_TO_ORIGIN)
-    {
-        targetPos = osg::Vec3(0.0,0.0,0.0);
-    }
-    
-    osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
-    
-    // can't do this, because that function only does something for NORMAL mode
-    //setOrientation(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+        else if (orientationMode_==POINT_TO_ORIGIN)
+        {
+            targetPos = osg::Vec3(0.0,0.0,0.0);
+        }
+        
+        osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
+        
+        // can't do this, because that function only does something for NORMAL mode
+        //setOrientation(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
 
-    _orientation = osg::Vec3(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
-    quat_ = osg::Quat( osg::DegreesToRadians(_orientation.x()), osg::Vec3d(1,0,0),
-                             osg::DegreesToRadians(_orientation.y()), osg::Vec3d(0,1,0),
-                             osg::DegreesToRadians(_orientation.z()), osg::Vec3d(0,0,1));
-    updateMatrix();
-    BROADCAST(this, "sfff", "setOrientation", _orientation.x(), _orientation.y(),  _orientation.z());
+        orientation_ = osg::Vec3(osg::RadiansToDegrees(aed.y()), 0.0, osg::RadiansToDegrees(aed.x()));
+        quat_ = osg::Quat( osg::DegreesToRadians(orientation_.x()), osg::Vec3d(1,0,0),
+                                 osg::DegreesToRadians(orientation_.y()), osg::Vec3d(0,1,0),
+                                 osg::DegreesToRadians(orientation_.z()), osg::Vec3d(0,0,1));
+        updateMatrix();
+    }
+    
+    if (!broadcastLock_)
+        BROADCAST(this, "sfff", "setOrientation", orientation_.x(), orientation_.y(),  orientation_.z());
 }
 
 
@@ -771,10 +891,10 @@ void GroupNode::applyOrientationMode()
 void GroupNode::setOrientationQuat (float x, float y, float z, float w)
 {
     osg::Quat = osg::Quat(x,y,z,w);
-    _orientation = QuatToEuler(q);
-    mainTransform->setAttitude(q);
+    orientation_ = QuatToEuler(q);
+    mainTransform_->setAttitude(q);
 
-    BROADCAST(this, "sfff", "setOrientation", _orientatoin.x(), _orientation.y(), _orientation.z());
+    BROADCAST(this, "sfff", "setOrientation", _orientatoin.x(), orientation_.y(), orientation_.z());
 }
 */
 
@@ -786,7 +906,9 @@ void GroupNode::setScale (float x, float y, float z)
     {
         scale_ = newScale;
         updateMatrix();
-        BROADCAST(this, "sfff", "setScale", x, y, z);
+        
+        if (!broadcastLock_)
+            BROADCAST(this, "sfff", "setScale", x, y, z);
     }
 }
 
@@ -794,41 +916,60 @@ void GroupNode::setVelocity (float dx, float dy, float dz)
 {
     osg::Vec3 newVelocity = osg::Vec3(dx,dy,dz);
 
-    if (newVelocity != _velocity)
+    if (newVelocity != velocity_)
     {
-        _velocity = newVelocity;
-        BROADCAST(this, "sfff", "setVelocity", dx, dy, dz);
+        velocity_ = newVelocity;
+        if (!broadcastLock_)
+            BROADCAST(this, "sfff", "setVelocity", dx, dy, dz);
+            
+        // if this is an object that was updated on the client side, and the
+        // velocity is stopped, let's do a server-side push of the latest state
+        // to ensure the client state is perfectly synchronized:
+        if ((velocity_.length()==0) && (computationMode_==CLIENT_SIDE))
+        {
+            BROADCAST(this, "sfff", "setTranslation", translation_.x(), translation_.y(), translation_.z());
+            BROADCAST(this, "sfff", "setOrientation", orientation_.x(), orientation_.y(), orientation_.z());
+        }
     }
 }
 
 void GroupNode::setVelocityMode (velocityMode mode)
 {
-    if (this->_velocityMode != (int)mode)
+    if (this->velocityMode_ != (int)mode)
     {
-        this->_velocityMode = mode;
-        BROADCAST(this, "si", "setVelocityMode", (int) this->_velocityMode);
+        this->velocityMode_ = mode;
+        BROADCAST(this, "si", "setVelocityMode", (int) this->velocityMode_);
     }
 }
-
 
 void GroupNode::setSpin (float dp, float dr, float dy)
 {
     osg::Vec3 newSpin = osg::Vec3(dp,dr,dy);
 
-    if (newSpin != _spin)
+    if (newSpin != spin_)
     {
-        _spin = newSpin;
-        BROADCAST(this, "sfff", "setSpin", dp, dr, dy);
-    }
+        spin_ = newSpin;
+        if (!broadcastLock_)
+            BROADCAST(this, "sfff", "setSpin", dp, dr, dy);
+            
+        // if this is an object that was updated on the client side, and the
+        // spin is stopped, let's do a server-side push of the latest state
+        // to ensure the client state is perfectly synchronized:
+        if ((spin_.length()==0) && (computationMode_==CLIENT_SIDE))
+        {
+            BROADCAST(this, "sfff", "setTranslation", translation_.x(), translation_.y(), translation_.z());
+            BROADCAST(this, "sfff", "setOrientation", orientation_.x(), orientation_.y(), orientation_.z());
+        }
 
+    }
 }
 
 void GroupNode::setDamping (float d)
 {
-    if (d != _damping)
+    if (d != damping_)
     {
-        _damping = d;
-        BROADCAST(this, "sf", "setDamping", _damping);
+        damping_ = d;
+        BROADCAST(this, "sf", "setDamping", damping_);
     }
 }
 
@@ -839,7 +980,6 @@ void GroupNode::translate (float x, float y, float z)
     setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
-
 void GroupNode::move (float x, float y, float z)
 {
     // take the orientation into account, and move along that vector:
@@ -847,10 +987,99 @@ void GroupNode::move (float x, float y, float z)
     setTranslation(newPos.x(), newPos.y(), newPos.z());
 }
 
-
-void GroupNode::rotate (float p, float r, float y)
+void GroupNode::rotate (float dPitch, float dRoll, float dYaw)
 {
-    this->setOrientation(_orientation.x()+p, _orientation.y()+r, _orientation.z()+y);
+    this->setOrientation(orientation_.x()+dPitch, orientation_.y()+dRoll, orientation_.z()+dYaw);
+}
+
+void GroupNode::addRotation (float dPitch, float dRoll, float dYaw)
+{
+    osg::Quat newQuat = EulerToQuat(dPitch,dRoll,dYaw).inverse() * getOrientationQuat();
+    this->setOrientationQuat(newQuat.x(), newQuat.y(), newQuat.z(), newQuat.w());
+}
+
+// *****************************************************************************
+
+
+
+void GroupNode::translateTo (float x, float y, float z, float duration, const char *motion)
+{
+
+    if (motion_.valid())
+    {
+        motion_ = NULL;
+    }
+
+    motionStart_ = getTranslation();
+    motionEnd_ = osg::Vec3(x,y,z);
+    
+    std::string motionType = std::string(motion);
+    
+    osgAnimation::Motion::TimeBehaviour tb = osgAnimation::Motion::CLAMP;
+    float init = 0.0f;
+    float d = 1.0f;
+
+    if (!motionType.compare("OutQuadMotion"))
+        motion_ = new osgAnimation::OutQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("InQuadMotion"))
+        motion_ = new osgAnimation::InQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutQuadMotion"))
+        motion_ = new osgAnimation::InOutQuadMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutCubicMotion"))
+        motion_ = new osgAnimation::OutCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("InCubicMotion"))
+        motion_ = new osgAnimation::InCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutCubicMotion"))
+        motion_ = new osgAnimation::InOutCubicMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutQuartMotion"))
+        motion_ = new osgAnimation::OutQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("InQuartMotion"))
+        motion_ = new osgAnimation::InQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutQuartMotion"))
+        motion_ = new osgAnimation::InOutQuartMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutBounceMotion"))
+        motion_ = new osgAnimation::OutBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("InBounceMotion"))
+        motion_ = new osgAnimation::InBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutBounceMotion"))
+        motion_ = new osgAnimation::InOutBounceMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutElasticMotion"))
+        motion_ = new osgAnimation::OutElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("InElasticMotion"))
+        motion_ = new osgAnimation::InElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutElasticMotion"))
+        motion_ = new osgAnimation::InOutElasticMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutSineMotion"))
+        motion_ = new osgAnimation::OutSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("InSineMotion"))
+        motion_ = new osgAnimation::InSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutSineMotion"))
+        motion_ = new osgAnimation::InOutSineMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutBackMotion"))
+        motion_ = new osgAnimation::OutBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("InBackMotion"))
+        motion_ = new osgAnimation::InBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutBackMotion"))
+        motion_ = new osgAnimation::InOutBackMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutCircMotion"))
+        motion_ = new osgAnimation::OutCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("InCircMotion"))
+        motion_ = new osgAnimation::InCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutCircMotion"))
+        motion_ = new osgAnimation::InOutCircMotion(init, duration, d, tb);
+    else if (!motionType.compare("OutExpoMotion"))
+        motion_ = new osgAnimation::OutExpoMotion(init, duration, d, tb);
+    else if (!motionType.compare("InExpoMotion"))
+        motion_ = new osgAnimation::InExpoMotion(init, duration, d, tb);
+    else if (!motionType.compare("InOutExpoMotion"))
+        motion_ = new osgAnimation::InOutExpoMotion(init, duration, d, tb);
+    else
+        motion_ = new osgAnimation::LinearMotion(init, duration, d, tb);
+
+    if (computationMode_==CLIENT_SIDE)
+    {
+        BROADCAST(this, "sffffs", "translateTo", x, y, z, duration, motion);
+    }
 }
 
 // *****************************************************************************
@@ -945,7 +1174,7 @@ void GroupNode::setManipulatorMatrix(float a00, float a01, float a02, float a03,
                                 a20,a21,a22,a23,
                                 a30,a31,a32,a33);
 
-    mainTransform->setMatrix(m);
+    mainTransform_->setMatrix(m);
     
     /*
     // Can't just broadcast the matrix, because it won't call the clients'
@@ -1001,7 +1230,7 @@ void GroupNode::setManipulatorMatrix(float a00, float a01, float a02, float a03,
     translation_ = t;
     quat_ = q;
     scale_ = s;
-    _orientation = Vec3inDegrees(QuatToEuler(quat_));
+    orientation_ = Vec3inDegrees(QuatToEuler(quat_));
 
     
     // can't do this yet, because a message will result!
@@ -1019,7 +1248,7 @@ void GroupNode::setManipulatorMatrix(float a00, float a01, float a02, float a03,
     
 void GroupNode::setManipulator(const char *manipulatorType)
 {
-    //if (this->owner.valid()) return;
+    //if (this->owner_.valid()) return;
     if (std::string(manipulatorType)==manipulatorType_) return;
     
     manipulatorType_ = std::string(manipulatorType);
@@ -1033,35 +1262,35 @@ void GroupNode::setManipulator(const char *manipulatorType)
 void GroupNode::drawManipulator()
 {
     // remove the previously attached dragger (if one exists):
-    if (dragger.valid())
+    if (dragger_.valid())
     {
-        this->removeChild(dragger.get());
-        dragger = 0;
+        this->removeChild(dragger_.get());
+        dragger_ = 0;
     }
 
-    dragger = createDragger(manipulatorType_, this->getBound().radius(), this->getTranslation(), this->getScale());
+    dragger_ = createDragger(manipulatorType_, this->getBound().radius(), this->getTranslation(), this->getScale());
     
-    if (dragger.valid())
+    if (dragger_.valid())
     {
-        this->addChild(dragger.get());
+        this->addChild(dragger_.get());
         
-        dragger->addDraggerCallback(new DraggerCallback(this));
+        dragger_->addDraggerCallback(new DraggerCallback(this));
 
         // we want the dragger to handle it's own events automatically
-        dragger->setHandleEvents(true);
+        dragger_->setHandleEvents(true);
         
         // if we don't set an activation key or mod mask then any mouse click on
         // the dragger will activate it, however if do define either of ActivationModKeyMask or
         // and ActivationKeyEvent then you'll have to press either than mod key or the specified key to
         // be able to activate the dragger when you mouse click on it.  Please note the follow allows
         // activation if either the ctrl key or the 'a' key is pressed and held down.
-        dragger->setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
-        dragger->setActivationKeyEvent('a');
+        dragger_->setActivationModKeyMask(osgGA::GUIEventAdapter::MODKEY_CTRL);
+        dragger_->setActivationKeyEvent('a');
 
     }
       
     // note: setAttachmentNode will call updateNodePath
-    //this->setAttachmentNode(clipNode.get());
+    //this->setAttachmentNode(clipNode_.get());
     //this->updateNodePath();
 }
 
@@ -1070,13 +1299,13 @@ void GroupNode::drawManipulator()
 
 osg::Matrix GroupNode::getGlobalMatrix()
 {
-    if (!this->_reportMode)
+    if (!this->reportMode_)
     {
         // might not be up-to-date, so force an update:
-        _globalMatrix = osg::computeLocalToWorld(this->currentNodePath);
+        globalMatrix_ = osg::computeLocalToWorld(this->currentNodePath_);
     }
 
-    return _globalMatrix;
+    return globalMatrix_;
 }
 
 osg::Vec3 GroupNode::getCenter() const
@@ -1095,14 +1324,14 @@ bool GroupNode::dumpGlobals(bool forced)
     // an update of the current global parameters
 
     //if (this->_reportGlobals)
-    if (this->_reportMode)
+    if (this->reportMode_)
     {
 
         // position & rotation: (should we get position from centre of boundingsphere?
-        osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath);
-        if ((myMatrix != this->_globalMatrix) || forced)
+        osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath_);
+        if ((myMatrix != this->globalMatrix_) || forced)
         {
-            this->_globalMatrix = myMatrix;
+            this->globalMatrix_ = myMatrix;
             
             //TODO: use decompose!
             //osg::Vec3 myPos = myMatrix.getTrans();
@@ -1112,13 +1341,13 @@ bool GroupNode::dumpGlobals(bool forced)
             osg::Quat myQuat;
             osg::Vec3 myScale;
             osg::Quat myScaleOrientation;
-            this->_globalMatrix.decompose(myPos, myQuat, myScale, myScaleOrientation);
+            this->globalMatrix_.decompose(myPos, myQuat, myScale, myScaleOrientation);
             osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myQuat));
             
 
             BROADCAST(this, "sffffff", "global6DOF", myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z());
 
-            if (this->_reportMode == GLOBAL_ALL)
+            if (this->reportMode_ == GLOBAL_ALL)
             {
                 osg::ComputeBoundsVisitor *vst = new osg::ComputeBoundsVisitor;
                 this->accept(*vst);
@@ -1133,13 +1362,13 @@ bool GroupNode::dumpGlobals(bool forced)
         }
 
 
-        if (this->_reportMode == GLOBAL_ALL)
+        if (this->reportMode_ == GLOBAL_ALL)
         {
             const osg::BoundingSphere& bs = this->getBound();
-            if ((bs.radius() != _globalRadius) || forced)
+            if ((bs.radius() != globalRadius_) || forced)
             {
-                _globalRadius = bs.radius();
-                BROADCAST(this, "sf", "globalRadius", _globalRadius);
+                globalRadius_ = bs.radius();
+                BROADCAST(this, "sf", "globalRadius", globalRadius_);
             }
         }
 
@@ -1166,6 +1395,17 @@ std::vector<lo_message> GroupNode::getState () const
     lo_message msg;
     osg::Vec3 v;
 
+	msg = lo_message_new();
+	lo_message_add(msg,  "ss", "setStateSet", getStateSetSymbol()->s_name);
+	ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setComputationMode", getComputationMode());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setUpdateRate", getUpdateRate());
+    ret.push_back(msg);
 
     msg = lo_message_new();
     lo_message_add(msg, "si", "setReportMode", getReportMode());
@@ -1186,7 +1426,7 @@ std::vector<lo_message> GroupNode::getState () const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    lo_message_add(msg, "sfff", "setClipping", _clipping.x(), _clipping.y(), _clipping.z());
+    lo_message_add(msg, "sfff", "setClipping", clipping_.x(), clipping_.y(), clipping_.z());
     ret.push_back(msg);
 
     msg = lo_message_new();

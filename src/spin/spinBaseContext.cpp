@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include "config.h"
 
 #include <string>
 #include <iostream>
@@ -71,7 +72,6 @@
 #include "nodeVisitors.h"
 #include "SoundConnection.h"
 #include "spinDefaults.h"
-#include "config.h"
 
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>
@@ -168,7 +168,7 @@ void spinBaseContext::debugPrint()
 {
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager->resourcesPath << std::endl;
+    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager_->resourcesPath << std::endl;
     std::cout << "  SPIN version:\t\t\t" << PACKAGE_VERSION << "" << std::endl;
     std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC
@@ -477,7 +477,53 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     spinApp &spin = spinApp::Instance();
 
-    if (theMethod == "addCronScript")
+
+    if (theMethod == "parentList")
+    {
+        // The "parentList" message is a redundancy measure to ensure that
+        // refreshes work properly after setParent is used. The issue is that
+        // setParent invokes a detachFrom("*") followed by attachTo("parent").
+        // However, if any of the broadcasted detachFrom("oldParent") messages
+        // get lost, the client will have multiple attachTo nodes instead of
+        // just the one intended "parent".
+        //
+        // So in addition to the "attachTo" state that is dumped, we send a
+        // deterministic list of parents called "parentList", which we compare
+        // here to remove any undesired parents.
+
+        ReferencedNode *n = dynamic_cast<ReferencedNode*>(s->s_thing);
+        if (n)
+        {
+            std::vector<std::string> detachList;
+            for (int p=0; p < n->getNumParents(); p++)
+            {
+                for (int i=0; i < argc; i++)
+                {
+                    // the parent we have is supposed to be there. all good.
+                    break;
+                }
+                // oh oh. we have a parent that is not in the parentList.
+                // we will need to detach this
+                detachList.push_back(n->getParentID(p));
+            }
+
+            // now do the detach:
+            std::vector<std::string>::iterator it; 
+	    for (it=detachList.begin(); it!=detachList.end(); ++it)
+            {
+                n->detachFrom((*it).c_str());
+            }
+
+            // let's be certain that we have all the parents in the parentList:
+            for (int i=0; i < argc; i++)
+            {
+                n->attachTo((const char*)argv[i]);
+            }
+        }
+        return 1;
+    }
+
+    else if (theMethod == "addCronScript")
     {
         // client or server?
         if (! lo_is_numerical_type((lo_type)types[1]))
@@ -765,7 +811,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     }
 
     spinApp &spin = spinApp::Instance();
-    SceneManager *sceneManager = spin.sceneManager;
+    SceneManager *sceneManager = spin.sceneManager_;
 
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;
@@ -833,9 +879,12 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             // may have detached it from the scenegraph:
             if (!sceneManager->worldNode->containsNode(spin.userNode.get()))
             {
+                spin.userNode->attachTo("world");
+                /*
                 std::cout << "calling attach on userNode (newparent=" << spin.userNode->newParent->s_name << std::endl;
                 spin.userNode->newParent = WORLD_SYMBOL;
                 spin.userNode->attach();
+                */
             }
             
             // if the server sends a userRefresh, it's possible that it has
@@ -854,6 +903,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             server->refreshSubscribers();
         }
     }
+    else if (theMethod == "getNodeTypes")
+        sceneManager->sendNodeTypes();
+    else if (theMethod == "getStateTypes")
+        sceneManager->sendStateTypes();
+        
     else if (theMethod == "getNodeList")
         sceneManager->sendNodeList("*");
     else if ((theMethod == "nodeList") && (argc>2))
@@ -878,6 +932,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->loadXML((char*) argv[1]);
     else if ((theMethod == "save") && (argc==2))
         sceneManager->saveXML((char*) argv[1]);
+    else if ((theMethod == "saveNode") && (argc==3))
+        sceneManager->saveNode((char*) argv[1], (char*) argv[2]);
     else if ((theMethod == "saveAll") && (argc==2))
         sceneManager->saveXML((char*) argv[1], true);
     else if ((theMethod == "saveUsers") && (argc==2))
@@ -949,6 +1005,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
                 bool updateExisting = (bool) lo_hires_val((lo_type)types[3], argv[3]);
                 spin.audioScene->setDefaultDopplerFactor(factor, updateExisting);
             }
+            if ((argc==3) && (std::string((char*)argv[1])=="setAutoConnect"))
+            {
+                bool enable = (bool) lo_hires_val((lo_type)types[2], argv[2]);
+                spin.audioScene->setAutoConnect(enable);
+            }
             if ((argc==4) && (std::string((char*)argv[1])=="setDefaultRolloffFactor"))
             {
                 double factor = (double) lo_hires_val((lo_type)types[2], argv[2]);
@@ -958,12 +1019,34 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         }
 #endif
     }
+    else if (theMethod == "event")
+    {
+	spinServerContext *context = dynamic_cast<spinServerContext*>(spin.getContext());
+	//if (spin.sceneManager_->isServer())
+	if (context)
+	{
+	    lo_message msg = lo_message_new();
+            for (int i=0; i<argc; i++)
+            {
+                if (lo_is_numerical_type((lo_type)types[i]))
+                {
+                    lo_message_add_float(msg, (float) lo_hires_val((lo_type)types[i], argv[i]));
+                } else {
+                    lo_message_add_string(msg, (const char*) argv[i] );
+                }
+            }
+    	    std::vector<lo_address>::iterator addrIter;
+            for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+                lo_send_message((*addrIter), path, msg);
+
+	}	
+    }
     else
     {
-        // FIXME: this used to rebroadcast messages that did not match command
+        // FIXME: this used to rebroadcast messages that did not match any command
 #if 0
         spinApp &spin = spinApp::Instance();
-        if (spin.sceneManager->isServer())
+        if (spin.sceneManager_->isServer())
         {
             lo_message msg = lo_message_new();
             for (int i=0; i<argc; i++)
@@ -975,7 +1058,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
                     lo_message_add_string(msg, (const char*) argv[i] );
                 }
             }
-            lo_send_message_from(spin.sceneManager->txAddr, spin.sceneManager->txServ, path, msg);
+            lo_send_message_from(spin.sceneManager_->txAddr, spin.sceneManager_->txServ, path, msg);
             //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args), but forwarding the message anyway." << std::endl;
         } else {
             //std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;

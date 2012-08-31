@@ -50,8 +50,6 @@
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -59,10 +57,10 @@ namespace spin
 
 // *****************************************************************************
 // constructor:
-GridNode::GridNode (SceneManager *sceneManager, char *initID) : ReferencedNode(sceneManager, initID)
+GridNode::GridNode (SceneManager *sceneManager, const char* initID) : ReferencedNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".GridNode");
-	nodeType = "GridNode";
+	this->setName(this->getID() + ".GridNode");
+	this->setNodeType("GridNode");
 
 	_size = 10;
 	_color = osg::Vec4(0.5,0.5,0.5,1);
@@ -105,7 +103,7 @@ void GridNode::setColor (float r, float g, float b, float a)
 
 void GridNode::drawGrid()
 {
-	if (!sceneManager->isGraphical()) return;
+	if (!sceneManager_->isGraphical()) return;
 	
     pthread_mutex_lock(&sceneMutex);
 

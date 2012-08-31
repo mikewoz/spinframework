@@ -38,7 +38,7 @@ wrappers:
 	$(MAKE) -C src/osgWrappers wrappers
 
 doc: htmldoc
-# $(MAKE) -C src/spin doc
+	$(MAKE) -C src/spin doc
 
 apps:
 	@echo ""; \

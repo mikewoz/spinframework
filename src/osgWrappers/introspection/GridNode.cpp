@@ -24,8 +24,8 @@
 BEGIN_OBJECT_REFLECTOR(spin::GridNode)
 	I_DeclaringFile("GridNode.h");
 	I_BaseType(spin::ReferencedNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____GridNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____GridNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, setSize, IN, int, _size,

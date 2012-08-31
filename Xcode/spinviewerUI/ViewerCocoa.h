@@ -77,6 +77,8 @@ namespace osgViewer
     
     spin::spinClientContext spinListener;
     BOOL gridEnabled;
+    
+    BOOL delayedFullscreen;
 
     // This timer is used to trigger animation callbacks since everything is event driven.
     NSTimer* animationTimer;

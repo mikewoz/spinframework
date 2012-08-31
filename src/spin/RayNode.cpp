@@ -50,19 +50,15 @@
 #include "spinBaseContext.h"
 #include "osgUtil.h"
 
-using namespace std;
-
-//extern SceneManager *sceneManager;
-
 namespace spin
 {
 
 // *****************************************************************************
 // constructor:
-RayNode::RayNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+RayNode::RayNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".RayNode");
-	nodeType = "RayNode";
+	this->setName(this->getID() + ".RayNode");
+	this->setNodeType("RayNode");
 
 	visible = true;
 	length = 100;
@@ -190,7 +186,7 @@ void RayNode::drawRay()
             ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
             
         	getAttachmentNode()->addChild(rayGeode.get());
-            rayGeode->setName(string(id->s_name) + ".rayGeode");
+            rayGeode->setName(this->getID() + ".rayGeode");
             osgUtil::Optimizer optimizer;
             optimizer.optimize(rayGeode.get());
         }

@@ -51,25 +51,28 @@ namespace spin
 
 // ===================================================================
 // constructor:
-SoundNode::SoundNode (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
+SoundNode::SoundNode (SceneManager *sceneManager, const char* initID) : DSPNode(sceneManager, initID)
 {
-	nodeType = "SoundNode";
-	this->setName(std::string(id->s_name) + ".SoundNode");
+	this->setNodeType("SoundNode");
+	this->setName(this->getID() + ".SoundNode");
 
 #ifdef WITH_SPATOSC
 	if (spinApp::Instance().hasAudioRenderer)
 	{
-	    spatOSCSource = spinApp::Instance().audioScene->createSoundSource(std::string(id->s_name));
+	    spatOSCSource = spinApp::Instance().audioScene->createSoundSource(this->getID());
         std::cout << "Created SpatOSC Source:" << std::endl;
         //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
+
+    // after the spatosc node is created, set some params:
+    
 }
 
 // destructor
 SoundNode::~SoundNode()
 {
-	//std::cout << "In SoundNode destructor... node: " << this->id->s_name << std::endl;
+	//std::cout << "In SoundNode destructor... node: " << this->getID() << std::endl;
 #ifdef WITH_SPATOSC
 	if (spinApp::Instance().hasAudioRenderer)
 	{
@@ -82,26 +85,29 @@ SoundNode::~SoundNode()
 }
 
 // ===================================================================
-void SoundNode::callbackUpdate()
+void SoundNode::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
     // which will update _globalMatrix (since reporting is on)
-    DSPNode::callbackUpdate();
+    DSPNode::callbackUpdate(nv);
+}
 
-    // now, we can get the global position and orientation, and we can forward
-    // it to SpatOSC
-
+bool SoundNode::dumpGlobals(bool forced)
+{
+    DSPNode::dumpGlobals();
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        osg::Vec3 myPos = _globalMatrix.getTrans();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        this->globalMatrix_ = getGlobalMatrix(); // in case reporting is off
+        osg::Vec3 myPos = globalMatrix_.getTrans();
+        osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(globalMatrix_.getRotate()));
 
         spatOSCSource->setPosition(myPos.x(), myPos.y(), myPos.z());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
     }
 #endif
-}
+    return 1;
+}   
 
 void SoundNode::setParam (const char *paramName, const char *paramValue)
 {
@@ -131,8 +137,8 @@ void SoundNode::setTranslation (float x, float y, float z)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        this->_globalMatrix = getGlobalMatrix();
-        osg::Vec3 myPos = _globalMatrix.getTrans();
+        this->globalMatrix_ = getGlobalMatrix();
+        osg::Vec3 myPos = globalMatrix_.getTrans();
         spatOSCSource->setPosition(myPos.x(), myPos.y(), myPos.z());
     }
 #endif
@@ -145,8 +151,8 @@ void SoundNode::setOrientation (float p, float r, float y)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        this->_globalMatrix = getGlobalMatrix();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        this->globalMatrix_ = getGlobalMatrix();
+        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
     }
 #endif
@@ -158,8 +164,8 @@ void SoundNode::setOrientationQuat (float x, float y, float z, float w)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        this->_globalMatrix = getGlobalMatrix();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        this->globalMatrix_ = getGlobalMatrix();
+        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
         spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
     }
 #endif
@@ -175,6 +181,19 @@ void SoundNode::setRadius (float f)
     }
 #endif
 }
+
+void SoundNode::setURI (const char *uri)
+{
+    DSPNode::setURI(uri);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCSource->setURI(this->getURI());
+    }
+#endif
+}
+
+
 
 std::vector<lo_message> SoundNode::getState () const
 {

@@ -61,10 +61,11 @@ namespace spin
 class Listener : public DSPNode
 {
     public:
-        Listener(SceneManager *sceneManager, char *initID);
+        Listener(SceneManager *sceneManager, const char* initID);
         virtual ~Listener();
         
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
+        bool dumpGlobals(bool forced=false);
 
         /**
          * For each subclass of ReferencedNode, we override the getState()
@@ -73,11 +74,12 @@ class Listener : public DSPNode
          */
         virtual std::vector<lo_message> getState() const;
         
-        void setType    (const char* t);
-        const char* getType() const { return type.c_str(); }
-        
-        std::string type;
+        // override some methods so that we can send them to SpatOSC:
+        virtual void setParam (const char *paramName, const char *paramValue);
+        virtual void setParam (const char *paramName, float paramValue);
 
+        virtual void setURI (const char *uri);
+        
     private:
 
 #ifdef WITH_SPATOSC

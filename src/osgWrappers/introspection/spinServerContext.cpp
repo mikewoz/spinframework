@@ -60,6 +60,20 @@ BEGIN_OBJECT_REFLECTOR(spin::spinServerContext)
 	          Properties::NON_VIRTUAL,
 	          __bool__shouldAutoClean,
 	          "",
-	          "A flag that decides if user nodes should be automatically cleaned up (ie, their entire subgraph deleted) if they stop sending ping messages. This is set by the --disable-auto-cleanup argument. ");
+	          "A flag that decides if user nodes should be automatically cleaned up (ie, their entire subgraph deleted) if they stop sending ping messages. This is set by the disable-auto-cleanup argument. ");
+	I_Method2(bool, applyHTTPMessage, IN, std::string, path, IN, const Poco::Net::HTMLForm &, form,
+	          Properties::NON_VIRTUAL,
+	          __bool__applyHTTPMessage__std_string__C5_Poco_Net_HTMLForm_R1,
+	          "",
+	          "");
+	I_Method0(unsigned short, getHttpPort,
+	          Properties::NON_VIRTUAL,
+	          __unsigned_short__getHttpPort,
+	          "",
+	          "");
+	I_SimpleProperty(unsigned short, HttpPort, 
+	                 __unsigned_short__getHttpPort, 
+	                 0);
+	I_PublicMemberProperty(std::map< std::string COMMA  lo_address >, tcpClientAddrs_);
 END_REFLECTOR
 

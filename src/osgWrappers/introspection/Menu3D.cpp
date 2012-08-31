@@ -25,8 +25,8 @@
 BEGIN_OBJECT_REFLECTOR(spin::Menu3D)
 	I_DeclaringFile("Menu3D.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____Menu3D__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____Menu3D__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method0(void, updateNodePath,
@@ -171,4 +171,8 @@ BEGIN_OBJECT_REFLECTOR(spin::Menu3D)
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
 END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::vector< osg::observer_ptr< spin::TextNode > >, spin::MenuVector)
+
+STD_VECTOR_REFLECTOR(std::vector< osg::observer_ptr< spin::TextNode > >)
 

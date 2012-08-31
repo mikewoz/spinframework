@@ -70,11 +70,16 @@ namespace spin
 
 #define Vec3inDegrees(v) (osg::Vec3( osg::RadiansToDegrees(v.x()), osg::RadiansToDegrees(v.y()), osg::RadiansToDegrees(v.z()) ))
 
-
 #define GENERIC_SHAPE_RESOLUTION 10.0f
 
 #define AS_UNIT_SCALE  1.0f // 1m
-#define AS_DEBUG_SCALE 4.0f // size of debug views (radiation/sensitivity/etc)
+#define AS_DEBUG_SCALE 1.0f // size of debug views (radiation/sensitivity/etc)
+
+double random(double min,double max);
+float random(float min,float max);
+int random(int min,int max);
+osg::Vec3 randomVec3();
+
 
 /**
  * Returns an absolute angle difference between v1 and v2 (with no notion of
@@ -105,9 +110,11 @@ osg::Vec3 rotateAroundAxis(osg::Vec3 v, osg::Vec3 axis, float angle);
 osg::Quat EulerToQuat(float roll, float pitch, float yaw);
 osg::Vec3 QuatToEuler(osg::Quat q);
 osg::Vec3 QuatToEuler2(osg::Quat q);
+bool getPlaneLineIntersection(const osg::Vec4d& plane, const osg::Vec3d& lineStart, const osg::Vec3d& lineEnd, osg::Vec3d& isect);
 
 //osg::Geode*     createGrid(int radius, osg::Vec4 color);
 osg::Geometry*    createPlane(float halfLength, osg::Vec4 color);
+osg::Geometry*    createCone(float length, float radius, osg::Vec4 color);
 osg::Geode*        createHollowSphere(float radius, osg::Vec4 color);
 osg::Geode*        createWireframeRolloff(int rolloff, float distortion, float scale, osg::Vec4 color);
 osg::Geode*        createHollowCone(float length, float radius, osg::Vec4 color);
@@ -127,7 +134,7 @@ class worldMatrixUpdater : public osg::NodeVisitor
             ss_soundNode *ourNode = dynamic_cast<ss_soundNode*>(node.getUserData());
             osg::Matrix mat = osg::computeWorldToLocal( getNodePath() );
             osg::Vec3 trans = mat.getTrans();
-            osg::notify(osg::NOTICE) << "global position of '" << ourNode->id->s_name << "' is (" << trans.x() << "," << trans.y() << "," << trans.z() << ")" << std::endl;
+            osg::notify(osg::NOTICE) << "global position of '" << ourNode->getID() << "' is (" << trans.x() << "," << trans.y() << "," << trans.z() << ")" << std::endl;
             //ourNode->worldMatrix = osg::computeWorldToLocal( getNodePath() );
             traverse(node);
 

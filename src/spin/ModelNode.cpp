@@ -70,8 +70,6 @@
 #include "VideoTexture.h"
 #include "SharedVideoTexture.h"
 
-using namespace std;
-
 extern pthread_mutex_t sceneMutex;
 
 namespace spin
@@ -79,10 +77,10 @@ namespace spin
 
 // ===================================================================
 // constructor:
-ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+ModelNode::ModelNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(string(id->s_name) + ".ModelNode");
-	nodeType = "ModelNode";
+	this->setName(this->getID() + ".ModelNode");
+	this->setNodeType("ModelNode");
 
     // Save a pointer to the current attachmentNode (we will attach the loaded
     // 3D mesh there:
@@ -99,6 +97,7 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
     _attachCentroid = false;
     _registerStates = false;
 	_statesetList.clear();
+    _statesetList.push_back(stateset_);
     _renderBin = 10;
     _lightingOverride = 0;
 
@@ -111,7 +110,7 @@ ModelNode::ModelNode (SceneManager *sceneManager, char *initID) : GroupNode(scen
 // destructor
 ModelNode::~ModelNode()
 {
-	//std::cout << "Destroying ModelNode: " << this->id->s_name << std::endl;
+	//std::cout << "Destroying ModelNode: " << this->getID() << std::endl;
 }
 
 
@@ -120,12 +119,12 @@ void ModelNode::updateNodePath(bool updateChildren)
 	// call GroupNode's method, which will update all the way from the root, and
 	// we just need to add the centroid node:
 	GroupNode::updateNodePath(false);
-	currentNodePath.push_back(_centroid.get());
+	currentNodePath_.push_back(_centroid.get());
 
     /*
     osg::NodePath::iterator iter;
-    std::cout << "nodepath for " << id->s_name << ":" << std::endl;
-    for (iter = currentNodePath.begin(); iter!=currentNodePath.end(); iter++)
+    std::cout << "nodepath for " << getID() << ":" << std::endl;
+    for (iter = currentNodePath_.begin(); iter!=currentNodePath_.end(); iter++)
     {
         std::cout << " > " << (*iter)->getName() << std::endl;
     }
@@ -142,7 +141,7 @@ void ModelNode::updateNodePath(bool updateChildren)
 
 void ModelNode::setContext (const char *newvalue)
 {
-	if (contextString==string(newvalue)) return;
+	if (getContextString()==std::string(newvalue)) return;
 
 	// need to redraw after setContext() is called:
 	ReferencedNode::setContext(newvalue);
@@ -151,7 +150,7 @@ void ModelNode::setContext (const char *newvalue)
 
 void ModelNode::setModelFromFile (const char* filename)
 {
-	string path = getRelativePath(string(filename));
+	std::string path = getRelativePath(std::string(filename));
 	
 	// don't do anything if the current model is already loaded:
 	if (path==modelPath) return;
@@ -176,11 +175,11 @@ void ModelNode::setAttachCentroid (int i)
         osg::BoundingSphere bound = model->computeBound();
         _centroid->setPosition(bound.center());
         osg::Vec3 c = bound.center();
-        std::cout << "setting centroid for model: " <<c.x()<<","<<c.y()<< ","<<c.z() << std::endl;
+        //std::cout << "setting centroid for model: " <<c.x()<<","<<c.y()<< ","<<c.z() << std::endl;
     }
     else
     {
-        std::cout << "setting centroid for model: 0,0,0" << std::endl;
+        //std::cout << "setting centroid for model: 0,0,0" << std::endl;
         _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
     }
     		
@@ -247,7 +246,7 @@ void ModelNode::setPlaying (int index, int playstate)
     if (sequencer[index].valid())
     {
         osg::Sequence::SequenceMode mode = sequencer[index]->getMode();
-        std:cout << "about to set mode to "<<_playState[index] << ", old="<<mode<<std::endl;
+        std::cout << "about to set mode to "<<_playState[index] << ", old="<<mode<<std::endl;
         
         sequencer[index]->setMode((osg::Sequence::SequenceMode)_playState[index]);
         
@@ -280,56 +279,51 @@ void ModelNode::setKeyframe (int index, float keyframe)
 
 void ModelNode::setStateSet (int i, const char *replacement)
 {
-	osg::ref_ptr<ReferencedStateSet> ssOrig, ssReplacement;
+    osg::ref_ptr<ReferencedStateSet> ssReplacement = sceneManager_->getStateSet(replacement);
 
-	if ( i < (int)_statesetList.size() )
-	{
-		ssOrig = dynamic_cast<ReferencedStateSet*>(_statesetList[i]->s_thing);
-	}
+    if (i==0)
+    {
+        osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+        if (mainTransform_.valid() && ss.valid()) mainTransform_->setStateSet( ss.get() );
+    }
+    else if ((i>0) && (i<_statesetList.size()))
+    {
+        osg::ref_ptr<ReferencedStateSet> ssOrig = dynamic_cast<ReferencedStateSet*>(_statesetList[i]->s_thing);
 
-	ssReplacement = sceneManager->getStateSet(replacement);
+        if (ssOrig.valid() && ssReplacement.valid())
+        {
+            // We need to search through the drawables and nodes that originally had
+            // statesets and replace ssOrig with ssReplacement:
+            std::vector<osg::Drawable*>::iterator dItr;
+            for (dItr=_ssDrawableList.begin(); dItr!=_ssDrawableList.end(); ++dItr)
+            {
+                if ((*dItr)->getStateSet() == ssOrig.get())
+                {
+                    (*dItr)->setStateSet(ssReplacement.get());
+                }
+            }
+            std::vector<osg::Node*>::iterator nItr;
+            for (nItr=_ssNodeList.begin(); nItr!=_ssNodeList.end(); ++nItr)
+            {
+                if ((*nItr)->getStateSet() == ssOrig.get())
+                {
+                    (*nItr)->setStateSet(ssReplacement.get());
+                }
+            }
+        }
+    }
+    
+    if (ssReplacement.valid())
+    {
+        _statesetList[i] = ssReplacement->getIDSymbol();
+        BROADCAST(this, "sis", "setStateSet", i, _statesetList[i]->s_name);
+    }
+}
 
-	if (ssOrig.valid() && ssReplacement.valid())
-	{
-
-		// oops. this method might replace other model's stateset (if more than
-		// one model is currently using ssOrig:
-		/*
-		for (int j=0; j < ssOrig->getNumParents(); j++)
-		{
-			// stateset can be shared by several parents within the model, but
-			// they must be either of type osg::Drawable or osg::Node
-			osg::Drawable *drawable = dynamic_cast<osg::Drawable*>(ssOrig->getParent(j));
-			osg::Node *node = dynamic_cast<osg::Node*>(ssOrig->getParent(j));
-			if (drawable) drawable->setStateSet(ssReplacement.get());
-			else if (node) node->setStateSet(ssReplacement.get());
-			else std::cout << "ERROR: setStateSet for model " << id->s_name << " had problems." << std::endl;
-		}
-		*/
-
-
-		// We need to search through the drawables and nodes that originally had
-		// statesets and replace ssOrig with ssReplacement:
-		std::vector<osg::Drawable*>::iterator dItr;
-		for (dItr=_ssDrawableList.begin(); dItr!=_ssDrawableList.end(); ++dItr)
-		{
-			if ((*dItr)->getStateSet() == ssOrig.get())
-			{
-				(*dItr)->setStateSet(ssReplacement.get());
-			}
-		}
-		std::vector<osg::Node*>::iterator nItr;
-		for (nItr=_ssNodeList.begin(); nItr!=_ssNodeList.end(); ++nItr)
-		{
-			if ((*nItr)->getStateSet() == ssOrig.get())
-			{
-				(*nItr)->setStateSet(ssReplacement.get());
-			}
-		}
-
-		_statesetList[i] = ssReplacement->id;
-		BROADCAST(this, "sis", "setStateSet", i, _statesetList[i]->s_name);
-	}
+void ModelNode::updateStateSet()
+{
+    // updateStateSet should do nothing for ModelNode.
+    this->setStateSet(0, stateset_->s_name);
 }
 
 void ModelNode::setLighting(int i)
@@ -354,8 +348,6 @@ void ModelNode::setLighting(int i)
 // ===================================================================
 void ModelNode::drawModel()
 {
-	int i,j;
-
 	pthread_mutex_lock(&sceneMutex);
 	
 	if (model.valid())
@@ -366,13 +358,14 @@ void ModelNode::drawModel()
         model = NULL;
         _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
 		_statesetList.clear();
+        _statesetList.push_back(stateset_);
 		_ssDrawableList.clear();
 		_ssNodeList.clear();
 
-		//if (sceneManager->sharedStateManager.valid()) sceneManager->sharedStateManager->prune();
+		//if (sceneManager_->sharedStateManager.valid()) sceneManager_->sharedStateManager->prune();
 		
 		
-		for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
+		for (int i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
 		{
 			// re-initialize:
 			switcher[i] = NULL;
@@ -384,7 +377,7 @@ void ModelNode::drawModel()
 
 	bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() and (this->getContext()==getHostname()));
 	
-	if ((modelPath != string("NULL")) && !ignoreOnThisHost)
+	if ((modelPath != std::string("NULL")) && !ignoreOnThisHost)
 	{
 
         //osg::setNotifyLevel(osg::DEBUG_FP);
@@ -416,14 +409,14 @@ void ModelNode::drawModel()
 
 			SearchVisitor searchVisitor;
 			char buf[16];
-			for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
+			for (int i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
 			{
 
 				sprintf( buf, "%02d", i );
 
 				// Check if there are multiple states available from a osg::Switch
 				// note: from 3DS exporter, switch nodes are called: OSG_Switch01, etc.
-				searchVisitor.searchNode(model.get(), "OSG_Switch"+string(buf));
+				searchVisitor.searchNode(model.get(), "OSG_Switch"+std::string(buf));
 
 				switcher[i] = searchVisitor.getSwitchNode();
 				if (switcher[i].valid())
@@ -432,12 +425,12 @@ void ModelNode::drawModel()
 					animationMode[i] = SWITCH;
 					// initialize so only first frame is visible:
 					switcher[i]->setValue(0, true);
-					for (j=1; j<switcher[i]->getNumChildren(); j++) switcher[i]->setValue(j, false);
+					for (int j=1; j<switcher[i]->getNumChildren(); j++) switcher[i]->setValue(j, false);
 
 				}
 
 				// Check if there is an osg::Sequence node.
-				searchVisitor.searchNode(model.get(), "OSG_Sequence"+string(buf));
+				searchVisitor.searchNode(model.get(), "OSG_Sequence"+std::string(buf));
 				sequencer[i] = searchVisitor.getSequenceNode();
 				if (sequencer[i].valid())
 				{
@@ -455,7 +448,7 @@ void ModelNode::drawModel()
 			// search for special "billboard" nodes
 
 			//optimizer.optimize(model.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
-			//optimizer.optimize(sceneManager->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
+			//optimizer.optimize(sceneManager_->worldNode.get(), osgUtil::Optimizer::ALL_OPTIMIZATIONS);
 			optimizer.optimize(model.get());
 			/*
             optimizer.optimize(model.get(),
@@ -541,93 +534,22 @@ void ModelNode::drawModel()
 
 
 						// NEW
-						//osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(osgDB::getNameLessExtension(imageFile).c_str());
-						osg::ref_ptr<ReferencedStateSet> ss = sceneManager->createStateSet(imageFile.c_str());
+						//osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(osgDB::getNameLessExtension(imageFile).c_str());
+						osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(imageFile.c_str());
 						if (ss.valid())
 						{
 							ss->replace((*itr).get());
-							this->_statesetList.push_back(ss->id);
-							std::cout << "  Replaced placeholder texture with " << ss->classType << ": " << ss->id->s_name << std::endl;
+							this->_statesetList.push_back(ss->getIDSymbol());
+							std::cout << "  Replaced placeholder texture with " << ss->getClassType() << ": " << ss->getID() << std::endl;
+                            
+                            //
+                            std::cout << "Now we have " << _statesetList.size() << " statesets:" << std::endl;
+                            for (int i=0; i<_statesetList.size(); i++)
+                            {
+                                std::cout << " - " << _statesetList[i]->s_name << std::endl;
+                            }
 
 						}
-
-
-
-						// OLD:
-						/*
-						// check if the imagefile (minus extension) is a directory, and replace if necessary
-						if (osgDB::getDirectoryContents(osgDB::getNameLessExtension(imageFile)).size())
-						{
-							osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet(osgDB::getStrippedName(imageFile).c_str(), "VideoTexture"));
-
-							//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
-							//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
-							if (vid.valid())
-							{
-								vid->setVideoPath(osgDB::getNameLessExtension(getRelativePath(imageFile)).c_str());
-								vid->replace((*itr).get());
-								//(*itr) = vid.get();
-								std::cout << "  Replaced placeholder texture with " << vid->classType << ": " << vid->id->s_name << std::endl;
-							}
-						}
-
-						// if filename contains "shared_video_texture", then replace
-						// current TextureAttribute with a SharedVideoTexture
-						if ((pos=imageFile.find("shared_video_texture01")) != string::npos)
-						{
-							std::string shID = "shvid_"+imageFile.substr(pos+20, imageFile.rfind(".")-(pos+20));
-							osg::ref_ptr<SharedVideoTexture> shvid = dynamic_cast<SharedVideoTexture*>(sceneManager->createStateSet(shID.c_str(), "SharedVideoTexture"));
-							if (shvid.valid())
-							{
-								shvid->setTextureID(shID.c_str());
-								(*itr)->removeAttribute(attr);
-								shvid->replace((*itr).get());
-								std::cout << "  Replaced placeholder texture with " << shvid->classType << ": " << shvid->id->s_name << std::endl;
-							}
-						}
-
-						// Check if filename (minus extension) is a movie format:
-						//
-						// ... the idea is that the model was created with using
-						// a placeholder image with a name like: texture.avi.jpg
-						//
-						// ... we look for a video file in the same path, but with
-						// the image extension stripped off: eg, texture.avi
-						//
-						// We replace the image with an ImageStream, and all YUV
-						// texture mapping will remain (assuming the image and video
-						// have identical resolutions.
-
-						else if (isVideoPath(imageFileLessExtension))
-						{
-							std::string vidPath;
-							if (imageFileLessExtension.substr(1)=="/")
-							{
-								// absolute path, so don't change it
-								vidPath = imageFileLessExtension;
-							}
-							else {
-								// relative path:
-								vidPath = osgDB::concatPaths(osgDB::getFilePath(getAbsolutePath(modelPath)), imageFileLessExtension);
-							}
-
-							std::cout << "... imageFileLessExtension: " << imageFileLessExtension << std::endl;
-							std::cout << "... vidPath: " << vidPath << std::endl;
-							std::cout << "--> " << (string(id->s_name)+"/"+osgDB::getStrippedName(imageFileLessExtension)).c_str() << std::endl;
-
-							osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet(osgDB::getStrippedName(imageFileLessExtension).c_str(), "VideoTexture"));
-							//osg::ref_ptr<VideoTexture> vid = dynamic_cast<VideoTexture*>(sceneManager->createStateSet((string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str(), "VideoTexture"));
-							//osg::ref_ptr<VideoTexture> vid = new VideoTexture(sceneManager, (string(id->s_name)+"/"+osgDB::getStrippedName(imageFile)).c_str());
-							if (vid.valid())
-							{
-								vid->setVideoPath(vidPath.c_str());
-								vid->replace((*itr).get());
-								//(*itr) = vid.get();
-							}
-						}
-						*/
-
-
 
 					} // if texture attribute
 				} // stateset iterator
@@ -638,7 +560,7 @@ void ModelNode::drawModel()
 
 			_modelAttachmentNode->addChild(model.get());
             model->setName(getID()+".file['"+modelPath+"']");
-            //model->setName(string(id->s_name) + ".model['" + modelPath + "']");
+            //model->setName(this->getID() + ".model['" + modelPath + "']");
 
 			std::cout << "Created model " << modelPath << std::endl;
 			osg::BoundingSphere bound = model->computeBound();
@@ -658,10 +580,12 @@ void ModelNode::drawModel()
             // Should we override our _renderBin value using ss->getBinNumber(),
             // or shoudld we apply our currently stored _renderBin to the model?
 			ss->setRenderBinDetails( (int)_renderBin, "RenderBin");
+            
+            ss->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 
 			/*
-			if (sceneManager->sharedStateManager.valid())
-				sceneManager->sharedStateManager->share(model.get());
+			if (sceneManager_->sharedStateManager.valid())
+				sceneManager_->sharedStateManager->share(model.get());
 			*/
 			
 		} else {
@@ -697,10 +621,6 @@ std::vector<lo_message> ModelNode::getState () const
     lo_message_add(msg, "si", "setLighting", getLighting());
     ret.push_back(msg);
     
-	msg = lo_message_new();
-	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
-	ret.push_back(msg);
-	
 	for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
 	{
 		if (switcher[i].valid() || sequencer[i].valid())
@@ -719,7 +639,7 @@ std::vector<lo_message> ModelNode::getState () const
 	lo_message_add(msg, "si", "setRenderBin", getRenderBin());
 	ret.push_back(msg);
 
-	for (i=0; i<_statesetList.size(); i++)
+	for (i=1; i<_statesetList.size(); i++)
 	{
 		msg = lo_message_new();
         lo_message_add(msg, "sis", "setStateSet", i, _statesetList[i]->s_name);

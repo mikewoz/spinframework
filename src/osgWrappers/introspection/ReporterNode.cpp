@@ -29,25 +29,32 @@ BEGIN_VALUE_REFLECTOR(spin::_reporterTarget)
 	I_PublicMemberProperty(osg::observer_ptr< spin::ReferencedNode >, node);
 	I_PublicMemberProperty(osg::Matrix, matrix);
 	I_PublicMemberProperty(bool, contained);
+	I_PublicMemberProperty(bool, needReport);
+	I_PublicMemberProperty(bool, inGraph);
 END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(spin::ReporterNode)
 	I_DeclaringFile("ReporterNode.h");
-	I_BaseType(spin::ReferencedNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____ReporterNode__SceneManager_P1__char_P1,
+	I_BaseType(spin::GroupNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____ReporterNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method0(void, debug,
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "Debug print (to log/console) ");
-	I_Method0(void, callbackUpdate,
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "The update callback for ReporterNode checks to see if a target or the the ReporterNode's global matrix has changed (ie, whether it has been moved or not). If so, it updates the internal matrices, and calls sendReports() ");
+	I_Method0(void, forceAllReports,
+	          Properties::NON_VIRTUAL,
+	          __void__forceAllReports,
+	          "",
+	          "Sometimes something happens in the scene that might not change the matrices of the reporter or the target (eg, a SwitchNode changes the visibility of the node). This method allows us to force a recomputation of all reports in such a case. ");
 	I_Method1(void, sendReports, IN, spin::reporterTarget *, target,
 	          Properties::NON_VIRTUAL,
 	          __void__sendReports__reporterTarget_P1,

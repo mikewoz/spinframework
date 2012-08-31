@@ -25,8 +25,8 @@
 BEGIN_OBJECT_REFLECTOR(spin::SoundSpace)
 	I_DeclaringFile("SoundSpace.h");
 	I_BaseType(spin::DSPNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____SoundSpace__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____SoundSpace__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, setAbsorption, IN, spin::t_floatarg, newval,

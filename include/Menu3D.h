@@ -59,7 +59,7 @@ class Menu3D : public GroupNode
 
 public:
 
-    Menu3D(SceneManager *sceneManager, char *initID);
+    Menu3D(SceneManager *sceneManager, const char* initID);
     virtual ~Menu3D();
 
     /**
@@ -138,7 +138,7 @@ public:
      */
 
     const char *getHighlighted() const { if (highlighted_.valid())
-    	return highlighted_->id->s_name; else return "NULL"; }
+    	return highlighted_->getID().c_str(); else return "NULL"; }
 
 
 

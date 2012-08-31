@@ -30,6 +30,7 @@ BEGIN_ENUM_REFLECTOR(spin::ShapeNode::shapeType)
 	I_EnumLabel(spin::ShapeNode::CAPSULE);
 	I_EnumLabel(spin::ShapeNode::CONE);
 	I_EnumLabel(spin::ShapeNode::PLANE);
+	I_EnumLabel(spin::ShapeNode::DISC);
 END_REFLECTOR
 
 BEGIN_ENUM_REFLECTOR(spin::ShapeNode::billboardType)
@@ -42,8 +43,8 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_DeclaringFile("ShapeNode.h");
 	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____ShapeNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____ShapeNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
 	I_Method1(void, setContext, IN, const char *, newvalue,
@@ -66,11 +67,6 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          __void__setColor__float__float__float__float,
 	          "",
 	          " param red Red channel. Number in the range [0, 1]  green Green channel. Number in the range [0, 1]  blue Blue channel. Number in the range [0, 1]  alpha Opacity channel. Number in the range [0, 1]  ");
-	I_Method1(void, setTextureFromFile, IN, const char *, filename,
-	          Properties::NON_VIRTUAL,
-	          __void__setTextureFromFile__C5_char_P1,
-	          "",
-	          "");
 	I_Method1(void, setRenderBin, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setRenderBin__int,
@@ -81,26 +77,21 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          __void__setLighting__int,
 	          "",
 	          "");
-	I_Method1(void, setStateSetFromFile, IN, const char *, filename,
+	I_Method1(void, setSingleSided, IN, int, singleSided,
 	          Properties::NON_VIRTUAL,
-	          __void__setStateSetFromFile__C5_char_P1,
+	          __void__setSingleSided__int,
 	          "",
-	          "");
-	I_Method1(void, setStateSet, IN, const char *, s,
+	          "Specify whether both sides or only one side of the shape is rendered. ie, whether the backface is culled or not. ");
+	I_Method0(int, getSingleSided,
 	          Properties::NON_VIRTUAL,
-	          __void__setStateSet__C5_char_P1,
-	          "",
-	          "");
-	I_Method0(const char *, getStateSet,
-	          Properties::NON_VIRTUAL,
-	          __C5_char_P1__getStateSet,
+	          __int__getSingleSided,
 	          "",
 	          "");
 	I_Method0(void, updateStateSet,
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,
 	          "",
-	          "In derived classes, you can handle how a stateset gets applied to a node (eg, which part of the subgraph it is attached by overriding the updateStateSet method. ");
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform_. ");
 	I_Method0(int, getShape,
 	          Properties::NON_VIRTUAL,
 	          __int__getShape,
@@ -126,11 +117,6 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          __int__getLighting,
 	          "",
 	          "");
-	I_Method2(void, addImageTexture, IN, osg::Node *, n, IN, std::string, texturePath,
-	          Properties::NON_VIRTUAL,
-	          __void__addImageTexture__osg_Node_P1__std_string,
-	          "",
-	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -140,12 +126,6 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	                   Properties::VIRTUAL,
 	                   Properties::NON_CONST,
 	                   __void__drawShape,
-	                   "",
-	                   "");
-	I_ProtectedMethod0(void, drawTexture,
-	                   Properties::VIRTUAL,
-	                   Properties::NON_CONST,
-	                   __void__drawTexture,
 	                   "",
 	                   "");
 	I_SimpleProperty(int, Billboard, 
@@ -166,25 +146,18 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_SimpleProperty(int, Shape, 
 	                 __int__getShape, 
 	                 0);
+	I_SimpleProperty(int, SingleSided, 
+	                 __int__getSingleSided, 
+	                 __void__setSingleSided__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_SimpleProperty(const char *, StateSet, 
-	                 __C5_char_P1__getStateSet, 
-	                 __void__setStateSet__C5_char_P1);
-	I_SimpleProperty(const char *, StateSetFromFile, 
-	                 0, 
-	                 __void__setStateSetFromFile__C5_char_P1);
-	I_SimpleProperty(const char *, TextureFromFile, 
-	                 0, 
-	                 __void__setTextureFromFile__C5_char_P1);
 	I_PublicMemberProperty(spin::ShapeNode::shapeType, shape);
-	I_PublicMemberProperty(spin::t_symbol *, stateset);
 	I_PublicMemberProperty(spin::ShapeNode::billboardType, billboard);
 	I_PublicMemberProperty(osg::Vec4, _color);
 	I_PublicMemberProperty(std::string, texturePath);
 	I_PublicMemberProperty(int, renderBin);
-	I_PublicMemberProperty(bool, lightingEnabled);
+	I_PublicMemberProperty(int, lightingEnabled);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, shapeGeode);
 	I_PublicMemberProperty(osgUtil::Optimizer, optimizer);
 END_REFLECTOR

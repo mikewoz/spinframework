@@ -53,12 +53,12 @@ class SceneManager;
 
 // *****************************************************************************
 // constructor:
-AnimationNode::AnimationNode (SceneManager *sceneManager, char *initID) : GroupNode(sceneManager, initID)
+AnimationNode::AnimationNode (SceneManager *sceneManager, const char* initID) : ConstraintsNode(sceneManager, initID)
 {
-    this->setName(std::string(id->s_name) + ".AnimationNode");
-    nodeType = "AnimationNode";
+    this->setName(this->getID() + ".AnimationNode");
+    this->setNodeType("AnimationNode");
 
-    _updateRate = 15; // hz
+    animationRate_ = 15; // hz
     _play = false;
     _record = false;
 
@@ -89,10 +89,10 @@ AnimationNode::~AnimationNode()
 
 // *****************************************************************************
 
-void AnimationNode::callbackUpdate()
+void AnimationNode::callbackUpdate(osg::NodeVisitor* nv)
 {
 
-    ReferencedNode::callbackUpdate();
+    ConstraintsNode::callbackUpdate(nv);
 
     if ( spinApp::Instance().getContext()->isServer() and getPlay() 
             and not _animationPath->empty())
@@ -101,7 +101,7 @@ void AnimationNode::callbackUpdate()
         float dt = osg::Timer::instance()->delta_s(_lastTick,tick);
 
         //if (dt > 0.05) // only update when dt is at least 0.05s (ie 20hz):
-        if (dt > (1/_updateRate))
+        if (dt > (1/animationRate_))
         {
             doUpdate(osg::Timer::instance()->delta_s(_startTime,tick));
             _lastTick = tick;
@@ -112,6 +112,7 @@ void AnimationNode::callbackUpdate()
 
 bool AnimationNode::doUpdate(double timestamp)
 {
+/*
     osg::Matrix myMatrix;
     if (_animationPath->getMatrix(timestamp, myMatrix))
     {
@@ -122,30 +123,43 @@ bool AnimationNode::doUpdate(double timestamp)
         myMatrix.decompose(myPos, myQuat, myScl, mySclOrientation);
         osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myQuat));
         
-        /*
-        osg::Vec3 myPos = myMatrix.getTrans();
-        osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
-        osg::Vec3 myScl = myMatrix.getScale();
-        */
         setTranslation(myPos.x(), myPos.y(), myPos.z());
         setOrientation(myRot.x(), myRot.y(), myRot.z());
         setScale(myScl.x(), myScl.y(), myScl.z());
-
         return true;
     }
+*/
+
+    if (_animationPath->empty()) return false;
 
 
+    osg::AnimationPath::ControlPoint cp;
+    if ((timestamp==_animationPath->getLastTime()) && (!_animationPath->empty()))
+        cp = _animationPath->getTimeControlPointMap()[_animationPath->getLastTime()];
+    else
+        _animationPath->getInterpolatedControlPoint(timestamp,cp);
+
+    osg::Vec3 newPos = cp.getPosition();
+    osg::Vec3 newRot = Vec3inDegrees(QuatToEuler(cp.getRotation()));
+    osg::Vec3 newScl = cp.getScale();
+
+    // old way: directly set translation, rotation is bad because collisions
+    // don't get triggered. They need translate and rotate.
     /*
-    AnimationPath::ControlPoint cp;
-    if (_animationPath->getInterpolatedControlPoint(currentTime,cp))
-    {
-        mainTransform.setPosition(cp.getPosition());
-        mainTransform.setAttitude(cp.getRotation());
-        mainTransform.setScale(cp.getScale());
-    }
+    setTranslation(newPos.x(), newPos.y(), newPos.z());
+    setOrientation(newRot.x(), newRot.y(), newRot.z());
+    setScale(newScl.x(), newScl.y(), newScl.z());
     */
+    
+    osg::Vec3 dPos = newPos - this->getTranslation();
+    osg::Vec3 dRot = newRot - this->getOrientation();
+    
+    translate(dPos.x(), dPos.y(), dPos.z());
+    rotate(dRot.x(), dRot.y(), dRot.z());
+    setScale(newScl.x(), newScl.y(), newScl.z());
+    
+    return true;
 
-    return false;
 }
 
 // *****************************************************************************
@@ -168,10 +182,10 @@ void AnimationNode::setIndex (float index)
 }
 
 
-void AnimationNode::setUpdateRate (float hz)
+void AnimationNode::setAnimationRate (float hz)
 {
-    _updateRate = hz;
-    BROADCAST(this, "sf", "setUpdateRate", hz);
+    animationRate_ = hz;
+    BROADCAST(this, "sf", "setAnimationRate", hz);
 }
 
 void AnimationNode::setPlay (int p)
@@ -224,7 +238,7 @@ void AnimationNode::setTranslation (float x, float y, float z)
     if (newTranslation != getTranslation())
     {
         // first, call the parent method
-        GroupNode::setTranslation(x,y,z);
+        ConstraintsNode::setTranslation(x,y,z);
 
         // now, if _record mode is set, store the updated position
         if (_record) storeCurrentPosition();
@@ -238,7 +252,7 @@ void AnimationNode::setOrientation (float p, float r, float y)
     if (newOrientation != getOrientation())
     {
         // first, call the parent method
-        GroupNode::setOrientation(p,r,y);
+        ConstraintsNode::setOrientation(p,r,y);
 
         // now, if _record mode is set, store the updated position
         if (_record) storeCurrentPosition();
@@ -252,7 +266,7 @@ void AnimationNode::setScale (float x, float y, float z)
     if (newScale != getScale())
     {
         // first, call the parent method
-        GroupNode::setScale(x,y,z);
+        ConstraintsNode::setScale(x,y,z);
 
         // now, if _record mode is set, store the updated position
         if (_record) storeCurrentPosition();
@@ -295,11 +309,17 @@ void AnimationNode::controlPoint (double timestamp, float x, float y, float z, f
 
 }
 
+void AnimationNode::clear()
+{
+    _animationPath->clear();
+    BROADCAST(this, "s", "clear");
+}
+
 // *****************************************************************************
 std::vector<lo_message> AnimationNode::getState () const
 {
     // inherit state from base class
-    std::vector<lo_message> ret = GroupNode::getState();
+    std::vector<lo_message> ret = ConstraintsNode::getState();
 
     lo_message msg;
 
@@ -308,7 +328,7 @@ std::vector<lo_message> AnimationNode::getState () const
     ret.push_back(msg);
 
     msg = lo_message_new();
-    lo_message_add(msg, "sf", "setUpdateRate", getUpdateRate());
+    lo_message_add(msg, "sf", "setAnimationRate", getAnimationRate());
     ret.push_back(msg);
 
     /*

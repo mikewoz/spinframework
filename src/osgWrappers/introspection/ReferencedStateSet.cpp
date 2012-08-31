@@ -12,6 +12,7 @@
 
 #include <ReferencedStateSet.h>
 #include <SceneManager.h>
+#include <spinUtil.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -32,6 +33,21 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	          __void__updateCallback,
 	          "",
 	          "This callback occurs every frame to update the state with any parameter changes. ");
+	I_Method0(std::string, getID,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getID,
+	          "",
+	          "Return the string id for this stateset ");
+	I_Method0(spin::t_symbol *, getIDSymbol,
+	          Properties::NON_VIRTUAL,
+	          __t_symbol_P1__getIDSymbol,
+	          "",
+	          "");
+	I_Method0(std::string, getClassType,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getClassType,
+	          "",
+	          "");
 	I_Method0(void, removeFromScene,
 	          Properties::NON_VIRTUAL,
 	          __void__removeFromScene,
@@ -87,6 +103,16 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	          __int__getLighting,
 	          "",
 	          "Returns a boolean indicating whether lighting affects the texture. ");
+	I_Method1(void, setTransparent, IN, int, i,
+	          Properties::VIRTUAL,
+	          __void__setTransparent__int,
+	          "",
+	          "Set whether the stateset is rendered in the transparent bin or not (ie, this is a different rendering pass with different optimizations) ");
+	I_Method0(int, getTransparent,
+	          Properties::VIRTUAL,
+	          __int__getTransparent,
+	          "",
+	          "Returns a boolean indicating whether stateset is rendered in transparent bin ");
 	I_Method1(void, setRenderBin, IN, int, i,
 	          Properties::VIRTUAL,
 	          __void__setRenderBin__int,
@@ -97,6 +123,15 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	          __int__getRenderBin,
 	          "",
 	          "Returns an integer indicating the render bin for this texture. Higher numbers get processed later (i.e. it appears on top). Default = 11 ");
+	I_SimpleProperty(std::string, ClassType, 
+	                 __std_string__getClassType, 
+	                 0);
+	I_SimpleProperty(std::string, ID, 
+	                 __std_string__getID, 
+	                 0);
+	I_SimpleProperty(spin::t_symbol *, IDSymbol, 
+	                 __t_symbol_P1__getIDSymbol, 
+	                 0);
 	I_SimpleProperty(int, Lighting, 
 	                 __int__getLighting, 
 	                 __void__setLighting__int);
@@ -109,8 +144,9 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet)
 	I_SimpleProperty(int, TextureBlend, 
 	                 __int__getTextureBlend, 
 	                 __void__setTextureBlend__int);
-	I_PublicMemberProperty(spin::t_symbol *, id);
-	I_PublicMemberProperty(std::string, classType);
+	I_SimpleProperty(int, Transparent, 
+	                 __int__getTransparent, 
+	                 __void__setTransparent__int);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet_callback)
@@ -121,6 +157,4 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedStateSet_callback)
 END_REFLECTOR
 
 TYPE_NAME_ALIAS(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >, spin::stateListType)
-
-STD_VECTOR_REFLECTOR(std::vector< osg::ref_ptr< spin::ReferencedStateSet > >)
 

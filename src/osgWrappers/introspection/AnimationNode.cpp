@@ -30,14 +30,14 @@ END_REFLECTOR
 
 BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	I_DeclaringFile("AnimationNode.h");
-	I_BaseType(spin::GroupNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____AnimationNode__SceneManager_P1__char_P1,
+	I_BaseType(spin::ConstraintsNode);
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____AnimationNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
 	I_Method1(bool, doUpdate, IN, double, timestamp,
@@ -50,16 +50,16 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          __void__setIndex__float,
 	          "",
 	          "A client interface that allows for setting the animation time using a normalized index in the range [0,1] ");
-	I_Method1(void, setUpdateRate, IN, float, hz,
+	I_Method1(void, setAnimationRate, IN, float, hz,
 	          Properties::NON_VIRTUAL,
-	          __void__setUpdateRate__float,
+	          __void__setAnimationRate__float,
 	          "Set the update rate (in Hz). ",
-	          " param hz Update rate in hz  ");
-	I_Method0(float, getUpdateRate,
+	          " param hz Animation rate in hz  ");
+	I_Method0(float, getAnimationRate,
 	          Properties::NON_VIRTUAL,
-	          __float__getUpdateRate,
+	          __float__getAnimationRate,
 	          "",
-	          "update rate in hz  ");
+	          "animation rate in hz  ");
 	I_Method1(void, setPlay, IN, int, p,
 	          Properties::NON_VIRTUAL,
 	          __void__setPlay__int,
@@ -130,6 +130,9 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(float, AnimationRate, 
+	                 __float__getAnimationRate, 
+	                 __void__setAnimationRate__float);
 	I_SimpleProperty(float, Index, 
 	                 0, 
 	                 __void__setIndex__float);
@@ -145,9 +148,6 @@ BEGIN_OBJECT_REFLECTOR(spin::AnimationNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
-	I_SimpleProperty(float, UpdateRate, 
-	                 __float__getUpdateRate, 
-	                 __void__setUpdateRate__float);
 END_REFLECTOR
 
 STD_VECTOR_REFLECTOR(std::vector< lo_message >)

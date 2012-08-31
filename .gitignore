@@ -47,6 +47,11 @@ src/spin/spindocgenerator
 src/spin/spinserver
 src/spin/spinviewer
 src/editor/spineditor
+src/osgWrappers/introspection/CompositeViewer.cpp
+src/osgWrappers/introspection/Users
+src/osgWrappers/introspection/dofppu.cpp
+src/osgWrappers/introspection/ssaoppu.cpp
+src/osgWrappers/introspection/pocoUtil.cpp
 spinframework-*.*.*
 doxyfile
 doxyfile.stamp
@@ -62,4 +67,4 @@ prototypes/web-server/main
 prototypes/bullet/bullettest
 prototypes/domeviewer/domeviewer
 prototypes/shaders/shadertest
-
+prototypes/poco/pocoServer

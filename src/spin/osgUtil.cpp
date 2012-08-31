@@ -51,6 +51,26 @@
 namespace spin
 {
 
+double random(double min,double max)
+{
+    return min + (max-min)*(double)rand()/(double)RAND_MAX;
+}
+
+float random(float min,float max)
+{
+    return min + (max-min)*(float)rand()/(float)RAND_MAX;
+}
+
+int random(int min,int max)
+{
+    return min + (int)((float)(max-min)*(float)rand()/(float)RAND_MAX);
+}
+
+osg::Vec3 randomVec3()
+{
+    return osg::Vec3(random(-1.0f,1.0f),random(-1.0f,1.0f),random(-1.0f,1.0f));
+}
+
 /**
  * Returns an absolute angle difference between v1 and v2 (with no notion of
  * which is ahead or behind the other). Returned angle is from 0 to PI
@@ -285,6 +305,24 @@ osg::Vec3 QuatToEuler2(osg::Quat q)
 	return osg::Vec3(yaw,pitch,roll); // note order is messed up on purpose
 }
 
+bool getPlaneLineIntersection(const osg::Vec4d& plane, const osg::Vec3d& lineStart, const osg::Vec3d& lineEnd, osg::Vec3d& isect)
+{
+    const double deltaX = lineEnd.x() - lineStart.x();
+    const double deltaY = lineEnd.y() - lineStart.y();
+    const double deltaZ = lineEnd.z() - lineStart.z();
+
+    const double denominator = (plane[0]*deltaX + plane[1]*deltaY + plane[2]*deltaZ);
+    if (! denominator) return false;
+
+    const double C = (plane[0]*lineStart.x() + plane[1]*lineStart.y() + plane[2]*lineStart.z() + plane[3]) / denominator;
+
+    isect.x() = lineStart.x() - deltaX * C;
+    isect.y() = lineStart.y() - deltaY * C;
+    isect.z() = lineStart.z() - deltaZ * C;
+
+    return true;
+}
+
 /*
 osg::Geode* createGrid(int radius, osg::Vec4 color)
 {
@@ -494,8 +532,71 @@ osg::Geode* createWireframeRolloff(int /*rolloff*/, float /*distortion*/, float 
 }
 
 
+osg::Geometry* createCone(float length, float radius, osg::Vec4 color)
+{
+	int grain = 50; // level of detail
+	
+	osg::Geometry* triFan = new osg::Geometry();
+	osg::Vec3Array* normals = new osg::Vec3Array;
+	osg::Vec3* myCoords = new osg::Vec3[grain + 2];
+	osg::Vec4Array* colors = new osg::Vec4Array;
+    osg::Vec2Array* texcoords = new osg::Vec2Array;
+    
+	// tip
+	myCoords[0] = osg::Vec3(0.0, 0.0, 0.0);
+	colors->push_back(color);
+	normals->push_back(osg::Vec3(0.0, 1.0, 0.0) );
+    texcoords->push_back(osg::Vec2(0.5,0.5));
+	
+	for (int i = 0; i <= grain; i++)
+	{
+        float ratio = (float)i / (float)grain;
+		myCoords[i+1] = osg::Vec3(radius*cos(ratio*2*osg::PI), length, radius*sin(ratio*2*osg::PI));
+		normals->push_back(myCoords[i]^myCoords[i+1]);
+        texcoords->push_back(osg::Vec2((cos(ratio*2*osg::PI) / 2) + 0.5,(sin(ratio*2*osg::PI) / 2) + 0.5));
+		colors->push_back(color);
+	}
+	
+	colors->push_back(color);
+	
+	osg::Vec3Array* vertices = new osg::Vec3Array(grain + 2,myCoords);
+	
+	// pass the created vertex array to the points geometry object.
+	triFan->setVertexArray(vertices);
+	triFan->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN,0, grain + 2));
+	
+    // pass the texture coordinates:
+    triFan->setTexCoordArray(0,texcoords);
+    
+	// pass the color arry to points geometry, note the binding to tell the geometry
+	// that only use one color for the whole object.
+	triFan->setColorArray(colors);
+	triFan->setColorBinding(osg::Geometry::BIND_OVERALL);
+	
+	// create the normals
+	triFan->setNormalArray(normals);
+	triFan->setNormalBinding(osg::Geometry::BIND_OVERALL);
+	osgUtil::SmoothingVisitor::smooth(*triFan);
+	
+    
+    
+	return triFan;
+}
+
+
+
+    
 osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 {
+    osg::Geode* triGeode = new osg::Geode();
+    triGeode->addDrawable(createCone(length,radius,color));
+	
+	osgUtil::Optimizer optimizer;
+	optimizer.optimize(triGeode);
+	
+	return triGeode;
+
+    /*
 
 	int grain = 50; // level of detail
 	
@@ -542,6 +643,7 @@ osg::Geode* createHollowCone(float length, float radius, osg::Vec4 color)
 	optimizer.optimize(triGeode);
 	
 	return triGeode;
+    */
 
 }
 

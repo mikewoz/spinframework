@@ -54,9 +54,9 @@ namespace spin
 
 // ===================================================================
 // constructor:
-SoundSpace::SoundSpace (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
+SoundSpace::SoundSpace (SceneManager *sceneManager, const char* initID) : DSPNode(sceneManager, initID)
 {
-	nodeType = "SoundSpace";
+	this->setNodeType("SoundSpace");
 	absorption = 0.6;
 	filterCoef = 0.0;
 	transition = 0.0;

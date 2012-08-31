@@ -48,28 +48,28 @@
 #include <spatosc/spatosc.h>
 #endif
 
-using namespace std;
-
 namespace spin
 {
 
 // ===================================================================
 // constructor:
-Listener::Listener (SceneManager *sceneManager, char *initID) : DSPNode(sceneManager, initID)
+Listener::Listener (SceneManager *sceneManager, const char* initID) : DSPNode(sceneManager, initID)
 {
-	nodeType = "Listener";
-	this->setPlugin("listener-stereo~");
-	type = "listener-stereo.conn~";
-	this->setName(string(id->s_name) + ".Listener");
+	this->setNodeType("Listener");
+	this->setName(this->getID() + ".Listener");
 
 #ifdef WITH_SPATOSC
 	if (spinApp::Instance().hasAudioRenderer)
 	{
-        spatOSCListener = spinApp::Instance().audioScene->createListener(std::string(id->s_name));
+        spatOSCListener = spinApp::Instance().audioScene->createListener(this->getID());
         std::cout << "Created SpatOSC Listener:" << std::endl;
         //spinApp::Instance().audioScene->debugPrint();
 	}
 #endif
+
+    // after the spatosc node is created, set some params:
+	//this->setURI("plugin://listener-stereo~");
+
 }
 
 // ===================================================================
@@ -87,34 +87,61 @@ Listener::~Listener()
     
 }
 // ===================================================================
-void Listener::callbackUpdate()
+void Listener::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
-    // which will update _globalMatrix
-    DSPNode::callbackUpdate();
+    // which will update globalMatrix_
+    DSPNode::callbackUpdate(nv);
+}
 
-    // now, we can get the global position and orientation, and we can forward
-    // it to SpatOSC
-
+bool Listener::dumpGlobals(bool forced)
+{
+    DSPNode::dumpGlobals();
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        osg::Vec3 myPos = _globalMatrix.getTrans();
-        osg::Vec3 myRot = QuatToEuler(_globalMatrix.getRotate());
+        this->globalMatrix_ = getGlobalMatrix(); // in case reporting is off
+        osg::Vec3 myPos = globalMatrix_.getTrans();
+        osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(globalMatrix_.getRotate()));
 
         spatOSCListener->setPosition(myPos.x(), myPos.y(), myPos.z());
         spatOSCListener->setOrientation(myRot.x(), myRot.y(), myRot.z());
     }
 #endif
+    return 1;
 }
 
-void Listener::setType (const char* t)
+void Listener::setParam (const char *paramName, const char *paramValue)
 {
-	// only do this if the type has changed:
-	if (type == std::string(t)) return;
-	type = std::string(t);
-	
-    BROADCAST(this, "ss", "setType", getType());
+    ReferencedNode::setParam(paramName,paramValue);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCListener->setStringProperty(paramName, paramValue);
+    }
+#endif
+}
+
+void Listener::setParam (const char *paramName, float paramValue)
+{
+    ReferencedNode::setParam(paramName,paramValue);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCListener->setFloatProperty(paramName, paramValue);
+    }
+#endif
+}
+
+void Listener::setURI (const char *uri)
+{
+    DSPNode::setURI(uri);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCListener->setURI(this->getURI());
+    }
+#endif
 }
 
 std::vector<lo_message> Listener::getState () const
@@ -122,9 +149,6 @@ std::vector<lo_message> Listener::getState () const
 	// inherit state from base class
 	std::vector<lo_message> ret = DSPNode::getState();
 	
-	lo_message msg = lo_message_new();
-	lo_message_add(msg,  "ss", "setType", getType());
-	ret.push_back(msg);
 	
 	return ret;
 }

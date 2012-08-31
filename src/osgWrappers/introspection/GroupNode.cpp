@@ -12,6 +12,7 @@
 
 #include <GroupNode.h>
 #include <SceneManager.h>
+#include <spinUtil.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -58,6 +59,12 @@ BEGIN_ENUM_REFLECTOR(spin::GroupNode::velocityMode)
 	I_EnumLabel(spin::GroupNode::MOVE);
 END_REFLECTOR
 
+BEGIN_ENUM_REFLECTOR(spin::GroupNode::ComputationMode)
+	I_DeclaringFile("GroupNode.h");
+	I_EnumLabel(spin::GroupNode::SERVER_SIDE);
+	I_EnumLabel(spin::GroupNode::CLIENT_SIDE);
+END_REFLECTOR
+
 BEGIN_ENUM_REFLECTOR(spin::GroupNode::OrientationMode)
 	I_DeclaringFile("GroupNode.h");
 	I_EnumLabel(spin::GroupNode::NORMAL);
@@ -69,20 +76,30 @@ END_REFLECTOR
 BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_DeclaringFile("GroupNode.h");
 	I_BaseType(spin::ReferencedNode);
-	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, char *, initID,
-	               ____GroupNode__SceneManager_P1__char_P1,
+	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
+	               ____GroupNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               " param initID will be converted into a t_symbol  ");
-	I_Method0(void, callbackUpdate,
+	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
-	          __void__callbackUpdate,
+	          __void__callbackUpdate__osg_NodeVisitor_P1,
 	          "",
 	          "For nodes that require regular programmatic control, there is a callback that is evaluated with every refresh. This function can thus be used for animations, or any other periodic updates.Note that changes to the scene graph structure (eg, moving/deleting nodes should NOT be done within this callback because traversals stacks will become corrupted. The technique is rather to enable a flag and then do the actual change in the SceneManager::updateGraph() method. ");
+	I_Method1(void, setUpdateRate, IN, float, seconds,
+	          Properties::VIRTUAL,
+	          __void__setUpdateRate__float,
+	          "",
+	          "The update rate tells the server how fast to send both velocity updates and reporting. Generally, we want to throttle network messages on the server-side so that messages don't flood the network when there is a lot of activity. ");
+	I_Method0(float, getUpdateRate,
+	          Properties::NON_VIRTUAL,
+	          __float__getUpdateRate,
+	          "",
+	          "");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
 	                      "",
-	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath. ");
+	                      "IMPORTANT: subclasses of ReferencedNode are allowed to contain complicated subgraphs and can also change their attachmentNode so that children are attached anywhere in that subgraph. If that is the case, the updateNodePath() function MUST be overridden, and extra nodes must be manually pushed onto currentNodePath_. ");
 	I_Method5(void, mouseEvent, IN, int, event, IN, int, keyMask, IN, int, buttonMask, IN, float, x, IN, float, y,
 	          Properties::NON_VIRTUAL,
 	          __void__mouseEvent__int__int__int__float__float,
@@ -102,7 +119,27 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::VIRTUAL,
 	          __void__debug,
 	          "",
-	          "Debug print (to log/console) ");
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
+	I_Method1(void, setStateSetFromFile, IN, const char *, filename,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSetFromFile__C5_char_P1,
+	          "",
+	          "setStateSetFromFile guesses the type of stateset from the filename extension, creates a new stateset of that type and assigns it to this node ");
+	I_Method1(void, setStateSet, IN, const char *, s,
+	          Properties::NON_VIRTUAL,
+	          __void__setStateSet__C5_char_P1,
+	          "",
+	          "Assign an existing stateset to this node ");
+	I_Method0(spin::t_symbol *, getStateSetSymbol,
+	          Properties::NON_VIRTUAL,
+	          __t_symbol_P1__getStateSetSymbol,
+	          "",
+	          "");
+	I_Method0(void, updateStateSet,
+	          Properties::VIRTUAL,
+	          __void__updateStateSet,
+	          "",
+	          "This method actually applies the stateset to the subgraph, replacing any existing stateset with this one. The setStateSet and setStateSetFromFile methods just set the stateset_ symbol, while updateStateSet does the actual work.Override this method in subclasses in order to change how stateset should be applied. For example, to which node in the subgraph it should be attached, or whether it should be merged with the existing stateset (rather than merged).By default it is applied to the mainTransform_. ");
 	I_Method1(void, setReportMode, IN, spin::GroupNode::globalsReportMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setReportMode__globalsReportMode,
@@ -111,6 +148,16 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_Method1(void, setInteractionMode, IN, spin::GroupNode::InteractionMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setInteractionMode__InteractionMode,
+	          "",
+	          "");
+	I_Method1(void, setComputationMode, IN, spin::GroupNode::ComputationMode, mode,
+	          Properties::NON_VIRTUAL,
+	          __void__setComputationMode__ComputationMode,
+	          "",
+	          "");
+	I_Method0(int, getComputationMode,
+	          Properties::NON_VIRTUAL,
+	          __int__getComputationMode,
 	          "",
 	          "");
 	I_Method3(void, setClipping, IN, float, x, IN, float, y, IN, float, z,
@@ -153,11 +200,6 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__setOrientationQuat__float__float__float__float,
 	          "",
 	          "Set the orientation offset as a quaternion ");
-	I_Method0(void, applyOrientationMode,
-	          Properties::NON_VIRTUAL,
-	          __void__applyOrientationMode,
-	          "",
-	          "");
 	I_Method3(void, setScale, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,
@@ -193,11 +235,21 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__move__float__float__float,
 	          "",
 	          "The move command adds a relative translation with respect to the node's current orientation. That is, the node will translate along it's direction vector by the supplied number of units. ");
-	I_Method3(void, rotate, IN, float, pitch, IN, float, roll, IN, float, yaw,
+	I_Method3(void, rotate, IN, float, dPitch, IN, float, dRoll, IN, float, dYaw,
 	          Properties::VIRTUAL,
 	          __void__rotate__float__float__float,
 	          "",
-	          "The rotate command adds a relative rotation to the node's current orientation. ");
+	          "The rotate command adds to the (absolute) orientation of the node ");
+	I_Method3(void, addRotation, IN, float, dPitch, IN, float, dRoll, IN, float, dYaw,
+	          Properties::VIRTUAL,
+	          __void__addRotation__float__float__float,
+	          "",
+	          "The addRotation command adds a (relative) rotation to the node's current orientation. ");
+	I_MethodWithDefaults5(void, translateTo, IN, float, x, , IN, float, y, , IN, float, z, , IN, float, time, , IN, const char *, motion, "Linear",
+	                      Properties::VIRTUAL,
+	                      __void__translateTo__float__float__float__float__C5_char_P1,
+	                      "",
+	                      "Instead of instantaneous setTranslation, this method uses an ease motion to animate the node to the target position. ");
 	I_Method1(void, setManipulator, IN, const char *, manipulatorType,
 	          Properties::VIRTUAL,
 	          __void__setManipulator__C5_char_P1,
@@ -213,6 +265,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	           __void__setManipulatorMatrix__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float,
 	           "",
 	           "");
+	I_Method1(void, setBroadcastLock, IN, bool, lock,
+	          Properties::NON_VIRTUAL,
+	          __void__setBroadcastLock__bool,
+	          "",
+	          "");
 	I_Method0(int, getReportMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getReportMode,
@@ -234,17 +291,17 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          "",
 	          "");
 	I_Method0(osg::Vec3, getTranslation,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __osg_Vec3__getTranslation,
 	          "",
 	          "");
 	I_Method0(osg::Quat, getOrientationQuat,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __osg_Quat__getOrientationQuat,
 	          "",
 	          "");
 	I_Method0(osg::Vec3, getScale,
-	          Properties::NON_VIRTUAL,
+	          Properties::VIRTUAL,
 	          __osg_Vec3__getScale,
 	          "",
 	          "");
@@ -273,11 +330,11 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __osg_Vec3__getCenter,
 	          "",
 	          "");
-	I_Method1(bool, dumpGlobals, IN, bool, forced,
-	          Properties::NON_VIRTUAL,
-	          __bool__dumpGlobals__bool,
-	          "",
-	          "The dumpGlobals method results in a broadcast of this node's translation and orientation. It is called by callbackUpdate() every frame, however the 'forced' flag will be set to false, so it will only send a message if the node's matrix has changed. If the 'forced' flag is set to true, it will definitely result in a message broadcast. This should only be used when necessary (eg, when a stateDump is requested).Note: the return value is only to fool wx so that it doesn't consider this as an editable property. ");
+	I_MethodWithDefaults1(bool, dumpGlobals, IN, bool, forced, false,
+	                      Properties::VIRTUAL,
+	                      __bool__dumpGlobals__bool,
+	                      "",
+	                      "The dumpGlobals method results in a broadcast of this node's translation and orientation. It is called by callbackUpdate() every frame, however the 'forced' flag will be set to false, so it will only send a message if the node's matrix has changed. If the 'forced' flag is set to true, it will definitely result in a message broadcast. This should only be used when necessary (eg, when a stateDump is requested).Note: the return value is only to fool wx so that it doesn't consider this as an editable property. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -298,6 +355,12 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__updateDraggerMatrix,
 	          "",
 	          "");
+	I_ProtectedMethod0(void, updateQuat,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__updateQuat,
+	                   "",
+	                   "");
 	I_ProtectedMethod0(void, updateMatrix,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -310,11 +373,23 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	                   __void__drawManipulator,
 	                   "",
 	                   "");
+	I_ProtectedMethod0(void, applyOrientationMode,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__applyOrientationMode,
+	                   "",
+	                   "");
+	I_SimpleProperty(bool, BroadcastLock, 
+	                 0, 
+	                 __void__setBroadcastLock__bool);
 	I_SimpleProperty(osg::Vec3, Center, 
 	                 __osg_Vec3__getCenter, 
 	                 0);
 	I_SimpleProperty(osg::Vec3, Clipping, 
 	                 __osg_Vec3__getClipping, 
+	                 0);
+	I_SimpleProperty(int, ComputationMode, 
+	                 __int__getComputationMode, 
 	                 0);
 	I_SimpleProperty(float, Damping, 
 	                 __float__getDamping, 
@@ -349,12 +424,24 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(const char *, StateSet, 
+	                 0, 
+	                 __void__setStateSet__C5_char_P1);
+	I_SimpleProperty(const char *, StateSetFromFile, 
+	                 0, 
+	                 __void__setStateSetFromFile__C5_char_P1);
+	I_SimpleProperty(spin::t_symbol *, StateSetSymbol, 
+	                 __t_symbol_P1__getStateSetSymbol, 
+	                 0);
 	I_SimpleProperty(osg::MatrixTransform *, Transform, 
 	                 __osg_MatrixTransform_P1__getTransform, 
 	                 0);
 	I_SimpleProperty(osg::Vec3, Translation, 
 	                 __osg_Vec3__getTranslation, 
 	                 0);
+	I_SimpleProperty(float, UpdateRate, 
+	                 __float__getUpdateRate, 
+	                 __void__setUpdateRate__float);
 	I_SimpleProperty(osg::Vec3, Velocity, 
 	                 __osg_Vec3__getVelocity, 
 	                 0);

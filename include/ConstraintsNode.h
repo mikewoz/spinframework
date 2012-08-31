@@ -72,7 +72,7 @@ class ConstraintsNode : public GroupNode
 public:
     
 
-    ConstraintsNode(SceneManager *sceneManager, char *initID);
+    ConstraintsNode(SceneManager *sceneManager, const char* initID);
     virtual ~ConstraintsNode();
     
     /**
@@ -141,7 +141,7 @@ enum CollisionMode {   POINT,               /*!< When computing collisions with
                     };
 
         
-    virtual void callbackUpdate();
+    virtual void callbackUpdate(osg::NodeVisitor* nv);
     
     /**
      * Sets a target whose properties can be used to limit movement of this
@@ -203,6 +203,8 @@ enum CollisionMode {   POINT,               /*!< When computing collisions with
 
 
     virtual void setTranslation (float x, float y, float z);
+    virtual osg::Vec3 getTranslation() const { return GroupNode::getTranslation(); };
+
     virtual void translate (float x, float y, float z);
     virtual void move (float x, float y, float z);
     

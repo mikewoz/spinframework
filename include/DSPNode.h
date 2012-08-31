@@ -75,10 +75,11 @@ class DSPNode : public GroupNode
 
 public:
         
-        DSPNode (SceneManager *sceneManager, char *initID);
+        DSPNode (SceneManager *sceneManager, const char* initID);
         virtual ~DSPNode();
         
-        virtual void callbackUpdate();
+        virtual void callbackUpdate(osg::NodeVisitor* nv);
+        bool dumpGlobals(bool forced=false);
         
         /**
          * Returns the SoundConnection object that exists between the current
@@ -110,16 +111,33 @@ public:
         void connectSource(const char *src);
 
         void disconnect(const char *snk);
-        void setActive (int i);
-        void setPlugin (const char *filename);
         
-       /**	for sending messages to the connections of this (source) node:
-        *	virtual void connectionMsg (char *snkName, char *method, float
-        * 	value);
-		*/
+        /**
+         * Set the media for the sound node using a URI pattern.
+         * 
+         * Examples:
+         * file://soundfilename.wav
+         * file:///home/johndoe/soundfilename.wav
+         * http://www.server.com/soundfile.wav
+         * adc://1:1
+         * adc://1
+         * content://media/external/audio/media/710
+         * mms://some_media_stream
+         * rtsp://127.0.0.1:12311
+         * pd_plugin://audio_plugin_patch.pd
+         */
+        virtual void setURI (const char *uri);
+        const char* getURI() const { return uri_.c_str(); }
         
+        // for sending messages to the connections of this (source) node:
+        // virtual void connectionMsg (char *snkName, char *method, float
+        // value);
+        
+        /**
+         * Activate or deactivate the DSP processing
+         */
+        virtual void setActive (int i);
         int getActive() const { return (int)active; }
-        const char* getPlugin() const { return plugin.c_str(); }
         
         /**
          * We maintain 2 lists of all SoundConnection for this node (it is
@@ -148,11 +166,12 @@ public:
         virtual void setLength (float newvalue);
         virtual void setRadius (float newvalue);
 
-        void setDirectivityColor(float r, float g, float b, float a);
+        void setDebugColor(float r, float g, float b, float a);
 
         void setVUmeterFlag (float newFlag);
         void setDirectivityFlag (float newFlag);
         void setLaserFlag (float newFlag);
+        void setRadiusFlag (float newFlag);
 
         //
         void setIntensity(float newvalue);
@@ -163,11 +182,12 @@ public:
         float getLength() const { return _length; }
         float getRadius() const { return _radius; }
 
-        osg::Vec4 getDirectivityColor() const { return directivityColor; }
+        osg::Vec4 getDebugColor() const { return debugColor; }
 
         float getVUmeterFlag() const { return VUmeterFlag; }
         float getDirectivityFlag() const { return directivityFlag; }
         float getLaserFlag() const { return laserFlag; }
+        float getRadiusFlag() const { return radiusFlag; }
 
         void updateVUmeter();
         void updateLaser();
@@ -177,15 +197,13 @@ public:
         void drawVUmeter();
         void drawDirectivity();
         void drawLaser();
+        void drawRadius();
         
 private:
     
         bool active;
         
-        /**
-         * dsp name (this is the name of a pd abstraction that handles the dsp):
-         */
-        std::string plugin;
+        std::string uri_;
         
         /**
          * This node should always broadcast global position and orientation 
@@ -205,7 +223,6 @@ private:
 							  //	(directivity) table
         float _spread; // propagation cone for source
         float _length; // the length of the laser and cone
-
         float _radius; // the radius 
 
         // TODO: add toggle for PRE/POST
@@ -214,6 +231,7 @@ private:
         float VUmeterFlag;
         float directivityFlag;
         float laserFlag;
+        float radiusFlag;
 
 
         // The following methods and parameters are for drawing aspects of the
@@ -221,7 +239,10 @@ private:
 
         // directivity patterns:
         osg::ref_ptr<osg::Geode> directivityGeode;
-        osg::Vec4 directivityColor;
+        osg::Vec4 debugColor;
+
+        osg::ref_ptr<osg::Geode> radiusGeode;
+        
 
         // laser beams:
         osg::ref_ptr<osg::Geode> laserGeode;
