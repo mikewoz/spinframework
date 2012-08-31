@@ -45,7 +45,6 @@
 #include "spinBaseContext.h"
 #include "spinServerContext.h"
 #include "ReferencedNode.h"
-#include "SoundConnection.h"
 #include "spinUtil.h"
 #include "osgUtil.h"
 #include "spinApp.h"
@@ -543,92 +542,57 @@ void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
                 msgs.push_back(msg);
             }
         }
-        // remember to send connections as well
-        sendConnectionList(txAddr);
     }
     // just send a list for the desired type:
     else 
     {
-        if (typeFilter == "SoundConnection")
-            sendConnectionList(txAddr);
-        else
         {
+            nodeMapType::iterator it;
+            nodeListType::iterator iter;
+            it = nodeMap.find(typeFilter);
+            if (it != nodeMap.end())
             {
-                nodeMapType::iterator it;
-                nodeListType::iterator iter;
-                it = nodeMap.find(typeFilter);
-                if (it != nodeMap.end())
+                msg = lo_message_new();
+
+                lo_message_add_string(msg, "nodeList" );
+                lo_message_add_string(msg, (*it).first.c_str() );
+                if ( (*it).second.size() )
                 {
-                    msg = lo_message_new();
-
-                    lo_message_add_string(msg, "nodeList" );
-                    lo_message_add_string(msg, (*it).first.c_str() );
-                    if ( (*it).second.size() )
+                    for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
                     {
-                        for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                        {
-                            lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
-                        }
+                        lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
                     }
-                    else 
-                        lo_message_add_string(msg, "NULL");
-                    msgs.push_back(msg);
                 }
-            }
-            {
-                ReferencedStateSetMap::iterator it;
-                ReferencedStateSetList::iterator iter;
-                it = stateMap.find(typeFilter);
-                if (it != stateMap.end())
-                {
-                    msg = lo_message_new();
-
-                    lo_message_add_string(msg, "stateList" );
-                    lo_message_add_string(msg, (*it).first.c_str() );
-                    if ((*it).second.size())
-                    {
-                        for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                            lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
-                    }
-                    else
-                        lo_message_add_string(msg, "NULL");
-
-                    msgs.push_back(msg);
-                }
+                else 
+                    lo_message_add_string(msg, "NULL");
+                msgs.push_back(msg);
             }
         }
+        {
+            ReferencedStateSetMap::iterator it;
+            ReferencedStateSetList::iterator iter;
+            it = stateMap.find(typeFilter);
+            if (it != stateMap.end())
+            {
+                msg = lo_message_new();
+
+                lo_message_add_string(msg, "stateList" );
+                lo_message_add_string(msg, (*it).first.c_str() );
+                if ((*it).second.size())
+                {
+                    for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+                        lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
+                }
+                else
+                    lo_message_add_string(msg, "NULL");
+
+                msgs.push_back(msg);
+            }
+        }
+        
     }
 
     spinApp::Instance().SceneBundle(msgs, txAddr);
-}
-
-void SceneManager::sendConnectionList(lo_address txAddr)
-{
-    // need to manually send soundConnections, since they are not in the nodeMap
-    lo_message msg = lo_message_new();
-    lo_message_add_string(msg, "nodeList" );
-    lo_message_add_string(msg, "SoundConnection" );
-
-    std::vector<SoundConnection*> connections = getConnections();
-
-    if (connections.size())
-    {
-        for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
-            lo_message_add_string(msg, (*iter)->getID().c_str() );
-    } else 
-        lo_message_add_string(msg, "NULL" );
-
-    if (txAddr == 0)
-    {
-        //SCENE_LO_MSG(msg);
-        spinApp::Instance().BroadcastMessage(std::string("/SPIN/"+spinApp::Instance().getSceneID()), msg);
-    }
-    else
-    {
-        //SCENE_LO_MSG_TCP(msg, txAddr);
-        std::cout << "WARNING: Should be sending connection list to subscriber but that is deprecated. Broadcasting instead." << std::endl;
-        spinApp::Instance().BroadcastMessage(std::string("/SPIN/"+spinApp::Instance().getSceneID()), msg);
-    }
 }
 
 void SceneManager::debugContext()
@@ -758,11 +722,6 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         std::cout << "Oops. Cannot create a node with the reserved name: 'NULL'" << std::endl;
         return NULL;
     }
-
-    // ignore SoundConnection messages (these should be created by
-    // the DSPNode::connect() method
-    if (nodeType == "SoundConnection")
-        return NULL;
 
     // Let's broadcast a createNode message BEFORE we actually do the creation.
     // Thus, if some messages are sent during instantiation, at least clients
@@ -1259,41 +1218,6 @@ ReferencedStateSetList SceneManager::findStateSets(const char *pattern)
 }
 */
 
-std::vector<SoundConnection*> SceneManager::getConnections()
-{
-    std::vector<SoundConnection*> allConnections;
-
-    nodeMapType::iterator it;
-    nodeListType::iterator iter;
-    for (it = nodeMap.begin(); it != nodeMap.end(); it++)
-    {
-        std::string nodeType = (*it).first;
-
-        const cppintrospection::Type &t = introspector::getType(nodeType);
-        if (t.isDefined())
-        {
-            // check if the nodeType is a subclass of DSPNode:
-            if (t.getBaseType(0).getName() == "DSPNode")
-            {
-                for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                {
-                    osg::ref_ptr<DSPNode> dspNode = dynamic_cast<DSPNode*>((*iter).get());
-
-                    if ((*iter).valid())
-                    {
-                        std::vector<SoundConnection*>::iterator connIter;
-                        for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
-                        {
-                            allConnections.push_back((*connIter));
-                        }
-                    } // bad dsp node
-                }
-            }
-        }
-    }
-    return allConnections;
-}
-
 void SceneManager::deleteNode(const char *id)
 {
     // don't use ref_ptr here, otherwise node will stay alive until the end of
@@ -1575,13 +1499,6 @@ void SceneManager::refreshAll()
                 (*sIter)->stateDump();
         }
     }
-
-    // must do connections manually:
-    std::vector<SoundConnection*> connections = getConnections();
-    for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
-    {
-        (*iter)->stateDump();
-    }
     
 #ifdef WITH_SPATOSC
 	if (spinApp::Instance().hasAudioRenderer)
@@ -1589,7 +1506,6 @@ void SceneManager::refreshAll()
 	    spinApp::Instance().audioScene->forceRefresh();
 	}
 #endif
-
 
     // Announce that a refresh has been completed
     spinApp::Instance().BroadcastSceneMessage("s", "refresh", SPIN_ARGS_END);
@@ -1623,36 +1539,8 @@ void SceneManager::refreshSubscribers(const std::map<std::string, lo_address> &c
                     (*sIter)->stateDump(client->second);
             }
         }
-
-        // must do connections manually:
-        std::vector<SoundConnection*> connections = getConnections();
-        for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
-            (*iter)->stateDump(client->second);
     }
 }
-
-// *****************************************************************************
-// This function returns a pointer to an SoundConnection object
-/*
-   SoundConnection* SceneManager::getConnection(char *from, char *to)
-   {
-   vector<SoundConnection*>::iterator iter;
-
-   osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( getNode(from) );
-   osg::ref_ptr<DSPNode> snkNode = dynamic_cast<DSPNode*>( getNode(to) );
-
-   if ( srcNode.valid() && snkNode.valid() ) {
-   for (iter = srcNode->connectTO.begin(); iter != srcNode->connectTO.end(); iter++)
-   {
-   if ((*iter)->sink->id == snkNode->id) return (*iter);
-   }
-   }
-
-// SoundConnection not found:
-return NULL;
-
-}
- */
 
 // *****************************************************************************
 // Here is where we change the graph (ie, attach nodes to their new parents,
@@ -1831,64 +1719,6 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers, bool w
     return output.str();
 }
 
-
-std::string SceneManager::getConnectionsAsXML()
-{
-    std::ostringstream output("");
-    output << "<connections>\n";
-
-    // go through all DSPNodes (actually, all nodes that are subclasses of
-    // DSPNode), and save the connection info at end of file:
-
-    nodeMapType::iterator it;
-    nodeListType::iterator iter;
-    for (it = nodeMap.begin(); it != nodeMap.end(); it++)
-    {
-        std::string nodeType = (*it).first;
-        const cppintrospection::Type &t = introspector::getType(nodeType);
-        if (t.isDefined())
-        {
-            // check if the nodeType is a subclass of DSPNode:
-            if (t.getBaseType(0).getName() == introspector::prependNamespace("DSPNode"))
-            {
-                for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                {
-                    osg::ref_ptr<DSPNode> dspNode = dynamic_cast<DSPNode*>((*iter).get());
-                    if ((*iter).valid())
-                    {
-                        std::vector<SoundConnection*>::iterator connIter;
-                        for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
-                        {
-                            // open tag for this node:
-                            output << "<SoundConnection id=" << (*connIter)->getID() << ">\n";
-                            output << getStateAsXML((*connIter)->getState());
-                            // close tag
-                            output << "</SoundConnection>";
-                        }
-                    } //else std::cout << "bad dspnode: " << (*iter)->getID() << std::endl;
-                }
-            }
-        }
-    }
-    output << "</connections>\n";
-    return output.str();
-}
-
-/*
-   std::string SceneManager::getConnectionsAsXML(ReferencedNode *n)
-   {
-// just give connections for the node in question (and all children
-
-ostringstream output("");
-output << "<connection>\n";
-
-
-
-output << "</connection>\n";
-return output.str();
-}
- */
-
 std::vector<t_symbol*> SceneManager::getSavableStateSets(ReferencedNode *n, bool withUsers)
 {
 	std::vector<t_symbol*> statesetsToSave;
@@ -2001,7 +1831,6 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
         }
     }
     output << "</spinScene>\n";
-    output << getConnectionsAsXML();
 
     // now write to file:
     TiXmlDocument outfile( filename.c_str() );
@@ -2276,112 +2105,6 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
     return true;
 }
 
-bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
-{
-    // NOTE: This assumes all nodes have already been created, but will create
-    //       connections if they do not exist.
-    TiXmlElement *child;
-    if (XMLnode->Value() == std::string("SoundConnection"))
-    {
-        //std::cout << "found <SoundConnection>: " << XMLnode->Attribute("id") << std::endl;
-        //std::cout << "src: " << XMLnode->FirstChild("src")->FirstChild()->Value() << std::endl;
-        //std::cout << "snk: " << XMLnode->FirstChild("snk")->FirstChild()->Value() << std::endl;
-
-        osg::ref_ptr<ReferencedNode> n = getNode(XMLnode->FirstChild("src")->FirstChild()->Value());
-        char *snkName = (char*)XMLnode->FirstChild("snk")->FirstChild()->Value();
-
-        if (! n.valid())
-            return false;
-
-        // we can call the connect() method again, to ensure the connection is actually made:
-        osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>(n.get());
-        srcNode->connect(snkName);
-
-        // check if it exists now (it might not, if the sink didn't exist)
-        SoundConnection *conn = srcNode->getConnection(snkName);
-
-        if (! conn)
-            return false;
-
-        // now we have it, so we can go through the rest of the xml children
-        // and update the connection's parameters:
-
-        for (child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
-        {
-            //std::cout << "child = " << child->Value() << ", value = " << child->FirstChild()->Value() << std::endl;
-
-            // we know that each method takes exactly one float arg:
-            float f;
-            if (child->Value() == std::string("setThru"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setThru(f);
-            }
-            else if (child->Value() == std::string("setDistanceEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setDistanceEffect(f);
-            }
-            else if (child->Value() == std::string("setRolloffEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setRolloffEffect(f);
-            }
-            else if (child->Value() == std::string("setDopplerEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setDopplerEffect(f);
-            }
-            else if (child->Value() == std::string("setDiffractionEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setDiffractionEffect(f);
-            }
-        }
-    }
-    return false;
-}
-
-/*
-   bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
-   {
-
-// NOTE: this assumes all nodes have already been created
-
-TiXmlElement *child1, *child2;
-
-for ( child1 = XMLnode->FirstChildElement(); child1; child1 = child1->NextSiblingElement() )
-{
-// first check children:
-if (child1->Value() == string("subgraph"))
-{
-for (child2 = child1->FirstChildElement(); child2; child2 = child2->NextSiblingElement() )
-{
-createConnectionsFromXML(child2);
-}
-}
-
-// now if this node has a "connect" message,
-else if (child1->Value() == string("connect"))
-{
-// don't care about nodeType (should be SoundNode or SoundSpace)
-//char *nodeType = (char*) XMLnode->Value();
-
-if (XMLnode->Attribute("id"))
-{
-osg::ref_ptr<ReferencedNode> n = getNode((char*) XMLnode->Attribute("id"));
-if (n.valid())
-{
-osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>(n.get());
-if (srcNode.valid()) srcNode->connect((char*)child1->FirstChild()->Value());
-}
-}
-}
-
-} // for ( child1
-}
- */
-
 bool SceneManager::loadXML(const char *s)
 {
     // convert filename into valid path:
@@ -2423,16 +2146,6 @@ bool SceneManager::loadXML(const char *s)
     for (child = root->FirstChildElement(); child; child = child->NextSiblingElement())
     {
         createNodeFromXML(child);
-    }
-
-    // Now see if there is a <connections> tag:
-    if (root = doc.FirstChild("connections"))
-    {
-        // go through the file again, making sure that connections get created:
-        for (child = root->FirstChildElement(); child; child = child->NextSiblingElement())
-        {
-            createConnectionsFromXML(child);
-        }
     }
 
     this->update();

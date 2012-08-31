@@ -70,7 +70,6 @@
 #include "spinApp.h"
 #include "spinLog.h"
 #include "nodeVisitors.h"
-#include "SoundConnection.h"
 #include "spinDefaults.h"
 
 #ifdef WITH_SPATOSC
@@ -369,64 +368,6 @@ void spinBaseContext::stop()
     while (isRunning())
         usleep(10);
 
-}
-
-int spinBaseContext::connectionCallback(const char *path, 
-        const char *types, 
-        lo_arg **argv, 
-        int argc, 
-        void * /*data*/, 
-        void *user_data)
-{
-    std::string idStr;
-    std::string theMethod;
-
-    // make sure there is at least one argument (ie, a method to call):
-    if (! argc)
-        return 1;
-
-    // get the method (argv[0]):
-    if (lo_is_string_type((lo_type) types[0]))
-    {
-        theMethod = std::string((char *) argv[0]);
-    }
-    else
-        return 1;
-
-    // get the instance of the connection:
-    SoundConnection *conn = (SoundConnection*) user_data;
-    if (! conn)
-    {
-        std::cout << "oscParser: Could not find connection: " << idStr << std::endl;
-        return 1;
-    }
-
-    // TODO: replace method call with osg::Introspection
-
-    if (theMethod == "stateDump")
-        conn->stateDump();
-    else if (theMethod == "debug")
-        conn->debug();
-    else if ((argc==2) && (lo_is_numerical_type((lo_type) types[1])))
-    {
-        float value = lo_hires_val((lo_type) types[1], argv[1]);
-
-        if (theMethod == "setThru")
-            conn->setThru((bool) value);
-        else if (theMethod == "setDistanceEffect")
-            conn->setDistanceEffect(value);
-        else if (theMethod == "setRolloffEffect")
-            conn->setRolloffEffect(value);
-        else if (theMethod == "setDopplerEffect")
-            conn->setDopplerEffect(value);
-        else if (theMethod == "setDiffractionEffect")
-            conn->setDiffractionEffect(value);
-        else
-            std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-    }
-    else
-        std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-    return 1;
 }
 
 int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **argv, int argc, void * /*data*/, void *user_data)

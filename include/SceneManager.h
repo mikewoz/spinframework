@@ -71,7 +71,6 @@ namespace spin
 // forward declarations:
 class GroupNode;
 class UserNode;
-class SoundConnection;
 class spinLog;
 
 /**
@@ -127,11 +126,6 @@ class SceneManager
 
         std::vector<ReferencedNode*> findNodes(const char *pattern);
         std::vector<ReferencedStateSet*> findStateSets(const char *pattern);
-        
-        //nodeListType findNodes(const char *pattern);
-        //ReferencedStateSetList findStateSet(const char *pattern);
-            
-        std::vector<SoundConnection*> getConnections();
 
         /**
          * This method removes a node from the scene, however the actual work is

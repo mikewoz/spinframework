@@ -86,7 +86,6 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     ShaderUtil.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
-    SoundConnection.cpp \
     SoundNode.cpp \
     SoundSpace.cpp \
     spinApp.cpp \
@@ -143,7 +142,6 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/ShaderUtil.h \
     $(top_srcdir)/include/ShapeNode.h \
     $(top_srcdir)/include/SharedVideoTexture.h \
-    $(top_srcdir)/include/SoundConnection.h \
     $(top_srcdir)/include/SoundNode.h \
     $(top_srcdir)/include/SoundSpace.h \
     $(top_srcdir)/include/spinApp.h \

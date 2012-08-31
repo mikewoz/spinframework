@@ -260,7 +260,6 @@
 		1C386CCA14BD3DF60065851F /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CA014BD3DF60065851F /* SceneManager.cpp */; };
 		1C386CCB14BD3DF60065851F /* ShapeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CA114BD3DF60065851F /* ShapeNode.cpp */; };
 		1C386CCC14BD3DF60065851F /* SharedVideoTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CA214BD3DF60065851F /* SharedVideoTexture.cpp */; };
-		1C386CCD14BD3DF60065851F /* SoundConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CA314BD3DF60065851F /* SoundConnection.cpp */; };
 		1C386CCE14BD3DF60065851F /* SoundNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CA414BD3DF60065851F /* SoundNode.cpp */; };
 		1C386CCF14BD3DF60065851F /* SoundSpace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CA514BD3DF60065851F /* SoundSpace.cpp */; };
 		1C386CD014BD3DF60065851F /* spinApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386CA614BD3DF60065851F /* spinApp.cpp */; };
@@ -558,7 +557,6 @@
 		1CA24D6814BE2875007A9C31 /* ReporterNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4C14BE2875007A9C31 /* ReporterNode.cpp */; };
 		1CA24D6914BE2875007A9C31 /* ShapeNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4D14BE2875007A9C31 /* ShapeNode.cpp */; };
 		1CA24D6A14BE2875007A9C31 /* SharedVideoTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4E14BE2875007A9C31 /* SharedVideoTexture.cpp */; };
-		1CA24D6B14BE2875007A9C31 /* SoundConnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4F14BE2875007A9C31 /* SoundConnection.cpp */; };
 		1CA24D6C14BE2875007A9C31 /* SoundNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D5014BE2875007A9C31 /* SoundNode.cpp */; };
 		1CA24D6D14BE2875007A9C31 /* SoundSpace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D5114BE2875007A9C31 /* SoundSpace.cpp */; };
 		1CA24D6E14BE2875007A9C31 /* SwitchNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D5214BE2875007A9C31 /* SwitchNode.cpp */; };
@@ -596,7 +594,6 @@
 		1CA24DC314BE2892007A9C31 /* SceneManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8F14BE2892007A9C31 /* SceneManager.h */; };
 		1CA24DC414BE2892007A9C31 /* ShapeNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9014BE2892007A9C31 /* ShapeNode.h */; };
 		1CA24DC614BE2892007A9C31 /* SharedVideoTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9214BE2892007A9C31 /* SharedVideoTexture.h */; };
-		1CA24DC714BE2892007A9C31 /* SoundConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9314BE2892007A9C31 /* SoundConnection.h */; };
 		1CA24DC814BE2892007A9C31 /* SoundNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9414BE2892007A9C31 /* SoundNode.h */; };
 		1CA24DC914BE2892007A9C31 /* SoundSpace.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9514BE2892007A9C31 /* SoundSpace.h */; };
 		1CA24DCA14BE2892007A9C31 /* spinApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9614BE2892007A9C31 /* spinApp.h */; };
@@ -1128,7 +1125,6 @@
 		1C386CA014BD3DF60065851F /* SceneManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SceneManager.cpp; path = ../src/spin/SceneManager.cpp; sourceTree = SOURCE_ROOT; };
 		1C386CA114BD3DF60065851F /* ShapeNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShapeNode.cpp; path = ../src/spin/ShapeNode.cpp; sourceTree = SOURCE_ROOT; };
 		1C386CA214BD3DF60065851F /* SharedVideoTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SharedVideoTexture.cpp; path = ../src/spin/SharedVideoTexture.cpp; sourceTree = SOURCE_ROOT; };
-		1C386CA314BD3DF60065851F /* SoundConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundConnection.cpp; path = ../src/spin/SoundConnection.cpp; sourceTree = SOURCE_ROOT; };
 		1C386CA414BD3DF60065851F /* SoundNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundNode.cpp; path = ../src/spin/SoundNode.cpp; sourceTree = SOURCE_ROOT; };
 		1C386CA514BD3DF60065851F /* SoundSpace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundSpace.cpp; path = ../src/spin/SoundSpace.cpp; sourceTree = SOURCE_ROOT; };
 		1C386CA614BD3DF60065851F /* spinApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinApp.cpp; path = ../src/spin/spinApp.cpp; sourceTree = SOURCE_ROOT; };
@@ -1371,7 +1367,6 @@
 		1CA24D4C14BE2875007A9C31 /* ReporterNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ReporterNode.cpp; path = ../src/osgWrappers/introspection/ReporterNode.cpp; sourceTree = "<group>"; };
 		1CA24D4D14BE2875007A9C31 /* ShapeNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShapeNode.cpp; path = ../src/osgWrappers/introspection/ShapeNode.cpp; sourceTree = "<group>"; };
 		1CA24D4E14BE2875007A9C31 /* SharedVideoTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SharedVideoTexture.cpp; path = ../src/osgWrappers/introspection/SharedVideoTexture.cpp; sourceTree = "<group>"; };
-		1CA24D4F14BE2875007A9C31 /* SoundConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundConnection.cpp; path = ../src/osgWrappers/introspection/SoundConnection.cpp; sourceTree = "<group>"; };
 		1CA24D5014BE2875007A9C31 /* SoundNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundNode.cpp; path = ../src/osgWrappers/introspection/SoundNode.cpp; sourceTree = "<group>"; };
 		1CA24D5114BE2875007A9C31 /* SoundSpace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SoundSpace.cpp; path = ../src/osgWrappers/introspection/SoundSpace.cpp; sourceTree = "<group>"; };
 		1CA24D5214BE2875007A9C31 /* SwitchNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SwitchNode.cpp; path = ../src/osgWrappers/introspection/SwitchNode.cpp; sourceTree = "<group>"; };
@@ -1409,7 +1404,6 @@
 		1CA24D8F14BE2892007A9C31 /* SceneManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SceneManager.h; path = ../include/SceneManager.h; sourceTree = "<group>"; };
 		1CA24D9014BE2892007A9C31 /* ShapeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ShapeNode.h; path = ../include/ShapeNode.h; sourceTree = "<group>"; };
 		1CA24D9214BE2892007A9C31 /* SharedVideoTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SharedVideoTexture.h; path = ../include/SharedVideoTexture.h; sourceTree = "<group>"; };
-		1CA24D9314BE2892007A9C31 /* SoundConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundConnection.h; path = ../include/SoundConnection.h; sourceTree = "<group>"; };
 		1CA24D9414BE2892007A9C31 /* SoundNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundNode.h; path = ../include/SoundNode.h; sourceTree = "<group>"; };
 		1CA24D9514BE2892007A9C31 /* SoundSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SoundSpace.h; path = ../include/SoundSpace.h; sourceTree = "<group>"; };
 		1CA24D9614BE2892007A9C31 /* spinApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = spinApp.h; path = ../include/spinApp.h; sourceTree = "<group>"; };
@@ -1865,7 +1859,6 @@
 				1C1ECB4D150E659000CCBFF3 /* ShaderUtil.cpp */,
 				1C386CA114BD3DF60065851F /* ShapeNode.cpp */,
 				1C386CA214BD3DF60065851F /* SharedVideoTexture.cpp */,
-				1C386CA314BD3DF60065851F /* SoundConnection.cpp */,
 				1C386CA414BD3DF60065851F /* SoundNode.cpp */,
 				1C386CA514BD3DF60065851F /* SoundSpace.cpp */,
 				1C386CA614BD3DF60065851F /* spinApp.cpp */,
@@ -1930,7 +1923,6 @@
 				1C1ECB4F150E65B000CCBFF3 /* ShaderUtil.h */,
 				1CA24D9014BE2892007A9C31 /* ShapeNode.h */,
 				1CA24D9214BE2892007A9C31 /* SharedVideoTexture.h */,
-				1CA24D9314BE2892007A9C31 /* SoundConnection.h */,
 				1CA24D9414BE2892007A9C31 /* SoundNode.h */,
 				1CA24D9514BE2892007A9C31 /* SoundSpace.h */,
 				1CA24D9614BE2892007A9C31 /* spinApp.h */,
@@ -1983,7 +1975,6 @@
 				1C1ECB4B150E54F400CCBFF3 /* Shader.cpp */,
 				1CA24D4D14BE2875007A9C31 /* ShapeNode.cpp */,
 				1CA24D4E14BE2875007A9C31 /* SharedVideoTexture.cpp */,
-				1CA24D4F14BE2875007A9C31 /* SoundConnection.cpp */,
 				1CA24D5014BE2875007A9C31 /* SoundNode.cpp */,
 				1CA24D5114BE2875007A9C31 /* SoundSpace.cpp */,
 				1CA24D5214BE2875007A9C31 /* SwitchNode.cpp */,
@@ -2431,7 +2422,6 @@
 				1CA24DC314BE2892007A9C31 /* SceneManager.h in Headers */,
 				1CA24DC414BE2892007A9C31 /* ShapeNode.h in Headers */,
 				1CA24DC614BE2892007A9C31 /* SharedVideoTexture.h in Headers */,
-				1CA24DC714BE2892007A9C31 /* SoundConnection.h in Headers */,
 				1CA24DC814BE2892007A9C31 /* SoundNode.h in Headers */,
 				1CA24DC914BE2892007A9C31 /* SoundSpace.h in Headers */,
 				1CA24DCA14BE2892007A9C31 /* spinApp.h in Headers */,
@@ -2830,7 +2820,6 @@
 				1C386CCA14BD3DF60065851F /* SceneManager.cpp in Sources */,
 				1C386CCB14BD3DF60065851F /* ShapeNode.cpp in Sources */,
 				1C386CCC14BD3DF60065851F /* SharedVideoTexture.cpp in Sources */,
-				1C386CCD14BD3DF60065851F /* SoundConnection.cpp in Sources */,
 				1C386CCE14BD3DF60065851F /* SoundNode.cpp in Sources */,
 				1C386CCF14BD3DF60065851F /* SoundSpace.cpp in Sources */,
 				1C386CD014BD3DF60065851F /* spinApp.cpp in Sources */,
@@ -2864,7 +2853,6 @@
 				1CA24D6814BE2875007A9C31 /* ReporterNode.cpp in Sources */,
 				1CA24D6914BE2875007A9C31 /* ShapeNode.cpp in Sources */,
 				1CA24D6A14BE2875007A9C31 /* SharedVideoTexture.cpp in Sources */,
-				1CA24D6B14BE2875007A9C31 /* SoundConnection.cpp in Sources */,
 				1CA24D6C14BE2875007A9C31 /* SoundNode.cpp in Sources */,
 				1CA24D6D14BE2875007A9C31 /* SoundSpace.cpp in Sources */,
 				1CA24D6E14BE2875007A9C31 /* SwitchNode.cpp in Sources */,

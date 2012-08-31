@@ -49,8 +49,6 @@
 #include "nodeVisitors.h"
 #include "spinDefaults.h"
 
-#include "SoundConnection.h" // for TCP wildcard check
-
 #ifdef WITH_POCO
 #include "pocoUtil.h"
 #endif
@@ -537,7 +535,7 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     }
 
 	// WE DON'T NEED TO DO ANYHING MORE. WE REGISTER WITH THE TCP SERVER NOW...
-	// FOR THE SCENE, AND EACH NODE, STATESET, AND SOUNDCONNECTION
+	// FOR THE SCENE, AND EACH NODE AND STATESET
 	
 	
     // any other scene message just gets forwarded to the generic (UDP)
@@ -564,7 +562,7 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 
 		
 		// WE DON'T NEED TO DO THIS ANYMORE. WE REGISTER THE TCP CALLBACK WITH
-		// EACH NODE, STATESET, AND SOUNDCONNECTION
+		// EACH NODE AND STATESET
 		
 		// The nodeString might have a wildcard, so here we call the method on
 		// any nodes (or statesets) that match:
@@ -577,19 +575,6 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 			spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) (*iter));
 		}
 
-
-		// connections are different:
-		std::vector<SoundConnection*> conns = spinApp::Instance().sceneManager_->getConnections();
-		
-		std::vector<SoundConnection*>::iterator cIter;
-		for ( cIter=conns.begin(); cIter!=conns.end(); ++cIter )
-		{
-			if (wildcardMatch(nodeString.c_str(), (*cIter)->getID().c_str()))
-			{
-				std::cout << " ... matched connection: " << (*cIter)->getID() << std::endl;
-				spinBaseContext::connectionCallback(path, types, argv, argc, (void*) data, (void*) (*iter));
-			}
-		}
 		*/
 
 	}

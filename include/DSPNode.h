@@ -56,7 +56,6 @@ namespace osg {
 namespace spin
 {
 
-class SoundConnection;
 class SceneManager;
 
 /**
@@ -80,37 +79,6 @@ public:
         
         virtual void callbackUpdate(osg::NodeVisitor* nv);
         bool dumpGlobals(bool forced=false);
-        
-        /**
-         * Returns the SoundConnection object that exists between the current
-         * node and the sink or null if none is found.
-         * @param snk a pointer to the sink node
-         */
-
-        SoundConnection *getConnection(DSPNode *snk);
-
-        /**
-         * Returns the SoundConnection object that exists between the current
-         * node and the sink or null if none is found.
-         * @param snk the name of the sink node to search for
-         */
-
-        SoundConnection *getConnection(const char *snk);
-
-        /**
-         *
-         */
-
-        void connect(DSPNode *snk);
-        void connect(const char *snk);
-
-        /**
-         * Sets the current node as a sink to the specified node.
-         */
-
-        void connectSource(const char *src);
-
-        void disconnect(const char *snk);
         
         /**
          * Set the media for the sound node using a URI pattern.
@@ -138,19 +106,6 @@ public:
          */
         virtual void setActive (int i);
         int getActive() const { return (int)active; }
-        
-        /**
-         * We maintain 2 lists of all SoundConnection for this node (it is
-         * redundant, but useful to have both forward and backward connection
-         * pointers).
-         */
-        std::vector<SoundConnection*> connectTO;
-        /**
-         * We maintian 2 lists of all SoundConnection for this node (it is
-         * redundant, but useful to have both forward and backward connection
-         * pointers).
-         */
-        std::vector<SoundConnection*> connectFROM;
         
         /**
          * For each subclass of ReferencedNode, we override the getState()
@@ -204,13 +159,6 @@ private:
         bool active;
         
         std::string uri_;
-        
-        /**
-         * This node should always broadcast global position and orientation 
-         * so that any audio spatializer software listening to messages can use
-         * the data without needing to understand and maintain a scene graph.
-         */
-        //osg::Matrix _globalMatrix;
 
         // TODO: move all graphical items (VUMeter, directivity, laser) into
         // separate node class, and attach as a subgraph, only when needed.
