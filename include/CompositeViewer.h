@@ -51,6 +51,7 @@
 #include "dofppu.h"
 #include "ssaoppu.h"
 #include "motionblurppu.h"
+#include "outlineppu.h"
 
 namespace spin
 {
@@ -121,20 +122,12 @@ class PPUProcessor : public osgPPU::Processor
 #define PPU_DOF         0x0001
 #define PPU_SSAO        0x0002
 #define PPU_MOTIONBLUR  0x0004
+#define PPU_OUTLINE     0x0008
 
 class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
 {
     public:
-        // enum of the different PPU effects available
-        // Use primes, to allow activation of multiple effects
-        enum ppuEffect
-        {
-            noEffect = 0,
-            dofEffect = 1,
-            ssaoEffect = 2
-        };
-
         //! Default construcotr
         CompositeViewer(osg::ArgumentParser& args);
 
@@ -154,7 +147,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         void viewerInit();
 
         //! Setup osgppu for rendering
-        void initializePPU(unsigned int pEffect = noEffect);
+        void initializePPU(unsigned int pEffect = PPU_NONE);
 
         //! Update the frames
         void frame(double f = USE_REFERENCE_TIME);
@@ -180,6 +173,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         std::vector<DoFRendering*> mDofPPUs;
         std::vector<SSAORendering*> mSsaoPPUs;
         std::vector<MotionBlurRendering*> mMBlurPPUs;
+        std::vector<OutlineRendering*> mOutlinePPUs;
 
     private:
         std::vector<osgPPU::Processor*> mProcessors;

@@ -97,6 +97,7 @@ int run(int argc, char **argv)
     bool ssao = false; 
     bool dof = false;
     bool mblur = false;
+    bool outline = false;
 	float speedScaleValue = 1.0;
 	float moving = false;
 	
@@ -149,6 +150,7 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--dof", "Enables depth of field effect");
     arguments.getApplicationUsage()->addCommandLineOption("--ssao", "Enables screen space ambient occlusion effect");
     arguments.getApplicationUsage()->addCommandLineOption("--mblur", "Enables motion blur effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--outline", "Enables the outline effect");
 
 	// *************************************************************************
 	// PARSE ARGS:
@@ -176,6 +178,7 @@ int run(int argc, char **argv)
     if (arguments.read("--dof")) dof=true;
     if (arguments.read("--ssao")) ssao=true;
     if (arguments.read("--mblur")) mblur=true;
+    if (arguments.read("--outline")) outline=true;
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}
@@ -330,7 +333,7 @@ int run(int argc, char **argv)
 	    view->addEventHandler(new osgViewer::ThreadingHandler);
 	    view->addEventHandler(new osgViewer::WindowSizeHandler);
         
-        if (dof || ssao || mblur)
+        if (dof || ssao || mblur || outline)
         {
             view->addEventHandler(new CustomResizeHandler(&viewer));
         }
@@ -512,7 +515,7 @@ int run(int argc, char **argv)
 	//std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
     std::cout << "\nspinviewer is READY" << std::endl;
 
-    if (dof || ssao || mblur)
+    if (dof || ssao || mblur || outline)
     {
         unsigned int lEffects = 0x0000;
         if(dof)
@@ -521,6 +524,8 @@ int run(int argc, char **argv)
             lEffects |= PPU_SSAO;
         if(mblur)
             lEffects |= PPU_MOTIONBLUR;
+        if(outline)
+            lEffects |= PPU_OUTLINE;
 
         //viewer.frame();
         viewer.viewerInit(); // TODO: move this in a better place
