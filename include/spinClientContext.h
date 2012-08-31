@@ -68,10 +68,12 @@ class spinClientContext : public spinBaseContext
         lo_server lo_syncServ;
 
         int pollUpdates();
+        void setSecureBroadcast(bool b);
 
-    //protected:
+
         /**
-         * Register the client's ip and port for reliable communication with the server
+         * Register the client's ip and port for reliable communication with the
+         * server
          */
         void subscribe();
         

@@ -91,9 +91,6 @@ namespace spin
  * be a public class member, but we have sigHandler, which should be used
  * instead
  */
-//namespace {
-//    volatile bool signalStop;
-//}
 volatile bool spinBaseContext::signalStop = false;
 
 spinBaseContext::spinBaseContext() :
@@ -104,7 +101,8 @@ spinBaseContext::spinBaseContext() :
     pthreadID(0),
     doDiscovery_(true),
     autoPorts_(true),
-    running(false)
+    running(false),
+    secureBroadcast_(false)
 {
     using namespace spin_defaults;
     
@@ -292,7 +290,12 @@ void spinBaseContext::setTTL(int ttl)
     lo_address_set_ttl(lo_infoAddr, ttl);
     lo_address_set_ttl(lo_syncAddr, ttl);
 }
-    
+
+void spinBaseContext::setSecureBroadcast(bool b)
+{
+    secureBroadcast_=b;
+}
+
 void spinBaseContext::addInfoHandler(EventHandler *obs)
 {
     infoHandlers.push_back(obs);
@@ -822,8 +825,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         theMethod = std::string((char *)argv[0]);
     else
         return 1;
-
-    //pthread_mutex_lock(&sceneMutex);
+    
 
     // note that args start at argv[1] now:
     if (theMethod == "debug")
@@ -861,13 +863,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     }
     else if ((theMethod == "setSecureBroadcast") && (argc==2))
     {
-        spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
-        server->setSecureBroadcast((bool)lo_hires_val((lo_type)types[1], argv[1]));
-    }
-    else if ((theMethod == "setSecureEvents") && (argc==2))
-    {
-        spinServerContext *server = dynamic_cast<spinServerContext*>(spin.getContext());
-        server->setSecureEvents((bool)lo_hires_val((lo_type)types[1], argv[1]));
+        spin.getContext()->setSecureBroadcast((bool)lo_hires_val((lo_type)types[1], argv[1]));
     }
     else if (theMethod == "clear")
         sceneManager->clear();

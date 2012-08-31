@@ -611,7 +611,8 @@ void spinApp::BroadcastMessage(std::string OSCpath, lo_message msg)
                 lo_send_message(addrIter->second, OSCpath.c_str(), msg);
             }
         }
-        else
+        //else
+        // Actually, let's always send out on the UDP channels as well.
         {
             std::vector<lo_address>::iterator addrIter;
             for (addrIter = context_->lo_txAddrs_.begin(); addrIter != context_->lo_txAddrs_.end(); ++addrIter)
@@ -655,12 +656,14 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
 
     // If a txAddr is provided, it is a TCP request from a single host and we 
     // just send there. Otherwise, txAddr will be 0, and we will send to
-    // everyone that is subscribed. The channel to the subscriber (UDP vs TCP)
-    // will be chosen according to whether the server has SecureBroadcast
-    // enabled.
+    // everyone.
     std::vector<lo_address> addressesToSendTo;
     if (txAddr == 0)
     {
+        // add all UDP addresses:
+        addressesToSendTo = context_->lo_txAddrs_;
+        
+        // also add all TCP subscribers if secure broadcast is enabled:
         if (serv->hasSecureBroadcast())
         {
             std::map<std::string,lo_address>::iterator addrIter;
@@ -669,7 +672,6 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
                 addressesToSendTo.push_back(addrIter->second);
             }
         }
-        else addressesToSendTo = context_->lo_txAddrs_;
     }
     else addressesToSendTo.push_back(txAddr);
 

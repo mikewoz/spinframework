@@ -75,9 +75,6 @@ spinServerContext::spinServerContext() : syncThreadID(0)
     lo_txAddrs_.push_back(lo_address_new(MULTICAST_GROUP, SERVER_TX_UDP_PORT));
     
     httpPort = 9980;
-    
-    secureBroadcast_ = false;
-    secureEvents_ = false;
 
     // now that we've overridden addresses, we can call setContext
     spin.setContext(this);
@@ -121,12 +118,6 @@ void spinServerContext::debugPrint()
         std::cout << "  Secure Broadcast:\t\tENABLED" << std::endl;
     else
         std::cout << "  Secure Broadcast:\t\tDISABLED" << std::endl;
-
-    if (secureEvents_)
-        std::cout << "  Secure Events:\t\tENABLED" << std::endl;
-    else
-        std::cout << "  Secure Events:\t\tDISABLED" << std::endl;
-
 
     if (tcpClientAddrs_.size())
     {
@@ -206,6 +197,19 @@ int spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     return 1;
 }
 
+void spinServerContext::setSecureBroadcast(bool b)
+{
+    // First, make sure that this message goes out securely to all clients:
+    std::map<std::string,lo_address>::iterator addrIter;
+    for (addrIter=tcpClientAddrs_.begin(); addrIter!=tcpClientAddrs_.end(); ++addrIter)
+    {
+        lo_send(addrIter->second, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "si", "setSecureBroadcast", b);
+    }
+    
+    // Then set the flag for subsequent messages:
+    spinBaseContext::setSecureBroadcast(b);
+}
+
 
 
 // *****************************************************************************
@@ -255,7 +259,7 @@ void spinServerContext::createServers()
     // oscCallback_debug() will match any path and args:
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
+            lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
     }
 #endif
 
@@ -268,7 +272,7 @@ void spinServerContext::createServers()
     // add scene callback
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter), std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
+            lo_server_add_method((*servIter), std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
     			NULL, sceneCallback, NULL);
     }
 

@@ -177,7 +177,7 @@ void spinClientContext::createServers()
 
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
+            lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
     }
 #endif
 
@@ -189,7 +189,7 @@ void spinClientContext::createServers()
     lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, sceneCallback, this);
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter),
+            lo_server_add_method((*servIter),
             std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
             NULL, sceneCallback, NULL);
     }
@@ -227,13 +227,43 @@ int spinClientContext::pollUpdates()
 {
 	static const int TIMEOUT = 0;
 	int recv = 0; // bytes received (note: might not be accurate for TCP)
-    for (std::vector<lo_server>::iterator it = lo_rxServs_.begin(); it != lo_rxServs_.end(); ++it)
-    	recv += lo_server_recv_noblock((*it), TIMEOUT);
+    if (!secureBroadcast_)
+    {
+        for (std::vector<lo_server>::iterator it = lo_rxServs_.begin(); it != lo_rxServs_.end(); ++it)
+        {
+            recv += lo_server_recv_noblock((*it), TIMEOUT);
+        }
+    }
 	recv += lo_server_recv_noblock(lo_syncServ, TIMEOUT);
 	recv += lo_server_recv_noblock(lo_infoServ_, TIMEOUT);
 	recv += lo_server_recv_noblock(lo_tcpRxServer_, TIMEOUT);
 
 	return recv;
+}
+
+void spinClientContext::setSecureBroadcast(bool b)
+{
+    // On the client-side, we disable UDP polling when secureBroadcast is
+    // enabled so we don't get double messages. This means that our UDP socket
+    // buffers are getting filled without anyone reading them. If we switch off
+    // secureBroadcast, we will read a bunch of old messages stuck in the buffer
+    // so here we go through and force a recv() on all UDP sockets, and just
+    // throw away the data.
+    if (!b)
+    {
+        char buffer[128];
+        std::vector<lo_server>::iterator servIter;
+        for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
+        {
+            while (int n = recv(lo_server_get_socket_fd(*servIter), buffer, sizeof(buffer), MSG_DONTWAIT))
+            {
+                if (n<=0) break;
+            }
+        }
+    }
+
+    // Then we set the flag:
+    spinBaseContext::setSecureBroadcast(b);
 }
 
 void *spinClientContext::spinClientThread(void *arg)

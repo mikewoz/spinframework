@@ -69,6 +69,8 @@ class spinServerContext : public spinBaseContext
         int parseCommandLineOptions(osg::ArgumentParser *arguments);
 
         void refreshSubscribers();
+        
+        virtual void setSecureBroadcast(bool b);
 
         /**
          * Starts the thread that sends synchronization timecode (syncThread)
@@ -81,15 +83,6 @@ class spinServerContext : public spinBaseContext
          * messages. This is set by the --disable-auto-cleanup argument.
          */
         bool shouldAutoClean() { return autoCleanup_; }
-
-        void setSecureBroadcast(bool b) { secureBroadcast_=b; }
-        bool hasSecureBroadcast() const { return secureBroadcast_; }
-
-        void setSecureEvents(bool b) { secureEvents_=b; }
-        bool hasSecureEvents() const { return secureEvents_; }
-    
-    
-        //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
 #ifdef WITH_POCO
         bool applyHTTPMessage(std::string path, const Poco::Net::HTMLForm &form);
@@ -115,7 +108,7 @@ class spinServerContext : public spinBaseContext
 
         /// creates all our osc servers, this has to happen later because we override addresses first
         void createServers();
-
+        
         /**
          * The syncThread sends timecode on an independent multicast UDP port
          */
@@ -133,9 +126,6 @@ class spinServerContext : public spinBaseContext
         //static int infoCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
 
         static int tcpCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
-        bool secureBroadcast_;
-        bool secureEvents_;
     
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
