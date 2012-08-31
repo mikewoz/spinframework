@@ -19,6 +19,7 @@ class MotionBlurRendering : virtual public osg::Referenced
 {
     private:
         osgPPU::ShaderAttribute* motionBlurAttr;
+        osgPPU::ShaderAttribute* blurAttr;
 
     public:
         /******************/
@@ -30,7 +31,10 @@ class MotionBlurRendering : virtual public osg::Referenced
         void setMotionBlurFactor(float pFactor)
         {
             if(pFactor >= 0.f && pFactor < 1.f)
+            {
                 motionBlurAttr->set("vMotionBlurFactor", pFactor);
+                blurAttr->set("vMotionBlurFactor", pFactor);
+            }
         }
 
         /******************/
@@ -53,14 +57,52 @@ class MotionBlurRendering : virtual public osg::Referenced
                 lCurrent = pLastUnit;
             }
 
+            // We also get the motion blur values for each pixel
+            // This also contains the flag for activation of motion blur with specific value,
+            // or usage of the global value (vMotionBlurFactor)
+            osgPPU::Unit* lMotionFactor;
+            {
+                lMotionFactor = new osgPPU::UnitCameraAttachmentBypass();
+                ((osgPPU::UnitCameraAttachmentBypass*)lMotionFactor)->setBufferComponent(osg::Camera::COLOR_BUFFER3);
+                ((osgPPU::UnitCameraAttachmentBypass*)lMotionFactor)->setName("motionFactor");
+                pParent->addChild(lMotionFactor);
+            }
+
             // We keep the result of the current rendering for the next pass
-            osgPPU::UnitBypass* lPrevious = new osgPPU::UnitBypass();
-            lPrevious->setName("previous");
+            osgPPU::UnitBypass* lPreviousColor = new osgPPU::UnitBypass();
+            lPreviousColor->setName("previousColor");
+            
+            osgPPU::UnitBypass* lPreviousBlur = new osgPPU::UnitBypass();
+            lPreviousBlur->setName("previousBlur");
+
+            // The following is needed to blur behind objects, when background doesn't have the same
+            // motion blur factor
+            osgPPU::UnitInOut* lBlurBlur = new osgPPU::UnitInOut();
+            lBlurBlur->setName("blurBlur");
+            blurAttr = new osgPPU::ShaderAttribute();
+            {
+                blurAttr->addShader(osgDB::readShaderFile("motionBlur_vp.glsl", vertexOptions.get()));
+                blurAttr->addShader(osgDB::readShaderFile("motionBlur_fp.glsl", fragmentOptions.get()));
+                blurAttr->setName("blurBlurAttr");
+
+                blurAttr->add("vMotionBlurFactor", osg::Uniform::FLOAT);
+                blurAttr->set("vMotionBlurFactor", 0.8f);
+
+                blurAttr->add("vPass", osg::Uniform::INT);
+                blurAttr->set("vPass", 1);
+
+                lBlurBlur->getOrCreateStateSet()->setAttributeAndModes(blurAttr);
+                lBlurBlur->setInputTextureIndexForViewportReference(0);
+
+                lBlurBlur->setInputToUniform(lMotionFactor, "vFactorMap", true);
+                lBlurBlur->setInputToUniform(lPreviousBlur, "vPreviousMap", true);
+            }
+
+            lBlurBlur->addChild(lPreviousBlur);
 
             // Then, motion blur unit
             osgPPU::UnitInOut* lMotionBlur = new osgPPU::UnitInOut();
             lMotionBlur->setName("motionBlur");
-
             motionBlurAttr = new osgPPU::ShaderAttribute();
             {
                 motionBlurAttr->addShader(osgDB::readShaderFile("motionBlur_vp.glsl", vertexOptions.get()));
@@ -70,15 +112,21 @@ class MotionBlurRendering : virtual public osg::Referenced
                 motionBlurAttr->add("vMotionBlurFactor", osg::Uniform::FLOAT);
                 motionBlurAttr->set("vMotionBlurFactor", 0.8f);
 
+                motionBlurAttr->add("vPass", osg::Uniform::INT);
+                motionBlurAttr->set("vPass", 2);
+
                 lMotionBlur->getOrCreateStateSet()->setAttributeAndModes(motionBlurAttr);
                 lMotionBlur->setInputTextureIndexForViewportReference(0);
 
+                lMotionBlur->setInputToUniform(lBlurBlur, "vFactorMap", true);
                 lMotionBlur->setInputToUniform(lCurrent, "vCurrentMap", true);
-                lMotionBlur->setInputToUniform(lPrevious, "vPreviousMap", true);
+                // This last uniform MUST be last, otherwise the loop we are trying to create with lPreviousColor
+                // won't work. Bug in osgPPU ?
+                lMotionBlur->setInputToUniform(lPreviousColor, "vPreviousMap", true);
             }
  
-            lMotionBlur->addChild(lPrevious);
+            lMotionBlur->addChild(lPreviousColor);
 
-            pLastUnit = lPrevious;
+            pLastUnit = lMotionBlur;
         }
 };

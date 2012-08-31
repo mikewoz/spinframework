@@ -1,3 +1,9 @@
+/*
+ * Applies the blur value contained in the texBlurMap to the
+ * color map, along y axis
+ * Author: Emmanuel Durand - 2012
+*/
+
 #version 120
 
 uniform sampler2D texBlurMap;
