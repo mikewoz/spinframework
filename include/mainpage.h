@@ -92,7 +92,7 @@
  * line tools.
  * 
  * 1. Download XCode from the 
- * <a href=http://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12>
+ * <a href=http://itunes.apple.com/us/app/xcode/id497799835>
  * Mac App Store</a>
  * 2. Launch XCode, open the Preferences, select the Downloads tab and install
  * "Command Line Tools."
