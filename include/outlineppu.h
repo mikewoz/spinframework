@@ -41,7 +41,7 @@ class OutlineRendering : virtual public osg::Referenced
         {
             dilateRadius = 3.0f;
             glowRadius = 10.f;
-            glowSigma = 1.f;
+            glowSigma = 5.f;
         }
 
         /*******************/
@@ -66,13 +66,19 @@ class OutlineRendering : virtual public osg::Referenced
         }
 
         /****************/
+        void setGlowPower(float power)
+        {
+            compositeAttr->set("uGlowPower", power);
+        }
+
+        /****************/
         void setOutlineColor(float r, float g, float b, float a)
         {
             compositeAttr->set("uOutlineColor", r, g, b, a);
         }
     
         /*********/
-        void createOutlinePipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit)
+        void createOutlinePipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, float zNear, float zFar)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");            
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
@@ -108,7 +114,12 @@ class OutlineRendering : virtual public osg::Referenced
                 outlineAttr->setName("OutlineShader");
 
                 outlineAttr->add("uPass", osg::Uniform::INT);
+                outlineAttr->add("uNear", osg::Uniform::FLOAT);
+                outlineAttr->add("uFar", osg::Uniform::FLOAT);
+
                 outlineAttr->set("uPass", 1);
+                outlineAttr->set("uNear", zNear);
+                outlineAttr->set("uFar", zFar);
 
                 lEdges->getOrCreateStateSet()->setAttributeAndModes(outlineAttr);
                 lEdges->setInputToUniform(lDepth, "uDepthMap", true);
@@ -221,9 +232,11 @@ class OutlineRendering : virtual public osg::Referenced
 
                 compositeAttr->add("uPass", osg::Uniform::INT);
                 compositeAttr->add("uOutlineColor", osg::Uniform::FLOAT_VEC4);
+                compositeAttr->add("uGlowPower", osg::Uniform::FLOAT);
 
                 compositeAttr->set("uPass", 2);
                 compositeAttr->set("uOutlineColor", 1.f, 1.f, 1.f, 1.f);
+                compositeAttr->set("uGlowPower", 1.f);
 
                 lComposite->getOrCreateStateSet()->setAttributeAndModes(compositeAttr);
                 lComposite->setInputToUniform(lDilatey, "uOutlineMap", true);

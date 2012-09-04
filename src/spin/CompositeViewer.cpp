@@ -268,7 +268,9 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         {
             OutlineRendering* lOutline = new OutlineRendering();
 
-            lOutline->createOutlinePipeline(lProcessor, lastUnit);
+            double left,right,bottom,top,near,far; 
+            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far); 
+            lOutline->createOutlinePipeline(lProcessor, lastUnit, near, far);
 
             mOutlinePPUs.push_back(lOutline);
         } 
@@ -1417,9 +1419,9 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 {
                     viewer->mOutlinePPUs[i]->setGlowRadius(floatArgs[0]);
                 }
-                else if (stringArgs[0] == "outlineColor" && floatArgs.size() == 4)
+                else if (stringArgs[0] == "outlineGlowPower")
                 {
-                    viewer->mOutlinePPUs[i]->setOutlineColor(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3]);
+                    viewer->mOutlinePPUs[i]->setGlowPower(floatArgs[0]);
                 }
             }
         }
@@ -1427,7 +1429,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         
         return 1;
     }
-    else if ((theMethod=="setParam") && (stringArgs.size()==1) && (floatArgs.size()==4))
+    else if ((theMethod=="setOutlineColor"))
     // TODO: remove this from setParam, and place it in a new message like setFrustum
     {
         bool lIsOutline = (viewer->mOutlinePPUs.size() == viewer->getNumViews());
@@ -1437,12 +1439,11 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         {
             if(lIsOutline)
             {
-                if (stringArgs[0] == "outlineColor")
-                {
-                    viewer->mOutlinePPUs[i]->setOutlineColor(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3]);
-                }
+                viewer->mOutlinePPUs[i]->setOutlineColor(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3]);
             }
         }
+
+        return 1;
     }
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
     {
