@@ -603,7 +603,7 @@ void spinApp::BroadcastMessage(std::string OSCpath, lo_message msg)
     {
         spinServerContext *serv = dynamic_cast<spinServerContext*>(context_);
         
-        if (serv->hasSecureBroadcast())
+        if (serv->hasReliableBroadcast())
         {
             std::map<std::string,lo_address>::iterator addrIter;
             for (addrIter=serv->tcpClientAddrs_.begin(); addrIter!=serv->tcpClientAddrs_.end(); ++addrIter)
@@ -663,8 +663,8 @@ void spinApp::sendBundle(const std::string &OSCpath, std::vector<lo_message> msg
         // add all UDP addresses:
         addressesToSendTo = context_->lo_txAddrs_;
         
-        // also add all TCP subscribers if secure broadcast is enabled:
-        if (serv->hasSecureBroadcast())
+        // also add all TCP subscribers if reliableBroadcast is enabled:
+        if (serv->hasReliableBroadcast())
         {
             std::map<std::string,lo_address>::iterator addrIter;
             for (addrIter=serv->tcpClientAddrs_.begin(); addrIter!=serv->tcpClientAddrs_.end(); ++addrIter)

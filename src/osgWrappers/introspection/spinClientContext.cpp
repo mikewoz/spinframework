@@ -51,19 +51,19 @@ BEGIN_OBJECT_REFLECTOR(spin::spinClientContext)
 	          __int__pollUpdates,
 	          "",
 	          "");
-	I_Method1(void, setSecureBroadcast, IN, bool, b,
+	I_Method1(void, setReliableBroadcast, IN, bool, b,
 	          Properties::VIRTUAL,
-	          __void__setSecureBroadcast__bool,
+	          __void__setReliableBroadcast__bool,
 	          "",
-	          "Enabling secure broadcast means that TCP subscribers will be notified by TCP of EVERY node and scene update. This is in addition to the regular multicast, so subscribers who also listen to multicast will receive duplicate messages. In the case of spinviewer, we stop polling UDP receivers when this flag is set (see pollUpdates() in spinClientContext). ");
+	          "Reliable broadcast means that TCP subscribers will be notified by TCP of EVERY node and scene update. This is in addition to the regular multicast, so subscribers who also listen to multicast will receive duplicate messages. In the case of spinviewer, we stop polling UDP receivers when this flag is set (see pollUpdates() in spinClientContext). ");
 	I_Method0(void, subscribe,
 	          Properties::NON_VIRTUAL,
 	          __void__subscribe,
 	          "",
 	          "Register the client's ip and port for reliable communication with the server ");
-	I_SimpleProperty(bool, SecureBroadcast, 
+	I_SimpleProperty(bool, ReliableBroadcast, 
 	                 0, 
-	                 __void__setSecureBroadcast__bool);
+	                 __void__setReliableBroadcast__bool);
 	I_PublicMemberProperty(lo_server, lo_syncServ);
 END_REFLECTOR
 

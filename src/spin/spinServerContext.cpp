@@ -112,10 +112,10 @@ void spinServerContext::debugPrint()
     else
         std::cout << "  Auto-clean users:\t\tDISABLED" << std::endl;
 
-    if (secureBroadcast_)
-        std::cout << "  Secure Broadcast:\t\tENABLED" << std::endl;
+    if (reliableBroadcast_)
+        std::cout << "  Reliable Broadcast:\t\tENABLED" << std::endl;
     else
-        std::cout << "  Secure Broadcast:\t\tDISABLED" << std::endl;
+        std::cout << "  Reliable Broadcast:\t\tDISABLED" << std::endl;
 
     if (tcpClientAddrs_.size())
     {
@@ -195,17 +195,17 @@ int spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     return 1;
 }
 
-void spinServerContext::setSecureBroadcast(bool b)
+void spinServerContext::setReliableBroadcast(bool b)
 {
-    // First, make sure that this message goes out securely to all clients:
+    // First, make sure that this message goes out reliability to all clients:
     std::map<std::string,lo_address>::iterator addrIter;
     for (addrIter=tcpClientAddrs_.begin(); addrIter!=tcpClientAddrs_.end(); ++addrIter)
     {
-        lo_send(addrIter->second, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "si", "setSecureBroadcast", b);
+        lo_send(addrIter->second, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "si", "setReliableBroadcast", b);
     }
     
     // Then set the flag for subsequent messages:
-    spinBaseContext::setSecureBroadcast(b);
+    spinBaseContext::setReliableBroadcast(b);
 }
 
 

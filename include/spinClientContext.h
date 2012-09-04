@@ -68,7 +68,7 @@ class spinClientContext : public spinBaseContext
         lo_server lo_syncServ;
 
         int pollUpdates();
-        void setSecureBroadcast(bool b);
+        void setReliableBroadcast(bool b);
 
 
         /**

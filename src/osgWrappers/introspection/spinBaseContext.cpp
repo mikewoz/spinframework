@@ -97,14 +97,14 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	          __void__setTTL__int,
 	          "",
 	          "Set the time-to-live for multicast packets (corresponds to the number of routers a packet will hop). ");
-	I_Method1(void, setSecureBroadcast, IN, bool, b,
+	I_Method1(void, setReliableBroadcast, IN, bool, b,
 	          Properties::VIRTUAL,
-	          __void__setSecureBroadcast__bool,
+	          __void__setReliableBroadcast__bool,
 	          "",
-	          "Enabling secure broadcast means that TCP subscribers will be notified by TCP of EVERY node and scene update. This is in addition to the regular multicast, so subscribers who also listen to multicast will receive duplicate messages. In the case of spinviewer, we stop polling UDP receivers when this flag is set (see pollUpdates() in spinClientContext). ");
-	I_Method0(bool, hasSecureBroadcast,
+	          "Reliable broadcast means that TCP subscribers will be notified by TCP of EVERY node and scene update. This is in addition to the regular multicast, so subscribers who also listen to multicast will receive duplicate messages. In the case of spinviewer, we stop polling UDP receivers when this flag is set (see pollUpdates() in spinClientContext). ");
+	I_Method0(bool, hasReliableBroadcast,
 	          Properties::NON_VIRTUAL,
-	          __bool__hasSecureBroadcast,
+	          __bool__hasReliableBroadcast,
 	          "",
 	          "");
 	I_StaticMethod1(void, sigHandler, IN, int, signum,
@@ -147,9 +147,9 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	                   __void__createServers,
 	                   "",
 	                   "this method is used by both spinClientContext and spinServerContext ");
-	I_SimpleProperty(bool, SecureBroadcast, 
+	I_SimpleProperty(bool, ReliableBroadcast, 
 	                 0, 
-	                 __void__setSecureBroadcast__bool);
+	                 __void__setReliableBroadcast__bool);
 	I_SimpleProperty(int, TTL, 
 	                 0, 
 	                 __void__setTTL__int);

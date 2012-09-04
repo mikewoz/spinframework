@@ -227,7 +227,7 @@ int spinClientContext::pollUpdates()
 {
 	static const int TIMEOUT = 0;
 	int recv = 0; // bytes received (note: might not be accurate for TCP)
-    if (!secureBroadcast_)
+    if (!reliableBroadcast_)
     {
         for (std::vector<lo_server>::iterator it = lo_rxServs_.begin(); it != lo_rxServs_.end(); ++it)
         {
@@ -241,12 +241,12 @@ int spinClientContext::pollUpdates()
 	return recv;
 }
 
-void spinClientContext::setSecureBroadcast(bool b)
+void spinClientContext::setReliableBroadcast(bool b)
 {
-    // On the client-side, we disable UDP polling when secureBroadcast is
+    // On the client-side, we disable UDP polling when reliableBroadcast is
     // enabled so we don't get double messages. This means that our UDP socket
     // buffers are getting filled without anyone reading them. If we switch off
-    // secureBroadcast, we will read a bunch of old messages stuck in the buffer
+    // reliableBroadcast, we will read a bunch of old messages stuck in the buffer
     // so here we go through and force a recv() on all UDP sockets, and just
     // throw away the data.
     if (!b)
@@ -263,7 +263,7 @@ void spinClientContext::setSecureBroadcast(bool b)
     }
 
     // Then we set the flag:
-    spinBaseContext::setSecureBroadcast(b);
+    spinBaseContext::setReliableBroadcast(b);
 }
 
 void *spinClientContext::spinClientThread(void *arg)

@@ -155,7 +155,7 @@ class spinBaseContext
         void setTTL(int ttl);
 
         /**
-         * Enabling secure broadcast means that TCP subscribers will be notified
+         * Reliable broadcast means that TCP subscribers will be notified
          * by TCP of EVERY node and scene update. This is in addition to the
          * regular multicast, so subscribers who also listen to multicast will
          * receive duplicate messages. In the case of spinviewer, we stop
@@ -163,8 +163,8 @@ class spinBaseContext
          * spinClientContext).
          *
          */
-        virtual void setSecureBroadcast(bool b);
-        bool hasSecureBroadcast() const { return secureBroadcast_; }
+        virtual void setReliableBroadcast(bool b);
+        bool hasReliableBroadcast() const { return reliableBroadcast_; }
 
         /**
          * List of clients to send to, each is an address and port
@@ -280,7 +280,7 @@ class spinBaseContext
          */
         virtual void createServers() = 0;
         
-        bool secureBroadcast_;
+        bool reliableBroadcast_;
 
     private:
         // pthread stuff

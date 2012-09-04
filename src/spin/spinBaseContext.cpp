@@ -101,7 +101,7 @@ spinBaseContext::spinBaseContext() :
     doDiscovery_(true),
     autoPorts_(true),
     running(false),
-    secureBroadcast_(false)
+    reliableBroadcast_(false)
 {
     using namespace spin_defaults;
     
@@ -290,9 +290,9 @@ void spinBaseContext::setTTL(int ttl)
     lo_address_set_ttl(lo_syncAddr, ttl);
 }
 
-void spinBaseContext::setSecureBroadcast(bool b)
+void spinBaseContext::setReliableBroadcast(bool b)
 {
-    secureBroadcast_=b;
+    reliableBroadcast_=b;
 }
 
 void spinBaseContext::addInfoHandler(EventHandler *obs)
@@ -802,9 +802,9 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             spin.BroadcastSceneMessage("s", "debug", SPIN_ARGS_END);
         }
     }
-    else if ((theMethod == "setSecureBroadcast") && (argc==2))
+    else if ((theMethod == "setReliableBroadcast") && (argc==2))
     {
-        spin.getContext()->setSecureBroadcast((bool)lo_hires_val((lo_type)types[1], argv[1]));
+        spin.getContext()->setReliableBroadcast((bool)lo_hires_val((lo_type)types[1], argv[1]));
     }
     else if (theMethod == "clear")
         sceneManager->clear();

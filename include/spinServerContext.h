@@ -70,7 +70,7 @@ class spinServerContext : public spinBaseContext
 
         void refreshSubscribers();
         
-        virtual void setSecureBroadcast(bool b);
+        virtual void setReliableBroadcast(bool b);
 
         /**
          * Starts the thread that sends synchronization timecode (syncThread)
