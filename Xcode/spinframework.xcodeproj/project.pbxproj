@@ -246,7 +246,6 @@
 		1C386CBB14BD3DF60065851F /* libloUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9114BD3DF60065851F /* libloUtil.cpp */; };
 		1C386CBC14BD3DF60065851F /* LightSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9214BD3DF60065851F /* LightSource.cpp */; };
 		1C386CBD14BD3DF60065851F /* Listener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9314BD3DF60065851F /* Listener.cpp */; };
-		1C386CBE14BD3DF60065851F /* MeasurementNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9414BD3DF60065851F /* MeasurementNode.cpp */; };
 		1C386CC014BD3DF60065851F /* Menu3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9614BD3DF60065851F /* Menu3D.cpp */; };
 		1C386CC114BD3DF60065851F /* ModelNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9714BD3DF60065851F /* ModelNode.cpp */; };
 		1C386CC214BD3DF60065851F /* nodeVisitors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C9814BD3DF60065851F /* nodeVisitors.cpp */; };
@@ -547,7 +546,6 @@
 		1CA24D5E14BE2875007A9C31 /* ImageTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4214BE2875007A9C31 /* ImageTexture.cpp */; };
 		1CA24D5F14BE2875007A9C31 /* LightSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4314BE2875007A9C31 /* LightSource.cpp */; };
 		1CA24D6014BE2875007A9C31 /* Listener.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4414BE2875007A9C31 /* Listener.cpp */; };
-		1CA24D6114BE2875007A9C31 /* MeasurementNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4514BE2875007A9C31 /* MeasurementNode.cpp */; };
 		1CA24D6214BE2875007A9C31 /* Menu3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4614BE2875007A9C31 /* Menu3D.cpp */; };
 		1CA24D6314BE2875007A9C31 /* ModelNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4714BE2875007A9C31 /* ModelNode.cpp */; };
 		1CA24D6414BE2875007A9C31 /* PointerNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CA24D4814BE2875007A9C31 /* PointerNode.cpp */; };
@@ -580,7 +578,6 @@
 		1CA24DB414BE2892007A9C31 /* LightSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8014BE2892007A9C31 /* LightSource.h */; };
 		1CA24DB514BE2892007A9C31 /* Listener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8114BE2892007A9C31 /* Listener.h */; };
 		1CA24DB614BE2892007A9C31 /* mainpage.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8214BE2892007A9C31 /* mainpage.h */; };
-		1CA24DB714BE2892007A9C31 /* MeasurementNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8314BE2892007A9C31 /* MeasurementNode.h */; };
 		1CA24DB914BE2892007A9C31 /* Menu3D.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8514BE2892007A9C31 /* Menu3D.h */; };
 		1CA24DBA14BE2892007A9C31 /* ModelNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8614BE2892007A9C31 /* ModelNode.h */; };
 		1CA24DBB14BE2892007A9C31 /* nodeVisitors.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D8714BE2892007A9C31 /* nodeVisitors.h */; };
@@ -1111,7 +1108,6 @@
 		1C386C9114BD3DF60065851F /* libloUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = libloUtil.cpp; path = ../src/spin/libloUtil.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9214BD3DF60065851F /* LightSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LightSource.cpp; path = ../src/spin/LightSource.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9314BD3DF60065851F /* Listener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Listener.cpp; path = ../src/spin/Listener.cpp; sourceTree = SOURCE_ROOT; };
-		1C386C9414BD3DF60065851F /* MeasurementNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeasurementNode.cpp; path = ../src/spin/MeasurementNode.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9614BD3DF60065851F /* Menu3D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Menu3D.cpp; path = ../src/spin/Menu3D.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9714BD3DF60065851F /* ModelNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ModelNode.cpp; path = ../src/spin/ModelNode.cpp; sourceTree = SOURCE_ROOT; };
 		1C386C9814BD3DF60065851F /* nodeVisitors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nodeVisitors.cpp; path = ../src/spin/nodeVisitors.cpp; sourceTree = SOURCE_ROOT; };
@@ -1357,7 +1353,6 @@
 		1CA24D4214BE2875007A9C31 /* ImageTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImageTexture.cpp; path = ../src/osgWrappers/introspection/ImageTexture.cpp; sourceTree = "<group>"; };
 		1CA24D4314BE2875007A9C31 /* LightSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LightSource.cpp; path = ../src/osgWrappers/introspection/LightSource.cpp; sourceTree = "<group>"; };
 		1CA24D4414BE2875007A9C31 /* Listener.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Listener.cpp; path = ../src/osgWrappers/introspection/Listener.cpp; sourceTree = "<group>"; };
-		1CA24D4514BE2875007A9C31 /* MeasurementNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MeasurementNode.cpp; path = ../src/osgWrappers/introspection/MeasurementNode.cpp; sourceTree = "<group>"; };
 		1CA24D4614BE2875007A9C31 /* Menu3D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Menu3D.cpp; path = ../src/osgWrappers/introspection/Menu3D.cpp; sourceTree = "<group>"; };
 		1CA24D4714BE2875007A9C31 /* ModelNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ModelNode.cpp; path = ../src/osgWrappers/introspection/ModelNode.cpp; sourceTree = "<group>"; };
 		1CA24D4814BE2875007A9C31 /* PointerNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PointerNode.cpp; path = ../src/osgWrappers/introspection/PointerNode.cpp; sourceTree = "<group>"; };
@@ -1390,7 +1385,6 @@
 		1CA24D8014BE2892007A9C31 /* LightSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LightSource.h; path = ../include/LightSource.h; sourceTree = "<group>"; };
 		1CA24D8114BE2892007A9C31 /* Listener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Listener.h; path = ../include/Listener.h; sourceTree = "<group>"; };
 		1CA24D8214BE2892007A9C31 /* mainpage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mainpage.h; path = ../include/mainpage.h; sourceTree = "<group>"; };
-		1CA24D8314BE2892007A9C31 /* MeasurementNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MeasurementNode.h; path = ../include/MeasurementNode.h; sourceTree = "<group>"; };
 		1CA24D8514BE2892007A9C31 /* Menu3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Menu3D.h; path = ../include/Menu3D.h; sourceTree = "<group>"; };
 		1CA24D8614BE2892007A9C31 /* ModelNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ModelNode.h; path = ../include/ModelNode.h; sourceTree = "<group>"; };
 		1CA24D8714BE2892007A9C31 /* nodeVisitors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nodeVisitors.h; path = ../include/nodeVisitors.h; sourceTree = "<group>"; };
@@ -1840,7 +1834,6 @@
 				1C386C9114BD3DF60065851F /* libloUtil.cpp */,
 				1C386C9214BD3DF60065851F /* LightSource.cpp */,
 				1C386C9314BD3DF60065851F /* Listener.cpp */,
-				1C386C9414BD3DF60065851F /* MeasurementNode.cpp */,
 				1C386C9614BD3DF60065851F /* Menu3D.cpp */,
 				1C386C9714BD3DF60065851F /* ModelNode.cpp */,
 				1C386C9814BD3DF60065851F /* nodeVisitors.cpp */,
@@ -1903,7 +1896,6 @@
 				1CA24D8014BE2892007A9C31 /* LightSource.h */,
 				1CA24D8114BE2892007A9C31 /* Listener.h */,
 				1CA24D8214BE2892007A9C31 /* mainpage.h */,
-				1CA24D8314BE2892007A9C31 /* MeasurementNode.h */,
 				1CA24D8514BE2892007A9C31 /* Menu3D.h */,
 				1CA24D8614BE2892007A9C31 /* ModelNode.h */,
 				1CA24D8714BE2892007A9C31 /* nodeVisitors.h */,
@@ -1962,7 +1954,6 @@
 				1CA24D4214BE2875007A9C31 /* ImageTexture.cpp */,
 				1CA24D4314BE2875007A9C31 /* LightSource.cpp */,
 				1CA24D4414BE2875007A9C31 /* Listener.cpp */,
-				1CA24D4514BE2875007A9C31 /* MeasurementNode.cpp */,
 				1CA24D4614BE2875007A9C31 /* Menu3D.cpp */,
 				1CA24D4714BE2875007A9C31 /* ModelNode.cpp */,
 				1CF94955151CD43C00628872 /* ParticleSystem.cpp */,
@@ -2408,7 +2399,6 @@
 				1CA24DB414BE2892007A9C31 /* LightSource.h in Headers */,
 				1CA24DB514BE2892007A9C31 /* Listener.h in Headers */,
 				1CA24DB614BE2892007A9C31 /* mainpage.h in Headers */,
-				1CA24DB714BE2892007A9C31 /* MeasurementNode.h in Headers */,
 				1CA24DB914BE2892007A9C31 /* Menu3D.h in Headers */,
 				1CA24DBA14BE2892007A9C31 /* ModelNode.h in Headers */,
 				1CA24DBB14BE2892007A9C31 /* nodeVisitors.h in Headers */,
@@ -2806,7 +2796,6 @@
 				1C386CBB14BD3DF60065851F /* libloUtil.cpp in Sources */,
 				1C386CBC14BD3DF60065851F /* LightSource.cpp in Sources */,
 				1C386CBD14BD3DF60065851F /* Listener.cpp in Sources */,
-				1C386CBE14BD3DF60065851F /* MeasurementNode.cpp in Sources */,
 				1C386CC014BD3DF60065851F /* Menu3D.cpp in Sources */,
 				1C386CC114BD3DF60065851F /* ModelNode.cpp in Sources */,
 				1C386CC214BD3DF60065851F /* nodeVisitors.cpp in Sources */,
@@ -2843,7 +2832,6 @@
 				1CA24D5E14BE2875007A9C31 /* ImageTexture.cpp in Sources */,
 				1CA24D5F14BE2875007A9C31 /* LightSource.cpp in Sources */,
 				1CA24D6014BE2875007A9C31 /* Listener.cpp in Sources */,
-				1CA24D6114BE2875007A9C31 /* MeasurementNode.cpp in Sources */,
 				1CA24D6214BE2875007A9C31 /* Menu3D.cpp in Sources */,
 				1CA24D6314BE2875007A9C31 /* ModelNode.cpp in Sources */,
 				1CA24D6414BE2875007A9C31 /* PointerNode.cpp in Sources */,
