@@ -247,7 +247,7 @@
  * skip this step for now.</b>
  * 
  * 1. Downalod XCode from the
- * <a href=http://itunes.apple.com/us/app/xcode/id497799835?ls=1&mt=12>
+ * <a href=http://itunes.apple.com/us/app/xcode/id497799835>
  * Mac App Store</a>.<br>
  * 2. Launch XCode, open the preferences, select the Downloads tab and "Install
  * command line tools."<br>
