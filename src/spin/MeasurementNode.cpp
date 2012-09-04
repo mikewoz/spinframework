@@ -61,7 +61,7 @@ MeasurementNode::MeasurementNode (SceneManager *sceneManager, const char* initID
     thisMatrix_.makeIdentity();
     targetMatrix_.makeIdentity();
 
-    this->setNodeMask(STATSDATA_NODE_MASK); // nodemask info in spinUtil.h
+    this->setNodeMask(DEBUGVIEW_NODE_MASK); // nodemask info in spinUtil.h
 }
 
 // *****************************************************************************

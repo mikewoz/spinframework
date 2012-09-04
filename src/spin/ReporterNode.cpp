@@ -58,7 +58,7 @@ ReporterNode::ReporterNode (SceneManager *sceneManager, const char* initID) : Gr
     this->setName(this->getID() + ".ReporterNode");
     this->setNodeType("ReporterNode");
 
-	maxRate_ = 20.0;
+    maxRate_ = 20.0;
 
     reporting_["DISTANCE"] = false;
     reporting_["INCIDENCE"] = false;
@@ -68,7 +68,7 @@ ReporterNode::ReporterNode (SceneManager *sceneManager, const char* initID) : Gr
 
     matrix_.makeIdentity();
 
-    this->setNodeMask(STATSDATA_NODE_MASK); // nodemask info in spinUtil.h
+    this->setNodeMask(DEBUGVIEW_NODE_MASK); // nodemask info in spinUtil.h
 
     lastTick = osg::Timer::instance()->tick();
 }
@@ -76,8 +76,8 @@ ReporterNode::ReporterNode (SceneManager *sceneManager, const char* initID) : Gr
 // destructor
 ReporterNode::~ReporterNode()
 {
-	targets_.clear();
-	reporting_.clear();
+    targets_.clear();
+    reporting_.clear();
 }
 
 // *****************************************************************************
@@ -88,7 +88,7 @@ void ReporterNode::debug()
     std::vector<reporterTarget>::const_iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
-    	if ((*t).node.valid()) std::cout << " " << (*t).node->getID();
+        if ((*t).node.valid()) std::cout << " " << (*t).node->getID();
     }
     std::cout << std::endl;
 }
@@ -105,33 +105,33 @@ void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
     float dt = osg::Timer::instance()->delta_s(lastTick,tick);
     if (dt > 1/maxRate_) // only update when dt is at least 0.05s (ie 20hz):
     {
-		std::vector<reporterTarget>::iterator t;
+        std::vector<reporterTarget>::iterator t;
 
-		osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath_);
-		if (matrix_!=mthis)
-		{
+        osg::Matrixd mthis = osg::computeLocalToWorld(this->currentNodePath_);
+        if (matrix_!=mthis)
+        {
             for (t = targets_.begin(); t != targets_.end(); ++t)
             {
                 if ((*t).node.valid())
                     (*t).needReport = true;
-			}
-			matrix_ = mthis;
-		}
+            }
+            matrix_ = mthis;
+        }
 
-		for (t = targets_.begin(); t != targets_.end();)
-		{
-			if ((*t).node.valid())
-			{
-				osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath_);
+        for (t = targets_.begin(); t != targets_.end();)
+        {
+            if ((*t).node.valid())
+            {
+                osg::Matrixd mtarget = osg::computeLocalToWorld((*t).node->currentNodePath_);
 
-				// if there is a change in this node's matrix or the target,
+                // if there is a change in this node's matrix or the target,
                 // we need to send an updated report:
-				if ((*t).matrix!=mtarget)
-				{
-					(*t).needReport = true;
-					(*t).matrix = mtarget;
-				}
-                
+                if ((*t).matrix!=mtarget)
+                {
+                    (*t).needReport = true;
+                    (*t).matrix = mtarget;
+                }
+
                 // if the target is suddenly not in the graph anymore (or has
                 // re-appeared)... eg, because of SwitchNode, then we need to
                 // force a new report:
@@ -141,24 +141,24 @@ void ReporterNode::callbackUpdate(osg::NodeVisitor* nv)
                     (*t).needReport = true;
                     (*t).inGraph = targetInGraph;
                 }
-                
+
                 // if anything flagged the need for a new report, let's do it:
                 if ((*t).needReport)
                     sendReports(&(*t));
-                    
-				t++;
-			}
 
-			else
-			{
-				// the node has been deleted, so we need to remove this target from
-				// the list
-				targets_.erase(t); // t++ is implicit
-			}
-		}
+                t++;
+            }
 
-		lastTick = tick;
-	}
+            else
+            {
+                // the node has been deleted, so we need to remove this target from
+                // the list
+                targets_.erase(t); // t++ is implicit
+            }
+        }
+
+        lastTick = tick;
+    }
 }
 
 void ReporterNode::forceAllReports()
@@ -172,15 +172,15 @@ void ReporterNode::forceAllReports()
 
 void ReporterNode::sendReports(reporterTarget *target)
 {
-	if (!spinApp::Instance().getContext()->isServer()) return;
+    if (!spinApp::Instance().getContext()->isServer()) return;
 
-	// check that at least one report is required:
-	bool allDisabled = true;
+    // check that at least one report is required:
+    bool allDisabled = true;
     for (ReportingType::iterator i=reporting_.begin(); i!=reporting_.end(); i++)
     {
-	    if (i->second) allDisabled = false;
+        if (i->second) allDisabled = false;
     }
-	if (allDisabled) return;
+    if (allDisabled) return;
 
     std::vector<lo_message> msgs;
     lo_message msg;
@@ -206,15 +206,15 @@ void ReporterNode::sendReports(reporterTarget *target)
 
     if (reporting_["DISTANCE"])
     {
-    	msg = lo_message_new();
-    	lo_message_add( msg, "ssf", "distance", target->node->getID().c_str(), connection_vector.length() );
-    	msgs.push_back(msg);
+        msg = lo_message_new();
+        lo_message_add( msg, "ssf", "distance", target->node->getID().c_str(), connection_vector.length() );
+        msgs.push_back(msg);
     }
 
     if (reporting_["INCIDENCE"])
     {
-    	// incidence: angle difference between current orientation to that which
-    	// would point at the target
+        // incidence: angle difference between current orientation to that which
+        // would point at the target
         double incidence = AngleBetweenVectors(src_dir, connection_vector);
 
         msg = lo_message_new();
@@ -275,7 +275,7 @@ void ReporterNode::sendReports(reporterTarget *target)
         {
             isContained = false;
         }
-        
+
         // run the IntersectionVisitor if we are within the bounding radius
         // of the target node:
         else if (connection_vector.length() < target->node->getBound().radius())
@@ -288,9 +288,9 @@ void ReporterNode::sendReports(reporterTarget *target)
             // are not checked for intersections:
             //intersectVisitor.setTraversalMask(GEOMETRIC_NODE_MASK|INTERACTIVE_NODE_MASK);
             //intersectVisitor.setTraversalMask(!DEBUGVIEW_NODE_MASK);
-            
+
             sceneManager_->rootNode->accept(intersectVisitor);
-            
+
 
             // If there are some intersections, they could be with some other
             // objects within the target's hull, so we have to check all
@@ -299,7 +299,7 @@ void ReporterNode::sendReports(reporterTarget *target)
             if (intersector->containsIntersections())
             {
                 isContained = true;
-                
+
                 osgUtil::LineSegmentIntersector::Intersections& intersections = intersector->getIntersections();
                 osgUtil::LineSegmentIntersector::Intersections::iterator itr;
 
@@ -329,7 +329,7 @@ void ReporterNode::sendReports(reporterTarget *target)
             }
         }
 
-        
+
         // check for change in containment, and if so, send a message:
         if (target->contained != isContained)
         {
@@ -339,39 +339,39 @@ void ReporterNode::sendReports(reporterTarget *target)
             msgs.push_back(msg);
         }
     }
-    
+
     if (reporting_["OCCLUSION"])
     {
-    	// TODO
+        // TODO
     }
 
     if (msgs.size())
-    	spinApp::Instance().NodeBundle(this->getID(), msgs);
-        
+        spinApp::Instance().NodeBundle(this->getID(), msgs);
+
     target->needReport = false;
 }
 
 // *****************************************************************************
 void ReporterNode::addTarget (const char *targetID)
 {
-	// get ReferencedNode for theat ID:
-	osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
+    // get ReferencedNode for theat ID:
+    osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
 
-	if (!n.valid())
-	{
-		std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but no node by that name could be found" << std::endl;
-		return;
-	}
+    if (!n.valid())
+    {
+        std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+        return;
+    }
 
-	// check if node is already in the list:
+    // check if node is already in the list:
     std::vector<reporterTarget>::iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
-    	if (n.get()==(*t).node.get())
-    	{
-    		//std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
-    		return;
-    	}
+        if (n.get()==(*t).node.get())
+        {
+            //std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to addTarget '" << targetID << "', but that node is already in the list" << std::endl;
+            return;
+        }
     }
 
     // add it to the list:
@@ -391,62 +391,62 @@ void ReporterNode::addTarget (const char *targetID)
 
 void ReporterNode::removeTarget (const char *targetID)
 {
-	// get ReferencedNode for the ID:
-	osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
+    // get ReferencedNode for the ID:
+    osg::ref_ptr<ReferencedNode> n = sceneManager_->getNode(targetID);
 
-	if (!n.valid())
-	{
-		std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
-		return;
-	}
+    if (!n.valid())
+    {
+        std::cout << "WARNING: reporterNode '" << this->getID() << "' tried to removeTarget '" << targetID << "', but no node by that name could be found" << std::endl;
+        return;
+    }
 
-	// find it in the list, and remove it:
+    // find it in the list, and remove it:
     std::vector<reporterTarget>::iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
-    	if (n.get()==(*t).node.get())
-    	{
-    		targets_.erase(t);
-    		BROADCAST(this, "ss", "removeTarget", targetID);
-    		break;
-    	}
+        if (n.get()==(*t).node.get())
+        {
+            targets_.erase(t);
+            BROADCAST(this, "ss", "removeTarget", targetID);
+            break;
+        }
     }
 }
 
 void ReporterNode::setReporting (const char *type, bool enabled)
 {
-	// make sure type exists:
-	ReportingType::iterator typeKey = reporting_.find(type);
-	if (typeKey!=reporting_.end())
-	{
-		reporting_[type] = enabled;
+    // make sure type exists:
+    ReportingType::iterator typeKey = reporting_.find(type);
+    if (typeKey!=reporting_.end())
+    {
+        reporting_[type] = enabled;
 
-		BROADCAST(this, "ssi", "setReporting", type, getReporting(type));
+        BROADCAST(this, "ssi", "setReporting", type, getReporting(type));
 
-		// if we've just turned on a report mode, we need to force one
-		// computation for all  targets:
-		//if (enabled) callbackUpdate();
+        // if we've just turned on a report mode, we need to force one
+        // computation for all  targets:
+        //if (enabled) callbackUpdate();
 
-		if (enabled)
-		{
-			std::vector<reporterTarget>::iterator t;
-			for (t = targets_.begin(); t != targets_.end(); t++)
-			{
-				if ((*t).node.valid())
-				{
-					(*t).matrix = osg::computeLocalToWorld((*t).node->currentNodePath_);
-					this->sendReports(&(*t));
-				}
-			}
-		}
+        if (enabled)
+        {
+            std::vector<reporterTarget>::iterator t;
+            for (t = targets_.begin(); t != targets_.end(); t++)
+            {
+                if ((*t).node.valid())
+                {
+                    (*t).matrix = osg::computeLocalToWorld((*t).node->currentNodePath_);
+                    this->sendReports(&(*t));
+                }
+            }
+        }
 
-	}
+    }
 }
 
 void ReporterNode::setMaxRate(float hz)
 {
-	maxRate_ = hz;
-	BROADCAST(this, "sf", "setMaxRate", maxRate_);
+    maxRate_ = hz;
+    BROADCAST(this, "sf", "setMaxRate", maxRate_);
 }
 
 
@@ -469,25 +469,25 @@ std::vector<lo_message> ReporterNode::getState () const
     std::vector<reporterTarget>::const_iterator t;
     for (t = targets_.begin(); t != targets_.end(); t++)
     {
-    	if ((*t).node.valid())
-		{
-    		msg = lo_message_new();
-    		lo_message_add(msg, "ss", "addTarget", (*t).node->getID().c_str());
-    		ret.push_back(msg);
-		}
+        if ((*t).node.valid())
+        {
+            msg = lo_message_new();
+            lo_message_add(msg, "ss", "addTarget", (*t).node->getID().c_str());
+            ret.push_back(msg);
+        }
     }
 
-	msg = lo_message_new();
-	lo_message_add(msg, "sf", "setMaxRate", getMaxRate());
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setMaxRate", getMaxRate());
     ret.push_back(msg);
 
 
     return ret;
 }
-	
-int ReporterNode::getReporting(const char *type) const 
-{ 
-    // don't do return (int)reporting_[type] because if report_[type] doesn't 
+
+int ReporterNode::getReporting(const char *type) const
+{
+    // don't do return (int)reporting_[type] because if report_[type] doesn't
     // exist, it will be created with a default value
     std::map<std::string, bool>::const_iterator iter = reporting_.find(type);
     if (iter != reporting_.end())
