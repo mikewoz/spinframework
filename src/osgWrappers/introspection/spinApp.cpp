@@ -26,7 +26,7 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	I_StaticMethod0(spin::spinApp &, Instance,
 	                __spinApp_R1__Instance_S,
 	                "",
-	                "Meyers Singleton design patternFIXME: Do we really need this? ");
+	                "Meyers Singleton design pattern ");
 	I_Method1(void, setContext, IN, spin::spinBaseContext *, c,
 	          Properties::NON_VIRTUAL,
 	          __void__setContext__spinBaseContext_P1,
@@ -56,45 +56,45 @@ BEGIN_OBJECT_REFLECTOR(spin::spinApp)
 	          Properties::NON_VIRTUAL,
 	          __void__InfoMessage__C5_std_string_R1__C5_char_P1__...,
 	          "",
-	          "This sends a variable length message.IMPORTANT: the list must be terminated with SPIN_ARGS_END, or this call will fail. This is used to do simple error checking on the sizes of parameters passed. ");
-	I_Method3(void, spin::InfoMessage, IN, const std::string &, OSCpath, IN, const char *, types, IN, va_list, ap,
-	          Properties::NON_VIRTUAL,
-	          __void__InfoMessage__C5_std_string_R1__C5_char_P1__va_list,
-	          "",
-	          "");
+	          "Send a variable length message on the INFO channel. Note: the list must be terminated with SPIN_ARGS_END, or this call will fail. ");
 	I_Method2(void, spin::InfoMessage, IN, const std::string &, OSCpath, IN, lo_message, msg,
 	          Properties::NON_VIRTUAL,
 	          __void__InfoMessage__C5_std_string_R1__lo_message,
-	          "",
-	          "");
-	I_Method2(void, SceneMessage, IN, const char *, types, IN, ..., x,
-	          Properties::NON_VIRTUAL,
-	          __void__SceneMessage__C5_char_P1__...,
-	          "",
-	          "");
-	I_Method2(void, SceneMessage, IN, const char *, types, IN, va_list, ap,
-	          Properties::NON_VIRTUAL,
-	          __void__SceneMessage__C5_char_P1__va_list,
-	          "",
-	          "");
-	I_Method1(void, SceneMessage, IN, lo_message, msg,
-	          Properties::NON_VIRTUAL,
-	          __void__SceneMessage__lo_message,
 	          "",
 	          "");
 	I_Method3(void, NodeMessage, IN, const char *, nodeId, IN, const char *, types, IN, ..., x,
 	          Properties::NON_VIRTUAL,
 	          __void__NodeMessage__C5_char_P1__C5_char_P1__...,
 	          "",
-	          "");
-	I_Method3(void, NodeMessage, IN, const char *, nodeId, IN, const char *, types, IN, va_list, ap,
-	          Properties::NON_VIRTUAL,
-	          __void__NodeMessage__C5_char_P1__C5_char_P1__va_list,
-	          "",
-	          "");
+	          "Send a variable length message to a particular node. Note: the list must be terminated with SPIN_ARGS_END, or this call will fail. ");
 	I_Method2(void, NodeMessage, IN, const char *, nodeId, IN, lo_message, msg,
 	          Properties::NON_VIRTUAL,
 	          __void__NodeMessage__C5_char_P1__lo_message,
+	          "",
+	          "");
+	I_Method3(void, BroadcastNodeMessage, IN, const char *, nodeId, IN, const char *, types, IN, ..., x,
+	          Properties::NON_VIRTUAL,
+	          __void__BroadcastNodeMessage__C5_char_P1__C5_char_P1__...,
+	          "",
+	          "");
+	I_Method2(void, SceneMessage, IN, const char *, types, IN, ..., x,
+	          Properties::NON_VIRTUAL,
+	          __void__SceneMessage__C5_char_P1__...,
+	          "",
+	          "Send a variable length message to the SCENE namespace. Note: the list must be terminated with SPIN_ARGS_END, or this call will fail. ");
+	I_Method1(void, SceneMessage, IN, lo_message, msg,
+	          Properties::NON_VIRTUAL,
+	          __void__SceneMessage__lo_message,
+	          "",
+	          "");
+	I_Method2(void, BroadcastSceneMessage, IN, const char *, types, IN, ..., x,
+	          Properties::NON_VIRTUAL,
+	          __void__BroadcastSceneMessage__C5_char_P1__...,
+	          "",
+	          "");
+	I_Method2(void, BroadcastMessage, IN, std::string, OSCpath, IN, lo_message, msg,
+	          Properties::NON_VIRTUAL,
+	          __void__BroadcastMessage__std_string__lo_message,
 	          "",
 	          "");
 	I_MethodWithDefaults3(void, NodeBundle, IN, std::string, nodeId, , IN, std::vector< lo_message >, msgs, , IN, lo_address, addr, 0,

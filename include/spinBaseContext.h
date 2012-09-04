@@ -155,6 +155,18 @@ class spinBaseContext
         void setTTL(int ttl);
 
         /**
+         * Reliable broadcast means that TCP subscribers will be notified
+         * by TCP of EVERY node and scene update. This is in addition to the
+         * regular multicast, so subscribers who also listen to multicast will
+         * receive duplicate messages. In the case of spinviewer, we stop
+         * polling UDP receivers when this flag is set (see pollUpdates() in
+         * spinClientContext).
+         *
+         */
+        virtual void setReliableBroadcast(bool b);
+        bool hasReliableBroadcast() const { return reliableBroadcast_; }
+
+        /**
          * List of clients to send to, each is an address and port
          * combination to which the server sends updates to the scene.
          * The vector usually just contains one multicast
@@ -267,6 +279,8 @@ class spinBaseContext
          * this method is used by both spinClientContext and spinServerContext
          */
         virtual void createServers() = 0;
+        
+        bool reliableBroadcast_;
 
     private:
         // pthread stuff

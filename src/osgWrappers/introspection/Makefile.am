@@ -28,7 +28,6 @@ libSPINwrappers_la_SOURCES = \
     Shader.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
-    SoundConnection.cpp \
     SoundNode.cpp \
     SoundSpace.cpp \
     SwitchNode.cpp \

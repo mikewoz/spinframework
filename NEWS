@@ -1,6 +1,54 @@
 SPIN Framework release notes
 ============================
 
+2012-??-?? : spinframework 0.3.20
+---------------------------------
+This release is in the development series 0.3.x that has an unstable API. 
+
+New Features:
+
+* TODO
+
+Bugs fixed:
+
+* TODO
+
+2012-08-31 : spinframework 0.3.18
+---------------------------------
+This release is in the development series 0.3.x that has an unstable API. 
+
+New Features:
+
+* Added ParticleSystems with many operators and examples
+* Added setUpdateRate method to GroupNode, particularly in order to be able to control the rate of audio spatialization messages
+* Initial SPIN webservice using poco (can call methods in spinserver from browser, but cannot GET)
+* Upgrade of SharedVideoTexture to new version that uses libshmdata
+* New methods to discover types: getNodeTypes, getStateTypes
+* Refactoring to support node instancing / cloning; new methods attachTo and detachFrom now supercede setParent
+* Added "translateTo" motion method with several ease animations
+* Added support for SpaceNavigator (3D mouse-like peripheral device)
+* Incorporated osgPPU (post-processing units) with initial effects: depth of field (dof), screen space ambient occlusion (ssao), and motion blur (mblur
+* Added extruded 3D TEXT option for TextNode
+* Support for compressed point clouds
+* Added setSingleSided method for TextNodes and ShapeNodes
+* Added option for CLIENT-SIDE computation and updating of velocities, providing reduction of network messages for large dynamic scenes
+* Enabled single sided option for TextNode
+* Support shaders on model nodes
+* StateSet refactoring: now statesets can be added onto any GroupNode.
+
+Bugs fixed:
+
+* Fixed ModelNode's reaction to light when scaled
+* Several SpatOSC fixes (support for setURI method, reliable refresh, and proper sending of radius, plugines, default connection params, autoconnect, etc.)
+* Fixed containment report when nodes are grouped
+* CHANGED attractor force direction, so positive force is attraction and negative force is replusion (more intuitive)
+* Bug fixes for AnimationNode: clear message wasn't working and index of 1 was out of animation range
+* Fixed unicode compatibility for TextNode
+* Made POINT draw mode the default for PointCloud (more efficient)
+* Added voxel filter and cropping to file-loaded point clouds (was previously only applied to kinect streams)
+* RenderBin now handled correctly for GeometryNode
+* Fixed many TextNode bugs (decoration, alignment, setFont, etc)
+
 2012-05-04 : spinframework 0.3.16
 ---------------------------------
 This release is in the development series 0.3.x that has an unstable API. 

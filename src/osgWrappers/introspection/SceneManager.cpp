@@ -13,7 +13,6 @@
 #include <ReferencedNode.h>
 #include <ReferencedStateSet.h>
 #include <SceneManager.h>
-#include <SoundConnection.h>
 #include <spinLog.h>
 #include <spinUtil.h>
 
@@ -172,11 +171,6 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __std_vectorT1_ReferencedStateSet_P1___findStateSets__C5_char_P1,
 	          "",
 	          "");
-	I_Method0(std::vector< spin::SoundConnection * >, getConnections,
-	          Properties::NON_VIRTUAL,
-	          __std_vectorT1_SoundConnection_P1___getConnections,
-	          "",
-	          "");
 	I_Method1(void, deleteNode, IN, const char *, id,
 	          Properties::NON_VIRTUAL,
 	          __void__deleteNode__C5_char_P1,
@@ -310,9 +304,6 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_SimpleProperty(std::vector< std::string >, AllNodeTypes, 
 	                 __std_vectorT1_std_string___getAllNodeTypes, 
 	                 0);
-	I_SimpleProperty(std::vector< spin::SoundConnection * >, Connections, 
-	                 __std_vectorT1_SoundConnection_P1___getConnections, 
-	                 0);
 	I_SimpleProperty(std::string, ConnectionsAsXML, 
 	                 __std_string__getConnectionsAsXML, 
 	                 0);
@@ -344,8 +335,6 @@ END_REFLECTOR
 STD_MAP_REFLECTOR(std::map< std::string COMMA  lo_address >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::ReferencedStateSet * >)
-
-STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::t_symbol * >)
 

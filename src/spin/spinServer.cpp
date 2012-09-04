@@ -160,7 +160,7 @@ int main(int argc, char **argv)
 
 	// *************************************************************************
 	// send a userRefresh message:
-    SCENE_MSG("s", "userRefresh");
+    spinApp::Instance().BroadcastSceneMessage("s", "userRefresh", SPIN_ARGS_END);
 	
 	// *************************************************************************
 	// loop:

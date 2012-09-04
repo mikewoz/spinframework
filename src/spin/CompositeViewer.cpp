@@ -479,7 +479,7 @@ void CompositeViewer::frame(double f)
         spinApp::Instance().userNode->nodepathUpdate = false;
     }
 
-    this->advance();
+    this->advance(f);
     this->eventTraversal();
     pthread_mutex_lock(&sceneMutex);
     spinApp::Instance().sceneManager_->update();
