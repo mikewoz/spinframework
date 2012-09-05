@@ -106,6 +106,11 @@ DSPNode::~DSPNode()
 
 // -----------------------------------------------------------------------------
 
+void DSPNode::debug()
+{
+    GroupNode::debug();
+}
+
 void DSPNode::callbackUpdate(osg::NodeVisitor* nv)
 {
     GroupNode::callbackUpdate(nv);

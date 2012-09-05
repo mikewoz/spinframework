@@ -85,6 +85,21 @@ SoundNode::~SoundNode()
 }
 
 // ===================================================================
+
+void SoundNode::debug()
+{
+    DSPNode::debug();
+    
+    std::cout << "   ---------" << std::endl;
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCSource->debugPrint();
+    }
+#endif
+    
+}
+
 void SoundNode::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
@@ -193,6 +208,18 @@ void SoundNode::setURI (const char *uri)
 #endif
 }
 
+void SoundNode::setDirectivity(const char* horizPattern, const char* vertPattern)
+{
+    horizDirectivity_ = horizPattern;
+    vertDirectivity_ = vertPattern;
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spinApp::Instance().audioScene->setDirectivity(spatOSCSource, horizPattern, vertPattern);
+    }
+#endif
+}
+
 void SoundNode::connect (const char* sinkNodeID)
 {
 #ifdef WITH_SPATOSC
@@ -273,8 +300,11 @@ std::vector<lo_message> SoundNode::getState () const
 	// inherit state from base class
 	std::vector<lo_message> ret = DSPNode::getState();
 	
-	//lo_message msg;
+	lo_message msg;
 	
+    msg = lo_message_new();
+    lo_message_add(msg, "sss", "setDirectivity", horizDirectivity_.c_str(), vertDirectivity_.c_str());
+    ret.push_back(msg);
 
 	
 	

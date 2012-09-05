@@ -28,6 +28,11 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	               ____SoundNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate__osg_NodeVisitor_P1,
@@ -73,6 +78,11 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          __void__setURI__C5_char_P1,
 	          "",
 	          "Set the media for the sound node using a URI pattern.Examples: file://soundfilename.wav file:///home/johndoe/soundfilename.wav http://www.server.com/soundfile.wav adc://1:1 adc://1 content://media/external/audio/media/710 mms://some_media_stream rtsp://127.0.0.1:12311 pd_plugin://audio_plugin_patch.pd ");
+	I_Method2(void, setDirectivity, IN, const char *, horizPattern, IN, const char *, vertPattern,
+	          Properties::VIRTUAL,
+	          __void__setDirectivity__C5_char_P1__C5_char_P1,
+	          "",
+	          "");
 	I_Method1(void, connect, IN, const char *, sinkNodeID,
 	          Properties::VIRTUAL,
 	          __void__connect__C5_char_P1,
