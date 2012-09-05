@@ -91,10 +91,11 @@ void Listener::debug()
 {
     DSPNode::debug();
     
-    std::cout << "   ---------" << std::endl;
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
+        std::cout << "-------------" << std::endl;
+        std::cout << "SpatOSC data:" << std::endl;
         spatOSCListener->debugPrint();
     }
 #endif

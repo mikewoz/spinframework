@@ -97,10 +97,6 @@ class SoundNode : public DSPNode
         spatosc::SoundSource *spatOSCSource;
 #endif
 
-        std::string horizDirectivity_;
-        std::string vertDirectivity_;
-
-
 };
 
 } // end of namespace spin

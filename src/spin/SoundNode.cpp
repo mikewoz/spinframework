@@ -90,10 +90,11 @@ void SoundNode::debug()
 {
     DSPNode::debug();
     
-    std::cout << "   ---------" << std::endl;
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
+    std::cout << "-------------" << std::endl;
+    std::cout << "SpatOSC data:" << std::endl;
         spatOSCSource->debugPrint();
     }
 #endif
@@ -210,8 +211,6 @@ void SoundNode::setURI (const char *uri)
 
 void SoundNode::setDirectivity(const char* horizPattern, const char* vertPattern)
 {
-    horizDirectivity_ = horizPattern;
-    vertDirectivity_ = vertPattern;
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
@@ -300,13 +299,16 @@ std::vector<lo_message> SoundNode::getState () const
 	// inherit state from base class
 	std::vector<lo_message> ret = DSPNode::getState();
 	
-	lo_message msg;
-	
-    msg = lo_message_new();
-    lo_message_add(msg, "sss", "setDirectivity", horizDirectivity_.c_str(), vertDirectivity_.c_str());
-    ret.push_back(msg);
-
-	
+#ifdef WITH_SPATOSC	
+    if (spinApp::Instance().hasAudioRenderer)
+    {    
+        lo_message msg;
+        
+        msg = lo_message_new();
+        lo_message_add(msg, "sss", "setDirectivity", spatOSCSource->getLateralDirectivity().c_str(), spatOSCSource->getVerticalDirectivity().c_str());
+        ret.push_back(msg);
+	}
+#endif
 	
 	return ret;
 }
