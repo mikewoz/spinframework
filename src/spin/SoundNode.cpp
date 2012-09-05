@@ -198,6 +198,17 @@ void SoundNode::setRadius (float f)
 #endif
 }
 
+void SoundNode::setTransitionFactor (float f)
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCSource->setTransitionFactor(f);
+    }
+#endif
+}
+
+
 void SoundNode::setURI (const char *uri)
 {
     DSPNode::setURI(uri);
@@ -307,6 +318,11 @@ std::vector<lo_message> SoundNode::getState () const
         msg = lo_message_new();
         lo_message_add(msg, "sss", "setDirectivity", spatOSCSource->getLateralDirectivity().c_str(), spatOSCSource->getVerticalDirectivity().c_str());
         ret.push_back(msg);
+        
+        msg = lo_message_new();
+        lo_message_add(msg, "sf", "setTransitionFactor", spatOSCSource->getTransitionFactor());
+        ret.push_back(msg);
+
 	}
 #endif
 	

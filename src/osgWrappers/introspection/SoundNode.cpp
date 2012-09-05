@@ -73,6 +73,11 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          __void__setRadius__float,
 	          "",
 	          "");
+	I_Method1(void, setTransitionFactor, IN, float, f,
+	          Properties::VIRTUAL,
+	          __void__setTransitionFactor__float,
+	          "",
+	          "");
 	I_Method1(void, setURI, IN, const char *, uri,
 	          Properties::VIRTUAL,
 	          __void__setURI__C5_char_P1,
@@ -109,6 +114,9 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(float, TransitionFactor, 
+	                 0, 
+	                 __void__setTransitionFactor__float);
 	I_SimpleProperty(const char *, URI, 
 	                 0, 
 	                 __void__setURI__C5_char_P1);
