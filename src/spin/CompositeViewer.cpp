@@ -94,6 +94,8 @@ CompositeViewer::~CompositeViewer()
     bool lIsDof = (mDofPPUs.size() == getNumViews());
     bool lIsSSAO = (mSsaoPPUs.size() == getNumViews());
     bool lIsMBlur = (mMBlurPPUs.size() == getNumViews());
+    bool lIsOutline = (mOutlinePPUs.size() == getNumViews());
+    bool lIsMask = (mMaskPPUs.size() == getNumViews());
 
     if(mbInitialized)
     {
@@ -107,6 +109,10 @@ CompositeViewer::~CompositeViewer()
                 delete mSsaoPPUs[i];
             if(lIsMBlur)
                 delete mMBlurPPUs[i];
+            if(lIsOutline)
+                delete mOutlinePPUs[i];
+            if(lIsMask)
+                delete mMaskPPUs[i];
         }
     }
 }
@@ -296,6 +302,16 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             lMBlur->createMotionBlurPipeline(lProcessor, lastUnit);
 
             mMBlurPPUs.push_back(lMBlur);
+        }
+
+        // Mask effect
+        if((pEffect & PPU_MASK) != 0)
+        {
+            osg::Camera *camera = NULL; //TODO: replace this with the real masking camera
+            MaskRendering* lMask = new MaskRendering();
+            lMask->createMaskPipeline(lProcessor, lastUnit, camera);
+
+            mMaskPPUs.push_back(lMask);
         }
 
         // add a text ppu after the pipeline is setted up

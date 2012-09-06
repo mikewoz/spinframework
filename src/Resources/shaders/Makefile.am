@@ -15,6 +15,8 @@ gauss_convolution_vp.glsl \
 luminance_adapted_fp.glsl \
 luminance_fp.glsl \
 luminance_mipmap_fp.glsl \
+mask_vp.glsl \
+mask_fp.glsl \
 motionBlur_fp.glsl \
 motionBlur_vp.glsl \
 outline_vp.glsl \

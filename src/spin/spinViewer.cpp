@@ -98,6 +98,7 @@ int run(int argc, char **argv)
     bool dof = false;
     bool mblur = false;
     bool outline = false;
+    bool mask = false;
 	float speedScaleValue = 1.0;
 	float moving = false;
 	
@@ -151,6 +152,7 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--ssao", "Enables screen space ambient occlusion effect");
     arguments.getApplicationUsage()->addCommandLineOption("--mblur", "Enables motion blur effect");
     arguments.getApplicationUsage()->addCommandLineOption("--outline", "Enables the outline effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--mask", "Enables the masking effect (from a secondary camera render)");
 
 	// *************************************************************************
 	// PARSE ARGS:
@@ -179,6 +181,7 @@ int run(int argc, char **argv)
     if (arguments.read("--ssao")) ssao=true;
     if (arguments.read("--mblur")) mblur=true;
     if (arguments.read("--outline")) outline=true;
+    if (arguments.read("--mask")) mask=true;
 	while (arguments.read("--window",x,y,width,height)) {}
 	while (arguments.read("--screen",screen)) {}
 	while (arguments.read("--framerate",maxFrameRate)) {}
@@ -333,7 +336,7 @@ int run(int argc, char **argv)
 	    view->addEventHandler(new osgViewer::ThreadingHandler);
 	    view->addEventHandler(new osgViewer::WindowSizeHandler);
         
-        if (dof || ssao || mblur || outline)
+        if (dof || ssao || mblur || outline || mask)
         {
             view->addEventHandler(new CustomResizeHandler(&viewer));
         }
@@ -526,6 +529,8 @@ int run(int argc, char **argv)
             lEffects |= PPU_MOTIONBLUR;
         if(outline)
             lEffects |= PPU_OUTLINE;
+        if(mask)
+            lEffects |= PPU_MASK;
 
         //viewer.frame();
         viewer.viewerInit(); // TODO: move this in a better place
