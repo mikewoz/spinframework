@@ -85,6 +85,22 @@ SoundNode::~SoundNode()
 }
 
 // ===================================================================
+
+void SoundNode::debug()
+{
+    DSPNode::debug();
+    
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+    std::cout << "-------------" << std::endl;
+    std::cout << "SpatOSC data:" << std::endl;
+        spatOSCSource->debugPrint();
+    }
+#endif
+    
+}
+
 void SoundNode::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
@@ -182,6 +198,17 @@ void SoundNode::setRadius (float f)
 #endif
 }
 
+void SoundNode::setTransitionFactor (float f)
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spatOSCSource->setTransitionFactor(f);
+    }
+#endif
+}
+
+
 void SoundNode::setURI (const char *uri)
 {
     DSPNode::setURI(uri);
@@ -189,6 +216,16 @@ void SoundNode::setURI (const char *uri)
     if (spinApp::Instance().hasAudioRenderer)
     {
         spatOSCSource->setURI(this->getURI());
+    }
+#endif
+}
+
+void SoundNode::setDirectivity(const char* horizPattern, const char* vertPattern)
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spinApp::Instance().audioScene->setDirectivity(spatOSCSource, horizPattern, vertPattern);
     }
 #endif
 }
@@ -273,10 +310,21 @@ std::vector<lo_message> SoundNode::getState () const
 	// inherit state from base class
 	std::vector<lo_message> ret = DSPNode::getState();
 	
-	//lo_message msg;
-	
+#ifdef WITH_SPATOSC	
+    if (spinApp::Instance().hasAudioRenderer)
+    {    
+        lo_message msg;
+        
+        msg = lo_message_new();
+        lo_message_add(msg, "sss", "setDirectivity", spatOSCSource->getLateralDirectivity().c_str(), spatOSCSource->getVerticalDirectivity().c_str());
+        ret.push_back(msg);
+        
+        msg = lo_message_new();
+        lo_message_add(msg, "sf", "setTransitionFactor", spatOSCSource->getTransitionFactor());
+        ret.push_back(msg);
 
-	
+	}
+#endif
 	
 	return ret;
 }

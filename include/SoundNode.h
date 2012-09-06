@@ -67,6 +67,7 @@ class SoundNode : public DSPNode
         SoundNode(SceneManager *sceneManager, const char* initID);
         virtual ~SoundNode();
 
+        virtual void debug();
         virtual void callbackUpdate(osg::NodeVisitor* nv);
         bool dumpGlobals(bool forced=false);
         
@@ -77,7 +78,9 @@ class SoundNode : public DSPNode
         virtual void setOrientation (float p, float r, float y);
         virtual void setOrientationQuat (float x, float y, float z, float w);
         virtual void setRadius (float f);
+        virtual void setTransitionFactor (float f);
         virtual void setURI (const char *uri);
+        virtual void setDirectivity(const char* horizPattern, const char* vertPattern);
         virtual void connect (const char* sinkNodeID);
         virtual void disconnect (const char* sinkNodeID);
         virtual void setConnectionParam (const char* sinkNodeID, const char* method, float value);
@@ -94,7 +97,6 @@ class SoundNode : public DSPNode
 #ifdef WITH_SPATOSC
         spatosc::SoundSource *spatOSCSource;
 #endif
-
 
 };
 

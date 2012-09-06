@@ -77,6 +77,8 @@ public:
         DSPNode (SceneManager *sceneManager, const char* initID);
         virtual ~DSPNode();
         
+        virtual void debug();
+        
         virtual void callbackUpdate(osg::NodeVisitor* nv);
         bool dumpGlobals(bool forced=false);
         

@@ -87,6 +87,21 @@ Listener::~Listener()
     
 }
 // ===================================================================
+void Listener::debug()
+{
+    DSPNode::debug();
+    
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        std::cout << "-------------" << std::endl;
+        std::cout << "SpatOSC data:" << std::endl;
+        spatOSCListener->debugPrint();
+    }
+#endif
+    
+}
+
 void Listener::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
