@@ -64,6 +64,7 @@ class Listener : public DSPNode
         Listener(SceneManager *sceneManager, const char* initID);
         virtual ~Listener();
         
+        virtual void debug();
         virtual void callbackUpdate(osg::NodeVisitor* nv);
         bool dumpGlobals(bool forced=false);
 

@@ -261,6 +261,18 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             lSsao->createSSAOPipeline(lProcessor, lastUnit, lProjectionMatrix);
 
             mSsaoPPUs.push_back(lSsao);
+        }
+
+        // Outline should be done before any blurring effect
+        if((pEffect & PPU_OUTLINE) != 0)
+        {
+            OutlineRendering* lOutline = new OutlineRendering();
+
+            double left,right,bottom,top,near,far; 
+            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far); 
+            lOutline->createOutlinePipeline(lProcessor, lastUnit, near, far);
+
+            mOutlinePPUs.push_back(lOutline);
         } 
   
         // DoF effect
@@ -1319,6 +1331,8 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
         bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
         bool lIsMBlur = (viewer->mMBlurPPUs.size() == viewer->getNumViews());
+        bool lIsOutline = (viewer->mOutlinePPUs.size() == viewer->getNumViews());
+
 
         // For each view
         for(unsigned int i=0; i<viewer->getNumViews(); ++i)
@@ -1389,8 +1403,46 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                     viewer->mMBlurPPUs[i]->setMotionBlurFactor(floatArgs[0]);
                 }
             }
+
+            // Params for the outline PPU
+            if(lIsOutline)
+            {
+                if (stringArgs[0] == "outlineStrength")
+                {
+                    viewer->mOutlinePPUs[i]->setOutlineStrength(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "outlineGlowSigma")
+                {
+                    viewer->mOutlinePPUs[i]->setGlowSigma(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "outlineGlowRadius")
+                {
+                    viewer->mOutlinePPUs[i]->setGlowRadius(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "outlineGlowPower")
+                {
+                    viewer->mOutlinePPUs[i]->setGlowPower(floatArgs[0]);
+                }
+            }
         }
         
+        
+        return 1;
+    }
+    else if ((theMethod=="setOutlineColor"))
+    // TODO: remove this from setParam, and place it in a new message like setFrustum
+    {
+        bool lIsOutline = (viewer->mOutlinePPUs.size() == viewer->getNumViews());
+
+        // For each view
+        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+        {
+            if(lIsOutline)
+            {
+                viewer->mOutlinePPUs[i]->setOutlineColor(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3]);
+            }
+        }
+
         return 1;
     }
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))

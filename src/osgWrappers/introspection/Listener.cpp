@@ -28,6 +28,11 @@ BEGIN_OBJECT_REFLECTOR(spin::Listener)
 	               ____Listener__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate__osg_NodeVisitor_P1,
