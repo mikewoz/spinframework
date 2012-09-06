@@ -53,7 +53,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ImageTexture)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getPath,
 	          "",
-	          "");
+	          "Returns the path on disk from where the texture is pulled. ");
 	I_Method1(void, setTextureMode, IN, spin::ImageTexture::TextureMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setTextureMode__TextureMode,

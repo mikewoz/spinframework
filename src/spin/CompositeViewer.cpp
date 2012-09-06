@@ -153,10 +153,10 @@ void CompositeViewer::setupCamera()
     // setup viewer's default camera
     //osg::Camera* camera = getCamera();
     //osg::Camera* camera = this->getView(0)->getCamera();
-    
-    //camera->setViewport(0,0,(int)vp->width(), (int)vp->height()); 
 
-    // We create texture buffers for the main camera of each view 
+    //camera->setViewport(0,0,(int)vp->width(), (int)vp->height());
+
+    // We create texture buffers for the main camera of each view
     //osgViewer::ViewerBase::Cameras lCameras;
     //this->getCameras(lCameras);
     //for(osgViewer::ViewerBase::Cameras::iterator lIt = lCameras.begin();
@@ -171,7 +171,7 @@ void CompositeViewer::setupCamera()
         std::cout << std::endl;
         std::cout << "---------------------------------------" << std::endl;
         std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
-        
+
 
         // create texture to render to
         osg::ref_ptr<osg::Texture> colorTexture1_ = createRenderTexture(lWidth, lHeight, false);
@@ -187,7 +187,7 @@ void CompositeViewer::setupCamera()
         // set viewport
         lCamera->setViewport(lCamera->getViewport()); // Useful ??
         lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-        //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0); 
+        //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
 
         // tell the camera to use OpenGL frame buffer object where supported.
         lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
@@ -211,7 +211,7 @@ void CompositeViewer::viewerInit()
     // setup data
     //setupCamera(getCamera()->getViewport());
     setupCamera();
-    
+
     // add ppu processor into the scene graph
     osg::Node* lData = getView(0)->getSceneData();
     for(unsigned int i=0; i<getNumViews(); ++i)
@@ -219,8 +219,8 @@ void CompositeViewer::viewerInit()
         osg::Group* group = new osg::Group();
         //group->addChild(getSceneData());
         group->addChild(lData);
-    
-        //setSceneData(group); 
+
+        //setSceneData(group);
         this->getView(i)->setSceneData(group);
     }
 }
@@ -235,16 +235,16 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
     if (mbInitialized == false)
         mbInitialized = true;
     else
-        return; 
+        return;
 
     // For each view, we create a processor
     for(unsigned int i=0; i<this->getNumViews(); ++i)
     {
-        osgPPU::Processor* lProcessor; 
+        osgPPU::Processor* lProcessor;
         lProcessor = new osgPPU::Processor();
-       
+
         osgViewer::View* lView = getView(i);
- 
+
         dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
 
         // initialize the post process
@@ -259,9 +259,9 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // SSAO effect must be applied before any other effect, especially those
         // which destroy information (such as DoF)
         if((pEffect & PPU_SSAO) != 0)
-        { 
+        {
             SSAORendering* lSsao = new SSAORendering();
-            
+
             // Gets the projection matrix
             osg::Matrixf lProjectionMatrix = lView->getCamera()->getProjectionMatrix();
             lSsao->createSSAOPipeline(lProcessor, lastUnit, lProjectionMatrix);
@@ -274,24 +274,24 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         {
             OutlineRendering* lOutline = new OutlineRendering();
 
-            double left,right,bottom,top,near,far; 
-            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far); 
+            double left,right,bottom,top,near,far;
+            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
             lOutline->createOutlinePipeline(lProcessor, lastUnit, near, far);
 
             mOutlinePPUs.push_back(lOutline);
-        } 
-  
+        }
+
         // DoF effect
         if((pEffect & PPU_DOF) != 0)
         {
             DoFRendering* lDoF = new DoFRendering();
 
-            double left,right,bottom,top,near,far; 
-            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far); 
+            double left,right,bottom,top,near,far;
+            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
             lDoF->createDoFPipeline(lProcessor, lastUnit, near, far);
             lDoF->setFocalLength(0.0);
             lDoF->setFocalRange(50.0);
-            
+
             mDofPPUs.push_back(lDoF);
         }
 
@@ -307,9 +307,18 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // Mask effect
         if((pEffect & PPU_MASK) != 0)
         {
-            osg::Camera *camera = NULL; //TODO: replace this with the real masking camera
+            osg::Camera *slaveCam = new osg::Camera( *lView->getCamera() );
+            slaveCam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
+            slaveCam->setCullMask( 0x20 );
+            //???slaveCam->setRenderOrder( osg::Camera::PRE_RENDER );
+            lView->addSlave( slaveCam );
+
+            osg::Camera *cam = lView->getCamera();
+            cam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
+            slaveCam->setCullMask( 0x10 );
+
             MaskRendering* lMask = new MaskRendering();
-            lMask->createMaskPipeline(lProcessor, lastUnit, camera);
+            lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam);
 
             mMaskPPUs.push_back(lMask);
         }
@@ -341,7 +350,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 void CompositeViewer::updateSpaceNavigator()
 {
 #ifdef HAVE_SPNAV_H
-    
+
     spin::spinApp &spin = spin::spinApp::Instance();
 
     float dt = (float)(osg::Timer::instance()->delta_s(lastNavTick_, osg::Timer::instance()->tick()) > 1.0);
@@ -355,7 +364,7 @@ void CompositeViewer::updateSpaceNavigator()
         return;
     }
     */
-    
+
     // poll the space navigator:
     int speventCount = 0;
     osg::Vec3 spVel, spSpin;
@@ -377,7 +386,7 @@ void CompositeViewer::updateSpaceNavigator()
         speedScaleValue_ = 1.0;
         moving_ = false;
     }
-    
+
     spnav_event spnavevent;
     while (spnav_poll_event(&spnavevent))
     {
@@ -465,7 +474,7 @@ void CompositeViewer::frame(double f)
     // this should also update the post processing graph
     // since it is attached to the camera
     //osgViewer::CompositeViewer::frame(f);
-    
+
     // initilize PPU if it was not done before
     //initializePPU();
 
@@ -502,7 +511,7 @@ void CompositeViewer::frame(double f)
     this->updateTraversal();
     this->renderingTraversals();
     pthread_mutex_unlock(&sceneMutex);
-    
+
 }
 
 //int run()
@@ -517,14 +526,14 @@ osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, c
 
     osg::Vec3d center(0.0,0.0,0.0);
     osg::Vec3d eye(0.0,0.0,0.0);
-    
+
     // this lets users override the distance:
     if (fabs(distance)<0.000001)
         distance = sqrt(sphere_radius*sphere_radius - collar_radius*collar_radius);
-    
+
     bool centerProjection = false;
     osg::Vec3d projector = eye - osg::Vec3d(0.0,0.0, distance);
-    
+
     /*
     osg::notify(osg::NOTICE)<<"Projector position = "<<spin::stringify(projector)<<std::endl;
     osg::notify(osg::NOTICE)<<"distance = "<<distance<<std::endl;
@@ -542,7 +551,7 @@ osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, c
     osg::Vec3 yAxis(heightVector);
     float height = heightVector.length();
     yAxis /= height;
-    
+
     int noSteps = 50;
 
     osg::Vec3Array* vertices = new osg::Vec3Array;
@@ -552,7 +561,7 @@ osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, c
     osg::Vec3 bottom = origin;
     osg::Vec3 dx = xAxis*(width/((float)(noSteps-1)));
     osg::Vec3 dy = yAxis*(height/((float)(noSteps-1)));
-    
+
     osg::Vec3d screenCenter = origin + widthVector*0.5f + heightVector*0.5f;
     float screenRadius = heightVector.length() * 0.5f;
 
@@ -599,13 +608,13 @@ osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, c
                 if (phi > osg::PI_2) phi = osg::PI_2;
 
                 // osg::notify(osg::NOTICE)<<"theta = "<<theta<< "phi="<<phi<<std::endl;
-                
+
                 double f = distance * sin(phi);
                 double e = distance * cos(phi) + sqrt( sphere_radius*sphere_radius - f*f);
                 double l = e * cos(phi);
                 double h = e * sin(phi);
                 double z = l - distance;
-                
+
                 osg::Vec3 texcoord(h * cos(theta) / sphere_radius,
                                    h * sin(theta) / sphere_radius,
                                    z / sphere_radius);
@@ -619,7 +628,7 @@ osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, c
             // osg::notify(osg::NOTICE)<<std::endl;
         }
     }
-    
+
     // pass the created vertex array to the points geometry object.
     geometry->setVertexArray(vertices);
 
@@ -638,7 +647,7 @@ osg::Geometry* create3DSphericalDisplayDistortionMesh(const osg::Vec3& origin, c
         }
         geometry->addPrimitiveSet(elements);
     }
-    
+
     return geometry;
 }
 
@@ -847,18 +856,18 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
 void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Camera *cam, osg::GraphicsContext::Traits *traits, osg::GraphicsContext *gc)
 //static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Camera *cam, int screenWidth, int screenHeight, int screenNum)
 {
-	TiXmlElement *child = 0;
-	std::string tag="", val="";
-	float v[4];
+    TiXmlElement *child = 0;
+    std::string tag="", val="";
+    float v[4];
 
     bool spherical = false;
 
     //osg::Vec3 eye = osg::Vec3(0,0,0);
-	//osg::Vec3 lookat = osg::Y_AXIS;
-	//osg::Vec3 up = osg::Z_AXIS;
+    //osg::Vec3 lookat = osg::Y_AXIS;
+    //osg::Vec3 up = osg::Z_AXIS;
     osg::Vec3 eye = osg::Vec3(0,-0.00000001,0);
-	osg::Vec3 lookat = osg::Vec3(0,0,0);
-	osg::Vec3 up = osg::Z_AXIS;
+    osg::Vec3 lookat = osg::Vec3(0,0,0);
+    osg::Vec3 up = osg::Z_AXIS;
 
     if (XMLnode->Attribute("id"))
     {
@@ -870,42 +879,42 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
 
     // FIRST PASS: parse generic parameters, and check if spherical cam
     for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
-	{
-		// get tag and value:
-		if (child->FirstChild())
-		{
-			tag = child->Value();
-			val = child->FirstChild()->Value();
-		} else continue;
-        
-		if (tag=="clearColor")
-		{
-			if (sscanf (val.c_str(),"%f %f %f %f",&v[0],&v[1],&v[2],&v[3]))
-				cam->setClearColor( osg::Vec4(v[0],v[1],v[2],v[3]) );
+    {
+        // get tag and value:
+        if (child->FirstChild())
+        {
+            tag = child->Value();
+            val = child->FirstChild()->Value();
+        } else continue;
+
+        if (tag=="clearColor")
+        {
+            if (sscanf (val.c_str(),"%f %f %f %f",&v[0],&v[1],&v[2],&v[3]))
+                cam->setClearColor( osg::Vec4(v[0],v[1],v[2],v[3]) );
         }
-    	else if (tag=="viewport")
-		{
-			if (sscanf(val.c_str(),"%f%% %f%% %f%% %f%%",&v[0],&v[1],&v[2],&v[3])==4)
-			{
+        else if (tag=="viewport")
+        {
+            if (sscanf(val.c_str(),"%f%% %f%% %f%% %f%%",&v[0],&v[1],&v[2],&v[3])==4)
+            {
                 //cam->setViewport( (int) (v[0]/100*screenWidth/100), (int) (v[1]/100*screenHeight), (int) (v[2]/100*screenWidth), (int) (v[3]/100*screenHeight) );
                 cam->setViewport( (int) (v[0]/100*traits->width/100), (int) (v[1]/100*traits->height), (int) (v[2]/100*traits->width), (int) (v[3]/100*traits->height) );
-			}
-			else if (sscanf(val.c_str(),"%f %f %f %f",&v[0],&v[1],&v[2],&v[3])==4)
-			{
+            }
+            else if (sscanf(val.c_str(),"%f %f %f %f",&v[0],&v[1],&v[2],&v[3])==4)
+            {
                 //view->getCamera()->setViewport( v[0],v[1],v[2],v[3] );
                 cam->setViewport( v[0],v[1],v[2],v[3] );
-			}
-			else {
-			    std::cout << "Bad viewport values: " << val << ". Need four values <x y width height>, either as pixel values of percentages of the window size" << std::endl;
-			}
+            }
+            else {
+                std::cout << "Bad viewport values: " << val << ". Need four values <x y width height>, either as pixel values of percentages of the window size" << std::endl;
+            }
 
-			const osg::Viewport *viewport = cam->getViewport();
-			if (viewport)
-			    std::cout << "     Camera viewport:  pos=(" << viewport->x() << "," << viewport->y() << ") size=" << viewport->width() << "x" << viewport->height() << std::endl;
-			else
-			    std::cout << "     Camera viewport:  INVALID" << std::endl;
+            const osg::Viewport *viewport = cam->getViewport();
+            if (viewport)
+                std::cout << "     Camera viewport:  pos=(" << viewport->x() << "," << viewport->y() << ") size=" << viewport->width() << "x" << viewport->height() << std::endl;
+            else
+                std::cout << "     Camera viewport:  INVALID" << std::endl;
 
-		}
+        }
         else if (tag=="spherical")
         {
             std::cout << "   (spherical camera)" << std::endl;
@@ -913,9 +922,9 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
         }
     }
 
-    
+
     // SECOND PASS: different options depending on spherical vs planar camera:
-	
+
     if (spherical)
     {
         int textureSize = 2048;
@@ -924,21 +933,21 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
         float distance = 0.0;
         float crop = 0.0;
         float near = 1.0;
-        float far = 1000.0; 
+        float far = 1000.0;
         osg::Vec3 dirVec = osg::Vec3(0.0, 0.0, 1.0);
         for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
-	    {
-		    if (child->FirstChild())
-		    {
-		    	tag = child->Value();
-	    		val = child->FirstChild()->Value();
-	    	} else continue;
-        
-		    if (tag=="textureSize")
+        {
+            if (child->FirstChild())
+            {
+                tag = child->Value();
+                val = child->FirstChild()->Value();
+            } else continue;
+
+            if (tag=="textureSize")
             {
                 sscanf(val.c_str(), "%d", &textureSize);
             }
-		    else if (tag=="radius")
+            else if (tag=="radius")
             {
                 sscanf(val.c_str(), "%f", &radius);
             }
@@ -961,7 +970,7 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
                     dirVec = osg::Vec3(x,y,z);
                 else
                     std::cout << "Bad direction values: " << val << ". Need three values <x y z>" << std::endl;
-			
+
             }
             else if (tag=="clipping")
             {
@@ -976,14 +985,14 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
 
         // TODO: read image paths from config for intensity map
         osg::Image *intensityMap = 0;
-        
+
         osg::Matrixd projMatrix = osg::Matrixd::identity();
         //osg::Matrixd projMatrix = osg::Matrixd::translate(osg::Vec3(0,0,1.0));
         //osg::Matrixd projMatrix = osg::Matrixd::rotate(osg::inDegrees(180.0f), 1.0,0.0,0.0);
-        
+
         //projMatrix.makeLookAt(osg::Vec3(0,0,0), dirVec, osg::Vec3(0,0,1));
-        
- 
+
+
         std::cout << "creating spherical display with textureSize="<<textureSize<<", radius="<<radius<<", collar="<<collar<<", crop="<<crop<<", direction="<<stringify(dirVec)<<std::endl;
 
         //view->setUpViewFor3DSphericalDisplay(radius, collar, screenNum, intensityMap, projMatrix);
@@ -997,61 +1006,61 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
     }
 
     // planar:
-    else 
+    else
     {
         for ( child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
-	    {
-		    if (child->FirstChild())
-		    {
-		    	tag = child->Value();
-	    		val = child->FirstChild()->Value();
-	    	} else continue;
-        
-		    if (tag=="eye")
-		    {
-			    if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
-				    eye = osg::Vec3(v[0],v[1],v[2]);
-		    }
-		    else if (tag=="lookat")
-		    {
-			    if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
-				    lookat = osg::Vec3(v[0],v[1],v[2]);
-		    }
-    		else if (tag=="up")
-	    	{
-			    if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
-				    up = osg::Vec3(v[0],v[1],v[2]);
-		    }
-       	    else if (tag == "perspective")
-	        {
-	            float fovy, aspectRatio, zNear, zFar;
-	            if (sscanf(val.c_str(), "%f %f %f %f", &fovy, &aspectRatio, &zNear, &zFar))
-	            {
-	                //std::cout << "setting perspective of " << fovy << "deg, aspect: " << aspectRatio << std::endl;
-	                cam->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
-	            }
-	        }
-	    	else if (tag=="frustum")
-		    {
+        {
+            if (child->FirstChild())
+            {
+                tag = child->Value();
+                val = child->FirstChild()->Value();
+            } else continue;
+
+            if (tag=="eye")
+            {
+                if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
+                    eye = osg::Vec3(v[0],v[1],v[2]);
+            }
+            else if (tag=="lookat")
+            {
+                if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
+                    lookat = osg::Vec3(v[0],v[1],v[2]);
+            }
+            else if (tag=="up")
+            {
+                if (sscanf (val.c_str(),"%f %f %f",&v[0],&v[1],&v[2]))
+                    up = osg::Vec3(v[0],v[1],v[2]);
+            }
+            else if (tag == "perspective")
+            {
+                float fovy, aspectRatio, zNear, zFar;
+                if (sscanf(val.c_str(), "%f %f %f %f", &fovy, &aspectRatio, &zNear, &zFar))
+                {
+                    //std::cout << "setting perspective of " << fovy << "deg, aspect: " << aspectRatio << std::endl;
+                    cam->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+                }
+            }
+            else if (tag=="frustum")
+            {
                 frustum frust;
                 if (sscanf (val.c_str(),"%f %f %f %f %f %f",&frust.left,&frust.right,&frust.bottom,&frust.top,&frust.near,&frust.far))
                 {
                     cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
                     cam->setProjectionMatrixAsFrustum(frust.left, frust.right, frust.bottom, frust.top, frust.near, frust.far);
-		        }   
+                }
             }
 
-		    else
-		    {
-			    std::cout << "Unknown parameter in configuration file: " << tag << std::endl;
-		    }
-	    }
+            else
+            {
+                std::cout << "Unknown parameter in configuration file: " << tag << std::endl;
+            }
+        }
 
         //view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
     }
 
 
-	//cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    //cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
     //cam->setViewMatrixAsLookAt(eye, lookat, up);
 
@@ -1061,13 +1070,13 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
 
 
 /*
-	// note: the first matrix scales and offsets the axes (perspective) while the second matrix offsets the view:
-	//viewer.addSlave(cam->camera.get(), cam->pMatrix*cam->tMatrix, cam->rMatrix);
-	//cam->camera->setViewMatrixAsLookAt( cam->_eye, cam->_lookat, cam->_up );
-	osg::Matrixd viewMatrix;
-	viewMatrix.makeLookAt( cam->_eye, cam->_lookat, cam->_up );
-	viewMatrix *= osg::Matrixd::rotate(osg::PI/2, X_AXIS);
-	viewer.addSlave(cam->camera.get(), cam->pMatrix*cam->tMatrix, cam->rMatrix*viewMatrix);
+    // note: the first matrix scales and offsets the axes (perspective) while the second matrix offsets the view:
+    //viewer.addSlave(cam->camera.get(), cam->pMatrix*cam->tMatrix, cam->rMatrix);
+    //cam->camera->setViewMatrixAsLookAt( cam->_eye, cam->_lookat, cam->_up );
+    osg::Matrixd viewMatrix;
+    viewMatrix.makeLookAt( cam->_eye, cam->_lookat, cam->_up );
+    viewMatrix *= osg::Matrixd::rotate(osg::PI/2, X_AXIS);
+    viewer.addSlave(cam->camera.get(), cam->pMatrix*cam->tMatrix, cam->rMatrix*viewMatrix);
 */
 
     GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
@@ -1081,7 +1090,7 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
 
 void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
 {
-	TiXmlElement *n;
+    TiXmlElement *n;
 
     // first check if the wsi is valid:
     osg::GraphicsContext::WindowingSystemInterface* wsi = osg::GraphicsContext::getWindowingSystemInterface();
@@ -1123,19 +1132,19 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
         si.screenNum = atoi(n->FirstChild()->Value());
     else
         si.screenNum = 0;
-    
-    
+
+
     // Now that we have the screen, let's get the resolution. This is important
     // because size and position in the xml file can be specified as a
     // percentage
-	unsigned int screenWidth, screenHeight;
-	wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(si.screenNum), screenWidth, screenHeight);
-	std::cout << "Resolution for screen " << si.screenNum << " is: " << screenWidth << "x" << screenHeight << std::endl;
+    unsigned int screenWidth, screenHeight;
+    wsi->getScreenResolution(osg::GraphicsContext::ScreenIdentifier(si.screenNum), screenWidth, screenHeight);
+    std::cout << "Resolution for screen " << si.screenNum << " is: " << screenWidth << "x" << screenHeight << std::endl;
 
     /*
-	if (n = XMLnode->FirstChildElement("fullscreen"))
-	{
-		if (n->FirstChild()->Value() == "true")
+    if (n = XMLnode->FirstChildElement("fullscreen"))
+    {
+        if (n->FirstChild()->Value() == "true")
         {
             view->setUpViewOnSingleScreen(screenNum);
         }
@@ -1145,11 +1154,11 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
             int y=50;
             int w=800;
             int h=600;
-	        if (n = XMLnode->FirstChildElement("windowPosition"))
-	            sscanf( n->FirstChild()->Value(), "%d %d", &x, &y);
-		    if (n = XMLnode->FirstChildElement("windowSize"))
-	            sscanf( n->FirstChild()->Value(), "%d %d", &w, &h);
-		    view->setUpViewInWindow(x,y,w,h,screenNum);
+            if (n = XMLnode->FirstChildElement("windowPosition"))
+                sscanf( n->FirstChild()->Value(), "%d %d", &x, &y);
+            if (n = XMLnode->FirstChildElement("windowSize"))
+                sscanf( n->FirstChild()->Value(), "%d %d", &w, &h);
+            view->setUpViewInWindow(x,y,w,h,screenNum);
             maxWidth = w;
             maxHeight = h;
         }
@@ -1159,9 +1168,9 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
 
     // create a GraphicsContext::Traits for this window and initialize with
     // some defaults:
-	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits(osg::DisplaySettings::instance().get());
+    osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits(osg::DisplaySettings::instance().get());
 
-	//traits->hostName = si.hostName;
+    //traits->hostName = si.hostName;
     traits->displayNum = 0;//si.displayNum;
     traits->screenNum = si.screenNum;
     traits->x = 0;
@@ -1232,7 +1241,7 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
         else
             traits->windowDecoration = true;
     }
-    
+
     if ((n = XMLnode->FirstChildElement("multiSamples")))
     {
         int numSamples;
@@ -1241,26 +1250,26 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
             traits->samples = numSamples;
         }
     }
-    
+
     osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
 
-	// now search for cameras:
+    // now search for cameras:
     bool firstCamera = true;
-	for ( n = XMLnode->FirstChildElement("camera"); n; n = n->NextSiblingElement("camera") )
-	{
-	    osg::Camera *cam;
-	     if (firstCamera)
-	     {
-	         cam = view->getCamera();
-	         firstCamera = false;
-	     }
-	     else
-	     {
-	         cam = new osg::Camera();
-	         view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
-	     }
-	     if (gc.valid()) cam->setGraphicsContext(gc.get());
-	     else std::cout << "ERROR: GraphicsContext not valid. Bad configuration file?" << std::endl;
+    for ( n = XMLnode->FirstChildElement("camera"); n; n = n->NextSiblingElement("camera") )
+    {
+        osg::Camera *cam;
+         if (firstCamera)
+         {
+             cam = view->getCamera();
+             firstCamera = false;
+         }
+         else
+         {
+             cam = new osg::Camera();
+             view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
+         }
+         if (gc.valid()) cam->setGraphicsContext(gc.get());
+         else std::cout << "ERROR: GraphicsContext not valid. Bad configuration file?" << std::endl;
 
         // Projection matrix aspect fix (can be overridden using either the
         // frustum or perspective configuration values in config file)
@@ -1284,10 +1293,10 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
         cam->setDrawBuffer(buffer);
         cam->setReadBuffer(buffer);
         */
-	}
+    }
 
-	view->setLightingMode(osg::View::SKY_LIGHT);
-	view->addEventHandler(new osgViewer::StatsHandler);
+    view->setLightingMode(osg::View::SKY_LIGHT);
+    view->addEventHandler(new osgViewer::StatsHandler);
     view->setSceneData(spinApp::Instance().sceneManager_->rootNode.get());
     viewer.addView(view.get());
 
@@ -1316,7 +1325,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         printf("\n");
         fflush(stdout);
     }
-    
+
 
     // make sure there is at least one argument (ie, a method to call):
     if (!argc) return 1;
@@ -1337,11 +1346,11 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         if (lo_is_numerical_type((lo_type)types[i]))
         {
             floatArgs.push_back( (float) lo_hires_val((lo_type)types[i], argv[i]) );
-		} else {
+        } else {
             stringArgs.push_back( (const char*) argv[i] );
         }
     }
-    
+
     if ((theMethod=="setParam") && (stringArgs.size()==1) && (floatArgs.size()==1))
     {
         bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
@@ -1355,7 +1364,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         {
             // Params for the DoF PPU
             if(lIsDof)
-            { 
+            {
                 if (stringArgs[0] == "gaussSigma")
                 {
                     viewer->mDofPPUs[i]->setGaussSigma(floatArgs[0]);
@@ -1441,8 +1450,8 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 }
             }
         }
-        
-        
+
+
         return 1;
     }
     else if ((theMethod=="setOutlineColor"))
@@ -1470,9 +1479,9 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         for(unsigned int i=0; i<viewer->getNumViews(); ++i)
         {
             viewer->getView(i)->getCamera()->setProjectionMatrixAsFrustum(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3], floatArgs[4], floatArgs[5]);
-       
+
             if(lIsDof)
-            { 
+            {
                 viewer->mDofPPUs[i]->setNear(floatArgs[4]);
                 viewer->mDofPPUs[i]->setFar(floatArgs[5]);
             }
@@ -1482,7 +1491,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 viewer->mSsaoPPUs[i]->setProjectionMatrix(viewer->getView(i)->getCamera()->getProjectionMatrix());
             }
         }
-        
+
         return 1;
     }
     else if ((theMethod=="setVelocityScalars") && (floatArgs.size()==3))
@@ -1500,7 +1509,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         viewer->setSpaceNavigatorNode(stringArgs[0]);
         return 1;
     }
-    
+
     return 1;
 }
 

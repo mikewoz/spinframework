@@ -47,7 +47,7 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          Properties::NON_VIRTUAL,
 	          __float__getMass,
 	          "",
-	          "");
+	          "Returns the current mass of the object. ");
 	I_Method1(void, setDynamic, IN, int, isDynamic,
 	          Properties::NON_VIRTUAL,
 	          __void__setDynamic__int,
@@ -57,12 +57,12 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          Properties::NON_VIRTUAL,
 	          __int__getDynamic,
 	          "",
-	          "");
+	          "Returns whether dynamic forces like gravity are enabled for the object. ");
 	I_Method1(bool, checkCollisions, IN, btTransform, tranform,
 	          Properties::NON_VIRTUAL,
 	          __bool__checkCollisions__btTransform,
 	          "",
-	          "");
+	          "A bool that sets whether collision checking is enabled or disabled. ");
 	I_Method3(void, setTranslation, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setTranslation__float__float__float,

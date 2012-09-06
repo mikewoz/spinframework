@@ -444,7 +444,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          Properties::VIRTUAL,
 	          __osg_Vec3__getTranslation,
 	          "",
-	          "");
+	          "Returns the local translation offset with respect to the node's parent. ");
 	I_Method0(void, updateStateSet,
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,

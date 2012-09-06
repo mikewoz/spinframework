@@ -32,42 +32,42 @@ BEGIN_OBJECT_REFLECTOR(spin::RayNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setVisible__int,
 	          "",
-	          "");
+	          "Set whether the ray is visible or not. ");
 	I_Method1(void, setLength, IN, float, length,
 	          Properties::NON_VIRTUAL,
 	          __void__setLength__float,
 	          "",
-	          "");
+	          "Sets the length of the ray from its origin. ");
 	I_Method1(void, setThickness, IN, float, thickness,
 	          Properties::NON_VIRTUAL,
 	          __void__setThickness__float,
 	          "",
-	          "");
+	          "Sets the thickness of the ray's line. ");
 	I_Method4(void, setColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
 	          "",
-	          "");
+	          "Sets the color of the ray's line. ");
 	I_Method0(int, getVisible,
 	          Properties::NON_VIRTUAL,
 	          __int__getVisible,
 	          "",
-	          "");
+	          "Returns whether the ray is currently set as visible or invisible. ");
 	I_Method0(float, getLength,
 	          Properties::NON_VIRTUAL,
 	          __float__getLength,
 	          "",
-	          "");
+	          "Returns the currently set length of the ray from its origin. ");
 	I_Method0(float, getThickness,
 	          Properties::NON_VIRTUAL,
 	          __float__getThickness,
 	          "",
-	          "");
+	          "Returns the currently set thickness of the ray's line. ");
 	I_Method0(osg::Vec4, getColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getColor,
 	          "",
-	          "");
+	          "Returns the currently set color of the ray in RGBA value. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

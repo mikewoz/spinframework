@@ -72,17 +72,17 @@ BEGIN_OBJECT_REFLECTOR(spin::LightSource)
 	          Properties::NON_VIRTUAL,
 	          __float__getCutoff,
 	          "",
-	          "");
+	          "Returns the current cutoff angle, measured from the center of the cone to the outer edge. ");
 	I_Method0(float, getExponent,
 	          Properties::NON_VIRTUAL,
 	          __float__getExponent,
 	          "",
-	          "");
+	          "Returns the current exponent value that defines the intensity of the light around the edges of the cone. ");
 	I_Method0(float, getAttenuation,
 	          Properties::NON_VIRTUAL,
 	          __float__getAttenuation,
 	          "",
-	          "");
+	          "Returns the current attenuation, which is the amount of attenuation that occurs as the light moves away from a surface. ");
 	I_Method0(osg::Vec4, getAmbient,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getAmbient,

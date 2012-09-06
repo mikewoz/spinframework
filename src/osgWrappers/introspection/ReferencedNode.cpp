@@ -53,13 +53,6 @@ BEGIN_VALUE_REFLECTOR(spin::EventScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(boost::python::object)
-	I_DeclaringFile("ReferencedNode.h");
-	I_Constructor0(____object,
-	               "",
-	               "");
-END_REFLECTOR
-
 BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
@@ -271,6 +264,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __bool__removeEventScript__C5_char_P1,
 	          "",
 	          "");
+	I_Method1(void, setNodeMask, IN, osg::Node::NodeMask, nm,
+	          Properties::NON_VIRTUAL,
+	          __void__setNodeMask__osg_Node_NodeMask,
+	          "",
+	          "");
 	I_ProtectedMethod1(bool, legalParent, IN, spin::t_symbol *, newParent,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -301,6 +299,9 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(std::string, ID, 
 	                 __std_string__getID, 
 	                 0);
+	I_SimpleProperty(osg::Node::NodeMask, NodeMask, 
+	                 0, 
+	                 __void__setNodeMask__osg_Node_NodeMask);
 	I_SimpleProperty(spin::t_symbol *, NodeSymbol, 
 	                 __t_symbol_P1__getNodeSymbol, 
 	                 0);
