@@ -31,7 +31,7 @@ class MaskRendering : virtual public osg::Referenced
         /***********/
         void createMaskPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Camera* pCamera)
         {
-            osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");            
+            osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
             // If last unit is null the first unit will bypass the color output of the camera
@@ -63,7 +63,7 @@ class MaskRendering : virtual public osg::Referenced
                 lMaskCamera->setCamera(pCamera);
                 lMaskCamera->setName("maskCamera");
             }
-            
+
             // Create the bypass for the first color buffer of this camera
             osgPPU::UnitCameraAttachmentBypass* lMaskBypass;
             {
@@ -75,6 +75,7 @@ class MaskRendering : virtual public osg::Referenced
 
             // Apply the mask
             osgPPU::Unit* lMask = new osgPPU::UnitInOut();
+            lMask->setName("maskInOut");
             maskAttr = new osgPPU::ShaderAttribute();
             {
                 osg::Shader* lVShader = osgDB::readShaderFile("mask_vp.glsl", vertexOptions.get());
