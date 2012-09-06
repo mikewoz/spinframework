@@ -108,9 +108,29 @@ typedef struct {
     #ifndef DISABLE_PYTHON_
     boost::python::object run;
     #endif
+
+	/**
+	 * A string containing the name of the Event.
+	 */
+	
     std::string eventName;
+
+	/**
+	 * Whether the event is enabled or disabled.
+	 */
+	
     bool enabled;
+
+	/**
+	 * Whether the event should be calculated serverside or only clientside.
+	 */
+	
     bool serverSide;
+
+	/**
+	 * The path of the python script to be attached.
+	 */
+	
     std::string path;
     std::string params;
     std::string pyScript;

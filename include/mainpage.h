@@ -293,24 +293,30 @@
  * Open Pd-extended. From the dropdown menu at the top of the screen, select
  * Pd-extended > Preferences > Path (pictured below).
  *
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/images/PD_Path_Selection_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/PDPathSelection.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/images/PDPathSelection.png>
+ * </a> @endhtmlonly
  * 
  * <br>
  * A window will open which displays all of the locations that Pure Data looks
  * to find the information it needs when it loads up. We need to add the
  * pdsheefa tools to this list so that Pure Data can access them.
  * 
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/images/PD_path_addition_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/PdPathAddition.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/images/PdPathAddition.png>
+ * </a> @endhtmlonly
  * 
  * <br>
  * Select New. In the file browser that opens, select the location where you
  * have placed pdsheefa. These tools are now available through your Pure Data
  * interface.
  * 
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/images/select_pdsheefa_location_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/selectPdsheefaLocation.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/images/selectPdsheefaLocation.png>
+ * </a> @endhtmlonly
  * 
  * <br>
  * Select OK to close the window.
@@ -325,14 +331,18 @@
  * 
  * Open spinserverUI. 
  *
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/open_spin_server_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/openSpinServer.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/images/openSpinServer.png>
+ * </a> @endhtmlonly
  * 
  * <br>
  * Also, open spinviewerUI.
  * 
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/images/open_spin_viewer_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/openSpinViewer.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/images/openSpinViewer.png>
+ * </a> @endhtmlonly
  * 
  * It is important here to verify that spinviewerUI and spinserverUI are
  * communicating to each other. When you open sinviewerUI, you should see a
@@ -343,8 +353,10 @@
  * button "Toggle Grid," which is the rightmost button in the list of buttons at
  * the top left of your spin viewer window (see below).
  * 
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/images/open_pd_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/openPd.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/images/openPd.png>
+ * </a> @endhtmlonly
  * 
  * <br>
  * <b>STEP 6:</b> Try the examples
@@ -352,14 +364,17 @@
  * From with Pure Data, select File > Open from the dropdown menu at the top of
  * the screen. 
  *
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/images/pdsheefa_examples_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/pdsheefaExamples.png>
+ * </a> @endhtmlonly
  * 
  * Using the file browser that opens, find the pdsheefa folder where
  * you have placed it on the hard drive, and find the examples subfolder.
  * 
- * <br><br>
- * @image html http://spinframework.org/sites/default/files/images/spin_messaging_tool_in_pdsheefa_0.png
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/images/spinMessagingToolInPdsheefa.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/images/spinMessagingToolInPdsheefa.png>
+ * </a> @endhtmlonly
  * 
  * The files that begin with the numbers 01-99 are SPIN tools that come with
  * included explanations. Open the first one and begin learning SPIN!
@@ -510,6 +525,11 @@
  * Click the "New" button and use the file browser to show Pd the location where
  * you have placed the pdsheeda files.
  * 
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/PD_Paths.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/PD_Paths.png>
+ * </a> @endhtmlonlyhttp://spinframework.org/sites/default/files/PD_Paths.png
+ * 
  * <br>
  * <b>STEP 6:</b> Test SPIN
  * 
@@ -526,11 +546,14 @@
  * Toggle the grid on and off to ensure that OSC messages are in fact being
  * transmitted.
  * 
- * <br>
- * <b>STEP 7:</b>
+ * <br><br> @htmlonly
+ * <a href=http://spinframework.org/sites/default/files/SPIN_setup.png>
+ * <image height=400 width=600 src=http://spinframework.org/sites/default/files/SPIN_setup.png>
+ * </a> @endhtmlonly
  * 
- * Go through all the examples in the pdsheefa/examples that are numbered 01 to
- * 99 and learn about various features of SPIN.
+ * Applications, from top left: a pdsheefa patch for Pure Data, spinviewer,
+ * spinserver, Pure Data extended at bottom left and a linux terminal at bottom
+ * right.
  * 
  * <br>
  * Start learning, with an <a href=introtospin.html>Introduction to SPIN</a>
@@ -933,6 +956,9 @@
  * billboards the object but only on the XY plane (if you fly over it, you
  * will see the top rather than the face, which will always turn to face you
  * if you go around the object by any side at the same height).
+ *
+ * <br>
+ * <a href=index.html>Return to Index</a>
  * 
  */
 

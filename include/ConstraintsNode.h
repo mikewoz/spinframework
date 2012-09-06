@@ -203,7 +203,12 @@ enum CollisionMode {   POINT,               /*!< When computing collisions with
 
 
     virtual void setTranslation (float x, float y, float z);
-    virtual osg::Vec3 getTranslation() const { return GroupNode::getTranslation(); };
+
+	/**
+	 * Returns the local translation offset with respect to the node's parent.
+	 */
+
+	virtual osg::Vec3 getTranslation() const { return GroupNode::getTranslation(); };
 
     virtual void translate (float x, float y, float z);
     virtual void move (float x, float y, float z);
