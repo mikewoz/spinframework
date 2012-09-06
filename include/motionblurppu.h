@@ -43,7 +43,7 @@ class MotionBlurRendering : virtual public osg::Referenced
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");            
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
-            // If last unit is nullthe first unit will bypass the color output of the camera
+            // If last unit is null the first unit will bypass the color output of the camera
             osgPPU::Unit* lCurrent;
             if(pLastUnit == NULL)
             {

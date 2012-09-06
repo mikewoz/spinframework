@@ -82,6 +82,10 @@ public:
      * Creates a texture from a path on disk.
      */
     void setPath (const char* newPath);
+
+	/**
+	 * Returns the path on disk from where the texture is pulled.
+	 */
     const char *getPath() const { return _path.c_str(); }
 
     void setTextureMode(TextureMode mode);

@@ -69,6 +69,11 @@ public:
      * GroupNode functions will have any effect.
      */
     void setMass(float mass);
+
+	/**
+	 * Returns the current mass of the object.
+	 */
+	
     float getMass() const { return (float)mass_; };
 
     /**
@@ -76,7 +81,16 @@ public:
      * non-zero mass for this to work.
      */
     void setDynamic(int isDynamic);
+
+	/**
+	 * Returns whether dynamic forces like gravity are enabled for the object.
+	 */
+	
     int getDynamic() const { return (int)isDynamic_; };
+
+	/**
+	 * A bool that sets whether collision checking is enabled or disabled.
+	 */
 
     bool checkCollisions(btTransform tranform);
     virtual void setTranslation (float x, float y, float z);

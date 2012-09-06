@@ -68,8 +68,6 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     libloUtil.cpp \
     LightSource.cpp \
     Listener.cpp \
-    MeasurementNode.cpp \
-    MediaManager.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
     nodeVisitors.cpp \
@@ -122,8 +120,6 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/LightSource.h \
     $(top_srcdir)/include/Listener.h \
     $(top_srcdir)/include/mainpage.h \
-    $(top_srcdir)/include/MeasurementNode.h \
-    $(top_srcdir)/include/MediaManager.h \
     $(top_srcdir)/include/Menu3D.h \
     $(top_srcdir)/include/ModelNode.h \
     $(top_srcdir)/include/nodeVisitors.h \

@@ -64,14 +64,52 @@ public:
     RayNode(SceneManager *sceneManager, const char* initID);
     virtual ~RayNode();
 
+	/**
+	 * Set whether the ray is visible or not.
+	 */
+
     void setVisible        (int visibilityFlag);
+
+	/**
+	 * Sets the length of the ray from its origin.
+	 */
+	
     void setLength        (float length);
+
+	/**
+	 * Sets the thickness of the ray's line.
+	 */
+	
     void setThickness    (float thickness);
+
+	/**
+	 * Sets the color of the ray's line.
+	 */
+	
     void setColor        (float red, float green, float blue, float alpha);
 
+	/**
+	 * Returns whether the ray is currently set as visible or invisible.
+	 */
+	
     int getVisible() const { return (int) this->visible; }
+
+	/**
+	 * Returns the currently set length of the ray from its origin.
+	 */
+	
     float getLength() const { return this->length; };
+
+	/**
+	 * Returns the currently set thickness of the ray's line.
+	 */
+	
     float getThickness() const { return this->thickness; };
+
+	/**
+	 * Returns the currently set color of the ray in RGBA value.
+	 */
+	
     osg::Vec4 getColor() const { return this->color;  };
 
 
