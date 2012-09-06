@@ -117,8 +117,26 @@ public:
      */
 
     int getVisible() const;
+
+	/**
+	 * Returns the current cutoff angle, measured from the center of the cone
+	 * to the outer edge.
+	 */
+	
     float getCutoff() const;
+
+	/**
+	 * Returns the current exponent value that defines the intensity of the 
+	 * light around the edges of the cone.
+	 */
+	
     float getExponent() const;
+
+	/**
+	 * Returns the current attenuation, which is the amount of attenuation that
+	 * occurs as the light moves away from a surface.
+	 */
+	
     float getAttenuation() const;
 
     /**

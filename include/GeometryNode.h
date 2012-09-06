@@ -102,6 +102,12 @@ public:
      * whether the backface is culled or not.
      */
     void setSingleSided (int singleSided);
+
+	/**
+	 * Returns whether both sides of the shape are being rendered or if the 
+	 * backface is being culled.
+	 */
+	
     int getSingleSided() const { return (int)singleSided_; }
 
 
