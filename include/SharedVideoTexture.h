@@ -60,7 +60,7 @@ namespace spin
 {
 
 /**
- * \brief Allows reception of video from an other process into an OSG texture.
+ * \brief Allows reception of video from another process into an OSG texture.
  *
  * This is accomplished by the use of libshmdata. 
  * http://code.sat.qc.ca/redmine/projects/libshmdata
