@@ -35,27 +35,18 @@ class MaskRendering : virtual public osg::Referenced
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
             // If last unit is null the first unit will bypass the color output of the camera
-            osgPPU::Unit* lCurrent;
+            osgPPU::Unit* lColorBypass;
             if(pLastUnit == NULL)
             {
-                lCurrent = new osgPPU::UnitCameraAttachmentBypass();
-                ((osgPPU::UnitCameraAttachmentBypass*)lCurrent)->setBufferComponent(osg::Camera::COLOR_BUFFER0);
-                ((osgPPU::UnitCameraAttachmentBypass*)lCurrent)->setName("current");
-                pParent->addChild(lCurrent);
+                lColorBypass = new osgPPU::UnitCameraAttachmentBypass();
+                ((osgPPU::UnitCameraAttachmentBypass*)lColorBypass)->setBufferComponent(osg::Camera::COLOR_BUFFER0);
+                ((osgPPU::UnitCameraAttachmentBypass*)lColorBypass)->setName("current");
+                pParent->addChild(lColorBypass);
             }
             else
             {
-                lCurrent = pLastUnit;
+                lColorBypass = pLastUnit;
             }
-
-            // Get the bypass from the pipeline's camera
-            osgPPU::UnitCameraAttachmentBypass* lColorBypass;
-            {
-                lColorBypass = new osgPPU::UnitCameraAttachmentBypass();
-                lColorBypass->setBufferComponent(osg::Camera::COLOR_BUFFER0);
-                lColorBypass->setName("colorBypass");
-            }
-            lCurrent->addChild(lColorBypass);
 
             // Create a unit for the additional camera
             osgPPU::UnitCamera* lMaskCamera = new osgPPU::UnitCamera();
