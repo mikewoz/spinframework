@@ -48,12 +48,16 @@ class MaskRendering : virtual public osg::Referenced
                 lColorBypass = pLastUnit;
             }
 
+            // Add a new camera to the pipeline
+            pParent->setCamera(pCamera);
+
             // Create a unit for the additional camera
             osgPPU::UnitCamera* lMaskCamera = new osgPPU::UnitCamera();
             {
                 lMaskCamera->setCamera(pCamera);
                 lMaskCamera->setName("maskCamera");
             }
+            pParent->addChild(lMaskCamera);
 
             // Create the bypass for the first color buffer of this camera
             osgPPU::UnitCameraAttachmentBypass* lMaskBypass;
