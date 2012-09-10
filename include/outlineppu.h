@@ -45,6 +45,15 @@ class OutlineRendering : virtual public osg::Referenced
         }
 
         /*******************/
+        void setOutlineMode(int mode)
+        {
+            if(mode != 0 && mode != 1)
+                return;
+
+            outlineAttr->set("uMode", mode);
+        }
+
+        /*******************/
         void setOutlineStrength(float radius)
         {
             dilatexAttr->set("radius", radius);
@@ -114,15 +123,18 @@ class OutlineRendering : virtual public osg::Referenced
                 outlineAttr->setName("OutlineShader");
 
                 outlineAttr->add("uPass", osg::Uniform::INT);
+                outlineAttr->add("uMode", osg::Uniform::INT);
                 outlineAttr->add("uNear", osg::Uniform::FLOAT);
                 outlineAttr->add("uFar", osg::Uniform::FLOAT);
 
                 outlineAttr->set("uPass", 1);
+                outlineAttr->set("uMode", 0);
                 outlineAttr->set("uNear", zNear);
                 outlineAttr->set("uFar", zFar);
 
                 lEdges->getOrCreateStateSet()->setAttributeAndModes(outlineAttr);
                 lEdges->setInputToUniform(lDepth, "uDepthMap", true);
+                lEdges->setInputToUniform(lColor, "uColorMap", true);
             }
 
             // A blur filter is applied to control the strength of the outline

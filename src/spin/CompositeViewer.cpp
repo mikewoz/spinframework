@@ -1448,6 +1448,10 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 {
                     viewer->mOutlinePPUs[i]->setGlowPower(floatArgs[0]);
                 }
+                else if (stringArgs[0] == "outlineMode")
+                {
+                    viewer->mOutlinePPUs[i]->setOutlineMode((int)floatArgs[0]);
+                }
             }
         }
 
