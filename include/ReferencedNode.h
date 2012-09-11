@@ -325,7 +325,7 @@ public:
     bool removeEventScript( const char* label );
 
     // a NodeMask is an unsigned int.
-    void setNodeMask( osg::Node::NodeMask nm ) { osg::Node::setNodeMask(nm); }
+    void setNodeMask( osg::Node::NodeMask nm );
 
     // FIXME
     osg::NodePath currentNodePath_;

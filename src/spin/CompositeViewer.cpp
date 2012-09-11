@@ -182,10 +182,10 @@ void CompositeViewer::setupCamera()
 
         // set up the background color and clear mask.
         lCamera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
-        lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // set viewport
-        lCamera->setViewport(lCamera->getViewport()); // Useful ??
+        //lCamera->setViewport(lCamera->getViewport()); // Useful ?? no.
         lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
         //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
 
@@ -225,6 +225,18 @@ void CompositeViewer::viewerInit()
     }
 }
 
+
+#define MASK_ALL   0x00ff
+#define MASK_SCENE 0x0010
+#define MASK_MASK  0x0020
+
+// WORKING  0x2 0xf
+// NOT 10, 20
+
+//#define MASK_SCENE MASK_ALL
+//#define MASK_MASK  MASK_ALL
+
+
 //! Setup osgppu for rendering
 void CompositeViewer::initializePPU(unsigned int pEffect)
 {
@@ -245,7 +257,8 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
         osgViewer::View* lView = getView(i);
 
-        dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
+        osg::Group* lGroup = dynamic_cast<osg::Group*>(lView->getSceneData());
+        lGroup->addChild( lProcessor );
 
         // initialize the post process
         lProcessor->setCamera(lView->getCamera());
@@ -307,17 +320,40 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // Mask effect
         if((pEffect & PPU_MASK) != 0)
         {
-            osg::Camera *slaveCam = new osg::Camera( *lView->getCamera() );
-            slaveCam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
-            slaveCam->setCullMask( 0x20 );
-            //???slaveCam->setRenderOrder( osg::Camera::PRE_RENDER );
-            lView->addSlave( slaveCam );
-
             osg::Camera *cam = lView->getCamera();
-            cam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
-            slaveCam->setCullMask( 0x10 );
+
+            int xsize = cam->getViewport()->width();
+            int ysize = cam->getViewport()->height();
+            osg::Texture* texture2D = CompositeViewer::createRenderTexture( xsize, ysize, false );
+
+
+            osg::Camera *slaveCam = new osg::Camera;
+
+            slaveCam->addChild( spinApp::Instance().sceneManager_->rootNode.get() );
+            lGroup->addChild( slaveCam );
+
+            //slaveCam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
+            slaveCam->setCullMask( MASK_MASK );
+            slaveCam->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            slaveCam->setClearColor(osg::Vec4(0,0,0,0));
+            osg::Viewport* vp = new osg::Viewport(0,0,xsize, ysize);
+            slaveCam->setViewport( vp );
+            //printf("... [0x%p]\n", vp);
+            slaveCam->setReferenceFrame(osg::Transform::RELATIVE_RF);
+            slaveCam->setRenderOrder(osg::Camera::PRE_RENDER);
+            slaveCam->attach(osg::Camera::COLOR_BUFFER0, texture2D);
+            slaveCam->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT);
+            slaveCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+
+            cam->getGraphicsContext()->getState()->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
+            // cam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
+            cam->setCullMask( MASK_SCENE );
+
+            printf("cam getCullMask: %u 0x%x\n", cam->getCullMask(), cam->getCullMask() );
+            printf("slaveCam getCullMask: %u 0x%x\n", slaveCam->getCullMask(), slaveCam->getCullMask() );
 
             MaskRendering* lMask = new MaskRendering();
+
             lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam);
 
             mMaskPPUs.push_back(lMask);

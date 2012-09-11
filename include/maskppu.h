@@ -49,7 +49,7 @@ class MaskRendering : virtual public osg::Referenced
             }
 
             // Add a new camera to the pipeline
-            pParent->setCamera(pCamera);
+            /// NOOOOpParent->setCamera(pCamera);
 
             // Create a unit for the additional camera
             osgPPU::UnitCamera* lMaskCamera = new osgPPU::UnitCamera();
