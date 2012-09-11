@@ -491,7 +491,7 @@ TextNode::TextNode (SceneManager *sceneManager, const char* initID) : GroupNode(
 	this->setName(this->getID() + ".TextNode");
 	this->setNodeType("TextNode");
 
-	//_text = "";
+	text_ = this->getID();
     drawMode_ = GLYPH;
 	font_ = "arial.ttf";
 	characterSize_ = 0.1f;
@@ -568,6 +568,12 @@ void TextNode::setDrawMode (DrawMode mode)
 
 void TextNode::setText (const char *s)
 {
+    if (!s)
+    {
+        std::cout << "WARNING: TextNode::setText got empty string" << std::endl;
+        return;
+    }
+    
 	//if (textLabel_->getText().createUTF8EncodedString() != string(s))
 	if (text_ != std::string(s))
 	{
