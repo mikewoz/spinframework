@@ -175,7 +175,6 @@ spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(sp
 #ifdef WITH_SPATOSC
     audioScene = new spatosc::Scene();
     audioScene->setVerbose(true);
-    audioScene->debugPrint();
 #endif
 
     _pyInitialized = false;
