@@ -58,6 +58,21 @@ BEGIN_OBJECT_REFLECTOR(spin::Listener)
 	          __void__setParam__C5_char_P1__float,
 	          "",
 	          "");
+	I_Method3(void, setTranslation, IN, float, x, IN, float, y, IN, float, z,
+	          Properties::VIRTUAL,
+	          __void__setTranslation__float__float__float,
+	          "",
+	          "The local translation offset for this node with respect to it's parent ");
+	I_Method3(void, setOrientation, IN, float, pitch, IN, float, roll, IN, float, yaw,
+	          Properties::VIRTUAL,
+	          __void__setOrientation__float__float__float,
+	          "",
+	          "The local orientation offset for this node with respect to it's parent ");
+	I_Method4(void, setOrientationQuat, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
+	          Properties::VIRTUAL,
+	          __void__setOrientationQuat__float__float__float__float,
+	          "",
+	          "Set the orientation offset as a quaternion ");
 	I_Method1(void, setURI, IN, const char *, uri,
 	          Properties::VIRTUAL,
 	          __void__setURI__C5_char_P1,

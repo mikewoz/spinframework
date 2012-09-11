@@ -96,12 +96,12 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setDrawMode__DrawMode,
 	          "",
-	          "Choose whether the text is drawn in 2D glyphs, or as 3D geometry. ");
+	          "Choose whether the text is drawn in 2D glyphs, or as 3D geometry, with respect to the DrawMode enum. ");
 	I_Method0(int, getDrawMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getDrawMode,
 	          "",
-	          "");
+	          "Returns whether the text is drawn in 2d glyphs or as 3d geometry, with respect to the DrawMode enum. ");
 	I_Method1(void, setText, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setText__C5_char_P1,
@@ -111,12 +111,12 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getText,
 	          "",
-	          "");
+	          "Returns the currently set text string. ");
 	I_Method0(std::string, getTextString,
 	          Properties::NON_VIRTUAL,
 	          __std_string__getTextString,
 	          "",
-	          "");
+	          "Returns the currently set text string. ");
 	I_Method1(void, setTextValue, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setTextValue__C5_char_P1,
@@ -131,7 +131,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getRepetitions,
 	          "",
-	          "");
+	          "Returns the current value for the number of text repititions. ");
 	I_Method1(void, setFont, IN, const char *, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setFont__C5_char_P1,
@@ -141,7 +141,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getFont,
 	          "",
-	          "");
+	          "Returns the currently set font associated to this text node. ");
 	I_Method1(void, setFontResolution, IN, int, resolution,
 	          Properties::NON_VIRTUAL,
 	          __void__setFontResolution__int,
@@ -151,7 +151,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getFontResolution,
 	          "",
-	          "");
+	          "Returns the currently set font resolution. ");
 	I_Method1(void, setCharacterSize, IN, float, s,
 	          Properties::NON_VIRTUAL,
 	          __void__setCharacterSize__float,
@@ -161,7 +161,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getCharacterSize,
 	          "",
-	          "");
+	          "Returns the currently-set size of text characters (in local coordinate system units). ");
 	I_Method1(void, setThickness, IN, float, thickness,
 	          Properties::NON_VIRTUAL,
 	          __void__setThickness__float,
@@ -171,7 +171,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getThickness,
 	          "",
-	          "");
+	          "Returns the currently-set value of thickness for 3d text. ");
 	I_Method2(void, setBoxSize, IN, float, width, IN, float, height,
 	          Properties::NON_VIRTUAL,
 	          __void__setBoxSize__float__float,
@@ -186,7 +186,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getLineSpacing,
 	          "",
-	          "");
+	          "Returns the currently-set line spacing as a percentage of character height. ");
 	I_Method1(void, setAlignment, IN, int, alignment,
 	          Properties::NON_VIRTUAL,
 	          __void__setAlignment__int,
@@ -201,7 +201,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getColor,
 	          "",
-	          "");
+	          "Returns the currently-set text color in RGBA values. ");
 	I_Method4(void, setBgColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setBgColor__float__float__float__float,
@@ -221,7 +221,7 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getMargin,
 	          "",
-	          "");
+	          "Returns the currently-set margins for the text in the node. ");
 	I_Method1(void, setBillboard, IN, spin::TextNode::billboardType, t,
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__billboardType,
@@ -266,12 +266,12 @@ BEGIN_OBJECT_REFLECTOR(spin::TextNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setLighting__int,
 	          "",
-	          "Specify whether both sides or only one side of the text is rendered. ie, whether the backface is culled or not. ");
+	          "Sets whether lighting has an effect on the text or not. If not, it is self-illuminated. ");
 	I_Method0(int, getLighting,
 	          Properties::NON_VIRTUAL,
 	          __int__getLighting,
 	          "",
-	          "");
+	          "Returns the currently-set lighting value. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
