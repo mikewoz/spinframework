@@ -15,6 +15,7 @@ uniform sampler2D uGlowMap;
 uniform float uNear;
 uniform float uFar;
 uniform int uPass;
+uniform int uMode;
 uniform float osgppu_ViewportWidth;
 uniform float osgppu_ViewportHeight;
 uniform vec4 uOutlineColor;
@@ -26,7 +27,7 @@ float linearDepth(const float d)
 {
     float a = uFar / (uFar-uNear);
     float b = uFar*uNear / (uNear-uFar);
-    return b / (d-a);
+    return b / ((d-a)*uFar);
 }
 
 // Small function which returns the depth value of the
@@ -39,7 +40,17 @@ float fetchDepth(const int u, const int v)
     return texture2D(uDepthMap, texcoord.st + vec2(u*lXRatio, v*lYRatio)).r;
 }
 
-mat3 fetchSquare()
+// Returns the luminance of the fragment offset by (u,v)
+float fetchLuminance(const int u, const int v)
+{
+    float lXRatio = 1.0 / osgppu_ViewportWidth;
+    float lYRatio = 1.0 / osgppu_ViewportHeight;
+
+    vec3 lColor = texture2D(uColorMap, texcoord.st + vec2(u*lXRatio, v*lYRatio)).rgb;
+    return 0.2126*lColor.r + 0.7152*lColor.g + 0.0722*lColor.b;
+}
+
+mat3 fetchSquareDepth()
 {
     mat3 lD;
     lD[0][0] = fetchDepth(-1, -1);
@@ -55,7 +66,7 @@ mat3 fetchSquare()
     return lD;
 }
 
-mat3 fetchSquareLinear()
+mat3 fetchSquareDepthLinear()
 {
     mat3 lD;
     lD[0][0] = linearDepth(fetchDepth(-1, -1));
@@ -71,10 +82,30 @@ mat3 fetchSquareLinear()
     return lD;
 }
 
+mat3 fetchSquareLuminance()
+{
+    mat3 lD;
+    lD[0][0] = fetchLuminance(-1, -1);
+    lD[1][0] = fetchLuminance(0, -1);
+    lD[2][0] = fetchLuminance(1, -1);
+    lD[0][1] = fetchLuminance(-1, 0);
+    lD[1][1] = fetchLuminance(0, 0);
+    lD[2][1] = fetchLuminance(1, 0);
+    lD[0][2] = fetchLuminance(-1, 1);
+    lD[1][2] = fetchLuminance(0, 1);
+    lD[2][2] = fetchLuminance(1, 1);
+
+    return lD;
+}
+
 // Applies the Sobel operator
 float sobel()
 {
-    mat3 lD = fetchSquare();
+    mat3 lD;
+    if(uMode == 0)
+        lD = fetchSquareDepthLinear();
+    else if(uMode == 1)
+        lD = fetchSquareLuminance();
 
     float gx, gy;
     gx = -1*lD[0][0]-2*lD[1][0]-1*lD[2][0]
@@ -88,7 +119,11 @@ float sobel()
 // Applies the Frei-chen operator
 float freiChen()
 {
-    mat3 lD = fetchSquareLinear();
+    mat3 lD;
+    if(uMode == 0)
+        lD = fetchSquareDepthLinear();
+    else if(uMode == 1)
+        lD = fetchSquareLuminance();
 
     float g1, g2, g3, g4, g5, g6, g7, g8, g9;
     float denom = 1/(2*SQRT2);
@@ -133,7 +168,13 @@ void main()
     // first pass: detect the edges on the depth map
     if(uPass == 1)
     {
-        gl_FragData[0].rgb = vec3(sobel());
+        // We need to check if we are on the border of the screen or not
+        float lXRatio = 1.0/osgppu_ViewportWidth;
+        float lYRatio = 1.0/osgppu_ViewportHeight;
+        float lIsBorder = step(lXRatio, texcoord.s) * (1.0-step(1.0-lXRatio, texcoord.s))
+            * step(lYRatio, texcoord.t) * (1.0-step(1.0-lYRatio, texcoord.t));
+
+        gl_FragData[0].rgb = vec3(sobel()) * lIsBorder;
         //gl_FragData[0].rgb = vec3(freiChen());
         gl_FragData[0].a = 1.0;
     }

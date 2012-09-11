@@ -110,7 +110,8 @@ void SoundNode::callbackUpdate(osg::NodeVisitor* nv)
 
 bool SoundNode::dumpGlobals(bool forced)
 {
-    DSPNode::dumpGlobals();
+    DSPNode::dumpGlobals(forced);
+    
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
@@ -123,7 +124,7 @@ bool SoundNode::dumpGlobals(bool forced)
     }
 #endif
     return 1;
-}   
+}
 
 void SoundNode::setParam (const char *paramName, const char *paramValue)
 {
@@ -152,11 +153,7 @@ void SoundNode::setTranslation (float x, float y, float z)
     GroupNode::setTranslation(x,y,z);
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
-    {
-        this->globalMatrix_ = getGlobalMatrix();
-        osg::Vec3 myPos = globalMatrix_.getTrans();
-        spatOSCSource->setPosition(myPos.x(), myPos.y(), myPos.z());
-    }
+        this->dumpGlobals(true);
 #endif
 
 }
@@ -166,11 +163,7 @@ void SoundNode::setOrientation (float p, float r, float y)
     GroupNode::setOrientation(p,r,y);
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
-    {
-        this->globalMatrix_ = getGlobalMatrix();
-        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
-        spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
-    }
+        this->dumpGlobals(true);
 #endif
 }
 
@@ -179,11 +172,7 @@ void SoundNode::setOrientationQuat (float x, float y, float z, float w)
     GroupNode::setOrientationQuat(x,y,z,w);
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
-    {
-        this->globalMatrix_ = getGlobalMatrix();
-        osg::Vec3 myRot = QuatToEuler(globalMatrix_.getRotate());
-        spatOSCSource->setOrientation(myRot.x(), myRot.y(), myRot.z());
-    }
+        this->dumpGlobals(true);
 #endif
 }
 
