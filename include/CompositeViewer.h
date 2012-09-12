@@ -184,6 +184,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         float mOldTime;
         //DoFRendering mDoFSetup;
         bool mbInitialized;
+        bool mIsDome;   // Is this a dome view ?
        
 	    // navigation update stuff:
         std::string spnavNodeID_; 

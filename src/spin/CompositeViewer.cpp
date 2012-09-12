@@ -83,6 +83,7 @@ CompositeViewer::CompositeViewer(osg::ArgumentParser& args) : osgViewer::Composi
 //CompositeViewer::CompositeViewer(osg::ArgumentParser& args) : osgViewer::Viewer(args)
 {
     mbInitialized = false;
+    mIsDome = false;
     mOldTime = 0.0f;
     lastNavTick_ = osg::Timer::instance()->tick();
     velocityScalars_ = osg::Vec3(1,1,1);
@@ -162,9 +163,39 @@ void CompositeViewer::setupCamera()
     //for(osgViewer::ViewerBase::Cameras::iterator lIt = lCameras.begin();
     //    lIt != lCameras.end();
     //    lIt++)
-    for(unsigned int i=0; i<this->getNumViews(); ++i)
+
+    // Small to detect if this view is a dome view
+    // TODO: replace this by an attribute in the xml file
+    int lNbrCam = getView(0)->getNumSlaves();
+
+    if(lNbrCam != 7)
     {
-        osg::Camera* lCamera = this->getView(i)->getCamera();
+        lNbrCam = this->getNumViews();
+        mIsDome = false;
+    }
+    else
+    {
+        lNbrCam--; // Minus 1, because the last camera is filming the cube
+        mIsDome = true;
+    }
+
+    for(unsigned int i=0; i<lNbrCam; ++i)
+    {
+        osgViewer::View* lView;
+        osg::Camera* lCamera;
+        // If not dome, process view after view
+        if(!mIsDome)
+        {
+            lView = getView(i);
+            lCamera = lView->getCamera();
+        }
+        // else, slave camera after slave camera
+        else
+        {
+            lView = getView(0);
+            lCamera = lView->getSlave(i)._camera.get();
+        }
+
         int lWidth = lCamera->getViewport()->width();
         int lHeight = lCamera->getViewport()->height();
 
@@ -185,7 +216,7 @@ void CompositeViewer::setupCamera()
         lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // set viewport
-        lCamera->setViewport(lCamera->getViewport()); // Useful ??
+        //lCamera->setViewport(lCamera->getViewport()); // Useful ??
         lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
         //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
 
@@ -238,17 +269,53 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         return;
 
     // For each view, we create a processor
-    for(unsigned int i=0; i<this->getNumViews(); ++i)
+    // If this is a dome view, we do the same for each slave camera
+    
+    // Small hack to detect if this view is a dome view
+    // TODO: replace this by an attribute in the xml file
+    int lNbrCam = getView(0)->getNumSlaves();
+
+    if(lNbrCam != 7)
+    {
+        lNbrCam = this->getNumViews();
+        mIsDome = false;
+    }
+    else
+    {
+        lNbrCam--; // Minus 1, because the last camera is filming the cube
+        mIsDome = true;
+    }
+
+    for(unsigned int i=0; i<lNbrCam; ++i)
     {
         osgPPU::Processor* lProcessor;
         lProcessor = new osgPPU::Processor();
 
-        osgViewer::View* lView = getView(i);
+        osgViewer::View* lView;
+        osg::Camera* lCamera;
+        /*************************************/
+        // If not dome, process view after view
+        if(!mIsDome)
+        {
+            lView = getView(i);
+            dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
 
-        dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
+            lCamera = lView->getCamera();
 
-        // initialize the post process
-        lProcessor->setCamera(lView->getCamera());
+            // initialize the post process
+            lProcessor->setCamera(lCamera);
+        }
+        // else, slave camera after slave camera
+        else
+        {
+            lView = getView(0);
+            dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
+
+            lCamera = lView->getSlave(i)._camera.get();
+
+            // initialize the post process
+            lProcessor->setCamera(lCamera);
+        }
         lProcessor->setName("Processor");
         lProcessor->dirtyUnitSubgraph();
 
@@ -256,6 +323,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
         osgPPU::Unit* lastUnit = NULL;
 
+        /**********************************************/
         // SSAO effect must be applied before any other effect, especially those
         // which destroy information (such as DoF)
         if((pEffect & PPU_SSAO) != 0)
@@ -263,7 +331,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             SSAORendering* lSsao = new SSAORendering();
 
             // Gets the projection matrix
-            osg::Matrixf lProjectionMatrix = lView->getCamera()->getProjectionMatrix();
+            osg::Matrixf lProjectionMatrix = lCamera->getProjectionMatrix();
             lSsao->createSSAOPipeline(lProcessor, lastUnit, lProjectionMatrix);
 
             mSsaoPPUs.push_back(lSsao);
@@ -275,8 +343,8 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             OutlineRendering* lOutline = new OutlineRendering();
 
             double left,right,bottom,top,near,far;
-            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
-            lOutline->createOutlinePipeline(lProcessor, lastUnit, near, far);
+            lCamera->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+            lOutline->createOutlinePipeline(lProcessor, lastUnit, lCamera, near, far);
 
             mOutlinePPUs.push_back(lOutline);
         }
@@ -287,7 +355,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             DoFRendering* lDoF = new DoFRendering();
 
             double left,right,bottom,top,near,far;
-            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+            lCamera->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
             lDoF->createDoFPipeline(lProcessor, lastUnit, near, far);
             lDoF->setFocalLength(0.0);
             lDoF->setFocalRange(50.0);
@@ -307,14 +375,13 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // Mask effect
         if((pEffect & PPU_MASK) != 0)
         {
-            osg::Camera *slaveCam = new osg::Camera( *lView->getCamera() );
+            osg::Camera *slaveCam = new osg::Camera( *lCamera );
             slaveCam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
             slaveCam->setCullMask( 0x20 );
             //???slaveCam->setRenderOrder( osg::Camera::PRE_RENDER );
             lView->addSlave( slaveCam );
 
-            osg::Camera *cam = lView->getCamera();
-            cam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
+            lCamera->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
             slaveCam->setCullMask( 0x10 );
 
             MaskRendering* lMask = new MaskRendering();
