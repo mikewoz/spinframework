@@ -243,9 +243,9 @@ else
     have_poco=false
 fi
 
-PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
+PKG_CHECK_MODULES(SPATOSC, spatosc-0.4, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
-    AC_MSG_WARN([missing package: spatosc-0.3])
+    AC_MSG_WARN([missing package: libspatosc-dev])
 else
     AC_DEFINE([WITH_SPATOSC],[1],[Enables linking with the SpatOSC library so that compatible audio renderers can be used for 3D sound spatialization]) AC_MSG_NOTICE([Enabled SpatOSC for audio])
     AC_MSG_NOTICE([SPATOSC_CFLAGS:        ${SPATOSC_CFLAGS}])
