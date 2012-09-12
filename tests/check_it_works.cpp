@@ -78,7 +78,7 @@ bool check_client_server()
     return true;
 }
 
-int main(int argc, char **argv)
+int main(int /* argc */, char ** /* argv */)
 {
     if (check_client_server())
         return 0;
