@@ -140,7 +140,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         std::vector<osgPPU::Processor*> getProcessor() { return mProcessors; }
 
         //! Create camera resulting texture
-        osg::Texture* createRenderTexture(int tex_width, int tex_height, bool depth);
+        osg::Texture* createRenderTexture(int tex_width, int tex_height, bool depth, bool cubemap);
         
         //! Setup the camera to do the render to texture
         void setupCamera();

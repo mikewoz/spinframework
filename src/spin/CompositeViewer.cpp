@@ -118,35 +118,50 @@ CompositeViewer::~CompositeViewer()
     }
 }
 
-osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height, bool depth)
+osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height, bool depth, bool cubemap)
 {
-    // create simple 2D texture
-    osg::Texture2D* texture2D = new osg::Texture2D;
-    texture2D->setTextureSize(tex_width, tex_height);
-    texture2D->setResizeNonPowerOfTwoHint(false);
-    texture2D->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
-    texture2D->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
-    texture2D->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
-    texture2D->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
-    texture2D->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+    osg::Texture2D* texture = new osg::Texture2D;
+    if(!cubemap)
+    {
+        // create simple 2D texture
+        texture->setTextureSize(tex_width, tex_height);
+        texture->setResizeNonPowerOfTwoHint(false);
+        texture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
+        texture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
+        texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
+        texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+    }
+    else
+    {
+        // create a cubemap
+        texture->setTextureSize(tex_width, tex_height);
+        texture->setResizeNonPowerOfTwoHint(false);
+        texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+        texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+        texture->setWrap(osg::Texture::WRAP_S,osg::Texture::CLAMP_TO_EDGE);
+        texture->setWrap(osg::Texture::WRAP_T,osg::Texture::CLAMP_TO_EDGE);
+        texture->setWrap(osg::Texture::WRAP_R,osg::Texture::CLAMP_TO_EDGE);
+        texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+    }
 
     // setup float format
     if (!depth)
     {
-        texture2D->setInternalFormat(GL_RGBA16F_ARB);
-        texture2D->setSourceFormat(GL_RGBA);
-        texture2D->setSourceType(GL_FLOAT);
+        texture->setInternalFormat(GL_RGBA16F_ARB);
+        texture->setSourceFormat(GL_RGBA);
+        texture->setSourceType(GL_FLOAT);
         /*
-        texture2D->setInternalFormat(GL_RGBA32I_EXT);
-        texture2D->setSourceFormat(GL_RGBA_INTEGER_EXT);
-        texture2D->setSourceType(GL_BYTE);
+        texture->setInternalFormat(GL_RGBA32I_EXT);
+        texture->setSourceFormat(GL_RGBA_INTEGER_EXT);
+        texture->setSourceType(GL_BYTE);
         */
     }
     else{
-        texture2D->setInternalFormat(GL_DEPTH_COMPONENT);
+        texture->setInternalFormat(GL_DEPTH_COMPONENT);
     }
 
-    return texture2D;
+    return texture;
 }
 
 void CompositeViewer::setupCamera()
@@ -164,71 +179,92 @@ void CompositeViewer::setupCamera()
     //    lIt != lCameras.end();
     //    lIt++)
 
-    // Small to detect if this view is a dome view
-    // TODO: replace this by an attribute in the xml file
-    int lNbrCam = getView(0)->getNumSlaves();
-
-    if(lNbrCam != 7)
+    if(mIsDome == false)
     {
-        lNbrCam = this->getNumViews();
-        mIsDome = false;
-    }
-    else
-    {
-        lNbrCam--; // Minus 1, because the last camera is filming the cube
-        mIsDome = true;
-    }
-
-    for(unsigned int i=0; i<lNbrCam; ++i)
-    {
-        osgViewer::View* lView;
-        osg::Camera* lCamera;
-        // If not dome, process view after view
-        if(!mIsDome)
+        for(unsigned int i=0; i<getNumViews(); ++i)
         {
+            osgViewer::View* lView;
+            osg::Camera* lCamera;
+            
             lView = getView(i);
             lCamera = lView->getCamera();
+
+            int lWidth = lCamera->getViewport()->width();
+            int lHeight = lCamera->getViewport()->height();
+
+            std::cout << std::endl;
+            std::cout << "---------------------------------------" << std::endl;
+            std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
+
+
+            // create texture to render to
+            osg::ref_ptr<osg::Texture> colorTexture1 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> colorTexture2 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> colorTexture3 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> colorTexture4 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> depthTexture = createRenderTexture(lWidth, lHeight, true, false);
+
+            // set up the background color and clear mask.
+            lCamera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
+            lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // set viewport
+            //lCamera->setViewport(lCamera->getViewport()); // Useful ??
+            lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
+
+            // tell the camera to use OpenGL frame buffer object where supported.
+            lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+
+            // attach the texture and use it as the color buffer.
+            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1);
+            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2);
+            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3);
+            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4);
+            lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
         }
-        // else, slave camera after slave camera
-        else
+    }
+    else // dome view
+    {
+        // This first slave camera has the cubemap as a color buffer. We need its dimensions
+        int lWidth = getView(0)->getSlave(0)._camera.get()->getViewport()->width();
+        int lHeight = getView(0)->getSlave(0)._camera.get()->getViewport()->height();
+        
+        // We create 5 cubemap texture for FBO rendering, to replace the actual single one
+        osg::ref_ptr<osg::Texture> colorTexture1 = createRenderTexture(lWidth, lHeight, false, true); 
+        osg::ref_ptr<osg::Texture> colorTexture2 = createRenderTexture(lWidth, lHeight, false, true); 
+        osg::ref_ptr<osg::Texture> colorTexture3 = createRenderTexture(lWidth, lHeight, false, true); 
+        osg::ref_ptr<osg::Texture> colorTexture4 = createRenderTexture(lWidth, lHeight, false, true); 
+        osg::ref_ptr<osg::Texture> depthTexture = createRenderTexture(lWidth, lHeight, true, true);
+
+        // Now we iterate through the cameras
+        // One of them is not composing the dome view, we detect it and don't do anything to it
+        for(int i=0; i<getView(0)->getNumSlaves(); i++)
         {
-            lView = getView(0);
-            lCamera = lView->getSlave(i)._camera.get();
+            osg::Camera* lCamera = getView(0)->getSlave(i)._camera.get(); 
+
+            if(lCamera->getRenderTargetImplementation() != osg::Camera::FRAME_BUFFER_OBJECT)
+                continue;
+
+            std::cout << std::endl;
+            std::cout << "---------------------------------------" << std::endl;
+            std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
+
+            lCamera->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 0.f));
+            lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+
+            // Attach the textures to the color and depth buffers
+            unsigned int lFace = lCamera->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._face;
+
+            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1, 0, lFace);
+            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2, 0, lFace);
+            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3, 0, lFace);
+            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4, 0, lFace);
+            lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture, 0, lFace);
         }
-
-        int lWidth = lCamera->getViewport()->width();
-        int lHeight = lCamera->getViewport()->height();
-
-        std::cout << std::endl;
-        std::cout << "---------------------------------------" << std::endl;
-        std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
-
-
-        // create texture to render to
-        osg::ref_ptr<osg::Texture> colorTexture1_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> colorTexture2_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> colorTexture3_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> colorTexture4_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> depthTexture_ = createRenderTexture(lWidth, lHeight, true);
-
-        // set up the background color and clear mask.
-        lCamera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
-        lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // set viewport
-        //lCamera->setViewport(lCamera->getViewport()); // Useful ??
-        lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-        //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
-
-        // tell the camera to use OpenGL frame buffer object where supported.
-        lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
-
-        // attach the texture and use it as the color buffer.
-        lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1_);
-        lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2_);
-        lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3_);
-        lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4_);
-        lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
     }
 }
 
@@ -238,6 +274,13 @@ void CompositeViewer::viewerInit()
     // propagate the method
     osgViewer::CompositeViewer::viewerInit();
     //osgViewer::Viewer::viewerInit();
+
+    // Check wether this is a dome view or not
+    if(getView(0)->getNumSlaves() > 0)
+        if(getView(0)->getSlave(0)._camera.get()->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._texture->getNumImages() == 6)
+        {
+            mIsDome = true;
+        }
 
     // setup data
     //setupCamera(getCamera()->getViewport());
@@ -269,53 +312,43 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         return;
 
     // For each view, we create a processor
-    // If this is a dome view, we do the same for each slave camera
-    
-    // Small hack to detect if this view is a dome view
-    // TODO: replace this by an attribute in the xml file
-    int lNbrCam = getView(0)->getNumSlaves();
-
-    if(lNbrCam != 7)
-    {
-        lNbrCam = this->getNumViews();
-        mIsDome = false;
-    }
+    // If this is a dome view, we iterate through slaves camera and not views
+    int lNbr = 0;
+    if(mIsDome)
+        lNbr = getView(0)->getNumSlaves();
     else
-    {
-        lNbrCam--; // Minus 1, because the last camera is filming the cube
-        mIsDome = true;
-    }
+        lNbr = getNumViews();
 
-    for(unsigned int i=0; i<lNbrCam; ++i)
+    for(unsigned int i=0; i<lNbr; ++i)
     {
         osgPPU::Processor* lProcessor;
         lProcessor = new osgPPU::Processor();
 
         osgViewer::View* lView;
         osg::Camera* lCamera;
-        /*************************************/
-        // If not dome, process view after view
+
         if(!mIsDome)
         {
             lView = getView(i);
             dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
 
             lCamera = lView->getCamera();
-
-            // initialize the post process
-            lProcessor->setCamera(lCamera);
         }
-        // else, slave camera after slave camera
         else
         {
             lView = getView(0);
-            dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
 
             lCamera = lView->getSlave(i)._camera.get();
+            // If not a camera from the dome
+            if(lCamera->getRenderTargetImplementation() != osg::Camera::FRAME_BUFFER_OBJECT)
+                continue;
 
-            // initialize the post process
-            lProcessor->setCamera(lCamera);
+            dynamic_cast<osg::Group*>(lView->getSceneData())->addChild(lProcessor);
         }
+
+        // initialize the post process
+        lProcessor->setCamera(lCamera);
+        
         lProcessor->setName("Processor");
         lProcessor->dirtyUnitSubgraph();
 
