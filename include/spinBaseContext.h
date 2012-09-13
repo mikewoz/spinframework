@@ -77,26 +77,26 @@ class spinBaseContext
 {
     public:
         /**
-         * Constructor. 
-         * 
+         * Constructor.
+         *
          * This is where the actual default port numbers and multicast groups are defined.
          */
         spinBaseContext();
 
         /**
-         * Destructor 
-         * 
-         * Frees the senders and receivers. 
+         * Destructor
+         *
+         * Frees the senders and receivers.
          */
         virtual ~spinBaseContext();
 
         static void sigHandler(int signum);
 
         /**
-         * Signal handler. 
-         * 
+         * Signal handler.
+         *
          * Called, for example, when the user presses Control-C
-         * 
+         *
          * All threads need to stop according to the following flag:
          */
         static volatile bool signalStop;
@@ -115,13 +115,14 @@ class spinBaseContext
         /**
          * Starts the context thread (passed as *threadFunction from a derived
          * class)
-         * 
+         *
          * Startup point of the server's thread.
          */
         bool startThread( void *(*threadFunction) (void*) );
 
         /**
          * Stops the currently running thread
+         * WARNING: Must be called explicitly before destroying an instance of spinServerContext.
          */
         void stop();
 
@@ -147,7 +148,7 @@ class spinBaseContext
          * ports manually with command-line options, this becomes false.
          */
         bool canAutoAssignPorts() { return autoPorts_; }
-        
+
         /**
          * Set the time-to-live for multicast packets (corresponds to the
          * number of routers a packet will hop).
@@ -179,7 +180,7 @@ class spinBaseContext
          * List of address/port combinations on which the server listens for messages that alters the scene graph.
          */
         std::vector<lo_address> lo_rxAddrs_;
-        
+
         /**
          * List of OSC receivers on which the server listens for messages that alters the scene graph.
          */
@@ -189,24 +190,24 @@ class spinBaseContext
          * Multicast group and port number to which the server sends the addresses and port numbers on which it sends and receives.
          */
         lo_address lo_infoAddr;
-        
+
         /**
          * Multicast group and port number to which the server sends messages to synchronize stuff for which timing matters.
          */
         lo_address lo_syncAddr;
         lo_server lo_infoServ_;
-       
-        std::string tcpPort_; 
+
+        std::string tcpPort_;
         lo_server lo_tcpRxServer_;
 
-        static int connectionCallback(const char *path, const char *types, lo_arg **argv, 
+        static int connectionCallback(const char *path, const char *types, lo_arg **argv,
                 int argc, void *data, void *user_data);
         /**
          * Callback for messages sent to a node in the scene graph.
-         * 
+         *
          * Messages to node should have an OSC address in the form /SPIN/<scene ID>/<node ID>
-         * Their first argument is the name of the method to call. 
-         * 
+         * Their first argument is the name of the method to call.
+         *
          * Methods to manage Python scripts for a node:
          * - addCronScript <label> <path> <frequency>
          * - addEventScript <label> <event> <path> [*args...]
@@ -214,18 +215,18 @@ class spinBaseContext
          * - removeCronScript <label>
          * - enableEventScript <label>
          * - removeEventScript <label>
-         * 
+         *
          * We use C++ introspection to figure out the other methods that can be called for a given node.
          */
-        static int nodeCallback(const char *path, const char *types, lo_arg **argv, 
+        static int nodeCallback(const char *path, const char *types, lo_arg **argv,
                 int argc, void *data, void *user_data);
         /**
-         * Callback for the OSC message to the whole scene. 
-         * 
+         * Callback for the OSC message to the whole scene.
+         *
          * The address of the OSC messages sent to the scene are in the form /SPIN/<scene ID> <method name> [args...]
-         * 
-         * They are used mostly to delete all nodes from a scene, or to ask the server to refresh the information about all nodes. It's also possible to save the current scene graph to an XML file, and to load a previously saved XML file. 
-         * 
+         *
+         * They are used mostly to delete all nodes from a scene, or to ask the server to refresh the information about all nodes. It's also possible to save the current scene graph to an XML file, and to load a previously saved XML file.
+         *
          * Some valid method include:
          * - clear
          * - clearUsers
@@ -238,7 +239,7 @@ class spinBaseContext
          * - stateList [] : Creates many state sets
          * - exportScene [] []
          * - load [XML file]
-         * - save [XML file] 
+         * - save [XML file]
          * - saveAll [XML file]
          * - saveUsers [XML file]
          * - createNode [node name] [node type]
@@ -246,11 +247,11 @@ class spinBaseContext
          * - deleteNode [name]
          * - deleteGraph [name]
          */
-        static int sceneCallback(const char *path, const char *types, lo_arg **argv, 
+        static int sceneCallback(const char *path, const char *types, lo_arg **argv,
                 int argc, void *data, void *user_data);
-        static int logCallback(const char *path, const char *types, lo_arg **argv, 
+        static int logCallback(const char *path, const char *types, lo_arg **argv,
                 int argc, void *data, void *user_data);
-        static int debugCallback(const char *path, const char *types, lo_arg **argv, 
+        static int debugCallback(const char *path, const char *types, lo_arg **argv,
                 int argc, void *data, void *user_data);
 
         static void oscParser_error(int num, const char *msg, const char *path);
@@ -260,7 +261,7 @@ class spinBaseContext
          * the INFO port.
          *
          * For a server, this disables sending via spinApp::infoMessage. For a
-         * client, this disables the info port listener callback in 
+         * client, this disables the info port listener callback in
          * spinClientContext.
          */
         bool doDiscovery_;
@@ -279,7 +280,7 @@ class spinBaseContext
          * this method is used by both spinClientContext and spinServerContext
          */
         virtual void createServers() = 0;
-        
+
         bool reliableBroadcast_;
 
     private:

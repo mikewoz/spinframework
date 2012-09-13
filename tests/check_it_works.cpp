@@ -21,7 +21,7 @@ bool check_client_server()
     spinApp &spin = spinApp::Instance();
 
     std::tr1::shared_ptr<spinServerContext> server(new spinServerContext());
-	server->start();
+    server->start();
     if (! server->isRunning())
     {
         std::cout << "Failed: Could not start a SPIN server." << std::endl;
@@ -46,7 +46,7 @@ bool check_client_server()
     std::cout << "Info: (CTRL-C to quit)" << std::endl;
 
     try
-    {	
+    {
         while (true) //spinListener.isRunning()) // send signal (eg, ctrl-c to stop)
         {
 
@@ -58,7 +58,7 @@ bool check_client_server()
             for (int i = 0; i < numSamples; ++i)
             {
                 float angle = i * 2.0f * osg::PI / ((float)numSamples - 1.0f);
-                spin.NodeMessage("shp", "sfff", "setTranslation", 
+                spin.NodeMessage("shp", "sfff", "setTranslation",
                     sinf(angle)*orbitRadius, cosf(angle) * orbitRadius, 0.0, LO_ARGS_END);
                 long sleepDuration = 1000000 * orbitDuration / numSamples;
                 usleep(sleepDuration);
@@ -73,6 +73,7 @@ bool check_client_server()
         std::cerr << "Failed: Got exception " << e.what() << std::endl;
         return false;
     }
+    server->stop();
     usleep(100);
     std::cout << "Info: Exited normally." << std::endl;
     return true;
