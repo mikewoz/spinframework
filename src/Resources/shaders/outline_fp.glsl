@@ -190,4 +190,7 @@ void main()
         gl_FragData[0] += lGlow*uOutlineColor*uGlowPower*uOutlineColor.a;
         gl_FragData[0] += lOutline*uOutlineColor*uOutlineColor.a;
     }
+
+    // DEBUG
+    //gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);
 }

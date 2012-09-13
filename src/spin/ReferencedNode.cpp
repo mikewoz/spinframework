@@ -1102,5 +1102,13 @@ bool ReferencedNode::removeEventScript(const char* label)
     return false;
 }
 
+
+void ReferencedNode::setNodeMask( osg::Node::NodeMask nm )
+{
+    osg::Node::setNodeMask(nm);
+    printf("NODE[%s] : setNodeMask %u 0x%x\n", getID().c_str(), nm, nm);
+    BROADCAST(this, "si", "setNodeMask", nm );
+}
+
 } // end of namespace spin
 

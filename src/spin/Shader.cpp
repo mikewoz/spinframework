@@ -626,6 +626,12 @@ void Shader::setUniform_vec4 (const char* name, float x, float y, float z, float
 // *****************************************************************************
 void Shader::setShader (const char* path)
 {
+    if (!path)
+    {
+        std::cout << "WARNING: setShader got empty string" << std::endl;
+        return;
+    }
+    
 	// only do this if the id has changed:
 	if (shaderPath_ == std::string(path)) return;
 

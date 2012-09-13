@@ -78,7 +78,9 @@ class Listener : public DSPNode
         // override some methods so that we can send them to SpatOSC:
         virtual void setParam (const char *paramName, const char *paramValue);
         virtual void setParam (const char *paramName, float paramValue);
-
+        virtual void setTranslation (float x, float y, float z);
+        virtual void setOrientation (float p, float r, float y);
+        virtual void setOrientationQuat (float x, float y, float z, float w);
         virtual void setURI (const char *uri);
         
     private:

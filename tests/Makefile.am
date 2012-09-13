@@ -7,16 +7,17 @@ AM_CPPFLAGS = \
     $(OSG_CFLAGS) \
     $(SHAREDVIDEO_CFLAGS) \
     -I$(top_srcdir)/include \
+    -I$(top_srcdir)/src \
     -I$(top_srcdir)/src/tinyxml
 
-LDADD = $(top_builddir)/src/spin/libspin_@SPIN_API_VERSION@.la
+LDADD = $(top_builddir)/src/spin/libspin-@SPIN_API_VERSION@.la
 
 AM_LDFLAGS = \
 	$(BOOST_FILESYSTEM_LIB) \
 	$(BOOST_LDFLAGS) \
 	$(CPPINTROSPECTION_LIBS) \
 	$(PYTHON_LDFLAGS) \
-	-l$(BOOST_PYTHON_LIB) \
+	$(BOOST_PYTHON_LIB) \
     $(BOOST_THREAD_LIB) \
     $(LIBLO_LIBS) \
     $(OPENTHREADS_LIBS) \

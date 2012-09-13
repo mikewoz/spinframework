@@ -12,6 +12,11 @@ Copyright (C) 2009 Mike Wozniewski, Zack Settel
 Developed/Maintained by:
    Mike Wozniewski (http://www.mikewoz.com)
    Zack Settel (http://www.sheefa.net/zack)
+   Nicolas Bouillot (http://www.nicolasbouillot.net)
+   Louis Bouchard <lwi.bouchard@gmail.com>
+   Tristan Matthews <tristan@sat.qc.ca>
+   Alexandre Quessy <alexandre@quessy.net>
+   Emmanuel Durand <emmanueldurand@gmail.com>
 
 Principle Partners:
    La Société des Arts Technologiques (http://www.sat.qc.ca)
@@ -45,23 +50,21 @@ For full documentation, visit http://spinframework.org
 
 Dependencies
 ------------
-* Compile and install openscenegraph 2.9.8 or later.
-* Compile and install wxwidgets2.9 2.9.1 or later.::
+On Ubuntu GNU/Linux Precise LTS 12.04::
 
-   On Ubuntu, you can get the libwxgtk2.9-dev package from the Metalab PPA. Do this:
-   $ sudo add-apt-repository ppa:sat-metalab/metalab
-   $ sudo apt-get update
-   $ sudo apt-get install libwxgtk2.9-dev libcppintrospection-2.11-dev
-   $ sudo ln -s /usr/lib/wx/config/gtk2-unicode-2.9 /usr/local/bin/wx-config
-
-* Compile and install cppintrospection from the https://github.com/sat-metalab/cppintrospection
+   sudo add-apt-repository ppa:sat-metalab/metalab
+   sudo apt-get update
+   sudo apt-get install automake bison build-essential cdbs cmake-curses-gui debhelper ffmpeg flex freeglut3-dev libavcodec-dev libavdevice-dev libavformat-dev libboost-filesystem-dev libboost-program-options-dev libboost-python-dev libboost-regex-dev libboost-system-dev libboost-thread-dev libcppintrospection-3.0-dev liblo-dev libopenscenegraph-dev libspatosc-dev libswscale-dev libtool libxml++2.6-dev python python-dev python-setuptools libspnav-dev
 
 
 Compiling
 ---------
-To compile SPIN::
+If you are compiling from a clone of the Git repository, and not from a tarball, you must first do this::
 
-  ./autogen.sh (if from svn/git, not the tarball)
+  ./autogen.sh
+
+And then , to compile SPIN::
+
   ./configure
   make 
 
@@ -74,8 +77,8 @@ To install SPIN::
   sudo ldconfig
 
 
-Installation notes on Ubuntu Lucid GNU/Linux
---------------------------------------------
+Installation notes on the old Ubuntu GNU/Linux Lucid LTS 10.04
+--------------------------------------------------------------
 * make sure you have no openscenegraph, nor openthreads Ubuntu package
 * download and compile openscenegraph (which contains openthreads)
 * download and compile cppintrospection version 3.0
