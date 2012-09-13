@@ -88,39 +88,28 @@ class OutlineRendering : virtual public osg::Referenced
         }
     
         /*********/
-        void createOutlinePipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Camera* pCamera, float zNear, float zFar)
+        void createOutlinePipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, float zNear, float zFar)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");            
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
             // We get the color buffer
             osgPPU::Unit* lColor;
-            osgPPU::UnitCamera* lCamera;
-            osgPPU::Unit* lDepth;
             if(pLastUnit == NULL)
             {
-                lCamera = new osgPPU::UnitCamera();
-                lCamera->setCamera(pCamera);
-                lCamera->setName("camera");
-                pParent->addChild(lCamera);
-
                 lColor = new osgPPU::UnitCameraAttachmentBypass();
                 ((osgPPU::UnitCameraAttachmentBypass*)lColor)->setBufferComponent(osg::Camera::COLOR_BUFFER0);
                 ((osgPPU::UnitCameraAttachmentBypass*)lColor)->setName("color");
-                lCamera->addChild(lColor);
-
-                lDepth = new osgPPU::UnitDepthbufferBypass();
-                lDepth->setName("depth");
-                lCamera->addChild(lDepth);
+                pParent->addChild(lColor);
             }
             else
             {
                 lColor = pLastUnit;
-
-                lDepth = new osgPPU::UnitDepthbufferBypass();
-                lDepth->setName("depth");
-                pParent->addChild(lDepth);
             }
+
+            osgPPU::Unit* lDepth = new osgPPU::UnitDepthbufferBypass();
+            lDepth->setName("depth");
+            pParent->addChild(lDepth);
             
             // First we detect the edges on the depth map
             osgPPU::Unit* lEdges = new osgPPU::UnitInOut();

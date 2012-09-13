@@ -88,6 +88,7 @@ CompositeViewer::CompositeViewer(osg::ArgumentParser& args) : osgViewer::Composi
     lastNavTick_ = osg::Timer::instance()->tick();
     velocityScalars_ = osg::Vec3(1,1,1);
     spinScalars_ = osg::Vec3(1,1,1);
+    mTexCubeMap = NULL;
 }
 
 CompositeViewer::~CompositeViewer()
@@ -217,6 +218,7 @@ void CompositeViewer::setupCamera()
             lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
             // attach the texture and use it as the color buffer.
+            //lCamera->detach(osg::Camera::COLOR_BUFFER);
             lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1);
             lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2);
             lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3);
@@ -226,44 +228,42 @@ void CompositeViewer::setupCamera()
     }
     else // dome view
     {
-        // This first slave camera has the cubemap as a color buffer. We need its dimensions
-        int lWidth = getView(0)->getSlave(0)._camera.get()->getViewport()->width();
-        int lHeight = getView(0)->getSlave(0)._camera.get()->getViewport()->height();
-        
-        // We create 5 cubemap texture for FBO rendering, to replace the actual single one
-        osg::ref_ptr<osg::Texture> colorTexture1 = createRenderTexture(lWidth, lHeight, false, true); 
-        osg::ref_ptr<osg::Texture> colorTexture2 = createRenderTexture(lWidth, lHeight, false, true); 
-        osg::ref_ptr<osg::Texture> colorTexture3 = createRenderTexture(lWidth, lHeight, false, true); 
-        osg::ref_ptr<osg::Texture> colorTexture4 = createRenderTexture(lWidth, lHeight, false, true); 
-        osg::ref_ptr<osg::Texture> depthTexture = createRenderTexture(lWidth, lHeight, true, true);
-
         // Now we iterate through the cameras
         // One of them is not composing the dome view, we detect it and don't do anything to it
         for(int i=0; i<getView(0)->getNumSlaves(); i++)
         {
-            osg::Camera* lCamera = getView(0)->getSlave(i)._camera.get(); 
+            osg::Camera* lCamera = getView(0)->getSlave(i)._camera.get();
 
             if(lCamera->getRenderTargetImplementation() != osg::Camera::FRAME_BUFFER_OBJECT)
                 continue;
+
+            int lWidth = lCamera->getViewport()->width();
+            int lHeight = lCamera->getViewport()->height();
+
+            // We create 5 cubemap texture for FBO rendering, to replace the actual single one
+            osg::ref_ptr<osg::Texture> colorTexture1 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> colorTexture2 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> colorTexture3 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> colorTexture4 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> depthTexture = createRenderTexture(lWidth, lHeight, true, false);
 
             std::cout << std::endl;
             std::cout << "---------------------------------------" << std::endl;
             std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
 
-            lCamera->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 0.f));
+            lCamera->setClearColor(osg::Vec4(0.f, 1.f, 0.f, 0.f));
             lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
             lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
             // Attach the textures to the color and depth buffers
-            unsigned int lFace = lCamera->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._face;
-
-            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1, 0, lFace);
-            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2, 0, lFace);
-            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3, 0, lFace);
-            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4, 0, lFace);
-            lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture, 0, lFace);
+            lCamera->detach(osg::Camera::COLOR_BUFFER);
+            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1);
+            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2);
+            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3);
+            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4);
+            lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
         }
     }
 }
@@ -280,6 +280,8 @@ void CompositeViewer::viewerInit()
         if(getView(0)->getSlave(0)._camera.get()->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._texture->getNumImages() == 6)
         {
             mIsDome = true;
+            // We need to have access to the current cubemap attached to the slave cameras
+            mTexCubeMap = (osg::TextureCubeMap*)(getView(0)->getSlave(0)._camera.get()->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._texture.get());
         }
 
     // setup data
@@ -313,6 +315,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
     // For each view, we create a processor
     // If this is a dome view, we iterate through slaves camera and not views
+    // Moreoever, we need the output cubemap texture
     int lNbr = 0;
     if(mIsDome)
         lNbr = getView(0)->getNumSlaves();
@@ -326,6 +329,8 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
         osgViewer::View* lView;
         osg::Camera* lCamera;
+
+        osg::Texture* lOutTex = NULL;
 
         if(!mIsDome)
         {
@@ -377,7 +382,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
             double left,right,bottom,top,near,far;
             lCamera->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
-            lOutline->createOutlinePipeline(lProcessor, lastUnit, lCamera, near, far);
+            lOutline->createOutlinePipeline(lProcessor, lastUnit, near, far);
 
             mOutlinePPUs.push_back(lOutline);
         }
@@ -437,9 +442,37 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // As a last step we setup a ppu which do render the content of the result
         // on the screenbuffer. This ppu MUST be as one of the last, otherwise you
         // will not be able to get results from the ppu pipeline
-        osgPPU::UnitOut* ppuout = new osgPPU::UnitOut();
-        ppuout->setName("PipelineResult");
-        ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
+        osgPPU::Unit* ppuout;
+
+        if(!mIsDome)
+        {
+            ppuout = new osgPPU::UnitOut();
+            ppuout->setName("PipelineResult");
+            ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
+        }
+        else
+        {
+            ppuout = new osgPPU::UnitInOut();
+            ppuout->setName("PipelineResult");
+            ((osgPPU::UnitInOut*)ppuout)->setOutputTextureType(osgPPU::UnitInOut::TEXTURE_CUBEMAP);
+
+            //unsigned int lFace = lCamera->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._face;
+            unsigned int lFace;
+            switch(i)
+            {
+            case 0: lFace = osg::TextureCubeMap::POSITIVE_Y; break;
+            case 1: lFace = osg::TextureCubeMap::POSITIVE_Z; break;
+            case 2: lFace = osg::TextureCubeMap::NEGATIVE_X; break;
+            case 3: lFace = osg::TextureCubeMap::POSITIVE_X; break;
+            case 4: lFace = osg::TextureCubeMap::NEGATIVE_Z; break;
+            case 5: lFace = osg::TextureCubeMap::NEGATIVE_Y; break;
+            default: lFace = osg::TextureCubeMap::POSITIVE_Y; break;
+            }
+
+            ((osgPPU::UnitInOut*)ppuout)->setOutputFace(lFace);
+            ((osgPPU::UnitInOut*)ppuout)->setOutputTexture(mTexCubeMap, 0);
+            osg::Texture* lTex = ((osgPPU::UnitInOut*)ppuout)->getOrCreateOutputTexture(0);
+        }
         lastUnit->addChild(ppuout);
 
         // write pipeline to a file
@@ -904,7 +937,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // new we need to add the texture to the mesh, we do so by creating a
         // StateSet to contain the Texture StateAttribute.
         osg::StateSet* stateset = geode->getOrCreateStateSet();
-        stateset->setTextureAttributeAndModes(0, texture,osg::StateAttribute::ON);
+        stateset->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
         stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
         if (!applyIntensityMapAsColours && intensityMap)
@@ -1451,16 +1484,37 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         }
     }
 
+    bool lIsDof, lIsSSAO, lIsMBlur, lIsOutline, lIsMask;
+
+    int lNumPPUs = 0;
+    if(!viewer->isDome())
+    {
+        lNumPPUs = viewer->getNumViews();
+        lIsDof = (viewer->mDofPPUs.size() == lNumPPUs);
+        lIsSSAO = (viewer->mSsaoPPUs.size() == lNumPPUs);
+        lIsMBlur = (viewer->mMBlurPPUs.size() == lNumPPUs);
+        lIsOutline = (viewer->mOutlinePPUs.size() == lNumPPUs);
+        lIsMask = (viewer->mMaskPPUs.size() == lNumPPUs);
+    }
+    else
+    {
+        // Dome view, we should have 7 slave cameras, 6 with ppus
+        // but we should check that anyway
+        for(int i=0; i<viewer->getView(0)->getNumSlaves(); i++)
+            if(viewer->getView(0)->getSlave(i)._camera.get()->getRenderTargetImplementation() == osg::Camera::FRAME_BUFFER_OBJECT)
+                lNumPPUs++;
+
+        lIsDof = (viewer->mDofPPUs.size() == lNumPPUs);
+        lIsSSAO = (viewer->mSsaoPPUs.size() == lNumPPUs);
+        lIsMBlur = (viewer->mMBlurPPUs.size() == lNumPPUs);
+        lIsOutline = (viewer->mOutlinePPUs.size() == lNumPPUs);
+        lIsMask = (viewer->mMaskPPUs.size() == lNumPPUs);
+    }
+
     if ((theMethod=="setParam") && (stringArgs.size()==1) && (floatArgs.size()==1))
     {
-        bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
-        bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
-        bool lIsMBlur = (viewer->mMBlurPPUs.size() == viewer->getNumViews());
-        bool lIsOutline = (viewer->mOutlinePPUs.size() == viewer->getNumViews());
-
-
         // For each view
-        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+        for(unsigned int i=0; i<lNumPPUs; ++i)
         {
             // Params for the DoF PPU
             if(lIsDof)
@@ -1559,12 +1613,9 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         return 1;
     }
     else if ((theMethod=="setOutlineColor"))
-    // TODO: remove this from setParam, and place it in a new message like setFrustum
     {
-        bool lIsOutline = (viewer->mOutlinePPUs.size() == viewer->getNumViews());
-
         // For each view
-        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+        for(unsigned int i=0; i<lNumPPUs; ++i)
         {
             if(lIsOutline)
             {
@@ -1576,11 +1627,8 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     }
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
     {
-        bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
-        bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
-
         // For each view
-        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+        for(unsigned int i=0; i<lNumPPUs; ++i)
         {
             viewer->getView(i)->getCamera()->setProjectionMatrixAsFrustum(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3], floatArgs[4], floatArgs[5]);
 

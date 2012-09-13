@@ -169,6 +169,11 @@ class CompositeViewer : public osgViewer::CompositeViewer
          * roll and allow only pitch and yaw by setting the scale to 1,0,1)
 	 */
         void setSpinScalars(osg::Vec3 v) { spinScalars_ = v; }
+
+        /**
+        * Returns true if the viewer is a dome view
+        */
+        bool isDome() { return mIsDome; }
  
         //int run();
 
@@ -184,7 +189,9 @@ class CompositeViewer : public osgViewer::CompositeViewer
         float mOldTime;
         //DoFRendering mDoFSetup;
         bool mbInitialized;
+
         bool mIsDome;   // Is this a dome view ?
+        osg::TextureCubeMap* mTexCubeMap; // We need to access this texture in the ppu
        
 	    // navigation update stuff:
         std::string spnavNodeID_; 
