@@ -97,6 +97,11 @@ public:
          * pd_plugin://audio_plugin_patch.pd
          */
         virtual void setURI (const char *uri);
+
+		/**
+	 	* Returns the currently-set URI associated with the sound node.
+	 	*/ 
+	
         const char* getURI() const { return uri_.c_str(); }
         
         // for sending messages to the connections of this (source) node:
@@ -107,6 +112,11 @@ public:
          * Activate or deactivate the DSP processing
          */
         virtual void setActive (int i);
+
+		/**
+	 	* Returns whether the DSP processing is active or inactive.
+	 	*/
+		
         int getActive() const { return (int)active; }
         
         /**

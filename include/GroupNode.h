@@ -101,9 +101,25 @@ public:
         DRAW        /*!< Provides access to the x,y,z intersection points as the
                     user draws over the surface of a node */
     };
-    enum globalsReportMode { NONE, GLOBAL_6DOF, GLOBAL_ALL };
-    enum velocityMode { TRANSLATE, MOVE };
-    enum ComputationMode { SERVER_SIDE, CLIENT_SIDE };
+	
+    enum globalsReportMode 
+	{ 
+		NONE, 
+		GLOBAL_6DOF, 
+		GLOBAL_ALL 
+	};
+	
+    enum velocityMode 
+	{ 	
+		TRANSLATE, 
+		MOVE 
+	};
+    enum ComputationMode 
+	{ 	
+		SERVER_SIDE, 
+		CLIENT_SIDE 
+	};
+	
     enum OrientationMode
     {
         NORMAL,
@@ -121,6 +137,11 @@ public:
      * of activity.
      */
     virtual void setUpdateRate(float seconds);
+
+	/**
+	 * Returns the currently-set update rate.
+	 */
+	
     float getUpdateRate() const { return maxUpdateDelta_; }
 
     /**
@@ -173,13 +194,31 @@ public:
      * By default it is applied to the mainTransform_.
      */
     virtual void updateStateSet();
-    
+
+	/**
+	 * Sets the report mode with reference to the globalsReportMode enum.
+	 */
     
     void setReportMode(globalsReportMode mode);
 
+	/**
+	 * Sets the interaction mode with reference to the InteractionMode enum.
+	 */
+
     void setInteractionMode(InteractionMode mode);
+
+	/**
+	 * Sets the Computation mode as either server or client side with respect to
+	 * the ComputationMode enum.
+	 */
     
     void setComputationMode(ComputationMode mode);
+
+	/**
+	 * Returns the currently-set computation mode with respect to the
+	 * ComputationMode enum.
+	 */
+	
     int getComputationMode() const { return (int)computationMode_; };
 
     /**
@@ -198,6 +237,12 @@ public:
      * transformation.
      */
     void setOrientationMode(OrientationMode m);
+
+	/**
+	 * Returns the currently-set Orientation Mode, with respect to the
+	 * OrientationMode enum.
+	 */
+	
     int getOrientationMode() const { return (int)orientationMode_; };
 
     void setOrientationTarget(const char* target);
@@ -205,7 +250,7 @@ public:
 
 
     /**
-     * The local orientation offset for this node with respect to it's parent
+     * The local orientation offset for this node with respect to its parent
      */
     virtual void setOrientation (float pitch, float roll, float yaw);
 
@@ -215,7 +260,7 @@ public:
     virtual void setOrientationQuat (float x, float y, float z, float w);
 
     /**
-     * A grouped scale operation
+     * A grouped scale operation.
      */
     virtual void setScale (float x, float y, float z);
 
@@ -292,10 +337,26 @@ public:
          
     void setBroadcastLock(bool lock) { broadcastLock_ = lock; }
 
-    
+	/**
+	 * Returns the currently-set Report Mode with reference to the
+	 * globalsReportMode enum.
+	 */
+	
     int getReportMode() const { return (int) reportMode_; };
+
+	/**
+	 * Returns the currently-set Interaction Mode with reference to the
+	 * InteractionMode enum.
+	 */
+	
     int getInteractionMode() const { return (int) interactionMode_; };
     osg::Vec3 getClipping() const { return clipping_; };
+
+	/**
+	 * Returns the currently-set local orientation offset for this node with
+	 * respect to its parent.
+	 */
+	
     osg::Vec3 getOrientation() const { return orientation_; };
     
     /*
@@ -303,8 +364,18 @@ public:
     osg::Quat getOrientationQuat() const { return mainTransform_->getMatrix().getRotate(); };
     osg::Vec3 getScale() const { return mainTransform_->getMatrix().getScale(); };
     */
-    
+
+	/**
+	 * Returns the currently-set local translation offset for this node with
+	 * respect to its parent.
+	 */
+	
     virtual osg::Vec3 getTranslation() const { return translation_; };
+
+	/**
+	 * Returns the currently-set 
+	 */
+	
     virtual osg::Quat getOrientationQuat() const { return quat_; };
     virtual osg::Vec3 getScale() const { return scale_; };     
     
