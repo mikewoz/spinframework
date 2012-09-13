@@ -83,10 +83,12 @@ CompositeViewer::CompositeViewer(osg::ArgumentParser& args) : osgViewer::Composi
 //CompositeViewer::CompositeViewer(osg::ArgumentParser& args) : osgViewer::Viewer(args)
 {
     mbInitialized = false;
+    mIsDome = false;
     mOldTime = 0.0f;
     lastNavTick_ = osg::Timer::instance()->tick();
     velocityScalars_ = osg::Vec3(1,1,1);
     spinScalars_ = osg::Vec3(1,1,1);
+    mTexCubeMap = NULL;
 }
 
 CompositeViewer::~CompositeViewer()
@@ -117,35 +119,50 @@ CompositeViewer::~CompositeViewer()
     }
 }
 
-osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height, bool depth)
+osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height, bool depth, bool cubemap)
 {
-    // create simple 2D texture
-    osg::Texture2D* texture2D = new osg::Texture2D;
-    texture2D->setTextureSize(tex_width, tex_height);
-    texture2D->setResizeNonPowerOfTwoHint(false);
-    texture2D->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
-    texture2D->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
-    texture2D->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
-    texture2D->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
-    texture2D->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+    osg::Texture2D* texture = new osg::Texture2D;
+    if(!cubemap)
+    {
+        // create simple 2D texture
+        texture->setTextureSize(tex_width, tex_height);
+        texture->setResizeNonPowerOfTwoHint(false);
+        texture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
+        texture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
+        texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
+        texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+    }
+    else
+    {
+        // create a cubemap
+        texture->setTextureSize(tex_width, tex_height);
+        texture->setResizeNonPowerOfTwoHint(false);
+        texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+        texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+        texture->setWrap(osg::Texture::WRAP_S,osg::Texture::CLAMP_TO_EDGE);
+        texture->setWrap(osg::Texture::WRAP_T,osg::Texture::CLAMP_TO_EDGE);
+        texture->setWrap(osg::Texture::WRAP_R,osg::Texture::CLAMP_TO_EDGE);
+        texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+    }
 
     // setup float format
     if (!depth)
     {
-        texture2D->setInternalFormat(GL_RGBA16F_ARB);
-        texture2D->setSourceFormat(GL_RGBA);
-        texture2D->setSourceType(GL_FLOAT);
+        texture->setInternalFormat(GL_RGBA16F_ARB);
+        texture->setSourceFormat(GL_RGBA);
+        texture->setSourceType(GL_FLOAT);
         /*
-        texture2D->setInternalFormat(GL_RGBA32I_EXT);
-        texture2D->setSourceFormat(GL_RGBA_INTEGER_EXT);
-        texture2D->setSourceType(GL_BYTE);
+        texture->setInternalFormat(GL_RGBA32I_EXT);
+        texture->setSourceFormat(GL_RGBA_INTEGER_EXT);
+        texture->setSourceType(GL_BYTE);
         */
     }
     else{
-        texture2D->setInternalFormat(GL_DEPTH_COMPONENT);
+        texture->setInternalFormat(GL_DEPTH_COMPONENT);
     }
 
-    return texture2D;
+    return texture;
 }
 
 void CompositeViewer::setupCamera()
@@ -162,42 +179,92 @@ void CompositeViewer::setupCamera()
     //for(osgViewer::ViewerBase::Cameras::iterator lIt = lCameras.begin();
     //    lIt != lCameras.end();
     //    lIt++)
-    for(unsigned int i=0; i<this->getNumViews(); ++i)
+
+    if(mIsDome == false)
     {
-        osg::Camera* lCamera = this->getView(i)->getCamera();
-        int lWidth = lCamera->getViewport()->width();
-        int lHeight = lCamera->getViewport()->height();
+        for(unsigned int i=0; i<getNumViews(); ++i)
+        {
+            osgViewer::View* lView;
+            osg::Camera* lCamera;
+            
+            lView = getView(i);
+            lCamera = lView->getCamera();
 
-        std::cout << std::endl;
-        std::cout << "---------------------------------------" << std::endl;
-        std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
+            int lWidth = lCamera->getViewport()->width();
+            int lHeight = lCamera->getViewport()->height();
+
+            std::cout << std::endl;
+            std::cout << "---------------------------------------" << std::endl;
+            std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
 
 
-        // create texture to render to
-        osg::ref_ptr<osg::Texture> colorTexture1_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> colorTexture2_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> colorTexture3_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> colorTexture4_ = createRenderTexture(lWidth, lHeight, false);
-        osg::ref_ptr<osg::Texture> depthTexture_ = createRenderTexture(lWidth, lHeight, true);
+            // create texture to render to
+            osg::ref_ptr<osg::Texture> colorTexture1 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> colorTexture2 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> colorTexture3 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> colorTexture4 = createRenderTexture(lWidth, lHeight, false, false);
+            osg::ref_ptr<osg::Texture> depthTexture = createRenderTexture(lWidth, lHeight, true, false);
 
-        // set up the background color and clear mask.
-        lCamera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
-        //lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // set up the background color and clear mask.
+            lCamera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
+            lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // set viewport
-        //lCamera->setViewport(lCamera->getViewport()); // Useful ?? no.
-        lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-        //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
+            // set viewport
+            //lCamera->setViewport(lCamera->getViewport()); // Useful ??
+            lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
 
-        // tell the camera to use OpenGL frame buffer object where supported.
-        lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+            // tell the camera to use OpenGL frame buffer object where supported.
+            lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
-        // attach the texture and use it as the color buffer.
-        lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1_);
-        lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2_);
-        lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3_);
-        lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4_);
-        lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture_);
+            // attach the texture and use it as the color buffer.
+            //lCamera->detach(osg::Camera::COLOR_BUFFER);
+            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1);
+            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2);
+            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3);
+            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4);
+            lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
+        }
+    }
+    else // dome view
+    {
+        // Now we iterate through the cameras
+        // One of them is not composing the dome view, we detect it and don't do anything to it
+        for(int i=0; i<getView(0)->getNumSlaves(); i++)
+        {
+            osg::Camera* lCamera = getView(0)->getSlave(i)._camera.get();
+
+            if(lCamera->getRenderTargetImplementation() != osg::Camera::FRAME_BUFFER_OBJECT)
+                continue;
+
+            int lWidth = lCamera->getViewport()->width();
+            int lHeight = lCamera->getViewport()->height();
+
+            // We create 5 cubemap texture for FBO rendering, to replace the actual single one
+            osg::ref_ptr<osg::Texture> colorTexture1 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> colorTexture2 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> colorTexture3 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> colorTexture4 = createRenderTexture(lWidth, lHeight, false, false); 
+            osg::ref_ptr<osg::Texture> depthTexture = createRenderTexture(lWidth, lHeight, true, false);
+
+            std::cout << std::endl;
+            std::cout << "---------------------------------------" << std::endl;
+            std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
+
+            lCamera->setClearColor(osg::Vec4(0.f, 1.f, 0.f, 0.f));
+            lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+
+            // Attach the textures to the color and depth buffers
+            lCamera->detach(osg::Camera::COLOR_BUFFER);
+            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1);
+            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2);
+            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3);
+            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4);
+            lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
+        }
     }
 }
 
@@ -207,6 +274,15 @@ void CompositeViewer::viewerInit()
     // propagate the method
     osgViewer::CompositeViewer::viewerInit();
     //osgViewer::Viewer::viewerInit();
+
+    // Check wether this is a dome view or not
+    if(getView(0)->getNumSlaves() > 0)
+        if(getView(0)->getSlave(0)._camera.get()->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._texture->getNumImages() == 6)
+        {
+            mIsDome = true;
+            // We need to have access to the current cubemap attached to the slave cameras
+            mTexCubeMap = (osg::TextureCubeMap*)(getView(0)->getSlave(0)._camera.get()->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._texture.get());
+        }
 
     // setup data
     //setupCamera(getCamera()->getViewport());
@@ -250,18 +326,46 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         return;
 
     // For each view, we create a processor
-    for(unsigned int i=0; i<this->getNumViews(); ++i)
+    // If this is a dome view, we iterate through slaves camera and not views
+    // Moreoever, we need the output cubemap texture
+    int lNbr = 0;
+    if(mIsDome)
+        lNbr = getView(0)->getNumSlaves();
+    else
+        lNbr = getNumViews();
+
+    for(unsigned int i=0; i<lNbr; ++i)
     {
         osgPPU::Processor* lProcessor;
         lProcessor = new osgPPU::Processor();
 
-        osgViewer::View* lView = getView(i);
+        osgViewer::View* lView;
+        osg::Camera* lCamera;
 
+        osg::Texture* lOutTex = NULL;
+
+        if(!mIsDome)
+        {
+            lView = getView(i);
+
+            lCamera = lView->getCamera();
+        }
+        else
+        {
+            lView = getView(0);
+
+            lCamera = lView->getSlave(i)._camera.get();
+            // If not a camera from the dome
+            if(lCamera->getRenderTargetImplementation() != osg::Camera::FRAME_BUFFER_OBJECT)
+                continue;
+        }
+        
         osg::Group* lGroup = dynamic_cast<osg::Group*>(lView->getSceneData());
         lGroup->addChild( lProcessor );
 
         // initialize the post process
-        lProcessor->setCamera(lView->getCamera());
+        lProcessor->setCamera(lCamera);
+        
         lProcessor->setName("Processor");
         lProcessor->dirtyUnitSubgraph();
 
@@ -269,6 +373,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
         osgPPU::Unit* lastUnit = NULL;
 
+        /**********************************************/
         // SSAO effect must be applied before any other effect, especially those
         // which destroy information (such as DoF)
         if((pEffect & PPU_SSAO) != 0)
@@ -276,7 +381,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             SSAORendering* lSsao = new SSAORendering();
 
             // Gets the projection matrix
-            osg::Matrixf lProjectionMatrix = lView->getCamera()->getProjectionMatrix();
+            osg::Matrixf lProjectionMatrix = lCamera->getProjectionMatrix();
             lSsao->createSSAOPipeline(lProcessor, lastUnit, lProjectionMatrix);
 
             mSsaoPPUs.push_back(lSsao);
@@ -288,7 +393,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             OutlineRendering* lOutline = new OutlineRendering();
 
             double left,right,bottom,top,near,far;
-            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+            lCamera->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
             lOutline->createOutlinePipeline(lProcessor, lastUnit, near, far);
 
             mOutlinePPUs.push_back(lOutline);
@@ -300,7 +405,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             DoFRendering* lDoF = new DoFRendering();
 
             double left,right,bottom,top,near,far;
-            lView->getCamera()->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+            lCamera->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
             lDoF->createDoFPipeline(lProcessor, lastUnit, near, far);
             lDoF->setFocalLength(0.0);
             lDoF->setFocalRange(50.0);
@@ -324,7 +429,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
             int xsize = cam->getViewport()->width();
             int ysize = cam->getViewport()->height();
-            osg::Texture* texture2D = CompositeViewer::createRenderTexture( xsize, ysize, false );
+            osg::Texture* texture2D = CompositeViewer::createRenderTexture( xsize, ysize, false, false );
 
 
             osg::Camera *slaveCam = new osg::Camera;
@@ -373,9 +478,37 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // As a last step we setup a ppu which do render the content of the result
         // on the screenbuffer. This ppu MUST be as one of the last, otherwise you
         // will not be able to get results from the ppu pipeline
-        osgPPU::UnitOut* ppuout = new osgPPU::UnitOut();
-        ppuout->setName("PipelineResult");
-        ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
+        osgPPU::Unit* ppuout;
+
+        if(!mIsDome)
+        {
+            ppuout = new osgPPU::UnitOut();
+            ppuout->setName("PipelineResult");
+            ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
+        }
+        else
+        {
+            ppuout = new osgPPU::UnitInOut();
+            ppuout->setName("PipelineResult");
+            ((osgPPU::UnitInOut*)ppuout)->setOutputTextureType(osgPPU::UnitInOut::TEXTURE_CUBEMAP);
+
+            //unsigned int lFace = lCamera->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._face;
+            unsigned int lFace;
+            switch(i)
+            {
+            case 0: lFace = osg::TextureCubeMap::POSITIVE_Y; break;
+            case 1: lFace = osg::TextureCubeMap::POSITIVE_Z; break;
+            case 2: lFace = osg::TextureCubeMap::NEGATIVE_X; break;
+            case 3: lFace = osg::TextureCubeMap::POSITIVE_X; break;
+            case 4: lFace = osg::TextureCubeMap::NEGATIVE_Z; break;
+            case 5: lFace = osg::TextureCubeMap::NEGATIVE_Y; break;
+            default: lFace = osg::TextureCubeMap::POSITIVE_Y; break;
+            }
+
+            ((osgPPU::UnitInOut*)ppuout)->setOutputFace(lFace);
+            ((osgPPU::UnitInOut*)ppuout)->setOutputTexture(mTexCubeMap, 0);
+            osg::Texture* lTex = ((osgPPU::UnitInOut*)ppuout)->getOrCreateOutputTexture(0);
+        }
         lastUnit->addChild(ppuout);
 
         // write pipeline to a file
@@ -840,7 +973,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         // new we need to add the texture to the mesh, we do so by creating a
         // StateSet to contain the Texture StateAttribute.
         osg::StateSet* stateset = geode->getOrCreateStateSet();
-        stateset->setTextureAttributeAndModes(0, texture,osg::StateAttribute::ON);
+        stateset->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
         stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
         if (!applyIntensityMapAsColours && intensityMap)
@@ -1387,16 +1520,37 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         }
     }
 
+    bool lIsDof, lIsSSAO, lIsMBlur, lIsOutline, lIsMask;
+
+    int lNumPPUs = 0;
+    if(!viewer->isDome())
+    {
+        lNumPPUs = viewer->getNumViews();
+        lIsDof = (viewer->mDofPPUs.size() == lNumPPUs);
+        lIsSSAO = (viewer->mSsaoPPUs.size() == lNumPPUs);
+        lIsMBlur = (viewer->mMBlurPPUs.size() == lNumPPUs);
+        lIsOutline = (viewer->mOutlinePPUs.size() == lNumPPUs);
+        lIsMask = (viewer->mMaskPPUs.size() == lNumPPUs);
+    }
+    else
+    {
+        // Dome view, we should have 7 slave cameras, 6 with ppus
+        // but we should check that anyway
+        for(int i=0; i<viewer->getView(0)->getNumSlaves(); i++)
+            if(viewer->getView(0)->getSlave(i)._camera.get()->getRenderTargetImplementation() == osg::Camera::FRAME_BUFFER_OBJECT)
+                lNumPPUs++;
+
+        lIsDof = (viewer->mDofPPUs.size() == lNumPPUs);
+        lIsSSAO = (viewer->mSsaoPPUs.size() == lNumPPUs);
+        lIsMBlur = (viewer->mMBlurPPUs.size() == lNumPPUs);
+        lIsOutline = (viewer->mOutlinePPUs.size() == lNumPPUs);
+        lIsMask = (viewer->mMaskPPUs.size() == lNumPPUs);
+    }
+
     if ((theMethod=="setParam") && (stringArgs.size()==1) && (floatArgs.size()==1))
     {
-        bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
-        bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
-        bool lIsMBlur = (viewer->mMBlurPPUs.size() == viewer->getNumViews());
-        bool lIsOutline = (viewer->mOutlinePPUs.size() == viewer->getNumViews());
-
-
         // For each view
-        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+        for(unsigned int i=0; i<lNumPPUs; ++i)
         {
             // Params for the DoF PPU
             if(lIsDof)
@@ -1495,12 +1649,9 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         return 1;
     }
     else if ((theMethod=="setOutlineColor"))
-    // TODO: remove this from setParam, and place it in a new message like setFrustum
     {
-        bool lIsOutline = (viewer->mOutlinePPUs.size() == viewer->getNumViews());
-
         // For each view
-        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+        for(unsigned int i=0; i<lNumPPUs; ++i)
         {
             if(lIsOutline)
             {
@@ -1512,11 +1663,8 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
     }
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
     {
-        bool lIsDof = (viewer->mDofPPUs.size() == viewer->getNumViews());
-        bool lIsSSAO = (viewer->mSsaoPPUs.size() == viewer->getNumViews());
-
         // For each view
-        for(unsigned int i=0; i<viewer->getNumViews(); ++i)
+        for(unsigned int i=0; i<lNumPPUs; ++i)
         {
             viewer->getView(i)->getCamera()->setProjectionMatrixAsFrustum(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3], floatArgs[4], floatArgs[5]);
 
