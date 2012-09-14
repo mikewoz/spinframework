@@ -48,9 +48,6 @@ class MaskRendering : virtual public osg::Referenced
                 lColorBypass = pLastUnit;
             }
 
-            // Add a new camera to the pipeline
-            /// NOOOOpParent->setCamera(pCamera);
-
             // Create a unit for the additional camera
             osgPPU::UnitCamera* lMaskCamera = new osgPPU::UnitCamera();
             {

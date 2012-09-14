@@ -425,40 +425,34 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         // Mask effect
         if((pEffect & PPU_MASK) != 0)
         {
-            osg::Camera *cam = lView->getCamera();
-
-            int xsize = cam->getViewport()->width();
-            int ysize = cam->getViewport()->height();
+            int xsize = lCamera->getViewport()->width();
+            int ysize = lCamera->getViewport()->height();
             osg::Texture* texture2D = CompositeViewer::createRenderTexture( xsize, ysize, false, false );
-
 
             osg::Camera *slaveCam = new osg::Camera;
 
             slaveCam->addChild( spinApp::Instance().sceneManager_->rootNode.get() );
-            lGroup->addChild( slaveCam );
+            lCamera->addChild( slaveCam ); // The slavecam needs to be child of the camera, for PPU to work
 
             //slaveCam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
             slaveCam->setCullMask( MASK_MASK );
             slaveCam->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             slaveCam->setClearColor(osg::Vec4(0,0,0,0));
-            osg::Viewport* vp = new osg::Viewport(0,0,xsize, ysize);
-            slaveCam->setViewport( vp );
-            //printf("... [0x%p]\n", vp);
+            slaveCam->setViewport( lCamera->getViewport() );
             slaveCam->setReferenceFrame(osg::Transform::RELATIVE_RF);
             slaveCam->setRenderOrder(osg::Camera::PRE_RENDER);
             slaveCam->attach(osg::Camera::COLOR_BUFFER0, texture2D);
             slaveCam->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT);
             slaveCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
-            cam->getGraphicsContext()->getState()->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
-            // cam->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
-            cam->setCullMask( MASK_SCENE );
+            lCamera->getGraphicsContext()->getState()->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
+            // lCamera->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
+            lCamera->setCullMask( MASK_SCENE );
 
-            printf("cam getCullMask: %u 0x%x\n", cam->getCullMask(), cam->getCullMask() );
+            printf("cam getCullMask: %u 0x%x\n", lCamera->getCullMask(), lCamera->getCullMask() );
             printf("slaveCam getCullMask: %u 0x%x\n", slaveCam->getCullMask(), slaveCam->getCullMask() );
 
             MaskRendering* lMask = new MaskRendering();
-
             lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam);
 
             mMaskPPUs.push_back(lMask);
@@ -490,6 +484,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         {
             ppuout = new osgPPU::UnitInOut();
             ppuout->setName("PipelineResult");
+            ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
             ((osgPPU::UnitInOut*)ppuout)->setOutputTextureType(osgPPU::UnitInOut::TEXTURE_CUBEMAP);
 
             //unsigned int lFace = lCamera->getBufferAttachmentMap()[osg::Camera::COLOR_BUFFER]._face;
@@ -507,7 +502,6 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
             ((osgPPU::UnitInOut*)ppuout)->setOutputFace(lFace);
             ((osgPPU::UnitInOut*)ppuout)->setOutputTexture(mTexCubeMap, 0);
-            osg::Texture* lTex = ((osgPPU::UnitInOut*)ppuout)->getOrCreateOutputTexture(0);
         }
         lastUnit->addChild(ppuout);
 
@@ -870,7 +864,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setName("Top face camera");
         camera->setGraphicsContext(gc);
         camera->setViewport(new osg::Viewport(0,0,camera_width, camera_height));
-        GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+        //GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
         camera->setDrawBuffer(buffer);
         camera->setReadBuffer(buffer);
         camera->setAllowEventFocus(false);
