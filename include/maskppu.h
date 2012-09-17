@@ -29,6 +29,13 @@ class MaskRendering : virtual public osg::Referenced
         }
 
         /***********/
+        void setMaskTransparency(float pTransparency)
+        {
+            if(pTransparency >= 0.f && pTransparency <= 1.f)
+                maskAttr->set("uTransparency", pTransparency);
+        }
+
+        /***********/
         void createMaskPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Camera* pCamera)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
@@ -64,17 +71,23 @@ class MaskRendering : virtual public osg::Referenced
 
             // Create the bypass for the first color buffer of this camera
             osgPPU::UnitCameraAttachmentBypass* lMaskBypass;
+            //osgPPU::UnitCameraAttachmentBypass* lMaskBypass2;
             osgPPU::UnitCameraAttachmentBypass* lMaskDepth;
             {
                 lMaskBypass = new osgPPU::UnitCameraAttachmentBypass();
                 lMaskBypass->setBufferComponent(osg::Camera::COLOR_BUFFER0);
                 lMaskBypass->setName("maskBypass");
-
+                
+                /*lMaskBypass = new osgPPU::UnitCameraAttachmentBypass();
+                lMaskBypass->setBufferComponent(osg::Camera::COLOR_BUFFER1);
+                lMaskBypass->setName("maskBypass2");*/
+                
                 lMaskDepth = new osgPPU::UnitCameraAttachmentBypass();
                 lMaskDepth->setBufferComponent(osg::Camera::DEPTH_BUFFER);
                 lMaskDepth->setName("maskDepth");
             }
             lMaskCamera->addChild(lMaskBypass);
+            //lMaskCamera->addChild(lMaskBypass2);
             lMaskCamera->addChild(lMaskDepth);
 
             // Apply the mask
@@ -89,10 +102,15 @@ class MaskRendering : virtual public osg::Referenced
                 maskAttr->addShader(lFShader);
                 maskAttr->setName("maskShader");
 
+                maskAttr->add("uTransparency", osg::Uniform::FLOAT);
+
+                maskAttr->set("uTransparency", 0.5f);
+                
                 lMask->getOrCreateStateSet()->setAttributeAndModes(maskAttr);
                 lMask->setInputToUniform(lColorBypass, "uColorMap", true);
                 lMask->setInputToUniform(lDepthBypass, "uDepthMap", true);
                 lMask->setInputToUniform(lMaskBypass, "uMaskMap", true);
+                //lMask->setInputToUniform(lMaskBypass2, "uMaskMap2", true);
                 lMask->setInputToUniform(lMaskDepth, "uMaskDepthMap", true);
             }
 

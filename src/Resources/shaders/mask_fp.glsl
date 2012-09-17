@@ -14,7 +14,7 @@ void main()
     vec4 lMask = texture2D(uMaskMap, texcoord.st);
     float lMaskDepth = texture2D(uMaskDepthMap, texcoord.st).r;
 
-    gl_FragData[0] = lColor*lMask.r;
+    //gl_FragData[0] = lColor*lMask.r;
 
     /*if(texcoord.s < 0.5)
         gl_FragData[0] = vec4(lMask, 0.0, 0.0, 1.0);
@@ -23,7 +23,7 @@ void main()
 
     //gl_FragData[0] = lColor;
 
-    /*if(texcoord.t < 0.5)
+    if(texcoord.t < 0.5)
         if(texcoord.s < 0.5)
             gl_FragData[0] = vec4(vec3(lDepth), 1.0);
         else
@@ -32,5 +32,5 @@ void main()
         if(texcoord.s < 0.5)
             gl_FragData[0] = vec4(vec3(lMaskDepth), 1.0);
         else
-            gl_FragData[0] = lMask;*/
+            gl_FragData[0] = lMask;
 }
