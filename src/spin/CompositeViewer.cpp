@@ -455,7 +455,12 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             printf("slaveCam getCullMask: %u 0x%x\n", slaveCam->getCullMask(), slaveCam->getCullMask() );
 
             MaskRendering* lMask = new MaskRendering();
-            lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam);
+
+            double left,right,bottom,top,near,far;
+            lCamera->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+            slaveCam->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
+
+            lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam, near, far);
 
             mMaskPPUs.push_back(lMask);
         }
@@ -1646,6 +1651,10 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 if (stringArgs[0] == "maskTransparency")
                 {
                     viewer->mMaskPPUs[i]->setMaskTransparency(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "maskLightingDistance")
+                {
+                    viewer->mMaskPPUs[i]->setMaskLightingDistance(floatArgs[0]);
                 }
             }
         }

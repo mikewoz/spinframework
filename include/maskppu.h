@@ -36,7 +36,14 @@ class MaskRendering : virtual public osg::Referenced
         }
 
         /***********/
-        void createMaskPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Camera* pCamera)
+        void setMaskLightingDistance(float pDist)
+        {
+            if(pDist >= 0.f)
+                maskAttr->set("uLightingDistance", pDist);
+        }
+
+        /***********/
+        void createMaskPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Camera* pCamera, float zNear, float zFar)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
@@ -103,8 +110,14 @@ class MaskRendering : virtual public osg::Referenced
                 maskAttr->setName("maskShader");
 
                 maskAttr->add("uTransparency", osg::Uniform::FLOAT);
+                maskAttr->add("uLightingDistance", osg::Uniform::FLOAT);
+                maskAttr->add("uNear", osg::Uniform::FLOAT);
+                maskAttr->add("uFar", osg::Uniform::FLOAT);
 
                 maskAttr->set("uTransparency", 0.5f);
+                maskAttr->set("uLightingDistance", 0.f);
+                maskAttr->set("uNear", zNear);
+                maskAttr->set("uFar", zFar);
                 
                 lMask->getOrCreateStateSet()->setAttributeAndModes(maskAttr);
                 lMask->setInputToUniform(lColorBypass, "uColorMap", true);
