@@ -27,6 +27,8 @@ float linearDepth(const float d)
 
 void main()
 {
+    const float epsilon = 0.0001;
+
     vec4 lColor = texture2D(uColorMap, texcoord.st);
     float lDepth = texture2D(uDepthMap, texcoord.st).r;
     vec4 lMask = texture2D(uMaskMap, texcoord.st);
@@ -38,8 +40,16 @@ void main()
 
     if(lDist >= 0.0)
     {
-        float lLighten = 1.0 - smoothstep(0.0, uLightingDistance, lDist);
-        gl_FragData[0].rgb = lVisible*lObject*lLighten*mix(lColor.rgb, lMask.rgb, uTransparency)
-            + (1.0-lLighten)*lMask.rgb;
+        if(uLightingDistance > 0.0)
+        {
+            float lLighten = 1.0 - smoothstep(0.0, uLightingDistance, lDist);
+            gl_FragData[0].rgb = lVisible*lObject*lLighten*mix(lColor.rgb, lMask.rgb, uTransparency)
+                + (1.0-lLighten)*lMask.rgb;
+        }
+        else
+        {
+            gl_FragData[0].rgb = lVisible*lObject*mix(lColor.rgb, lMask.rgb, uTransparency)
+                + (1.0-lObject)*lMask.rgb;
+        }
     }
 }
