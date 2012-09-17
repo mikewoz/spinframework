@@ -635,6 +635,9 @@
 		1CCCA0F614BE389B00DCA0B7 /* spinViewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */; };
 		1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
+		1CD065FA160780CE00D2DBE2 /* LODNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD065F9160780CE00D2DBE2 /* LODNode.h */; };
+		1CD065FD160780E500D2DBE2 /* LODNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD065FC160780E500D2DBE2 /* LODNode.cpp */; };
+		1CD065FF160787F000D2DBE2 /* LODNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD065FE160787F000D2DBE2 /* LODNode.cpp */; };
 		1CD9411D1543BBB80075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9411C1543BBB80075A81C /* CollisionShape.cpp */; };
 		1CD941201543BC0A0075A81C /* CollisionShape.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD9411F1543BC0A0075A81C /* CollisionShape.h */; };
 		1CD9412B1543C77E0075A81C /* CollisionShape.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD9412A1543C77E0075A81C /* CollisionShape.cpp */; };
@@ -1448,6 +1451,9 @@
 		1CCCA0F114BE361B00DCA0B7 /* spin.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spin.icns; path = ../src/Resources/images/spin.icns; sourceTree = "<group>"; };
 		1CCCA0F314BE36CE00DCA0B7 /* spinViewer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = spinViewer.icns; path = ../src/Resources/images/spinViewer.icns; sourceTree = "<group>"; };
 		1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinViewer.cpp; path = ../../src/spin/spinViewer.cpp; sourceTree = "<group>"; };
+		1CD065F9160780CE00D2DBE2 /* LODNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LODNode.h; path = ../include/LODNode.h; sourceTree = "<group>"; };
+		1CD065FC160780E500D2DBE2 /* LODNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LODNode.cpp; path = ../src/spin/LODNode.cpp; sourceTree = "<group>"; };
+		1CD065FE160787F000D2DBE2 /* LODNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LODNode.cpp; path = ../src/osgWrappers/introspection/LODNode.cpp; sourceTree = "<group>"; };
 		1CD9411C1543BBB80075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = CollisionShape.cpp; path = ../src/spin/CollisionShape.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		1CD9411F1543BC0A0075A81C /* CollisionShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CollisionShape.h; path = ../include/CollisionShape.h; sourceTree = "<group>"; };
 		1CD9412A1543C77E0075A81C /* CollisionShape.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CollisionShape.cpp; path = ../src/osgWrappers/introspection/CollisionShape.cpp; sourceTree = "<group>"; };
@@ -1834,6 +1840,7 @@
 				1C386C9114BD3DF60065851F /* libloUtil.cpp */,
 				1C386C9214BD3DF60065851F /* LightSource.cpp */,
 				1C386C9314BD3DF60065851F /* Listener.cpp */,
+				1CD065FC160780E500D2DBE2 /* LODNode.cpp */,
 				1C386C9614BD3DF60065851F /* Menu3D.cpp */,
 				1C386C9714BD3DF60065851F /* ModelNode.cpp */,
 				1C386C9814BD3DF60065851F /* nodeVisitors.cpp */,
@@ -1895,6 +1902,7 @@
 				1CA24D7F14BE2892007A9C31 /* libloUtil.h */,
 				1CA24D8014BE2892007A9C31 /* LightSource.h */,
 				1CA24D8114BE2892007A9C31 /* Listener.h */,
+				1CD065F9160780CE00D2DBE2 /* LODNode.h */,
 				1CA24D8214BE2892007A9C31 /* mainpage.h */,
 				1CA24D8514BE2892007A9C31 /* Menu3D.h */,
 				1CA24D8614BE2892007A9C31 /* ModelNode.h */,
@@ -1954,6 +1962,7 @@
 				1CA24D4214BE2875007A9C31 /* ImageTexture.cpp */,
 				1CA24D4314BE2875007A9C31 /* LightSource.cpp */,
 				1CA24D4414BE2875007A9C31 /* Listener.cpp */,
+				1CD065FE160787F000D2DBE2 /* LODNode.cpp */,
 				1CA24D4614BE2875007A9C31 /* Menu3D.cpp */,
 				1CA24D4714BE2875007A9C31 /* ModelNode.cpp */,
 				1CF94955151CD43C00628872 /* ParticleSystem.cpp */,
@@ -2470,6 +2479,7 @@
 				1C068B211575532200BC6207 /* dofppu.h in Headers */,
 				1C329CB115BEF740002F845C /* pocoUtil.h in Headers */,
 				1CBD882815E5A8B9007ABACE /* ParticleSystemUtil.h in Headers */,
+				1CD065FA160780CE00D2DBE2 /* LODNode.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2892,6 +2902,8 @@
 				1C068B1C157552FE00BC6207 /* Utility.cpp in Sources */,
 				1C068B1E157552FE00BC6207 /* Visitor.cpp in Sources */,
 				1C329CAF15BEF306002F845C /* pocoUtil.cpp in Sources */,
+				1CD065FD160780E500D2DBE2 /* LODNode.cpp in Sources */,
+				1CD065FF160787F000D2DBE2 /* LODNode.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
