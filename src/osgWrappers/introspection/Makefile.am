@@ -16,6 +16,7 @@ libSPINwrappers_la_SOURCES = \
     ImageTexture.cpp \
     LightSource.cpp \
     Listener.cpp \
+    LODNode.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
     ParticleSystem.cpp \
