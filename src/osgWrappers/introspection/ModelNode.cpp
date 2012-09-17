@@ -44,7 +44,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
 	          "",
-	          "The context is an arbitrary keyword that associates this node with a particular behaviour. Currently, it is used to prevent display if the context matches the name of a machine. ie, allowing it to be seen on all machines except for the one that is named by setContext. ");
+	          "The context is an arbitrary keyword that associates this node with a particular behaviour. Currently, it is used to *prevent* display if the context matches the name of a machine. ie, allowing it to be seen on all machines except for the one that is named by setContext. ");
 	I_Method1(void, setModelFromFile, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __void__setModelFromFile__C5_char_P1,

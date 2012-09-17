@@ -224,7 +224,7 @@ PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 #        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6, have_sharedvideo=true, have_sharedvideo=false)
+PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6 shmdata-any-0.6, have_sharedvideo=true, have_sharedvideo=false)
 if test "x${have_sharedvideo}" = "xfalse" ; then
     AC_MSG_WARN([missing package: libshmdata-0.6-dev ])
 else

@@ -52,7 +52,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getURI,
 	          "",
-	          "");
+	          "Returns the currently-set URI associated with the sound node. ");
 	I_Method1(void, setActive, IN, int, i,
 	          Properties::VIRTUAL,
 	          __void__setActive__int,
@@ -62,7 +62,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getActive,
 	          "",
-	          "");
+	          "Returns whether the DSP processing is active or inactive. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

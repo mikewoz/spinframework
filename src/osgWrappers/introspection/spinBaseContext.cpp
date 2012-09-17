@@ -66,7 +66,7 @@ BEGIN_ABSTRACT_OBJECT_REFLECTOR(spin::spinBaseContext)
 	          Properties::NON_VIRTUAL,
 	          __void__stop,
 	          "",
-	          "Stops the currently running thread ");
+	          "Stops the currently running thread WARNING: Must be called explicitly before destroying an instance of spinServerContext. ");
 	I_Method0(bool, isRunning,
 	          Properties::NON_VIRTUAL,
 	          __bool__isRunning,

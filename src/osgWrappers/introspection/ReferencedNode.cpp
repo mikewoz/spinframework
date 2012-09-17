@@ -53,13 +53,6 @@ BEGIN_VALUE_REFLECTOR(spin::EventScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
-BEGIN_VALUE_REFLECTOR(boost::python::object)
-	I_DeclaringFile("ReferencedNode.h");
-	I_Constructor0(____object,
-	               "",
-	               "");
-END_REFLECTOR
-
 BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,

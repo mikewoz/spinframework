@@ -56,8 +56,12 @@
 #include <pcl/io/openni_grabber.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#include <pcl/compression/octree_pointcloud_compression.h>
 #endif WITH_PCL
 
+#ifdef WITH_SHARED_VIDEO
+#include <shmdata/any-data-reader.h>
+#endif
 
 namespace spin
 {
@@ -84,7 +88,18 @@ public:
 
     void setURI(const char* filename);
 
+	
 #ifdef WITH_PCL
+#ifdef WITH_SHARED_VIDEO
+	static void shmCallback (
+	     shmdata_any_reader_t *reader,
+         void *shmbuf,
+         void *data,
+         int data_size,
+         unsigned long long timestamp,
+         const char *type_description, void *user_data);
+#endif
+	
     void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &cloud);
     void applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud);
 
@@ -139,8 +154,13 @@ private:
     pcl::Grabber* grabber_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
+	pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *decoder_;
 #endif
-    
+
+#ifdef WITH_SHARED_VIDEO
+	shmdata_any_reader_t *shmReader_;
+#endif
+	
     t_symbol* customNode_;
     
     osg::ref_ptr<osg::PositionAttitudeTransform> cloudGroup_;
