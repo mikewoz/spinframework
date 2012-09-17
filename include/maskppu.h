@@ -34,7 +34,8 @@ class MaskRendering : virtual public osg::Referenced
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
-            // If last unit is null the first unit will bypass the color output of the camera
+            // If last unit is null the first unit will bypass the color output of the camera,
+            // as well as the depth output
             osgPPU::Unit* lColorBypass;
             if(pLastUnit == NULL)
             {
@@ -48,6 +49,11 @@ class MaskRendering : virtual public osg::Referenced
                 lColorBypass = pLastUnit;
             }
 
+            osgPPU::UnitDepthbufferBypass* lDepthBypass = new osgPPU::UnitDepthbufferBypass();
+            lDepthBypass->setName("depthBypass");
+            pParent->addChild(lDepthBypass);
+            
+
             // Create a unit for the additional camera
             osgPPU::UnitCamera* lMaskCamera = new osgPPU::UnitCamera();
             {
@@ -58,12 +64,18 @@ class MaskRendering : virtual public osg::Referenced
 
             // Create the bypass for the first color buffer of this camera
             osgPPU::UnitCameraAttachmentBypass* lMaskBypass;
+            osgPPU::UnitCameraAttachmentBypass* lMaskDepth;
             {
                 lMaskBypass = new osgPPU::UnitCameraAttachmentBypass();
                 lMaskBypass->setBufferComponent(osg::Camera::COLOR_BUFFER0);
                 lMaskBypass->setName("maskBypass");
+
+                lMaskDepth = new osgPPU::UnitCameraAttachmentBypass();
+                lMaskDepth->setBufferComponent(osg::Camera::DEPTH_BUFFER);
+                lMaskDepth->setName("maskDepth");
             }
             lMaskCamera->addChild(lMaskBypass);
+            lMaskCamera->addChild(lMaskDepth);
 
             // Apply the mask
             osgPPU::Unit* lMask = new osgPPU::UnitInOut();
@@ -79,7 +91,9 @@ class MaskRendering : virtual public osg::Referenced
 
                 lMask->getOrCreateStateSet()->setAttributeAndModes(maskAttr);
                 lMask->setInputToUniform(lColorBypass, "uColorMap", true);
+                lMask->setInputToUniform(lDepthBypass, "uDepthMap", true);
                 lMask->setInputToUniform(lMaskBypass, "uMaskMap", true);
+                lMask->setInputToUniform(lMaskDepth, "uMaskDepthMap", true);
             }
 
             pLastUnit = lMask;

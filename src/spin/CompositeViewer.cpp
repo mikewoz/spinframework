@@ -427,7 +427,8 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
         {
             int xsize = lCamera->getViewport()->width();
             int ysize = lCamera->getViewport()->height();
-            osg::Texture* texture2D = CompositeViewer::createRenderTexture( xsize, ysize, false, false );
+            osg::Texture* texture2D = CompositeViewer::createRenderTexture(xsize, ysize, false, false);
+            osg::Texture* textureDepth = CompositeViewer::createRenderTexture(xsize, ysize, true, false);
 
             osg::Camera *slaveCam = new osg::Camera;
 
@@ -442,6 +443,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             slaveCam->setReferenceFrame(osg::Transform::RELATIVE_RF);
             slaveCam->setRenderOrder(osg::Camera::PRE_RENDER);
             slaveCam->attach(osg::Camera::COLOR_BUFFER0, texture2D);
+            slaveCam->attach(osg::Camera::DEPTH_BUFFER, textureDepth);
             slaveCam->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT);
             slaveCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
