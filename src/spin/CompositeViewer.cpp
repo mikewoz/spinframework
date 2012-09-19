@@ -129,8 +129,8 @@ osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height
         texture->setResizeNonPowerOfTwoHint(false);
         texture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
         texture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
-        texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
-        texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::REPEAT);
+        texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::REPEAT);
         texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
     }
     else
@@ -167,19 +167,6 @@ osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height
 
 void CompositeViewer::setupCamera()
 {
-    // setup viewer's default camera
-    //osg::Camera* camera = getCamera();
-    //osg::Camera* camera = this->getView(0)->getCamera();
-
-    //camera->setViewport(0,0,(int)vp->width(), (int)vp->height());
-
-    // We create texture buffers for the main camera of each view
-    //osgViewer::ViewerBase::Cameras lCameras;
-    //this->getCameras(lCameras);
-    //for(osgViewer::ViewerBase::Cameras::iterator lIt = lCameras.begin();
-    //    lIt != lCameras.end();
-    //    lIt++)
-
     if(mIsDome == false)
     {
         for(unsigned int i=0; i<getNumViews(); ++i)
@@ -251,7 +238,7 @@ void CompositeViewer::setupCamera()
             std::cout << "---------------------------------------" << std::endl;
             std::cout << "setting up camera " << i << " with wxh=" << lWidth<<"x"<<lHeight << std::endl;
 
-            lCamera->setClearColor(osg::Vec4(0.f, 1.f, 0.f, 0.f));
+            lCamera->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 0.f));
             lCamera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
@@ -442,10 +429,10 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             slaveCam->setViewport( lCamera->getViewport() );
             slaveCam->setReferenceFrame(osg::Transform::RELATIVE_RF);
             slaveCam->setRenderOrder(osg::Camera::PRE_RENDER);
-            slaveCam->attach(osg::Camera::COLOR_BUFFER0, texture2D);
-            slaveCam->attach(osg::Camera::DEPTH_BUFFER, textureDepth);
             slaveCam->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT);
             slaveCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            slaveCam->attach(osg::Camera::COLOR_BUFFER0, texture2D);
+            slaveCam->attach(osg::Camera::DEPTH_BUFFER, textureDepth);
 
             lCamera->getGraphicsContext()->getState()->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
             // lCamera->setInheritanceMask( osg::CullSettings::ALL_VARIABLES & ~osg::CullSettings::CULL_MASK );
@@ -456,11 +443,7 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
 
             MaskRendering* lMask = new MaskRendering();
 
-            double left,right,bottom,top,near,far;
-            lCamera->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
-            slaveCam->getProjectionMatrixAsFrustum(left,right,bottom,top,near,far);
-
-            lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam, near, far);
+            lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam);
 
             mMaskPPUs.push_back(lMask);
         }

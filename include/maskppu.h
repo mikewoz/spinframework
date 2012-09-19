@@ -21,6 +21,7 @@ class MaskRendering : virtual public osg::Referenced
 {
     private:
         osgPPU::ShaderAttribute* maskAttr;
+        osgPPU::ShaderAttribute* maskLightAttr;
 
     public:
         /************/
@@ -43,10 +44,13 @@ class MaskRendering : virtual public osg::Referenced
         }
 
         /***********/
-        void createMaskPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Camera* pCamera, float zNear, float zFar)
+        void createMaskPipeline(osgPPU::Processor* pParent, osgPPU::Unit*& pLastUnit, osg::Camera* pCamera)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
+
+            double left,right,bottom,top,near,far;
+            pParent->getCamera()->getProjectionMatrixAsFrustum(left, right, bottom, top, near, far);
 
             // If last unit is null the first unit will bypass the color output of the camera,
             // as well as the depth output
@@ -63,10 +67,9 @@ class MaskRendering : virtual public osg::Referenced
                 lColorBypass = pLastUnit;
             }
 
-            osgPPU::UnitDepthbufferBypass* lDepthBypass = new osgPPU::UnitDepthbufferBypass();
+            osgPPU::Unit* lDepthBypass = new osgPPU::UnitDepthbufferBypass();
             lDepthBypass->setName("depthBypass");
             pParent->addChild(lDepthBypass);
-            
 
             // Create a unit for the additional camera
             osgPPU::UnitCamera* lMaskCamera = new osgPPU::UnitCamera();
@@ -78,24 +81,78 @@ class MaskRendering : virtual public osg::Referenced
 
             // Create the bypass for the first color buffer of this camera
             osgPPU::UnitCameraAttachmentBypass* lMaskBypass;
-            //osgPPU::UnitCameraAttachmentBypass* lMaskBypass2;
             osgPPU::UnitCameraAttachmentBypass* lMaskDepth;
             {
                 lMaskBypass = new osgPPU::UnitCameraAttachmentBypass();
                 lMaskBypass->setBufferComponent(osg::Camera::COLOR_BUFFER0);
                 lMaskBypass->setName("maskBypass");
                 
-                /*lMaskBypass = new osgPPU::UnitCameraAttachmentBypass();
-                lMaskBypass->setBufferComponent(osg::Camera::COLOR_BUFFER1);
-                lMaskBypass->setName("maskBypass2");*/
-                
                 lMaskDepth = new osgPPU::UnitCameraAttachmentBypass();
                 lMaskDepth->setBufferComponent(osg::Camera::DEPTH_BUFFER);
                 lMaskDepth->setName("maskDepth");
             }
             lMaskCamera->addChild(lMaskBypass);
-            //lMaskCamera->addChild(lMaskBypass2);
             lMaskCamera->addChild(lMaskDepth);
+
+            // Compute the mask to get the max lighting distance
+            // We do this in lower res to keep resource usage low
+            /*osgPPU::UnitInResampleOut* lMaskResample = new osgPPU::UnitInResampleOut();
+            osgPPU::UnitInResampleOut* lMaskDepthResample = new osgPPU::UnitInResampleOut();
+            {
+                lMaskResample->setName("maskResample");
+                lMaskResample->setFactorX(0.5f);
+                lMaskResample->setFactorY(0.5f);
+
+                lMaskDepthResample->setName("maskResample");
+                lMaskDepthResample->setFactorX(0.5f);
+                lMaskDepthResample->setFactorY(0.5f);
+            }
+            lMaskBypass->addChild(lMaskResample);
+            lMaskDepth->addChild(lMaskDepthResample);
+
+            osgPPU::Unit* lMaskLight = new osgPPU::UnitInOut();
+            maskLightAttr = new osgPPU::ShaderAttribute();
+            {
+                osg::Shader* lVShader = osgDB::readShaderFile("mask_vp.glsl", vertexOptions.get());
+                osg::Shader* lFShader = osgDB::readShaderFile("mask_fp.glsl", fragmentOptions.get());
+
+                maskLightAttr->addShader(lVShader);
+                maskLightAttr->addShader(lFShader);
+                maskLightAttr->setName("maskLightShader");
+
+                maskLightAttr->add("uPass", osg::Uniform::INT);
+                maskLightAttr->add("uMaxLightSearch", osg::Uniform::FLOAT);
+                maskLightAttr->add("uLightSearchStep", osg::Uniform::FLOAT);
+                maskLightAttr->add("uNear", osg::Uniform::FLOAT);
+                maskLightAttr->add("uFar", osg::Uniform::FLOAT);
+                maskLightAttr->add("uLeft", osg::Uniform::FLOAT);
+                maskLightAttr->add("uRight", osg::Uniform::FLOAT);
+                maskLightAttr->add("uTop", osg::Uniform::FLOAT);
+                maskLightAttr->add("uBottom", osg::Uniform::FLOAT);
+
+                maskLightAttr->set("uPass", 1);
+                maskLightAttr->set("uMaxLightSearch", 5.f);
+                maskLightAttr->set("uLightSearchStep", 2.f);
+                maskLightAttr->set("uNear", (float)near);
+                maskLightAttr->set("uFar", (float)far);
+                maskLightAttr->set("uLeft", (float)left);
+                maskLightAttr->set("uRight", (float)right);
+                maskLightAttr->set("uTop", (float)top);
+                maskLightAttr->set("uBottom", (float)bottom);
+
+                lMaskLight->getOrCreateStateSet()->setAttributeAndModes(maskLightAttr);
+                lMaskLight->setInputToUniform(lMaskResample, "uMaskMap", true);
+                lMaskLight->setInputToUniform(lMaskDepthResample, "uMaskDepthResample", true);
+            }
+
+            // We need to resample the result to the correct resolution
+            osgPPU::UnitInResampleOut* lMaskBlurredDepth = new osgPPU::UnitInResampleOut();
+            {
+                lMaskBlurredDepth->setName("maskBlurredDepth");
+                lMaskBlurredDepth->setFactorX(2.f);
+                lMaskBlurredDepth->setFactorY(2.f);
+            }
+            lMaskLight->addChild(lMaskBlurredDepth);*/
 
             // Apply the mask
             osgPPU::Unit* lMask = new osgPPU::UnitInOut();
@@ -109,21 +166,22 @@ class MaskRendering : virtual public osg::Referenced
                 maskAttr->addShader(lFShader);
                 maskAttr->setName("maskShader");
 
+                maskAttr->add("uPass", osg::Uniform::INT);
                 maskAttr->add("uTransparency", osg::Uniform::FLOAT);
                 maskAttr->add("uLightingDistance", osg::Uniform::FLOAT);
                 maskAttr->add("uNear", osg::Uniform::FLOAT);
                 maskAttr->add("uFar", osg::Uniform::FLOAT);
 
+                maskAttr->set("uPass", 2);
                 maskAttr->set("uTransparency", 0.5f);
                 maskAttr->set("uLightingDistance", 0.f);
-                maskAttr->set("uNear", zNear);
-                maskAttr->set("uFar", zFar);
+                maskAttr->set("uNear", (float)near);
+                maskAttr->set("uFar", (float)far);
                 
                 lMask->getOrCreateStateSet()->setAttributeAndModes(maskAttr);
                 lMask->setInputToUniform(lColorBypass, "uColorMap", true);
                 lMask->setInputToUniform(lDepthBypass, "uDepthMap", true);
                 lMask->setInputToUniform(lMaskBypass, "uMaskMap", true);
-                //lMask->setInputToUniform(lMaskBypass2, "uMaskMap2", true);
                 lMask->setInputToUniform(lMaskDepth, "uMaskDepthMap", true);
             }
 
