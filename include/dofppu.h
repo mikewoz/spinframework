@@ -58,13 +58,11 @@ class DoFRendering : virtual public osg::Referenced
         void setFocalLength(float f)
         {
             dofShaderAttr->set("focalLength", f);
-            printf("focalLength: %f\n", f);
         }
 
         void setFocalRange(float range)
         {
             dofShaderAttr->set("focalRange", range);
-            printf("focalRange: %f\n", range);
         }
 
         void setNear(float near)
@@ -96,8 +94,6 @@ class DoFRendering : virtual public osg::Referenced
             {
                 bypass = lastUnit;
             }
-
-            printf("near: %f, far: %f\n", zNear, zFar);
 
             // next unit will bypass the depth output of the camera
             osgPPU::Unit* depthbypass = new osgPPU::UnitDepthbufferBypass();
@@ -179,6 +175,7 @@ class DoFRendering : virtual public osg::Referenced
             blurx->addChild(blury);
 
             lastUnit = blury;
+            //lastUnit = dof;
         }
 };
 
