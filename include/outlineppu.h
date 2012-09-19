@@ -27,6 +27,9 @@ class OutlineRendering : virtual public osg::Referenced
         osgPPU::ShaderAttribute* gaussx;
         osgPPU::ShaderAttribute* gaussy;
 
+        osgPPU::UnitInResampleOut* mResample;
+        osgPPU::UnitInResampleOut* mUnResample;
+
         float dilateRadius;
         float glowRadius, glowSigma;
 
@@ -138,7 +141,7 @@ class OutlineRendering : virtual public osg::Referenced
                 lEdges->setInputToUniform(lColor, "uColorMap", true);
             }
 
-            // A blur filter is applied to control the strength of the outline
+            // A dilate filter is applied to control the strength of the outline
             dilatexAttr = new osgPPU::ShaderAttribute();
             dilateyAttr = new osgPPU::ShaderAttribute();
             {
@@ -184,6 +187,14 @@ class OutlineRendering : virtual public osg::Referenced
             lDilatex->addChild(lDilatey);
 
             // For those who need glow, here it is !
+            // We calculate it in a lowered resolution to keep performance high
+            // It doesn't matter as glow is blur...
+            osgPPU::UnitInResampleOut* lResample = new osgPPU::UnitInResampleOut();
+            lResample->setName("resample");
+            lResample->setFactorX(0.5f);
+            lResample->setFactorY(0.5f);
+            lDilatey->addChild(lResample);
+
             gaussx = new osgPPU::ShaderAttribute();
             gaussy = new osgPPU::ShaderAttribute();
             {
@@ -229,8 +240,15 @@ class OutlineRendering : virtual public osg::Referenced
                 lGlowX->getOrCreateStateSet()->setAttributeAndModes(gaussx);
                 lGlowY->getOrCreateStateSet()->setAttributeAndModes(gaussy);
             }
-            lDilatey->addChild(lGlowX);
+            lResample->addChild(lGlowX);
             lGlowX->addChild(lGlowY);
+
+            // Go back to the original resolution
+            osgPPU::UnitInResampleOut* lUnResample = new osgPPU::UnitInResampleOut();
+            lUnResample->setName("unResample");
+            lUnResample->setFactorX(2.0f);
+            lUnResample->setFactorY(2.0f);
+            lGlowY->addChild(lUnResample);
 
             // New we can composite the color image with the outline
             osgPPU::UnitInOut* lComposite = new osgPPU::UnitInOut();
@@ -254,7 +272,7 @@ class OutlineRendering : virtual public osg::Referenced
                 lComposite->setName("composite");
                 lComposite->getOrCreateStateSet()->setAttributeAndModes(compositeAttr);
                 lComposite->setInputToUniform(lDilatey, "uOutlineMap", true);
-                lComposite->setInputToUniform(lGlowY, "uGlowMap", true);
+                lComposite->setInputToUniform(lUnResample, "uGlowMap", true);
                 lComposite->setInputToUniform(lColor, "uColorMap", true);
             }
 

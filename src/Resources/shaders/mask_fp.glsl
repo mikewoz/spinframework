@@ -20,6 +20,10 @@ uniform float uNear, uFar, uLeft, uRight, uTop, uBottom;
 uniform float osgppu_ViewportWidth, osgppu_ViewportHeight;
 
 varying vec2 texcoord;
+// Precomputed values
+varying float uA, uB;
+
+const float epsilon = 0.0001;
 
 // This function is not available in GLSL 1.2 ...
 float smoothStep(float edge0, float edge1, float x)
@@ -32,9 +36,9 @@ float smoothStep(float edge0, float edge1, float x)
 // Convert depth value to linear depth
 float linearDepth(const float d)
 {
-    float a = uFar / (uFar-uNear);
-    float b = uFar*uNear / (uNear-uFar);
-    return b / ((d-a)*uFar);
+    //float a = uFar / (uFar-uNear);
+    //float b = uFar*uNear / (uNear-uFar);
+    return uB / ((d-uA)*uFar);
 }
 
 // Calculate the position of the fragment in view coordinates
@@ -53,8 +57,6 @@ vec3 getViewPos(const float s, const float t, const float depth)
 
 void main()
 {
-    const float epsilon = 0.0001;
-
     if(uPass == 1)
     {
         float lMaskDepth = texture2D(uMaskDepthMap, texcoord.st).r;
