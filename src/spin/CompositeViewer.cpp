@@ -1626,6 +1626,10 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 {
                     viewer->mOutlinePPUs[i]->setOutlineMode((int)floatArgs[0]);
                 }
+                else if (stringArgs[0] == "outlineResample")
+                {
+                    viewer->mOutlinePPUs[i]->setResampleFactor(floatArgs[0]);
+                }
             }
 
             // Params for the mask PPU
