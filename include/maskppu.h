@@ -40,7 +40,28 @@ class MaskRendering : virtual public osg::Referenced
         void setMaskLightingDistance(float pDist)
         {
             if(pDist >= 0.f)
+            {
                 maskAttr->set("uLightingDistance", pDist);
+                maskLightAttr->set("uLightingDistance", pDist);
+            }
+        }
+
+        /***********/
+        void setLightSearchDistance(float pDist)
+        {
+            if(pDist >= 0.f)
+            {
+                maskLightAttr->set("uMaxLightSearch", pDist);
+            }
+        }
+
+        /***********/
+        void setLightSearchStep(float pStep)
+        {
+            if(pStep >= 1.f)
+            {
+                maskLightAttr->set("uLightSearchStep", pStep);
+            }
         }
 
         /***********/
@@ -96,7 +117,7 @@ class MaskRendering : virtual public osg::Referenced
 
             // Compute the mask to get the max lighting distance
             // We do this in lower res to keep resource usage low
-            /*osgPPU::UnitInResampleOut* lMaskResample = new osgPPU::UnitInResampleOut();
+            osgPPU::UnitInResampleOut* lMaskResample = new osgPPU::UnitInResampleOut();
             osgPPU::UnitInResampleOut* lMaskDepthResample = new osgPPU::UnitInResampleOut();
             {
                 lMaskResample->setName("maskResample");
@@ -123,6 +144,7 @@ class MaskRendering : virtual public osg::Referenced
                 maskLightAttr->add("uPass", osg::Uniform::INT);
                 maskLightAttr->add("uMaxLightSearch", osg::Uniform::FLOAT);
                 maskLightAttr->add("uLightSearchStep", osg::Uniform::FLOAT);
+                maskLightAttr->add("uLightingDistance", osg::Uniform::FLOAT);
                 maskLightAttr->add("uNear", osg::Uniform::FLOAT);
                 maskLightAttr->add("uFar", osg::Uniform::FLOAT);
                 maskLightAttr->add("uLeft", osg::Uniform::FLOAT);
@@ -132,7 +154,8 @@ class MaskRendering : virtual public osg::Referenced
 
                 maskLightAttr->set("uPass", 1);
                 maskLightAttr->set("uMaxLightSearch", 5.f);
-                maskLightAttr->set("uLightSearchStep", 2.f);
+                maskLightAttr->set("uLightSearchStep", 1.f);
+                maskLightAttr->set("uLightingDistance", 0.f);
                 maskLightAttr->set("uNear", (float)near);
                 maskLightAttr->set("uFar", (float)far);
                 maskLightAttr->set("uLeft", (float)left);
@@ -142,7 +165,7 @@ class MaskRendering : virtual public osg::Referenced
 
                 lMaskLight->getOrCreateStateSet()->setAttributeAndModes(maskLightAttr);
                 lMaskLight->setInputToUniform(lMaskResample, "uMaskMap", true);
-                lMaskLight->setInputToUniform(lMaskDepthResample, "uMaskDepthResample", true);
+                lMaskLight->setInputToUniform(lMaskDepthResample, "uMaskDepthMap", true);
             }
 
             // We need to resample the result to the correct resolution
@@ -152,7 +175,7 @@ class MaskRendering : virtual public osg::Referenced
                 lMaskBlurredDepth->setFactorX(2.f);
                 lMaskBlurredDepth->setFactorY(2.f);
             }
-            lMaskLight->addChild(lMaskBlurredDepth);*/
+            lMaskLight->addChild(lMaskBlurredDepth);
 
             // Apply the mask
             osgPPU::Unit* lMask = new osgPPU::UnitInOut();
@@ -182,7 +205,7 @@ class MaskRendering : virtual public osg::Referenced
                 lMask->setInputToUniform(lColorBypass, "uColorMap", true);
                 lMask->setInputToUniform(lDepthBypass, "uDepthMap", true);
                 lMask->setInputToUniform(lMaskBypass, "uMaskMap", true);
-                lMask->setInputToUniform(lMaskDepth, "uMaskDepthMap", true);
+                lMask->setInputToUniform(lMaskBlurredDepth, "uMaskDepthMap", true);
             }
 
             pLastUnit = lMask;

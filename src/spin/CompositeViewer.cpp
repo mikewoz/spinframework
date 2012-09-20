@@ -416,6 +416,9 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             int ysize = lCamera->getViewport()->height();
             osg::Texture* texture2D = CompositeViewer::createRenderTexture(xsize, ysize, false, false);
             osg::Texture* textureDepth = CompositeViewer::createRenderTexture(xsize, ysize, true, false);
+            // We need the depth buffer to not be smoothed, so we choose a nearest filter
+            textureDepth->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+            textureDepth->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
 
             osg::Camera *slaveCam = new osg::Camera;
 
@@ -1642,6 +1645,14 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 else if (stringArgs[0] == "maskLightingDistance")
                 {
                     viewer->mMaskPPUs[i]->setMaskLightingDistance(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "maskLightSearchDistance")
+                {
+                    viewer->mMaskPPUs[i]->setLightSearchDistance(floatArgs[0]);
+                }
+                else if (stringArgs[0] == "maskLightSearchStep")
+                {
+                    viewer->mMaskPPUs[i]->setLightSearchStep(floatArgs[0]);
                 }
             }
         }
