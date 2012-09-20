@@ -22,6 +22,7 @@ uniform float osgppu_ViewportWidth, osgppu_ViewportHeight;
 varying vec2 texcoord;
 // Precomputed values
 varying float uA, uB;
+varying float invViewportHeight, invViewportWidth;
 
 const float epsilon = 0.0001;
 
@@ -65,9 +66,6 @@ void main()
 {
     if(uPass == 1)
     {
-        float invViewportWidth = 1.0 / osgppu_ViewportWidth;
-        float invViewportHeight = 1.0 / osgppu_ViewportHeight;
-
         float lMaskDepth = texture2D(uMaskDepthMap, texcoord.st).r;
 
         if(lMaskDepth == 1.0)
