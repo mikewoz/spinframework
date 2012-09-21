@@ -161,7 +161,7 @@ namespace spin
 {
 
 // constructors:
-
+    btRigidBody* fallRigidBody;
 //SceneManager::SceneManager(const std::string &id)
 SceneManager::SceneManager(std::string id)
 {
@@ -354,10 +354,11 @@ SceneManager::SceneManager(std::string id)
     btVector3 worldAabbMax(100, 100, 100);
     //const int maxProxies = 32766;
     const int maxProxies = 1000;
-    btAxisSweep3 *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
-
+    //btAxisSweep3
+    btBroadphaseInterface *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+    //btBroadphaseInterface* broadphase = new btDbvtBroadphase();
     dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
-
+    dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
 
     // This callback is a global method of checking collisions after every
     // pyhsics step. We register a global callback using gContactAddedCallback,
@@ -371,7 +372,6 @@ SceneManager::SceneManager(std::string id)
         //gContactAddedCallback = btCollisionCallback;
     }
 
-    dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
 
 #endif
 
@@ -1603,8 +1603,9 @@ void SceneManager::update()
         if (spinApp::Instance().getContext()->isServer())
         {
             //dynamicsWorld_->performDiscreteCollisionDetection();
-            dynamicsWorld_->stepSimulation(dt);
-            dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            //printf("stepSimulation %f\n", dt);
+            dynamicsWorld_->stepSimulation(dt);//, 7, 0.0004);
+            //dynamicsWorld_->updateAabbs(); // <- is this necessary?
         }
     }
 #endif
