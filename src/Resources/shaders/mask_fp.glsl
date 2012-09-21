@@ -129,5 +129,7 @@ void main()
 
         // This only applies if the objects are behind the masking object
         gl_FragData[0].rgb *= step(0.0, lDist);
+
+        //gl_FragData[0].rgb = vec3(lMaskDepth.g);
     }
 }

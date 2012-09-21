@@ -252,7 +252,7 @@ else
     AC_MSG_NOTICE([SPATOSC_LIBS:          ${SPATOSC_LIBS}])
 fi
 
-PKG_CHECK_MODULES(BULLET, bullet, have_bullet=true, have_bullet=false)
+PKG_CHECK_MODULES(BULLET, [bullet >= 2.81], have_bullet=true, have_bullet=false)
 if test "x${have_bullet}" = "xfalse" ; then
     AC_MSG_WARN([missing package: bullet])
 else

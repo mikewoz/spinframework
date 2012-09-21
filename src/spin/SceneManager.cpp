@@ -161,7 +161,6 @@ namespace spin
 {
 
 // constructors:
-    btRigidBody* fallRigidBody;
 //SceneManager::SceneManager(const std::string &id)
 SceneManager::SceneManager(std::string id)
 {
