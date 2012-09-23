@@ -96,7 +96,7 @@ class DoFRendering : virtual public osg::Referenced
             }
 
             // next unit will bypass the depth output of the camera
-            osgPPU::UnitDepthbufferBypass* depthbypass = new osgPPU::UnitDepthbufferBypass();
+            osgPPU::Unit* depthbypass = new osgPPU::UnitDepthbufferBypass();
             depthbypass->setName("DepthBypass");
             parent->addChild(depthbypass);
 
@@ -175,6 +175,7 @@ class DoFRendering : virtual public osg::Referenced
             blurx->addChild(blury);
 
             lastUnit = blury;
+            //lastUnit = dof;
         }
 };
 

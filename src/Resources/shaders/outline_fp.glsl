@@ -22,31 +22,28 @@ uniform vec4 uOutlineColor;
 uniform float uGlowPower;
 
 varying vec2 texcoord;
+// Precomputed values
+varying float invViewportWidth, invViewportHeight;
+varying float uA, uB;
 
 float linearDepth(const float d)
 {
-    float a = uFar / (uFar-uNear);
-    float b = uFar*uNear / (uNear-uFar);
-    return b / ((d-a)*uFar);
+    //float a = uFar / (uFar-uNear);
+    //float b = uFar*uNear / (uNear-uFar);
+    return uB / ((d-uA)*uFar);
 }
 
 // Small function which returns the depth value of the
 // fragment offset by (u,v)
 float fetchDepth(const int u, const int v)
 {
-    float lXRatio = 1.0 / osgppu_ViewportWidth;
-    float lYRatio = 1.0 / osgppu_ViewportHeight;
-
-    return texture2D(uDepthMap, texcoord.st + vec2(u*lXRatio, v*lYRatio)).r;
+    return texture2D(uDepthMap, texcoord.st + vec2(u*invViewportWidth, v*invViewportHeight)).r;
 }
 
 // Returns the luminance of the fragment offset by (u,v)
 float fetchLuminance(const int u, const int v)
 {
-    float lXRatio = 1.0 / osgppu_ViewportWidth;
-    float lYRatio = 1.0 / osgppu_ViewportHeight;
-
-    vec3 lColor = texture2D(uColorMap, texcoord.st + vec2(u*lXRatio, v*lYRatio)).rgb;
+    vec3 lColor = texture2D(uColorMap, texcoord.st + vec2(u*invViewportWidth, v*invViewportHeight)).rgb;
     return 0.2126*lColor.r + 0.7152*lColor.g + 0.0722*lColor.b;
 }
 
@@ -169,8 +166,8 @@ void main()
     if(uPass == 1)
     {
         // We need to check if we are on the border of the screen or not
-        float lXRatio = 1.0/osgppu_ViewportWidth;
-        float lYRatio = 1.0/osgppu_ViewportHeight;
+        float lXRatio = invViewportWidth;
+        float lYRatio = invViewportHeight;
         float lIsBorder = step(lXRatio, texcoord.s) * (1.0-step(1.0-lXRatio, texcoord.s))
             * step(lYRatio, texcoord.t) * (1.0-step(1.0-lYRatio, texcoord.t));
 
