@@ -86,6 +86,9 @@ namespace osg {
 // not count when doing collision detection or intersection testing.
 #define DEBUGVIEW_NODE_MASK   0x00000004
 
+#define RECEIVE_SHADOW_NODE_MASK 0x00000008
+#define CAST_SHADOW_NODE_MASK 0x0000000F
+
 
 namespace spin
 {

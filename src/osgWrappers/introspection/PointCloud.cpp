@@ -192,10 +192,6 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_StaticMethod7(void, shmCallback, IN, shmdata_any_reader_t *, reader, IN, void *, shmbuf, IN, void *, data, IN, int, data_size, IN, unsigned long long, timestamp, IN, const char *, type_description, IN, void *, user_data,
-	                __void__shmCallback__shmdata_any_reader_t_P1__void_P1__void_P1__int__unsigned_long_long__C5_char_P1__void_P1_S,
-	                "",
-	                "");
 	I_SimpleProperty(osg::Vec4, Color, 
 	                 __osg_Vec4__getColor, 
 	                 0);

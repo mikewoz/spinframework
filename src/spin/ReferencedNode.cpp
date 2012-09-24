@@ -474,6 +474,30 @@ void ReferencedNode::setAlpha (float alpha)
     std::cout << "set alpha for " << this->id_->s_name << " to " << subgraphAlpha_ << std::endl;
 }
 
+void ReferencedNode::setReceiveShadows(int b)
+{
+    receiveShadows_ = (bool)b;
+    /*
+    osg::node::setNodeMask(this->getNodeMask() |
+                  (int)receiveShadows_*RECEIVE_SHADOW_NODE_MASK |
+                  (int)castShadows_*CAST_SHADOW_NODE_MASK);
+                  */
+    BROADCAST(this, "si", "setReceiveShadows", (int)b);
+    this->setNodeMask(this->getNodeMask());
+}
+
+void ReferencedNode::setCastShadows(int b)
+{
+    castShadows_ = (bool)b;
+    /*
+    osg::node::setNodeMask(this->getNodeMask() |
+                  (int)receiveShadows_*RECEIVE_SHADOW_NODE_MASK |
+                  (int)castShadows_*CAST_SHADOW_NODE_MASK);
+                  */
+    BROADCAST(this, "si", "setCastShadows", (int)b);
+    this->setNodeMask(this->getNodeMask());
+}
+
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)
 {
     //std::cout << id_->s_name << " got setParam: " << paramValue << std::endl;
@@ -608,6 +632,16 @@ std::vector<lo_message> ReferencedNode::getState() const
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setAlpha", this->getAlpha());
     ret.push_back(msg);
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setReceiveShadows", this->getReceiveShadows());
+    ret.push_back(msg);
+        
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setCastShadows", this->getCastShadows());
+    ret.push_back(msg);
+    
+
 
     stringParamType::const_iterator stringIter;
     for (stringIter = stringParams_.begin(); stringIter != stringParams_.end(); stringIter++ )
@@ -1105,7 +1139,10 @@ bool ReferencedNode::removeEventScript(const char* label)
 
 void ReferencedNode::setNodeMask( osg::Node::NodeMask nm )
 {
-    osg::Node::setNodeMask(nm);
+    osg::Node::setNodeMask(nm |
+                  (int)receiveShadows_*RECEIVE_SHADOW_NODE_MASK |
+                  (int)castShadows_*CAST_SHADOW_NODE_MASK);
+    //osg::Node::setNodeMask(nm);
     printf("NODE[%s] : setNodeMask %u 0x%x\n", getID().c_str(), nm, nm);
     BROADCAST(this, "si", "setNodeMask", nm );
 }

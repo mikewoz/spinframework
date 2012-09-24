@@ -70,6 +70,16 @@
 #include <osgDB/Registry>
 #include <osgUtil/Optimizer>
 
+#include <osgShadow/ShadowedScene>
+//#include <osgShadow/ShadowVolume>
+//#include <osgShadow/ShadowTexture>
+//#include <osgShadow/ShadowMap>
+//#include <osgShadow/SoftShadowMap>
+//#include <osgShadow/ParallelSplitShadowMap>
+//#include <osgShadow/LightSpacePerspectiveShadowMap>
+//#include <osgShadow/StandardShadowMap>
+#include <osgShadow/ViewDependentShadowMap>
+
 #include <cppintrospection/Reflection>
 #include <cppintrospection/Type>
 #include <cppintrospection/Value>
@@ -284,16 +294,36 @@ SceneManager::SceneManager(std::string id)
     }
     */
 
-    // create some initial nodeS:
+    // create some initial nodes:
     rootNode = new osg::ClearNode();
     rootNode->setName("root");
+    
     //worldNode = new osg::ClearNode();
     //worldNode->setName("world");
     worldNode = new ReferencedNode(this, "world");
     worldNode->setNodeMask( 0xffffffff );
-    rootNode->addChild(worldNode.get());
-
     worldStateSet_ = gensym("NULL");
+
+    // shadow scene:
+    // we use a view-dependent shadow map to improve efficiency over regular
+    // osgShadow::ShadowMap, since shadow interactors will only be rendered if
+    // they and their assumed shadows are visible in the view frustum.
+    
+    //osg::ref_ptr<osgShadow::ShadowMap> sm = new osgShadow::ShadowMap;
+    osg::ref_ptr<osgShadow::ViewDependentShadowMap> vdsm = new osgShadow::ViewDependentShadowMap;
+    //vdsm->setShadowMapProjectionHint(osgShadow::ViewDependentShadowMap::ORTHOGRAPHIC_SHADOW_MAP);
+    //vdsm->setBaseShadowTextureUnit( 1 );
+    osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot = new osgShadow::ShadowedScene;
+    shadowRoot->setName("shadowRoot");
+    shadowRoot->setShadowTechnique( vdsm.get() );
+    shadowRoot->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
+    shadowRoot->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
+    
+    
+    //rootNode->addChild(worldNode.get());
+    rootNode->addChild(shadowRoot.get());
+    shadowRoot->addChild( worldNode.get() );
+
 
     for (int i = 0; i < OSG_NUM_LIGHTS; i++)
     {
