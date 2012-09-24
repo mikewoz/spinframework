@@ -63,7 +63,7 @@ struct btContactCallback : public btCollisionWorld::ContactResultCallback
      *  (supplied by the superclass) for needsCollision() */
     btContactCallback(btRigidBody& tgtBody , CollisionShape& node /*, ... */)
         : btCollisionWorld::ContactResultCallback(), body(tgtBody), node_(node) { }
-
+    ~btContactCallback() {}
     btRigidBody& body; //!< The body the sensor is monitoring
     CollisionShape& node_; //!< External information for contact processing
 
@@ -80,18 +80,18 @@ struct btContactCallback : public btCollisionWorld::ContactResultCallback
 
     //! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
     virtual btScalar addSingleResult(btManifoldPoint& cp,
-        const btCollisionObjectWrapper* colObj0,int partId0,int index0,
-        const btCollisionObjectWrapper* colObj1,int partId1,int index1)
-
-    //const btCollisionObject* colObj0,int partId0,int index0,
-    //   const btCollisionObject* colObj1,int partId1,int index1)
+                                     // const btCollisionObjectWrapper* colObj0,int partId0,int index0,
+                                     //const btCollisionObjectWrapper* colObj1,int partId1,int index1)
+                                     const btCollisionObject* colObj0,int partId0,int index0,
+                                     const btCollisionObject* colObj1,int partId1,int index1)
     {
         osg::Vec3 hitPoint;
         osg::Vec3 hitPoint2;
 
         osg::Vec3 normal;
 
-        if (colObj0->getCollisionObject()==&body)
+        //if (colObj0->getCollisionObject()==&body)
+        if (colObj0==&body)
         {
             hitPoint = asOsgVec3( cp.m_localPointA );
             hitPoint2 = asOsgVec3( cp.m_localPointB );
@@ -102,10 +102,10 @@ struct btContactCallback : public btCollisionWorld::ContactResultCallback
             normal = asOsgVec3( cp.m_normalWorldOnB );
         }
 
-        //CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
-        //CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
-        CollisionShape *n0 = (CollisionShape*)(colObj0->getCollisionObject()->getUserPointer());
-        CollisionShape *n1 = (CollisionShape*)(colObj1->getCollisionObject()->getUserPointer());
+        CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
+        CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
+        //CollisionShape *n0 = (CollisionShape*)(colObj0->getCollisionObject()->getUserPointer());
+        //CollisionShape *n1 = (CollisionShape*)(colObj1->getCollisionObject()->getUserPointer());
 
 
         if ( !n0 || !n1 ) return 0;
