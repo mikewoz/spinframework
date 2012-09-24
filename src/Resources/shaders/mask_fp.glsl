@@ -77,7 +77,16 @@ void main()
             for(float i=-uMaxLightSearch; i<uMaxLightSearch; i+=uLightSearchStep)
                 for(float j=-uMaxLightSearch; j<uMaxLightSearch; j+=uLightSearchStep)
                 {
+                    // We need to search in a circle zone: check we are still in the circle
+                    if(i*i + j*j > uMaxLightSearch*uMaxLightSearch)
+                        continue;
+
                     vec2 lFrag = vec2(texcoord.s+i*invViewportWidth, texcoord.t+j*invViewportHeight);
+                    // We check if the fragment is textured or not
+                    vec3 lColor = texture2D(uMaskMap, lFrag.st).rgb;
+                    if(lColor == vec3(0, 0, 0))
+                        continue;
+
                     float lDepth = texture2D(uMaskDepthMap, lFrag.st).r;
                     
                     if(lDepth < lObjDepth)
@@ -92,7 +101,9 @@ void main()
             vec3 lObjPos = getViewPos(lObjFrag.s, lObjFrag.t, lObjDepth);
             float lDist = getSquareDist(lPos, lObjPos);
             
+            // Light factor as a function of the distance in the world space
             float lLightFactor = smoothStep(pow(uLightingDistance, 2.0), 0.0, lDist);
+
             gl_FragData[0].rgb = vec3(lObjDepth, lLightFactor, 0.0);
             gl_FragData[0].a = 1.0;
         }
@@ -130,6 +141,6 @@ void main()
         // This only applies if the objects are behind the masking object
         gl_FragData[0].rgb *= step(0.0, lDist);
 
-        //gl_FragData[0].rgb = vec3(lMaskDepth.g);
+        //gl_FragData[0].rgb = vec3(lMaskDepth.rg, 0.0);
     }
 }
