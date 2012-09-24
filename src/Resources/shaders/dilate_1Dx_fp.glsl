@@ -10,15 +10,16 @@ uniform float osgppu_ViewportWidth;
 uniform float osgppu_ViewportHeight;
 
 varying vec2 texcoord;
+// Precomputed values
+varying float invViewportWidth;
 
 void main()
 {
     vec4 lColor = vec4(0.0);
-	float inputTexTexelWidth = 1.0 / osgppu_ViewportWidth;
 
     for(float i=-radius; i<radius; i+=1.0)
     {
-        vec4 lTmp = texture2D(texUnit0, texcoord.st + vec2(i*inputTexTexelWidth, 0));
+        vec4 lTmp = texture2D(texUnit0, texcoord.st + vec2(i*invViewportWidth, 0));
         lColor = max(lColor, lTmp);
     }
 

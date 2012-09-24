@@ -13,7 +13,7 @@
             <spherical>true</spherical>
             <collar>0.95</collar>
             <radius>1.0</radius>
-            <textureSize>4096</textureSize>
+            <textureSize>1024</textureSize>
             <viewport>0% 0% 100% 100%</viewport>
             <clearColor>0.5 0.5 0.5 1.0</clearColor>
             <clipping>0.001 1000.0</clipping>

@@ -2,7 +2,7 @@
 # Wavefront OBJ file
 # Created with Kaydara FBX
 # 
-mtllib guidemodel.mtl
+mtllib domeGrid.mtl
 
 g TextBacking
 v -1.025225 0.079518 3.927390
