@@ -264,7 +264,10 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
     float dt = osg::Timer::instance()->delta_s(lastUpdate_,tick);
 
     if (dt > maxUpdateDelta_)
+    {
         dumpGlobals(false); // never force globals here
+        lastUpdate_ = tick;
+    }
     
     // Decide whether messages should be broadcasted during this update:
     if (spinApp::Instance().getContext()->isServer())
@@ -282,7 +285,6 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
         else if (dt > maxUpdateDelta_)
         {
             broadcastLock_ = false;
-            lastUpdate_ = tick;
         }
         else 
         {
