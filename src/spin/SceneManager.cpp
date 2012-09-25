@@ -78,7 +78,6 @@
 #include <osgShadow/ParallelSplitShadowMap>
 //#include <osgShadow/LightSpacePerspectiveShadowMap>
 //#include <osgShadow/StandardShadowMap>
-#include <osgShadow/ViewDependentShadowMap>
 
 #include <cppintrospection/Reflection>
 #include <cppintrospection/Type>
@@ -297,7 +296,7 @@ SceneManager::SceneManager(std::string id)
     // create some initial nodes:
     rootNode = new osg::ClearNode();
     rootNode->setName("root");
-    
+
     //worldNode = new osg::ClearNode();
     //worldNode->setName("world");
     worldNode = new ReferencedNode(this, "world");
@@ -306,19 +305,19 @@ SceneManager::SceneManager(std::string id)
 
 
     // shadow scene:
-    
+
     osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot = new osgShadow::ShadowedScene;
     shadowRoot->setName("shadowRoot");
     shadowRoot->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
     shadowRoot->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
-    
+
     // soft shadows:
 
     softShadowMap_ = new osgShadow::SoftShadowMap;
     softShadowMap_->setTextureSize( osg::Vec2s(2048, 2048) );
     shadowRoot->setShadowTechnique( softShadowMap_.get() );
 
-    
+
     // can use a view-dependent shadow map to improve efficiency over regular
     // osgShadow::ShadowMap, since shadow interactors will only be rendered if
     // they and their assumed shadows are visible in the view frustum.
@@ -328,7 +327,7 @@ SceneManager::SceneManager(std::string id)
     //vdsm->setBaseShadowTextureUnit( 1 );
     shadowRoot->setShadowTechnique( vdsm.get() );
     */
-    
+
     //
     /*
     int mapcount = 3;
@@ -340,8 +339,8 @@ SceneManager::SceneManager(std::string id)
     //pssm->setMoveVCamBehindRCamFactor(moveVCamFactor);
     shadowRoot->setShadowTechnique(pssm.get());
     */
-    
-    
+
+
     //rootNode->addChild(worldNode.get());
     rootNode->addChild(shadowRoot.get());
     shadowRoot->addChild( worldNode.get() );
