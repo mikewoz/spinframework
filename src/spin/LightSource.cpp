@@ -116,6 +116,11 @@ void LightSource::setCutoff (float cut)
     if (this->_cutoff != cut)
     {
         this->_cutoff = cut;
+
+        if (_cutoff > 180.0f ) _cutoff = 180.0f;
+        else if ( _cutoff < 0.0f ) _cutoff = 0.0f;
+        else if ( _cutoff > 90.0f ) _cutoff = 90.0f;
+
         drawLight();
         BROADCAST(this, "sf", "setCutoff", this->_cutoff);
     }
