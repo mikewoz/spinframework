@@ -127,7 +127,7 @@ void main()
         }
         else
         {
-            gl_FragData[0].rgb = vec3(lMaskDepth, lMaskAlpha, 0.0);
+            gl_FragData[0].rg = vec2(lMaskDepth, lMaskAlpha);
             gl_FragData[0].a = 1.0;
         }
     }
@@ -146,7 +146,7 @@ void main()
         if(uLightingDistance > 0.0)
         {
             float lLighten = 1.0 - smoothstep(0.0, uLightingDistance, lDist);
-            gl_FragData[0].rgb = 0.0*lVisible*lObject*lLighten*mix(lColor.rgb, lMask.rgb, uTransparency)
+            gl_FragData[0].rgb = lVisible*lObject*lLighten*mix(lColor.rgb, lMask.rgb, uTransparency)
                 + lObject*lLighten*lLightFactor*lColor.rgb
                 + (1.0-lLighten)*lMask.rgb;
         }
@@ -159,6 +159,6 @@ void main()
         // This only applies if the objects are behind the masking object
         gl_FragData[0].rgb *= step(0.0, lDist);
 
-        //gl_FragData[0].rgb = vec3(lMask.g);
+        //gl_FragData[0].rgb = vec3(lMaskDepth.g);
     }
 }
