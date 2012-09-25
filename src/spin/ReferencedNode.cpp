@@ -82,6 +82,7 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, const char *initID) 
 
     scheduleForDeletion_ = false;
     subgraphAlpha_ = 1.0;
+    castShadows_ = false;
 
     // When children are attached to this, they get added to the attachmentNode:
     attachmentNode_ = this;
@@ -98,6 +99,7 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, const char *initID) 
     // set initial nodepath:
     currentNodePath_.clear();
 
+    // set nodemask (see spinUtil.h for more info)
     if (this->getID()=="world")
     {
         this->setNodeMask(INTERACTIVE_NODE_MASK);
@@ -105,7 +107,7 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, const char *initID) 
     else
     {
         registerNode(sceneManager);
-        this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
+        this->setNodeMask(GEOMETRIC_NODE_MASK);
         attachTo("world");
     }
 
@@ -474,28 +476,25 @@ void ReferencedNode::setAlpha (float alpha)
     std::cout << "set alpha for " << this->id_->s_name << " to " << subgraphAlpha_ << std::endl;
 }
 
-void ReferencedNode::setReceiveShadows(int b)
-{
-    receiveShadows_ = (bool)b;
-    /*
-    osg::node::setNodeMask(this->getNodeMask() |
-                  (int)receiveShadows_*RECEIVE_SHADOW_NODE_MASK |
-                  (int)castShadows_*CAST_SHADOW_NODE_MASK);
-                  */
-    BROADCAST(this, "si", "setReceiveShadows", (int)b);
-    this->setNodeMask(this->getNodeMask());
-}
-
 void ReferencedNode::setCastShadows(int b)
 {
     castShadows_ = (bool)b;
+    
     /*
-    osg::node::setNodeMask(this->getNodeMask() |
-                  (int)receiveShadows_*RECEIVE_SHADOW_NODE_MASK |
-                  (int)castShadows_*CAST_SHADOW_NODE_MASK);
-                  */
+    // if the castShadow flag is set, ensure to add it to the nodemask
+    if (castShadows_)
+    {
+        osg::Node::setNodeMask(getNodeMask() | CAST_SHADOW_NODE_MASK);
+    }
+    else if (getNodeMask() | CAST_SHADOW_NODE_MASK)
+    {
+        // if castShadows flag is false, remove the bit from the nodemask:
+        osg::Node::setNodeMask(getNodeMask() & ~CAST_SHADOW_NODE_MASK);
+    }
+    */
+    
+    this->setNodeMask(getNodeMask());
     BROADCAST(this, "si", "setCastShadows", (int)b);
-    this->setNodeMask(this->getNodeMask());
 }
 
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)
@@ -609,6 +608,7 @@ void ReferencedNode::debug()
             std::cout << "      " << (*childIter)->getID() << std::endl;
         }
     }
+    printf("   nodeMask %u (0x%04x)\n", this->getNodeMask(), this->getNodeMask());
     BROADCAST(this, "s", "debug");
 }
 
@@ -632,17 +632,11 @@ std::vector<lo_message> ReferencedNode::getState() const
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setAlpha", this->getAlpha());
     ret.push_back(msg);
-    
-    msg = lo_message_new();
-    lo_message_add(msg, "si", "setReceiveShadows", this->getReceiveShadows());
-    ret.push_back(msg);
         
     msg = lo_message_new();
     lo_message_add(msg, "si", "setCastShadows", this->getCastShadows());
     ret.push_back(msg);
     
-
-
     stringParamType::const_iterator stringIter;
     for (stringIter = stringParams_.begin(); stringIter != stringParams_.end(); stringIter++ )
     {
@@ -1139,11 +1133,17 @@ bool ReferencedNode::removeEventScript(const char* label)
 
 void ReferencedNode::setNodeMask( osg::Node::NodeMask nm )
 {
-    osg::Node::setNodeMask(nm |
-                  (int)receiveShadows_*RECEIVE_SHADOW_NODE_MASK |
-                  (int)castShadows_*CAST_SHADOW_NODE_MASK);
-    //osg::Node::setNodeMask(nm);
-    printf("NODE[%s] : setNodeMask %u 0x%x\n", getID().c_str(), nm, nm);
+    // if the castShadow flag is set, ensure to add it to the nodemask
+    if (castShadows_)
+    {
+        osg::Node::setNodeMask(nm | CAST_SHADOW_NODE_MASK);
+    }
+    else
+    {
+        osg::Node::setNodeMask(nm);
+    }
+    
+    //printf("NODE[%s] : setNodeMask %u (0x%04x)\n", getID().c_str(), getNodeMask(), getNodeMask());
     BROADCAST(this, "si", "setNodeMask", nm );
 }
 

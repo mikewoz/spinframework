@@ -898,6 +898,22 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "setShadowSoftness") && (argc==2))
+    {
+        sceneManager->setShadowSoftness((float) lo_hires_val((lo_type)types[1], argv[1]));
+    }
+    else if ((theMethod == "setShadowJitter") && (argc==2))
+    {
+        sceneManager->setShadowJitter((float) lo_hires_val((lo_type)types[1], argv[1]));
+    }
+    else if ((theMethod == "setShadowBias") && (argc==2))
+    {
+        sceneManager->setShadowBias((float) lo_hires_val((lo_type)types[1], argv[1]));
+    }
+    else if ((theMethod == "setShadowAmbientBias") && (argc==3))
+    {
+        sceneManager->setShadowAmbientBias((float) lo_hires_val((lo_type)types[1], argv[1]), (float) lo_hires_val((lo_type)types[2], argv[2]));
+    }
     else if ((theMethod == "setGravity") && (argc==4))
     {
         float x = (float) lo_hires_val((lo_type)types[1], argv[1]);

@@ -251,9 +251,9 @@ public:
     void setAlpha (float alpha);
     float getAlpha() const { return subgraphAlpha_; }
     
-    void setReceiveShadows(int b);
-    int getReceiveShadows() const { return (int)receiveShadows_; }
-    
+    /**
+     * Flag to determine whether this node casts shadows or not.
+     */
     void setCastShadows(int b);
     int getCastShadows() const { return (int)castShadows_; }
 
@@ -359,8 +359,6 @@ public:
     std::string contextString_;
     nodeListType parentNodes_;
     float subgraphAlpha_;
-    
-    bool receiveShadows_;
     bool castShadows_;
 
     /**

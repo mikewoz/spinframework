@@ -77,18 +77,18 @@ namespace osg {
 // GEOMETRIC nodes are those that always have physical presence in the scene,
 // such as models or shapes. These items will be processed for collisions,
 // intersections, etc.
-#define GEOMETRIC_NODE_MASK   0x00000001
+#define GEOMETRIC_NODE_MASK   0x0001
 
 // INTERACTIVE nodes are those that can be picked and drawn upon.
-#define INTERACTIVE_NODE_MASK 0x00000002
+#define INTERACTIVE_NODE_MASK 0x0002
 
 // DEBUGVIEW nodes are those that should be visible in a viewing window, but do
 // not count when doing collision detection or intersection testing.
-#define DEBUGVIEW_NODE_MASK   0x00000004
+#define DEBUGVIEW_NODE_MASK   0x0004
 
-#define RECEIVE_SHADOW_NODE_MASK 0x00000008
-#define CAST_SHADOW_NODE_MASK 0x0000000F
-
+// define whether a node casts shadows
+#define CAST_SHADOW_NODE_MASK 0x1000
+#define RECEIVE_SHADOW_NODE_MASK 0x2000
 
 namespace spin
 {

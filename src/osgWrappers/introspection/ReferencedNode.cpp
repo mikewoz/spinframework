@@ -146,21 +146,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __float__getAlpha,
 	          "",
 	          "");
-	I_Method1(void, setReceiveShadows, IN, int, b,
-	          Properties::NON_VIRTUAL,
-	          __void__setReceiveShadows__int,
-	          "",
-	          "");
-	I_Method0(int, getReceiveShadows,
-	          Properties::NON_VIRTUAL,
-	          __int__getReceiveShadows,
-	          "",
-	          "");
 	I_Method1(void, setCastShadows, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__setCastShadows__int,
 	          "",
-	          "");
+	          "Flag to determine whether this node casts shadows or not. ");
 	I_Method0(int, getCastShadows,
 	          Properties::NON_VIRTUAL,
 	          __int__getCastShadows,
@@ -344,9 +334,6 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(const char *, Parent, 
 	                 0, 
 	                 __void__setParent__C5_char_P1);
-	I_SimpleProperty(int, ReceiveShadows, 
-	                 __int__getReceiveShadows, 
-	                 __void__setReceiveShadows__int);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);

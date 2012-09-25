@@ -74,8 +74,8 @@
 //#include <osgShadow/ShadowVolume>
 //#include <osgShadow/ShadowTexture>
 //#include <osgShadow/ShadowMap>
-//#include <osgShadow/SoftShadowMap>
-//#include <osgShadow/ParallelSplitShadowMap>
+#include <osgShadow/SoftShadowMap>
+#include <osgShadow/ParallelSplitShadowMap>
 //#include <osgShadow/LightSpacePerspectiveShadowMap>
 //#include <osgShadow/StandardShadowMap>
 #include <osgShadow/ViewDependentShadowMap>
@@ -304,20 +304,42 @@ SceneManager::SceneManager(std::string id)
     worldNode->setNodeMask( 0xffffffff );
     worldStateSet_ = gensym("NULL");
 
+
     // shadow scene:
-    // we use a view-dependent shadow map to improve efficiency over regular
+    
+    osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot = new osgShadow::ShadowedScene;
+    shadowRoot->setName("shadowRoot");
+    shadowRoot->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
+    shadowRoot->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
+    
+    // soft shadows:
+
+    softShadowMap_ = new osgShadow::SoftShadowMap;
+    softShadowMap_->setTextureSize( osg::Vec2s(2048, 2048) );
+    shadowRoot->setShadowTechnique( softShadowMap_.get() );
+
+    
+    // can use a view-dependent shadow map to improve efficiency over regular
     // osgShadow::ShadowMap, since shadow interactors will only be rendered if
     // they and their assumed shadows are visible in the view frustum.
-    
-    //osg::ref_ptr<osgShadow::ShadowMap> sm = new osgShadow::ShadowMap;
+    /*
     osg::ref_ptr<osgShadow::ViewDependentShadowMap> vdsm = new osgShadow::ViewDependentShadowMap;
     //vdsm->setShadowMapProjectionHint(osgShadow::ViewDependentShadowMap::ORTHOGRAPHIC_SHADOW_MAP);
     //vdsm->setBaseShadowTextureUnit( 1 );
-    osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot = new osgShadow::ShadowedScene;
-    shadowRoot->setName("shadowRoot");
     shadowRoot->setShadowTechnique( vdsm.get() );
-    shadowRoot->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
-    shadowRoot->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
+    */
+    
+    //
+    /*
+    int mapcount = 3;
+    osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm = new osgShadow::ParallelSplitShadowMap(NULL,mapcount);
+    pssm->setTextureResolution(1024);
+    //pssm->setDebugColorOn();
+    //pssm->setMinNearDistanceForSplits(minNearSplit);
+    //pssm->setMaxFarDistance(maxfardist);
+    //pssm->setMoveVCamBehindRCamFactor(moveVCamFactor);
+    shadowRoot->setShadowTechnique(pssm.get());
+    */
     
     
     //rootNode->addChild(worldNode.get());
@@ -2185,8 +2207,34 @@ bool SceneManager::loadXML(const char *s)
     return true;
 }
 
+// -----------------------------------------------------------------------------
 
-// *****************************************************************************
+void SceneManager::setShadowSoftness(float f)
+{
+    softShadowMap_->setSoftnessWidth(f);
+    spinApp::Instance().BroadcastSceneMessage("sf", "setShadowSoftness", f, SPIN_ARGS_END);
+}
+
+void SceneManager::setShadowJitter(float f)
+{
+    softShadowMap_->setJitteringScale(f);
+    spinApp::Instance().BroadcastSceneMessage("sf", "setShadowJitter", f, SPIN_ARGS_END);
+}
+
+void SceneManager::setShadowBias(float f)
+{
+    softShadowMap_->setBias(f);
+    spinApp::Instance().BroadcastSceneMessage("sf", "setShadowBias", f, SPIN_ARGS_END);
+}
+
+void SceneManager::setShadowAmbientBias(float x, float y)
+{
+    softShadowMap_->setAmbientBias(osg::Vec2(x,y));
+    spinApp::Instance().BroadcastSceneMessage("sff", "setShadowAmbientBias", x, y, SPIN_ARGS_END);
+}
+
+
+// -----------------------------------------------------------------------------
 void SceneManager::setGravity(float x, float y, float z)
 {
 #ifdef WITH_BULLET
