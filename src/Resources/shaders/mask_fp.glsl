@@ -67,24 +67,39 @@ void main()
     if(uPass == 1)
     {
         float lMaskDepth = texture2D(uMaskDepthMap, texcoord.st).r;
+        float lMaskAlpha = texture2D(uMaskMap, texcoord.st).a;
 
-        if(lMaskDepth == 1.0)
+        if(lMaskDepth == 1.0 || lMaskAlpha == 0.0)
         {
             vec2 lObjFrag;
             float lObjDepth = 1.0;
+            float lObjAlpha = 1.0;
+            float lSearchFactor = 1.0;
+            float lSquareSearch = float(uMaxLightSearch*uMaxLightSearch);
 
             // In the neighbourhood, we look for the fragment which is the nearest to the camera
-            for(float i=-uMaxLightSearch; i<uMaxLightSearch; i+=uLightSearchStep)
-                for(float j=-uMaxLightSearch; j<uMaxLightSearch; j+=uLightSearchStep)
+            // We will search starting from the start, hence this particular loop
+            float lIStep = -1.0;
+            for(float i=-1.0; i<uMaxLightSearch && i>-uMaxLightSearch; i+=lIStep)
+            //for(float i=-uMaxLightSearch; i<uMaxLightSearch; i+=uLightSearchStep)
+            {
+                lIStep = -1.0*lIStep/abs(lIStep)*(abs(lIStep)+uLightSearchStep);
+
+                float lJStep = -1.0;
+                for(float j=-1.0; j<uMaxLightSearch && j>-uMaxLightSearch; j+=lJStep)
+                //for(float j=-uMaxLightSearch; j<uMaxLightSearch; j+=uLightSearchStep)
                 {
+                    lJStep = -1.0*lJStep/abs(lJStep)*(abs(lJStep)+uLightSearchStep);
+
                     // We need to search in a circle zone: check we are still in the circle
-                    if(i*i + j*j > uMaxLightSearch*uMaxLightSearch)
+                    float lSquareDist = float(i*i + j*j);
+                    if(lSquareDist > lSquareSearch)
                         continue;
 
                     vec2 lFrag = vec2(texcoord.s+i*invViewportWidth, texcoord.t+j*invViewportHeight);
                     // We check if the fragment is textured or not
-                    vec3 lColor = texture2D(uMaskMap, lFrag.st).rgb;
-                    if(lColor == vec3(0, 0, 0))
+                    vec4 lColor = texture2D(uMaskMap, lFrag.st);
+                    if(lColor.rgb == vec3(0, 0, 0) || lColor.a == 0.0)
                         continue;
 
                     float lDepth = texture2D(uMaskDepthMap, lFrag.st).r;
@@ -93,8 +108,11 @@ void main()
                     {
                         lObjFrag = lFrag;
                         lObjDepth = lDepth;
+                        lObjAlpha = lColor.a;
+                        lSearchFactor = (lSquareSearch-lSquareDist)/lSquareSearch;
                     }
                 }
+            }
 
             // We compute the distance between the object's fragment, and the current one
             vec3 lPos = getViewPos(texcoord.s, texcoord.t, lObjDepth);
@@ -104,12 +122,12 @@ void main()
             // Light factor as a function of the distance in the world space
             float lLightFactor = smoothStep(pow(uLightingDistance, 2.0), 0.0, lDist);
 
-            gl_FragData[0].rgb = vec3(lObjDepth, lLightFactor, 0.0);
+            gl_FragData[0].rg = vec2(lObjDepth, min(lLightFactor, lSearchFactor)*lObjAlpha);
             gl_FragData[0].a = 1.0;
         }
         else
         {
-            gl_FragData[0].rgb = vec3(lMaskDepth, 1.0, 0.0);
+            gl_FragData[0].rgb = vec3(lMaskDepth, lMaskAlpha, 0.0);
             gl_FragData[0].a = 1.0;
         }
     }
@@ -128,7 +146,7 @@ void main()
         if(uLightingDistance > 0.0)
         {
             float lLighten = 1.0 - smoothstep(0.0, uLightingDistance, lDist);
-            gl_FragData[0].rgb = lVisible*lObject*lLighten*mix(lColor.rgb, lMask.rgb, uTransparency)
+            gl_FragData[0].rgb = 0.0*lVisible*lObject*lLighten*mix(lColor.rgb, lMask.rgb, uTransparency)
                 + lObject*lLighten*lLightFactor*lColor.rgb
                 + (1.0-lLighten)*lMask.rgb;
         }
@@ -141,6 +159,6 @@ void main()
         // This only applies if the objects are behind the masking object
         gl_FragData[0].rgb *= step(0.0, lDist);
 
-        //gl_FragData[0].rgb = vec3(lMaskDepth.rg, 0.0);
+        //gl_FragData[0].rgb = vec3(lMask.g);
     }
 }
