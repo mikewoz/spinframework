@@ -69,7 +69,7 @@ void main()
         float lMaskDepth = texture2D(uMaskDepthMap, texcoord.st).r;
         float lMaskAlpha = texture2D(uMaskMap, texcoord.st).a;
 
-        if(lMaskDepth == 1.0 || lMaskAlpha == 0.0)
+        if(uMaxLightSearch > 1.0)
         {
             vec2 lObjFrag;
             float lObjDepth = 1.0;
@@ -80,13 +80,13 @@ void main()
             // In the neighbourhood, we look for the fragment which is the nearest to the camera
             // We will search starting from the start, hence this particular loop
             float lIStep = -1.0;
-            for(float i=-1.0; i<uMaxLightSearch && i>-uMaxLightSearch; i+=lIStep)
+            for(float i=-1.0; i<=uMaxLightSearch && i>=-uMaxLightSearch; i+=lIStep)
             //for(float i=-uMaxLightSearch; i<uMaxLightSearch; i+=uLightSearchStep)
             {
                 lIStep = -1.0*lIStep/abs(lIStep)*(abs(lIStep)+uLightSearchStep);
 
                 float lJStep = -1.0;
-                for(float j=-1.0; j<uMaxLightSearch && j>-uMaxLightSearch; j+=lJStep)
+                for(float j=-1.0; j<=uMaxLightSearch && j>=-uMaxLightSearch; j+=lJStep)
                 //for(float j=-uMaxLightSearch; j<uMaxLightSearch; j+=uLightSearchStep)
                 {
                     lJStep = -1.0*lJStep/abs(lJStep)*(abs(lJStep)+uLightSearchStep);
@@ -130,35 +130,36 @@ void main()
             gl_FragData[0].rg = vec2(lMaskDepth, lMaskAlpha);
             gl_FragData[0].a = 1.0;
         }
+
+        gl_FragData[0].b = lMaskDepth;
     }
     else if(uPass == 2)
     {
         vec4 lColor = texture2D(uColorMap, texcoord.st);
         float lDepth = texture2D(uDepthMap, texcoord.st).r;
         vec4 lMask = texture2D(uMaskMap, texcoord.st);
-        vec2 lMaskDepth = texture2D(uMaskDepthMap, texcoord.st).rg;
+        vec3 lMaskDepth = texture2D(uMaskDepthMap, texcoord.st).rgb;
 
-        float lVisible = 1.0 - step(1.0, lMask.a);
         float lObject = 1.0 - step(1.0, lDepth);
         float lDist = (linearDepth(lDepth) - linearDepth(lMaskDepth.r))*(uFar-uNear);
+        float lVisible = step(0.0, lDist); //1.0 - step(1.0, lMask.a);
+        float lMaskBehind = 1.0 - step(0.0, linearDepth(lDepth) - linearDepth(lMaskDepth.b)); // Are masking objects behind "real" objects ?
         float lLightFactor = lMaskDepth.g;
 
         if(uLightingDistance > 0.0)
         {
             float lLighten = 1.0 - smoothstep(0.0, uLightingDistance, lDist);
-            gl_FragData[0].rgb = lVisible*lObject*lLighten*mix(lColor.rgb, lMask.rgb, uTransparency)
+            gl_FragData[0].rgb = lObject*lLighten*lLightFactor*mix(lColor.rgb, lMask.rgb, uTransparency)
                 + lObject*lLighten*lLightFactor*lColor.rgb
                 + (1.0-lLighten)*lMask.rgb;
         }
         else
         {
-            gl_FragData[0].rgb = lVisible*lObject*mix(lColor.rgb, lMask.rgb, uTransparency)
+            gl_FragData[0].rgb = lObject*mix(lColor.rgb, lMask.rgb, uTransparency)
                 + (1.0-lObject)*lMask.rgb;
         }
 
         // This only applies if the objects are behind the masking object
-        gl_FragData[0].rgb *= step(0.0, lDist);
-
-        //gl_FragData[0].rgb = vec3(lMaskDepth.g);
+        gl_FragData[0].rgb = gl_FragData[0].rgb*lVisible + lMaskBehind*(1.0-lVisible)*lMask.rgb;
     }
 }
