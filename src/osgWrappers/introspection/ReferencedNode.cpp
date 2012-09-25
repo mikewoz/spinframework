@@ -53,6 +53,13 @@ BEGIN_VALUE_REFLECTOR(spin::EventScript)
 	I_PublicMemberProperty(std::string, pyModule);
 END_REFLECTOR
 
+BEGIN_VALUE_REFLECTOR(boost::python::object)
+	I_DeclaringFile("ReferencedNode.h");
+	I_Constructor0(____object,
+	               "",
+	               "");
+END_REFLECTOR
+
 BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_DeclaringFile("ReferencedNode.h");
 	I_Constructor2(IN, spin::SceneManager *, sceneManager, IN, const char *, initID,
@@ -137,6 +144,16 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_Method0(float, getAlpha,
 	          Properties::NON_VIRTUAL,
 	          __float__getAlpha,
+	          "",
+	          "");
+	I_Method1(void, setCastShadows, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setCastShadows__int,
+	          "",
+	          "Flag to determine whether this node casts shadows or not. ");
+	I_Method0(int, getCastShadows,
+	          Properties::NON_VIRTUAL,
+	          __int__getCastShadows,
 	          "",
 	          "");
 	I_Method0(const char *, getContext,
@@ -287,6 +304,9 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(osg::Group *, AttachmentNode, 
 	                 __osg_Group_P1__getAttachmentNode, 
 	                 __int__setAttachmentNode__osg_Group_P1);
+	I_SimpleProperty(int, CastShadows, 
+	                 __int__getCastShadows, 
+	                 __void__setCastShadows__int);
 	I_SimpleProperty(std::vector< spin::ReferencedNode * >, Children, 
 	                 __std_vectorT1_ReferencedNode_P1___getChildren, 
 	                 0);

@@ -250,6 +250,12 @@ public:
 
     void setAlpha (float alpha);
     float getAlpha() const { return subgraphAlpha_; }
+    
+    /**
+     * Flag to determine whether this node casts shadows or not.
+     */
+    void setCastShadows(int b);
+    int getCastShadows() const { return (int)castShadows_; }
 
     /**
      * Returns the current host
@@ -353,6 +359,7 @@ public:
     std::string contextString_;
     nodeListType parentNodes_;
     float subgraphAlpha_;
+    bool castShadows_;
 
     /**
      * The node that children get attached to:
