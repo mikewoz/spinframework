@@ -109,7 +109,7 @@ void main()
                         lObjFrag = lFrag;
                         lObjDepth = lDepth;
                         lObjAlpha = lColor.a;
-                        lSearchFactor = (lSquareSearch-lSquareDist)/lSquareSearch;
+                        lSearchFactor = (lSquareSearch*1.5-lSquareDist)/lSquareSearch;
                     }
                 }
             }
