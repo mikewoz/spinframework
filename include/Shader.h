@@ -135,6 +135,7 @@ protected:
     
     osg::ref_ptr<osg::Program> programObject_;
     osg::ref_ptr<osg::Shader> vertexObject_;
+    osg::ref_ptr<osg::Shader> geometryObject_;
     osg::ref_ptr<osg::Shader> fragmentObject_;
     
     std::string shaderPath_;
