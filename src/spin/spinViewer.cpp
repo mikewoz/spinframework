@@ -144,7 +144,7 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--window <x y w h>", "Set the position (x,y) and size (w,h) of the viewer window (Default: 50 50 640 480)");
     arguments.getApplicationUsage()->addCommandLineOption("--clipping <near far>", "Manually specify fixed clipping planes (Default: clipping planes will be recomputed for every frame)");
     arguments.getApplicationUsage()->addCommandLineOption("--screen <num>", "Screen number to display on (Default: ALLSCREENS)");
-    arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: not limited)");
+    arguments.getApplicationUsage()->addCommandLineOption("--framerate <num>", "Set the maximum framerate (Default: 60fps). Set to -1 for no limit (except VSync)");
     arguments.getApplicationUsage()->addCommandLineOption("--multisamples <num>", "Set the level of multisampling for antialiasing (Default: 4)");
     arguments.getApplicationUsage()->addCommandLineOption("--disable-camera-controls", "Disable mouse-based camera controls for this user");
     arguments.getApplicationUsage()->addCommandLineOption("--cache", "Enable caching for all models and textures. ie, disable automatic unloading of culled media");
@@ -603,34 +603,39 @@ int run(int argc, char **argv)
 
             double dt = osg::Timer::instance()->delta_s(lastFrameTick, osg::Timer::instance()->tick());
 
-            if (dt >= minFrameTime)
+            if(maxFrameRate = -1)
+                viewer.frame();
+            else
             {
-                                viewer.frame();
+                if (dt >= minFrameTime)
+                {
+                                    viewer.frame();
 
 /*
-                // poll the space navigator:
-                viewer.updateSpaceNavigator();
+                    // poll the space navigator:
+                    viewer.updateSpaceNavigator();
 
-                viewer.advance();
-                viewer.eventTraversal();
-                pthread_mutex_lock(&sceneMutex);
-                spin.sceneManager_->update();
-                viewer.updateTraversal();
-                viewer.renderingTraversals();
-                pthread_mutex_unlock(&sceneMutex);
+                    viewer.advance();
+                    viewer.eventTraversal();
+                    pthread_mutex_lock(&sceneMutex);
+                    spin.sceneManager_->update();
+                    viewer.updateTraversal();
+                    viewer.renderingTraversals();
+                    pthread_mutex_unlock(&sceneMutex);
 */
 
-                // save time when the last time a frame was rendered:
-                lastFrameTick = osg::Timer::instance()->tick();
-                dt = 0;
+                    // save time when the last time a frame was rendered:
+                    lastFrameTick = osg::Timer::instance()->tick();
+                    dt = 0;
+                }
+
+                unsigned int sleepTime;
+                if (!recv) sleepTime = static_cast<unsigned int>(1000000.0*(minFrameTime-dt));
+                else sleepTime = 0;
+                if (sleepTime > 100) sleepTime = 100;
+
+                if (!recv) OpenThreads::Thread::microSleep(sleepTime);
             }
-
-            unsigned int sleepTime;
-            if (!recv) sleepTime = static_cast<unsigned int>(1000000.0*(minFrameTime-dt));
-            else sleepTime = 0;
-            if (sleepTime > 100) sleepTime = 100;
-
-            if (!recv) OpenThreads::Thread::microSleep(sleepTime);
 
             // ***** END
 

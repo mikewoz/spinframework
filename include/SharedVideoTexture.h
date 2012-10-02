@@ -81,6 +81,8 @@ public:
     SharedVideoTexture(SceneManager *sceneManager, const char *initID);
     ~SharedVideoTexture();
 
+    void updateCallback();
+
     void setTextureID(const char *id);
     const char* getTextureID() const { return textureID.c_str(); }
 

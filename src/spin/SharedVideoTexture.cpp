@@ -79,8 +79,8 @@ namespace spin
     
     tex->setImage(img.get());
 
-    tex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-    tex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+    tex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR);
+    tex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);
 	
     //tex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
     //tex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
@@ -130,6 +130,15 @@ namespace spin
   // destructor
   SharedVideoTexture::~SharedVideoTexture()
   {
+  }
+  
+  // ===================================================================
+  // update callback
+  void SharedVideoTexture::updateCallback()
+  {
+    reader_.updateImage();
+
+    //((spin::Shader*)this)->updateCallback();
   }
 
   // ===================================================================
