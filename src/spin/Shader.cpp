@@ -134,7 +134,12 @@ void Shader::debug()
     else
         std::cout << "   vert shader: NULL" << std::endl;
 
-	if (fragmentObject_.valid())
+    if (geometryObject_.valid())
+        std::cout << "   geometry shader: LOADED" << std::endl;
+    else
+        std::cout << "   geometry shader: NULL" << std::endl;
+
+    if (fragmentObject_.valid())
 		std::cout << "   frag shader: LOADED" << std::endl;
 	else
         std::cout << "   frag shader: NULL" << std::endl;
@@ -419,6 +424,7 @@ bool Shader::loadJitterShader(std::string path)
     TiXmlElement *child2 = 0;
 
     osg::Shader *vertShader = 0;
+    osg::Shader *geometryShader = 0;
     osg::Shader *fragShader = 0;
 
     // Load the XML file and verify:
@@ -457,6 +463,21 @@ bool Shader::loadJitterShader(std::string path)
                     vertexObject_->setShaderSource(child2->FirstChild()->Value());
                     replaceSampler2DRect(vertexObject_);
                     programObject_->addShader( vertexObject_ );
+                }
+            }
+            else if (std::string(child2->Attribute("type"))=="geometry")
+            {
+                geometryObject_ = new osg::Shader( osg::Shader::GEOMETRY );
+                if (child2->Attribute("source"))
+                {
+                    if (loadShaderSource(geometryObject_, osgDB::getFilePath(path)+"/"+child2->Attribute("source")))
+                        programObject_->addShader( geometryObject_ );
+                }
+                else
+                {
+                    geometryObject_->setShaderSource(child2->FirstChild()->Value());
+                    replaceSampler2DRect(geometryObject_);
+                    programObject_->addShader( geometryObject_ );
                 }
             }
             else if (std::string(child2->Attribute("type"))=="fragment")
@@ -522,11 +543,13 @@ void Shader::loadGLSLShader(std::string path)
 {
     // create tmp shaders:
     osg::Shader *vertShader = new osg::Shader( osg::Shader::VERTEX );
+    osg::Shader *geomShader = new osg::Shader( osg::Shader::GEOMETRY );
     osg::Shader *fragShader = new osg::Shader( osg::Shader::FRAGMENT );
 
     std::string folderPath = osgDB::getFilePath(path);
 
     bool vertSuccess = false;
+    bool geomSuccess = false;
     bool fragSuccess = false;
     
     std::string ext = osgDB::getLowerCaseFileExtension(path);
@@ -534,10 +557,18 @@ void Shader::loadGLSLShader(std::string path)
     {
         fragSuccess = loadShaderSource( fragShader, path );
         vertSuccess = loadShaderSource( vertShader, folderPath+".vert" );
+        geomSuccess = loadShaderSource( geomShader, folderPath+".geom" );
     }
     else if (ext=="vert")
     {
         vertSuccess = loadShaderSource( vertShader, path );
+        fragSuccess = loadShaderSource( fragShader, folderPath+".frag" );
+        geomSuccess = loadShaderSource( geomShader, folderPath+".geom" );
+    }
+    else if (ext=="geom")
+    {
+        geomSuccess = loadShaderSource( geomShader, path );
+        vertSuccess = loadShaderSource( vertShader, folderPath+".vert" );
         fragSuccess = loadShaderSource( fragShader, folderPath+".frag" );
     }
     else
@@ -556,6 +587,16 @@ void Shader::loadGLSLShader(std::string path)
             registerUniform(u->first.c_str(), u->second.c_str());
 
         programObject_->addShader( vertexObject_ );
+    }
+    if (geomSuccess)
+    {
+        geometryObject_ = geomShader;
+
+        ParsedUniforms uniforms = parseUniformsFromShader(geometryObject_.get());
+        for (ParsedUniforms::iterator u=uniforms.begin(); u!=uniforms.end(); ++u)
+            registerUniform(u->first.c_str(), u->second.c_str());
+
+        programObject_->addShader( geometryObject_ );
     }
     if (fragSuccess)
     {
@@ -644,6 +685,11 @@ void Shader::setShader (const char* path)
         programObject_->removeShader(vertexObject_);
         vertexObject_ = 0;
     }
+    if (geometryObject_)
+    {
+        programObject_->removeShader(geometryObject_);
+        geometryObject_ = 0;
+    }
     if (fragmentObject_)
     {
         programObject_->removeShader(fragmentObject_);
@@ -671,6 +717,7 @@ void Shader::setShader (const char* path)
         }
         
         // enable shader:
+        // geometry shader is not necessary
         if (vertexObject_.valid() && fragmentObject_.valid())
         {
             this->setAttributeAndModes(programObject_);
