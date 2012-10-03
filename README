@@ -52,29 +52,41 @@ Dependencies
 ------------
 On Ubuntu GNU/Linux Precise LTS 12.04::
 
-   sudo add-apt-repository ppa:sat-metalab/metalab
-   sudo apt-get update
-   sudo apt-get install automake bison build-essential cdbs cmake-curses-gui debhelper ffmpeg flex freeglut3-dev libavcodec-dev libavdevice-dev libavformat-dev libboost-filesystem-dev libboost-program-options-dev libboost-python-dev libboost-regex-dev libboost-system-dev libboost-thread-dev libcppintrospection-3.0-dev liblo-dev libopenscenegraph-dev libspatosc-dev libswscale-dev libtool libxml++2.6-dev python python-dev python-setuptools libspnav-dev
+    sudo add-apt-repository ppa:sat-metalab/metalab
+    sudo apt-add-repository ppa:openrave/release
+    sudo apt-add-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
+    sudo apt-get update
+    sudo apt-get install automake bison build-essential cmake-curses-gui flex libtool 
+    sudo apt-get install ffmpeg freeglut3-dev libavcodec-dev libavdevice-dev libavformat-dev libboost-filesystem-dev libboost-program-options-dev libboost-python-dev libboost-regex-dev libboost-system-dev libboost-thread-dev libcppintrospection-3.0-dev liblo-dev libopenscenegraph-dev libswscale-dev libxml++2.6-dev
+    sudo apt-get install libspatosc-dev
+    sudo apt-get install libspnav-dev spacenavd
+    sudo apt-get install python python-dev python-setuptools
+    sudo apt-get install libbullet-dev
+    sudo apt-get install libpoco-dev
+    sudo apt-get install ffmpeg
+    sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
+    sudo apt-get install libshmdata-dev
+    sudo apt-get install libpcl-1.6-all
 
 
 Compiling
 ---------
 If you are compiling from a clone of the Git repository, and not from a tarball, you must first do this::
 
-  ./autogen.sh
+    ./autogen.sh
 
 And then , to compile SPIN::
 
-  ./configure
-  make 
+    ./configure
+    make 
 
 
 Installing 
 ----------
 To install SPIN::
 
-  sudo make install
-  sudo ldconfig
+    sudo make install
+    sudo ldconfig
 
 
 Installation notes on the old Ubuntu GNU/Linux Lucid LTS 10.04
