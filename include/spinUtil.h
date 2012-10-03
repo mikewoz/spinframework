@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -45,6 +45,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 // forward declaration
 namespace osg {
@@ -76,22 +77,18 @@ namespace osg {
 // GEOMETRIC nodes are those that always have physical presence in the scene,
 // such as models or shapes. These items will be processed for collisions,
 // intersections, etc.
-#define GEOMETRIC_NODE_MASK 0x00000001
+#define GEOMETRIC_NODE_MASK   0x0001
 
 // INTERACTIVE nodes are those that can be picked and drawn upon.
-#define INTERACTIVE_NODE_MASK 0x00000010
-
+#define INTERACTIVE_NODE_MASK 0x0002
 
 // DEBUGVIEW nodes are those that should be visible in a viewing window, but do
 // not count when doing collision detection or intersection testing.
-#define DEBUGVIEW_NODE_MASK 0x00000100
+#define DEBUGVIEW_NODE_MASK   0x0004
 
-// STATSDATA nodes are those which do not need a visual representation, and so
-// they are culled in camera traversals. These nodes are typically used to hold
-// information for interaction.
-#define STATSDATA_NODE_MASK 0x10000000
-
-
+// define whether a node casts shadows
+#define CAST_SHADOW_NODE_MASK 0x1000
+#define RECEIVE_SHADOW_NODE_MASK 0x2000
 
 namespace spin
 {
@@ -171,10 +168,10 @@ typedef struct _symbol
 } t_symbol;
 
 typedef float t_float;
-typedef float t_floatarg;  
+typedef float t_floatarg;
 
 #define t_class struct _class
-typedef t_class *t_pd; 
+typedef t_class *t_pd;
 
 EXTERN t_symbol *gensym(const char *s);
 

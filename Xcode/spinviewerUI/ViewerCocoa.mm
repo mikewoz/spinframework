@@ -500,7 +500,7 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     spinListener.subscribe();
     
 	// ask for refresh:
-	spin::spinApp::Instance().SceneMessage("s", "refresh", LO_ARGS_END);
+	spin::spinApp::Instance().SceneMessage("s", "refresh", SPIN_ARGS_END);
 
     
 }

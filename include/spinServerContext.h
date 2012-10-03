@@ -55,8 +55,16 @@ namespace spin
  * \brief A server-side spinContext for maintaining an instance of SPIN and
  * updating all clients
  *
- *
  */
+
+/*
+ * WARNING: the stop() method from spinBaseContext must be called explicitly before destroying an instance of spinServerContext.
+ *          Failing to do so might result in a segfault due to a race condition due to ~spinServerContext being called before
+ *          ~spinBaseContext.  In ~spinBaseContext, the server thread is stopped, prompting a call to spinApp::destroyScene(),
+ *          spinApp then tries to dynamic_cast a spinBaseContext into a spinServerContext, but since ~spinServerContext has already
+ *          been called, the dynamic_cast fails.
+*/
+
 class spinServerContext : public spinBaseContext
 {
     public:
@@ -70,6 +78,8 @@ class spinServerContext : public spinBaseContext
 
         void refreshSubscribers();
 
+        virtual void setReliableBroadcast(bool b);
+
         /**
          * Starts the thread that sends synchronization timecode (syncThread)
          */
@@ -82,17 +92,14 @@ class spinServerContext : public spinBaseContext
          */
         bool shouldAutoClean() { return autoCleanup_; }
 
-        
-        //static int sceneCallback(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data);
-
 #ifdef WITH_POCO
         bool applyHTTPMessage(std::string path, const Poco::Net::HTMLForm &form);
 #endif
         unsigned short getHttpPort() { return httpPort; }
-    
+
         // TODO: make private
         std::map<std::string, lo_address> tcpClientAddrs_;
-    
+
     private:
 
         /**
@@ -130,7 +137,7 @@ class spinServerContext : public spinBaseContext
 
         pthread_t syncThreadID; // id of sync thread
         pthread_attr_t syncthreadAttr;
-    
+
         unsigned short httpPort;
 };
 

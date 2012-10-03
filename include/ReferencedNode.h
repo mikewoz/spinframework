@@ -83,7 +83,7 @@ typedef std::pair< std::string, ReferencedStateSetList > ReferencedStateSetPair;
 
 
 
-    
+
 /**
  * Python script that is ran periodically.
  */
@@ -108,9 +108,29 @@ typedef struct {
     #ifndef DISABLE_PYTHON_
     boost::python::object run;
     #endif
+
+    /**
+     * A string containing the name of the Event.
+     */
+
     std::string eventName;
+
+    /**
+     * Whether the event is enabled or disabled.
+     */
+
     bool enabled;
+
+    /**
+     * Whether the event should be calculated serverside or only clientside.
+     */
+
     bool serverSide;
+
+    /**
+     * The path of the python script to be attached.
+     */
+
     std::string path;
     std::string params;
     std::string pyScript;
@@ -179,10 +199,10 @@ public:
      * Internally, this method just sets the newParent property.
      */
     void setParent (const char *newvalue);
-    
+
     /**
      * Attach this node to the node with parentID (if found).
-     * 
+     *
      */
     void attachTo (const char* parentID);
 
@@ -191,16 +211,16 @@ public:
      * for the parentID and the node will be detached from ALL parents.
      */
     void detachFrom(const char* parentID);
-    
+
     /**
      * The inGraph method checks if the node is actually attached to the scene
      * graph. There are cases (eg, SwitchNode or using detachFrom) that may
-     * cause a node to be orphaned (not attached anywhere). In these cases, 
+     * cause a node to be orphaned (not attached anywhere). In these cases,
      * reporters and pointers and anything that maintains a list of targets must
      * check if the node is inGraph().
      */
     bool inGraph();
-    
+
 
     unsigned int getNumParents() const { return parentNodes_.size(); }
 
@@ -208,12 +228,12 @@ public:
      * Returns the parent id (string)
      */
     std::string getParentID(int i) const;
-    
+
     /**
      * Returns the current parent as an osg::Group
      */
     ReferencedNode* getParentNode(int i);
-    
+
 
     std::vector<ReferencedNode*> getChildren();
 
@@ -230,6 +250,12 @@ public:
 
     void setAlpha (float alpha);
     float getAlpha() const { return subgraphAlpha_; }
+    
+    /**
+     * Flag to determine whether this node casts shadows or not.
+     */
+    void setCastShadows(int b);
+    int getCastShadows() const { return (int)castShadows_; }
 
     /**
      * Returns the current host
@@ -243,10 +269,10 @@ public:
     void setStateSetFromFile (const char* filename);
     void setStateSet         (const char* s);
     const char *getStateSet  () const { return stateset_->s_name; }
-    
+
     /**
      * In derived classes, you can handle how a stateset gets applied to a node
-     * (eg, which part of the subgraph it is attached by overriding the 
+     * (eg, which part of the subgraph it is attached by overriding the
      * updateStateSet method.
      */
     virtual void updateStateSet();
@@ -275,7 +301,7 @@ public:
      * Request to broadcast the node state via SceneManager.
      */
     virtual void stateDump();
-    
+
     /**
      * Request to send the node state to one address
      */
@@ -288,7 +314,8 @@ public:
     std::string getID() const { return std::string(id_->s_name); }
     std::string getNodeType() const { return nodeType_; }
     t_symbol* getNodeSymbol() { return id_; }
-    
+
+    std::string getOSCPath() const;
 
     bool addCronScript( bool serverSide, const std::string& label, const std::string& scriptPath,
                         double freq, const std::string& params );
@@ -303,16 +330,17 @@ public:
     bool enableEventScript( const char* label, int enable );
     bool removeEventScript( const char* label );
 
+    // a NodeMask is an unsigned int.
+    void setNodeMask( osg::Node::NodeMask nm );
 
-    
-    // FIXME 
+    // FIXME
     osg::NodePath currentNodePath_;
     bool scheduleForDeletion_;
 
-    // ***********************************************************    
-    
+    // ***********************************************************
+
  protected:
- 
+
     /**
      * TO BE DEPRECATED?
      * The idea is that one type of node can only be attached to certain types
@@ -331,6 +359,7 @@ public:
     std::string contextString_;
     nodeListType parentNodes_;
     float subgraphAlpha_;
+    bool castShadows_;
 
     /**
      * The node that children get attached to:
@@ -343,7 +372,7 @@ public:
     floatParamType floatParams_;
 
     t_symbol* stateset_;
-    
+
     std::string _scriptFile;
 #ifndef DISABLE_PYTHON
     boost::python::object _scriptRun;

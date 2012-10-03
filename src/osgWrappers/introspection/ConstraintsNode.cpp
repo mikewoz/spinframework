@@ -99,7 +99,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ConstraintsNode)
 	          Properties::VIRTUAL,
 	          __osg_Vec3__getTranslation,
 	          "",
-	          "");
+	          "Returns the local translation offset with respect to the node's parent. ");
 	I_Method3(void, translate, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__translate__float__float__float,

@@ -94,7 +94,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::NON_VIRTUAL,
 	          __float__getUpdateRate,
 	          "",
-	          "");
+	          "Returns the currently-set update rate. ");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
@@ -144,22 +144,22 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setReportMode__globalsReportMode,
 	          "",
-	          "");
+	          "Sets the report mode with reference to the globalsReportMode enum. ");
 	I_Method1(void, setInteractionMode, IN, spin::GroupNode::InteractionMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setInteractionMode__InteractionMode,
 	          "",
-	          "");
+	          "Sets the interaction mode with reference to the InteractionMode enum. ");
 	I_Method1(void, setComputationMode, IN, spin::GroupNode::ComputationMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setComputationMode__ComputationMode,
 	          "",
-	          "");
+	          "Sets the Computation mode as either server or client side with respect to the ComputationMode enum. ");
 	I_Method0(int, getComputationMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getComputationMode,
 	          "",
-	          "");
+	          "Returns the currently-set computation mode with respect to the ComputationMode enum. ");
 	I_Method3(void, setClipping, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setClipping__float__float__float,
@@ -179,7 +179,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getOrientationMode,
 	          "",
-	          "");
+	          "Returns the currently-set Orientation Mode, with respect to the OrientationMode enum. ");
 	I_Method1(void, setOrientationTarget, IN, const char *, target,
 	          Properties::NON_VIRTUAL,
 	          __void__setOrientationTarget__C5_char_P1,
@@ -194,7 +194,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::VIRTUAL,
 	          __void__setOrientation__float__float__float,
 	          "",
-	          "The local orientation offset for this node with respect to it's parent ");
+	          "The local orientation offset for this node with respect to its parent ");
 	I_Method4(void, setOrientationQuat, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
 	          Properties::VIRTUAL,
 	          __void__setOrientationQuat__float__float__float__float,
@@ -204,7 +204,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,
 	          "",
-	          "A grouped scale operation ");
+	          "A grouped scale operation. ");
 	I_Method3(void, setVelocity, IN, float, dx, IN, float, dy, IN, float, dz,
 	          Properties::VIRTUAL,
 	          __void__setVelocity__float__float__float,
@@ -274,12 +274,12 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getReportMode,
 	          "",
-	          "");
+	          "Returns the currently-set Report Mode with reference to the globalsReportMode enum. ");
 	I_Method0(int, getInteractionMode,
 	          Properties::NON_VIRTUAL,
 	          __int__getInteractionMode,
 	          "",
-	          "");
+	          "Returns the currently-set Interaction Mode with reference to the InteractionMode enum. ");
 	I_Method0(osg::Vec3, getClipping,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getClipping,
@@ -289,17 +289,17 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec3__getOrientation,
 	          "",
-	          "");
+	          "Returns the currently-set local orientation offset for this node with respect to its parent. ");
 	I_Method0(osg::Vec3, getTranslation,
 	          Properties::VIRTUAL,
 	          __osg_Vec3__getTranslation,
 	          "",
-	          "");
+	          "Returns the currently-set local translation offset for this node with respect to its parent. ");
 	I_Method0(osg::Quat, getOrientationQuat,
 	          Properties::VIRTUAL,
 	          __osg_Quat__getOrientationQuat,
 	          "",
-	          "");
+	          "Returns the currently-set ");
 	I_Method0(osg::Vec3, getScale,
 	          Properties::VIRTUAL,
 	          __osg_Vec3__getScale,

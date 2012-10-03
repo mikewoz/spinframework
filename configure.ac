@@ -17,7 +17,7 @@ AC_PREREQ([2.61])
 # - increase spin_interface_version to the next odd number
 m4_define([spin_major_version], [0])
 m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [18])
+m4_define([spin_micro_version], [20])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -224,7 +224,7 @@ PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 #        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6, have_sharedvideo=true, have_sharedvideo=false)
+PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6 shmdata-any-0.6, have_sharedvideo=true, have_sharedvideo=false)
 if test "x${have_sharedvideo}" = "xfalse" ; then
     AC_MSG_WARN([missing package: libshmdata-0.6-dev ])
 else
@@ -243,16 +243,16 @@ else
     have_poco=false
 fi
 
-PKG_CHECK_MODULES(SPATOSC, spatosc-0.3, have_spatosc=true, have_spatosc=false)
+PKG_CHECK_MODULES(SPATOSC, spatosc-0.4, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
-    AC_MSG_WARN([missing package: spatosc-0.3])
+    AC_MSG_WARN([missing package: libspatosc-dev])
 else
     AC_DEFINE([WITH_SPATOSC],[1],[Enables linking with the SpatOSC library so that compatible audio renderers can be used for 3D sound spatialization]) AC_MSG_NOTICE([Enabled SpatOSC for audio])
     AC_MSG_NOTICE([SPATOSC_CFLAGS:        ${SPATOSC_CFLAGS}])
     AC_MSG_NOTICE([SPATOSC_LIBS:          ${SPATOSC_LIBS}])
 fi
 
-PKG_CHECK_MODULES(BULLET, bullet, have_bullet=true, have_bullet=false)
+PKG_CHECK_MODULES(BULLET, [bullet >= 0.26], have_bullet=true, have_bullet=false)
 if test "x${have_bullet}" = "xfalse" ; then
     AC_MSG_WARN([missing package: bullet])
 else
@@ -316,6 +316,7 @@ AC_CONFIG_FILES([
         src/Resources/scripts/Makefile
         src/Resources/shaders/Makefile
         src/editor/Makefile
+        man/Makefile 
         tests/Makefile
         spin-${SPIN_API_VERSION}.pc:spin.pc.in
         completion/Makefile

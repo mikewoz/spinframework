@@ -91,7 +91,10 @@ public:
         PLANE,
         DISC
     };
-    enum billboardType { RELATIVE, POINT_EYE, STAY_UP };
+    enum billboardType { 	RELATIVE,	/*!< No billboarding set. */
+							POINT_EYE,  /*!< Billboarding from any angle. */
+							STAY_UP 	/*!< Horizontal billboarding only. */
+						};
     
     virtual void setContext (const char *newvalue);
 
@@ -99,6 +102,12 @@ public:
      * Sets the shape this ShapeNode should have, identified by its number.
      */
     void setShape            (shapeType t);
+
+	/**
+	 * Set the object's billboarding, with reference to the setbillboardType
+	 * enum.
+	 */
+	
     void setBillboard        (billboardType t);
 
     /**
@@ -109,7 +118,12 @@ public:
      * \param alpha Opacity channel. Number in the range [0, 1]
      */
     void setColor            (float red, float green, float blue, float alpha);
-    void setRenderBin        (int i);
+
+	/**
+	 * Sets the render bin.
+	 */
+
+	void setRenderBin        (int i);
     void setLighting        (int i);
 
     /**
@@ -121,10 +135,36 @@ public:
 
     virtual void updateStateSet();
 
+	/**
+	 * Returns the currently set shape of the ShapeNode, with reference to the
+	 * shapeType enum.
+	 */
+
     int getShape() const { return (int)shape; }
+
+	/**
+	 * Returns the current billboarding setting, with reference to the 
+	 * billboardType enum.
+	 */
+	
     int getBillboard() const { return (int)billboard; }
+
+	/**
+	 * Returns the currently set color in RGBA value.
+	 */
+	
     osg::Vec4 getColor() const { return _color; };
+
+	/**
+	 * Returns the currently set render bin.
+	 */
+	
     int getRenderBin() const { return renderBin; }
+
+	/**
+	 * Returns whether lighting is enabled or disabled on the object.
+	 */
+	
     int getLighting() const { return lightingEnabled; }
 
     

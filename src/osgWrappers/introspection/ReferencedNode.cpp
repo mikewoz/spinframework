@@ -146,6 +146,16 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __float__getAlpha,
 	          "",
 	          "");
+	I_Method1(void, setCastShadows, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setCastShadows__int,
+	          "",
+	          "Flag to determine whether this node casts shadows or not. ");
+	I_Method0(int, getCastShadows,
+	          Properties::NON_VIRTUAL,
+	          __int__getCastShadows,
+	          "",
+	          "");
 	I_Method0(const char *, getContext,
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getContext,
@@ -226,6 +236,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __t_symbol_P1__getNodeSymbol,
 	          "",
 	          "");
+	I_Method0(std::string, getOSCPath,
+	          Properties::NON_VIRTUAL,
+	          __std_string__getOSCPath,
+	          "",
+	          "");
 	I_Method5(bool, addCronScript, IN, bool, serverSide, IN, const std::string &, label, IN, const std::string &, scriptPath, IN, double, freq, IN, const std::string &, params,
 	          Properties::NON_VIRTUAL,
 	          __bool__addCronScript__bool__C5_std_string_R1__C5_std_string_R1__double__C5_std_string_R1,
@@ -266,6 +281,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __bool__removeEventScript__C5_char_P1,
 	          "",
 	          "");
+	I_Method1(void, setNodeMask, IN, osg::Node::NodeMask, nm,
+	          Properties::NON_VIRTUAL,
+	          __void__setNodeMask__osg_Node_NodeMask,
+	          "",
+	          "");
 	I_ProtectedMethod1(bool, legalParent, IN, spin::t_symbol *, newParent,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -284,6 +304,9 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(osg::Group *, AttachmentNode, 
 	                 __osg_Group_P1__getAttachmentNode, 
 	                 __int__setAttachmentNode__osg_Group_P1);
+	I_SimpleProperty(int, CastShadows, 
+	                 __int__getCastShadows, 
+	                 __void__setCastShadows__int);
 	I_SimpleProperty(std::vector< spin::ReferencedNode * >, Children, 
 	                 __std_vectorT1_ReferencedNode_P1___getChildren, 
 	                 0);
@@ -296,11 +319,17 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	I_SimpleProperty(std::string, ID, 
 	                 __std_string__getID, 
 	                 0);
+	I_SimpleProperty(osg::Node::NodeMask, NodeMask, 
+	                 0, 
+	                 __void__setNodeMask__osg_Node_NodeMask);
 	I_SimpleProperty(spin::t_symbol *, NodeSymbol, 
 	                 __t_symbol_P1__getNodeSymbol, 
 	                 0);
 	I_SimpleProperty(std::string, NodeType, 
 	                 __std_string__getNodeType, 
+	                 0);
+	I_SimpleProperty(std::string, OSCPath, 
+	                 __std_string__getOSCPath, 
 	                 0);
 	I_SimpleProperty(const char *, Parent, 
 	                 0, 

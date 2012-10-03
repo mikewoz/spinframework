@@ -67,7 +67,7 @@ BEGIN_OBJECT_REFLECTOR(spin::GeometryNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getSingleSided,
 	          "",
-	          "");
+	          "Returns whether both sides of the shape are being rendered or if the backface is being culled. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

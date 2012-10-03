@@ -12,7 +12,7 @@
 // Developed/Maintained by:
 //    Mike Wozniewski (http://www.mikewoz.com)
 //    Zack Settel (http://www.sheefa.net/zack)
-// 
+//
 // Principle Partners:
 //    Shared Reality Lab, McGill University (http://www.cim.mcgill.ca/sre)
 //    La Societe des Arts Technologiques (http://www.sat.qc.ca)
@@ -39,87 +39,57 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
-#include "MediaManager.h"
-#include "spinUtil.h"
+#ifndef __LODNode_H
+#define __LODNode_H
+
+#include "GroupNode.h"
+
+#include <osg/LOD>
 
 namespace spin
 {
 
-// ***********************************************************
-// constructor
-MediaManager::MediaManager (const std::string &p)
+// forward declarations
+class SceneManager;
+
+/**
+ * The LODNode encapsulates a level-of-detail technique that maintians levels of
+ * detail or complexity for a given object, and provides certain hints to
+ * automatically choose the appropriate level of the object, for instance,
+ * according to the distance from the viewer. It decreases the complexity of the
+ * object's representation in the 3D world, and often has an unnoticeable
+ * quality loss on a distant object's appearance.
+ *
+ * To use this node, just attach children to this node and specify their visible
+ * range using the setRange method
+ *
+ */
+class LODNode : public GroupNode
 {
-	this->dataPath = p;
-}
 
-// ***********************************************************
-// destructor
-MediaManager::~MediaManager()
-{
-}
+public:
 
-// ***********************************************************
-std::string MediaManager::getImagePath(const std::string &s) const
-{
-	/*
-	if (s=="NULL") return "";
-	else return this->projectPath + "/sounds/" + s;
-	*/
-	
-	if (s=="NULL") return "";
-	else if (s.substr(0,1) == std::string("~")) // look for "~"
-	{
-		return getenv("HOME") + s.substr(1);
-	} else return s;
-}
+    LODNode(SceneManager *sceneManager, const char* initID);
+    virtual ~LODNode();
+        
+    virtual void updateNodePath();
+        
+    /**
+     * Set the visible range of a child node
+     */
+    void setRange (const char* childID, float min, float max);
 
-std::string MediaManager::getModelPath(const std::string &s) const
-{
-	/*
-	if (s=="NULL") return "";
-	
-	else
-	{
-		string f = this->projectPath + "/models/" + s + "/" + s + ".ive";
-		if (!fileExists(f)) f = this->projectPath + "/models/" + s + "/" + s + ".osg";
-	
-		return f;
-	}
-	*/
-	if (s=="NULL") return "";
-	else if (s.substr(0,1) == std::string("~")) // look for "~"
-	{
-		return getenv("HOME") + s.substr(1);
-	} else return s;
+    /**
+     * For each subclass of ReferencedNode, we override the getState() method to
+     * fill the vector with the correct set of methods for this particular node
+     */
+    virtual std::vector<lo_message> getState() const;
 
-}
-
-std::string MediaManager::getSoundPath(const std::string &s) const
-{
-	/*
-	if (s=="NULL") return "";
-	else return this->projectPath + "/sounds/" + s;
-	*/
-	
-	if (s=="NULL") return "";
-	else if (s.substr(0,1) == std::string("~")) // look for "~"
-	{
-		return getenv("HOME") + s.substr(1);
-	} else return s;
-}
-
-// TODO: connect to database and get media given the id:
-std::string MediaManager::getImagePath(int id) const { return ""; }
-std::string MediaManager::getModelPath(int id) const { return ""; }
-std::string MediaManager::getSoundPath(int id) const { return ""; }
-
-std::string MediaManager::getImageName(int id) const { return "NULL"; }
-std::string MediaManager::getModelName(int id) const { return "NULL"; }
-std::string MediaManager::getSoundName(int id) const { return "NULL"; }
+protected:
+    
+    osg::ref_ptr<osg::LOD> LOD_;
+};
 
 } // end of namespace spin
 
-
+#endif

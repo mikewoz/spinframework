@@ -51,6 +51,8 @@
 #include "dofppu.h"
 #include "ssaoppu.h"
 #include "motionblurppu.h"
+#include "outlineppu.h"
+#include "maskppu.h"
 
 namespace spin
 {
@@ -121,20 +123,13 @@ class PPUProcessor : public osgPPU::Processor
 #define PPU_DOF         0x0001
 #define PPU_SSAO        0x0002
 #define PPU_MOTIONBLUR  0x0004
+#define PPU_OUTLINE     0x0008
+#define PPU_MASK        0x0010
 
 class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
 {
     public:
-        // enum of the different PPU effects available
-        // Use primes, to allow activation of multiple effects
-        enum ppuEffect
-        {
-            noEffect = 0,
-            dofEffect = 1,
-            ssaoEffect = 2
-        };
-
         //! Default construcotr
         CompositeViewer(osg::ArgumentParser& args);
 
@@ -145,7 +140,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         std::vector<osgPPU::Processor*> getProcessor() { return mProcessors; }
 
         //! Create camera resulting texture
-        osg::Texture* createRenderTexture(int tex_width, int tex_height, bool depth);
+        osg::Texture* createRenderTexture(int tex_width, int tex_height, bool depth, bool cubemap);
         
         //! Setup the camera to do the render to texture
         void setupCamera();
@@ -154,7 +149,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         void viewerInit();
 
         //! Setup osgppu for rendering
-        void initializePPU(unsigned int pEffect = noEffect);
+        void initializePPU(unsigned int pEffect = PPU_NONE);
 
         //! Update the frames
         void frame(double f = USE_REFERENCE_TIME);
@@ -174,12 +169,19 @@ class CompositeViewer : public osgViewer::CompositeViewer
          * roll and allow only pitch and yaw by setting the scale to 1,0,1)
 	 */
         void setSpinScalars(osg::Vec3 v) { spinScalars_ = v; }
+
+        /**
+        * Returns true if the viewer is a dome view
+        */
+        bool isDome() { return mIsDome; }
  
         //int run();
 
         std::vector<DoFRendering*> mDofPPUs;
         std::vector<SSAORendering*> mSsaoPPUs;
         std::vector<MotionBlurRendering*> mMBlurPPUs;
+        std::vector<OutlineRendering*> mOutlinePPUs;
+        std::vector<MaskRendering*> mMaskPPUs;
 
     private:
         std::vector<osgPPU::Processor*> mProcessors;
@@ -187,6 +189,9 @@ class CompositeViewer : public osgViewer::CompositeViewer
         float mOldTime;
         //DoFRendering mDoFSetup;
         bool mbInitialized;
+
+        bool mIsDome;   // Is this a dome view ?
+        osg::TextureCubeMap* mTexCubeMap; // We need to access this texture in the ppu
        
 	    // navigation update stuff:
         std::string spnavNodeID_; 

@@ -434,7 +434,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          Properties::VIRTUAL,
 	          __void__setOrientation__float__float__float,
 	          "",
-	          "The local orientation offset for this node with respect to it's parent ");
+	          "The local orientation offset for this node with respect to its parent ");
 	I_Method4(void, setOrientationQuat, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
 	          Properties::VIRTUAL,
 	          __void__setOrientationQuat__float__float__float__float,
@@ -444,7 +444,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ParticleSystem)
 	          Properties::VIRTUAL,
 	          __osg_Vec3__getTranslation,
 	          "",
-	          "");
+	          "Returns the local translation offset with respect to the node's parent. ");
 	I_Method0(void, updateStateSet,
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,

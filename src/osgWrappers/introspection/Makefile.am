@@ -16,7 +16,7 @@ libSPINwrappers_la_SOURCES = \
     ImageTexture.cpp \
     LightSource.cpp \
     Listener.cpp \
-    MeasurementNode.cpp \
+    LODNode.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
     ParticleSystem.cpp \
@@ -28,7 +28,6 @@ libSPINwrappers_la_SOURCES = \
     Shader.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
-    SoundConnection.cpp \
     SoundNode.cpp \
     SoundSpace.cpp \
     SwitchNode.cpp \

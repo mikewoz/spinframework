@@ -61,7 +61,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setBillboard__billboardType,
 	          "",
-	          "");
+	          "Set the object's billboarding, with reference to the setbillboardType enum. ");
 	I_Method4(void, setColor, IN, float, red, IN, float, green, IN, float, blue, IN, float, alpha,
 	          Properties::NON_VIRTUAL,
 	          __void__setColor__float__float__float__float,
@@ -71,7 +71,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          Properties::NON_VIRTUAL,
 	          __void__setRenderBin__int,
 	          "",
-	          "");
+	          "Sets the render bin. ");
 	I_Method1(void, setLighting, IN, int, i,
 	          Properties::NON_VIRTUAL,
 	          __void__setLighting__int,
@@ -96,27 +96,27 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getShape,
 	          "",
-	          "");
+	          "Returns the currently set shape of the ShapeNode, with reference to the shapeType enum. ");
 	I_Method0(int, getBillboard,
 	          Properties::NON_VIRTUAL,
 	          __int__getBillboard,
 	          "",
-	          "");
+	          "Returns the current billboarding setting, with reference to the billboardType enum. ");
 	I_Method0(osg::Vec4, getColor,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4__getColor,
 	          "",
-	          "");
+	          "Returns the currently set color in RGBA value. ");
 	I_Method0(int, getRenderBin,
 	          Properties::NON_VIRTUAL,
 	          __int__getRenderBin,
 	          "",
-	          "");
+	          "Returns the currently set render bin. ");
 	I_Method0(int, getLighting,
 	          Properties::NON_VIRTUAL,
 	          __int__getLighting,
 	          "",
-	          "");
+	          "Returns whether lighting is enabled or disabled on the object. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,

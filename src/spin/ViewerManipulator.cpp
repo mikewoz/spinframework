@@ -82,7 +82,6 @@ ViewerManipulator::ViewerManipulator()
 	setMinimumDistance( 0.0 );
 	setHomePosition( osg::Vec3(0,-0.00001,0), osg::Vec3(0,0,0), osg::Vec3(0,0,1), false );
 	//setHomePosition( osg::Vec3(0,0,0), osg::Vec3(0,0.0001,0), osg::Vec3(0,0,1), false );
-        std::cout << "after?" << std::endl;
 
 }
 
@@ -175,7 +174,7 @@ void ViewerManipulator::handleKeypress(const osgGA::GUIEventAdapter& ea)
 	if (ea.getKey()=='r')
 	{
         if (ea.getEventType()==osgGA::GUIEventAdapter::KEYUP)
-            sendEvent(spinApp::Instance().userNode->getID().c_str(), "sfff", "setOrientation", 0.0, 0.0, 0.0, LO_ARGS_END);
+            sendEvent(spinApp::Instance().userNode->getID().c_str(), "sfff", "setOrientation", 0.0, 0.0, 0.0, SPIN_ARGS_END);
 	}
     else if (ea.getKey()=='a')
     {
@@ -514,9 +513,9 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				clickY = ea.getYnormalized();
 				
 				
-				sendEvent(userID, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(userID, "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
 				if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
-					sendEvent(userID, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+					sendEvent(userID, "sfff", "setSpin", 0.0, 0.0, 0.0, SPIN_ARGS_END);
 
 				
 				break;
@@ -544,17 +543,17 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// pan forward/back & left/right:
-				    	sendEvent(userID, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, LO_ARGS_END);
+				    	sendEvent(userID, "sfff", "move", dX*movScalar, dY*movScalar, 0.0, SPIN_ARGS_END);
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// pan up/down & left/right:
-				    	sendEvent(userID, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, LO_ARGS_END);
+				    	sendEvent(userID, "sfff", "move", dX*movScalar, 0.0, dY*movScalar, SPIN_ARGS_END);
 				    }
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-				    	sendEvent(userID, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, LO_ARGS_END);
+				    	sendEvent(userID, "sfff", "rotate", dY*rotScalar, 0.0, dX*rotScalar, SPIN_ARGS_END);
 				    }
 				}
 			
@@ -572,26 +571,26 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 				    if (buttonMask == GUIEventAdapter::LEFT_MOUSE_BUTTON)
 				    {
 				    	// drive forward/back & left/right:
-			    		sendEvent(userID, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, LO_ARGS_END);
+			    		sendEvent(userID, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), dYsign*pow(dYclick*movScalar,2), 0.0f, SPIN_ARGS_END);
 			    		
 				    }
 				    else if (buttonMask == GUIEventAdapter::RIGHT_MOUSE_BUTTON)
 				    {
 				    	// drive up/down & left/right:
-			    		sendEvent(userID, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), LO_ARGS_END);
+			    		sendEvent(userID, "sfff", "setVelocity", dXsign*pow(dXclick*movScalar,2), 0.0f, dYsign*pow(dYclick*movScalar,2), SPIN_ARGS_END);
 			    	}
 				    else if (buttonMask == (GUIEventAdapter::LEFT_MOUSE_BUTTON+GUIEventAdapter::RIGHT_MOUSE_BUTTON))
 				    {
 				    	// rotate mode:
-			    		sendEvent(userID, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), LO_ARGS_END);
+			    		sendEvent(userID, "sfff", "setSpin", dYsign*pow(dYclick*rotScalar,2), 0.0, dXsign*pow(dXclick*rotScalar,2), SPIN_ARGS_END);
 				    }
 			    }
 
 				break;
 				
 			case(GUIEventAdapter::RELEASE):
-				sendEvent(userID, "sfff", "setVelocity", 0.0, 0.0, 0.0, LO_ARGS_END);
-				sendEvent(userID, "sfff", "setSpin", 0.0, 0.0, 0.0, LO_ARGS_END);
+				sendEvent(userID, "sfff", "setVelocity", 0.0, 0.0, 0.0, SPIN_ARGS_END);
+				sendEvent(userID, "sfff", "setSpin", 0.0, 0.0, 0.0, SPIN_ARGS_END);
 				break;
 				
 			case(GUIEventAdapter::SCROLL):
@@ -614,7 +613,7 @@ void ViewerManipulator::handleMouse(osgViewer::View* view, const osgGA::GUIEvent
 			(int) ea.getButtonMask(),
 		    (float) ea.getXnormalized(),
 		    (float) ea.getYnormalized(),
-		    LO_ARGS_END);
+		    SPIN_ARGS_END);
 	}
 
 	lastX = ea.getXnormalized();
@@ -640,7 +639,7 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 					  hitPoint.x(),
 					  hitPoint.y(),
 					  hitPoint.z(),
-					  LO_ARGS_END);
+					  SPIN_ARGS_END);
 			break;
 		
 		// DRAG will only occur if someone clicks elsewhere
@@ -657,7 +656,7 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 					  hitPoint.x(),
 					  hitPoint.y(),
 					  hitPoint.z(),
-					  LO_ARGS_END);
+					  SPIN_ARGS_END);
 			break;
 		
 		// Same goes for the case where someone rolls onto a
@@ -675,7 +674,7 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 					hitPoint.x(),
 					hitPoint.y(),
 					hitPoint.z(),
-					LO_ARGS_END);
+					SPIN_ARGS_END);
 			/*
 			for (std::vector<GroupNode*>::iterator it=selectedNodes.begin(); it!=selectedNodes.end(); ++it)
 			{
@@ -701,7 +700,7 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 					hitPoint.x(),
 					hitPoint.y(),
 					hitPoint.z(),
-					LO_ARGS_END);
+					SPIN_ARGS_END);
 			break;
 		
 		// In the case of a PUSH, we both send the
@@ -717,7 +716,7 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 					hitPoint.x(),
 					hitPoint.y(),
 					hitPoint.z(),
-					LO_ARGS_END);
+					SPIN_ARGS_END);
 			//selectedNodes.push_back(hitNode);
 			break;
 
@@ -732,7 +731,7 @@ void ViewerManipulator::sendPick(GroupNode *hitNode, unsigned int eventType, uns
 					hitPoint.x(),
 					hitPoint.y(),
 					hitPoint.z(),
-					LO_ARGS_END);
+					SPIN_ARGS_END);
 			break;	
 	}
 }

@@ -141,16 +141,31 @@ public:
     virtual void setContext (const char *newvalue);
 
     /**
-     * Choose whether the text is drawn in 2D glyphs, or as 3D geometry.
+     * Choose whether the text is drawn in 2D glyphs, or as 3D geometry, with
+	 * respect to the DrawMode enum.
      */
     void setDrawMode (DrawMode mode);
+
+	/**
+	 * Returns whether the text is drawn in 2d glyphs or as 3d geometry, with
+	 * respect to the DrawMode enum.
+	 */
+	
     int  getDrawMode() const { return (int)drawMode_; }
 
     /**
      * Accepts user-entered string for the node's text.
      */
     void setText (const char* s);
+
+	/**
+	 * Returns the currently set text string.
+	 */
     const char *getText() const   { return text_.c_str(); }
+
+	/**
+	 * Returns the currently set text string.
+	 */
     std::string getTextString() const  { return text_; }
 
     /**
@@ -162,6 +177,10 @@ public:
      * Set the number of times the text should repeat
      */
     void setRepetitions (int repetitions);
+
+	/**
+	 * Returns the current value for the number of text repititions.
+	 */
     int  getRepetitions() const { return repetitions_; }
     
 
@@ -169,24 +188,41 @@ public:
      * Sets the font for the text associated with this node.
      */
     void setFont (const char* s);
+
+	/**
+	 * Returns the currently set font associated to this text node.
+	 */
     const char *getFont() const { return font_.c_str(); }
 
     /**
      * Set the font resolution. eg, 128 will produce 128x128 textures
      */
     void setFontResolution (int resolution);
+
+	/**
+	 * Returns the currently set font resolution.
+	 */
     int  getFontResolution() const { return resolution_; }
 
     /**
      * Sets the size of text characters (in local coordinate system units)
      */
     void  setCharacterSize (float s);
+
+	/**
+	 * Returns the currently-set size of text characters (in local coordinate
+	 * system units).
+	 */
     float getCharacterSize() const { return characterSize_; }
 
     /**
      * Set the thickness of 3D text
      */
     void setThickness (float thickness);
+
+	/**
+	 * Returns the currently-set value of thickness for 3d text.
+	 */
     float getThickness() const { return thickness_; }
     
     /**
@@ -200,9 +236,12 @@ public:
      * default is 0 
      */
     void setLineSpacing     (float spacing);
+
+	/**
+	 * Returns the currently-set line spacing as a percentage of character 
+	 * height.
+	 */
     float getLineSpacing() const { return lineSpacing_; }
-    
-    
 
     /**
      * Sets the maximum size of the text box.
@@ -213,6 +252,11 @@ public:
      * Sets the color for the text associated to this node in RGBA values.
      */
     void setColor (float red, float green, float blue, float alpha);
+
+	/**
+	 * Returns the currently-set text color in RGBA values.
+	 */
+	
     osg::Vec4     getColor() const        { return color_; };
     
     /**
@@ -225,6 +269,10 @@ public:
      * Sets the margins for the text associated to this node.
      */
     void  setMargin (float margin);
+
+	/**
+	 * Returns the currently-set margins for the text in the node.
+	 */
     float getMargin() const { return margin_; }
 
     /**
@@ -256,12 +304,15 @@ public:
     int  getSingleSided() const { return (int)singleSided_; }
 
     /**
-     * Specify whether both sides or only one side of the text is rendered. ie,
-     * whether the backface is culled or not.
+     * Sets whether lighting has an effect on the text or not. If not, it is
+	 * self-illuminated.
      */
     void setLighting (int lighting);
-    int  getLighting() const { return (int)lighting_; }
 
+	/**
+	 * Returns the currently-set lighting value.
+	 */
+    int  getLighting() const { return (int)lighting_; }
     
     /**
      * For each subclass of ReferencedNode, we override the getState() method to

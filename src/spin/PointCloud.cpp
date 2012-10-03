@@ -55,6 +55,7 @@
 #include <osgDB/FileNameUtils>
 
 #ifdef WITH_PCL
+#include <pcl/point_cloud.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
@@ -109,7 +110,11 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     distCrop_ = osg::Vec2(0.0,10.0);
     
 #ifdef WITH_PCL
+	#ifdef WITH_SHARED_VIDEO
+	shmReader_ = 0;
+	#endif
     grabber_ = 0;
+	decoder_ = new pcl::octree::PointCloudCompression< pcl::PointXYZRGBA >();
 #endif
     
 }
@@ -177,70 +182,87 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 
 // -----------------------------------------------------------------------------
 #ifdef WITH_PCL
+
+#ifdef WITH_SHARED_VIDEO 
+void PointCloud::shmCallback (
+         shmdata_any_reader_t *reader,
+         void *shmbuf,
+         void *data,
+         int data_size,
+         unsigned long long timestamp,
+         const char *type_description, void *user_data)
+{
+
+	PointCloud *node = (PointCloud*)(user_data);
+
+	pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
+	
+ 	// stringstream to store compressed point cloud
+	std::stringstream compressedData;
+	compressedData.write ((const char *) data, data_size);
+	
+  	// decode:
+	node->decoder_->decodePointCloud(compressedData,cloudOut);
+
+	std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+	
+	// update stored pointcloud:
+	{
+		// Just write the pointcloud to our local instance:
+		/*
+		boost::mutex::scoped_lock lock (grabberMutex);
+		node->cloud_.swap(cloudOut);
+		*/
+		
+		// OR call applyFilters:
+		node->applyFilters(cloudOut);
+	}
+
+	// TODO: we should only set updateFlag_ here and try to draw only once
+	// when we get the first frame, right? Unless, the shm data can change size?
+	//node->redrawFlag_ = true;
+	node->updateFlag_ = true;
+	
+	shmdata_any_reader_free (shmbuf);
+}
+#endif
+
 //#if PCL_MAJOR_VERSION>1 && PCL_MINOR_VERSION>5
 void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
 //#else
 //void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr &rawCloud)
 //#endif
 {
-
-
+	
     // DEBUG INFO
+	/*
     static unsigned count = 0;
     static osg::Timer_t lastTick = osg::Timer::instance()->tick();
     if (++count == 30)
     {
         osg::Timer_t tick = osg::Timer::instance()->tick();
         framerate_ = count / osg::Timer::instance()->delta_s(lastTick,tick);
-        //float center = rawCloud->points[(rawCloud->width >> 1) * (rawCloud->height + 1)].z;
-        
-        //std::cout << rawCloud->points.size() << " points. Distance of center pixel=" << center << "mm. Average framerate: " << framerate_ << " Hz" <<  std::endl;
+        float center = rawCloud->points[(rawCloud->width >> 1) * (rawCloud->height + 1)].z;
+        std::cout << rawCloud->points.size() << " points. Distance of center pixel=" << center << "mm. Average framerate: " << framerate_ << " Hz" <<  std::endl;
         count = 0;
         lastTick = tick;
     }
+	*/
     
     // If the redraw flag is set, our geometry is about to be destroyed anyway,
     // so let's just exit and wait. The cloud needs to exist before we can
     // update it.
     if (redrawFlag_) return;
-    
-    
+        
     applyFilters(rawCloud);
-    /*
-    // First apply crop filter along depth (z) axis:
-    
-    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
-    pcl::PassThrough<pcl::PointXYZRGBA> pass;
-    pass.setInputCloud(rawCloud);
-    pass.setFilterFieldName ("z");
-    pass.setFilterLimits (distCrop_.x(), distCrop_.y());
-    //pass.setFilterLimitsNegative (true);
-    pass.filter(*cloudFiltered);
-    
-    // Now we apply a VoxelGrid filter to reduce the number of points
-    
-    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
-    pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
-    sor.setInputCloud(cloudFiltered);
-    sor.setLeafSize(voxelSize_, voxelSize_, voxelSize_);
-    sor.filter(*cloud);
-    
-    // now set out member pointer with a mutex
-    {
-        boost::mutex::scoped_lock lock (grabberMutex);
-        cloud_.swap(cloud);
-    }
-    */
-    
+
     // Set the flag so that we update during the next traversal:
     updateFlag_ = true;
 }
 
 void PointCloud::applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
 {
-            
-    // First apply crop filter along depth (z) axis:
-    
+    // First apply crop filter along depth (z) axis:   
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
     pcl::PassThrough<pcl::PointXYZRGBA> pass;
     pass.setInputCloud(rawCloud);
@@ -250,7 +272,6 @@ void PointCloud::applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr
     pass.filter(*cloudFiltered);
     
     // Now we apply a VoxelGrid filter to reduce the number of points
-    
     if (voxelSize_>0)
     {
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
@@ -496,7 +517,6 @@ void PointCloud::draw()
     else if (drawMode_ == SQUARES)
     {
         // TODO: Billboarded planes
-    
     }
     */
     
@@ -550,6 +570,14 @@ void PointCloud::setURI(const char* filename)
         grabber_->stop();
         grabber_ = 0;
     }
+#ifdef WITH_SHARED_VIDEO
+	if (shmReader_)
+	{
+		shmdata_any_reader_close(shmReader_);
+		shmReader_ = 0;
+	}
+#endif
+	
     cloudOrig_.reset();
             
     path_ = filename;
@@ -563,7 +591,28 @@ void PointCloud::setURI(const char* filename)
         // do nothing
         return;
     }
-    
+
+	else if (std::string(path_).find("shm://") != std::string::npos)
+	{
+		
+		std::string shmPath = path_.substr(6);
+		std::cout << "Connecting to shmdata path: " << shmPath << std::endl;
+		
+#ifdef WITH_SHARED_VIDEO
+		shmReader_ = shmdata_any_reader_init();
+		if (1)//(verbose)
+			shmdata_any_reader_set_debug(shmReader_, SHMDATA_ENABLE_DEBUG);
+		else
+			shmdata_any_reader_set_debug(shmReader_, SHMDATA_DISABLE_DEBUG);
+
+		shmdata_any_reader_set_on_data_handler(shmReader_, &PointCloud::shmCallback, this);
+  		shmdata_any_reader_set_data_type(shmReader_, "application/x-pcd");
+  		shmdata_any_reader_start(shmReader_, shmPath.c_str());
+#endif
+
+		maxPoints_ = 76800;
+		success = true;
+	}
     else if (std::string(path_).find("kinect://") != std::string::npos)
     {
         // Kinect or any other dynamic point cloud needs to reserve a maximum

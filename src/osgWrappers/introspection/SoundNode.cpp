@@ -28,6 +28,11 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	               ____SoundNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate__osg_NodeVisitor_P1,
@@ -57,7 +62,7 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          Properties::VIRTUAL,
 	          __void__setOrientation__float__float__float,
 	          "",
-	          "The local orientation offset for this node with respect to it's parent ");
+	          "The local orientation offset for this node with respect to its parent ");
 	I_Method4(void, setOrientationQuat, IN, float, x, IN, float, y, IN, float, z, IN, float, w,
 	          Properties::VIRTUAL,
 	          __void__setOrientationQuat__float__float__float__float,
@@ -68,11 +73,36 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          __void__setRadius__float,
 	          "",
 	          "");
+	I_Method1(void, setTransitionFactor, IN, float, f,
+	          Properties::VIRTUAL,
+	          __void__setTransitionFactor__float,
+	          "",
+	          "");
 	I_Method1(void, setURI, IN, const char *, uri,
 	          Properties::VIRTUAL,
 	          __void__setURI__C5_char_P1,
 	          "",
 	          "Set the media for the sound node using a URI pattern.Examples: file://soundfilename.wav file:///home/johndoe/soundfilename.wav http://www.server.com/soundfile.wav adc://1:1 adc://1 content://media/external/audio/media/710 mms://some_media_stream rtsp://127.0.0.1:12311 pd_plugin://audio_plugin_patch.pd ");
+	I_Method2(void, setDirectivity, IN, const char *, horizPattern, IN, const char *, vertPattern,
+	          Properties::VIRTUAL,
+	          __void__setDirectivity__C5_char_P1__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(void, connect, IN, const char *, sinkNodeID,
+	          Properties::VIRTUAL,
+	          __void__connect__C5_char_P1,
+	          "",
+	          "");
+	I_Method1(void, disconnect, IN, const char *, sinkNodeID,
+	          Properties::VIRTUAL,
+	          __void__disconnect__C5_char_P1,
+	          "",
+	          "");
+	I_Method3(void, setConnectionParam, IN, const char *, sinkNodeID, IN, const char *, method, IN, float, value,
+	          Properties::VIRTUAL,
+	          __void__setConnectionParam__C5_char_P1__C5_char_P1__float,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -84,6 +114,9 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(float, TransitionFactor, 
+	                 0, 
+	                 __void__setTransitionFactor__float);
 	I_SimpleProperty(const char *, URI, 
 	                 0, 
 	                 __void__setURI__C5_char_P1);

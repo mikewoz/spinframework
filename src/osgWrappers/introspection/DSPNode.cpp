@@ -12,7 +12,6 @@
 
 #include <DSPNode.h>
 #include <SceneManager.h>
-#include <SoundConnection.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -29,6 +28,11 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	               ____DSPNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
 	I_Method1(void, callbackUpdate, IN, osg::NodeVisitor *, nv,
 	          Properties::VIRTUAL,
 	          __void__callbackUpdate__osg_NodeVisitor_P1,
@@ -39,36 +43,6 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	                      __bool__dumpGlobals__bool,
 	                      "",
 	                      "The dumpGlobals method results in a broadcast of this node's translation and orientation. It is called by callbackUpdate() every frame, however the 'forced' flag will be set to false, so it will only send a message if the node's matrix has changed. If the 'forced' flag is set to true, it will definitely result in a message broadcast. This should only be used when necessary (eg, when a stateDump is requested).Note: the return value is only to fool wx so that it doesn't consider this as an editable property. ");
-	I_Method1(spin::SoundConnection *, getConnection, IN, spin::DSPNode *, snk,
-	          Properties::NON_VIRTUAL,
-	          __SoundConnection_P1__getConnection__DSPNode_P1,
-	          "",
-	          " param snk a pointer to the sink node  ");
-	I_Method1(spin::SoundConnection *, getConnection, IN, const char *, snk,
-	          Properties::NON_VIRTUAL,
-	          __SoundConnection_P1__getConnection__C5_char_P1,
-	          "",
-	          " param snk the name of the sink node to search for  ");
-	I_Method1(void, connect, IN, spin::DSPNode *, snk,
-	          Properties::NON_VIRTUAL,
-	          __void__connect__DSPNode_P1,
-	          "",
-	          "");
-	I_Method1(void, connect, IN, const char *, snk,
-	          Properties::NON_VIRTUAL,
-	          __void__connect__C5_char_P1,
-	          "",
-	          "");
-	I_Method1(void, connectSource, IN, const char *, src,
-	          Properties::NON_VIRTUAL,
-	          __void__connectSource__C5_char_P1,
-	          "",
-	          "Sets the current node as a sink to the specified node. ");
-	I_Method1(void, disconnect, IN, const char *, snk,
-	          Properties::NON_VIRTUAL,
-	          __void__disconnect__C5_char_P1,
-	          "",
-	          "");
 	I_Method1(void, setURI, IN, const char *, uri,
 	          Properties::VIRTUAL,
 	          __void__setURI__C5_char_P1,
@@ -78,7 +52,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __C5_char_P1__getURI,
 	          "",
-	          "");
+	          "Returns the currently-set URI associated with the sound node. ");
 	I_Method1(void, setActive, IN, int, i,
 	          Properties::VIRTUAL,
 	          __void__setActive__int,
@@ -88,7 +62,7 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	          Properties::NON_VIRTUAL,
 	          __int__getActive,
 	          "",
-	          "");
+	          "Returns whether the DSP processing is active or inactive. ");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
@@ -258,7 +232,5 @@ BEGIN_OBJECT_REFLECTOR(spin::DSPNode)
 	I_SimpleProperty(float, VUmeterFlag, 
 	                 __float__getVUmeterFlag, 
 	                 __void__setVUmeterFlag__float);
-	I_PublicMemberProperty(std::vector< spin::SoundConnection * >, connectTO);
-	I_PublicMemberProperty(std::vector< spin::SoundConnection * >, connectFROM);
 END_REFLECTOR
 

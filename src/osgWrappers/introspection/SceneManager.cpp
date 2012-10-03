@@ -13,7 +13,6 @@
 #include <ReferencedNode.h>
 #include <ReferencedStateSet.h>
 #include <SceneManager.h>
-#include <SoundConnection.h>
 #include <spinLog.h>
 #include <spinUtil.h>
 
@@ -172,11 +171,6 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __std_vectorT1_ReferencedStateSet_P1___findStateSets__C5_char_P1,
 	          "",
 	          "");
-	I_Method0(std::vector< spin::SoundConnection * >, getConnections,
-	          Properties::NON_VIRTUAL,
-	          __std_vectorT1_SoundConnection_P1___getConnections,
-	          "",
-	          "");
 	I_Method1(void, deleteNode, IN, const char *, id,
 	          Properties::NON_VIRTUAL,
 	          __void__deleteNode__C5_char_P1,
@@ -292,6 +286,21 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__refreshSubscribers__C5_std_mapT1_std_stringComma_lo_address__R1,
 	          "",
 	          "The refreshSubscribers method results in a publication of all nodelists to the given TCP subscribers. Then, the full node state is published to the subscribers, for ALL nodes. ");
+	I_Method1(void, setShadowSoftness, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setShadowSoftness__float,
+	          "",
+	          "");
+	I_Method1(void, setShadowJitter, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setShadowJitter__float,
+	          "",
+	          "");
+	I_Method1(void, setShadowBias, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setShadowBias__float,
+	          "",
+	          "");
 	I_Method3(void, setGravity, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
 	          __void__setGravity__float__float__float,
@@ -310,9 +319,6 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_SimpleProperty(std::vector< std::string >, AllNodeTypes, 
 	                 __std_vectorT1_std_string___getAllNodeTypes, 
 	                 0);
-	I_SimpleProperty(std::vector< spin::SoundConnection * >, Connections, 
-	                 __std_vectorT1_SoundConnection_P1___getConnections, 
-	                 0);
 	I_SimpleProperty(std::string, ConnectionsAsXML, 
 	                 __std_string__getConnectionsAsXML, 
 	                 0);
@@ -322,6 +328,15 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_SimpleProperty(spin::spinLog &, Log, 
 	                 0, 
 	                 __void__setLog__spinLog_R1);
+	I_SimpleProperty(float, ShadowBias, 
+	                 0, 
+	                 __void__setShadowBias__float);
+	I_SimpleProperty(float, ShadowJitter, 
+	                 0, 
+	                 __void__setShadowJitter__float);
+	I_SimpleProperty(float, ShadowSoftness, 
+	                 0, 
+	                 __void__setShadowSoftness__float);
 	I_SimpleProperty(float, UpdateRate, 
 	                 0, 
 	                 __void__setUpdateRate__float);
@@ -344,8 +359,6 @@ END_REFLECTOR
 STD_MAP_REFLECTOR(std::map< std::string COMMA  lo_address >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::ReferencedStateSet * >)
-
-STD_VECTOR_REFLECTOR(std::vector< spin::SoundConnection * >)
 
 STD_VECTOR_REFLECTOR(std::vector< spin::t_symbol * >)
 

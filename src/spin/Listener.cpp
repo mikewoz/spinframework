@@ -87,6 +87,21 @@ Listener::~Listener()
     
 }
 // ===================================================================
+void Listener::debug()
+{
+    DSPNode::debug();
+    
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        std::cout << "-------------" << std::endl;
+        std::cout << "SpatOSC data:" << std::endl;
+        spatOSCListener->debugPrint();
+    }
+#endif
+    
+}
+
 void Listener::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
@@ -96,7 +111,7 @@ void Listener::callbackUpdate(osg::NodeVisitor* nv)
 
 bool Listener::dumpGlobals(bool forced)
 {
-    DSPNode::dumpGlobals();
+    DSPNode::dumpGlobals(forced);
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
@@ -130,6 +145,34 @@ void Listener::setParam (const char *paramName, float paramValue)
     {
         spatOSCListener->setFloatProperty(paramName, paramValue);
     }
+#endif
+}
+
+void Listener::setTranslation (float x, float y, float z)
+{
+    GroupNode::setTranslation(x,y,z);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+        this->dumpGlobals(true);
+#endif
+
+}
+
+void Listener::setOrientation (float p, float r, float y)
+{
+    GroupNode::setOrientation(p,r,y);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+        this->dumpGlobals(true);
+#endif
+}
+
+void Listener::setOrientationQuat (float x, float y, float z, float w)
+{
+    GroupNode::setOrientationQuat(x,y,z,w);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+        this->dumpGlobals(true);
 #endif
 }
 

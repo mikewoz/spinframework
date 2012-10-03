@@ -41,7 +41,6 @@
 
 #include <iostream>
 #include "DSPNode.h"
-#include "SoundConnection.h"
 
 #include "SceneManager.h"
 #include "spinApp.h"
@@ -63,21 +62,14 @@ extern pthread_mutex_t sceneMutex;
 namespace spin
 {
 
-//extern SceneManager *sceneManager;
-
-// *****************************************************************************
+// -----------------------------------------------------------------------------
 // constructor:
 DSPNode::DSPNode (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-
 	this->setNodeType("DSPNode");
 	
 	// enable report of globals by default:
 	setReportMode(GroupNode::GLOBAL_6DOF);
-	
-	// connection stuff:
-	connectTO.clear();
-	connectFROM.clear();
 	
 	active = 1;
 	
@@ -106,45 +98,18 @@ DSPNode::DSPNode (SceneManager *sceneManager, const char* initID) : GroupNode(sc
 	
 }
 
-// *****************************************************************************
+// -----------------------------------------------------------------------------
 // destructor
 DSPNode::~DSPNode()
-{
-	// we should check if there are any connections on this node, and delete
-	// them before this object is gone.
-
-	while (connectTO.size())
-	{
-		this->disconnect(connectTO[0]->sink->getID().c_str());	
-	}
-	
-	while (connectFROM.size())
-    {
-        if (connectFROM[0]->source)
-            connectFROM[0]->source->disconnect(this->getID().c_str());
-	}
-	
+{	
 }
 
-// *****************************************************************************
+// -----------------------------------------------------------------------------
 
-
-/*
-void DSPNode::callbackUpdate()
+void DSPNode::debug()
 {
-
-	osg::Matrix myMatrix = osg::computeLocalToWorld(this->currentNodePath_);
-	
-	if (this->_globalMatrix != myMatrix)
-	{
-		this->_globalMatrix = myMatrix;
-		osg::Vec3 myPos = myMatrix.getTrans();
-		osg::Vec3 myRot = Vec3inDegrees(QuatToEuler(myMatrix.getRotate()));
-		
-		BROADCAST(this, "sffffff", "global6DOF", myPos.x(), myPos.y(), myPos.z(), myRot.x(), myRot.y(), myRot.z());
-	}
+    GroupNode::debug();
 }
-*/
 
 void DSPNode::callbackUpdate(osg::NodeVisitor* nv)
 {
@@ -153,109 +118,8 @@ void DSPNode::callbackUpdate(osg::NodeVisitor* nv)
 
 bool DSPNode::dumpGlobals(bool forced)
 {
-    GroupNode::dumpGlobals(forced);
+    return GroupNode::dumpGlobals(forced);
 }
-
-// *****************************************************************************
-
-SoundConnection *DSPNode::getConnection(DSPNode *snk)
-{
-	if (snk)
-	{	
-        std::vector<SoundConnection*>::iterator iter;
-		for (iter = this->connectTO.begin(); iter != this->connectTO.end(); iter++)
-		{
-			if ((*iter)->sink == snk) return (*iter);
-		}
-	}
-	
-	return NULL;
-}
-
-SoundConnection *DSPNode::getConnection(const char *snk)
-{
-	return getConnection( dynamic_cast<DSPNode*>( sceneManager_->getNode(snk) ) );
-}
-
-
-// *****************************************************************************
-void DSPNode::connect(DSPNode *snk)
-{
-	// check if this connection already exists:
-	if (!this->getConnection(snk))
-	{
-		SoundConnection *conn = new SoundConnection(this->sceneManager_, this, snk);
-
-		// add to the connection lists for each node:
-		this->connectTO.push_back(conn);
-		conn->sink->connectFROM.push_back(conn);
-	}
-	
-	BROADCAST(this, "ss", "connect", snk->getID().c_str());
-}
-
-// *****************************************************************************
-void DSPNode::connect(const char *snk)
-{
-	osg::ref_ptr<DSPNode> sinkNode = dynamic_cast<DSPNode*>( sceneManager_->getNode(snk) );
-	if (sinkNode.valid()) this->connect(sinkNode.get());
-}
-
-void DSPNode::connectSource(const char *src)
-{
-	osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( sceneManager_->getNode(src) );
-	if (srcNode.valid()) srcNode->connect(this);	
-}
-
-
-void DSPNode::disconnect(const char *snk)
-{
-	// check if this connection already exists:
-	SoundConnection *conn = this->getConnection(snk);
-
-	if (conn)
-	{
-		/*
-		// if this is the last connection for this node, then disactivate it:
-		if (this->connectTO.empty() && this->connectFROM.empty())
-			this->setActive(0);
-		
-		// also check the sink:
-		if (conn->sink->connectTO.empty() && conn->sink->connectFROM.empty())
-			conn->sink->setActive(0);
-		 */
-		
-		// remove it from the connectTO list:		
-        std::vector<SoundConnection*>::iterator iter;
-		for (iter = connectTO.begin(); iter != connectTO.end(); iter++)
-		{
-			if ((*iter) == conn)
-			{
-				connectTO.erase(iter);
-				break;
-			}
-		}
-		
-		// and remove it from the sink's connectFROM list:
-		for (iter = conn->sink->connectFROM.begin(); iter != conn->sink->connectFROM.end(); iter++)
-		{
-			if ((*iter) == conn)
-			{
-				conn->sink->connectFROM.erase(iter);
-				break;
-			}
-		}
-		
-		
-		// now delete the actual object:
-		delete conn;
-
-		BROADCAST(this, "ss", "disconnect", snk);
-	} else { 
-        std::cout << "oops. couldn't find connection: " << this->getID() << " -> " << snk << std::endl;
-    }
-}
-
 
 // -----------------------------------------------------------------------------
 // - SET METHODS:
@@ -519,7 +383,6 @@ void DSPNode::drawDirectivity()
 
 }
 
-
 void DSPNode::drawRadius()
 {
     pthread_mutex_lock(&sceneMutex);
@@ -611,25 +474,7 @@ std::vector<lo_message> DSPNode::getState() const
 	lo_message_add(msg, "ss", "setURI", uri_.c_str());
 	ret.push_back(msg);
 	
-	/*
-	if (connectTO.size())
-	{
-		msg = lo_message_new();
-		lo_message_add_string(msg, "connectedTo");
-		for (int i=0; i<connectTO.size(); i++)
-			lo_message_add_string(msg, (char*)connectTO[i]->sink->getID().c_str());
-		ret.push_back(msg);
-	}
-	*/
-	
-	for (int i=0; i<connectTO.size(); i++)	
-	{
-		msg = lo_message_new();
-		lo_message_add(msg, "ss", "connect", (char*)connectTO[i]->sink->getID().c_str());
-		ret.push_back(msg);
-	}
-	
-   msg = lo_message_new();
+    msg = lo_message_new();
     lo_message_add(msg, "ss", "setRolloff", _rolloff.c_str());
     ret.push_back(msg);
 
@@ -664,13 +509,6 @@ std::vector<lo_message> DSPNode::getState() const
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setRadiusFlag", radiusFlag);
     ret.push_back(msg);
-
-    // not doing this anymore (not supposed to be saved or refreshed)
-    /*
-    msg = lo_message_new();
-    lo_message_add(msg, "sf", "setIntensity", currentSoundIntensity);
-    ret.push_back(msg);
-    */
 
     // have to re-send setContext AFTER setURI, so that loaded plugins will
     // have the up-to-date parameter

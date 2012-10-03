@@ -47,7 +47,7 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          Properties::NON_VIRTUAL,
 	          __float__getMass,
 	          "",
-	          "");
+	          "Returns the current mass of the object. ");
 	I_Method1(void, setDynamic, IN, int, isDynamic,
 	          Properties::NON_VIRTUAL,
 	          __void__setDynamic__int,
@@ -57,12 +57,12 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          Properties::NON_VIRTUAL,
 	          __int__getDynamic,
 	          "",
-	          "");
+	          "Returns whether dynamic forces like gravity are enabled for the object. ");
 	I_Method1(bool, checkCollisions, IN, btTransform, tranform,
 	          Properties::NON_VIRTUAL,
 	          __bool__checkCollisions__btTransform,
 	          "",
-	          "");
+	          "A bool that sets whether collision checking is enabled or disabled. ");
 	I_Method3(void, setTranslation, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setTranslation__float__float__float,
@@ -77,12 +77,12 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          Properties::VIRTUAL,
 	          __void__setOrientation__float__float__float,
 	          "",
-	          "The local orientation offset for this node with respect to it's parent ");
+	          "The local orientation offset for this node with respect to its parent ");
 	I_Method3(void, setScale, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::VIRTUAL,
 	          __void__setScale__float__float__float,
 	          "",
-	          "A grouped scale operation ");
+	          "A grouped scale operation. ");
 	I_Method16(void, setManipulatorMatrix, IN, float, a00, IN, float, a01, IN, float, a02, IN, float, a03, IN, float, a10, IN, float, a11, IN, float, a12, IN, float, a13, IN, float, a20, IN, float, a21, IN, float, a22, IN, float, a23, IN, float, a30, IN, float, a31, IN, float, a32, IN, float, a33,
 	           Properties::VIRTUAL,
 	           __void__setManipulatorMatrix__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float__float,

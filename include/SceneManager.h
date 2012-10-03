@@ -48,6 +48,7 @@
 #include <osg/Geode>
 
 #include <osgDB/SharedStateManager>
+#include <osgShadow/SoftShadowMap>
 #include <cppintrospection/Value>
 
 #include "config.h"
@@ -71,7 +72,6 @@ namespace spin
 // forward declarations:
 class GroupNode;
 class UserNode;
-class SoundConnection;
 class spinLog;
 
 /**
@@ -127,11 +127,6 @@ class SceneManager
 
         std::vector<ReferencedNode*> findNodes(const char *pattern);
         std::vector<ReferencedStateSet*> findStateSets(const char *pattern);
-        
-        //nodeListType findNodes(const char *pattern);
-        //ReferencedStateSetList findStateSet(const char *pattern);
-            
-        std::vector<SoundConnection*> getConnections();
 
         /**
          * This method removes a node from the scene, however the actual work is
@@ -267,6 +262,29 @@ class SceneManager
         void refreshSubscribers(const std::map<std::string, lo_address> &clients);
 
         /**
+         * Set the values for width of the soft penumbra the shader will use.
+         */
+        void setShadowSoftness(float f);
+        /**
+         * Set the values for jittering scale the shader will use. 
+         */
+        void setShadowJitter(float f);
+        /**
+         * Add a small bias to the z-value, this can reduce shadow acne problem. 
+         */
+        void setShadowBias(float f);
+        /**
+         * The ambiantBias defines how much shadows darken the scene. It is
+         * usually used to set up lower bound for shadowing factor, in the range
+         * [0..1]. Sometimes we want to make shadows to be only a bit darker
+         * than lit areas. This is called "AmbientBias" because shadowed areas
+         * are lit only by the ambient light component). AmbientBias.y is
+         * usually set up to 1 - AmbientBias.x but it may be also set bit larger
+         * or smaller values used to make shadow range more dynamic or flat. 
+         */
+        void setShadowAmbientBias(float x, float y);
+
+        /**
          * Set the gravity vector for the physics engine (only used by some
          * nodes).
          */
@@ -286,6 +304,8 @@ class SceneManager
 #endif
 
     private:
+
+        osg::ref_ptr<osgShadow::SoftShadowMap> softShadowMap_;
 
         static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);
         //std::vector< osg::ref_ptr<ReferencedNode> > nodeList;

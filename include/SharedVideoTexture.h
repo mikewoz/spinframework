@@ -60,7 +60,7 @@ namespace spin
 {
 
 /**
- * \brief Allows reception of video from an other process into an OSG texture.
+ * \brief Allows reception of video from another process into an OSG texture.
  *
  * This is accomplished by the use of libshmdata. 
  * http://code.sat.qc.ca/redmine/projects/libshmdata
@@ -80,6 +80,8 @@ public:
 
     SharedVideoTexture(SceneManager *sceneManager, const char *initID);
     ~SharedVideoTexture();
+
+    void updateCallback();
 
     void setTextureID(const char *id);
     const char* getTextureID() const { return textureID.c_str(); }
