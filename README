@@ -65,7 +65,7 @@ On Ubuntu GNU/Linux Precise LTS 12.04::
     sudo apt-get install libpoco-dev
     sudo apt-get install ffmpeg
     sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
-    sudo apt-get install libshmdata-dev
+    sudo apt-get install libshmdata-0.6-dev
     sudo apt-get install libpcl-1.6-all
 
 
