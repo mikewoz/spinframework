@@ -5,6 +5,8 @@ SPIN Framework release notes
 ---------------------------------
 This release is in the development series 0.3 that has an unstable API. 
 
+It is the first release candidate for the 0.4 series.
+
 New Features:
 
 * Update spatosc version to 0.4
@@ -14,6 +16,16 @@ New Features:
 * Add setDirectivity setTransitionFactor and debugPrint to SoundNode
 * Rename secureBroadcast to reliableBroadcast
 * Add outline PPU glow effect
+* support shadows
+* support physics with bullet
+* PPU masks
+* dome_viewer.pd patch created
+* changed required Bullet version
+* added shmdata PointCloud reader
+* added double pass rendering to the osg particle system for it to write to the depth buffer
+* Added level-of-detail (LOD) node to allow automatic switching between different qualities of subgraphs based on distance
+* Added a uniform to control transparency in the PPU mask
+* Added a depth buffer to the mask PPU, might be useful
 
 Bugs fixed:
 
@@ -27,6 +39,8 @@ Bugs fixed:
 * update README and AUTHORS
 * fix error in check_it_works test
 * fix crash when leaving the spinviewer
+* now syncs with milisecond double instead of osg::timer_t
+* Corrected the mask PPU slave camera creation to work with dome view
 
 
 2012-08-31 : spinframework 0.3.18
