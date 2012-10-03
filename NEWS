@@ -1,7 +1,22 @@
 SPIN Framework release notes
 ============================
 
-2012-??-?? : spinframework 0.3.20
+2012-10-?? : spinframework 0.3.22
+---------------------------------
+This release is in the development series 0.3 that has an unstable API. 
+
+It is a release candidate for the 0.4 series.
+
+New Features:
+
+* (none)
+
+Bugs fixed:
+
+* (none)
+
+
+2012-10-03 : spinframework 0.3.20
 ---------------------------------
 This release is in the development series 0.3 that has an unstable API. 
 

@@ -102,13 +102,13 @@ libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION
 libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
-    $(top_srcdir)/include/config.h \
+    $(top_srcdir)/include/CollisionShape.h \
     $(top_srcdir)/include/CompositeViewer.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
+    $(top_srcdir)/include/DSPNode.h \
     $(top_srcdir)/include/DraggerTrackball.h \
     $(top_srcdir)/include/DraggerWith3Axes.h \
-    $(top_srcdir)/include/DSPNode.h \
     $(top_srcdir)/include/EventHandler.h \
     $(top_srcdir)/include/EventTypes.h \
     $(top_srcdir)/include/Fog.h \
@@ -116,20 +116,15 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/GridNode.h \
     $(top_srcdir)/include/GroupNode.h \
     $(top_srcdir)/include/ImageTexture.h \
-    $(top_srcdir)/include/introspect_helpers.h \
-    $(top_srcdir)/include/libloUtil.h \
+    $(top_srcdir)/include/KinectCloud.h \
+    $(top_srcdir)/include/LODNode.h \
     $(top_srcdir)/include/LightSource.h \
     $(top_srcdir)/include/Listener.h \
-    $(top_srcdir)/include/LODNode.h \
-    $(top_srcdir)/include/mainpage.h \
     $(top_srcdir)/include/Menu3D.h \
     $(top_srcdir)/include/ModelNode.h \
-    $(top_srcdir)/include/nodeVisitors.h \
-    $(top_srcdir)/include/oscParser.h \
-    $(top_srcdir)/include/osgUtil.h \
     $(top_srcdir)/include/ParticleSystem.h \
     $(top_srcdir)/include/ParticleSystemUtil.h \
-    $(top_srcdir)/include/pocoUtil.h \
+    $(top_srcdir)/include/PointCloud.h \
     $(top_srcdir)/include/PointerNode.h \
     $(top_srcdir)/include/RayNode.h \
     $(top_srcdir)/include/ReferencedNode.h \
@@ -142,6 +137,25 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/SharedVideoTexture.h \
     $(top_srcdir)/include/SoundNode.h \
     $(top_srcdir)/include/SoundSpace.h \
+    $(top_srcdir)/include/SwitchNode.h \
+    $(top_srcdir)/include/SyphonTexture.h \
+    $(top_srcdir)/include/TextNode.h \
+    $(top_srcdir)/include/UserNode.h \
+    $(top_srcdir)/include/VideoTexture.h \
+    $(top_srcdir)/include/ViewerManipulator.h \
+    $(top_srcdir)/include/bulletUtil.h \
+    $(top_srcdir)/include/config.h \
+    $(top_srcdir)/include/dofppu.h \
+    $(top_srcdir)/include/introspect_helpers.h \
+    $(top_srcdir)/include/libloUtil.h \
+    $(top_srcdir)/include/mainpage.h \
+    $(top_srcdir)/include/maskppu.h \
+    $(top_srcdir)/include/motionblurppu.h \
+    $(top_srcdir)/include/nodeVisitors.h \
+    $(top_srcdir)/include/oscParser.h \
+    $(top_srcdir)/include/osgUtil.h \
+    $(top_srcdir)/include/outlineppu.h \
+    $(top_srcdir)/include/pocoUtil.h \
     $(top_srcdir)/include/spinApp.h \
     $(top_srcdir)/include/spinBaseContext.h \
     $(top_srcdir)/include/spinClientContext.h \
@@ -151,11 +165,9 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/spinServerContext.h \
     $(top_srcdir)/include/spinUtil.h \
     $(top_srcdir)/include/spinWX.h \
-    $(top_srcdir)/include/SwitchNode.h \
-    $(top_srcdir)/include/TextNode.h \
-    $(top_srcdir)/include/UserNode.h \
-    $(top_srcdir)/include/VideoTexture.h \
-    $(top_srcdir)/include/ViewerManipulator.h \
+    $(top_srcdir)/include/ssaoppu.h \
+    $(top_srcdir)/include/util.h \
+    $(top_srcdir)/include/videoSize.h \
     $(top_srcdir)/src/tinyxml/tinystr.h \
     $(top_srcdir)/src/tinyxml/tinyxml.h
 
