@@ -52,7 +52,7 @@ Dependencies
 ------------
 On Ubuntu GNU/Linux Precise LTS 12.04::
 
-    sudo add-apt-repository ppa:sat-metalab/metalab
+    sudo apt-add-repository ppa:sat-metalab/metalab
     sudo apt-add-repository ppa:openrave/release
     sudo apt-add-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
     sudo apt-get update
