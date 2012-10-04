@@ -1,7 +1,7 @@
 SPIN Framework release notes
 ============================
 
-2012-10-?? : spinframework 0.3.22
+2012-10-08 : spinframework 0.3.22
 ---------------------------------
 This release is in the development series 0.3 that has an unstable API. 
 
@@ -9,11 +9,13 @@ It is a release candidate for the 0.4 series.
 
 New Features:
 
-* (none)
+* support geometry shaders
 
 Bugs fixed:
 
-* (none)
+* Check for libshmdata in SharedVideoTexture.cpp
+* remove bullet-specific files to be installed by default
+* fix typo in a command in README
 
 
 2012-10-03 : spinframework 0.3.20
