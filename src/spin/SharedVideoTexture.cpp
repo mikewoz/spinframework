@@ -136,7 +136,9 @@ namespace spin
   // update callback
   void SharedVideoTexture::updateCallback()
   {
+#ifdef WITH_SHARED_VIDEO
     reader_.updateImage();
+#endif
 
     //((spin::Shader*)this)->updateCallback();
   }

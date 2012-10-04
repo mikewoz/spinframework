@@ -49,6 +49,7 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
 #	$(BOOST_THREAD_LIBS) 
 
 # please keep those in alphabetical order:
+# Warning: bullet-specific files are not listed here!
 libspin_@SPIN_API_VERSION@_la_SOURCES = \
     AnimationNode.cpp \
     AttractorNode.cpp \
@@ -99,10 +100,10 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     ViewerManipulator.cpp
 
 libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
+# Warning: bullet-specific files are not listed here!
 libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
-    $(top_srcdir)/include/CollisionShape.h \
     $(top_srcdir)/include/CompositeViewer.h \
     $(top_srcdir)/include/ConstraintsNode.h \
     $(top_srcdir)/include/Contour.h \
@@ -143,7 +144,6 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/UserNode.h \
     $(top_srcdir)/include/VideoTexture.h \
     $(top_srcdir)/include/ViewerManipulator.h \
-    $(top_srcdir)/include/bulletUtil.h \
     $(top_srcdir)/include/config.h \
     $(top_srcdir)/include/dofppu.h \
     $(top_srcdir)/include/introspect_helpers.h \
