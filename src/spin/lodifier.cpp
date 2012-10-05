@@ -6,6 +6,7 @@
 #include <osg/Texture2D>
 #include <osg/TextureRectangle>
 #include <osg/Geode>
+#include <osg/ShapeDrawable>
 #include <osg/PagedLOD>
 #include <osg/ProxyNode>
 
@@ -229,13 +230,16 @@ public:
         }
 
         if ( g.getNumChildren() == 1 ) {
-            osg::PagedLOD* plod = dynamic_cast<osg::PagedLOD*>( g.getChild(0) );
-            if ( plod ) {
+            //osg::PagedLOD* plod = dynamic_cast<osg::PagedLOD*>( g.getChild(0) );
+            osg::Node* n = g.getChild(0);
+            //if ( plod ) {
+            if ( n ) {
                 indent(); printf( "useless group!!!!\n" );
                 //////osg::ref_ptr<osg::Group> gref( &g );
                 osg::Node::ParentList pl = g.getParents();
                 for ( size_t i = 0; i < pl.size(); i++ ) {
-                    pl[i]->replaceChild( &g, plod );
+                    //pl[i]->replaceChild( &g, plod );
+                    pl[i]->replaceChild( &g, n );
                 }
                 g_tab -= 4;
                 indent(g_tab); printf( "traversing group done\n");
@@ -263,6 +267,15 @@ public:
                 indent(); printf("added something to lowdef group ******************************************\n");
             }
         }
+
+        osg::ShapeDrawable* sd = new osg::ShapeDrawable( new osg::Sphere( bs.center(), bs.radius() ) );
+        sd->setColor( osg::Vec4(1, 0, 1, 0.3) );
+        osg::Geode* sg = new osg::Geode();
+        sg->getOrCreateStateSet()->setMode(GL_BLEND,osg::StateAttribute::ON);
+        sg->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+        sg->addDrawable( sd );
+
+        lowDef->addChild( sg );
 
         float cutoff = bs.radius() / _root->getBound().radius();
         indent(); printf( "cutoff = %f\n", cutoff );
