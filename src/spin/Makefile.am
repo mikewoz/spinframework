@@ -211,7 +211,9 @@ endif
 if PCL
 AM_CPPFLAGS += $(PCL_CFLAGS)  
 libspin_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
-libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
+#the following fixes the bugy pc file in libflann
+#libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
+libspin_@SPIN_API_VERSION@_la_LDFLAGS += -lpcl_io -lOpenNI -lusb-1.0 -lpcl_filters -lpcl_sample_consensus -lpcl_search -lpcl_kdtree -lflann_cpp -lpcl_octree -lpcl_common
 libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h
 endif
 
