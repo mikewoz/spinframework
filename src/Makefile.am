@@ -4,6 +4,7 @@ SUBDIRS = \
     osgWrappers/introspection \
     osgPPU \
     spin \
+    lodifier \
     Resources \
     editor
 

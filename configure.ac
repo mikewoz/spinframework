@@ -316,6 +316,7 @@ AC_CONFIG_FILES([
         src/Resources/scripts/Makefile
         src/Resources/shaders/Makefile
         src/editor/Makefile
+        src/lodifier/Makefile
         man/Makefile 
         tests/Makefile
         spin-${SPIN_API_VERSION}.pc:spin.pc.in

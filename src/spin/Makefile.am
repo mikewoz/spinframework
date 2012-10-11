@@ -204,7 +204,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointClou
 endif
 
 
-bin_PROGRAMS = spinserver spinviewer spindocgenerator lodifier
+bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
 spinserver_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
@@ -214,9 +214,6 @@ spinviewer_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
 spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
-
-lodifier_SOURCES = lodifier.cpp
-lodifier_LDADD = $(OPENTHREADS_LIBS) $(OSG_LIBS) $(BOOST_SYSTEM_LIBS)
 
 ###############################################################################
 # CUSTOM targets:
