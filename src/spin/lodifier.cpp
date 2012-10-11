@@ -26,6 +26,7 @@
 #include <iostream>
 #include <sstream>
 
+#define DEBUG_VIEW
 
 std::string g_outputDir = "";
 std::string g_extension = ".osg";
@@ -93,8 +94,8 @@ bool lodifyImage( osg::Image* img, std::deque<osg::Image*>& imgLOD )
         osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
         imgLOD.push_front( tmp );
     }
-#define DEBUG_COLORS
-#ifdef DEBUG_COLORS
+
+#ifdef DEBUG_VIEW
     //f ( tmp->r() == 1 ) {
     if ( osg::Image::computeNumComponents(tmp->getPixelFormat()) == 1 ) {
         indent(); printf("grayscale!\n");
@@ -146,7 +147,7 @@ bool lodifyImage( osg::Image* img, std::deque<osg::Image*>& imgLOD )
         osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
         asdf++;
     }
-#endif // DEBUG_COLORS
+#endif // DEBUG_VIEW
     return true;
 }
 
@@ -268,15 +269,15 @@ public:
             }
         }
 
+#ifdef DEBUG_VIEW
         osg::ShapeDrawable* sd = new osg::ShapeDrawable( new osg::Sphere( bs.center(), bs.radius() ) );
         sd->setColor( osg::Vec4(1, 0, 1, 0.3) );
         osg::Geode* sg = new osg::Geode();
         sg->getOrCreateStateSet()->setMode(GL_BLEND,osg::StateAttribute::ON);
         sg->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
         sg->addDrawable( sd );
-
         lowDef->addChild( sg );
-
+#endif
         float cutoff = bs.radius() / g_sceneRadius;// _root->getBound().radius();
         indent(); printf( "cutoff = %f\n", cutoff );
 
