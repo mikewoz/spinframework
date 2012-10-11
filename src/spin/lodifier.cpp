@@ -30,6 +30,8 @@
 std::string g_outputDir = "";
 std::string g_extension = ".osg";
 int g_tab = 0;
+float g_lodScale = 1.0f;
+float g_sceneRadius = -1;
 
 void print_with_indent( int indent, char * s, ... )
 {
@@ -91,7 +93,8 @@ bool lodifyImage( osg::Image* img, std::deque<osg::Image*>& imgLOD )
         osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
         imgLOD.push_front( tmp );
     }
-
+#define DEBUG_COLORS
+#ifdef DEBUG_COLORS
     //f ( tmp->r() == 1 ) {
     if ( osg::Image::computeNumComponents(tmp->getPixelFormat()) == 1 ) {
         indent(); printf("grayscale!\n");
@@ -108,11 +111,21 @@ bool lodifyImage( osg::Image* img, std::deque<osg::Image*>& imgLOD )
     osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
 
     int asdf = 0;
+    double w;
     for ( size_t q = 1; q < imgLOD.size()-1; q++) {
 
         tmp = imgLOD[q];
+        w = (double) (q-1) / (double) (imgLOD.size()-1);
 
-        if ( asdf % 2) {
+        for ( int i = 0; i < tmp->s(); i++ ) {
+                for ( int j = 0; j < tmp->t(); j++ ) {
+                    //tmp->data(i,j)[0] = 0;
+                    tmp->data(i,j)[1] = (unsigned char)( (1.0-w)*255.0 + w*tmp->data(i,j)[1] );
+                    tmp->data(i,j)[2] = (unsigned char)( w*255.0 + (1.0-w)*tmp->data(i,j)[2] );
+                }
+            }
+
+        /*if ( asdf % 2) {
 
             for ( int i = 0; i < tmp->s(); i++ ) {
                 for ( int j = 0; j < tmp->t(); j++ ) {
@@ -129,27 +142,14 @@ bool lodifyImage( osg::Image* img, std::deque<osg::Image*>& imgLOD )
                     //tmp->data(i,j)[2] = 0;
                 }
             }
-        }
+            }*/
         osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
         asdf++;
     }
-
+#endif // DEBUG_COLORS
     return true;
 }
 
-/*
-bool lodifyImage( const std::string& fileName, std::vector<osg::Image*>& imgLOD )
-{
-
-    printf("loading....");
-    osg::Image* img = osgDB::readImageFile( fileName );
-    if ( !img ) {
-        indent(); printf("no image\n");
-        return false;
-    }
-    return lodifyImage( img, imgLOD );
-}
-*/
 
 /*******************************************************************************/
 
@@ -277,11 +277,11 @@ public:
 
         lowDef->addChild( sg );
 
-        float cutoff = bs.radius() / _root->getBound().radius();
+        float cutoff = bs.radius() / g_sceneRadius;// _root->getBound().radius();
         indent(); printf( "cutoff = %f\n", cutoff );
 
         //plod->addChild( lowDef, 70, 1000, "" );
-        plod->addChild( lowDef, 0, cutoff, "" );
+        plod->addChild( lowDef, 0, cutoff * g_lodScale, "" );
 
         osg::ref_ptr<osg::Group> gref( &g );
 
@@ -295,7 +295,11 @@ public:
         indent(); printf("asdf %i\n", g.getNumChildren() );
 
         //plod->addChild( &g, 0, 70, hidefFile ); //high lod
-        plod->addChild( &g, cutoff, 1000, hidefFile ); //high lod.. in pixels
+        plod->addChild( &g, cutoff * g_lodScale, 1000.0f * g_lodScale, hidefFile ); //high lod.. in pixels
+
+        indent(); printf( "GROUP: added LOD range %f to %f\n", 0.0, cutoff * g_lodScale );
+        indent(); printf( "GROUP: added LOD range %f to %f\n", cutoff * g_lodScale, 1000.0 * g_lodScale );
+
 
         osgDB::writeNodeFile( g, g_outputDir + hidefFile );
         _nbGroups++;
@@ -384,57 +388,32 @@ public:
         osg::PagedLOD* plod = new osg::PagedLOD();
         plod->setRangeMode( osg::LOD::PIXEL_SIZE_ON_SCREEN );
 
-
-        //float offDist = 0;
-        // float minDist = 0;
-        // float maxDist = 1.0f / ( pow(2.0f, geoLOD.size()-1.0f) );
-        //float minDist = 0;
-        //float maxDist = 0.5;
-
-        // using pixel size on screen
         float minSize = 0;
-        //float maxSize = 1.0f / ( pow(2.0f, geoLOD.size()-1.0f) );
-        float cutoff = g.getBound().radius() / _root->getBound().radius();
+        float cutoff = 2.0 * g.getBound().radius() / g_sceneRadius;// _root->getBound().radius();
         float maxSize = cutoff;
         float incr = (1.0f - cutoff) / pow(2.0f, geoLOD.size()-2.0f);
         indent(); printf( "cutoff = %f, incr = %f\n", cutoff, incr );
+
         for ( size_t i = 0; i < geoLOD.size(); i++ ) {
 
-            plod->addChild( geoLOD[i], minSize, maxSize,
+            plod->addChild( geoLOD[i], minSize * g_lodScale, maxSize * g_lodScale,
                             "geode_" + boost::lexical_cast<std::string>(_nbPlods) +
                             "_" + boost::lexical_cast<std::string>(i) + g_extension );
             osgDB::writeNodeFile( *plod->getChild(i), g_outputDir + plod->getFileName(i) );
-            indent(); printf( "added LOD range %f to %f\n", minSize, maxSize );
+            indent(); printf( "GEODE: added LOD range %f to %f\n", minSize * g_lodScale, maxSize * g_lodScale );
             minSize = maxSize;
             maxSize = cutoff + incr*pow(2,i);
-
-            /*plod->addChild( geoLOD[i], offDist+minDist, offDist+maxDist,
-                            "geode_" + boost::lexical_cast<std::string>(_nbPlods) +
-                            "_" + boost::lexical_cast<std::string>(i) + g_extension );
-            osgDB::writeNodeFile( *plod->getChild(i), g_outputDir + plod->getFileName(i) );
-            minDist = maxDist;
-            maxDist *= 2.0;
-            */
-
-            // plod->addChild( geoLOD[geoLOD.size()-i-1], offDist+minDist, offDist+maxDist, "blorg" + boost::lexical_cast<std::string>(i) + ".osg" );
-            // osgDB::writeNodeFile( *geoLOD[geoLOD.size()-i-1], plod->getFileName(i) );
-            //maxDist = minDist;
-            //minDist /= 2.0;
 
         }
 
         indent(); printf("plod->getNumChildren = %u\n", plod->getNumChildren() );
-        ///plod->setRange( plod->getNumChildren()-1, plod->getMinRange(plod->getNumChildren()-1), FLT_MAX ); // might bust with lodscale > 1
-        plod->setRange( plod->getNumChildren()-1, plod->getMinRange(plod->getNumChildren()-1), 1000 );
 
-// plod->getMinRange(plod->getNumChildren()-1)*8.0);
+        plod->setRange( plod->getNumChildren()-1, plod->getMinRange(plod->getNumChildren()-1), 1000.0f * g_lodScale );
 
         const osg::BoundingSphere& bs = geoLOD[geoLOD.size()-1]->getBound();
         plod->setCenter( bs.center() );
         plod->setRadius( bs.radius() );
 
-        /*std::string plodFile = "plod_" + boost::lexical_cast<std::string>(_nbPlods) + g_extension;
-          osgDB::writeNodeFile( *plod, g_outputDir + plodFile );*/
         _nbPlods++;
 
         osg::Node::ParentList pl = g.getParents();
@@ -442,7 +421,6 @@ public:
             pl[i]->replaceChild( &g, plod );
         }
 
-        //abort();
         g_tab -= 4;
         indent(g_tab); printf( "traversing geode done\n");
     }
@@ -471,11 +449,11 @@ public:
 
     bool _doTextures;
     bool _doGeometry;
-    //osg::Group* _baseGroup;
+
     osg::Group* _root;
     int _nbPlods;
     int _nbGroups;
-    //std::string _basename;
+
 };
 
 /*******************************************************************************/
@@ -491,6 +469,8 @@ int main( int argc, char **argv )
     arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" creates a hierarchy of files for paging which can be later loaded by viewers.");
     arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] filename ...");
     arguments.getApplicationUsage()->addCommandLineOption("-h or --help","Display this information");
+    arguments.getApplicationUsage()->addCommandLineOption("-s","set the LOD Scale factor.  should be the intended display resolution");
+    arguments.getApplicationUsage()->addCommandLineOption("-r","scene bounding sphere radius [optional]");
     arguments.getApplicationUsage()->addCommandLineOption("-i","set the input file");
     arguments.getApplicationUsage()->addCommandLineOption("-o","set the output file (defaults to output.ive)");
     arguments.getApplicationUsage()->addCommandLineOption("--makeAllChildrenPaged","Force all children of LOD to be written out as external PagedLOD children");
@@ -504,18 +484,12 @@ int main( int argc, char **argv )
     std::string inputFile = "";
     std::string outputFile = "";
     bool display = false;
+    while (arguments.read("-s",g_lodScale)) {}
+    while (arguments.read("-r",g_sceneRadius)) {}
     while (arguments.read("-i",inputFile)) {}
     while (arguments.read("-o",outputFile)) {}
     while (arguments.read("-d")) { display = true;}
 
-    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( inputFile );
-
-    if (!model) {
-        printf("No model loaded.\n");
-        return 1;
-    }
-    //osgDB::Registry::instance()->getDataFilePathList().push_back( osgDB::getFilePath(inputFile) );
-    osgDB::getDataFilePathList().push_back( osgDB::getFilePath(inputFile) ); // w/FileUtils
 
 
     if ( outputFile.empty() ) outputFile = "output.osgt";
@@ -527,8 +501,60 @@ int main( int argc, char **argv )
         printf( "could not create directory %s\n", g_outputDir.c_str() );
     }
 
-    //std::string ext = '.'+ osgDB::getFileExtension(outputfile);
+#define TEST
+#ifdef TEST
+
+
+    std::vector< osg::ref_ptr<osg::Node> > nodeList;
+    for( int pos = 1; pos < arguments.argc(); pos++ ) {
+        if ( !arguments.isOption(pos) ) {
+            // not an option so assume string is a filename.
+            osg::Node *node = osgDB::readNodeFile( arguments[pos] );
+            if( node )   {
+                osgDB::getDataFilePathList().push_back( osgDB::getFilePath( arguments[pos]) );
+                if ( node->getName().empty() ) node->setName( arguments[pos] );
+                nodeList.push_back( node );
+            }
+        }
+    }
+
+
+    osg::ref_ptr<osg::Group> group = 0;
+
+    if ( nodeList.size() == 0 ) {
+        printf( "no model loaded.\n");
+        return 0;
+    } else if ( nodeList.size() == 1 ) {
+
+        if ( !nodeList[0]->asGroup() ) {
+            group = new osg::Group();
+            group->addChild( nodeList[0].get() );
+        } else {
+            group = nodeList[0]->asGroup();
+        }
+
+
+    } else {
+        //for(NodeList::iterator itr=nodeList.begin();itr!=nodeList.end();++itr)
+        //group->addChild((*itr).get());
+        group = new osg::Group();
+        for ( size_t i = 0; i < nodeList.size(); i++ )
+            group->addChild( nodeList[i].get());
+    }
+
+#else // test
+
+    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( inputFile );
+
+    if (!model) {
+        printf("No model loaded.\n");
+        return 1;
+    }
+    //osgDB::Registry::instance()->getDataFilePathList().push_back( osgDB::getFilePath(inputFile) );
+    osgDB::getDataFilePathList().push_back( osgDB::getFilePath(inputFile) ); // w/FileUtils
+
     osg::Group* group = model->asGroup();
+
     if ( !group ) {
         printf("model is not a group.  putting it in a group.\n");
         group = new osg::Group();
@@ -537,18 +563,29 @@ int main( int argc, char **argv )
         printf( "model is a group!\n" );
     }
 
+#endif // TEST
 
+    if ( g_sceneRadius <= 0.0f ) g_sceneRadius = group->getBound().radius();
+
+    printf( "scene radius = %f\n", g_sceneRadius );
+    //exit(0);
 
     ConvertToPageLODVistor converter(true, false, group); // ewww
-    model->accept(converter);
-
-
+    group->accept(converter);
 
     osgDB::writeNodeFile( *group, g_outputDir + "base" + g_extension );
 
     osg::ProxyNode* pn = new osg::ProxyNode();
-
     pn->addChild( group, g_outputDir + "base" + g_extension  );
+    pn->setRadius( group->getBound().radius() );
+    pn->setCenter( group->getBound().center() );
+    pn->setLoadingExternalReferenceMode( osg::ProxyNode::LOAD_IMMEDIATELY );
+
+    //osg::ref_ptr<osgDB::Options> options = new osgDB::Options;
+    //options->setDatabasePath( "" );
+    //pn->setDatabaseOptions( options.get() );
+    //pn->setDatabasePath(".");
+
     osgDB::writeNodeFile( *pn, outputFile );
 
 
@@ -558,7 +595,7 @@ int main( int argc, char **argv )
     osgViewer::Viewer viewer;
 
     osg::Camera* cam = viewer.getCamera();
-    cam->setLODScale( 1920.0 );
+    if (g_lodScale == 1.0f) cam->setLODScale( 1920.0 );
 
     //cam->addChild( pn );
     viewer.setSceneData( pn );
