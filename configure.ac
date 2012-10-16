@@ -17,7 +17,7 @@ AC_PREREQ([2.61])
 # - increase spin_interface_version to the next odd number
 m4_define([spin_major_version], [0])
 m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [22])
+m4_define([spin_micro_version], [24])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -316,6 +316,7 @@ AC_CONFIG_FILES([
         src/Resources/scripts/Makefile
         src/Resources/shaders/Makefile
         src/editor/Makefile
+        src/lodifier/Makefile
         man/Makefile 
         tests/Makefile
         spin-${SPIN_API_VERSION}.pc:spin.pc.in
