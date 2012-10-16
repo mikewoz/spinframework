@@ -1,7 +1,7 @@
 SPIN Framework release notes
 ============================
 
-2012-??-?? : spinframework 0.3.24
+2012-??-?? : spinframework 0.3.26
 ---------------------------------
 This release is in the development series 0.3 that has an unstable API. 
 
@@ -9,11 +9,27 @@ It is a release candidate for the 0.4 series.
 
 New Features:
 
-* (none)
+* none
 
 Bugs fixed:
 
-* (none)
+* none
+
+
+2012-10-16 : spinframework 0.3.24
+---------------------------------
+This release is in the development series 0.3 that has an unstable API. 
+
+It is a release candidate for the 0.4 series.
+
+New Features:
+
+* lodified (level of detail) models now loadable in spin via ModelNode
+* add new lodifer tool. (level of detail) takes a 3d scene as input and creates levels of detail versions of it
+
+Bugs fixed:
+
+* fixing libflann pck-config issue
 
 
 2012-10-08 : spinframework 0.3.22
