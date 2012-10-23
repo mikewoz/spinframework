@@ -676,7 +676,7 @@ int main(int argc, char **argv)
     /*
     // *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     std::vector<char*> newArgs;
     if (argc == 1)
     {
@@ -716,7 +716,7 @@ int main(int argc, char **argv)
 
     // *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     std::vector<char*> newArgs = spin::getUserArgs();
     if ((argc==1) && (newArgs.size() > 1))
     {

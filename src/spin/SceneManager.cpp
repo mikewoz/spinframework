@@ -199,7 +199,7 @@ SceneManager::SceneManager(std::string id)
     else
     {
         // FIXME: this path should be replaced by PACKAGE_DATA/PACKAGE_NAME, not hard-coded
-        resourcesPath = "/usr/local/share/spinFramework";
+        resourcesPath = "/usr/local/share/spinframework";
     }
 #endif
 
