@@ -319,7 +319,7 @@ AC_CONFIG_FILES([
         src/lodifier/Makefile
         man/Makefile 
         tests/Makefile
-        spin-${SPIN_API_VERSION}.pc:spin.pc.in
+        spinframework-${SPIN_API_VERSION}.pc:spin.pc.in
         completion/Makefile
         ])
 

@@ -17,18 +17,18 @@ AM_CPPFLAGS = \
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
-lib_LTLIBRARIES = libspin-@SPIN_API_VERSION@.la
+lib_LTLIBRARIES = libspinframework-@SPIN_API_VERSION@.la
 
 if HAVE_PYTHON
 python_LTLIBRARIES = libSPINPyWrap.la
 endif
 
-libspin_@SPIN_API_VERSION@_la_LIBADD = \
+libspinframework_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
     $(top_builddir)/src/osgPPU/libosgPPU.la \
     $(top_builddir)/src/tinyxml/libtinyxml.la
 
-libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
+libspinframework_@SPIN_API_VERSION@_la_LDFLAGS = \
     -export-dynamic \
     -version-info $(SPIN_LT_VERSION) \
     $(BOOST_SYSTEM_LIBS) \
@@ -50,7 +50,7 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
 
 # please keep those in alphabetical order:
 # Warning: bullet-specific files are not listed here!
-libspin_@SPIN_API_VERSION@_la_SOURCES = \
+libspinframework_@SPIN_API_VERSION@_la_SOURCES = \
     AnimationNode.cpp \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
@@ -99,9 +99,9 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     VideoTexture.cpp \
     ViewerManipulator.cpp
 
-libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
+libspinframework_@SPIN_API_VERSION@_la_includedir = $(includedir)/spinframework-$(SPIN_API_VERSION)/spin
 # Warning: bullet-specific files are not listed here!
-libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
+libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/AnimationNode.h \
     $(top_srcdir)/include/AttractorNode.h \
     $(top_srcdir)/include/CompositeViewer.h \
@@ -176,7 +176,7 @@ libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
 if HAVE_PYTHON
 libSPINPyWrap_la_SOURCES = python_wrappers.cpp
 #libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
+libSPINPyWrap_la_LIBADD = libspinframework-@SPIN_API_VERSION@.la \
 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
 libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
@@ -198,36 +198,36 @@ endif
 if BULLET
 AM_CPPFLAGS += \
     $(BULLET_CFLAGS) 
-libspin_@SPIN_API_VERSION@_la_SOURCES += \
+libspinframework_@SPIN_API_VERSION@_la_SOURCES += \
     CollisionShape.cpp\
     bulletUtil.cpp
-libspin_@SPIN_API_VERSION@_la_LDFLAGS += \
+libspinframework_@SPIN_API_VERSION@_la_LDFLAGS += \
     $(BULLET_LIBS)
-libspin_@SPIN_API_VERSION@_la_include_HEADERS += \
+libspinframework_@SPIN_API_VERSION@_la_include_HEADERS += \
     $(top_srcdir)/include/bulletUtil.h \
     $(top_srcdir)/include/CollisionShape.h
 endif
 
 if PCL
 AM_CPPFLAGS += $(PCL_CFLAGS)  
-libspin_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
+libspinframework_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
 #the following fixes the bugy pc file in libflann
-#libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
-libspin_@SPIN_API_VERSION@_la_LDFLAGS += -lpcl_io -lOpenNI -lusb-1.0 -lpcl_filters -lpcl_sample_consensus -lpcl_search -lpcl_kdtree -lflann_cpp -lpcl_octree -lpcl_common
-libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h
+#libspinframework_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
+libspinframework_@SPIN_API_VERSION@_la_LDFLAGS += -lpcl_io -lOpenNI -lusb-1.0 -lpcl_filters -lpcl_sample_consensus -lpcl_search -lpcl_kdtree -lflann_cpp -lpcl_octree -lpcl_common
+libspinframework_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h
 endif
 
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
+spinserver_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(SPNAV_LIBS)
+spinviewer_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(SPNAV_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
+spindocgenerator_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
 
 ###############################################################################
 # CUSTOM targets:
