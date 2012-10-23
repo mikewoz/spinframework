@@ -220,7 +220,7 @@ class SceneManager
 
         /**
          * Write the entire scene to an XML file. If no absolute path is
-         * specified, the file will be written to the ~/.spinFramework folder.
+         * specified, the file will be written to the ~/.spinframework folder.
          */
         bool saveXML(const char *filename, bool withUsers = false);
         

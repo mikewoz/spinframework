@@ -66,7 +66,7 @@ namespace osg {
 #define NULL_SYMBOL gensym("NULL")
 #define WORLD_SYMBOL gensym("world")
 
-#define SPIN_DIRECTORY spin::getAbsolutePath("~/.spinFramework")
+#define SPIN_DIRECTORY spin::getAbsolutePath("~/.spinframework")
 
 // *****************************************************************************
 // NODE MASKS:
