@@ -4,12 +4,12 @@ all: $(NAME)
 
 ###################################################################
 
-DEPS = cppintrospection-3.0
+DEPS = cppintrospection-3.0 spin-0.3 openscenegraph openthreads liblo
 CPPFLAGS += -I../../include -g -I/usr/include/boost $(shell python-config --cflags) `pkg-config --cflags $(DEPS)`
-LDFLAGS +=  -llo -lSPIN $(shell python-config --libs) `pkg-config --libs $(DEPS)`
-LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
-		-losgManipulator -losgText -losgUtil \
-		-losgParticle -losgViewer
+LDFLAGS +=  -llo $(shell python-config --libs) `pkg-config --libs $(DEPS)`
+#LDFLAGS +=  -lpthread -lOpenThreads -losg -losgGA -losgSim -losgDB -losgFX \
+#	-losgManipulator -losgText -losgUtil \
+# -losgParticle -losgViewer
 
 ifeq ($(shell uname -s),Darwin)
   CPPFLAGS += -I/opt/local/include
