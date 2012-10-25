@@ -54,6 +54,11 @@ Dependencies
    $ sudo apt-get install libwxgtk2.9-dev libcppintrospection-2.11-dev
    $ sudo ln -s /usr/lib/wx/config/gtk2-unicode-2.9 /usr/local/bin/wx-config
 
+Also::
+
+  sudo apt-add-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
+  sudo apt-get install libpcl-dev
+
 * Compile and install cppintrospection from the https://github.com/sat-metalab/cppintrospection
 
 
