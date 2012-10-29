@@ -60,16 +60,15 @@
 #include <boost/algorithm/string.hpp>
 
 #include "config.h"
-#include "ViewerManipulator.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinClientContext.h"
-#include "osgUtil.h"
-#include "GroupNode.h"
-#include "SceneManager.h"
-#include "ShapeNode.h"
-
-#include "CompositeViewer.h"
+#include "viewermanipulator.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinclientcontext.h"
+#include "osgutil.h"
+#include "groupnode.h"
+#include "scenemanager.h"
+#include "shapenode.h"
+#include "compositeviewer.h"
 
 #ifdef HAVE_SPNAV_H
 #include "spnav.h"

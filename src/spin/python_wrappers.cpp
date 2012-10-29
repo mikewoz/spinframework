@@ -73,9 +73,9 @@
 #include <cppintrospection/Attributes>
 #include <cppintrospection/ExtendedTypeInfo>
 #include <cppintrospection/variant_cast>
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "SceneManager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "scenemanager.h"
 
 using namespace boost::python;
 

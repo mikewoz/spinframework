@@ -65,11 +65,11 @@
 #include <pcl/compression/octree_pointcloud_compression.h>
 #endif
 
-#include "PointCloud.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
+#include "pointcloud.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
 
 
 //using namespace std;

@@ -42,7 +42,7 @@
 #ifndef LightSource_H_
 #define LightSource_H_
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 namespace osg {
     class LightSource;

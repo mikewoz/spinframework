@@ -42,7 +42,7 @@
 #ifndef __ShapeNode_H
 #define __ShapeNode_H
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 #include <osg/Geode>
 #include <osg/ShapeDrawable>

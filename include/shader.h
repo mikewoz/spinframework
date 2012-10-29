@@ -56,8 +56,8 @@ namespace osg {
 #include <lo/lo_types.h>
 #include <vector>
 #include <osg/ref_ptr>
-#include "ReferencedStateSet.h"
-#include "ShaderUtil.h"
+#include "referencedstateset.h"
+#include "shaderutil.h"
 
 
 namespace spin

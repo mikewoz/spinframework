@@ -42,7 +42,7 @@
 #ifndef __CollisionShape_H
 #define __CollisionShape_H
 
-#include "ShapeNode.h"
+#include "shapenode.h"
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 

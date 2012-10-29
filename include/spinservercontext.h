@@ -44,8 +44,8 @@
 
 #include <map>
 #include <string>
-#include "spinBaseContext.h"
-#include "pocoUtil.h"
+#include "spinbasecontext.h"
+#include "pocoutil.h"
 
 
 namespace spin

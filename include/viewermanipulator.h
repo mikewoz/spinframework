@@ -45,7 +45,7 @@
 #include <osg/ref_ptr>
 #include <osgGA/NodeTrackerManipulator>
 #include <cstdarg>
-#include "spinUtil.h" // for t_symbol
+#include "spinutil.h" // for t_symbol
 
 
 namespace osgViewer {

@@ -43,7 +43,7 @@
 #define __Fog_H
 
 #include <osg/Vec4>
-#include "ReferencedStateSet.h"
+#include "referencedstateset.h"
 
 namespace osg
 {

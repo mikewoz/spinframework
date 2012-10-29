@@ -43,7 +43,7 @@
 #define GridNode_H_
 
 #include <osg/Vec4>
-#include "ReferencedNode.h"
+#include "referencednode.h"
 
 namespace osg {
     class Geode;

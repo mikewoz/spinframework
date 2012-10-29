@@ -42,7 +42,7 @@
 #ifndef __spinClientContext_H
 #define __spinClientContext_H
 
-#include "spinBaseContext.h"
+#include "spinbasecontext.h"
 
 namespace spin
 {

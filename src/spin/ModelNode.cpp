@@ -59,16 +59,16 @@
 #include <osg/BoundingBox>
 #include <osg/ImageStream>
 
-#include "ModelNode.h"
-#include "osgUtil.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "nodeVisitors.h"
+#include "modelnode.h"
+#include "osgutil.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "nodevisitors.h"
 
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "SharedVideoTexture.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "sharedvideotexture.h"
 
 extern pthread_mutex_t sceneMutex;
 

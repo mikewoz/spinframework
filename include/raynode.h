@@ -44,7 +44,7 @@
 
 #include <osg/Geode>
 
-#include "GroupNode.h"
+#include "groupnode.h"
 namespace spin
 {
 

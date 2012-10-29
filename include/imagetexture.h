@@ -52,7 +52,7 @@ namespace osg {
 #include <lo/lo_types.h>
 #include <vector>
 #include <osg/ref_ptr>
-#include "Shader.h"
+#include "shader.h"
 
 namespace spin
 {

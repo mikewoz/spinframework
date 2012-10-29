@@ -48,7 +48,7 @@
 #include <osgSim/LightPointNode>
 #include <osg/Timer>
 
-#include "GroupNode.h"
+#include "groupnode.h"
 #include "config.h"
 
 #ifdef WITH_PCL

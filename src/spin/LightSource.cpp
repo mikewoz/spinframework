@@ -39,14 +39,15 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "LightSource.h"
-#include <osg/LightSource>
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
 
 #include <string>
 #include <iostream>
+#include <osg/LightSource>
+
+#include "lightsource.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 namespace spin
 {

@@ -43,8 +43,8 @@
 #define __Menu3D_H
 
 #include <osg/Switch>
-#include "GroupNode.h"
-#include "TextNode.h"
+#include "groupnode.h"
+#include "textnode.h"
 
 namespace spin
 {

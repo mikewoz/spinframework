@@ -39,11 +39,11 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "Menu3D.h"
-#include "spinApp.h"
-#include "osgUtil.h"
-#include "spinBaseContext.h"
-#include "SceneManager.h"
+#include "menu3d.h"
+#include "spinapp.h"
+#include "osgutil.h"
+#include "spinbasecontext.h"
+#include "scenemanager.h"
 
 extern pthread_mutex_t sceneMutex;
 

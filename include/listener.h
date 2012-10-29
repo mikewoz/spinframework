@@ -42,7 +42,7 @@
 #ifndef __Listener_H
 #define __Listener_H
 
-#include "DSPNode.h"
+#include "dspnode.h"
 
 namespace spatosc
 {

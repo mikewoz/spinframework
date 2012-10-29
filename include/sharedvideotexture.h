@@ -45,7 +45,7 @@
 #include "config.h"
 #include <osg/Timer>
 
-#include "Shader.h"
+#include "shader.h"
 
 #ifdef WITH_SHARED_VIDEO 
 #include <shmdata/osg-reader.h>

@@ -56,7 +56,7 @@
 #include <lo/lo_types.h>
 #include <osg/ref_ptr>
 
-#include "spinUtil.h"
+#include "spinutil.h"
 
 namespace spatosc
 {

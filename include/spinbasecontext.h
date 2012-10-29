@@ -45,7 +45,7 @@
 #include <vector>
 #include <string>
 #include <lo/lo_types.h>
-#include "EventTypes.h"
+#include "eventtypes.h"
 #include <osg/ArgumentParser>
 
 namespace spin

@@ -42,7 +42,7 @@
 #ifndef __SoundNode_H
 #define __SoundNode_H
 
-#include "DSPNode.h"
+#include "dspnode.h"
 
 namespace spatosc
 {

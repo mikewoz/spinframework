@@ -48,7 +48,7 @@
 #include <osg/MatrixTransform>
 #include <osg/ShapeDrawable>
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 #include "libfreenect.hpp"
 

@@ -42,7 +42,7 @@
 #ifndef __LODNode_H
 #define __LODNode_H
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 #include <osg/LOD>
 

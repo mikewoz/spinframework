@@ -52,10 +52,10 @@
 #include <cppintrospection/Value>
 
 #include "config.h"
-#include "ReferencedNode.h"
-#include "ReferencedStateSet.h"
+#include "referencednode.h"
+#include "referencedstateset.h"
 
-#include "UserNode.h"
+#include "usernode.h"
 
 #include "lo/lo.h"
 #include "tinyxml.h"

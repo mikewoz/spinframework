@@ -42,8 +42,8 @@
 #ifndef __ReferencedStateSet_H
 #define __ReferencedStateSet_H
 
-#include "spinUtil.h"
-#include "libloUtil.h"
+#include "spinutil.h"
+#include "libloutil.h"
 
 #ifndef GL_GLEXT_LEGACY
 #define GL_GLEXT_LEGACY // To avoid glext error

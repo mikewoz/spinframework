@@ -44,7 +44,7 @@
 #define __ConstraintsNode_H
 
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 #include <vector>
 

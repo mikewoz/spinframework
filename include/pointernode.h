@@ -46,7 +46,7 @@
 #include <osgManipulator/Dragger> // for PointerInf
 #include <osgManipulator/Selection> // for Selection (typedef)
 #include <osgUtil/LineSegmentIntersector>
-#include "RayNode.h"
+#include "raynode.h"
 
 
 namespace osgGA {

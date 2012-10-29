@@ -43,8 +43,8 @@
 #ifndef __GroupNode_H
 #define __GroupNode_H
 
-#include "spinUtil.h"
-#include "ReferencedNode.h"
+#include "spinutil.h"
+#include "referencednode.h"
 
 #include <osg/Group>
 #include <osg/PositionAttitudeTransform>

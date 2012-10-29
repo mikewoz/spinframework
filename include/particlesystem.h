@@ -42,8 +42,8 @@
 #ifndef ParticleSystem_H_
 #define ParticleSystem_H_
 
-#include "ParticleSystemUtil.h"
-#include "ConstraintsNode.h"
+#include "particlesystemutil.h"
+#include "constraintsnode.h"
 
 namespace spin
 {

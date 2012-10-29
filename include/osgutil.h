@@ -62,7 +62,7 @@
 #endif
 
 
-#include "ReferencedNode.h"
+#include "referencednode.h"
 
 
 namespace spin

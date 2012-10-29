@@ -46,7 +46,7 @@
 #include <osgUtil/IntersectVisitor>
 #endif
 
-#include "DSPNode.h"
+#include "dspnode.h"
 
 namespace spin
 {

@@ -45,7 +45,7 @@
 #include <string>
 #include <osgUtil/Optimizer>
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 namespace spin
 {

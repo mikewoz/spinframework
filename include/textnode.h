@@ -42,7 +42,7 @@
 #ifndef _TextNode_H
 #define _TextNode_H
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 #include <osgText/Text>
 #include <osgText/Text3D>

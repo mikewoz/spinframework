@@ -46,8 +46,8 @@
 #include <string>
 
 #include "config.h"
-#include "spinUtil.h"
-#include "libloUtil.h"
+#include "spinutil.h"
+#include "libloutil.h"
 
 #include <osg/Referenced>
 #ifndef GL_GLEXT_LEGACY

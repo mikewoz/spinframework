@@ -40,24 +40,24 @@
 // -----------------------------------------------------------------------------
 
 
-#include "SceneManager.h"
-#include "DSPNode.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "ReferencedNode.h"
-#include "spinUtil.h"
-#include "osgUtil.h"
-#include "spinApp.h"
+#include "scenemanager.h"
+#include "dspnode.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "referencednode.h"
+#include "spinutil.h"
+#include "osgutil.h"
+#include "spinapp.h"
 
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "Shader.h"
-#include "ShapeNode.h"
-#include "ModelNode.h"
-#include "SharedVideoTexture.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "shader.h"
+#include "shapenode.h"
+#include "modelnode.h"
+#include "sharedvideotexture.h"
 
-#include "nodeVisitors.h"
-#include "spinLog.h"
+#include "nodevisitors.h"
+#include "spinlog.h"
 
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
@@ -103,8 +103,8 @@ extern pthread_mutex_t sceneMutex;
 
 #ifdef WITH_BULLET
 #include <btBulletDynamicsCommon.h>
-#include "bulletUtil.h"
-#include "CollisionShape.h"
+#include "bulletutil.h"
+#include "collisionshape.h"
 
 extern ContactAddedCallback gContactAddedCallback;
 

@@ -47,7 +47,7 @@ namespace osg {
     class PositionAttitudeTransform;
 }
 
-#include "ReferencedNode.h"
+#include "referencednode.h"
 //#include "GroupNode.h"
 
 namespace spin

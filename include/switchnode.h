@@ -42,7 +42,7 @@
 #ifndef SwitchNode_H_
 #define SwitchNode_H_
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 namespace osg {
     class Switch;

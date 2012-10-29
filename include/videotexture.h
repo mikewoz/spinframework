@@ -42,7 +42,7 @@
 #ifndef __VideoTexture_H
 #define __VideoTexture_H
 
-#include "Shader.h"
+#include "shader.h"
 
 namespace osg {
     class ImageStream;

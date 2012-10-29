@@ -42,7 +42,7 @@
 #ifndef __AnimationNode_H
 #define __AnimationNode_H
 
-#include "ConstraintsNode.h"
+#include "constraintsnode.h"
 
 #include <osg/AnimationPath>
 

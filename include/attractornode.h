@@ -43,7 +43,7 @@
 #ifndef __AttractorNode_H
 #define __AttractorNode_H
 
-#include "GroupNode.h"
+#include "groupnode.h"
 
 namespace spin
 {

@@ -44,8 +44,8 @@
 
 #include <vector>
 #include <lo/lo_types.h>
-#include "GroupNode.h"
-#include "osgUtil.h"
+#include "groupnode.h"
+#include "osgutil.h"
 
 
 namespace osg {

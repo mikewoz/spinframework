@@ -42,7 +42,7 @@
 #ifndef ReporterNode_H_
 #define ReporterNode_H_
 
-#include "GroupNode.h"
+#include "groupnode.h"
 #include <osg/Timer>
 
 namespace spin

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <lo/lo.h>
-#include "EventTypes.h"
+#include "eventtypes.h"
 
 namespace spin
 {

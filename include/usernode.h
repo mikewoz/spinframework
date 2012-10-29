@@ -43,7 +43,7 @@
 #define __UserNode_H
 
 
-#include "ConstraintsNode.h"
+#include "constraintsnode.h"
 
 #include <osg/Timer>
 

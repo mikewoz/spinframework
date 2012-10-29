@@ -49,10 +49,10 @@
 #include <osg/Timer>
 
 
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinServerContext.h"
-#include "spinLog.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinservercontext.h"
+#include "spinlog.h"
 #include "config.h"
 
 #ifdef WITH_POCO

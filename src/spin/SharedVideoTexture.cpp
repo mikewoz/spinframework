@@ -45,10 +45,10 @@
 #include <osg/Image>
 
 #include <iostream>
-#include "SharedVideoTexture.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "sharedvideotexture.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 using namespace std;
 
