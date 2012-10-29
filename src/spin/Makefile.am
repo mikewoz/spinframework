@@ -20,7 +20,7 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libspinframework-@SPIN_API_VERSION@.la
 
 if HAVE_PYTHON
-python_LTLIBRARIES = libSPINPyWrap.la
+python_LTLIBRARIES = spinframework.la
 endif
 
 libspinframework_@SPIN_API_VERSION@_la_LIBADD = \
@@ -174,12 +174,14 @@ libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
 # $(top_srcdir)/include/videoSize.h
 
 if HAVE_PYTHON
-libSPINPyWrap_la_SOURCES = python_wrappers.cpp
-#libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libspinframework-@SPIN_API_VERSION@.la \
+spinframework_la_LDFLAGS = -module
+spinframework_la_SOURCES = python_wrappers.cpp
+#spinframework_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
+spinframework_la_LIBADD = libspinframework-@SPIN_API_VERSION@.la \
 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
-libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+
+spinframeworkdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
 
 # On OSX, we need the python module to have a .so extension, but the -shrext option
@@ -188,7 +190,7 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 # do this only for OSX?
 if HAVE_OSX
 install-exec-hook:
-	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+	cd $(spinframeworkdir) && $(LN_S) -f spinframework.dylib spinframework.so
 endif
 
 # #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)

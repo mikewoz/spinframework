@@ -281,7 +281,7 @@ bool spinApp::initPython()
         //exec("print sys.path", _pyNamespace, _pyNamespace);
 
         //exec("import spin", _pyNamespace, _pyNamespace);
-        exec("import libSPINPyWrap", _pyNamespace, _pyNamespace);
+        exec("import spinframework", _pyNamespace, _pyNamespace);
 
     } catch (boost::python::error_already_set const & ) {
         std::cout << "sc: Python error: " << std::endl;
