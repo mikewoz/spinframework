@@ -384,7 +384,7 @@ double time_n()
 /**
  * Please document this.
  */
-BOOST_PYTHON_MODULE(libSPINPyWrap)
+BOOST_PYTHON_MODULE(spinframework)
 {
     def("callback", &SceneManagerCallback_script);
     def("time_s", &time_s);
