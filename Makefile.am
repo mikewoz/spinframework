@@ -36,5 +36,5 @@ htmldoc:
 # pkg-config file:
 DISTCLEANFILES = spin.pc
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = spin-@SPIN_API_VERSION@.pc
+pkgconfig_DATA = spinframework-@SPIN_API_VERSION@.pc
 

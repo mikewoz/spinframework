@@ -1,4 +1,4 @@
-#include "nodeVisitors.h"
+#include "nodevisitors.h"
 
 #include <osg/NodeVisitor>
 #include <osg/Node>
@@ -10,7 +10,7 @@
 #include <osg/TextureRectangle>
 #include <osg/Switch>
 #include <osg/Sequence>
-#include "ReferencedNode.h"
+#include "referencednode.h"
 
 #include <iostream>
 

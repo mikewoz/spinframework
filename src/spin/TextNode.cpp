@@ -45,11 +45,11 @@
 #include <osg/Version>
 #include <lo/lo_types.h>
 
-#include "osgUtil.h"
-#include "TextNode.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "osgutil.h"
+#include "textnode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 extern pthread_mutex_t sceneMutex;
 

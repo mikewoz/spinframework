@@ -3,7 +3,7 @@ import os.path
 import imp
 import traceback
 import sys
-import libSPINPyWrap
+import spinframework
 
 ##########################################################################################
 
@@ -18,7 +18,7 @@ class ScriptBase:
         print "Node ", self._nodeID, ": script destroyed"
 
     def applyEvent(self, eventMethod, eventArgs, cascade):
-        libSPINPyWrap.callback( self._nodeID, eventMethod, eventArgs, cascade)
+        spinframework.callback( self._nodeID, eventMethod, eventArgs, cascade)
 
   
 

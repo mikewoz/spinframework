@@ -50,7 +50,7 @@ spineditor_LDFLAGS = \
     -l$(BOOST_PYTHON_LIB) \
     $(WX_LIBS)
 
-spineditor_LDADD = ../spin/libSPIN.la
+spineditor_LDADD = ../spin/libspinframework.la
 
 endif
 

@@ -49,11 +49,11 @@
 #include <osgSim/LightPointNode>
 
 
-#include "KinectCloud.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
+#include "kinectcloud.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
 
 //volatile int die = 0;
 

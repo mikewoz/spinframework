@@ -42,12 +42,12 @@
 #include <string>
 #include <iostream>
 
-#include "pocoUtil.h"
+#include "pocoutil.h"
 
 #ifdef WITH_POCO
 
-#include "spinApp.h"
-#include "SceneManager.h"
+#include "spinapp.h"
+#include "scenemanager.h"
 
 
 namespace spin

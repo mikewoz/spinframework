@@ -39,7 +39,6 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "SwitchNode.h"
 #include <osg/ShapeDrawable>
 #include <osgUtil/Optimizer>
 #include <osg/Geometry>
@@ -47,12 +46,13 @@
 #include <osg/Switch>
 #include <lo/lo_types.h>
 
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
-#include "ReporterNode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
+#include "reporternode.h"
 
+#include "switchnode.h"
 //extern SceneManager *sceneManager;
 
 namespace spin
