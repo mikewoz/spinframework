@@ -62,6 +62,12 @@ void indent()
     printf( "%*s", g_tab, " " );
 }
 
+double logb( double b, double x )
+{
+    return log(x)/log(b);
+}
+
+
 typedef std::vector< osg::ref_ptr<osg::StateSet> > StateSetList;
 
 /*******************************************************************************/
@@ -90,7 +96,10 @@ bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
     std::string prefix = osgDB::getNameLessExtension( osgDB::getSimpleFileName(img->getFileName()) );
     //prefix = "balls";
     // prefix = g_outputDir + prefix;
-    osg::Image* tmp = new osg::Image( *img );
+    //osg::Image* tmp = new osg::Image( *img );
+
+    osg::ref_ptr<osg::Image> tmp = new osg::Image( *img );
+
     indent(); printf("ensureValidSizeForTexturing...\n");
     tmp->ensureValidSizeForTexturing( 4096 );
     indent(); printf("ensureValidSizeForTexturing... done\n");
@@ -99,20 +108,95 @@ bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
 
     tmp->setFileName( prefix + boost::lexical_cast<std::string>(s) + "x" + boost::lexical_cast<std::string>(t) + ext );
     osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
-    imgLOD.push_front( tmp );
 
-    //indent(); printf("img is now %i x %i\n", s, t );
+#ifdef DEBUG_VIEW
+    //f ( tmp->r() == 1 ) {
+    bool grayscale = false;
+    if ( osg::Image::computeNumComponents(tmp->getPixelFormat()) == 1 ) {
+        indent(); printf("grayscale!\n");
+        grayscale = true;
+    }
+    int nblod = logb( 2, MAX(s, t) ) - 2;
+    indent(); printf( "nblod = %i\n", nblod);
+    int blood = nblod;
+#endif
+
+
+
+    osg::Image* dummy = new osg::Image();
+    dummy->setImage( tmp->s(), tmp->t(), tmp->r(),
+                     tmp->getInternalTextureFormat(),
+                     tmp->getPixelFormat(), tmp->getDataType(),
+                     0, tmp->getAllocationMode() );
+    dummy->setFileName( tmp->getFileName() );
+    imgLOD.push_front( dummy );
+    indent(); printf("tmp   is %i x %i\n", tmp->s(), tmp->t() );
+    indent(); printf("dummy is %i x %i\n", dummy->s(), dummy->t() );
+
+#ifdef DEBUG_VIEW
+    tmp.release();
+#endif
+    //imgLOD.push_front( tmp );
+
+
+
 
     while ( s > 2 && t > 2 ) {
         s /= 2;
         t /= 2;
-        //indent(); printf("new lod image %i x %i\n", s, t );
+
+#ifdef DEBUG_VIEW
+        indent(); printf("NEW! lod image %i x %i\n", s, t );
         tmp = new osg::Image( *img );
+#endif
+
         tmp->scaleImage( s, t, tmp->r() );
         tmp->setFileName( prefix + boost::lexical_cast<std::string>(s) + "x" + boost::lexical_cast<std::string>(t) + ext );
 
+#ifdef DEBUG_VIEW
+        if ( !grayscale ) {
+            if ( nblod ) {
+
+                double w = (double)nblod / (double)blood;
+                indent(); printf("make it %f blue green!\n", w );
+                for ( int i = 0; i < tmp->s(); i++ ) {
+                    for ( int j = 0; j < tmp->t(); j++ ) {
+                        //tmp->data(i,j)[0] = 0;
+                        tmp->data(i,j)[1] = (unsigned char)( (1.0-w)*255.0 + w*tmp->data(i,j)[1] );
+                        tmp->data(i,j)[2] = (unsigned char)( w*255.0 + (1.0-w)*tmp->data(i,j)[2] );
+                    }
+                }
+
+            } else {
+                indent(); printf("make it red!\n" );
+                for ( int i = 0; i < tmp->s(); i++ ) {
+                    for ( int j = 0; j < tmp->t(); j++ ) {
+                        tmp->data(i,j)[0] = 255;
+                        //tmp->data(i,j)[1] = 0;
+                        //tmp->data(i,j)[2] = 0;
+                    }
+                }
+            }
+        }
+        nblod--;
+#endif
+
         osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
-        imgLOD.push_front( tmp );
+        dummy = new osg::Image();
+        dummy->setImage( tmp->s(), tmp->t(), tmp->r(),
+                         tmp->getInternalTextureFormat(),
+                         tmp->getPixelFormat(), tmp->getDataType(),
+                         0, tmp->getAllocationMode() );
+        dummy->setFileName( tmp->getFileName() );
+        imgLOD.push_front( dummy );
+        indent(); printf("tmp   is %i x %i\n", tmp->s(), tmp->t() );
+        indent(); printf("dummy is %i x %i\n", dummy->s(), dummy->t() );
+#ifdef DEBUG_VIEW
+        tmp.release();
+#endif
+        //tmp.release();
+        // imgLOD.push_front( tmp );
+        printf("\n");
     }
 
     if ( image != img.get() ) {
@@ -122,66 +206,14 @@ bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
         indent(); printf( "freeing temp image... done\n" );
     }
 
-
-#ifdef DEBUG_VIEW
-    //f ( tmp->r() == 1 ) {
-    if ( osg::Image::computeNumComponents(tmp->getPixelFormat()) == 1 ) {
-        indent(); printf("grayscale!\n");
-        return true;
-    }
-
-    for ( int i = 0; i < tmp->s(); i++ ) {
-        for ( int j = 0; j < tmp->t(); j++ ) {
-            tmp->data(i,j)[0] = 255;
-            //tmp->data(i,j)[1] = 0;
-            //tmp->data(i,j)[2] = 0;
-        }
-    }
-    osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
-
-    int asdf = 0;
-    double w;
-    for ( size_t q = 1; q < imgLOD.size()-1; q++) {
-
-        tmp = imgLOD[q];
-        w = (double) (q-1) / (double) (imgLOD.size()-1);
-
-        for ( int i = 0; i < tmp->s(); i++ ) {
-                for ( int j = 0; j < tmp->t(); j++ ) {
-                    //tmp->data(i,j)[0] = 0;
-                    tmp->data(i,j)[1] = (unsigned char)( (1.0-w)*255.0 + w*tmp->data(i,j)[1] );
-                    tmp->data(i,j)[2] = (unsigned char)( w*255.0 + (1.0-w)*tmp->data(i,j)[2] );
-                }
-            }
-
-        /*if ( asdf % 2) {
-
-            for ( int i = 0; i < tmp->s(); i++ ) {
-                for ( int j = 0; j < tmp->t(); j++ ) {
-                    //tmp->data(i,j)[0] = 0;
-                    //tmp->data(i,j)[1] = 0;
-                    tmp->data(i,j)[2] = 255;
-                }
-            }
-        } else {
-            for ( int i = 0; i < tmp->s(); i++ ) {
-                for ( int j = 0; j < tmp->t(); j++ ) {
-                    //tmp->data(i,j)[0] = 0;
-                    tmp->data(i,j)[1] = 255;
-                    //tmp->data(i,j)[2] = 0;
-                }
-            }
-            }*/
-        osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
-        asdf++;
-    }
+#ifndef DEBUG_VIEW
+    tmp.release();
 #endif // DEBUG_VIEW
 
 
     indent(); printf("image lodifying done\n");
     return true;
 }
-
 
 /*******************************************************************************/
 
@@ -325,7 +357,7 @@ public:
 
         if ( foundLOD ) {
 
-#ifdef DEBUG_VIEW
+#ifdef DEBUG_VIEW_SPHERES
             osg::ShapeDrawable* sd = new osg::ShapeDrawable( new osg::Sphere( bs.center(), bs.radius() ) );
             sd->setColor( osg::Vec4(1, 0, 1, 0.3) );
             osg::Geode* sg = new osg::Geode();
@@ -488,9 +520,12 @@ public:
             plod->addChild( geoLOD[i], minSize * f, maxSize * f,
                             "geode_" + boost::lexical_cast<std::string>(_nbPlods) +
                             "_" + boost::lexical_cast<std::string>(i) + g_extension );
+
+            indent(); printf( "GEODE: added LOD range %f to %f\n", minSize * f, maxSize * f );
+            fflush(stdout);
             osgDB::writeNodeFile( *plod->getChild(i), g_outputDir + plod->getFileName(i) );
             //indent(); printf( "GEODE: added LOD range %f to %f\n", minSize * g_lodScale, maxSize * g_lodScale );
-            indent(); printf( "GEODE: added LOD range %f to %f\n", minSize * f, maxSize * f );
+
             minSize = maxSize;
             maxSize = cutoff + incr*pow(2,i);
 
