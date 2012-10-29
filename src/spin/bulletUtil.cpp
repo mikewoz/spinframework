@@ -4,7 +4,7 @@
 #include <osg/Matrix>
 #include <LinearMath/btTransform.h>
 
-#include "bulletUtil.h"
+#include "bulletutil.h"
 
 //using namespace spin;
 

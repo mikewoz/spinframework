@@ -52,16 +52,16 @@
 #include <osgManipulator/Translate1DDragger>
 #include <osgManipulator/Translate2DDragger>
 //#include <osgManipulator/TranslateAxisDragger>
-#include "DraggerWith3Axes.h"
-#include "DraggerTrackball.h"
+#include "draggerwith3axes.h"
+#include "draggertrackball.h"
 
-#include "GroupNode.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
-#include "UserNode.h"
-#include "spinApp.h"
+#include "groupnode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
+#include "usernode.h"
+#include "spinapp.h"
 
 extern pthread_mutex_t sceneMutex;
 

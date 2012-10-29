@@ -39,11 +39,11 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "AttractorNode.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "SceneManager.h"
-#include "osgUtil.h"
+#include "attractornode.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "scenemanager.h"
+#include "osgutil.h"
 
 using namespace std;
 

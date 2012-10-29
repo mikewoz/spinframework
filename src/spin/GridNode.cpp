@@ -44,11 +44,11 @@
 #include <osg/Geometry>
 #include <osgUtil/SmoothingVisitor>
 
-#include "GridNode.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
+#include "gridnode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
 
 extern pthread_mutex_t sceneMutex;
 

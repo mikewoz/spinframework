@@ -39,9 +39,9 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "LODNode.h"
-#include "spinApp.h"
-#include "SceneManager.h"
+#include "lodnode.h"
+#include "spinapp.h"
+#include "scenemanager.h"
 
 namespace spin
 {

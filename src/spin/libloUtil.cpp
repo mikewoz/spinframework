@@ -39,7 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "libloUtil.h"
+#include "libloutil.h"
 #include <string.h>
 #include <string>
 

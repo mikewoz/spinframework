@@ -12,7 +12,7 @@
 */
 //osgManipulator - Copyright (C) 2007 Fugro-Jason B.V.
 
-#include "DraggerWith3Axes.h"
+#include "draggerwith3axes.h"
 
 #include <osg/ShapeDrawable>
 #include <osg/Geometry>

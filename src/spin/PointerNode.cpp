@@ -39,8 +39,6 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "PointerNode.h"
-
 #include <osgManipulator/CommandManager>
 #include <osgManipulator/TabBoxDragger>
 #include <osgManipulator/TabPlaneDragger>
@@ -51,13 +49,14 @@
 #include <osgManipulator/TranslateAxisDragger>
 #include <osgUtil/IntersectionVisitor>
 
-#include "RayNode.h"
-#include "GroupNode.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
-#include "spinUtil.h"
+#include "raynode.h"
+#include "groupnode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
+#include "spinutil.h"
+#include "pointernode.h"
 
 extern pthread_mutex_t sceneMutex;
 

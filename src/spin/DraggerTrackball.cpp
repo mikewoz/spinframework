@@ -12,7 +12,7 @@
 */
 //osgManipulator - Copyright (C) 2007 Fugro-Jason B.V.
 
-#include "DraggerTrackball.h"
+#include "draggertrackball.h"
 #include <osgManipulator/AntiSquish>
 
 #include <osg/ShapeDrawable>

@@ -59,14 +59,14 @@
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
-#include "spinApp.h"
-#include "spinDefaults.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "spinUtil.h"
-#include "spinLog.h"
-#include "nodeVisitors.h"
+#include "spinapp.h"
+#include "spindefaults.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "spinutil.h"
+#include "spinlog.h"
+#include "nodevisitors.h"
 
 #ifdef WITH_SPATOSC
 #include <spatosc/scene.h>

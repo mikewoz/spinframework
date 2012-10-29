@@ -42,15 +42,15 @@
 #include <string>
 #include <iostream>
 
-#include "spinApp.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "spinLog.h"
-#include "nodeVisitors.h"
-#include "spinDefaults.h"
+#include "spinapp.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "spinlog.h"
+#include "nodevisitors.h"
+#include "spindefaults.h"
 
 #ifdef WITH_POCO
-#include "pocoUtil.h"
+#include "pocoutil.h"
 #endif
 
 extern pthread_mutex_t sceneMutex;
