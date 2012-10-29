@@ -8,11 +8,10 @@ AM_CPPFLAGS = \
     $(SHAREDVIDEO_CFLAGS) \
     $(SPATOSC_CFLAGS) \
     $(BULLET_CFLAGS) \
+    $(TINYXML_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src \
-    -I$(top_srcdir)/src/tinyxml \
     -I$(top_srcdir)/src/osgPPU
-
 
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
@@ -25,8 +24,7 @@ endif
 
 libspinframework_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
-    $(top_builddir)/src/osgPPU/libosgPPU.la \
-    $(top_builddir)/src/tinyxml/libtinyxml.la
+    $(top_builddir)/src/osgPPU/libosgPPU.la
 
 libspinframework_@SPIN_API_VERSION@_la_LDFLAGS = \
     -export-dynamic \
@@ -44,9 +42,8 @@ libspinframework_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(SHAREDVIDEO_LIBS) \
     $(SPATOSC_LIBS) \
     $(SPNAV_LIBS) \
+    $(TINYXML_LIBS) \
     $(POCO_LIBS)
-    
-#	$(BOOST_THREAD_LIBS) 
 
 # please keep those in alphabetical order:
 # Warning: bullet-specific files are not listed here!
@@ -167,11 +164,7 @@ libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/spinwx.h \
     $(top_srcdir)/include/ssaoppu.h \
     $(top_srcdir)/include/util.h \
-    $(top_srcdir)/include/videosize.h \
-    $(top_srcdir)/src/tinyxml/tinystr.h \
-    $(top_srcdir)/src/tinyxml/tinyxml.h
-
-# $(top_srcdir)/include/videoSize.h
+    $(top_srcdir)/include/videosize.h
 
 if HAVE_PYTHON
 spinframework_la_LDFLAGS = -module
@@ -223,13 +216,13 @@ endif
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
+spinserver_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS) $(TINYXML_LIBS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(SPNAV_LIBS)
+spinviewer_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(SPNAV_LIBS) $(TINYXML_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
+spindocgenerator_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS) $(TINYXML_LIBS)
 
 ###############################################################################
 # CUSTOM targets:
