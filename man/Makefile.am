@@ -1,4 +1,4 @@
-man_MANS = spinserver.1 spinviewer.1 
+man_MANS = spinserver.1 spinviewer.1 spindocgenerator.1
 MAN_TEXT_FILES = man-spinserver.txt man-spinviewer.txt
 
 EXTRA_DIST = \
