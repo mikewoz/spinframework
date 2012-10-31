@@ -618,18 +618,26 @@ int main( int argc, char **argv )
 
     // set up the usage document, in case we need to print out how to use this program.
     arguments.getApplicationUsage()->setApplicationName(arguments.getApplicationName());
-    arguments.getApplicationUsage()->setDescription(arguments.getApplicationName()+" creates a hierarchy of files for paging which can be later loaded by viewers.");
-    arguments.getApplicationUsage()->setCommandLineUsage(arguments.getApplicationName()+" [options] filename ...");
+    arguments.getApplicationUsage()->setDescription("lodifier takes one or more 3D model files and outputs a paged level-of-detail version fo the input scene.  The resulting scene is a proxy node named via the -o option, with the rest of the scenes resources located in <outpout file name w/o extension>_data/.  The format of the output scene is determined by the extension of the output file name.");
+    arguments.getApplicationUsage()->setCommandLineUsage( arguments.getApplicationName()+ std::string(" [options] filename(s)") ); //\n") + arguments.getApplicationUsage()->getDescription());
+
     arguments.getApplicationUsage()->addCommandLineOption("-h or --help","Display this information");
-    arguments.getApplicationUsage()->addCommandLineOption("-s","set the LOD Scale factor.  should be the intended display resolution");
-    arguments.getApplicationUsage()->addCommandLineOption("-r","scene bounding sphere radius [optional]");
-    arguments.getApplicationUsage()->addCommandLineOption("-i","set the input file");
-    arguments.getApplicationUsage()->addCommandLineOption("-o","set the output file (defaults to output.ive)");
-    arguments.getApplicationUsage()->addCommandLineOption("--makeAllChildrenPaged","Force all children of LOD to be written out as external PagedLOD children");
+    arguments.getApplicationUsage()->addCommandLineOption("-s <num>","set the LOD Scale factor.  Should be the intended display resolution.");
+    arguments.getApplicationUsage()->addCommandLineOption("-r <num>","input scene bounding sphere radius [optional]");
+    //arguments.getApplicationUsage()->addCommandLineOption("-i","input file name");
+    arguments.getApplicationUsage()->addCommandLineOption("-o <filename>","output file name (defaults to output.osgt)");
+    arguments.getApplicationUsage()->addCommandLineOption("-d","display result after processing");
+    arguments.getApplicationUsage()->addCommandLineOption("--version","displays version information");
 
     // if user request help write it out to cout.
     if (arguments.read("-h") || arguments.read("--help")) {
+        std::cout << arguments.getApplicationUsage()->getDescription() << std::endl;
         arguments.getApplicationUsage()->write(std::cout);
+        return 1;
+    }
+
+    if (arguments.read("--version")) {
+        printf("SPIN Framework lodifier version 0.4\n");
         return 1;
     }
 
@@ -638,7 +646,7 @@ int main( int argc, char **argv )
     bool display = false;
     while (arguments.read("-s",g_lodScale)) {}
     while (arguments.read("-r",g_sceneRadius)) {}
-    while (arguments.read("-i",inputFile)) {}
+    //while (arguments.read("-i",inputFile)) {}
     while (arguments.read("-o",outputFile)) {}
     while (arguments.read("-d")) { display = true;}
 
