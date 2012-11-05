@@ -612,19 +612,17 @@ public:
 
 int main( int argc, char **argv )
 {
-
     // use an ArgumentParser object to manage the program arguments.
     osg::ArgumentParser arguments(&argc,argv);
 
     // set up the usage document, in case we need to print out how to use this program.
     arguments.getApplicationUsage()->setApplicationName(arguments.getApplicationName());
-    arguments.getApplicationUsage()->setDescription("lodifier takes one or more 3D model files and outputs a paged level-of-detail version fo the input scene.  The resulting scene is a proxy node named via the -o option, with the rest of the scenes resources located in <outpout file name w/o extension>_data/.  The format of the output scene is determined by the extension of the output file name.");
+    arguments.getApplicationUsage()->setDescription("lodifier takes one or more 3D model files and outputs a paged level-of-detail version fo the input scene.  The resulting scene is a proxy node named via the -o option, with the rest of the scenes resources located in <output file name w/o extension>_data/.  The format of the output scene is determined by the extension of the output file name.");
     arguments.getApplicationUsage()->setCommandLineUsage( arguments.getApplicationName()+ std::string(" [options] filename(s)") ); //\n") + arguments.getApplicationUsage()->getDescription());
 
     arguments.getApplicationUsage()->addCommandLineOption("-h or --help","Display this information");
     arguments.getApplicationUsage()->addCommandLineOption("-s <num>","set the LOD Scale factor.  Should be the intended display resolution.");
     arguments.getApplicationUsage()->addCommandLineOption("-r <num>","input scene bounding sphere radius [optional]");
-    //arguments.getApplicationUsage()->addCommandLineOption("-i","input file name");
     arguments.getApplicationUsage()->addCommandLineOption("-o <filename>","output file name (defaults to output.osgt)");
     arguments.getApplicationUsage()->addCommandLineOption("-d","display result after processing");
     arguments.getApplicationUsage()->addCommandLineOption("--version","displays version information");
@@ -641,16 +639,13 @@ int main( int argc, char **argv )
         return 1;
     }
 
-    std::string inputFile = "";
     std::string outputFile = "";
     bool display = false;
+
     while (arguments.read("-s",g_lodScale)) {}
     while (arguments.read("-r",g_sceneRadius)) {}
-    //while (arguments.read("-i",inputFile)) {}
     while (arguments.read("-o",outputFile)) {}
     while (arguments.read("-d")) { display = true;}
-
-
 
     if ( outputFile.empty() ) outputFile = "output.osgt";
     std::string outbase( osgDB::getNameLessExtension(outputFile) );
