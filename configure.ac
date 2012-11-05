@@ -169,8 +169,13 @@ AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
+case "$host" in *-darwin* | *-macos*)
+TINYXML_LIBS=-ltinyxml
+;;
+*)
 PKG_CHECK_MODULES(TINYXML, tinyxml >= 2.0.0, [], AC_MSG_ERROR(TinyXML 2.0.0 or greater is required. Please see INSTALL))
-AC_SUBST([TINYXML_CFLAGS])
+;;
+esac
 AC_SUBST([TINYXML_LIBS])
 
 # Method to disable Python (note the negative: DISable)
