@@ -57,6 +57,11 @@ namespace osg {
     class Geode;
     class MatrixTransform;
 }
+namespace osgAnimation
+{
+    class AnimationManagerBase;
+    class BasicAnimationManager;
+}
 
 namespace spin
 {
@@ -191,6 +196,15 @@ class TextureStateSetFinder : public osg::NodeVisitor
 
     protected:
         TextureStateSetFinder& operator = (const TextureStateSetFinder&);
+};
+
+
+class AnimationManagerFinder : public osg::NodeVisitor
+{
+public:
+    osgAnimation::BasicAnimationManager* _am;
+    AnimationManagerFinder() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) { _am = 0; }
+    virtual void apply(osg::Node& node);
 };
 
 } // end of namespace spin

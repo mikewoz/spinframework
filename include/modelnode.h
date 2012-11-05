@@ -44,6 +44,7 @@
 
 #include <string>
 #include <osgUtil/Optimizer>
+#include <osgAnimation/BasicAnimationManager>
 
 #include "groupnode.h"
 
@@ -227,6 +228,9 @@ private:
     animationModeType animationMode[MODELNODE_NUM_ANIM_CONTROLS]; // type of animation (switch vs. sequence vs. ??)
     osg::ref_ptr<osg::Switch> switcher[MODELNODE_NUM_ANIM_CONTROLS];
     osg::ref_ptr<osg::Sequence> sequencer[MODELNODE_NUM_ANIM_CONTROLS];
+
+    // animation manager from osgAnimation nodekit:
+    osg::ref_ptr<osgAnimation::BasicAnimationManager> animationManager;
 
     osgUtil::Optimizer optimizer;
 

@@ -10,6 +10,8 @@
 #include <osg/TextureRectangle>
 #include <osg/Switch>
 #include <osg/Sequence>
+#include <osgAnimation/AnimationManagerBase>
+#include <osgAnimation/BasicAnimationManager>
 #include "referencednode.h"
 
 #include <iostream>
@@ -256,6 +258,21 @@ void TextureStateSetFinder::apply(osg::StateSet* stateset)
 }
         
 TextureStateSetFinder& TextureStateSetFinder::operator= (const TextureStateSetFinder&) { return *this; }
+
+
+void AnimationManagerFinder::apply(osg::Node& node)
+{
+    if (_am)
+        return;
+    if (node.getUpdateCallback()) {
+        osgAnimation::AnimationManagerBase* b = dynamic_cast<osgAnimation::AnimationManagerBase*>(node.getUpdateCallback());
+        if (b) {
+            _am = new osgAnimation::BasicAnimationManager(*b);
+            return;
+        }
+    }
+    traverse(node);
+}
 
 } // end of namespace spin
 
