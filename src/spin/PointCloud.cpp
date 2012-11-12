@@ -114,7 +114,11 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
 	shmReader_ = 0;
 	#endif
     grabber_ = 0;
+    #if PCL_VERSION_HIGHER_THAN_1_6
+    decoder_ = new pcl::io::OctreePointCloudCompression< pcl::PointXYZRGBA >();
+    #else
 	decoder_ = new pcl::octree::PointCloudCompression< pcl::PointXYZRGBA >();
+    #endif
 #endif
     
 }
@@ -653,7 +657,11 @@ void PointCloud::setURI(const char* filename)
             framerate_ = 0;
             success = true;
         }
+        #if PCL_VERSION_HIGHER_THAN_1_6
+        catch (pcl::PCLException e)
+        #else
         catch (pcl::PCLIOException e)
+        #endif
         {
             std::cout << "[PointCloud]: Error connecting to Kinect; perhaps it is already being used? ... " << e.detailedMessage() << std::endl;
         }
@@ -670,7 +678,11 @@ void PointCloud::setURI(const char* filename)
             if (ext=="cpc")
             {
                 std::stringstream compressedData;
+                #if PCL_VERSION_HIGHER_THAN_1_6
+                pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA>();
+                #else
                 pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::octree::PointCloudCompression<pcl::PointXYZRGBA>();
+                #endif
                 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr tmpCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
 
                 std::ifstream readCompressedFile(absPath.c_str());
