@@ -575,6 +575,7 @@ void Shader::loadGLSLShader(std::string path)
     {
         // let's check if the user just passed the base file name (without an extention)
         vertSuccess = loadShaderSource( vertShader, path+".vert" );
+        geomSuccess = loadShaderSource( vertShader, path+".geom" );
         fragSuccess = loadShaderSource( fragShader, path+".frag" );
     }
 
