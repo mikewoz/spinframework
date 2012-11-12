@@ -1,4 +1,4 @@
-shadersdir = $(datadir)/spinFramework/shaders
+shadersdir = $(datadir)/spinframework/shaders
 shaders_DATA = \
 brightpass_fp.glsl \
 bypass_fp.glsl \

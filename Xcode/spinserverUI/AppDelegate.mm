@@ -80,7 +80,7 @@
     
 	// *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     std::vector<char*> newArgs = spin::getUserArgs();
     if (newArgs.size() > 1)
     {

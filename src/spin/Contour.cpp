@@ -43,12 +43,12 @@
 #include <osgUtil/Optimizer>
 #include <osg/ShapeDrawable>
 
-#include "Contour.h"
+#include "contour.h"
 
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
 
 namespace spin
 {

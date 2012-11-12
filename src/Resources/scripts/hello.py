@@ -1,5 +1,5 @@
 import spin
-import libSPINPyWrap
+import spinframework
 import math
 
 __spin_behavior_class__ = "Script"
@@ -21,9 +21,9 @@ class Script( spin.ScriptBase ):
         self.angle += 0.001
         x = self.radius * math.cos(self.angle);
         y = self.radius * math.sin(self.angle);
-        libSPINPyWrap.callback(self._nodeID, "setTranslation", [x, y, 0.0], 0)
+        spinframework.callback(self._nodeID, "setTranslation", [x, y, 0.0], 0)
         
-        ret = libSPINPyWrap.callback(self._nodeID, "getTranslation", [], 0)
+        ret = spinframework.callback(self._nodeID, "getTranslation", [], 0)
         print "ret?? = ", ret.getVector()
 
 

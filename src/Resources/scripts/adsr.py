@@ -1,5 +1,5 @@
 import spin
-import libSPINPyWrap
+import spinframework
 import math
 
 __spin_behavior_class__ = "ADSR"
@@ -18,11 +18,11 @@ class ADSR( spin.ScriptBase ):
         self.release = r
         self.scale = scale
         self.duration = duration
-        self.start_time = libSPINPyWrap.time_s()
+        self.start_time = spinframework.time_s()
 
     def run( self ): 
         
-        t = libSPINPyWrap.time_s()
+        t = spinframework.time_s()
         val = 0
 
         if (t > self.start_time + self.duration ):
@@ -55,6 +55,6 @@ class ADSR( spin.ScriptBase ):
         else:
             print "DONE"
 
-        libSPINPyWrap.callback( self._nodeID, "setTranslation", [0, 0, val], 1 )
+        spinframework.callback( self._nodeID, "setTranslation", [0, 0, val], 1 )
 
 print "adsr module loaded."

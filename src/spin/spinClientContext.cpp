@@ -44,11 +44,11 @@
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 
-#include "spinClientContext.h"
-#include "spinApp.h"
-#include "SceneManager.h"
-#include "spinDefaults.h"
-#include "EventHandler.h"
+#include "spinclientcontext.h"
+#include "spinapp.h"
+#include "scenemanager.h"
+#include "spindefaults.h"
+#include "eventhandler.h"
 
 namespace spin
 {

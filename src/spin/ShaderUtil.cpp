@@ -4,7 +4,7 @@
 #include <osgDB/FileUtils>
 
 
-#include "ShaderUtil.h"
+#include "shaderutil.h"
 
 namespace spin
 {

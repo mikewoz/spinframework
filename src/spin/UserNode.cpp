@@ -39,11 +39,11 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "UserNode.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "osgUtil.h"
-#include "spinBaseContext.h"
+#include "usernode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "osgutil.h"
+#include "spinbasecontext.h"
 
 namespace spin
 {

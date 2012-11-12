@@ -50,10 +50,10 @@
 #include <osgDB/FileNameUtils>
 
 #include <iostream>
-#include "spinApp.h"
-#include "SceneManager.h"
-#include "spinBaseContext.h"
-#include "VideoTexture.h"
+#include "spinapp.h"
+#include "scenemanager.h"
+#include "spinbasecontext.h"
+#include "videotexture.h"
 
 namespace spin
 {

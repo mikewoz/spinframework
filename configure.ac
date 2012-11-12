@@ -169,6 +169,15 @@ AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
+case "$host" in *-darwin* | *-macos*)
+TINYXML_LIBS=-ltinyxml
+;;
+*)
+PKG_CHECK_MODULES(TINYXML, tinyxml >= 2.0.0, [], AC_MSG_ERROR(TinyXML 2.0.0 or greater is required. Please see INSTALL))
+;;
+esac
+AC_SUBST([TINYXML_LIBS])
+
 # Method to disable Python (note the negative: DISable)
 AC_ARG_ENABLE([python],
     AS_HELP_STRING([--enable-python], [Enables the Python interpreter within SPIN (enabled by default)]),
@@ -178,7 +187,6 @@ if test "x$enable_python" != xtrue; then
 AC_DEFINE([DISABLE_PYTHON],[1],[Disables python interpreter and thus all behaviours scripts in SPIN]) AC_MSG_NOTICE([Disabled Python scripts])
 fi
 AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xtrue)
-
 
 if test "x$enable_python" = xtrue; then
 
@@ -299,11 +307,11 @@ if test "x$with_editor" = xyes; then
     fi
 fi
 
+#        src/tinyxml/Makefile 
 AC_CONFIG_FILES([
         Makefile 
         doxyfile
         src/Makefile 
-        src/tinyxml/Makefile 
         src/osgPPU/Makefile 
         src/osgWrappers/introspection/Makefile 
         src/spin/Makefile
@@ -319,7 +327,7 @@ AC_CONFIG_FILES([
         src/lodifier/Makefile
         man/Makefile 
         tests/Makefile
-        spin-${SPIN_API_VERSION}.pc:spin.pc.in
+        spinframework-${SPIN_API_VERSION}.pc:spin.pc.in
         completion/Makefile
         ])
 

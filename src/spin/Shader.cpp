@@ -53,12 +53,12 @@
 
 #include <iostream>
 
-#include "SceneManager.h"
-#include "Shader.h"
-#include "ShaderUtil.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "scenemanager.h"
+#include "shader.h"
+#include "shaderutil.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 extern pthread_mutex_t sceneMutex;
 

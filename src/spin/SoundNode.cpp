@@ -39,9 +39,9 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "spinApp.h"
-#include "SoundNode.h"
-#include "SceneManager.h"
+#include "spinapp.h"
+#include "soundnode.h"
+#include "scenemanager.h"
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>
 #endif

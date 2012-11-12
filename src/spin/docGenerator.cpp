@@ -63,8 +63,8 @@
 #include <cppintrospection/StaticMethodInfo>
 #include <cppintrospection/Attributes>
 
-#include "spinApp.h"
-#include "ReferencedNode.h"
+#include "spinapp.h"
+#include "referencednode.h"
 
 using namespace cppintrospection;
 using namespace std;

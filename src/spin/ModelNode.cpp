@@ -59,16 +59,16 @@
 #include <osg/BoundingBox>
 #include <osg/ImageStream>
 
-#include "ModelNode.h"
-#include "osgUtil.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "nodeVisitors.h"
+#include "modelnode.h"
+#include "osgutil.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "nodevisitors.h"
 
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "SharedVideoTexture.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "sharedvideotexture.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -358,6 +358,12 @@ void ModelNode::drawModel()
 
         _modelAttachmentNode->removeChild(model.get());
 
+        if (animationManager.valid())
+        {
+            model->setUpdateCallback(NULL);
+            animationManager = NULL;
+        }
+        
         model = NULL;
         _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
         _statesetList.clear();
@@ -366,8 +372,7 @@ void ModelNode::drawModel()
         _ssNodeList.clear();
 
         //if (sceneManager_->sharedStateManager.valid()) sceneManager_->sharedStateManager->prune();
-
-
+        
         for (int i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
         {
             // re-initialize:
@@ -376,6 +381,8 @@ void ModelNode::drawModel()
             animationMode[i] = OFF;
             _keyframe[i] = 0;
         }
+
+        
     }
 
     bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() and (this->getContext()==getHostname()));
@@ -446,7 +453,26 @@ void ModelNode::drawModel()
                 }
 
             }
-
+            
+            // *****************************************************************
+            // search for special animations (osgAnimation)
+            
+            AnimationManagerFinder animFinder;
+            model->accept(animFinder);
+            if (animFinder._am)
+            {
+                animationManager = animFinder._am;
+                model->setUpdateCallback(animationManager.get());
+                
+                std::cout << "Found osgAnimation, which for now will just loop. Controls are coming soon." << std::endl;
+                for (osgAnimation::AnimationList::const_iterator it = animationManager->getAnimationList().begin(); it != animationManager->getAnimationList().end(); it++)
+                {
+                    std::cout << "- looping anim: " << (*it)->getName() << std::endl;
+                    (*it)->setPlayMode(osgAnimation::Animation::LOOP);
+                    animationManager->playAnimation(*it);
+                }
+            }
+            
             // *****************************************************************
             // search for special "billboard" nodes
 
