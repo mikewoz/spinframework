@@ -43,6 +43,10 @@
 #define __ModelNode_H
 
 #include <string>
+#include <osg/Referenced>
+#include <osg/Switch>
+#include <osg/Sequence>
+#include <osgAnimation/Animation>
 #include <osgUtil/Optimizer>
 #include <osgAnimation/BasicAnimationManager>
 
@@ -53,7 +57,30 @@ namespace spin
 
 class SceneManager;
 
-#define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
+
+class ModelNodeAnimation : virtual public osg::Referenced
+{
+public:
+    ModelNodeAnimation() : _loopMode(LOOP), _type(INVALID) {}
+    
+    enum AnimationType { INVALID, SWITCH, SEQUENCE, ANIMATION };
+    enum AnimationLoopMode { LOOP, NO_LOOPING, SWING };
+    
+    AnimationType _type;
+    AnimationLoopMode _loopMode;
+    bool _playState;
+    float _index;
+    
+    osg::ref_ptr<osg::Switch> _switch;
+    osg::ref_ptr<osg::Sequence> _sequence;
+    osg::ref_ptr<osgAnimation::Animation> _animation;
+};
+
+typedef std::map< std::string, osg::ref_ptr<ModelNodeAnimation> > AnimationList;
+
+
+
+//#define MODELNODE_NUM_ANIM_CONTROLS 10 // identify how many animation controls there are
 
 /**
  * \brief Node for including 3D models of popular formats in the scene.
@@ -75,6 +102,9 @@ public:
     virtual ~ModelNode();
 
     enum animationModeType { OFF, SWITCH, SEQUENCE };
+
+    virtual void debug();
+    void listAnimations();
 
     /**
      * We change our attachmentNode (add attachment to the centroid), so we MUST
@@ -154,29 +184,19 @@ public:
     int getRenderBin() const { return _renderBin; }
 
     /**
-     * Control the keyframe of a particular animation saved within the model
-     * (there can be several animations, hence the required index number)
+     * Control the seek index of a particular animation saved within the model
      */
-    void setKeyframe (int index, float keyframe);
+    void setAnimationIndex (const char* animName, float index);
 
     /**
-     * Return the keyframe of a particular animation saved within the model
-     * (there can be several animations, hence the required index number)
+     * Set the loop mode of a particular animation saved within the model
      */
-
-    float getKeyframe(int index) const { return _keyframe[index]; }
+    void setAnimationLoopMode (const char* animName, int mode);
 
     /**
      * Set the playing state of a particular animation (paused by default)
      */
-    void setPlaying (int index, int playState);
-
-    /**
-     * Returns a boolean indicating whether the animation is currently playing.
-     */
-
-    float getPlaying(int index) const { return _playState[index]; }
-
+    void setPlaying (const char* animName, int playState);
     
     /**
      * For statesets embedded in the model, it is possible to swap with some
@@ -222,15 +242,9 @@ private:
     osg::ref_ptr<osg::Group> model;
     osg::ref_ptr<osg::PositionAttitudeTransform> _centroid;
 
-    // animation stuff for gfx:
-    int _playState[MODELNODE_NUM_ANIM_CONTROLS]; // 0=paused, 1=playing
-    float _keyframe[MODELNODE_NUM_ANIM_CONTROLS]; // keyframe index (value from 0-1)
-    animationModeType animationMode[MODELNODE_NUM_ANIM_CONTROLS]; // type of animation (switch vs. sequence vs. ??)
-    osg::ref_ptr<osg::Switch> switcher[MODELNODE_NUM_ANIM_CONTROLS];
-    osg::ref_ptr<osg::Sequence> sequencer[MODELNODE_NUM_ANIM_CONTROLS];
-
     // animation manager from osgAnimation nodekit:
     osg::ref_ptr<osgAnimation::BasicAnimationManager> animationManager;
+    AnimationList _animationList;
 
     osgUtil::Optimizer optimizer;
 
