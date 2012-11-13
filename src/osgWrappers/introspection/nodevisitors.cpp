@@ -20,6 +20,19 @@
 #undef OUT
 #endif
 
+BEGIN_VALUE_REFLECTOR(spin::AnimationManagerFinder)
+	I_DeclaringFile("nodevisitors.h");
+	I_Constructor0(____AnimationManagerFinder,
+	               "",
+	               "");
+	I_Method1(void, apply, IN, osg::Node &, node,
+	          Properties::VIRTUAL,
+	          __void__apply__osg_Node_R1,
+	          "",
+	          "");
+	I_PublicMemberProperty(osgAnimation::BasicAnimationManager *, _am);
+END_REFLECTOR
+
 BEGIN_VALUE_REFLECTOR(spin::DebugVisitor)
 	I_DeclaringFile("nodevisitors.h");
 	I_Constructor0(____DebugVisitor,
