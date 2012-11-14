@@ -354,6 +354,8 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
         }
         else spin_ = osg::Vec3(0,0,0);
     }
+
+    applyOrientationModeToTargetters();
     
     lastTick_ = tick;
     broadcastLock_ = false;
@@ -830,9 +832,52 @@ void GroupNode::setOrientationMode (OrientationMode m)
     }
 }
 
+void GroupNode::removeOrientationTargetter( GroupNode* gn )
+{
+    for ( size_t i = 0; i < orientationTargetters_.size(); i++ ) {
+        if ( orientationTargetters_[i] == gn ) {
+            orientationTargetters_.erase( orientationTargetters_.begin()+i );
+            return;
+        }
+    }
+}
+
+void GroupNode::addOrientationTargetter( GroupNode* gn )
+{
+    orientationTargetters_.push_back( gn );
+}
+
+void GroupNode::applyOrientationModeToTargetters()
+{
+    for ( size_t i = 0; i < orientationTargetters_.size(); i++ )
+        orientationTargetters_[i]->applyOrientationMode();
+}
+
 void GroupNode::setOrientationTarget (const char* target)
 {
-    orientationTarget_ = gensym(target);
+
+    GroupNode *targetNode;
+    t_symbol* targetSym = gensym( target );
+    if ( orientationTarget_ && targetSym &&
+         strcmp( targetSym->s_name, orientationTarget_->s_name ) == 0 ) {
+
+        if ( orientationTarget_->s_thing ) {// previous target
+            targetNode = dynamic_cast<GroupNode*>(orientationTarget_->s_thing);
+            if (targetNode) targetNode->removeOrientationTargetter(this);            
+        }
+    }
+
+    orientationTarget_ = targetSym;// gensym(target);
+    if ( !orientationTarget_->s_thing ) {
+        orientationTarget_ = gensym("NULL");
+    } else {
+        targetNode = dynamic_cast<GroupNode*>(orientationTarget_->s_thing);
+        if (targetNode) targetNode->addOrientationTargetter(this);    
+    }
+
+    //printf("orientationTarget_ = [%s]\n", orientationTarget_->s_name);
+    //if (orientationTarget_->s_thing) printf("orientationTarget_ = [%s]\n", orientationTarget_->s_thing->getName().c_str());
+
     if (orientationMode_!=NORMAL)
     {
         applyOrientationMode();
@@ -844,7 +889,7 @@ void GroupNode::applyOrientationMode()
 {
     if (spinApp::Instance().getContext()->isServer() || (!spinApp::Instance().getContext()->isServer() && (computationMode_==CLIENT_SIDE)))
     {
-    
+        bool validTarget = false;
         osg::Vec3 targetPos;
         osg::Matrix thisMatrix = osg::computeLocalToWorld(this->currentNodePath_);
         
@@ -865,13 +910,17 @@ void GroupNode::applyOrientationMode()
                     osg::Matrixd targetMatrix = osg::computeLocalToWorld(target->currentNodePath_);
                     targetPos = targetMatrix.getTrans();
                 }
+                validTarget = true;
             }
         }
         else if (orientationMode_==POINT_TO_ORIGIN)
         {
             targetPos = osg::Vec3(0.0,0.0,0.0);
+            validTarget = true;
         }
         
+        if ( !validTarget ) return;
+
         osg::Vec3 aed = cartesianToSpherical(targetPos - thisMatrix.getTrans());
         
         // can't do this, because that function only does something for NORMAL mode
