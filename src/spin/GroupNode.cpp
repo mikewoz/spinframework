@@ -239,6 +239,8 @@ GroupNode::GroupNode (SceneManager *sceneManager, const char* initID) : Referenc
     // keep a timer for velocity calculation:
     lastTick_ = osg::Timer::instance()->tick();
     lastUpdate_ = osg::Timer::instance()->tick();
+
+    motionMutex_ = PTHREAD_MUTEX_INITIALIZER;
 }
 
 // ***********************************************************
@@ -306,18 +308,21 @@ void GroupNode::callbackUpdate(osg::NodeVisitor* nv)
         // velocity/spin values. We find out how many seconds passed since the
         // last time this was called, and move by velocity_*dt (ie, m/s) and 
         // rotate by spin_*dt (ie, deg/sec)
+        
         if (motion_.valid())
         {
+            pthread_mutex_lock(&motionMutex_);
             motion_->update(dt);
             float motionIndex = motion_->getValue();
             osg::Vec3 newPos = motionStart_ + ((motionEnd_-motionStart_) * motionIndex);
             this->setTranslation( newPos.x(), newPos.y(), newPos.z() );
-            
+         
             if (motion_->getTime() >= motion_->getDuration())
             {
                 BROADCAST(this, "sss", "event", "translateTo", "done");
                 motion_ = NULL;
             }
+            pthread_mutex_unlock(&motionMutex_);
         }
 
 
@@ -1055,7 +1060,7 @@ void GroupNode::addRotation (float dPitch, float dRoll, float dYaw)
 
 void GroupNode::translateTo (float x, float y, float z, float duration, const char *motion)
 {
-
+    pthread_mutex_lock(&motionMutex_);
     if (motion_.valid())
     {
         motion_ = NULL;
@@ -1131,6 +1136,7 @@ void GroupNode::translateTo (float x, float y, float z, float duration, const ch
     {
         BROADCAST(this, "sffffs", "translateTo", x, y, z, duration, motion);
     }
+    pthread_mutex_unlock(&motionMutex_);
 }
 
 // *****************************************************************************
