@@ -730,12 +730,8 @@ void TextNode::setMargin (float margin)
 	margin_ = margin;
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(2,9,7)
-	if (textLabel_.valid())
-	{
-		textLabel_->setBoundingBoxMargin(margin_);
-	}
-	else
-		redrawFlag_ = true;
+	if (textLabel_.valid() ) updateFlag_ = true;
+    else redrawFlag_ = true;
 #endif
 #endif
 	BROADCAST(this, "sf", "setMargin", getMargin());

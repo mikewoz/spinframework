@@ -35,6 +35,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	               ____ModelNode__SceneManager_P1__C5_char_P1,
 	               "",
 	               "");
+	I_Method0(void, debug,
+	          Properties::VIRTUAL,
+	          __void__debug,
+	          "",
+	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
+	I_Method0(void, listAnimations,
+	          Properties::NON_VIRTUAL,
+	          __void__listAnimations,
+	          "",
+	          "");
 	I_MethodWithDefaults1(void, updateNodePath, IN, bool, updateChildren, true,
 	                      Properties::VIRTUAL,
 	                      __void__updateNodePath__bool,
@@ -44,7 +54,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          Properties::VIRTUAL,
 	          __void__setContext__C5_char_P1,
 	          "",
-	          "The context is an arbitrary keyword that associates this node with a particular behaviour. Currently, it is used to *prevent* display if the context matches the name of a machine. ie, allowing it to be seen on all machines except for the one that is named by setContext. ");
+	          "The context is an arbitrary keyword that associates this node with a particular behaviour. Currently, it is used to prevent display if the context matches the name of a machine. ie, allowing it to be seen on all machines except for the one that is named by setContext. ");
 	I_Method1(void, setModelFromFile, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __void__setModelFromFile__C5_char_P1,
@@ -90,26 +100,21 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	          __int__getRenderBin,
 	          "",
 	          "Returns an integer representing the render bin of the node. See setRenderBin for more information. ");
-	I_Method2(void, setKeyframe, IN, int, index, IN, float, keyframe,
+	I_Method2(void, setAnimationIndex, IN, const char *, animName, IN, float, index,
 	          Properties::NON_VIRTUAL,
-	          __void__setKeyframe__int__float,
+	          __void__setAnimationIndex__C5_char_P1__float,
 	          "",
-	          "Control the keyframe of a particular animation saved within the model (there can be several animations, hence the required index number) ");
-	I_Method1(float, getKeyframe, IN, int, index,
+	          "Control the seek index of a particular animation saved within the model ");
+	I_Method2(void, setAnimationLoopMode, IN, const char *, animName, IN, int, mode,
 	          Properties::NON_VIRTUAL,
-	          __float__getKeyframe__int,
+	          __void__setAnimationLoopMode__C5_char_P1__int,
 	          "",
-	          "Return the keyframe of a particular animation saved within the model (there can be several animations, hence the required index number) ");
-	I_Method2(void, setPlaying, IN, int, index, IN, int, playState,
+	          "Set the loop mode of a particular animation saved within the model ");
+	I_Method2(void, setPlaying, IN, const char *, animName, IN, int, playState,
 	          Properties::NON_VIRTUAL,
-	          __void__setPlaying__int__int,
+	          __void__setPlaying__C5_char_P1__int,
 	          "",
 	          "Set the playing state of a particular animation (paused by default) ");
-	I_Method1(float, getPlaying, IN, int, index,
-	          Properties::NON_VIRTUAL,
-	          __float__getPlaying__int,
-	          "",
-	          "Returns a boolean indicating whether the animation is currently playing. ");
 	I_Method2(void, setStateSet, IN, int, index, IN, const char *, replacement,
 	          Properties::NON_VIRTUAL,
 	          __void__setStateSet__int__C5_char_P1,
@@ -141,10 +146,6 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	I_SimpleProperty(const char *, Context, 
 	                 0, 
 	                 __void__setContext__C5_char_P1);
-	I_IndexedProperty(float, Keyframe, 
-	                  __float__getKeyframe__int, 
-	                  __void__setKeyframe__int__float, 
-	                  0);
 	I_SimpleProperty(int, Lighting, 
 	                 __int__getLighting, 
 	                 __void__setLighting__int);
@@ -162,4 +163,37 @@ BEGIN_OBJECT_REFLECTOR(spin::ModelNode)
 	                 __void__setStateRegistration__int);
 	I_PublicMemberProperty(std::vector< spin::t_symbol * >, _statesetList);
 END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::ModelNodeAnimation::AnimationType)
+	I_DeclaringFile("modelnode.h");
+	I_EnumLabel(spin::ModelNodeAnimation::INVALID);
+	I_EnumLabel(spin::ModelNodeAnimation::SWITCH);
+	I_EnumLabel(spin::ModelNodeAnimation::SEQUENCE);
+	I_EnumLabel(spin::ModelNodeAnimation::ANIMATION);
+END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::ModelNodeAnimation::AnimationLoopMode)
+	I_DeclaringFile("modelnode.h");
+	I_EnumLabel(spin::ModelNodeAnimation::LOOP);
+	I_EnumLabel(spin::ModelNodeAnimation::NO_LOOPING);
+	I_EnumLabel(spin::ModelNodeAnimation::SWING);
+END_REFLECTOR
+
+BEGIN_VALUE_REFLECTOR(spin::ModelNodeAnimation)
+	I_DeclaringFile("modelnode.h");
+	I_Constructor0(____ModelNodeAnimation,
+	               "",
+	               "");
+	I_PublicMemberProperty(spin::ModelNodeAnimation::AnimationType, _type);
+	I_PublicMemberProperty(spin::ModelNodeAnimation::AnimationLoopMode, _loopMode);
+	I_PublicMemberProperty(bool, _playState);
+	I_PublicMemberProperty(float, _index);
+	I_PublicMemberProperty(osg::ref_ptr< osg::Switch >, _switch);
+	I_PublicMemberProperty(osg::ref_ptr< osg::Sequence >, _sequence);
+	I_PublicMemberProperty(osg::ref_ptr< osgAnimation::Animation >, _animation);
+END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  osg::ref_ptr< spin::ModelNodeAnimation > >, spin::AnimationList)
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  osg::ref_ptr< spin::ModelNodeAnimation > >)
 

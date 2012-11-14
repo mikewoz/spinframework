@@ -169,6 +169,43 @@ class UpdateSceneVisitor : public osg::NodeVisitor
 };
 
 typedef std::vector< osg::ref_ptr<osg::StateSet> > StateSetList;
+typedef std::vector< osg::ref_ptr<osg::Switch> > SwitchNodeList;
+typedef std::vector< osg::ref_ptr<osg::Sequence> > SequenceNodeList;
+
+
+
+
+/**
+ * \brief A NodeVisitor class that finds all osg::Switch nodes
+ */
+class SwitchNodeFinder : public osg::NodeVisitor
+{
+    public:
+        SwitchNodeFinder(SwitchNodeList& list) : _switchList(list)
+        { setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN ); }    
+        virtual void apply(osg::Node& node);
+
+        SwitchNodeList& _switchList;
+
+    protected:
+        SwitchNodeFinder& operator = (const SwitchNodeFinder&);
+};
+
+/**
+ * \brief A NodeVisitor class that finds all osg::Sequence nodes
+ */
+class SequenceNodeFinder : public osg::NodeVisitor
+{
+    public:
+        SequenceNodeFinder(SequenceNodeList& list) : _sequenceList(list)
+        { setTraversalMode( NodeVisitor::TRAVERSE_ALL_CHILDREN ); }    
+        virtual void apply(osg::Node& node);
+
+        SequenceNodeList& _sequenceList;
+
+    protected:
+        SequenceNodeFinder& operator = (const SequenceNodeFinder&);
+};
 
 /**
  * \brief A NodeVisitor class that finds all textured statesets in a node:

@@ -355,6 +355,21 @@ BEGIN_OBJECT_REFLECTOR(spin::GroupNode)
 	          __void__updateDraggerMatrix,
 	          "",
 	          "");
+	I_Method1(void, removeOrientationTargetter, IN, spin::GroupNode *, gn,
+	          Properties::NON_VIRTUAL,
+	          __void__removeOrientationTargetter__GroupNode_P1,
+	          "",
+	          "");
+	I_Method1(void, addOrientationTargetter, IN, spin::GroupNode *, gn,
+	          Properties::NON_VIRTUAL,
+	          __void__addOrientationTargetter__GroupNode_P1,
+	          "",
+	          "");
+	I_Method0(void, applyOrientationModeToTargetters,
+	          Properties::NON_VIRTUAL,
+	          __void__applyOrientationModeToTargetters,
+	          "",
+	          "");
 	I_ProtectedMethod0(void, updateQuat,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,

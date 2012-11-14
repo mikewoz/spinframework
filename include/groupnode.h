@@ -248,7 +248,6 @@ public:
     void setOrientationTarget(const char* target);
     char* getOrientationTarget() const { return orientationTarget_->s_name; };
 
-
     /**
      * The local orientation offset for this node with respect to its parent
      */
@@ -420,6 +419,9 @@ public:
 
     void updateDraggerMatrix();
 
+    void removeOrientationTargetter( GroupNode* gn );
+    void addOrientationTargetter( GroupNode* gn );
+    void applyOrientationModeToTargetters();
 
 protected:
 
@@ -440,7 +442,8 @@ protected:
     
     osg::ref_ptr<osgAnimation::Motion> motion_;
     osg::Vec3 motionStart_, motionEnd_;
-    
+    pthread_mutex_t motionMutex_;
+
     InteractionMode interactionMode_;
     std::vector<osg::Vec4> trajectory_;
     int drawMod_;
@@ -474,6 +477,8 @@ protected:
 
     bool broadcastLock_;
 
+    typedef std::vector<GroupNode*> GroupNodeList;
+    GroupNodeList orientationTargetters_;
     
 private:
 

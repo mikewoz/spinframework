@@ -57,7 +57,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/compression/octree_pointcloud_compression.h>
-#endif WITH_PCL
+#endif //WITH_PCL
 
 #ifdef WITH_SHARED_VIDEO
 #include <shmdata/any-data-reader.h>
@@ -154,7 +154,11 @@ private:
     pcl::Grabber* grabber_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
+    #if PCL_VERSION_HIGHER_THAN_1_6
+    pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *decoder_;
+    #else
 	pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *decoder_;
+    #endif
 #endif
 
 #ifdef WITH_SHARED_VIDEO

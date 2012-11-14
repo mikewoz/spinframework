@@ -207,6 +207,19 @@ void UpdateSceneVisitor::apply(osg::Group &node)
     traverse(node);
 }
 
+void SwitchNodeFinder::apply(osg::Node& node)
+{
+    osg::Switch *sw = dynamic_cast<osg::Switch*>(&node);
+    if (sw) _switchList.push_back(sw);
+    traverse(node);
+}
+
+void SequenceNodeFinder::apply(osg::Node& node)
+{
+    osg::Sequence *seq = dynamic_cast<osg::Sequence*>(&node);
+    if (seq) _sequenceList.push_back(seq);
+    traverse(node);
+}
 
 TextureStateSetFinder::TextureStateSetFinder(StateSetList& list) : _statesetList(list)
 {
