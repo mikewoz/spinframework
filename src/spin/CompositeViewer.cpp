@@ -1015,7 +1015,6 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         view->addSlave(camera.get(), osg::Matrixd(), osg::Matrixd(), false);
     }
 
-    //view->getCamera()->setNearFarRatio(0.0001f);
     cam->setNearFarRatio(0.0001f);
     cam->setViewport(0,0,0,0); // <- hack to prevent flickering
 }
@@ -1023,7 +1022,6 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
 
 
 void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Camera *cam, osg::GraphicsContext::Traits *traits, osg::GraphicsContext *gc)
-//static void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Camera *cam, int screenWidth, int screenHeight, int screenNum)
 {
     TiXmlElement *child = 0;
     std::string tag="", val="";
@@ -1198,7 +1196,6 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
                 float fovy, aspectRatio, zNear, zFar;
                 if (sscanf(val.c_str(), "%f %f %f %f", &fovy, &aspectRatio, &zNear, &zFar))
                 {
-                    //std::cout << "setting perspective of " << fovy << "deg, aspect: " << aspectRatio << std::endl;
                     cam->setProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
                 }
             }
@@ -1217,29 +1214,11 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
                 std::cout << "Unknown parameter in configuration file: " << tag << std::endl;
             }
         }
-
-        //view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
     }
-
-
-    //cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-
-    //cam->setViewMatrixAsLookAt(eye, lookat, up);
 
     ViewerManipulator *manipulator = new spin::ViewerManipulator();
     manipulator->setHomePosition( eye, lookat, up, false );
     view->setCameraManipulator(manipulator);
-
-
-/*
-    // note: the first matrix scales and offsets the axes (perspective) while the second matrix offsets the view:
-    //viewer.addSlave(cam->camera.get(), cam->pMatrix*cam->tMatrix, cam->rMatrix);
-    //cam->camera->setViewMatrixAsLookAt( cam->_eye, cam->_lookat, cam->_up );
-    osg::Matrixd viewMatrix;
-    viewMatrix.makeLookAt( cam->_eye, cam->_lookat, cam->_up );
-    viewMatrix *= osg::Matrixd::rotate(osg::PI/2, X_AXIS);
-    viewer.addSlave(cam->camera.get(), cam->pMatrix*cam->tMatrix, cam->rMatrix*viewMatrix);
-*/
 
     GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
     cam->setDrawBuffer(buffer);

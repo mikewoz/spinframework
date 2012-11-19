@@ -469,7 +469,6 @@ int run(int argc, char **argv)
 
     // ***************************************************************************
     // debug print camera info
-
     if (0)
     {
         std::cout << std::endl << "CAMERA DEBUG PRINT:" << std::endl;
@@ -478,7 +477,7 @@ int run(int argc, char **argv)
         viewer.getCameras(cameras);
 
         osg::Vec3d eye, center, up;
-        double left, right, bottom, top, zNear, zFar;
+        double left, right, bottom, top, zNear, zFar, fovy, aspectRatio;
 
         if (manipulator.valid())
         {
@@ -493,7 +492,15 @@ int run(int argc, char **argv)
             std::cout << "   clear color:      (" << v4.x() << "," << v4.y() << "," << v4.z() << "," << v4.w() << ")" << std::endl;
 
             (*iter)->getProjectionMatrixAsFrustum (left, right, bottom, top, zNear, zFar);
-            std::cout << "   Frustum:          " << left << "," << right << "," << top << "," << bottom << "  clip: " << zNear << "-" << zFar << std::endl;
+            std::cout << "   Proj as Frustum:  " << left << "," << right << "," << top << "," << bottom << "  clip: " << zNear << "-" << zFar << std::endl;
+
+            (*iter)->getProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+            std::cout << "   Proj as Perspect: fovy=" << fovy << ", aspectRatio=" << aspectRatio << ", clip: " << zNear << "-" << zFar << std::endl;
+
+            (*iter)->getProjectionMatrixAsOrtho(left, right, bottom, top, zNear, zFar);
+            std::cout << "   Proj as Ortho:    " << left << "," << right << "," << top << "," << bottom << "  clip: " << zNear << "-" << zFar << std::endl;
+
+
 
             (*iter)->getViewMatrixAsLookAt (eye, center, up);
             std::cout << "   Camera LookAt:    eye=(" << eye.x() << "," << eye.y() << "," << eye.z() << ") center=(" << center.x() << "," << center.y() << "," << center.z() << ") up=(" << up.x() << "," << up.y() << "," << up.z() << ")" << std::endl;
