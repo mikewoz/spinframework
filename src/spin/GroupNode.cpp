@@ -44,6 +44,8 @@
 #include <osg/BlendFunc>
 #include <osg/BlendColor>
 
+#include <pthread.h>
+
 #include <osgManipulator/TabBoxDragger>
 #include <osgManipulator/TabBoxTrackballDragger>
 #include <osgManipulator/TabPlaneDragger>
@@ -64,6 +66,8 @@
 #include "spinapp.h"
 
 extern pthread_mutex_t sceneMutex;
+
+pthread_mutex_t motionMutex_ = PTHREAD_MUTEX_INITIALIZER;
 
 namespace spin
 {
@@ -240,7 +244,7 @@ GroupNode::GroupNode (SceneManager *sceneManager, const char* initID) : Referenc
     lastTick_ = osg::Timer::instance()->tick();
     lastUpdate_ = osg::Timer::instance()->tick();
 
-    motionMutex_ = PTHREAD_MUTEX_INITIALIZER;
+    //motionMutex_ = PTHREAD_MUTEX_INITIALIZER;
 }
 
 // ***********************************************************
