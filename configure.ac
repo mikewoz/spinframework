@@ -273,7 +273,7 @@ AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 dnl PCL
 dnl FIXME: the line below is evil but required in order to get -lflann working
 #export PKG_CONFIG_PATH=$PWD
-PCL_PKGS="pcl_common-1.6 pcl_filters-1.6 pcl_io-1.6 pcl_io_ply-1.6 pcl_kdtree-1.6 pcl_octree-1.6 pcl_sample_consensus-1.6 pcl_search-1.6"
+PCL_PKGS="pcl_common-1.6 pcl_filters-1.6 pcl_io-1.6 pcl_kdtree-1.6 pcl_octree-1.6 pcl_sample_consensus-1.6 pcl_search-1.6"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])
