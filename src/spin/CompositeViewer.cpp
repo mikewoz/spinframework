@@ -1017,6 +1017,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
 
     //view->getCamera()->setNearFarRatio(0.0001f);
     cam->setNearFarRatio(0.0001f);
+    cam->setViewport(0,0,0,0); // <- hack to prevent flickering
 }
 
 
@@ -1157,7 +1158,7 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
         
         std::cout << "creating spherical display with textureSize="<<textureSize<<", radius="<<radius<<", collar="<<collar<<", crop="<<crop<<", rotation="<<rotation<<"degrees"<<std::endl;
 
-        //view->setUpViewFor3DSphericalDisplay(radius, collar, screenNum, intensityMap, projMatrix);
+        // note: cam is currently not being used by makeDomeView!
         makeDomeView(gc, traits, view, cam, textureSize, radius, collar, distance, crop, intensityMap, projMatrix);
 
         double fovy, aspectRatio, zNear, zFar;
@@ -1419,18 +1420,18 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
     for ( n = XMLnode->FirstChildElement("camera"); n; n = n->NextSiblingElement("camera") )
     {
         osg::Camera *cam;
-         if (firstCamera)
-         {
-             cam = view->getCamera();
-             firstCamera = false;
-         }
-         else
-         {
-             cam = new osg::Camera();
-             view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
-         }
-         if (gc.valid()) cam->setGraphicsContext(gc.get());
-         else std::cout << "ERROR: GraphicsContext not valid. Bad configuration file?" << std::endl;
+        if (firstCamera)
+        {
+            cam = view->getCamera();
+            firstCamera = false;
+        }
+        else
+        {
+            cam = new osg::Camera();
+            view->addSlave(cam, view->getCamera()->getProjectionMatrix(), view->getCamera()->getViewMatrix());
+        }
+        if (gc.valid()) cam->setGraphicsContext(gc.get());
+        else std::cout << "ERROR: GraphicsContext not valid. Bad configuration file?" << std::endl;
 
         // Projection matrix aspect fix (can be overridden using either the
         // frustum or perspective configuration values in config file)

@@ -500,12 +500,17 @@ int run(int argc, char **argv)
 
             const osg::Viewport *viewport = (*iter)->getViewport();
             if (viewport)
-                std::cout << "   Camera viewport:    " << viewport->x() << "," << viewport->y() << " " << viewport->width() << "x" << viewport->height() << std::endl;
+                std::cout << "   Camera viewport:  pos=(" << viewport->x() << "," << viewport->y() << ") size=" << viewport->width() << "x" << viewport->height() << std::endl;
             else
-                std::cout << "   Camera viewport:    INVALID" << std::endl;
+                std::cout << "   Camera viewport:  INVALID" << std::endl;
 
-            osg::View *v = (*iter)->getView();
-            std::cout << "   view numSlaves:   " << v->getNumSlaves() << std::endl;
+            //osg::View *v = (*iter)->getView();
+            //std::cout << "   view numSlaves:   " << v->getNumSlaves() << std::endl;
+        }
+        for (unsigned int i=0; i<viewer.getNumViews(); i++)
+        {
+            osg::View *v = viewer.getView(i);
+            std::cout << "View " << v->getName() << " has " << v->getNumSlaves() << " slaves" << std::endl;
 
             for (unsigned int slaveNum=0; slaveNum<v->getNumSlaves(); slaveNum++)
             {
