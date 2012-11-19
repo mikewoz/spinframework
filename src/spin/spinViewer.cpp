@@ -60,16 +60,15 @@
 #include <boost/algorithm/string.hpp>
 
 #include "config.h"
-#include "ViewerManipulator.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinClientContext.h"
-#include "osgUtil.h"
-#include "GroupNode.h"
-#include "SceneManager.h"
-#include "ShapeNode.h"
-
-#include "CompositeViewer.h"
+#include "viewermanipulator.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinclientcontext.h"
+#include "osgutil.h"
+#include "groupnode.h"
+#include "scenemanager.h"
+#include "shapenode.h"
+#include "compositeviewer.h"
 
 #ifdef HAVE_SPNAV_H
 #include "spnav.h"
@@ -81,6 +80,10 @@
 //#define SPIN_SCALAR 0.01
 #define VELOCITY_SCALAR 0.004
 #define SPIN_SCALAR 0.007
+
+#define DISPLAY_FPS_TERMINAL 1
+#define DISPLAY_FPS_WINDOW 2
+#define DISPLAY_FPS_LOG 3
 
 extern pthread_mutex_t sceneMutex;
 
@@ -121,6 +124,13 @@ int run(int argc, char **argv)
     std::string camConfig;
     std::string sceneID = spin.getSceneID();
 
+    int displayFps = 0;
+    double displayFpsFreq = 1.0;
+    std::string displayFpsWhere = "";
+    int displayFpsNb = 0;
+    osgViewer::Viewer* fpsViewer = 0;
+    osgText::Text* fpsWindowText = 0;
+
     //osg::setNotifyLevel(osg::INFO);
 
     // *************************************************************************
@@ -153,7 +163,7 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--mblur", "Enables motion blur effect");
     arguments.getApplicationUsage()->addCommandLineOption("--outline", "Enables the outline effect");
     arguments.getApplicationUsage()->addCommandLineOption("--mask", "Enables the masking effect (from a secondary camera render)");
-
+    arguments.getApplicationUsage()->addCommandLineOption("--display-fps < [terminal|window|log] t >", "Display the framerate on the terminal, in a window or in the server's logs.  The fps is refreshed every t seconds.");
     // *************************************************************************
     // PARSE ARGS:
 
@@ -189,12 +199,19 @@ int run(int argc, char **argv)
     if (arguments.read("--disable-camera-controls")) mover=false;
     if (arguments.read("--grid")) grid=true;
 
+    while( arguments.read("--display-fps", displayFpsWhere , displayFpsFreq ) ) {}
+
+    //displayFps = DISPLAY_FPS_TERMINAL; }
+    //while( arguments.read("--display-fps" , displayFpsFreq ) ) { displayFps = DISPLAY_FPS_WINDOW; }
+
     if (arguments.read("--cache"))
     {
         osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options();
         options->setObjectCacheHint(osgDB::ReaderWriter::Options::CACHE_ALL);
         osgDB::Registry::instance()->setOptions(options);
     }
+
+ 
 
 
     // *************************************************************************
@@ -212,6 +229,64 @@ int run(int argc, char **argv)
     viewer.setThreadingModel(osgViewer::CompositeViewer::CullDrawThreadPerContext);
 
     viewer.getUsage(*arguments.getApplicationUsage());
+
+    // *************************************************************************
+    // display fps
+
+    if ( displayFpsWhere == "terminal" ) {
+        displayFps = DISPLAY_FPS_TERMINAL;
+        //printf("terminal!, %f\n", displayFpsFreq);
+        
+    } else if ( displayFpsWhere == "window" ) {
+        int fpsw = 150;
+        int fpsh = 50;
+        displayFps = DISPLAY_FPS_WINDOW;
+        //printf("window!, %f\n", displayFpsFreq);
+
+        fpsViewer = new osgViewer::Viewer();
+        fpsViewer->setUpViewInWindow(0,0,fpsw,fpsh);
+
+        osg::Camera* camera = fpsViewer->getCamera();
+        camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+        camera->setProjectionMatrixAsOrtho2D(0,fpsw,0,fpsh);
+        camera->setViewMatrix(osg::Matrix::identity());
+        //camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+        //camera->addChild(createHUDText());
+        camera->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+
+
+        osgText::Font* font = osgText::readFontFile("arial.ttf");
+        osg::Vec4 layoutColor(1.0f,1.0f,1.0f,1.0f);
+        float layoutCharacterSize = 30.0f;    
+                     
+        fpsWindowText = new osgText::Text;
+        fpsWindowText->setFont(font);
+        fpsWindowText->setColor(layoutColor);
+        fpsWindowText->setCharacterSize(layoutCharacterSize);
+        //fpsWindowText->setPosition(osg::Vec3(50, 15, 0));
+        fpsWindowText->setPosition(osg::Vec3(fpsw/2, fpsh/2, 0));
+        fpsWindowText->setLayout(osgText::Text::LEFT_TO_RIGHT);
+        fpsWindowText->setAlignment(osgText::Text::CENTER_CENTER);
+        //fpsWindowText->setAlignment(osgText::Text::LEFT_TOP);
+        fpsWindowText->setFontResolution(30,30);
+        //fpsWindowText->setDrawMode(osgText::Text::TEXT|osgText::Text::ALIGNMENT|osgText::Text::BOUNDINGBOX);
+        fpsWindowText->setText("FPS");
+        osg::Geode* g = new osg::Geode();
+        g->addDrawable( fpsWindowText );
+        
+        fpsViewer->setSceneData( g );
+        fpsViewer->realize();
+        fpsViewer->frame();
+    } else if ( displayFpsWhere == "log" ) {
+        displayFps = DISPLAY_FPS_LOG;
+    } else {
+        displayFps = 0;
+    }
+
+    if ( displayFps ) viewer.getViewerStats()->collectStats( "frame_rate", true );
+
+
+
 
     // *************************************************************************
     // multisampling / antialiasing:
@@ -574,6 +649,8 @@ int run(int argc, char **argv)
         spin.sceneManager_->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
     }*/
 
+
+
     // program loop:
     while(not viewer.done())
     {
@@ -608,9 +685,8 @@ int run(int argc, char **argv)
             else
             {
                 if (dt >= minFrameTime)
-                {
-                                    viewer.frame();
-
+                    {
+                        viewer.frame();
 /*
                     // poll the space navigator:
                     viewer.updateSpaceNavigator();
@@ -635,6 +711,23 @@ int run(int argc, char **argv)
                 if (sleepTime > 100) sleepTime = 100;
 
                 if (!recv) OpenThreads::Thread::microSleep(sleepTime);
+            }
+
+            if ( displayFps && viewer.getViewerFrameStamp()->getReferenceTime() > displayFpsFreq * displayFpsNb ) {
+                double d;
+                viewer.getViewerStats()->getAveragedAttribute( "Frame rate", d );
+                if ( displayFps == DISPLAY_FPS_TERMINAL ) {
+                    printf( "Frame rate: %f               \r", d );
+                    fflush( stdout );
+                } else if ( displayFps == DISPLAY_FPS_WINDOW ) {                    
+                    std::ostringstream oss;
+                    oss << d;
+                    fpsWindowText->setText( oss.str() );
+                    fpsViewer->frame();
+                } else { // displayFps == DISPLAY_FPS_LOG
+                    spin.NodeMessage( spin.getUserID().c_str(), "si", "FPS", (int)d, SPIN_ARGS_END );
+                }
+                displayFpsNb++;
             }
 
             // ***** END
@@ -676,7 +769,7 @@ int main(int argc, char **argv)
     /*
     // *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     std::vector<char*> newArgs;
     if (argc == 1)
     {
@@ -716,7 +809,7 @@ int main(int argc, char **argv)
 
     // *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     std::vector<char*> newArgs = spin::getUserArgs();
     if ((argc==1) && (newArgs.size() > 1))
     {

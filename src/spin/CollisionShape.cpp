@@ -39,12 +39,12 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "CollisionShape.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "SceneManager.h"
-#include "osgUtil.h"
-#include "bulletUtil.h"
+#include "collisionshape.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "scenemanager.h"
+#include "osgutil.h"
+#include "bulletutil.h"
 
 using namespace std;
 

@@ -53,10 +53,13 @@ src/osgWrappers/introspection/dofppu.cpp
 src/osgWrappers/introspection/maskppu.cpp
 src/osgWrappers/introspection/ssaoppu.cpp
 src/osgWrappers/introspection/pocoUtil.cpp
+src/osgWrappers/introspection/nodevisitors.cpp
 src/osgWrappers/introspection/outlineppu.cpp
 src/osgWrappers/introspection/ParticleSystemUtil.cpp
 src/osgWrappers/introspection/motionblurppu.cpp
 src/osgWrappers/introspection/osgParticleUtil.cpp
+src/osgWrappers/introspection/spinservercontext.cpp
+src/osgWrappers/introspection/spinapp.cpp
 spinframework-*.*.*
 doxyfile
 doxyfile.stamp

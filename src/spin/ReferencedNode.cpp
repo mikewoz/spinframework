@@ -48,12 +48,12 @@
 #include <osg/BlendColor>
 #include <osg/BlendEquation>
 
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "ReferencedNode.h"
-#include "SwitchNode.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "referencednode.h"
+#include "switchnode.h"
 
 #include <cppintrospection/Value>
 #include <cppintrospection/Type>

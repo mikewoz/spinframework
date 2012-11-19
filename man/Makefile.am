@@ -1,5 +1,5 @@
-man_MANS = spinserver.1 spinviewer.1 
-MAN_TEXT_FILES = man-spinserver.txt man-spinviewer.txt
+man_MANS = spinserver.1 spinviewer.1 spindocgenerator.1 lodifier.1
+MAN_TEXT_FILES = man-spinserver.txt man-spinviewer.txt man-lodifier.txt
 
 EXTRA_DIST = \
     $(man_MANS) \
@@ -18,6 +18,11 @@ spinserver.1: $(top_srcdir)/src/spin/spinServer.cpp $(common_mandeps) $(top_srcd
 
 spinviewer.1: $(top_srcdir)/src/spin/spinViewer.cpp $(common_mandeps) $(top_srcdir)/man/man-spinviewer.txt
 	$(HELP2MAN) --include=man-spinviewer.txt --name="3D viewer for the SPIN Framework" --no-info $(top_builddir)/src/spin/spinviewer -o $@
+
+lodifier.1: $(top_srcdir)/src/lodifier/lodifier.cpp $(common_mandeps) $(top_srcdir)/man/man-lodifier.txt
+	$(HELP2MAN) --include=man-lodifier.txt --name="Automatic level-of-detail generator for 3d scenes" --no-info $(top_builddir)/src/lodifier/lodifier -o $@
+
+
 
 # man pages:
 # if HAVE_DOXYGEN

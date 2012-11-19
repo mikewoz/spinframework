@@ -40,16 +40,15 @@
 // -----------------------------------------------------------------------------
 
 #include <iostream>
-#include "DSPNode.h"
-
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-
 
 #include <osg/ShapeDrawable>
 #include <osg/PolygonMode>
 #include <osg/Material>
+
+#include "dspnode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 
 namespace {

@@ -17,7 +17,7 @@ AC_PREREQ([2.61])
 # - increase spin_interface_version to the next odd number
 m4_define([spin_major_version], [0])
 m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [23])
+m4_define([spin_micro_version], [25])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -169,6 +169,15 @@ AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
+case "$host" in *-darwin* | *-macos*)
+TINYXML_LIBS=-ltinyxml
+;;
+*)
+PKG_CHECK_MODULES(TINYXML, tinyxml >= 2.0.0, [], AC_MSG_ERROR(TinyXML 2.0.0 or greater is required. Please see INSTALL))
+;;
+esac
+AC_SUBST([TINYXML_LIBS])
+
 # Method to disable Python (note the negative: DISable)
 AC_ARG_ENABLE([python],
     AS_HELP_STRING([--enable-python], [Enables the Python interpreter within SPIN (enabled by default)]),
@@ -178,7 +187,6 @@ if test "x$enable_python" != xtrue; then
 AC_DEFINE([DISABLE_PYTHON],[1],[Disables python interpreter and thus all behaviours scripts in SPIN]) AC_MSG_NOTICE([Disabled Python scripts])
 fi
 AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xtrue)
-
 
 if test "x$enable_python" = xtrue; then
 
@@ -265,7 +273,7 @@ AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 dnl PCL
 dnl FIXME: the line below is evil but required in order to get -lflann working
 #export PKG_CONFIG_PATH=$PWD
-PCL_PKGS="pcl_common-1.6 pcl_io-1.6 pcl_filters-1.6 pcl_octree-1.6"
+PCL_PKGS="pcl_common-1.6 pcl_filters-1.6 pcl_io-1.6 pcl_io_ply-1.6 pcl_kdtree-1.6 pcl_octree-1.6 pcl_sample_consensus-1.6 pcl_search-1.6"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])
@@ -299,11 +307,11 @@ if test "x$with_editor" = xyes; then
     fi
 fi
 
+#        src/tinyxml/Makefile 
 AC_CONFIG_FILES([
         Makefile 
         doxyfile
         src/Makefile 
-        src/tinyxml/Makefile 
         src/osgPPU/Makefile 
         src/osgWrappers/introspection/Makefile 
         src/spin/Makefile
@@ -316,9 +324,10 @@ AC_CONFIG_FILES([
         src/Resources/scripts/Makefile
         src/Resources/shaders/Makefile
         src/editor/Makefile
+        src/lodifier/Makefile
         man/Makefile 
         tests/Makefile
-        spin-${SPIN_API_VERSION}.pc:spin.pc.in
+        spinframework-${SPIN_API_VERSION}.pc:spin.pc.in
         completion/Makefile
         ])
 

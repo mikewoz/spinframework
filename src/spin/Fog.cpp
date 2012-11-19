@@ -42,10 +42,10 @@
 #include <iostream>
 #include <osg/Fog>
 
-#include "Fog.h"
-#include "spinApp.h" // for BROADCAST
-#include "spinBaseContext.h"
-#include "SceneManager.h"
+#include "fog.h"
+#include "spinapp.h" // for BROADCAST
+#include "spinbasecontext.h"
+#include "scenemanager.h"
 
 namespace spin
 {

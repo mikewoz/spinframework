@@ -40,10 +40,10 @@
 // -----------------------------------------------------------------------------
 
 
-#include "SoundSpace.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "soundspace.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 using namespace std;
 

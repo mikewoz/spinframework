@@ -46,12 +46,12 @@
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 
-#include "ParticleSystem.h"
-#include "SceneManager.h"
-#include "ShapeNode.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
+#include "particlesystem.h"
+#include "scenemanager.h"
+#include "shapenode.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
 
 #define USE_LOCAL_SHADERS 1
 

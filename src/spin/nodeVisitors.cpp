@@ -1,4 +1,4 @@
-#include "nodeVisitors.h"
+#include "nodevisitors.h"
 
 #include <osg/NodeVisitor>
 #include <osg/Node>
@@ -10,7 +10,9 @@
 #include <osg/TextureRectangle>
 #include <osg/Switch>
 #include <osg/Sequence>
-#include "ReferencedNode.h"
+#include <osgAnimation/AnimationManagerBase>
+#include <osgAnimation/BasicAnimationManager>
+#include "referencednode.h"
 
 #include <iostream>
 
@@ -205,6 +207,19 @@ void UpdateSceneVisitor::apply(osg::Group &node)
     traverse(node);
 }
 
+void SwitchNodeFinder::apply(osg::Node& node)
+{
+    osg::Switch *sw = dynamic_cast<osg::Switch*>(&node);
+    if (sw) _switchList.push_back(sw);
+    traverse(node);
+}
+
+void SequenceNodeFinder::apply(osg::Node& node)
+{
+    osg::Sequence *seq = dynamic_cast<osg::Sequence*>(&node);
+    if (seq) _sequenceList.push_back(seq);
+    traverse(node);
+}
 
 TextureStateSetFinder::TextureStateSetFinder(StateSetList& list) : _statesetList(list)
 {
@@ -256,6 +271,21 @@ void TextureStateSetFinder::apply(osg::StateSet* stateset)
 }
         
 TextureStateSetFinder& TextureStateSetFinder::operator= (const TextureStateSetFinder&) { return *this; }
+
+
+void AnimationManagerFinder::apply(osg::Node& node)
+{
+    if (_am)
+        return;
+    if (node.getUpdateCallback()) {
+        osgAnimation::AnimationManagerBase* b = dynamic_cast<osgAnimation::AnimationManagerBase*>(node.getUpdateCallback());
+        if (b) {
+            _am = new osgAnimation::BasicAnimationManager(*b);
+            return;
+        }
+    }
+    traverse(node);
+}
 
 } // end of namespace spin
 

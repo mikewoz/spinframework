@@ -46,7 +46,7 @@
 #include <osgUtil/SmoothingVisitor>
 #include <osg/PositionAttitudeTransform> 
 
-#include "osgUtil.h"
+#include "osgutil.h"
 
 namespace spin
 {

@@ -41,10 +41,10 @@
 
 //#include <osg/Matrix>
 
-#include "osgUtil.h"
-#include "AnimationNode.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "osgutil.h"
+#include "animationnode.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 namespace spin
 {

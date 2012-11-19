@@ -45,11 +45,11 @@
 #include <osg/Version>
 #include <lo/lo_types.h>
 
-#include "osgUtil.h"
-#include "TextNode.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "osgutil.h"
+#include "textnode.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -730,12 +730,8 @@ void TextNode::setMargin (float margin)
 	margin_ = margin;
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(2,9,7)
-	if (textLabel_.valid())
-	{
-		textLabel_->setBoundingBoxMargin(margin_);
-	}
-	else
-		redrawFlag_ = true;
+	if (textLabel_.valid() ) updateFlag_ = true;
+    else redrawFlag_ = true;
 #endif
 #endif
 	BROADCAST(this, "sf", "setMargin", getMargin());
