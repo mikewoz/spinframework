@@ -40,6 +40,8 @@
 // -----------------------------------------------------------------------------
 
 #import <Cocoa/Cocoa.h>
+#include <AppKit/AppKit.h>
+#import "SpinViewerAppDelegate.h"
 #include "spinApp.h"
 #include <dlfcn.h>
 
@@ -61,6 +63,12 @@ int main(int argc, char *argv[])
     }
     
     spin::spinApp &spin = spin::spinApp::Instance();
+    
+    SpinViewerAppDelegate *delegate = [[SpinViewerAppDelegate alloc] init];
+    [NSApplication sharedApplication];
+    [NSApp setDelegate:delegate];
+
+    
     
     [pool release];
     

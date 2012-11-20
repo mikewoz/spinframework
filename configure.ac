@@ -271,9 +271,16 @@ fi
 AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
 dnl PCL
-dnl FIXME: the line below is evil but required in order to get -lflann working
-#export PKG_CONFIG_PATH=$PWD
-PCL_PKGS="pcl_common-1.6 pcl_io-1.6 pcl_filters-1.6 pcl_octree-1.6"
+AC_ARG_ENABLE([pcl-dev],
+    AS_HELP_STRING([--enable-pcl-dev], [Enables linking with the latest development branch of PCL]),
+    [enable_pcl_dev=$enableval],
+    [enable_pcl_dev=true])
+if test "x$enable_pcl_dev" != xtrue; then
+  PCL_PKGS="pcl_common-1.7 pcl_filters-1.7 pcl_io-1.7 pcl_kdtree-1.7 pcl_octree-1.7 pcl_sample_consensus-1.7 pcl_search-1.7"
+  AC_DEFINE([PCL_VERSION_HIGHER_THAN_1_6],[1],[When pcl-dev is enabled, we set this flag])
+else
+  PCL_PKGS="pcl_common-1.6 pcl_filters-1.6 pcl_io-1.6 pcl_kdtree-1.6 pcl_octree-1.6 pcl_sample_consensus-1.6 pcl_search-1.6"
+fi
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])

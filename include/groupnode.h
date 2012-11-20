@@ -442,7 +442,7 @@ protected:
     
     osg::ref_ptr<osgAnimation::Motion> motion_;
     osg::Vec3 motionStart_, motionEnd_;
-    pthread_mutex_t motionMutex_;
+    //pthread_mutex_t motionMutex_;
 
     InteractionMode interactionMode_;
     std::vector<osg::Vec4> trajectory_;
