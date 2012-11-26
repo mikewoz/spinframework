@@ -1666,6 +1666,8 @@ void SceneManager::update()
 // save scene as .osg
 void SceneManager::exportScene (const char *nodeID, const char *filename)
 {
+    if (spinApp::Instance().getContext()->isServer()) return;
+    
     std::string fullPath = std::string(filename);
     if (fullPath.substr(fullPath.size()-4) != ".osg")
         fullPath += ".osg";
