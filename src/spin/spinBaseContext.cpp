@@ -875,7 +875,10 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         }
     }
     else if ((theMethod == "exportScene") && (argc==3))
+    {
         sceneManager->exportScene((char*) argv[1], (char*) argv[2]);
+        spin.BroadcastSceneMessage("sss", "exportScene", (char*) argv[1], (char*) argv[2], SPIN_ARGS_END);
+    }
     else if ((theMethod == "load") && (argc==2))
         sceneManager->loadXML((char*) argv[1]);
     else if ((theMethod == "save") && (argc==2))
