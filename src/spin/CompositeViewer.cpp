@@ -97,6 +97,7 @@ CompositeViewer::~CompositeViewer()
     bool lIsMBlur = (mMBlurPPUs.size() == getNumViews());
     bool lIsOutline = (mOutlinePPUs.size() == getNumViews());
     bool lIsMask = (mMaskPPUs.size() == getNumViews());
+    bool lIsShader = (mShaderPPUs.size() == getNumViews());
 
     if(mbInitialized)
     {
@@ -114,6 +115,8 @@ CompositeViewer::~CompositeViewer()
                 delete mOutlinePPUs[i];
             if(lIsMask)
                 delete mMaskPPUs[i];
+            if(lIsShader)
+                delete mShaderPPUs[i];
         }
     }
 }
@@ -448,6 +451,15 @@ void CompositeViewer::initializePPU(unsigned int pEffect)
             lMask->createMaskPipeline(lProcessor, lastUnit, slaveCam);
 
             mMaskPPUs.push_back(lMask);
+        }
+
+        // User specified shader
+        if((pEffect & PPU_SHADER) != 0)
+        {
+            ShaderRendering* lShader = new ShaderRendering();
+            lShader->createShaderPipeline(lProcessor, lastUnit);
+
+            mShaderPPUs.push_back(lShader);
         }
 
         // add a text ppu after the pipeline is setted up
@@ -1492,7 +1504,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         }
     }
 
-    bool lIsDof, lIsSSAO, lIsMBlur, lIsOutline, lIsMask;
+    bool lIsDof, lIsSSAO, lIsMBlur, lIsOutline, lIsMask, lIsShader;
 
     int lNumPPUs = 0;
     if(!viewer->isDome())
@@ -1503,6 +1515,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         lIsMBlur = (viewer->mMBlurPPUs.size() == lNumPPUs);
         lIsOutline = (viewer->mOutlinePPUs.size() == lNumPPUs);
         lIsMask = (viewer->mMaskPPUs.size() == lNumPPUs);
+        lIsShader = (viewer->mShaderPPUs.size() == lNumPPUs);
     }
     else
     {
@@ -1517,6 +1530,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
         lIsMBlur = (viewer->mMBlurPPUs.size() == lNumPPUs);
         lIsOutline = (viewer->mOutlinePPUs.size() == lNumPPUs);
         lIsMask = (viewer->mMaskPPUs.size() == lNumPPUs);
+        lIsShader = (viewer->mShaderPPUs.size() == lNumPPUs);
     }
 
     if ((theMethod=="setParam") && (stringArgs.size()==1) && (floatArgs.size()==1))
@@ -1640,10 +1654,26 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                     viewer->mMaskPPUs[i]->setLightSearchStep(floatArgs[0]);
                 }
             }
+
         }
 
 
         return 1;
+    }
+    else if ((theMethod=="setParam") && (stringArgs.size()==2))
+    {
+        // For each view
+        for(unsigned int i=0; i<lNumPPUs; ++i)
+        {
+            // Params for the custom shader PPU
+            if(lIsShader)
+            {
+                if (stringArgs[0] == "shader")
+                {
+                    viewer->mShaderPPUs[i]->setShaderFile(stringArgs[1]);
+                }
+            }
+        }
     }
     else if ((theMethod=="setOutlineColor"))
     {

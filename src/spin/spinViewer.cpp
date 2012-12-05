@@ -102,6 +102,7 @@ int run(int argc, char **argv)
     bool mblur = false;
     bool outline = false;
     bool mask = false;
+    bool shader = false;
     float speedScaleValue = 1.0;
     float moving = false;
 
@@ -161,7 +162,8 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--dof", "Enables depth of field effect");
     arguments.getApplicationUsage()->addCommandLineOption("--ssao", "Enables screen space ambient occlusion effect");
     arguments.getApplicationUsage()->addCommandLineOption("--mblur", "Enables motion blur effect");
-    arguments.getApplicationUsage()->addCommandLineOption("--outline", "Enables the outline effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--outline <filename>", "Enables the outline effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--shader", "Activates an additionnal PPU shader, to specify through OSC messaging");
     arguments.getApplicationUsage()->addCommandLineOption("--mask", "Enables the masking effect (from a secondary camera render)");
     arguments.getApplicationUsage()->addCommandLineOption("--display-fps < [terminal|window|log] t >", "Display the framerate on the terminal, in a window or in the server's logs.  The fps is refreshed every t seconds.");
     // *************************************************************************
@@ -192,6 +194,7 @@ int run(int argc, char **argv)
     if (arguments.read("--mblur")) mblur=true;
     if (arguments.read("--outline")) outline=true;
     if (arguments.read("--mask")) mask=true;
+    if (arguments.read("--shader")) shader=true;
     while (arguments.read("--window",x,y,width,height)) {}
     while (arguments.read("--screen",screen)) {}
     while (arguments.read("--framerate",maxFrameRate)) {}
@@ -411,7 +414,7 @@ int run(int argc, char **argv)
         view->addEventHandler(new osgViewer::ThreadingHandler);
         view->addEventHandler(new osgViewer::WindowSizeHandler);
 
-        if (dof || ssao || mblur || outline || mask)
+        if (dof || ssao || mblur || outline || mask || shader)
         {
             view->addEventHandler(new CustomResizeHandler(&viewer));
         }
@@ -605,7 +608,7 @@ int run(int argc, char **argv)
     //std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
     std::cout << "\nspinviewer is READY" << std::endl;
 
-    if (dof || ssao || mblur || outline || mask)
+    if (dof || ssao || mblur || outline || mask || shader)
     {
         unsigned int lEffects = 0x0000;
         if(dof)
@@ -618,6 +621,8 @@ int run(int argc, char **argv)
             lEffects |= PPU_OUTLINE;
         if(mask)
             lEffects |= PPU_MASK;
+        if(shader)
+            lEffects |= PPU_SHADER;
 
         //viewer.frame();
         viewer.viewerInit(); // TODO: move this in a better place

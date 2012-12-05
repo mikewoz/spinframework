@@ -53,6 +53,7 @@
 #include "motionblurppu.h"
 #include "outlineppu.h"
 #include "maskppu.h"
+#include "shaderppu.h"
 
 namespace spin
 {
@@ -125,6 +126,7 @@ class PPUProcessor : public osgPPU::Processor
 #define PPU_MOTIONBLUR  0x0004
 #define PPU_OUTLINE     0x0008
 #define PPU_MASK        0x0010
+#define PPU_SHADER      0x0020
 
 class CompositeViewer : public osgViewer::CompositeViewer
 //class CompositeViewer : public osgViewer::Viewer
@@ -182,6 +184,7 @@ class CompositeViewer : public osgViewer::CompositeViewer
         std::vector<MotionBlurRendering*> mMBlurPPUs;
         std::vector<OutlineRendering*> mOutlinePPUs;
         std::vector<MaskRendering*> mMaskPPUs;
+        std::vector<ShaderRendering*> mShaderPPUs;
 
     private:
         std::vector<osgPPU::Processor*> mProcessors;
