@@ -266,6 +266,7 @@ bool spinApp::initPython()
 
     try {
         Py_Initialize();
+        PyEval_InitThreads();
         _pyMainModule = boost::python::import("__main__");
         _pyNamespace = _pyMainModule.attr("__dict__");
 
