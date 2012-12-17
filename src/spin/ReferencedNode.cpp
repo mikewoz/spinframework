@@ -175,6 +175,8 @@ void ReferencedNode::attachTo (const char* parentID)
 
     osg::ref_ptr<ReferencedNode> newParentNode = sceneManager_->getNode(parentID);
 
+    if ( newParentNode.get() == this ) return;
+
     if (newParentNode.valid())
     {
         if (! (newParentNode->getAttachmentNode()->containsNode(this)))
