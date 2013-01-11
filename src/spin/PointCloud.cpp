@@ -122,6 +122,12 @@ PointCloud::~PointCloud()
         grabber_->stop();
         grabber_ = 0;
     }
+
+    if (shmPointCloud_.get())
+    {
+        shmIsRunning = false;
+        shmThread_->join();
+    }
 #endif
 }
 // -----------------------------------------------------------------------------
@@ -161,16 +167,6 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
         updateFlag_ = true;
     }
     
-    // If we use a shmdata through ShmPointCloud, this is the way
-    if (shmPointCloud_.get() != nullptr)
-    {
-        if (shmPointCloud_->isUpdated())
-        {
-            shmPointCloud_->getCloud(cloud_);
-            updateFlag_ = true;
-        }
-    }
-
     // an "update" will just update positions, colors, spacing, etc of the
     // points (eg, when the grabberCallback gets a new frame from the Kinect)
     if (updateFlag_)
@@ -616,6 +612,32 @@ void PointCloud::setURI(const char* filename)
   		//shmdata_any_reader_start(shmReader_, shmPath.c_str());
 
         shmPointCloud_.reset(new ShmPointCloud<pcl::PointXYZRGBA>(shmPath.c_str(), false));
+
+        // We create a thread to handle the clouds from the shmData
+        shmIsRunning = true;
+        shmThread_.reset(new std::thread([&] ()
+        {
+            struct timespec sleepTime;
+            sleepTime.tv_sec = 0;
+            sleepTime.tv_nsec = 1e5;
+
+            while (shmIsRunning)
+            {
+                if (shmPointCloud_->isUpdated())
+                {
+                    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
+                    shmPointCloud_->getCloud(cloudOut);
+
+                    std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+    		        applyFilters(cloudOut);
+
+                    updateFlag_ = true;
+                }
+
+                nanosleep(&sleepTime, NULL);
+            }
+        } ));
+
 #endif
 
 		maxPoints_ = 76800;

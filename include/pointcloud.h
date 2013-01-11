@@ -43,6 +43,7 @@
 #define PointCloud_H_
 
 #include <memory>
+#include <thread>
 
 #include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>
@@ -171,6 +172,8 @@ private:
 #ifdef WITH_SHARED_VIDEO
 	//shmdata_any_reader_t *shmReader_;
     std::shared_ptr<ShmPointCloud<pcl::PointXYZRGBA>> shmPointCloud_;
+    std::shared_ptr<std::thread> shmThread_;
+    bool shmIsRunning;
 #endif
 	
     t_symbol* customNode_;
