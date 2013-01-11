@@ -36,6 +36,7 @@ libSPINwrappers_la_SOURCES = \
     videotexture.cpp
 
 libSPINwrappers_la_CPPFLAGS = \
+    -std=gnu++0x \
     $(BOOST_CPPFLAGS) \
     $(CPPINTROSPECTION_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
@@ -53,7 +54,8 @@ libSPINwrappers_la_SOURCES += collisionshape.cpp
 endif
 
 if PCL
-libSPINwrappers_la_CPPFLAGS += $(PCL_CFLAGS)
+libSPINwrappers_la_CPPFLAGS += $(PCL_CFLAGS) \
+    -I/usr/include/ni
 libSPINwrappers_la_SOURCES += pointcloud.cpp
 endif
 

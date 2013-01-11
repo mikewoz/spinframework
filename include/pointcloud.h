@@ -42,6 +42,8 @@
 #ifndef PointCloud_H_
 #define PointCloud_H_
 
+#include <memory>
+
 #include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>
 #include <osg/ShapeDrawable>
@@ -53,14 +55,19 @@
 
 #ifdef WITH_PCL
 #include <pcl/pcl_config.h>
-#include <pcl/io/openni_grabber.h>
+#include <pcl/point_cloud.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#include <pcl/io/openni_grabber.h>
+#include <pcl/common/time.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/passthrough.h>
 #include <pcl/compression/octree_pointcloud_compression.h>
 #endif //WITH_PCL
 
 #ifdef WITH_SHARED_VIDEO
 #include <shmdata/any-data-reader.h>
+#include "shmpointcloud.h"
 #endif
 
 namespace spin
@@ -91,13 +98,13 @@ public:
 	
 #ifdef WITH_PCL
 #ifdef WITH_SHARED_VIDEO
-	static void shmCallback (
-	     shmdata_any_reader_t *reader,
-         void *shmbuf,
-         void *data,
-         int data_size,
-         unsigned long long timestamp,
-         const char *type_description, void *user_data);
+	//static void shmCallback (
+	//     shmdata_any_reader_t *reader,
+    //     void *shmbuf,
+    //     void *data,
+    //     int data_size,
+    //     unsigned long long timestamp,
+    //     const char *type_description, void *user_data);
 #endif
 	
     void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &cloud);
@@ -162,7 +169,8 @@ private:
 #endif
 
 #ifdef WITH_SHARED_VIDEO
-	shmdata_any_reader_t *shmReader_;
+	//shmdata_any_reader_t *shmReader_;
+    std::shared_ptr<ShmPointCloud<pcl::PointXYZRGBA>> shmPointCloud_;
 #endif
 	
     t_symbol* customNode_;
