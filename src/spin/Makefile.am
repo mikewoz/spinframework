@@ -1,4 +1,5 @@
 AM_CPPFLAGS = \
+    -std=gnu++0x \
     $(BOOST_CPPFLAGS) \
     $(CPPINTROSPECTION_CFLAGS) \
     $(PYTHON_CPPFLAGS) \
@@ -204,7 +205,8 @@ libspinframework_@SPIN_API_VERSION@_la_include_HEADERS += \
 endif
 
 if PCL
-AM_CPPFLAGS += $(PCL_CFLAGS)  
+AM_CPPFLAGS += $(PCL_CFLAGS) \
+    -I/usr/include/ni
 libspinframework_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
 #the following fixes the bugy pc file in libflann
 #libspinframework_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)

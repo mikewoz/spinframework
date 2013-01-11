@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+
 #include "config.h"
 
 
@@ -53,17 +54,6 @@
 #include <osgUtil/SmoothingVisitor>
 #include <osgSim/LightPointNode>
 #include <osgDB/FileNameUtils>
-
-#ifdef WITH_PCL
-#include <pcl/point_cloud.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
-#include <pcl/io/openni_grabber.h>
-#include <pcl/common/time.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/compression/octree_pointcloud_compression.h>
-#endif
 
 #include "pointcloud.h"
 #include "scenemanager.h"
@@ -111,7 +101,7 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     
 #ifdef WITH_PCL
 	#ifdef WITH_SHARED_VIDEO
-	shmReader_ = 0;
+	//shmReader_ = 0;
 	#endif
     grabber_ = 0;
     #if PCL_VERSION_HIGHER_THAN_1_6
@@ -131,6 +121,12 @@ PointCloud::~PointCloud()
     {
         grabber_->stop();
         grabber_ = 0;
+    }
+
+    if (shmPointCloud_.get())
+    {
+        shmIsRunning = false;
+        shmThread_->join();
     }
 #endif
 }
@@ -178,6 +174,8 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
         this->updatePoints();
         updateFlag_ = false;
     }
+
+
 #endif
     
     GroupNode::callbackUpdate(nv);
@@ -188,47 +186,47 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 #ifdef WITH_PCL
 
 #ifdef WITH_SHARED_VIDEO 
-void PointCloud::shmCallback (
-         shmdata_any_reader_t *reader,
-         void *shmbuf,
-         void *data,
-         int data_size,
-         unsigned long long timestamp,
-         const char *type_description, void *user_data)
-{
-
-	PointCloud *node = (PointCloud*)(user_data);
-
-	pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
-	
- 	// stringstream to store compressed point cloud
-	std::stringstream compressedData;
-	compressedData.write ((const char *) data, data_size);
-	
-  	// decode:
-	node->decoder_->decodePointCloud(compressedData,cloudOut);
-
-	std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
-	
-	// update stored pointcloud:
-	{
-		// Just write the pointcloud to our local instance:
-		/*
-		boost::mutex::scoped_lock lock (grabberMutex);
-		node->cloud_.swap(cloudOut);
-		*/
-		
-		// OR call applyFilters:
-		node->applyFilters(cloudOut);
-	}
-
-	// TODO: we should only set updateFlag_ here and try to draw only once
-	// when we get the first frame, right? Unless, the shm data can change size?
-	//node->redrawFlag_ = true;
-	node->updateFlag_ = true;
-	
-	shmdata_any_reader_free (shmbuf);
-}
+//void PointCloud::shmCallback (
+//         shmdata_any_reader_t *reader,
+//         void *shmbuf,
+//         void *data,
+//         int data_size,
+//         unsigned long long timestamp,
+//         const char *type_description, void *user_data)
+//{
+//
+//	PointCloud *node = (PointCloud*)(user_data);
+//
+//	pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
+//	
+// 	// stringstream to store compressed point cloud
+//	std::stringstream compressedData;
+//	compressedData.write ((const char *) data, data_size);
+//	
+//  	// decode:
+//	node->decoder_->decodePointCloud(compressedData,cloudOut);
+//
+//	std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+//	
+//	// update stored pointcloud:
+//	{
+//		// Just write the pointcloud to our local instance:
+//		/*
+//		boost::mutex::scoped_lock lock (grabberMutex);
+//		node->cloud_.swap(cloudOut);
+//		*/
+//		
+//		// OR call applyFilters:
+//		node->applyFilters(cloudOut);
+//	}
+//
+//	// TODO: we should only set updateFlag_ here and try to draw only once
+//	// when we get the first frame, right? Unless, the shm data can change size?
+//	//node->redrawFlag_ = true;
+//	node->updateFlag_ = true;
+//	
+//	shmdata_any_reader_free (shmbuf);
+//}
 #endif
 
 //#if PCL_MAJOR_VERSION>1 && PCL_MINOR_VERSION>5
@@ -575,11 +573,11 @@ void PointCloud::setURI(const char* filename)
         grabber_ = 0;
     }
 #ifdef WITH_SHARED_VIDEO
-	if (shmReader_)
-	{
-		shmdata_any_reader_close(shmReader_);
-		shmReader_ = 0;
-	}
+	//if (shmReader_)
+	//{
+	//	shmdata_any_reader_close(shmReader_);
+	//	shmReader_ = 0;
+	//}
 #endif
 	
     cloudOrig_.reset();
@@ -603,15 +601,43 @@ void PointCloud::setURI(const char* filename)
 		std::cout << "Connecting to shmdata path: " << shmPath << std::endl;
 		
 #ifdef WITH_SHARED_VIDEO
-		shmReader_ = shmdata_any_reader_init();
-		if (1)//(verbose)
-			shmdata_any_reader_set_debug(shmReader_, SHMDATA_ENABLE_DEBUG);
-		else
-			shmdata_any_reader_set_debug(shmReader_, SHMDATA_DISABLE_DEBUG);
+		//shmReader_ = shmdata_any_reader_init();
+		//if (1)//(verbose)
+		//	shmdata_any_reader_set_debug(shmReader_, SHMDATA_ENABLE_DEBUG);
+		//else
+		//	shmdata_any_reader_set_debug(shmReader_, SHMDATA_DISABLE_DEBUG);
 
-		shmdata_any_reader_set_on_data_handler(shmReader_, &PointCloud::shmCallback, this);
-  		shmdata_any_reader_set_data_type(shmReader_, "application/x-pcd");
-  		shmdata_any_reader_start(shmReader_, shmPath.c_str());
+		//shmdata_any_reader_set_on_data_handler(shmReader_, &PointCloud::shmCallback, this);
+  		//shmdata_any_reader_set_data_type(shmReader_, "application/x-pcd-compressed");
+  		//shmdata_any_reader_start(shmReader_, shmPath.c_str());
+
+        shmPointCloud_.reset(new ShmPointCloud<pcl::PointXYZRGBA>(shmPath.c_str(), false));
+
+        // We create a thread to handle the clouds from the shmData
+        shmIsRunning = true;
+        shmThread_.reset(new std::thread([&] ()
+        {
+            struct timespec sleepTime;
+            sleepTime.tv_sec = 0;
+            sleepTime.tv_nsec = 1e5;
+
+            while (shmIsRunning)
+            {
+                if (shmPointCloud_->isUpdated())
+                {
+                    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
+                    shmPointCloud_->getCloud(cloudOut);
+
+                    std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+    		        applyFilters(cloudOut);
+
+                    updateFlag_ = true;
+                }
+
+                nanosleep(&sleepTime, NULL);
+            }
+        } ));
+
 #endif
 
 		maxPoints_ = 76800;
