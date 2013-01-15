@@ -43,7 +43,10 @@
 #define PointCloud_H_
 
 #include <memory>
+
+#ifdef WITH_SHARED_VIDEO
 #include <thread>
+#endif
 
 #include <osg/PositionAttitudeTransform>
 #include <osg/MatrixTransform>

@@ -122,12 +122,14 @@ PointCloud::~PointCloud()
         grabber_->stop();
         grabber_ = 0;
     }
-
+    
+	#ifdef WITH_SHARED_VIDEO
     if (shmPointCloud_.get())
     {
         shmIsRunning = false;
         shmThread_->join();
     }
+    #endif
 #endif
 }
 // -----------------------------------------------------------------------------
