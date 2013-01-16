@@ -47,14 +47,14 @@ class NetworkPointCloudCompression : public OctreePointCloudCompression<PointT, 
     typedef typename OctreePointCloudCompression<PointT, LeafT, BranchT, OctreeT>::PointCloudPtr PointCloudPtr;
 
     public:
-        NetworkPointCloudCompression(compression_Profiles_e compressionProfile_arg = MED_RES_ONLINE_COMPRESSION_WITH_COLOR,
-                               bool showStatistics_arg = false,
-                               const double pointResolution_arg = 0.001,
-                               const double octreeResolution_arg = 0.01,
-                               bool doVoxelGridDownDownSampling_arg = false,
-                               const unsigned int iFrameRate_arg = 0,
-                               bool doColorEncoding_arg = true,
-                               const unsigned char colorBitResolution_arg = 6) :
+        NetworkPointCloudCompression(const compression_Profiles_e compressionProfile_arg = MED_RES_ONLINE_COMPRESSION_WITH_COLOR,
+                                     const bool showStatistics_arg = false,
+                                     const double pointResolution_arg = 0.001,
+                                     const double octreeResolution_arg = 0.01,
+                                     const bool doVoxelGridDownDownSampling_arg = false,
+                                     const unsigned int iFrameRate_arg = 0,
+                                     const bool doColorEncoding_arg = true,
+                                     const unsigned char colorBitResolution_arg = 6) :
             OctreePointCloudCompression<PointT, LeafT, BranchT, OctreeT> (compressionProfile_arg, showStatistics_arg, pointResolution_arg,
                 octreeResolution_arg, doVoxelGridDownDownSampling_arg, iFrameRate_arg, doColorEncoding_arg, colorBitResolution_arg),
             validFrame_(PointCloudPtr()),
@@ -114,10 +114,11 @@ class PointCloudBlob
         ~PointCloudBlob() {free(_blob);}
 
         void* toBlob(typename PointCloud<T>::Ptr &cloud, int &size);
-        typename PointCloud<T>::Ptr toCloud(void* blob, int size);
+        typename PointCloud<T>::Ptr toCloud(const void* blob, const int size);
 
     private:
         float* _blob;
+        unsigned int _size;
 };
 
 /*************/
@@ -125,19 +126,23 @@ template <typename T>
 PointCloudBlob<T>::PointCloudBlob()
 {
     _blob = NULL;
+    _size = 0;
 }
 
 /*************/
 template <typename T>
 void* PointCloudBlob<T>::toBlob(typename PointCloud<T>::Ptr &cloud, int &size)
 {
-    if (_blob != NULL)
-        free(_blob);
-
     // Get the size for the blob
-    size_t cloudSize = cloud->size();
-    int blobSize = cloudSize * (3 + 1); // each point is 3 floats for xyz and one float for the color
-    _blob = (float*)malloc(blobSize*sizeof(float));
+    const size_t cloudSize = cloud->size();
+    const unsigned int blobSize = cloudSize * (3 + 1); // each point is 3 floats for xyz and one float for the color
+
+    if (blobSize > _size)
+    {
+        free(_blob);
+        _blob = (float*)malloc(blobSize*sizeof(float));
+        _size = blobSize;
+    }
 
     for (unsigned int i = 0; i < cloudSize; ++i)
     {
@@ -154,15 +159,16 @@ void* PointCloudBlob<T>::toBlob(typename PointCloud<T>::Ptr &cloud, int &size)
 
 /*************/
 template <typename T>
-typename PointCloud<T>::Ptr PointCloudBlob<T>::toCloud(void* blob, int size)
+typename PointCloud<T>::Ptr PointCloudBlob<T>::toCloud(const void* blob, const int size)
 {
     typename PointCloud<T>::Ptr cloud(new PointCloud<T>());
 
     // Get the size of the cloud
-    float* newBlob = (float*)blob;
-    unsigned int cloudSize = size / (4*sizeof(float));
+    const float* newBlob = (float*)blob;
+    const unsigned int cloudSize = size / (4*sizeof(float));
 
     cloud->reserve(cloudSize);
+
     for (unsigned int i = 0; i < cloudSize; ++i)
     {
         T point;
@@ -189,21 +195,21 @@ class ShmPointCloud
     public:
         typedef typename pcl::PointCloud<T>::Ptr cloudPtr;
 
-        ShmPointCloud(const char* filename, bool isWriter = false);
+        ShmPointCloud(const char* filename, const bool isWriter = false);
         ~ShmPointCloud();
 
-        void setCompression(compression_Profiles_e compressionProfile = MED_RES_ONLINE_COMPRESSION_WITH_COLOR,
-                            bool showStatistics = false,
+        void setCompression(const compression_Profiles_e compressionProfile = MED_RES_ONLINE_COMPRESSION_WITH_COLOR,
+                            const bool showStatistics = false,
                             const double pointResolution = 0.001,
                             const double octreeResolution = 0.01,
-                            bool doVoxelGridDownDownSampling = false,
+                            const bool doVoxelGridDownDownSampling = false,
                             const unsigned int iFrameRate = 0,
-                            bool doColorEncoding = true,
+                            const bool doColorEncoding = true,
                             const unsigned char colorBitResolution = 6);
 
-        bool isUpdated() {return _updated;}
-        unsigned long long getCloud(cloudPtr &cloud);
-        void setCloud(cloudPtr &cloud, bool compress = false, unsigned long long timestamp = 0);
+        bool isUpdated() const {return _updated;}
+        unsigned long long getCloud(cloudPtr &cloud) const;
+        void setCloud(const cloudPtr &cloud, const bool compress = false, const unsigned long long timestamp = 0);
 
     private:
         bool _isWriter;
@@ -214,13 +220,13 @@ class ShmPointCloud
         shmdata_any_reader_t* _reader;
         cloudPtr _cloud;
 
-        bool _updated;
+        mutable bool _updated;
         unsigned long long _timestamp;
 
         char* _dataBuffer;
         unsigned int _dataBufferSize;
 
-        std::mutex _mutex;
+        mutable std::mutex _mutex;
 
         std::shared_ptr<NetworkPointCloudCompression<T>> _networkPointCloudEncoder;
         std::shared_ptr<PointCloudBlob<T>> _blober;
@@ -231,7 +237,7 @@ class ShmPointCloud
 
 /*************/
 template <typename T>
-ShmPointCloud<T>::ShmPointCloud(const char* filename, bool isWriter) :
+ShmPointCloud<T>::ShmPointCloud(const char* filename, const bool isWriter) :
     _writer(NULL),
     _reader(NULL),
     _updated(false)
@@ -297,7 +303,7 @@ void ShmPointCloud<T>::setCompression(compression_Profiles_e compressionProfile,
 
 /*************/
 template <typename T>
-unsigned long long ShmPointCloud<T>::getCloud(cloudPtr &cloud)
+unsigned long long ShmPointCloud<T>::getCloud(cloudPtr &cloud) const
 {
     std::lock_guard<std::mutex> lock(_mutex);
     cloud = _cloud;
@@ -307,10 +313,12 @@ unsigned long long ShmPointCloud<T>::getCloud(cloudPtr &cloud)
 
 /*************/
 template <typename T>
-void ShmPointCloud<T>::setCloud(cloudPtr &cloud, bool compress, unsigned long long timestamp)
+void ShmPointCloud<T>::setCloud(const cloudPtr &cloud, const bool compress, const unsigned long long timestamp)
 {
     if (cloud.get() == NULL || !_isWriter)
         return;
+
+    cloudPtr lCloud = const_cast<cloudPtr&>(cloud);
 
     static bool wasCompressed = false;
     if (compress != wasCompressed)
@@ -352,7 +360,7 @@ void ShmPointCloud<T>::setCloud(cloudPtr &cloud, bool compress, unsigned long lo
     if (compress)
     {
         stringstream compressedData;
-        _networkPointCloudEncoder->encodePointCloud(cloud, compressedData);
+        _networkPointCloudEncoder->encodePointCloud(lCloud, compressedData);
         compressedData.read(_dataBuffer, _dataBufferSize);
 
         unsigned int size = compressedData.gcount();
@@ -371,7 +379,7 @@ void ShmPointCloud<T>::setCloud(cloudPtr &cloud, bool compress, unsigned long lo
     else
     {
         int dataSize;
-        void* blob =_blober->toBlob(cloud, dataSize);
+        void* blob =_blober->toBlob(lCloud, dataSize);
 
         shmdata_any_writer_push_data(_writer, blob, dataSize, currentTime, NULL, NULL);
     }
