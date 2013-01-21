@@ -173,7 +173,7 @@ case "$host" in *-darwin* | *-macos*)
 TINYXML_LIBS=-ltinyxml
 ;;
 *)
-PKG_CHECK_MODULES(TINYXML, tinyxml >= 2.0.0, [], AC_MSG_ERROR(TinyXML 2.0.0 or greater is required. Please see INSTALL))
+PKG_CHECK_MODULES(TINYXML, tinyxml >= 2.0.0, [], AC_MSG_ERROR(TinyXML 2.0.0 or greater is required. Please see README))
 ;;
 esac
 AC_SUBST([TINYXML_LIBS])

@@ -57,7 +57,7 @@ On Ubuntu GNU/Linux Precise LTS 12.04::
     sudo apt-add-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
     sudo apt-get update
     sudo apt-get install automake bison build-essential cmake-curses-gui flex libtool 
-    sudo apt-get install ffmpeg freeglut3-dev libavcodec-dev libavdevice-dev libavformat-dev libboost-filesystem-dev libboost-program-options-dev libboost-python-dev libboost-regex-dev libboost-system-dev libboost-thread-dev libcppintrospection-3.0-dev liblo-dev libopenscenegraph-dev libswscale-dev libxml++2.6-dev
+    sudo apt-get install ffmpeg freeglut3-dev libavcodec-dev libavdevice-dev libavformat-dev libboost-filesystem-dev libboost-program-options-dev libboost-python-dev libboost-regex-dev libboost-system-dev libboost-thread-dev libcppintrospection-3.0-dev liblo-dev libopenscenegraph-dev libswscale-dev libxml++2.6-dev libtinyxml-dev
     sudo apt-get install libspatosc-dev
     sudo apt-get install libspnav-dev spacenavd
     sudo apt-get install python python-dev python-setuptools
