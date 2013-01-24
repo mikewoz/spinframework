@@ -60,7 +60,9 @@ void spinTextNode::computeGlyphRepresentation()
 {
 
 #ifdef OSG_MIN_VERSION_REQUIRED
-#if OSG_MIN_VERSION_REQUIRED(3,0,0)
+#if OSG_MIN_VERSION_REQUIRED(3,0,0) && OSG_VERSION_LESS_OR_EQUAL(3,1,0)
+
+    std::cout << "using spinTextNode" << std::endl;
 
     using namespace osgText;
 
@@ -370,6 +372,7 @@ void spinTextNode::computeGlyphRepresentation()
 
 #else
     osgText::Text::computeGlyphRepresentation();
+    std::cout << "using OSG" << std::endl;
 #endif
 #endif
 
@@ -378,7 +381,7 @@ void spinTextNode::computeGlyphRepresentation()
 osgText::String::iterator spinTextNode::computeLastCharacterOnLine(osg::Vec2& cursor, osgText::String::iterator first, osgText::String::iterator last)
 {
 #ifdef OSG_MIN_VERSION_REQUIRED
-#if OSG_MIN_VERSION_REQUIRED(3,0,0)
+#if OSG_MIN_VERSION_REQUIRED(3,0,0) && OSG_VERSION_LESS_OR_EQUAL(3,1,0)
 
     using namespace osgText;
     
@@ -495,6 +498,7 @@ TextNode::TextNode (SceneManager *sceneManager, const char* initID) : GroupNode(
     drawMode_ = GLYPH;
 	font_ = "arial.ttf";
 	characterSize_ = 0.1f;
+    //lineSpacing_ = 0.0f;
     thickness_ = 0.02f;
     resolution_ = 128;
 	color_ = osg::Vec4(1.0,1.0,1.0,1.0);
@@ -764,7 +768,21 @@ void TextNode::setBackground (backgroundType t)
 void TextNode::setSingleSided (int singleSided)
 {
     singleSided_ = singleSided;
-    updateFlag_ = true;
+    
+    if (textLabel_.valid())
+    {
+        osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
+        if (singleSided_)
+        {
+            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
+        } else
+        {
+            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
+        }
+    }
+    else
+        redrawFlag_ = true;
+
 	BROADCAST(this, "si", "setSingleSided", getSingleSided());
 }
 
@@ -792,24 +810,23 @@ void TextNode::setLighting (int lighting)
 // =============================================================================
 void TextNode::drawText()
 {
-    using std::string;
 	osg::Billboard *b;
 	
     //pthread_mutex_lock(&sceneMutex);
 	
 	
 	// first remove existing text:
+    
 	if (this->getAttachmentNode()->containsNode(textGeode_.get()))
 	{
-		this->getAttachmentNode()->removeChild(textGeode_.get());
-		textGeode_ = NULL;
+        this->getAttachmentNode()->removeChild(textGeode_.get());
+        textGeode_ = NULL;
 	}
     if (textLabel_.valid()) textLabel_ = NULL;
 
 	//bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() && (this->getContext()==getHostname()));
 
-	bool drawOnThisHost = ((this->getContextString() == spinApp::Instance().getUserID()) or
-	                       (this->getContextString() == "NULL"));
+	bool drawOnThisHost = ((this->getContextString() == spinApp::Instance().getUserID()) || (this->getContextString() == "NULL"));
 	
 	if (drawOnThisHost)
 	{
@@ -845,32 +862,35 @@ void TextNode::drawText()
         }
         else
         {
-            spinTextNode *n = new spinTextNode();
-            textLabel_ = n;
-            //testLabel_ = new osgText::Text();
+            //spinTextNode *n = new spinTextNode();
+            osgText::Text *n = new osgText::Text();
+            n->setColorGradientMode(osgText::Text::SOLID);
+            //n->setColorGradientMode(osgText::Text::OVERALL);
+            //n->setColorGradientMode(osgText::Text::PER_CHARACTER);
+            
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(3,0,0)
             n->setEnableDepthWrites(true);
+            //n->setEnableDepthWrites(false);
 #endif
 #endif
+            textLabel_ = n;
         }
-        
-        osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
-        
         
         textLabel_->setLayout(osgText::TextBase::LEFT_TO_RIGHT);
         
-		textGeode_->addDrawable(textLabel_.get());
+        textGeode_->addDrawable(textLabel_.get());
         
+        osg::StateSet *labelStateSet = textLabel_->getOrCreateStateSet();
         
 		// allow transparency:
 		labelStateSet->setMode( GL_BLEND, osg::StateAttribute::ON );
 		labelStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
         
         if (singleSided_)
-            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE );
         else
-            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+            labelStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE );
         
         labelStateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
         
@@ -894,6 +914,7 @@ void TextNode::updateText()
     {
 		// set some parameters for the text:
 		textLabel_->setCharacterSize(characterSize_);
+
 		//textLabel_->setFont(0); // inbuilt font (small)
 		//textLabel_->setFont( sceneManager_->resourcesPath + "/fonts/" + font_ );
 #ifdef OSG_MIN_VERSION_REQUIRED
@@ -916,7 +937,6 @@ void TextNode::updateText()
 		if (tt) tt->setColor( color_ );
 #endif
 #endif
-	
 
         
 #ifdef OSG_MIN_VERSION_REQUIRED
@@ -942,7 +962,7 @@ void TextNode::updateText()
         textLabel_->setMaximumWidth(boxSize_.x() * boxScalar);
         textLabel_->setMaximumHeight(boxSize_.y() * boxScalar);
 
-		// setDrawMode (background):
+		// background:
 		if (background_ == NO_BACKGROUND)
 			textLabel_->setDrawMode(osgText::Text::TEXT);
 		else if (background_ == FILLED)
@@ -968,21 +988,17 @@ void TextNode::updateText()
 #endif
         }
 
-
 		// setAlignment
 		// LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM, CENTER_TOP,
 		// CENTER_CENTER, CENTER_BOTTOM, RIGHT_TOP, RIGHT_CENTER,
 		// RIGHT_BOTTOM, LEFT_BASE_LINE, CENTER_BASE_LINE, RIGHT_BASE_LINE,
 		// LEFT_BOTTOM_BASE_LINE, CENTER_BOTTOM_BASE_LINE, RIGHT_BOTTOM_BASE_LINE
 		textLabel_->setAlignment(alignment_);
-
 		//textLabel_->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS) * osg::Quat(osg::PI, osg::Z_AXIS));
 		textLabel_->setRotation(osg::Quat(osg::PI_2, osg::X_AXIS));
 
         textLabel_->setLineSpacing(lineSpacing_);
-
-		
-        
+    
         
         // finally, set the actual text string:
         std::string finalString;
