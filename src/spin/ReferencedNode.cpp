@@ -213,7 +213,17 @@ void ReferencedNode::attachTo (const char* parentID)
 
 void ReferencedNode::detachFrom(const char* parentID)
 {
-    if (getID()=="world") return;
+    if (getID()=="world")
+    {
+        if (sceneManager_->worldNode->containsNode(this))
+        {
+            sceneManager_->worldNode->removeChild(this);
+        }
+    
+        BROADCAST(this, "ss", "detachFrom", "world");
+        spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "detach", this->getID().c_str(), "world", SPIN_ARGS_END);
+        return;
+    }
 
     // detach from all parents if the "*" wildcard is specified:
     if (std::string(parentID)=="*")
