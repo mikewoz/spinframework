@@ -144,7 +144,7 @@ esac
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH:$PWD/pkgconfig
 
 
-CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
+CXXFLAGS+=" -Wall -Wextra -Wfatal-errors -std=c++0x "
 LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.

@@ -26,7 +26,7 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_VIEW
+//#define DEBUG_VIEW
 
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -72,6 +72,19 @@ typedef std::vector< osg::ref_ptr<osg::StateSet> > StateSetList;
 
 /*******************************************************************************/
 
+bool imageHasAlpha( osg::Image* img )
+{
+    switch ( img->getPixelFormat() ) {
+    case(GL_ALPHA):
+    case(GL_LUMINANCE_ALPHA):
+    case(GL_RGBA):
+    case(GL_BGRA):
+        return true;
+    default:
+        return false;
+    }
+}
+
 
 bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
 {
@@ -90,7 +103,7 @@ bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
     }
 
     //indent(); printf("img file name: %s\n", img->getFileName().c_str() );
-    indent(); printf("img is %i x %i\n",img->s(), img->t() );
+    indent(); printf("img is %i x %i x %i\n",img->s(), img->t(), img->r() );
 
     std::string ext = osgDB::getFileExtensionIncludingDot( img->getFileName() );
     std::string prefix = osgDB::getNameLessExtension( osgDB::getSimpleFileName(img->getFileName()) );
@@ -106,7 +119,7 @@ bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
     s = tmp->s();
     t = tmp->t();
 
-    tmp->setFileName( prefix + boost::lexical_cast<std::string>(s) + "x" + boost::lexical_cast<std::string>(t) + ext );
+    tmp->setFileName( prefix + "_" + boost::lexical_cast<std::string>(s) + "x" + boost::lexical_cast<std::string>(t) + ext );
     osgDB::writeImageFile( *tmp, g_outputDir + tmp->getFileName() );
 
 #ifdef DEBUG_VIEW
@@ -151,7 +164,7 @@ bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
 #endif
 
         tmp->scaleImage( s, t, tmp->r() );
-        tmp->setFileName( prefix + boost::lexical_cast<std::string>(s) + "x" + boost::lexical_cast<std::string>(t) + ext );
+        tmp->setFileName( prefix + "_" + boost::lexical_cast<std::string>(s) + "x" + boost::lexical_cast<std::string>(t) + ext );
 
 #ifdef DEBUG_VIEW
         if ( !grayscale ) {
@@ -339,6 +352,7 @@ public:
         const osg::BoundingSphere& bs = g.getBound();
         plod->setCenter( bs.center() );
         plod->setRadius( bs.radius() );
+        plod->setNumChildrenThatCannotBeExpired(1);
 
         bool foundLOD = false;
         osg::Group* lowDef = new osg::Group();
@@ -357,6 +371,7 @@ public:
 
         if ( foundLOD ) {
 
+            //#define DEBUG_VIEW_SPHERES
 #ifdef DEBUG_VIEW_SPHERES
             osg::ShapeDrawable* sd = new osg::ShapeDrawable( new osg::Sphere( bs.center(), bs.radius() ) );
             sd->setColor( osg::Vec4(1, 0, 1, 0.3) );
@@ -437,14 +452,23 @@ public:
             osg::StateSet* ss;
 
             ss = g.getStateSet();
-
+            if ( !ss ) {
+                printf("no stateset.\n");
+                ss = g.getOrCreateStateSet();// was getStateSet
+            }
             if ( ss && isTextureAttribute(ss) ) ssl.push_back( ss );
+            else if ( ss && ss->getNumTextureAttributeLists() > 0 ) ssl.push_back( ss );////////////////////////////////////////////////////////
 
             for( size_t i = 0; i < g.getNumDrawables(); i++ ) {
-                osg::StateSet *ss = g.getDrawable(i)->getStateSet();
+                osg::StateSet *sss = g.getDrawable(i)->getStateSet();
+                if ( !sss ) {
+                    printf("[%zu] no stateset.\n", i);
+                    sss = g.getDrawable(i)->getOrCreateStateSet(); // was getStateSet
+                }
+
                 //if ( isTextureAttribute(ss) )
-                if ( ss->getNumTextureAttributeLists() > 0 )
-                    ssl.push_back( ss );
+                if ( sss->getNumTextureAttributeLists() > 0 )
+                    ssl.push_back( sss );
 
             }
 
@@ -490,6 +514,11 @@ public:
                         //printf("ss.getName() = %s\n", g.getStateSet()->getName().c_str() );
                         ss = new osg::StateSet( *(*itr) );//*g.getStateSet() );
                         ss->setTextureAttributeAndModes( texunit, tex, osg::StateAttribute::ON );
+                        //if ( imgLOD[i]->isImageTranslucent() ) { CRASHES!
+                        if ( imageHasAlpha( imgLOD[i] ) ) {
+                            ss->setMode(GL_BLEND,osg::StateAttribute::ON);
+                            ss->setRenderingHint( osg::StateSet::TRANSPARENT_BIN);
+                        }
                         gtmp->setStateSet( ss );
 
                         //if ( !_doGeometry )
@@ -523,8 +552,12 @@ public:
 
             indent(); printf( "GEODE: added LOD range %f to %f\n", minSize * f, maxSize * f );
             fflush(stdout);
+            if ( !plod->getChild(i) ) printf ( "!plod->getChild(i)\n" );
+            indent(); printf( "GEODE: saving [%s]\n", (g_outputDir + plod->getFileName(i)).c_str() );
             osgDB::writeNodeFile( *plod->getChild(i), g_outputDir + plod->getFileName(i) );
-            //indent(); printf( "GEODE: added LOD range %f to %f\n", minSize * g_lodScale, maxSize * g_lodScale );
+            //osgDB::writeNodeFile( *geoLOD[i], g_outputDir + plod->getFileName(i) );
+            //osgDB::writeNodeFile( *geoLOD[i], "timeline_data/geode_0_0.osg"); //"g_outputDir + plod->getFileName(i) );
+            indent(); printf( "GEODE: saved [%s]\n", (g_outputDir + plod->getFileName(i)).c_str() );
 
             minSize = maxSize;
             maxSize = cutoff + incr*pow(2,i);
@@ -538,7 +571,7 @@ public:
         const osg::BoundingSphere& bs = geoLOD[geoLOD.size()-1]->getBound();
         plod->setCenter( bs.center() );
         plod->setRadius( bs.radius() );
-
+        plod->setNumChildrenThatCannotBeExpired(1);
         _nbPlods++;
 
         osg::Node::ParentList pl = g.getParents();
@@ -597,12 +630,15 @@ public:
         osgDB::ReaderWriter::ReadResult result = osgDB::Registry::instance()->readImageImplementation(fileName,options);
         std::cout<<"after readImage"<<std::endl;
 
-        if ( !osgDB::fileExists( fileName ) )
+        if ( !osgDB::fileExists( fileName ) ) {
+            printf("file [%s] not found\n", fileName.c_str());
             return osgDB::ReaderWriter::ReadResult( osgDB::ReaderWriter::ReadResult::FILE_NOT_FOUND );
+        }
 
         osg::Image* img = new osg::Image();
         img->setFileName( fileName );
 
+        printf("FILE LOADED [%s]\n", img->getFileName().c_str() );
         return osgDB::ReaderWriter::ReadResult( img, osgDB::ReaderWriter::ReadResult::FILE_LOADED ); // that's a lie!
 
     }
@@ -702,6 +738,8 @@ int main( int argc, char **argv )
         for ( size_t i = 0; i < nodeList.size(); i++ )
             group->addChild( nodeList[i].get());
     }
+
+    //osgDB::writeNodeFile( *group, "group.osgt" );
 
     /*#else // test
 
