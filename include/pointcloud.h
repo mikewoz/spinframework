@@ -42,8 +42,9 @@
 #ifndef PointCloud_H_
 #define PointCloud_H_
 
-#include <memory>
+#include "config.h"
 
+#include <memory>
 #ifdef WITH_SHARED_VIDEO
 #include <thread>
 #endif
@@ -55,7 +56,6 @@
 #include <osg/Timer>
 
 #include "groupnode.h"
-#include "config.h"
 
 #ifdef WITH_PCL
 #include <pcl/pcl_config.h>
