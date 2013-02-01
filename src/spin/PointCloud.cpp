@@ -42,6 +42,7 @@
 
 #include "config.h"
 
+#include <chrono>
 
 #include <osg/Geode>
 #include <osg/BlendColor>
@@ -61,6 +62,7 @@
 #include "spinbasecontext.h"
 #include "osgutil.h"
 
+using namespace std;
 
 //using namespace std;
 extern pthread_mutex_t sceneMutex;
@@ -302,6 +304,11 @@ osg::Vec3 PointCloud::getPos(unsigned int i)
     return osg::Vec3 (cloud_->points[i].x*spacing_, cloud_->points[i].y*spacing_, cloud_->points[i].z*spacing_) + randomVec3()*randomCoeff_;
 }
 
+void PointCloud::getPos(unsigned int i, osg::Vec3& point)
+{
+    point.set(cloud_->points[i].x*spacing_, cloud_->points[i].y*spacing_, cloud_->points[i].z*spacing_);
+}
+
 osg::Vec4f PointCloud::getColor(unsigned int i)
 {
     if (colorMode_==OVERRIDE) return color_;
@@ -319,11 +326,29 @@ osg::Vec4f PointCloud::getColor(unsigned int i)
     return osg::Vec4f ((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f);
 }
 
+void PointCloud::getColor(unsigned int i, osg::Vec4& color)
+{
+    if (colorMode_==OVERRIDE)
+        color = color_;
+
+    uint32_t rgba_val_;
+    memcpy(&rgba_val_, &(cloud_->points[i].rgba), sizeof(uint32_t));
+    
+    uint32_t red,green,blue;
+    blue=rgba_val_ & 0x000000ff;
+    rgba_val_ = rgba_val_ >> 8;
+    green=rgba_val_ & 0x000000ff;
+    rgba_val_ = rgba_val_ >> 8;
+    red=rgba_val_ & 0x000000ff;
+
+    color.set((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f);
+}
+
 void PointCloud::updatePoints()
 {
     if (spinApp::Instance().getContext()->isServer()) return;
     if (redrawFlag_ || !cloud_) return;
-    
+
     boost::mutex::scoped_lock lock(grabberMutex);
     
     //std::cout << "doing update. cloudsize=" << cloud_->points.size() << " maxsize=" << maxPoints_ << std::endl;
@@ -336,12 +361,15 @@ void PointCloud::updatePoints()
         osg::Vec3Array* verts = new osg::Vec3Array();
         osg::Vec4Array* colors = new osg::Vec4Array();
         
+        verts->resize(cloud_->points.size());
+        colors->resize(cloud_->points.size());
+
         for (unsigned int i=0; i<cloud_->points.size(); i++)
         {
-            verts->push_back(this->getPos(i));
-            colors->push_back(this->getColor(i));
+            this->getPos(i, (*verts)[i]);
+            this->getColor(i, (*colors)[i]);
         }
-        
+
         osg::Geometry *geom = new osg::Geometry();
         switch (drawMode_)
         {
@@ -385,7 +413,6 @@ void PointCloud::updatePoints()
         geom->setColorArray(colors);
         geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
         cloudGeode_->addDrawable( geom );
-        
     }
     
     else if ((drawMode_==LIGHTPOINTS) && lightPointNode_.valid() && lightPointNode_->getNumLightPoints())
@@ -395,8 +422,8 @@ void PointCloud::updatePoints()
         {
             osgSim::LightPoint& lp = lightPointNode_->getLightPoint(i);
             lp._on = true;
-            lp._color = this->getColor(i);
-            lp._position = this->getPos(i);
+            this->getColor(i, lp._color);
+            this->getPos(i, lp._position);
             lp._radius = pointSize_/1000.0;
         }
         for (; i<maxPoints_; i++)
@@ -458,7 +485,6 @@ void PointCloud::draw()
         if (cloudGeode_.valid()) cloudGeode_ = NULL;
         xforms_.clear();
     }
-    
     
     if (maxPoints_<=0) return;
 
