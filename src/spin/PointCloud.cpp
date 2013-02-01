@@ -307,6 +307,8 @@ osg::Vec3 PointCloud::getPos(unsigned int i)
 void PointCloud::getPos(unsigned int i, osg::Vec3& point)
 {
     point.set(cloud_->points[i].x*spacing_, cloud_->points[i].y*spacing_, cloud_->points[i].z*spacing_);
+    if (randomCoeff_ > 0.f)
+        point += randomVec3()*randomCoeff_;
 }
 
 osg::Vec4f PointCloud::getColor(unsigned int i)
