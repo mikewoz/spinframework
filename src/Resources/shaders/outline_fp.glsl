@@ -103,6 +103,8 @@ float sobel()
         lD = fetchSquareDepthLinear();
     else if(uMode == 1)
         lD = fetchSquareLuminance();
+    else if(uMode == 2)
+        lD = fetchSquareDepth();
 
     float gx, gy;
     gx = -1*lD[0][0]-2*lD[1][0]-1*lD[2][0]
