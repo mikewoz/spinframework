@@ -196,8 +196,8 @@ typename PointCloud<T>::Ptr PointCloudBlob<T>::toCloud(const void* blob, const i
 /*************/
 // ShmPointCloud
 /*************/
-#define SHMCLOUD_TYPE_BASE          "application/x-pcd"
-#define SHMCLOUD_TYPE_COMPRESSED    "application/x-pcd-compressed"
+#define SHMCLOUD_TYPE_BASE          "application/x-pcl"
+#define SHMCLOUD_TYPE_COMPRESSED    "application/x-pcd"
 
 template <typename T>
 class ShmPointCloud
