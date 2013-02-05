@@ -70,17 +70,25 @@ class ShaderRendering : virtual public osg::Referenced
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
             // If last unit is nullthe first unit will bypass the color output of the camera
-            osgPPU::Unit* bypass;
+            osgPPU::Unit* colorBuffer[4];
             if (lastUnit == NULL)
             {
-                bypass = new osgPPU::UnitCameraAttachmentBypass();
-                ((osgPPU::UnitCameraAttachmentBypass*)bypass)->setBufferComponent(osg::Camera::COLOR_BUFFER0);
-                ((osgPPU::UnitCameraAttachmentBypass*)bypass)->setName("ColorBypass");
-                parent->addChild(bypass);
+                colorBuffer[0] = new osgPPU::UnitCameraAttachmentBypass();
+                ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[0])->setBufferComponent(osg::Camera::COLOR_BUFFER0);
+                ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[0])->setName("colorBuffer_0");
+                parent->addChild(colorBuffer[0]);
             }
             else
             {
-                bypass = lastUnit;
+                colorBuffer[0] = lastUnit;
+            }
+
+            // We get to other buffers from the camera
+            for (unsigned int i = 1; i < 4; ++i)
+            {
+                colorBuffer[i] = new osgPPU::UnitCameraAttachmentBypass();
+                ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[i])->setBufferComponent(osg::Camera::COLOR_BUFFER0);
+                parent->addChild(colorBuffer[i]);
             }
 
             // If we are unable to open the specified shader, we do nothing
@@ -105,9 +113,12 @@ class ShaderRendering : virtual public osg::Referenced
 
             mShader->getOrCreateStateSet()->setAttributeAndModes(mShaderAttr);
 
-            mShader->setInputToUniform(bypass, "vColor", true);
+            mShader->setInputToUniform(colorBuffer[0], "vColorBuffer_0", true);
+            mShader->setInputToUniform(colorBuffer[1], "vColorBuffer_1", true);
+            mShader->setInputToUniform(colorBuffer[2], "vColorBuffer_2", true);
+            mShader->setInputToUniform(colorBuffer[3], "vColorBuffer_3", true);
 
-            bypass->addChild(mShader);
+            colorBuffer[0]->addChild(mShader);
             lastUnit = mShader;
         }
 };
