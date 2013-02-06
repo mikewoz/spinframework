@@ -84,12 +84,18 @@ class ShaderRendering : virtual public osg::Referenced
             }
 
             // We get to other buffers from the camera
-            for (unsigned int i = 1; i < 4; ++i)
-            {
-                colorBuffer[i] = new osgPPU::UnitCameraAttachmentBypass();
-                ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[i])->setBufferComponent(osg::Camera::COLOR_BUFFER0);
-                parent->addChild(colorBuffer[i]);
-            }
+            colorBuffer[1] = new osgPPU::UnitCameraAttachmentBypass();
+            ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[1])->setBufferComponent(osg::Camera::COLOR_BUFFER1);
+            parent->addChild(colorBuffer[1]);
+
+            colorBuffer[2] = new osgPPU::UnitCameraAttachmentBypass();
+            ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[2])->setBufferComponent(osg::Camera::COLOR_BUFFER2);
+            parent->addChild(colorBuffer[2]);
+
+            colorBuffer[3] = new osgPPU::UnitCameraAttachmentBypass();
+            ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[3])->setBufferComponent(osg::Camera::COLOR_BUFFER3);
+            parent->addChild(colorBuffer[3]);
+
 
             // If we are unable to open the specified shader, we do nothing
             std::string vertexShaderFile = mShaderBaseName + std::string(".vert");
