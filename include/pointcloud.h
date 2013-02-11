@@ -115,7 +115,9 @@ public:
     void applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud);
 
     osg::Vec3 getPos(unsigned int i);
+    void getPos(unsigned int i, osg::Vec3& point);
     osg::Vec4f getColor(unsigned int i);
+    void getColor(unsigned int i, osg::Vec4& color);
 
     virtual void updatePoints();
     virtual void draw();
