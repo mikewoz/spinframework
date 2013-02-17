@@ -87,6 +87,16 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	          __int__getSingleSided,
 	          "",
 	          "");
+	I_Method1(void, setDetailRatio, IN, float, detailRatio,
+	          Properties::NON_VIRTUAL,
+	          __void__setDetailRatio__float,
+	          "",
+	          "");
+	I_Method0(float, getDetailRatio,
+	          Properties::NON_VIRTUAL,
+	          __float__getDetailRatio,
+	          "",
+	          "");
 	I_Method0(void, updateStateSet,
 	          Properties::VIRTUAL,
 	          __void__updateStateSet,
@@ -137,6 +147,9 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_SimpleProperty(const char *, Context, 
 	                 0, 
 	                 __void__setContext__C5_char_P1);
+	I_SimpleProperty(float, DetailRatio, 
+	                 __float__getDetailRatio, 
+	                 __void__setDetailRatio__float);
 	I_SimpleProperty(int, Lighting, 
 	                 __int__getLighting, 
 	                 __void__setLighting__int);

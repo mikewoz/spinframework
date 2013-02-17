@@ -133,6 +133,10 @@ public:
     void setSingleSided (int singleSided);
     int getSingleSided() const { return (int)singleSided_; }
 
+    void setDetailRatio (float detailRatio);
+    float getDetailRatio() const { return detailRatio_; }
+
+
     virtual void updateStateSet();
 
 	/**
@@ -197,6 +201,7 @@ protected:
     virtual void drawShape();
     
     bool singleSided_;
+    float detailRatio_;
 
 };
 

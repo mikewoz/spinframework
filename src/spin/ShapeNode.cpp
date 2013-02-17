@@ -75,6 +75,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, const char* initID) : GroupNod
 	renderBin = -1;
 	lightingEnabled = -1;
     singleSided_ = false;
+    detailRatio_ = 1.0;
     
     // quick shader test:
     if (0)
@@ -237,6 +238,12 @@ void ShapeNode::setSingleSided (int singleSided)
     BROADCAST(this, "si", "setSingleSided", getSingleSided());
 }
 
+void ShapeNode::setDetailRatio (float detailRatio)
+{
+    detailRatio_ = detailRatio;
+    drawShape();
+    BROADCAST(this, "sf", "setDetailRatio", getDetailRatio());
+}
 
 // ===================================================================
 void ShapeNode::drawShape()
@@ -268,7 +275,7 @@ void ShapeNode::drawShape()
 	if (shape and drawOnThisHost)
 	{
 		osg::TessellationHints* hints = new osg::TessellationHints;
-		hints->setDetailRatio(GENERIC_SHAPE_RESOLUTION);
+		hints->setDetailRatio(detailRatio_);
 
 		if (billboard)
 		{
