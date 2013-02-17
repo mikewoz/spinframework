@@ -70,18 +70,32 @@ class ShaderRendering : virtual public osg::Referenced
             osg::ref_ptr<osgDB::ReaderWriter::Options> vertexOptions = new osgDB::ReaderWriter::Options("vertex");
 
             // If last unit is nullthe first unit will bypass the color output of the camera
-            osgPPU::Unit* bypass;
+            osgPPU::Unit* colorBuffer[4];
             if (lastUnit == NULL)
             {
-                bypass = new osgPPU::UnitCameraAttachmentBypass();
-                ((osgPPU::UnitCameraAttachmentBypass*)bypass)->setBufferComponent(osg::Camera::COLOR_BUFFER0);
-                ((osgPPU::UnitCameraAttachmentBypass*)bypass)->setName("ColorBypass");
-                parent->addChild(bypass);
+                colorBuffer[0] = new osgPPU::UnitCameraAttachmentBypass();
+                ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[0])->setBufferComponent(osg::Camera::COLOR_BUFFER0);
+                ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[0])->setName("colorBuffer_0");
+                parent->addChild(colorBuffer[0]);
             }
             else
             {
-                bypass = lastUnit;
+                colorBuffer[0] = lastUnit;
             }
+
+            // We get to other buffers from the camera
+            colorBuffer[1] = new osgPPU::UnitCameraAttachmentBypass();
+            ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[1])->setBufferComponent(osg::Camera::COLOR_BUFFER1);
+            parent->addChild(colorBuffer[1]);
+
+            colorBuffer[2] = new osgPPU::UnitCameraAttachmentBypass();
+            ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[2])->setBufferComponent(osg::Camera::COLOR_BUFFER2);
+            parent->addChild(colorBuffer[2]);
+
+            colorBuffer[3] = new osgPPU::UnitCameraAttachmentBypass();
+            ((osgPPU::UnitCameraAttachmentBypass*)colorBuffer[3])->setBufferComponent(osg::Camera::COLOR_BUFFER3);
+            parent->addChild(colorBuffer[3]);
+
 
             // If we are unable to open the specified shader, we do nothing
             std::string vertexShaderFile = mShaderBaseName + std::string(".vert");
@@ -105,9 +119,12 @@ class ShaderRendering : virtual public osg::Referenced
 
             mShader->getOrCreateStateSet()->setAttributeAndModes(mShaderAttr);
 
-            mShader->setInputToUniform(bypass, "vColor", true);
+            mShader->setInputToUniform(colorBuffer[0], "vColorBuffer_0", true);
+            mShader->setInputToUniform(colorBuffer[1], "vColorBuffer_1", true);
+            mShader->setInputToUniform(colorBuffer[2], "vColorBuffer_2", true);
+            mShader->setInputToUniform(colorBuffer[3], "vColorBuffer_3", true);
 
-            bypass->addChild(mShader);
+            colorBuffer[0]->addChild(mShader);
             lastUnit = mShader;
         }
 };

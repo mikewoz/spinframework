@@ -51,7 +51,7 @@ class OutlineRendering : virtual public osg::Referenced
         /*******************/
         void setOutlineMode(int mode)
         {
-            if(mode != 0 && mode != 1)
+            if(mode < 0 || mode > 2)
                 return;
 
             outlineAttr->set("uMode", mode);

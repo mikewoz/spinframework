@@ -378,6 +378,8 @@ void Menu3D::setColor (float r, float g, float b, float a)
     {
     	if ((*i).valid()) (*i)->setColor(r, g, b, a);
     }
+
+    BROADCAST(this, "sffff", "setColor", r,g,b,a);
 }
 
 // -----------------------------------------------------------------------------

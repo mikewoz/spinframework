@@ -26,10 +26,10 @@
 #include <pcl/point_types.h>
 #include <pcl/compression/octree_pointcloud_compression.h>
 
+#include "config.h"
 #include "shmdata/any-data-reader.h"
 #include "shmdata/any-data-writer.h"
 
-#include "config.h"
 
 using namespace std;
 using namespace pcl;
@@ -113,8 +113,8 @@ class PointCloudBlob
         PointCloudBlob();
         ~PointCloudBlob() {free(_blob);}
 
-        void* toBlob(typename PointCloud<T>::Ptr &cloud, int &size);
-        typename PointCloud<T>::Ptr toCloud(const void* blob, const int size);
+        void* toBlob(typename PointCloud<T>::Ptr &cloud, int &size, const unsigned long long timestamp = 0);
+        typename PointCloud<T>::Ptr toCloud(const void* blob, const int size, unsigned long long* timestamp = NULL);
 
     private:
         float* _blob;
@@ -131,7 +131,7 @@ PointCloudBlob<T>::PointCloudBlob()
 
 /*************/
 template <typename T>
-void* PointCloudBlob<T>::toBlob(typename PointCloud<T>::Ptr &cloud, int &size)
+void* PointCloudBlob<T>::toBlob(typename PointCloud<T>::Ptr &cloud, int &size, const unsigned long long timestamp)
 {
     // Get the size for the blob
     const size_t cloudSize = cloud->size();
@@ -140,32 +140,42 @@ void* PointCloudBlob<T>::toBlob(typename PointCloud<T>::Ptr &cloud, int &size)
     if (blobSize > _size)
     {
         free(_blob);
-        _blob = (float*)malloc(blobSize*sizeof(float));
+        _blob = (float*)malloc(blobSize*sizeof(float) + sizeof(unsigned long long));
         _size = blobSize;
     }
 
+    unsigned long long* stampPtr = (unsigned long long*)_blob;
+    *stampPtr = timestamp;
+
+    float* blobPtr = (float*)((char*)_blob + sizeof(unsigned long long));
     for (unsigned int i = 0; i < cloudSize; ++i)
     {
         T* point = &(cloud->at(i));
-        _blob[i*4 + 0] = point->x;
-        _blob[i*4 + 1] = point->y;
-        _blob[i*4 + 2] = point->z;
-        _blob[i*4 + 3] = point->rgb;
+        blobPtr[i*4 + 0] = point->x;
+        blobPtr[i*4 + 1] = point->y;
+        blobPtr[i*4 + 2] = point->z;
+        blobPtr[i*4 + 3] = point->rgb;
     }
 
-    size = blobSize*sizeof(float);
+    size = blobSize*sizeof(float) + sizeof(unsigned long long);
     return (void*)_blob;
 }
 
 /*************/
 template <typename T>
-typename PointCloud<T>::Ptr PointCloudBlob<T>::toCloud(const void* blob, const int size)
+typename PointCloud<T>::Ptr PointCloudBlob<T>::toCloud(const void* blob, const int size, unsigned long long* timestamp)
 {
     typename PointCloud<T>::Ptr cloud(new PointCloud<T>());
 
+    if (timestamp != NULL)
+    {
+        unsigned long long* stampPtr = (unsigned long long*)blob;
+        *timestamp = *stampPtr;
+    }
+
     // Get the size of the cloud
-    const float* newBlob = (float*)blob;
-    const unsigned int cloudSize = size / (4*sizeof(float));
+    const float* newBlob = (float*)((char*)blob + sizeof(unsigned long long));
+    const unsigned int cloudSize = (size - sizeof(unsigned long long)) / (4*sizeof(float));
 
     cloud->reserve(cloudSize);
 
@@ -186,8 +196,8 @@ typename PointCloud<T>::Ptr PointCloudBlob<T>::toCloud(const void* blob, const i
 /*************/
 // ShmPointCloud
 /*************/
-#define SHMCLOUD_TYPE_BASE          "application/x-pcd"
-#define SHMCLOUD_TYPE_COMPRESSED    "application/x-pcd-compressed"
+#define SHMCLOUD_TYPE_BASE          "application/x-pcl"
+#define SHMCLOUD_TYPE_COMPRESSED    "application/x-pcd"
 
 template <typename T>
 class ShmPointCloud
@@ -267,7 +277,7 @@ ShmPointCloud<T>::ShmPointCloud(const char* filename, const bool isWriter) :
         // Shmdata reader
         _reader = shmdata_any_reader_init();
         shmdata_any_reader_set_on_data_handler(_reader, ShmPointCloud::onData, this);
-        shmdata_any_reader_set_absolute_timestamp(_reader, SHMDATA_ENABLE_ABSOLUTE_TIMESTAMP);
+        //shmdata_any_reader_set_absolute_timestamp(_reader, SHMDATA_ENABLE_ABSOLUTE_TIMESTAMP);
         shmdata_any_reader_start(_reader, (char*)(filename));
     }
 
@@ -357,13 +367,17 @@ void ShmPointCloud<T>::setCloud(const cloudPtr &cloud, const bool compress, cons
     }
 
     // Compress (or not) and send through shmdata
+    // Timestamp is added to the start of the buffer
     if (compress)
     {
+        unsigned long long* stampBuffer = (unsigned long long*)_dataBuffer;
+        *stampBuffer = currentTime;
+
         stringstream compressedData;
         _networkPointCloudEncoder->encodePointCloud(lCloud, compressedData);
-        compressedData.read(_dataBuffer, _dataBufferSize);
+        compressedData.read(_dataBuffer + sizeof(unsigned long long), _dataBufferSize);
 
-        unsigned int size = compressedData.gcount();
+        unsigned int size = compressedData.gcount() + sizeof(unsigned long long);
         if (size == _dataBufferSize)
         {
             // It is likely that the buffer is too short, we will resize it
@@ -373,15 +387,15 @@ void ShmPointCloud<T>::setCloud(const cloudPtr &cloud, const bool compress, cons
         }
         else
         {
-            shmdata_any_writer_push_data(_writer, _dataBuffer, size, currentTime, NULL, NULL);
+            shmdata_any_writer_push_data(_writer, _dataBuffer, size, 0, NULL, NULL);
         }
     }
     else
     {
         int dataSize;
-        void* blob =_blober->toBlob(lCloud, dataSize);
+        void* blob =_blober->toBlob(lCloud, dataSize, currentTime);
 
-        shmdata_any_writer_push_data(_writer, blob, dataSize, currentTime, NULL, NULL);
+        shmdata_any_writer_push_data(_writer, blob, dataSize, 0, NULL, NULL);
     }
 
     auto now = chrono::high_resolution_clock::now();
@@ -399,24 +413,28 @@ void ShmPointCloud<T>::onData(shmdata_any_reader_t* reader, void* shmbuf, void* 
 
     cloudPtr cloudOut(new pcl::PointCloud<T>());
 
+    unsigned long long stamp;
     string dataType(type_description);
     if (dataType == string(SHMCLOUD_TYPE_COMPRESSED))
     {
+        unsigned long long* stampPtr = (unsigned long long*)data;
+        stamp = *stampPtr;
+
         std::stringstream compressedData;
-        compressedData.write((const char*)data, data_size);
+        compressedData.write((const char*)data + sizeof(unsigned long long), data_size);
         context->_networkPointCloudEncoder->decodeNetworkPointCloud(compressedData, cloudOut);
         context->_cloud = cloudOut;
     }
     else if (dataType == string(SHMCLOUD_TYPE_BASE))
     {
-        context->_cloud = context->_blober->toCloud(data, data_size);
+        context->_cloud = context->_blober->toCloud(data, data_size, &stamp);
     }
     else
     {
         return;
     }
 
-    context->_timestamp = timestamp;
+    context->_timestamp = stamp;
     context->_updated = true;
 
     shmdata_any_reader_free(shmbuf);
