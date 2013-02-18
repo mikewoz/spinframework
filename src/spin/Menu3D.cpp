@@ -134,7 +134,7 @@ void Menu3D::addItem (const char *itemText)
 	n->setBillboard(billboardType_);
 	n->setInteractionMode(GroupNode::SELECT);
 	n->setText(itemText);
-    
+    n->setAlignment( osgText::TextBase::CENTER_CENTER );
     n->detachFrom("world");
     n->attachTo(this->getID().c_str());
 	//n->setParent(this->getID().c_str());
