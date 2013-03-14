@@ -29,6 +29,8 @@ src/.deps/*
 src/config.h
 src/config.h.in
 src/stamp-h1
+src/lodifier/lodifier
+src/lodifier/megascene
 spin-*.pc
 tests/.deps/*
 *.lo
