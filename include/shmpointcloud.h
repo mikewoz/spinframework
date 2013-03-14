@@ -39,9 +39,9 @@ using namespace pcl::octree;
 /*************/
 // NetworkPointCloudCompression
 /*************/
-template<typename PointT, typename LeafT = OctreeContainerDataTVector<int>,
-    typename BranchT = OctreeContainerEmpty<int>,
-    typename OctreeT = Octree2BufBase<int, LeafT, BranchT> >
+template<typename PointT, typename LeafT = OctreeContainerPointIndices,
+    typename BranchT = OctreeContainerEmpty,
+    typename OctreeT = Octree2BufBase<LeafT, BranchT> >
 class NetworkPointCloudCompression : public OctreePointCloudCompression<PointT, LeafT, BranchT, OctreeT>
 {
     typedef typename OctreePointCloudCompression<PointT, LeafT, BranchT, OctreeT>::PointCloudPtr PointCloudPtr;
