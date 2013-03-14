@@ -64,6 +64,13 @@ class ShaderRendering : virtual public osg::Referenced
         }
 
         /****************************/
+        void setShaderColor(std::string uniformName, float r, float g, float b, float a)
+        {
+            mShaderAttr->add(uniformName.c_str(), osg::Uniform::FLOAT_VEC4);
+            mShaderAttr->set(uniformName.c_str(), r, g, b, a); 
+        }
+
+        /****************************/
         void createShaderPipeline(osgPPU::Processor* parent, osgPPU::Unit*& lastUnit)
         {
             osg::ref_ptr<osgDB::ReaderWriter::Options> fragmentOptions = new osgDB::ReaderWriter::Options("fragment");
