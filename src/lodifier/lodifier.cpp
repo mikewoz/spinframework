@@ -105,7 +105,7 @@ bool lodifyImage( osg::Image* image, std::deque<osg::Image*>& imgLOD )
     //indent(); printf("img file name: %s\n", img->getFileName().c_str() );
     indent(); printf("img is %i x %i x %i\n",img->s(), img->t(), img->r() );
 
-    std::string ext = osgDB::getFileExtensionIncludingDot( img->getFileName() );
+    std::string ext = ".png"; //osgDB::getFileExtensionIncludingDot( img->getFileName() );
     std::string prefix = osgDB::getNameLessExtension( osgDB::getSimpleFileName(img->getFileName()) );
     //prefix = "balls";
     // prefix = g_outputDir + prefix;
