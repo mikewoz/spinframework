@@ -134,14 +134,6 @@
 
 // stuff needed for SPIN:
 
-//#include <string>
-//#include <iostream>
-//#include <boost/filesystem.hpp>
-//#include <boost/filesystem/operations.hpp>
-//#include <boost/filesystem/exception.hpp>
-//#include <boost/algorithm/string.hpp>
-//#include <boost/python.hpp>
-//#include <Python.h>
 #include "config.h"
 
 #include "ViewerManipulator.h"

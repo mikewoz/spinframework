@@ -36,7 +36,6 @@ libSPINwrappers_la_SOURCES = \
     videotexture.cpp
 
 libSPINwrappers_la_CPPFLAGS = \
-    -std=gnu++0x \
     $(BOOST_CPPFLAGS) \
     $(CPPINTROSPECTION_CFLAGS) \
     $(OPENTHREADS_CFLAGS) \
@@ -47,6 +46,9 @@ libSPINwrappers_la_CPPFLAGS = \
     -I$(top_srcdir)/src/spin \
     -I$(top_srcdir)/src/tinyxml
 
+if SHAREDVIDEO
+libSPINwrappers_la_CPPFLAGS += -std=gnu++0x
+endif
 
 if BULLET
 libSPINwrappers_la_CPPFLAGS += $(BULLET_CFLAGS)

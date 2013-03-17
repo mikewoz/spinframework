@@ -1,5 +1,4 @@
 AM_CPPFLAGS = \
-    -std=gnu++0x \
     $(BOOST_CPPFLAGS) \
     $(CPPINTROSPECTION_CFLAGS) \
     $(PYTHON_CPPFLAGS) \
@@ -13,6 +12,10 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src \
     -I$(top_srcdir)/src/osgPPU
+
+if SHAREDVIDEO
+AM_CPPFLAGS += -std=gnu++0x
+endif
 
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 

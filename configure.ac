@@ -118,6 +118,9 @@ case "$host" in *-darwin* | *-macos10*)
   SRCDIR=`pwd`
   #LIBTOOL="libtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
+  #CPPFLAGS="$CPPFLAGS -D__Darwin -fpermissive"
+  #CXXFLAGS=" -std=c++0x -stdlib=libc++"
+  #CXX="clang++"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
   if test -d /opt/local ; then
     CPPFLAGS="$CPPFLAGS -I/usr/local/include -I/opt/local/include"
@@ -232,14 +235,18 @@ PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 #        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6 shmdata-any-0.6, have_sharedvideo=true, have_sharedvideo=false)
-if test "x${have_sharedvideo}" = "xfalse" ; then
+AC_ARG_ENABLE([sharedvideo], AS_HELP_STRING([--disable-sharedvideo], [Disable shmdata library]))
+AS_IF([test "x$enable_sharedvideo" != "xno"], [
+  PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6 shmdata-any-0.6, have_sharedvideo=true, have_sharedvideo=false)
+  if test "x${have_sharedvideo}" = "xfalse" ; then
     AC_MSG_WARN([missing package: libshmdata-0.6-dev ])
-else
-    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
+  else
+    AC_DEFINE([WITH_SHAREDVIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
     AC_MSG_NOTICE([SHAREDVIDEO_CFLAGS:    ${SHAREDVIDEO_CFLAGS}])
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
-fi
+  fi
+])
+AM_CONDITIONAL(SHAREDVIDEO, test -n "$SHAREDVIDEO_LIBS")
 
 AC_CHECK_LIB([PocoFoundation],[main],[have_poco=true] [POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
 if test "x${have_poco}" = "xtrue" ; then
