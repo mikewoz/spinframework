@@ -42,7 +42,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
 #include "spinclientcontext.h"
 #include "spinapp.h"
@@ -159,7 +158,6 @@ void spinClientContext::createServers()
 {
     std::vector<lo_server>::iterator servIter;
 
-    using boost::lexical_cast;
     using std::string;
 
     /*
@@ -205,7 +203,7 @@ void spinClientContext::createServers()
             std::string addr(lo_address_get_hostname(lo_syncAddr));
             lo_address_free(lo_syncAddr);
             lo_syncServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+            lo_syncAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_syncServ)).c_str());
         }
     } else {
         lo_syncServ = lo_server_new(lo_address_get_port(lo_syncAddr), oscParser_error);
@@ -216,7 +214,7 @@ void spinClientContext::createServers()
             std::string addr(lo_address_get_hostname(lo_syncAddr));
             lo_address_free(lo_syncAddr);
             lo_syncServ = lo_server_new(NULL, oscParser_error);
-            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+            lo_syncAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_syncServ)).c_str());
         }
     }
     lo_server_add_method(lo_syncServ, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),

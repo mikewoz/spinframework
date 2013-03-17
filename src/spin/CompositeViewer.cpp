@@ -41,8 +41,7 @@
 
 #include <string>
 #include <iostream>
-#include <boost/filesystem.hpp>
-
+#include <osgDB/FileNameUtils>
 
 #include <osg/TextureCubeMap>
 
@@ -51,8 +50,6 @@
 #include <osgGA/StateSetManipulator>
 
 #include <osgDB/ReadFile>
-
-#include <boost/algorithm/string.hpp>
 
 #include "config.h"
 #include "viewermanipulator.h"
@@ -1368,7 +1365,7 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
 
     if ((n = XMLnode->FirstChildElement("supportsResize")))
     {
-        if (boost::iequals(n->FirstChild()->Value(), "false"))
+        if (osgDB::convertToLowerCase(n->FirstChild()->Value()).compare(std::string("false")) == 0)
         {
             traits->supportsResize = false;
         }
@@ -1381,7 +1378,7 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
 
     if ((n = XMLnode->FirstChildElement("useCursor")))
     {
-        if (boost::iequals(n->FirstChild()->Value(), "false"))
+        if (osgDB::convertToLowerCase(n->FirstChild()->Value()).compare(std::string("false")) == 0)
             traits->useCursor = false;
         else
             traits->useCursor = true;
@@ -1389,7 +1386,7 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
 
     if ((n = XMLnode->FirstChildElement("windowDecoration")))
     {
-        if (boost::iequals(n->FirstChild()->Value(), "false"))
+        if (osgDB::convertToLowerCase(n->FirstChild()->Value()).compare(std::string("false")) == 0)
             traits->windowDecoration = false;
         else
             traits->windowDecoration = true;

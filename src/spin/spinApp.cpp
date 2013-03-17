@@ -48,10 +48,10 @@
 
 #include <osg/Version>
 #include <osgDB/Registry>
+#include <osgDB/FileNameUtils>
+#include <osgDB/FileUtils>
 #include <cppintrospection/Type>
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
 #ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
 #endif
@@ -149,23 +149,15 @@ spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(sp
         exit(1);
     }
 
-
-    //sceneID = "default";
-
-    // check if local user directory exists, otherwise make it:
-    try
+    // create local user directory (create it if doesn't exist):
+    if (!osgDB::makeDirectory(SPIN_DIRECTORY))
     {
-        using namespace boost::filesystem;
-
-        if (!exists(SPIN_DIRECTORY))
-        {
-            create_directory(path(SPIN_DIRECTORY));
-            create_directory(path(SPIN_DIRECTORY+"/log"));
-        }
+        std::cout << "ERROR: Could not create data folder for SPIN at: " << SPIN_DIRECTORY << std::endl;
+        exit(1);
     }
-    catch ( const boost::filesystem::filesystem_error& e )
+    if (!osgDB::makeDirectory(SPIN_DIRECTORY+"/log"))
     {
-        std::cout << "ERROR: " << e.what() << std::endl;
+        std::cout << "ERROR: Could not create log folder for SPIN at: " << SPIN_DIRECTORY+"/log" << std::endl;
         exit(1);
     }
 
