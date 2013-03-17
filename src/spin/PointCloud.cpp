@@ -42,7 +42,6 @@
 
 #include "config.h"
 
-#include <chrono>
 
 #include <osg/Geode>
 #include <osg/BlendColor>
