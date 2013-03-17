@@ -995,8 +995,8 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setGraphicsContext(gc);
         camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
         camera->setClearColor( osg::Vec4(0.0,0.0,0.0,1.0) );
-        //camera->setViewport(new osg::Viewport(0, 0, traits->width, traits->height));
-        camera->setViewport(new osg::Viewport(-stretch_x / 2, 0, traits->width + stretch_x, traits->height));
+        camera->setViewport(new osg::Viewport(0, 0, traits->width, traits->height));
+        //camera->setViewport(new osg::Viewport(-stretch_x / 2, 0, traits->width + stretch_x, traits->height));
         GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
         camera->setDrawBuffer(buffer);
         camera->setReadBuffer(buffer);
@@ -1398,6 +1398,7 @@ void loadXMLwindow(TiXmlElement *XMLnode, osgViewer::CompositeViewer &viewer)
         if (sscanf( n->FirstChild()->Value(), "%d", &numSamples)==1)
         {
             traits->samples = numSamples;
+            //traits->sampleBuffers = numSamples;
         }
     }
 
@@ -1672,7 +1673,7 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
             }
         }
     }
-    else if ((theMethod=="setOutlineColor"))
+    else if ((theMethod=="setOutlineColor") && (floatArgs.size()==4))
     {
         // For each view
         for(unsigned int i=0; i<lNumPPUs; ++i)
@@ -1682,7 +1683,17 @@ int viewerCallback(const char *path, const char *types, lo_arg **argv, int argc,
                 viewer->mOutlinePPUs[i]->setOutlineColor(floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3]);
             }
         }
-
+        return 1;
+    }
+    else if ((theMethod=="setShaderColor") && (stringArgs.size()==1) && (floatArgs.size()==4))
+    {
+        for (unsigned int i=0; i<lNumPPUs; ++i)
+        {
+            if (lIsShader)
+            {
+                viewer->mShaderPPUs[i]->setShaderColor(stringArgs[0], floatArgs[0], floatArgs[1], floatArgs[2], floatArgs[3]);
+            }
+        }
         return 1;
     }
     else if ((theMethod=="setFrustum") && (floatArgs.size()==6))
