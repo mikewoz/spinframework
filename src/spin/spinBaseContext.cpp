@@ -901,6 +901,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "setShadows") && (argc==2))
+        sceneManager->setShadows((bool) lo_hires_val((lo_type)types[1], argv[1]));
     else if ((theMethod == "setShadowSoftness") && (argc==2))
     {
         sceneManager->setShadowSoftness((float) lo_hires_val((lo_type)types[1], argv[1]));

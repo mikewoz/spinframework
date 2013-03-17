@@ -492,7 +492,6 @@ void ReferencedNode::setCastShadows(int b)
 {
     castShadows_ = (bool)b;
     
-    /*
     // if the castShadow flag is set, ensure to add it to the nodemask
     if (castShadows_)
     {
@@ -503,9 +502,8 @@ void ReferencedNode::setCastShadows(int b)
         // if castShadows flag is false, remove the bit from the nodemask:
         osg::Node::setNodeMask(getNodeMask() & ~CAST_SHADOW_NODE_MASK);
     }
-    */
     
-    this->setNodeMask(getNodeMask());
+    //this->setNodeMask(getNodeMask());
     BROADCAST(this, "si", "setCastShadows", (int)b);
 }
 
