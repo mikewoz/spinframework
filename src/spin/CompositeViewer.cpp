@@ -832,8 +832,11 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
 
     texture->setTextureSize(textureSize, textureSize);
     texture->setInternalFormat(GL_RGB);
-    texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
-    texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+    texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+    texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+    texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+    texture->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE);
     
     /*
     std::cout << "projectorMatrix: " << std::endl;
@@ -843,13 +846,16 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
     std::cout<<projectorMatrix.ptr()[12]<<" "<<projectorMatrix.ptr()[13]<<" "<<projectorMatrix.ptr()[14]<<" "<<projectorMatrix.ptr()[15]<<std::endl;
     */
     
-#if 0
-    osg::Camera::RenderTargetImplementation renderTargetImplementation = osg::Camera::SEPERATE_WINDOW;
-    GLenum buffer = GL_FRONT;
-#else
+
     osg::Camera::RenderTargetImplementation renderTargetImplementation = osg::Camera::FRAME_BUFFER_OBJECT;
-    GLenum buffer = GL_FRONT;
-#endif
+    GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+
+    unsigned int mipmapLevel = 0;
+    bool mipmapGeneration = true;
+    unsigned int multisampleSamples = traits->samples;
+    unsigned int multisampleColorSamples = traits->samples;
+    
+    //texture->setNumMipmapLevels(8);
 
     // front face
     {
@@ -864,7 +870,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setRenderTargetImplementation(renderTargetImplementation);
 
         // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_Y);
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, mipmapLevel, osg::TextureCubeMap::POSITIVE_Y, mipmapGeneration, multisampleSamples, multisampleColorSamples);
 
         view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd());
     }
@@ -884,7 +890,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setRenderTargetImplementation(renderTargetImplementation);
 
         // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_Z);
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, mipmapLevel, osg::TextureCubeMap::POSITIVE_Z, mipmapGeneration, multisampleSamples, multisampleColorSamples);
 
         view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 1.0,0.0,0.0));
     }
@@ -903,7 +909,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setRenderTargetImplementation(renderTargetImplementation);
 
         // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_X);
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, mipmapLevel, osg::TextureCubeMap::NEGATIVE_X, mipmapGeneration, multisampleSamples, multisampleColorSamples);
 
         view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,1.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(-90.0f), 0.0,0.0,1.0));
     }
@@ -922,7 +928,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setRenderTargetImplementation(renderTargetImplementation);
 
         // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::POSITIVE_X);
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, mipmapLevel, osg::TextureCubeMap::POSITIVE_X, mipmapGeneration, multisampleSamples, multisampleColorSamples);
 
         view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,1.0,0.0 ) * osg::Matrixd::rotate(osg::inDegrees(90.0f), 0.0,0.0,1.0));
     }
@@ -941,7 +947,7 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setRenderTargetImplementation(renderTargetImplementation);
 
         // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_Z);
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, mipmapLevel, osg::TextureCubeMap::NEGATIVE_Z, mipmapGeneration, multisampleSamples, multisampleColorSamples);
 
         view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(90.0f), 1.0,0.0,0.0) * osg::Matrixd::rotate(osg::inDegrees(180.0f), 0.0,0.0,1.0));
     }
@@ -960,12 +966,11 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
         camera->setRenderTargetImplementation(renderTargetImplementation);
 
         // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, osg::TextureCubeMap::NEGATIVE_Y);
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, mipmapLevel, osg::TextureCubeMap::NEGATIVE_Y, mipmapGeneration, multisampleSamples, multisampleColorSamples);
 
         view->addSlave(camera.get(), osg::Matrixd(), projectorMatrix * osg::Matrixd::rotate(osg::inDegrees(180.0f), 1.0,0.0,0.0));
     }
 
-    //view->getCamera()->setProjectionMatrixAsPerspective(90.0f, 1.0, 1, 1000.0);
     cam->setProjectionMatrixAsPerspective(90.0f, 1.0, 1, 1000.0);
 
     // distortion correction set up.
@@ -1025,7 +1030,12 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
     }
 
     cam->setNearFarRatio(0.0001f);
-    cam->setViewport(0,0,0,0); // <- hack to prevent flickering
+    
+    // In the spherical case, all cameras are slaves, but we couldn't figure
+    // out how to get rid of the original cam so we just set it's viewport to
+    // zero. If you don't do this, then this camera and the distortion camera
+    // will z-fight and you'll see flickering.
+    cam->setViewport(0,0,0,0);
 }
 
 
@@ -1103,7 +1113,7 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
 
     if (spherical)
     {
-        int textureSize = 2048;
+        int textureSize = 512;
         float radius = 1.0;
         float collar = 0.45;
         float distance = 0.0;
@@ -1121,7 +1131,11 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
                 val = child->FirstChild()->Value();
             } else continue;
 
-            if (tag=="textureSize")
+            if (tag=="spherical")
+            {
+                // noop
+            }
+            else if (tag=="textureSize")
             {
                 sscanf(val.c_str(), "%d", &textureSize);
             }
@@ -1163,7 +1177,7 @@ void loadXMLcamera(TiXmlElement *XMLnode, osgViewer::Viewer::View *view, osg::Ca
         // A rotation of 180 would point down.
         projMatrix *= osg::Matrixd::rotate(osg::inDegrees(rotation), osg::X_AXIS);
         
-        std::cout << "creating spherical display with textureSize="<<textureSize<<", radius="<<radius<<", collar="<<collar<<", crop="<<crop<<", rotation="<<rotation<<"degrees"<<std::endl;
+        std::cout << "creating spherical display with textureSize="<<textureSize<<", multiSamples="<<traits->samples<<", radius="<<radius<<", collar="<<collar<<", crop="<<crop<<", rotation="<<rotation<<"degrees"<<std::endl;
 
         // note: cam is currently not being used by makeDomeView!
         makeDomeView(gc, traits, view, cam, textureSize, radius, collar, distance, crop, intensityMap, projMatrix);
