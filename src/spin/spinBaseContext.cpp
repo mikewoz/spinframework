@@ -171,7 +171,7 @@ void spinBaseContext::debugPrint()
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     std::cout << "  sharedvideo enabled?\t\tYES" << std::endl;
 #else
     std::cout << "  sharedvideo enabled?\t\tNO" << std::endl;

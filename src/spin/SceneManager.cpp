@@ -1565,7 +1565,7 @@ void SceneManager::update()
     osg::Timer_t tick = osg::Timer::instance()->tick();
     double dt =osg::Timer::instance()->delta_s(lastTick_,tick);
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     // it's possible that a SharedVideoTexture is in the sceneManager, but not
     // currently applied on any geometry. In this canse, it will not be be
     // seen in the update traversal of the scene graph, and it's updateCallback
