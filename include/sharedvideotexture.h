@@ -47,7 +47,7 @@
 
 #include "shader.h"
 
-#ifdef WITH_SHARED_VIDEO 
+#ifdef WITH_SHAREDVIDEO
 #include <shmdata/osg-reader.h>
 #endif
 
@@ -107,7 +107,7 @@ private:
         
     bool killed_;
     
-#ifdef WITH_SHARED_VIDEO         
+#ifdef WITH_SHAREDVIDEO         
     shmdata::OsgReader reader_;
 #endif 
 	
