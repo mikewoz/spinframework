@@ -167,11 +167,7 @@ private:
     pcl::Grabber* grabber_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
-    #if PCL_VERSION_HIGHER_THAN_1_6
     pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *decoder_;
-    #else
-	pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *decoder_;
-    #endif
 #endif
 
 #ifdef WITH_SHAREDVIDEO
