@@ -262,6 +262,11 @@ class SceneManager
         void refreshSubscribers(const std::map<std::string, lo_address> &clients);
 
         /**
+         * Enable the shadow system
+         **/
+        void setShadows(bool b);
+
+        /**
          * Set the values for width of the soft penumbra the shader will use.
          */
         void setShadowSoftness(float f);
@@ -305,6 +310,7 @@ class SceneManager
 
     private:
 
+        osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot_;
         osg::ref_ptr<osgShadow::SoftShadowMap> softShadowMap_;
 
         static bool nodeSortFunction (osg::ref_ptr<ReferencedNode> n1, osg::ref_ptr<ReferencedNode> n2);

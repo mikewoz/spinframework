@@ -118,6 +118,9 @@ case "$host" in *-darwin* | *-macos10*)
   SRCDIR=`pwd`
   #LIBTOOL="libtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
+  #CPPFLAGS="$CPPFLAGS -D__Darwin -fpermissive"
+  #CXXFLAGS=" -std=c++0x -stdlib=libc++"
+  #CXX="clang++"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
   if test -d /opt/local ; then
     CPPFLAGS="$CPPFLAGS -I/usr/local/include -I/opt/local/include"
@@ -232,14 +235,18 @@ PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 #        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6 shmdata-any-0.6, have_sharedvideo=true, have_sharedvideo=false)
-if test "x${have_sharedvideo}" = "xfalse" ; then
+AC_ARG_ENABLE([sharedvideo], AS_HELP_STRING([--disable-sharedvideo], [Disable shmdata library]))
+AS_IF([test "x$enable_sharedvideo" != "xno"], [
+  PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6 shmdata-any-0.6, have_sharedvideo=true, have_sharedvideo=false)
+  if test "x${have_sharedvideo}" = "xfalse" ; then
     AC_MSG_WARN([missing package: libshmdata-0.6-dev ])
-else
-    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
+  else
+    AC_DEFINE([WITH_SHAREDVIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
     AC_MSG_NOTICE([SHAREDVIDEO_CFLAGS:    ${SHAREDVIDEO_CFLAGS}])
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
-fi
+  fi
+])
+AM_CONDITIONAL(SHAREDVIDEO, test -n "$SHAREDVIDEO_LIBS")
 
 AC_CHECK_LIB([PocoFoundation],[main],[have_poco=true] [POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
 if test "x${have_poco}" = "xtrue" ; then
@@ -271,16 +278,7 @@ fi
 AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
 dnl PCL
-AC_ARG_ENABLE([pcl-dev],
-    AS_HELP_STRING([--enable-pcl-dev], [Enables linking with the latest development branch of PCL]),
-    [enable_pcl_dev=$enableval],
-    [enable_pcl_dev=true])
-if test "x$enable_pcl_dev" != xtrue; then
-  PCL_PKGS="pcl_common-1.7 pcl_filters-1.7 pcl_io-1.7 pcl_kdtree-1.7 pcl_octree-1.7 pcl_sample_consensus-1.7 pcl_search-1.7"
-  AC_DEFINE([PCL_VERSION_HIGHER_THAN_1_6],[1],[When pcl-dev is enabled, we set this flag])
-else
-  PCL_PKGS="pcl_common-1.6 pcl_filters-1.6 pcl_io-1.6 pcl_kdtree-1.6 pcl_octree-1.6 pcl_sample_consensus-1.6 pcl_search-1.6"
-fi
+PCL_PKGS="pcl_common-1.7 pcl_filters-1.7 pcl_io-1.7 pcl_kdtree-1.7 pcl_octree-1.7 pcl_sample_consensus-1.7 pcl_search-1.7"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])

@@ -42,7 +42,6 @@
 
 #include "config.h"
 
-#include <chrono>
 
 #include <osg/Geode>
 #include <osg/BlendColor>
@@ -102,15 +101,11 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     distCrop_ = osg::Vec2(0.0,10.0);
     
 #ifdef WITH_PCL
-	#ifdef WITH_SHARED_VIDEO
+	#ifdef WITH_SHAREDVIDEO
 	//shmReader_ = 0;
 	#endif
     grabber_ = 0;
-    #if PCL_VERSION_HIGHER_THAN_1_6
     decoder_ = new pcl::io::OctreePointCloudCompression< pcl::PointXYZRGBA >();
-    #else
-	decoder_ = new pcl::octree::PointCloudCompression< pcl::PointXYZRGBA >();
-    #endif
 #endif
     
 }
@@ -125,7 +120,7 @@ PointCloud::~PointCloud()
         grabber_ = 0;
     }
     
-	#ifdef WITH_SHARED_VIDEO
+	#ifdef WITH_SHAREDVIDEO
     if (shmPointCloud_.get())
     {
         shmIsRunning = false;
@@ -189,7 +184,7 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 // -----------------------------------------------------------------------------
 #ifdef WITH_PCL
 
-#ifdef WITH_SHARED_VIDEO 
+#ifdef WITH_SHAREDVIDEO
 //void PointCloud::shmCallback (
 //         shmdata_any_reader_t *reader,
 //         void *shmbuf,
@@ -602,7 +597,7 @@ void PointCloud::setURI(const char* filename)
         grabber_->stop();
         grabber_ = 0;
     }
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 	//if (shmReader_)
 	//{
 	//	shmdata_any_reader_close(shmReader_);
@@ -630,7 +625,7 @@ void PointCloud::setURI(const char* filename)
 		std::string shmPath = path_.substr(6);
 		std::cout << "Connecting to shmdata path: " << shmPath << std::endl;
 		
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 		//shmReader_ = shmdata_any_reader_init();
 		//if (1)//(verbose)
 		//	shmdata_any_reader_set_debug(shmReader_, SHMDATA_ENABLE_DEBUG);
@@ -713,11 +708,7 @@ void PointCloud::setURI(const char* filename)
             framerate_ = 0;
             success = true;
         }
-        #if PCL_VERSION_HIGHER_THAN_1_6
         catch (pcl::PCLException e)
-        #else
-        catch (pcl::PCLIOException e)
-        #endif
         {
             std::cout << "[PointCloud]: Error connecting to Kinect; perhaps it is already being used? ... " << e.detailedMessage() << std::endl;
         }
@@ -734,11 +725,7 @@ void PointCloud::setURI(const char* filename)
             if (ext=="cpc")
             {
                 std::stringstream compressedData;
-                #if PCL_VERSION_HIGHER_THAN_1_6
                 pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA>();
-                #else
-                pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::octree::PointCloudCompression<pcl::PointXYZRGBA>();
-                #endif
                 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr tmpCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
 
                 std::ifstream readCompressedFile(absPath.c_str());

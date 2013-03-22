@@ -266,6 +266,7 @@
 		1C4E06451548F3DC0056BD10 /* DraggerWith3Axes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C4E06441548F3DC0056BD10 /* DraggerWith3Axes.cpp */; };
 		1C4E06471548FC8D0056BD10 /* DraggerTrackball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C4E06461548FC8D0056BD10 /* DraggerTrackball.cpp */; };
 		1C4E06491548FC9B0056BD10 /* draggertrackball.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C4E06481548FC9B0056BD10 /* draggertrackball.h */; };
+		1C52951D16ED85B50045B618 /* shmpointcloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C52951C16ED85B50045B618 /* shmpointcloud.h */; };
 		1C57789614BD702A00632E46 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1C70F33414C3C7540054B0A1 /* osgPlugins.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */; };
 		1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
@@ -588,7 +589,6 @@
 		1C7EDC4316519E0B0071459B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7EDC4216519E0A0071459B /* CoreGraphics.framework */; };
 		1C7EDC4516519E320071459B /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7EDC4416519E310071459B /* ApplicationServices.framework */; };
 		1C875F3C14C8EF4200A46EBC /* libcppintrospection-3.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
-		1C875F3F14C8EF4200A46EBC /* libboost_python-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
 		1C875FE214C9BE3200A46EBC /* icon_3Dsphere.xpm in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FAF14C9BE3200A46EBC /* icon_3Dsphere.xpm */; };
 		1C875FE314C9BE3200A46EBC /* icon_3Dsphere.xpm in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FAF14C9BE3200A46EBC /* icon_3Dsphere.xpm */; };
 		1C875FE414C9BE3200A46EBC /* icon_3Dview.gif in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FB014C9BE3200A46EBC /* icon_3Dview.gif */; };
@@ -655,12 +655,8 @@
 		1C90C16214CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C16114CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png */; };
 		1C90C16314CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C16114CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png */; };
 		1C90C16F14CCCD0100C929AE /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
-		1C94DEBC14BFEBAB006394AD /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
 		1C94DEC214BFEC2D006394AD /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
-		1C94DEC514BFEC2E006394AD /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
 		1C94DEC814BFEC2E006394AD /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
-		1C94DECB14BFEC2F006394AD /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
-		1C94DECE14BFED32006394AD /* libboost_python-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
 		1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C94DED114C00250006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
@@ -984,7 +980,6 @@
 				1C1EF4FD1648441200838809 /* libtinyxml.dylib in CopyFiles */,
 				1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C875F3C14C8EF4200A46EBC /* libcppintrospection-3.0.0.dylib in CopyFiles */,
-				1C875F3F14C8EF4200A46EBC /* libboost_python-mt.dylib in CopyFiles */,
 				1C2C701A163F024E0017F484 /* libboost_filesystem-mt.dylib in CopyFiles */,
 				1C2C701B163F024E0017F484 /* libboost_thread-mt.dylib in CopyFiles */,
 				1C2C701C163F024E0017F484 /* libboost_system-mt.dylib in CopyFiles */,
@@ -1125,7 +1120,6 @@
 				1C1EF4FE1648441A00838809 /* libtinyxml.dylib in CopyFiles */,
 				1C94DED514C00548006394AD /* libcppintrospection-3.0.0.dylib in CopyFiles */,
 				1C34AE5514DCFBA9001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */,
-				1C94DECE14BFED32006394AD /* libboost_python-mt.dylib in CopyFiles */,
 				1C2C701D163F027F0017F484 /* libboost_filesystem-mt.dylib in CopyFiles */,
 				1C2C701E163F027F0017F484 /* libboost_thread-mt.dylib in CopyFiles */,
 				1C2C701F163F027F0017F484 /* libboost_system-mt.dylib in CopyFiles */,
@@ -1291,6 +1285,7 @@
 		1C4E06441548F3DC0056BD10 /* DraggerWith3Axes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DraggerWith3Axes.cpp; path = ../src/spin/DraggerWith3Axes.cpp; sourceTree = "<group>"; };
 		1C4E06461548FC8D0056BD10 /* DraggerTrackball.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DraggerTrackball.cpp; path = ../src/spin/DraggerTrackball.cpp; sourceTree = "<group>"; };
 		1C4E06481548FC9B0056BD10 /* draggertrackball.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = draggertrackball.h; path = ../include/draggertrackball.h; sourceTree = "<group>"; };
+		1C52951C16ED85B50045B618 /* shmpointcloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shmpointcloud.h; path = ../include/shmpointcloud.h; sourceTree = "<group>"; };
 		1C57788A14BD6F4400632E46 /* spinserver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinserver; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C70F33114C3C69C0054B0A1 /* osgPlugins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = osgPlugins.h; sourceTree = "<group>"; };
 		1C70F33314C3C7540054B0A1 /* osgPlugins.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = osgPlugins.cpp; sourceTree = "<group>"; };
@@ -1580,7 +1575,6 @@
 			files = (
 				1C90C16F14CCCD0100C929AE /* libusb-1.0.0.dylib in Frameworks */,
 				1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1C94DEBC14BFEBAB006394AD /* libboost_python-mt.dylib in Frameworks */,
 				1C9C083014D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C068AC215754B7300BC6207 /* OpenGL.framework in Frameworks */,
 				1C068AC315754B7800BC6207 /* AGL.framework in Frameworks */,
@@ -1682,7 +1676,6 @@
 				1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1CA24DF714BE2D3C007A9C31 /* Cocoa.framework in Frameworks */,
 				1CA24C9114BE5AAA0023DD8B /* liblo.7.dylib in Frameworks */,
-				1C94DEC514BFEC2E006394AD /* libboost_python-mt.dylib in Frameworks */,
 				1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1C9C082E14D07661006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */,
@@ -1788,7 +1781,6 @@
 				1CCCA0F014BE353500DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1CCCA0EF14BE353100DCA0B7 /* OpenGL.framework in Frameworks */,
 				1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */,
-				1C94DECB14BFEC2F006394AD /* libboost_python-mt.dylib in Frameworks */,
 				1C94DED414C00252006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1C9C082C14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */,
@@ -2045,6 +2037,7 @@
 				1C1ECB4F150E65B000CCBFF3 /* shaderutil.h */,
 				1CA24D9014BE2892007A9C31 /* shapenode.h */,
 				1CA24D9214BE2892007A9C31 /* sharedvideotexture.h */,
+				1C52951C16ED85B50045B618 /* shmpointcloud.h */,
 				1CA24D9414BE2892007A9C31 /* soundnode.h */,
 				1CA24D9514BE2892007A9C31 /* soundspace.h */,
 				1CA24D9614BE2892007A9C31 /* spinapp.h */,
@@ -2509,24 +2502,26 @@
 				1C329CB115BEF740002F845C /* pocoutil.h in Headers */,
 				1CBD882815E5A8B9007ABACE /* particlesystemutil.h in Headers */,
 				1CD065FA160780CE00D2DBE2 /* lodnode.h in Headers */,
+				1C52951D16ED85B50045B618 /* shmpointcloud.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
-		1CB6CD0614EDD20900A29B1C /* libspin-0.3 */ = {
+		1CD3D90D166D3D660036E97E /* libspinframework */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = 1CB6CD0714EDD20900A29B1C /* Build configuration list for PBXLegacyTarget "libspin-0.3" */;
+			buildConfigurationList = 1CD3D90E166D3D660036E97E /* Build configuration list for PBXLegacyTarget "libspinframework" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/mikewoz/src/spinframework;
 			dependencies = (
 			);
-			name = "libspin-0.3";
+			name = libspinframework;
 			passBuildSettingsInEnvironment = 1;
-			productName = "libspin-0.3";
+			productName = libspinframework;
 		};
 /* End PBXLegacyTarget section */
 
@@ -2666,8 +2661,8 @@
 				1CCCA0CC14BE31AB00DCA0B7 /* SPIN Viewer */,
 				1C90C17714CCF7E800C929AE /* buildWrappers */,
 				1C90C18C14CDCC3100C929AE /* ALL */,
-				1CB6CD0614EDD20900A29B1C /* libspin-0.3 */,
 				1C122B3D153532720004D0A2 /* CommandLineTools */,
+				1CD3D90D166D3D660036E97E /* libspinframework */,
 			);
 		};
 /* End PBXProject section */
@@ -3105,7 +3100,6 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = /opt/local/Library/Frameworks;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -3126,10 +3120,11 @@
 					/opt/local/include,
 					/usr/local/include,
 					"/usr/local/include/spatosc-0.3",
+					"/usr/local/include/shmdata-0.6",
 					"/usr/local/include/cppintrospection-3.0",
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
-					"/usr/local/include/pcl-1.6",
+					"/usr/local/include/pcl-1.7",
 					/opt/local/include/bullet,
 					/usr/include/ni,
 					../src/,
@@ -3140,7 +3135,7 @@
 					/opt/local/Library/Python.framework/Versions/2.6/config,
 					/usr/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
@@ -3167,7 +3162,6 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = /opt/local/Library/Frameworks;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -3177,10 +3171,11 @@
 					/opt/local/include,
 					/usr/local/include,
 					"/usr/local/include/spatosc-0.3",
+					"/usr/local/include/shmdata-0.6",
 					"/usr/local/include/cppintrospection-3.0",
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
-					"/usr/local/include/pcl-1.6",
+					"/usr/local/include/pcl-1.7",
 					/opt/local/include/bullet,
 					/usr/include/ni,
 					../src/,
@@ -3191,7 +3186,7 @@
 					/opt/local/Library/Python.framework/Versions/2.6/config,
 					/usr/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
@@ -3220,18 +3215,6 @@
 					"\"$(SDKROOT)/usr/local/lib\"",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				HEADER_SEARCH_PATHS = (
-					/opt/local/include,
-					/usr/local/include,
-					"/usr/local/include/spatosc-0.3",
-					"/usr/local/include/cppintrospection-3.0",
-					/usr/local/include/libfreenect,
-					/opt/local/include/eigen3,
-					"/usr/local/include/pcl-1.7",
-					/opt/local/include/bullet,
-					/usr/include/ni,
-					../src/,
-				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3262,18 +3245,6 @@
 					"\"$(SDKROOT)/usr/local/lib\"",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				HEADER_SEARCH_PATHS = (
-					/opt/local/include,
-					/usr/local/include,
-					"/usr/local/include/spatosc-0.3",
-					"/usr/local/include/cppintrospection-3.0",
-					/usr/local/include/libfreenect,
-					/opt/local/include/eigen3,
-					"/usr/local/include/pcl-1.7",
-					/opt/local/include/bullet,
-					/usr/include/ni,
-					../src/,
-				);
 				LD_DYLIB_INSTALL_NAME = "@rpath/$(EXECUTABLE_PATH)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3344,7 +3315,6 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3356,7 +3326,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3424,43 +3393,6 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		1CB6CD0814EDD20900A29B1C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				DEBUGGING_SYMBOLS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		1CB6CD0914EDD20900A29B1C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -3554,6 +3486,50 @@
 			};
 			name = Release;
 		};
+		1CD3D90F166D3D660036E97E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1CD3D910166D3D660036E97E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3620,15 +3596,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1CB6CD0714EDD20900A29B1C /* Build configuration list for PBXLegacyTarget "libspin-0.3" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				1CB6CD0814EDD20900A29B1C /* Debug */,
-				1CB6CD0914EDD20900A29B1C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		1CCCA0C614BE315500DCA0B7 /* Build configuration list for PBXNativeTarget "spinviewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -3643,6 +3610,15 @@
 			buildConfigurations = (
 				1CCCA0E314BE31AC00DCA0B7 /* Debug */,
 				1CCCA0E414BE31AC00DCA0B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1CD3D90E166D3D660036E97E /* Build configuration list for PBXLegacyTarget "libspinframework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CD3D90F166D3D660036E97E /* Debug */,
+				1CD3D910166D3D660036E97E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

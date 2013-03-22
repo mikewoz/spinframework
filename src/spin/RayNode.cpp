@@ -50,6 +50,8 @@
 #include "spinbasecontext.h"
 #include "osgutil.h"
 
+extern pthread_mutex_t sceneMutex;
+
 namespace spin
 {
 
@@ -124,6 +126,8 @@ void RayNode::setColor (float r, float g, float b, float a)
 
 void RayNode::drawRay()
 {
+    pthread_mutex_lock(&sceneMutex);
+
 	// remove the old ray:
 	if (getAttachmentNode()->containsNode(rayGeode.get()))
 	{
@@ -185,12 +189,14 @@ void RayNode::drawRay()
             // disable lighting
             ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
             
-        	getAttachmentNode()->addChild(rayGeode.get());
+            getAttachmentNode()->addChild(rayGeode.get());
             rayGeode->setName(this->getID() + ".rayGeode");
             osgUtil::Optimizer optimizer;
             optimizer.optimize(rayGeode.get());
         }
     }
+    
+    pthread_mutex_unlock(&sceneMutex);
 
 }
 

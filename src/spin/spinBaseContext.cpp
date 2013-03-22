@@ -45,7 +45,6 @@
 #include <iostream>
 #include <pthread.h>
 #include <signal.h>
-#include <boost/lexical_cast.hpp>
 
 #include <osgDB/Registry>
 #include <cppintrospection/Type>
@@ -53,8 +52,6 @@
 #include <osgUtil/Optimizer>
 #include <osg/Version>
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
 #ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
 #endif
@@ -174,7 +171,7 @@ void spinBaseContext::debugPrint()
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     std::cout << "  sharedvideo enabled?\t\tYES" << std::endl;
 #else
     std::cout << "  sharedvideo enabled?\t\tNO" << std::endl;
@@ -901,6 +898,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "setShadows") && (argc==2))
+        sceneManager->setShadows((bool) lo_hires_val((lo_type)types[1], argv[1]));
     else if ((theMethod == "setShadowSoftness") && (argc==2))
     {
         sceneManager->setShadowSoftness((float) lo_hires_val((lo_type)types[1], argv[1]));
@@ -1082,7 +1081,6 @@ void spinBaseContext::oscParser_error(int num, const char *msg, const char *path
 
 void spinBaseContext::createServers()
 {
-    using boost::lexical_cast;
     using std::string;
 
     lo_tcpRxServer_ = lo_server_new_with_proto(tcpPort_.c_str(), LO_TCP, oscParser_error);
@@ -1112,7 +1110,7 @@ void spinBaseContext::createServers()
                 std::string addr(lo_address_get_hostname(*it));
                 tmpServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
                 lo_address_free(*it);
-                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+                (*it) = lo_address_new(addr.c_str(), stringify(lo_server_get_port(tmpServ)).c_str());
             }
         }
         else
@@ -1124,7 +1122,7 @@ void spinBaseContext::createServers()
                 tmpServ = lo_server_new(NULL, oscParser_error);
                 std::string addr(lo_address_get_hostname(*it));
                 lo_address_free(*it);
-                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+                (*it) = lo_address_new(addr.c_str(), stringify(lo_server_get_port(tmpServ)).c_str());
             }
         }
         lo_rxServs_.push_back(tmpServ);
@@ -1141,7 +1139,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
     } 
     else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
@@ -1154,7 +1152,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new(NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
         int sock = lo_server_get_socket_fd(lo_infoServ_);
         int sockopt = 1;
@@ -1170,7 +1168,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new(NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
     }
 }

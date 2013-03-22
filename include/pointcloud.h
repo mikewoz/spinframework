@@ -45,7 +45,7 @@
 #include "config.h"
 
 #include <memory>
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 #include <thread>
 #endif
 
@@ -69,7 +69,7 @@
 #include <pcl/compression/octree_pointcloud_compression.h>
 #endif //WITH_PCL
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 #include <shmdata/any-data-reader.h>
 #include "shmpointcloud.h"
 #endif
@@ -101,7 +101,7 @@ public:
 
 	
 #ifdef WITH_PCL
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 	//static void shmCallback (
 	//     shmdata_any_reader_t *reader,
     //     void *shmbuf,
@@ -167,14 +167,10 @@ private:
     pcl::Grabber* grabber_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
-    #if PCL_VERSION_HIGHER_THAN_1_6
     pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *decoder_;
-    #else
-	pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *decoder_;
-    #endif
 #endif
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 	//shmdata_any_reader_t *shmReader_;
     std::shared_ptr<ShmPointCloud<pcl::PointXYZRGBA>> shmPointCloud_;
     std::shared_ptr<std::thread> shmThread_;
