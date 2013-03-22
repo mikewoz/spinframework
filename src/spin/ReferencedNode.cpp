@@ -454,20 +454,23 @@ void ReferencedNode::setAlpha (float alpha)
 
     // turn on blending and tell OSG to sort meshes before displaying them
     ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-    ss->setMode(GL_BLEND, osg::StateAttribute::ON);
+    ss->setMode(GL_BLEND, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-    osg::BlendFunc *blendFunc = new osg::BlendFunc();
-    osg::BlendColor *blendColor= new osg::BlendColor(osg::Vec4(1, 1, 1, subgraphAlpha_));
+    osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::CONSTANT_ALPHA,
+                                                    osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA );
+
+    osg::BlendColor *blendColor= new osg::BlendColor(osg::Vec4(0, 0, 0, subgraphAlpha_));
 
     blendFunc->setDataVariance(osg::Object::DYNAMIC);
     blendColor->setDataVariance(osg::Object::DYNAMIC);
 
-    blendFunc->setSource(osg::BlendFunc::CONSTANT_ALPHA);
-    blendFunc->setDestination(osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA);
+    // blendFunc->setSource(osg::BlendFunc::CONSTANT_ALPHA);
+    // blendFunc->setDestination(osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA);
     ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
-
-    this->osg::Group::setStateSet(ss);
+    // ss->setAttributeAndModes(new osg::BlendEquation(),
+    //                          osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE); 
+    //    this->osg::Group::setStateSet(ss);
 
     /*
     osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
@@ -486,6 +489,9 @@ void ReferencedNode::setAlpha (float alpha)
     */
 
     std::cout << "set alpha for " << this->id_->s_name << " to " << subgraphAlpha_ << std::endl;
+    
+    BROADCAST(this, "sf", "setAlpha", subgraphAlpha_);
+
 }
 
 void ReferencedNode::setCastShadows(int b)
