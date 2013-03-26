@@ -244,18 +244,25 @@ void CompositeViewer::setupCamera()
             lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
             // We need to get the current attachment parameters
-            osg::Camera::BufferAttachmentMap attachmentMap = lCamera->getBufferAttachmentMap();
-            osg::Camera::Attachment attachment = attachmentMap[osg::Camera::COLOR_BUFFER];
-            bool mipmapGeneration = attachment._mipMapGeneration;
-            unsigned int multisampleSamples = attachment._multisampleSamples;
-            unsigned int multisampleColorSamples = attachment._multisampleColorSamples;
+            //osg::Camera::BufferAttachmentMap attachmentMap = lCamera->getBufferAttachmentMap();
+            //osg::Camera::Attachment* attachment = &(attachmentMap[osg::Camera::COLOR_BUFFER]);
+            //bool mipmapGeneration = attachment->_mipMapGeneration;
+            //unsigned int multisampleSamples = attachment->_multisampleSamples;
+            //unsigned int multisampleColorSamples = attachment->_multisampleColorSamples;
 
             // Attach the textures to the color and depth buffers
+            //lCamera->detach(osg::Camera::COLOR_BUFFER);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+
             lCamera->detach(osg::Camera::COLOR_BUFFER);
-            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
-            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
-            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
-            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+            lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1);
+            lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2);
+            lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3);
+            lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4);
+
             lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
         }
     }
