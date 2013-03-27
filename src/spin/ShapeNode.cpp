@@ -148,9 +148,10 @@ void ShapeNode::setColor (float r, float g, float b, float a)
 	if (_color != newColor)
 	{
 		_color = newColor;
-	
-		drawShape();
-	
+
+        if ( _shapeDrawable.get() ) _shapeDrawable->setColor( _color );
+        else drawShape();  
+        
 		BROADCAST(this, "sffff", "setColor", r, g, b, a);
 	}
 }
@@ -299,7 +300,7 @@ void ShapeNode::drawShape()
 			shapeGeode = new osg::Geode();
 		}
 
-
+        _shapeDrawable.release();
 
 		if (shape==PLANE) // OSG doesn't support planes
 		{
@@ -310,32 +311,32 @@ void ShapeNode::drawShape()
             shapeGeode->addDrawable(createCone(0, AS_UNIT_SCALE * .5, _color));
         }
 		else {
-			osg::ShapeDrawable *shapeDrawable;
+			//osg::ShapeDrawable *shapeDrawable; is now member
 			if (shape==SPHERE)
 			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.5), hints);
+				_shapeDrawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.5), hints);
 			}
 			else if (shape==BOX)
 			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE), hints);
+				_shapeDrawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE), hints);
 			}
 			else if (shape==CYLINDER)
 			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
+				_shapeDrawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
 			}
 			else if (shape==CAPSULE)
 			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Capsule(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
+				_shapeDrawable = new osg::ShapeDrawable(new osg::Capsule(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
 			}
 			else if (shape==CONE)
 			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Cone(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
+				_shapeDrawable = new osg::ShapeDrawable(new osg::Cone(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
 			}
 			else {
 				return;
 			}
-			shapeGeode->addDrawable(shapeDrawable);
-			shapeDrawable->setColor(_color);
+			shapeGeode->addDrawable(_shapeDrawable);
+			_shapeDrawable->setColor(_color);
 		}
 
 
