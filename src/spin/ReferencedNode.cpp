@@ -461,16 +461,13 @@ void ReferencedNode::setAlpha (float alpha)
         ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
         ss->setMode(GL_BLEND, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-        //osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::CONSTANT_ALPHA,
-        //                                                osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA );
-
-        osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::SRC_ALPHA,//rgb
-                                                        osg::BlendFunc::DST_ALPHA,
-                                                        osg::BlendFunc::CONSTANT_ALPHA,//alpha
+        osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::CONSTANT_ALPHA,
                                                         osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA );
 
+        // osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::SRC_ALPHA,
+        //                                                 osg::BlendFunc::ONE_MINUS_SRC_ALPHA );
 
-        osg::BlendColor *blendColor = new osg::BlendColor(osg::Vec4(0, 0, 0, subgraphAlpha_));
+        osg::BlendColor *blendColor = new osg::BlendColor(osg::Vec4(subgraphAlpha_,subgraphAlpha_,subgraphAlpha_,subgraphAlpha_));
 
         blendFunc->setDataVariance(osg::Object::DYNAMIC);
         blendColor->setDataVariance(osg::Object::DYNAMIC);
@@ -478,7 +475,7 @@ void ReferencedNode::setAlpha (float alpha)
         ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     } else {
         osg::BlendColor *bc = dynamic_cast<osg::BlendColor*>( ss->getAttribute( osg::StateAttribute::BLENDCOLOR ) );
-        bc->setConstantColor( osg::Vec4(0,0,0,subgraphAlpha_) );
+        bc->setConstantColor( osg::Vec4(subgraphAlpha_,subgraphAlpha_,subgraphAlpha_,subgraphAlpha_) );
         ss->setAttributeAndModes( bc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON ); // needed?
     }
 
