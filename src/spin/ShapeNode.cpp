@@ -123,7 +123,6 @@ void ShapeNode::setShape (shapeType t)
 	else shape = t;
 
 	//std::cout << "GOT NEW SHAPE MESSAGE: " << s << std::endl;
-    printf("ShapeNode::setShape()\n");
 	drawShape();
 
 	BROADCAST(this, "si", "setShape", (int) shape);
@@ -248,7 +247,7 @@ void ShapeNode::setDetailRatio (float detailRatio)
 
 // ===================================================================
 void ShapeNode::drawShape()
-{   printf("ShapeNode::drawShape()\n");
+{
     pthread_mutex_lock(&sceneMutex);
 
 	// remove the old shape:
@@ -297,7 +296,6 @@ void ShapeNode::drawShape()
 			shapeGeode = b;
 			
 		} else {
-            printf("new geode\n");
 			shapeGeode = new osg::Geode();
 		}
 
@@ -305,7 +303,7 @@ void ShapeNode::drawShape()
         _shapeDrawable.release();
 
 		if (shape==PLANE) // OSG doesn't support planes
-            {   printf("plane.\n");
+        {
             shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
 			//if ( shapeGeode->getNumDrawables() == 0 ) shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
             //else shapeGeode->setDrawable(0, createPlane(AS_UNIT_SCALE * .5, _color));

@@ -67,13 +67,13 @@ public:
     void setShape( shapeType t);
 
     void setBounciness( float f );
-    float getBounciness() { return bounciness_; }
+    float getBounciness() const { return bounciness_; }
 
     void setFriction( float f );
-    float getFriction() { return friction_; }
+    float getFriction() const { return friction_; }
 
     void setRollingFriction( float f );
-    float getRollingFriction() { return rollingFriction_; }
+    float getRollingFriction() const { return rollingFriction_; }
 
     /**
      * Set the mass of the object. A value of 0 makes the object static
