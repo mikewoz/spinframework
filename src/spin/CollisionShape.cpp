@@ -110,8 +110,8 @@ struct btContactCallback : public btCollisionWorld::ContactResultCallback
 
         if ( !n0 || !n1 ) return 0;
 
-        if ( !n0->getNodeSymbol() ) {printf( "contactcallback: n0 id_ null\n" ); return 0;}
-        if ( !n1->getNodeSymbol() ) {printf( "contactcallback: n1 id_ null\n" ); return 0;}
+        if ( !n0->getNodeSymbol() ) { /*printf( "contactcallback: n0 id_ null\n" );*/ return 0;}
+        if ( !n1->getNodeSymbol() ) { /*printf( "contactcallback: n1 id_ null\n" );*/ return 0;}
         //     if ( n0->getNodeSymbol() && !n0->getID() ) {printf( "contactcallback: n0 s_name null\n" ); return 0;}
         //if ( n1->getNodeSymbol() && !n0->getID() ) {printf( "contactcallback: n1 s_name null\n" ); return 0;}
 
@@ -177,11 +177,13 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
 
     mass_ = 1.0;
     isDynamic_ = false;
+    bounciness_ = 0.0; // bt default
+    friction_ = 0.5; // bt default
+    rollingFriction_ = 0.5;// not bt default, but more practical, so that round things don't roll forever.
 
     //gContactAddedCallback = btCollisionCallback2;
-
-
-    collisionObj_ = new btBoxShape(btVector3(0.5,0.5,0.5));
+        
+    collisionObj_ = new btBoxShape( btVector3(0.5,0.5,0.5) );
 
     currentTransform_.setIdentity();
 
@@ -191,27 +193,25 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
 
     // using motionstate is recommended, it provides interpolation capabilities,
     // and only synchronizes 'active' objects
-    btDefaultMotionState* myMotionState = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));//currentTransform_);
-    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, myMotionState, collisionObj_, localInertia);
+    motionState_ = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));//currentTransform_);
+    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionObj_, localInertia);
     body_ = new btRigidBody(rbci);//(mass_, myMotionState, collisionObj_, localInertia);
 
 
     body_->setUserPointer(this);
-    printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
+    //printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
     // body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-    // body_->setCcdMotionThreshold(0.5);
-    // body_->setCcdSweptSphereRadius(0.2 * 0.5);
-    /*
-    body_->setCcdMotionThreshold(0.0);
-    body_->setContactProcessingThreshold(0.0);*/
-    //body_->setCcdSweptSphereRadius(0.2 * 0.5);
+
+    // body_->setCcdMotionThreshold(0.1);
+    // body_->setCcdSweptSphereRadius(0.05);
+
 
     //Collision objects with a callback still have collision response with dynamic rigid bodies. In order to use collision objects as trigger, you have to disable the collision response.
     //mBody->setCollisionFlags(mBody->getCollisionFlags() |btCollisionObject::CF_NO_CONTACT_RESPONSE));
 
     //body_->setCollisionFlags( body_->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_NO_CONTACT_RESPONSE);
     body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT ); //| btCollisionObject::CF_NO_CONTACT_RESPONSE);
-    printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
+    //printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
     //body_->setActivationState( DISABLE_DEACTIVATION );
 
     //    sceneManager_->dynamicsWorld_->addCollisionObject(body_);
@@ -230,7 +230,7 @@ sceneManager_->dynamicsWorld_->addRigidBody(body_);
 // destructor
 CollisionShape::~CollisionShape()
 {
-    printf("~collisionshape()\n");
+
     sceneManager_->dynamicsWorld_->removeRigidBody(body_);
     delete body_->getMotionState();
     delete body_;
@@ -295,6 +295,123 @@ void CollisionShape::debug()
 
 // -----------------------------------------------------------------------------
 
+void CollisionShape::resetCollisionObj()
+{
+    bool isInWorld = body_->isInWorld();
+    if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
+
+    btVector3 localInertia(0,0,0);
+    if (mass_!=0.f) collisionObj_->calculateLocalInertia(mass_, localInertia);
+
+    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionObj_, localInertia);
+    rbci.m_restitution = bounciness_;
+    rbci.m_friction = friction_;
+    //BULLET VERSION >= 2.81 rbci.m_rollingFriction = rollingFriction_;
+    rbci.m_angularDamping = rollingFriction_; // WILL DO FOR NOW
+
+    body_ = new btRigidBody(rbci);
+    body_->setUserPointer(this);
+    body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+   
+    if ( isInWorld )  sceneManager_->dynamicsWorld_->addRigidBody(body_);
+
+}
+
+
+// -----------------------------------------------------------------------------
+
+
+void CollisionShape::setShape( shapeType t )
+{
+
+    if (t == shape) return;
+	else shape = t;
+
+    bool isInWorld = body_->isInWorld();
+    if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
+
+    switch (t) {
+    case SPHERE:
+        collisionObj_ = new btSphereShape( AS_UNIT_SCALE * 0.5 );
+        break;
+    case CYLINDER:
+        collisionObj_ = new btCylinderShape( AS_UNIT_SCALE * btVector3(0.25,0.5,0.25) );
+        break;
+    case CAPSULE:
+        collisionObj_ = new btCapsuleShape( AS_UNIT_SCALE * 0.25, AS_UNIT_SCALE );
+        break;
+    case CONE:
+        collisionObj_ = new btConeShape( AS_UNIT_SCALE * 0.25, AS_UNIT_SCALE );
+        break;
+    case PLANE:
+        collisionObj_ = new btStaticPlaneShape( btVector3(0, 1, 0), 0 ); // 'createPlane' makes a y=0 plane.
+        break;
+    case BOX:
+    default:
+        collisionObj_ = new btBoxShape( AS_UNIT_SCALE * btVector3(0.5,0.5,0.5) );
+        break;
+    }
+
+    /* btVector3 localInertia(0,0,0);
+    if (mass_!=0.f) collisionObj_->calculateLocalInertia(mass_, localInertia);
+
+    ///////recycle old.motionState_ = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));//currentTransform_);
+    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionObj_, localInertia);
+    rbci.m_restitution = bounciness_;
+    rbci.m_friction = friction_;
+    body_ = new btRigidBody(rbci);
+   
+
+
+    body_->setUserPointer(this);
+    //printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );  
+    body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+    //printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
+    */
+
+    resetCollisionObj();
+	drawShape();
+
+    if ( isInWorld )  sceneManager_->dynamicsWorld_->addRigidBody(body_);
+
+	BROADCAST(this, "si", "setShape", (int) shape);
+}
+
+
+// -----------------------------------------------------------------------------
+
+void CollisionShape::setBounciness( float f )
+{    
+    if ( bounciness_ == (btScalar)f ) return;
+    //printf("setBounciness %f\n", f);
+    bounciness_ = f;
+    resetCollisionObj();
+    BROADCAST(this, "sf", "setBounciness", (float) bounciness_);
+}
+
+// -----------------------------------------------------------------------------
+
+void CollisionShape::setFriction( float f )
+{
+    if ( friction_ == (btScalar)f ) return;
+    //printf("setFriction %f\n", f);
+    friction_ = f;
+    resetCollisionObj();
+    BROADCAST(this, "sf", "setFriction", (float) friction_);
+}
+// -----------------------------------------------------------------------------
+
+void CollisionShape::setRollingFriction( float f )
+{
+    if ( friction_ == (btScalar)f ) return;
+    //printf("setRollingFriction %f\n", f);
+    rollingFriction_ = f;
+    resetCollisionObj();
+    BROADCAST(this, "sf", "setFriction", (float) friction_);
+}
+
+
+// -----------------------------------------------------------------------------
 
 void CollisionShape::setMass (float mass)
 {
@@ -336,7 +453,7 @@ void CollisionShape::setDynamic(int isDynamic)
 
     sceneManager_->dynamicsWorld_->addRigidBody(body_);
 
-    printf("%s: getCollisionFlags = 0x%x\n", getID().c_str(), body_->getCollisionFlags()  );
+    //printf("%s: getCollisionFlags = 0x%x\n", getID().c_str(), body_->getCollisionFlags()  );
     BROADCAST(this, "si", "setDynamic", getDynamic());
 }
 
@@ -364,7 +481,7 @@ bool CollisionShape::checkCollisions(btTransform tranform)
 
 void CollisionShape::setTranslation (float x, float y, float z)
 {
-    printf("CollisionShape::setTranslation(%f, %f ,%f)\n", x, y, z);
+    //printf("CollisionShape::setTranslation(%f, %f ,%f)\n", x, y, z);
     // We start by applying the translation to the physics only and checking for
     // collisions using Bullet's contactTest() method. The callback will set the
     // appropriate contactOffset if there is a collision. Thus, we avoid sending
@@ -503,8 +620,8 @@ void CollisionShape::setScale(float x, float y, float z)
 
     //currentTransform_ = asBtTransform(mainTransform->getMatrix());
     //body_->getMotionState()->setWorldTransform(currentTransform_);
-
-    collisionObj_->setLocalScaling(asBtVector3(this->getScale()));
+    if ( shape != ShapeNode::PLANE )
+        collisionObj_->setLocalScaling(asBtVector3(this->getScale()));
 }
 
 void CollisionShape::setManipulatorMatrix
@@ -521,14 +638,14 @@ void CollisionShape::setManipulatorMatrix
 }
 
 // -----------------------------------------------------------------------------
-void CollisionShape::drawShape()
-{
+/*void CollisionShape::drawShape()
+{   printf("CollisionShape::drawShape()\n");
     ShapeNode::drawShape();
-
+    
     // update the collision object's shape:
 
 }
-
+*/
 // -----------------------------------------------------------------------------
 std::vector<lo_message> CollisionShape::getState () const
 {
@@ -543,6 +660,18 @@ std::vector<lo_message> CollisionShape::getState () const
 
     msg = lo_message_new();
     lo_message_add(msg, "si", "setDynamic", getDynamic());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setBounciness", getBounciness());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setFriction", getFriction());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setRollingFriction", getRollingFriction());
     ret.push_back(msg);
 
 

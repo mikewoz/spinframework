@@ -123,7 +123,7 @@ void ShapeNode::setShape (shapeType t)
 	else shape = t;
 
 	//std::cout << "GOT NEW SHAPE MESSAGE: " << s << std::endl;
-
+    printf("ShapeNode::setShape()\n");
 	drawShape();
 
 	BROADCAST(this, "si", "setShape", (int) shape);
@@ -248,7 +248,7 @@ void ShapeNode::setDetailRatio (float detailRatio)
 
 // ===================================================================
 void ShapeNode::drawShape()
-{
+{   printf("ShapeNode::drawShape()\n");
     pthread_mutex_lock(&sceneMutex);
 
 	// remove the old shape:
@@ -297,18 +297,24 @@ void ShapeNode::drawShape()
 			shapeGeode = b;
 			
 		} else {
+            printf("new geode\n");
 			shapeGeode = new osg::Geode();
 		}
 
+        //shapeGeode->removeDrawable( _shapeDrawable.release() );
         _shapeDrawable.release();
 
 		if (shape==PLANE) // OSG doesn't support planes
-		{
-			shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
+            {   printf("plane.\n");
+            shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
+			//if ( shapeGeode->getNumDrawables() == 0 ) shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
+            //else shapeGeode->setDrawable(0, createPlane(AS_UNIT_SCALE * .5, _color));
 		}
         else if (shape==DISC)
         {
             shapeGeode->addDrawable(createCone(0, AS_UNIT_SCALE * .5, _color));
+            //if ( shapeGeode->getNumDrawables() == 0 ) shapeGeode->addDrawable(createCone(0, AS_UNIT_SCALE * .5, _color));
+            //else shapeGeode->setDrawable(0, createCone(0, AS_UNIT_SCALE * .5, _color));
         }
 		else {
 			//osg::ShapeDrawable *shapeDrawable; is now member
@@ -335,7 +341,11 @@ void ShapeNode::drawShape()
 			else {
 				return;
 			}
-			shapeGeode->addDrawable(_shapeDrawable);
+
+            shapeGeode->addDrawable( _shapeDrawable );
+			//if ( shapeGeode->getNumDrawables() == 0 ) shapeGeode->addDrawable( _shapeDrawable );
+            //else shapeGeode->setDrawable( 0, _shapeDrawable );
+
 			_shapeDrawable->setColor(_color);
 		}
 

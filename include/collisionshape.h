@@ -63,6 +63,18 @@ public:
     virtual void callbackUpdate(osg::NodeVisitor* nv);
     virtual void debug();
     
+
+    void setShape( shapeType t);
+
+    void setBounciness( float f );
+    float getBounciness() { return bounciness_; }
+
+    void setFriction( float f );
+    float getFriction() { return friction_; }
+
+    void setRollingFriction( float f );
+    float getRollingFriction() { return rollingFriction_; }
+
     /**
      * Set the mass of the object. A value of 0 makes the object static
      * (unmovable) by the dynamics engine. Only direct transformation through
@@ -110,19 +122,21 @@ public:
     osg::Vec3 collisionOffset_;
 
 protected:
-
-    virtual void drawShape();
+    void resetCollisionObj();
+    // virtual void drawShape();
 
     btRigidBody* body_;
     btCollisionShape *collisionObj_;
-    
+    btDefaultMotionState* motionState_;
     btTransform currentTransform_;
 
 private:
 
     bool isDynamic_;
     btScalar mass_;
-    
+    btScalar bounciness_;
+    btScalar friction_;
+    btScalar rollingFriction_;
     osg::Timer_t lastTick_;
 
 };
