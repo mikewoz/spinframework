@@ -11,7 +11,7 @@
         <supportsResize>true</supportsResize>
         <camera id="domeCamera">
             <spherical>true</spherical>
-            <collar>0.915</collar>
+            <collar>0.975</collar>
             <radius>1.0</radius>
             <crop>0</crop>
             <textureSize>1024</textureSize>
