@@ -172,6 +172,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_PublicMemberProperty(int, renderBin);
 	I_PublicMemberProperty(int, lightingEnabled);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, shapeGeode);
+	I_PublicMemberProperty(osg::ref_ptr< osg::ShapeDrawable >, _shapeDrawable);
 	I_PublicMemberProperty(osgUtil::Optimizer, optimizer);
 END_REFLECTOR
 
