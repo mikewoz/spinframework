@@ -157,7 +157,7 @@ public:
     int getColorMode()      const { return (int)this->colorMode_; };
     float getFilterSize()   const { return this->voxelSize_; };
     osg::Vec2 getDistCrop() const { return this->distCrop_; };
-    int getModulatePointSize() const { return modulatePointSize_; }
+    int getModulatePointSize() const { return (int)modulatePointSize_; }
     virtual std::vector<lo_message> getState() const;
     
 

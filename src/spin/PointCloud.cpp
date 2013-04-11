@@ -98,6 +98,7 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     pointSize_ = 1.0;
     voxelSize_ = 0.01f;
     distCrop_ = osg::Vec2(0.0,10.0);
+    modulatePointSize_ = 0;
     
 #ifdef WITH_PCL
 	#ifdef WITH_SHAREDVIDEO
@@ -452,11 +453,11 @@ void PointCloud::updatePoints()
 
         if ( cloud_->points.size() ) {
             center_ /= (float)cloud_->points.size();
-            float dist = 1.0f;
-            if ( modulatePointSize_ ) dist = computeDistanceFromCamera();
-            float rad = dist * pointSize_ / 1000.0;
-            // printf( "LIGHTPOINTS center_ = %f %f %f, nb points = %u,\ndist = %f, rad = %f\n",
-            //         center_.x(), center_.y(), center_.z(), cloud_->points.size(), dist, rad );
+            float invDist = 1.0f;
+            if ( modulatePointSize_ ) invDist = 1.0f / computeDistanceFromCamera();
+            float rad = invDist * pointSize_ / 1000.0;
+            //printf( "LIGHTPOINTS center_ = %f %f %f, nb points = %u,\ninvdist = %f, rad = %f\n",
+            //        center_.x(), center_.y(), center_.z(), cloud_->points.size(), invDist, rad );
             for (i=0; i<cloud_->points.size(); i++)  lightPointNode_->getLightPoint(i)._radius = rad;
         }
         
@@ -972,10 +973,10 @@ void PointCloud::setColorMode (ColorMode mode)
 }
 void PointCloud::setModulatePointSize (int a)
 {
-    if ( modulatePointSize_ == a ) return;
+    if ( modulatePointSize_ == (bool)a ) return;
     printf("setModulatePointSize %i\n", a);
     modulatePointSize_ = a;
-	BROADCAST(this, "si", "setModulatePointSize", getColorMode());
+	BROADCAST(this, "si", "setModulatePointSize", getModulatePointSize());
     updateFlag_ = true;
 }
 // -----------------------------------------------------------------------------
