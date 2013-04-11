@@ -96,7 +96,6 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     spacing_ = 1.0;
     randomCoeff_ = 0.0;
     pointSize_ = 1.0;
-    
     voxelSize_ = 0.01f;
     distCrop_ = osg::Vec2(0.0,10.0);
     
@@ -249,14 +248,14 @@ void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::Cons
         lastTick = tick;
     }
 	*/
-    
+
     // If the redraw flag is set, our geometry is about to be destroyed anyway,
     // so let's just exit and wait. The cloud needs to exist before we can
     // update it.
     if (redrawFlag_) return;
         
     applyFilters(rawCloud);
-
+    
     // Set the flag so that we update during the next traversal:
     updateFlag_ = true;
 }
@@ -341,6 +340,31 @@ void PointCloud::getColor(unsigned int i, osg::Vec4& color)
     color.set((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f);
 }
 
+float PointCloud::computeDistanceFromCamera()
+{
+    if (spinApp::Instance().getContext()->isServer()) return -1.0f;
+    
+    osg::Node::ParentList pl = spinApp::Instance().sceneManager_->rootNode->getParents();
+
+    if ( pl.size() == 0 ) return -1.0f;
+
+    osg::Camera* cam = 0;
+
+    for ( size_t i = 0; i < pl.size(); i++ ) {
+        cam = dynamic_cast<osg::Camera*>( pl[i] );
+        if ( cam ) break;
+    }
+
+    if ( !cam ) return -1.0f;
+
+    osg::Vec3f eye, a, b;
+    cam->getViewMatrixAsLookAt( eye, a, b );
+    printf( "eye = %f %f %f\n", eye.x(), eye.y(), eye.z() );
+    return ( eye - center_ ).length();
+
+}
+
+
 void PointCloud::updatePoints()
 {
     if (spinApp::Instance().getContext()->isServer()) return;
@@ -401,7 +425,7 @@ void PointCloud::updatePoints()
                 geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,cloud_->points.size()));
                 
                 osg::Point *point = new osg::Point();
-                point->setSize(pointSize_*2);
+                point->setSize(pointSize_*2.0f); // 2?
                 cloudGeode_->getOrCreateStateSet()->setAttribute(point);
 
                 break;
@@ -415,14 +439,28 @@ void PointCloud::updatePoints()
     else if ((drawMode_==LIGHTPOINTS) && lightPointNode_.valid() && lightPointNode_->getNumLightPoints())
     {        
         unsigned int i=0;
+        center_.set(0,0,0);
         for (; i<cloud_->points.size(); i++)
         {
             osgSim::LightPoint& lp = lightPointNode_->getLightPoint(i);
             lp._on = true;
             this->getColor(i, lp._color);
             this->getPos(i, lp._position);
+            center_ += lp._position;            
             lp._radius = pointSize_/1000.0;
         }
+
+        if ( cloud_->points.size() ) {
+            center_ /= (float)cloud_->points.size();
+            float dist = 1.0f;
+            if ( modulatePointSize_ ) dist = computeDistanceFromCamera();
+            float rad = dist * pointSize_ / 1000.0;
+            // printf( "LIGHTPOINTS center_ = %f %f %f, nb points = %u,\ndist = %f, rad = %f\n",
+            //         center_.x(), center_.y(), center_.z(), cloud_->points.size(), dist, rad );
+            for (i=0; i<cloud_->points.size(); i++)  lightPointNode_->getLightPoint(i)._radius = rad;
+        }
+        
+
         for (; i<maxPoints_; i++)
         {
             // deactivate any filtered out light points (recall, we reserve the
@@ -932,7 +970,14 @@ void PointCloud::setColorMode (ColorMode mode)
         updateFlag_ = true;
 	}
 }
-
+void PointCloud::setModulatePointSize (int a)
+{
+    if ( modulatePointSize_ == a ) return;
+    printf("setModulatePointSize %i\n", a);
+    modulatePointSize_ = a;
+	BROADCAST(this, "si", "setModulatePointSize", getColorMode());
+    updateFlag_ = true;
+}
 // -----------------------------------------------------------------------------
 std::vector<lo_message> PointCloud::getState () const
 {
@@ -976,6 +1021,10 @@ std::vector<lo_message> PointCloud::getState () const
  
     msg = lo_message_new();
     lo_message_add(msg, "si", "setColorMode", getColorMode());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setModulatePointSize", getModulatePointSize());
     ret.push_back(msg);
     
     msg = lo_message_new();
