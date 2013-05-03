@@ -198,6 +198,7 @@ void CompositeViewer::setupCamera()
             // set viewport
             //lCamera->setViewport(lCamera->getViewport()); // Useful ??
             lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            lCamera->setCullingMode(osg::CullSettings::NO_CULLING);
             //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
 
             // tell the camera to use OpenGL frame buffer object where supported.

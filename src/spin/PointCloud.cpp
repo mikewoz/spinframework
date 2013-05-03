@@ -692,7 +692,7 @@ void PointCloud::setURI(const char* filename)
                     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
                     shmPointCloud_->getCloud(cloudOut);
 
-                    std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+                    //std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
     		        applyFilters(cloudOut);
 
                     updateFlag_ = true;

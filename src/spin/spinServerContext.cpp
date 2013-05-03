@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 
@@ -382,7 +383,12 @@ void *spinServerContext::spinServerThread(void *arg)
         //
 
         if (recv == 0)
-        	usleep(1000);
+        {
+            timespec nap;
+            nap.tv_sec = 0;
+            nap.tv_nsec = 1e6;
+            nanosleep(&nap, NULL);
+        }
     }
     
     // send disconnect message to clients that that they don't have to wait
@@ -420,7 +426,11 @@ void *spinServerContext::syncThread(void * /*arg*/)
     while (spin.getContext()->isRunning())
     {
         //usleep(1000000 * 0.25); // 1/4 second sleep
-        usleep(1000000 * 0.5); // 1/2 second sleep
+        //usleep(1000000 * 0.5); // 1/2 second sleep
+        timespec nap;
+        nap.tv_sec = 0;
+        nap.tv_nsec = 5e8;
+        nanosleep(&nap, NULL);
 
         frameTick = timer->tick();
 

@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -302,7 +303,12 @@ void *spinClientContext::spinClientThread(void *arg)
         int recv = context->pollUpdates();
 
         if (recv == 0)
-            usleep(10);
+        {
+            timespec nap;
+            nap.tv_sec = 0;
+            nap.tv_nsec = 1e4;
+            nanosleep(&nap, NULL);
+        }
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();

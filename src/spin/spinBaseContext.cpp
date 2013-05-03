@@ -41,6 +41,7 @@
 
 #include "config.h"
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <pthread.h>
@@ -345,8 +346,11 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
     //pthread_join(pthreadID, NULL); // if not DETACHED thread
 
     // wait until the thread gets into it's loop before returning:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (! running )
-        usleep(10);
+        nanosleep(&nap, NULL);
 
     return true;
 }
@@ -362,8 +366,11 @@ void spinBaseContext::stop()
     }
 
     // wait here until the thread has really exited:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (isRunning())
-        usleep(10);
+        nanosleep(&nap, NULL);
 
 }
 
