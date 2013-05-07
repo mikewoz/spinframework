@@ -56,6 +56,27 @@ namespace spin
 class CollisionShape : public ShapeNode
 {
 public:
+    struct btContactCallback : public btCollisionWorld::ContactResultCallback {
+        btContactCallback(btRigidBody& tgtBody , CollisionShape& node);
+        ~btContactCallback();
+
+        btRigidBody& body; //!< The body the sensor is monitoring
+        CollisionShape& node_; //!< External information for contact processing
+
+        osg::Vec3 prevHitPoint;
+        osg::Vec3 prevHitPoint2;
+        const btCollisionObject* prevObj;
+        bool hit, prevHit;
+
+        virtual bool needsCollision(btBroadphaseProxy* proxy) const;
+        virtual btScalar addSingleResult(btManifoldPoint& cp,
+                                         const btCollisionObject* colObj0,int partId0,int index0,
+                                         const btCollisionObject* colObj1,int partId1,int index1);
+    };
+
+
+
+
 
     CollisionShape(SceneManager *sceneManager, const char* initID);
     virtual ~CollisionShape();
@@ -65,6 +86,15 @@ public:
     
 
     void setShape( shapeType t);
+    void setModelFromFile( const char* file );
+
+    enum ConstraintType
+    {
+        POINT_2_POINT = 0,
+        HINGE
+    };
+
+    void setConstraint( ConstraintType ct, float x, float y, float z );
 
     void setBounciness( float f );
     float getBounciness() const { return bounciness_; }
@@ -75,6 +105,11 @@ public:
     void setRollingFriction( float f );
     float getRollingFriction() const { return rollingFriction_; }
 
+    void setReportContacts( int b );
+    int getReportContacts() const { return (contactCallback_ != 0); }
+
+    void setFilterContacts( int b );
+    int getFilterContacts() const { return filterContacts_; }
     /**
      * Set the mass of the object. A value of 0 makes the object static
      * (unmovable) by the dynamics engine. Only direct transformation through
@@ -109,7 +144,7 @@ public:
     virtual void setOrientationQuat(float x, float y, float z, float w);
     virtual void setOrientation (float pitch, float roll, float yaw);
     virtual void setScale (float x, float y, float z);
-
+    
     virtual void setManipulatorMatrix
         (float a00, float a01, float a02, float a03,
          float a10, float a11, float a12, float a13,
@@ -137,6 +172,10 @@ private:
     btScalar bounciness_;
     btScalar friction_;
     btScalar rollingFriction_;
+    btTypedConstraint* constraint_;
+    //btCollisionWorld::ContactResultCallback* contactCallback_;
+    btContactCallback* contactCallback_;
+    bool filterContacts_;
     osg::Timer_t lastTick_;
 
 };

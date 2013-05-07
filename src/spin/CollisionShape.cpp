@@ -39,6 +39,9 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <osgDB/ReadFile>
+#include <osgDB/FileUtils>
+#include <osgDB/FileNameUtils>
 #include "collisionshape.h"
 #include "spinapp.h"
 #include "spinbasecontext.h"
@@ -51,122 +54,157 @@ using namespace std;
 //extern float lastBtHitDepth;
 static float lastBtHitDepth = 0.0;
 
+extern ContactAddedCallback gContactAddedCallback; 
+
 namespace spin
 {
 
-
-struct btContactCallback : public btCollisionWorld::ContactResultCallback
+static bool callbackFunc(btManifoldPoint& cp,const btCollisionObject* obj1,int id1,int index1,const btCollisionObject* obj2,int id2,int index2)
 {
+    //((bulletObject*)obj1->getUserPointer())->hit=true;
+    //   ((bulletObject*)obj2->getUserPointer())->hit=true;
+    printf("callbackFunc!\n");
+        return false;
+}
+
+//struct btContactCallback : public btCollisionWorld::ContactResultCallback
+//{
 
     //! Constructor, pass whatever context you want to have available when processing contacts
     /*! You may also want to set m_collisionFilterGroup and m_collisionFilterMask
      *  (supplied by the superclass) for needsCollision() */
-    btContactCallback(btRigidBody& tgtBody , CollisionShape& node /*, ... */)
-        : btCollisionWorld::ContactResultCallback(), body(tgtBody), node_(node) { }
-    ~btContactCallback() {}
-    btRigidBody& body; //!< The body the sensor is monitoring
+
+CollisionShape::btContactCallback::btContactCallback(btRigidBody& tgtBody , CollisionShape& node /*, ... */)
+        : btCollisionWorld::ContactResultCallback(), body(tgtBody), node_(node), prevHit(false), hit(false) { }
+
+CollisionShape::btContactCallback::~btContactCallback() {}
+
+    /*    btRigidBody& body; //!< The body the sensor is monitoring
     CollisionShape& node_; //!< External information for contact processing
 
+    osg::Vec3 prevHitPoint;
+    osg::Vec3 prevHitPoint2;
+    const btCollisionObject* prevObj;
+    bool hit, prevHit;
+    */
     //! If you don't want to consider collisions where the bodies are joined by a constraint, override needsCollision:
     /*! However, if you use a btCollisionObject for #body instead of a btRigidBody,
      *  then this is unnecessary—checkCollideWithOverride isn't available */
-    virtual bool needsCollision(btBroadphaseProxy* proxy) const {
-        // superclass will check m_collisionFilterGroup and m_collisionFilterMask
-        if(!btCollisionWorld::ContactResultCallback::needsCollision(proxy))
-            return false;
-        // if passed filters, may also want to avoid contacts between constraints
-        return body.checkCollideWithOverride(static_cast<btCollisionObject*>(proxy->m_clientObject));
+bool CollisionShape::btContactCallback::needsCollision(btBroadphaseProxy* proxy) const
+{
+    // superclass will check m_collisionFilterGroup and m_collisionFilterMask
+    if(!btCollisionWorld::ContactResultCallback::needsCollision(proxy))
+        return false;
+    // if passed filters, may also want to avoid contacts between constraints
+    return body.checkCollideWithOverride(static_cast<btCollisionObject*>(proxy->m_clientObject));
+}
+
+//! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
+btScalar CollisionShape::btContactCallback::addSingleResult(btManifoldPoint& cp,
+                                            const btCollisionObject* colObj0,int partId0,int index0,
+                                            const btCollisionObject* colObj1,int partId1,int index1)
+{
+    osg::Vec3 hitPoint;
+    osg::Vec3 hitPoint2;
+    osg::Vec3 normal;
+
+    //if (colObj0->getCollisionObject()==&body)
+    const btCollisionObject* otherObj;
+    const btCollisionObject* thisObj;
+    if (colObj0==&body) {
+        hitPoint = asOsgVec3( cp.m_localPointA );
+        hitPoint2 = asOsgVec3( cp.m_localPointB );
+        normal = -asOsgVec3( cp.m_normalWorldOnB );
+        thisObj = colObj0;
+        otherObj = colObj1;
+    } else {
+        hitPoint = asOsgVec3( cp.m_localPointB );
+        hitPoint2 = asOsgVec3( cp.m_localPointA );
+        normal = asOsgVec3( cp.m_normalWorldOnB );
+        thisObj = colObj1;
+        otherObj = colObj0;
     }
 
-    //! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
-    virtual btScalar addSingleResult(btManifoldPoint& cp,
-                                     // const btCollisionObjectWrapper* colObj0,int partId0,int index0,
-                                     //const btCollisionObjectWrapper* colObj1,int partId1,int index1)
-                                     const btCollisionObject* colObj0,int partId0,int index0,
-                                     const btCollisionObject* colObj1,int partId1,int index1)
-    {
-        osg::Vec3 hitPoint;
-        osg::Vec3 hitPoint2;
+    hit = true;
+    if ( prevHit && otherObj == prevObj ) {
+        //printf("prevHit\n");
+        return 0;
+    } 
 
-        osg::Vec3 normal;
-
-        //if (colObj0->getCollisionObject()==&body)
-        if (colObj0==&body)
-        {
-            hitPoint = asOsgVec3( cp.m_localPointA );
-            hitPoint2 = asOsgVec3( cp.m_localPointB );
-            normal = -asOsgVec3( cp.m_normalWorldOnB );
-        } else {
-            hitPoint = asOsgVec3( cp.m_localPointB );
-            hitPoint2 = asOsgVec3( cp.m_localPointA );
-            normal = asOsgVec3( cp.m_normalWorldOnB );
-        }
-
-        CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
-        CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
-        //CollisionShape *n0 = (CollisionShape*)(colObj0->getCollisionObject()->getUserPointer());
-        //CollisionShape *n1 = (CollisionShape*)(colObj1->getCollisionObject()->getUserPointer());
+    /*if ( (hitPoint == prevHitPoint || hitPoint2 == prevHitPoint2) && colObj1 == prevObj ) {
+        //printf("nope\n");
+        return 0;
+        }*/
+    prevHitPoint = hitPoint;
+    prevHitPoint2 = hitPoint2;
+    prevObj = otherObj;
+    
+    CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
+    CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
+    //CollisionShape *n0 = (CollisionShape*)(colObj0->getCollisionObject()->getUserPointer());
+    //CollisionShape *n1 = (CollisionShape*)(colObj1->getCollisionObject()->getUserPointer());
 
 
-        if ( !n0 || !n1 ) return 0;
+    if ( !n0 || !n1 ) return 0;
 
-        if ( !n0->getNodeSymbol() ) { /*printf( "contactcallback: n0 id_ null\n" );*/ return 0;}
-        if ( !n1->getNodeSymbol() ) { /*printf( "contactcallback: n1 id_ null\n" );*/ return 0;}
-        //     if ( n0->getNodeSymbol() && !n0->getID() ) {printf( "contactcallback: n0 s_name null\n" ); return 0;}
-        //if ( n1->getNodeSymbol() && !n0->getID() ) {printf( "contactcallback: n1 s_name null\n" ); return 0;}
-
-        // penetration depth
-        float depth = cp.getDistance();
-
-        if (depth==-1) return 0; // ????
-
-        //std::cout << "NEW: Hit between " << n0->getID() << " and " << n1->getID() << " at: " << stringify(hitPoint) << ", otherPt: " << stringify(hitPoint2) << ", normal: " << stringify(normal) << ", depth="<< depth << std::endl;
+    if ( !n0->getNodeSymbol() ) { /*printf( "contactcallback: n0 id_ null\n" );*/ return 0;}
+    if ( !n1->getNodeSymbol() ) { /*printf( "contactcallback: n1 id_ null\n" );*/ return 0;}
+    //     if ( n0->getNodeSymbol() && !n0->getID() ) {printf( "contactcallback: n0 s_name null\n" ); return 0;}
+    //if ( n1->getNodeSymbol() && !n0->getID() ) {printf( "contactcallback: n1 s_name null\n" ); return 0;}
 
 
-        // This collisionOffset is not good because it assumes that the node
-        // has actually moved to that collision depth and must be moved back.
-        node_.collisionOffset_ = (normal * depth);// + (normal * 0.00001);
+    // penetration depth
+    float depth = cp.getDistance();
 
-        // We need to compute the amount of remaining translation that can be
-        // performed before the collision occurs.
+    if (depth==-1) return 0; // ????
 
-
-        /*
-        btScalar m[16];
-        btDefaultMotionState* myMotionState = (btDefaultMotionState*) body.getMotionState();
-        myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
-        osg::Matrixf mat(m);
-
-        // vector from current node pos to the position the node would be if we
-        // moved it to the collision pos
-        osg::Vec3 diff = mat.getTrans() - node_.getTransform()->getMatrix().getTrans();
-
-        std::cout << "diff = " << stringify(diff) << std::endl;
-
-        // this one worked well:
-        node_.collisionOffset_ = -diff + (normal * depth) + (normal * -0.000001);
-        */
+    std::cout << "NEW: Hit between " << n0->getID() << " and " << n1->getID() << " at: " << stringify(hitPoint) << ", otherPt: " << stringify(hitPoint2) << ", normal: " << stringify(normal) << ", depth="<< depth << std::endl;
 
 
-        node_.collisionOffset_ = (normal * depth) + (normal * -0.000001);
+    // This collisionOffset is not good because it assumes that the node
+    // has actually moved to that collision depth and must be moved back.
+    node_.collisionOffset_ = (normal * depth);// + (normal * 0.00001);
+
+    // We need to compute the amount of remaining translation that can be
+    // performed before the collision occurs.
+
+
+    /*
+      btScalar m[16];
+      btDefaultMotionState* myMotionState = (btDefaultMotionState*) body.getMotionState();
+      myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+      osg::Matrixf mat(m);
+
+      // vector from current node pos to the position the node would be if we
+      // moved it to the collision pos
+      osg::Vec3 diff = mat.getTrans() - node_.getTransform()->getMatrix().getTrans();
+
+      std::cout << "diff = " << stringify(diff) << std::endl;
+
+      // this one worked well:
+      node_.collisionOffset_ = -diff + (normal * depth) + (normal * -0.000001);
+    */
+
+
+    node_.collisionOffset_ = (normal * depth) + (normal * -0.000001);
 
 
 
-        osg::Vec3 newT = node_.getTranslation() + (normal * depth);// + (normal * 0.00001);
+    osg::Vec3 newT = node_.getTranslation() + (normal * depth);// + (normal * 0.00001);
 
-        if (depth != lastBtHitDepth)
+    if (depth != lastBtHitDepth)
         {
             BROADCAST(n0, "ssfff", "collide", n1->getID().c_str(), normal.x(), normal.y(), normal.z());
         }
 
-        lastBtHitDepth = depth;
+    lastBtHitDepth = depth;
 
-        // Returns false, telling Bullet that we did not modify the contact point
-        // properties at all. We would return true if we changed friction or
-        // something
-        return 0;
-    }
-};
+    // Returns false, telling Bullet that we did not modify the contact point
+    // properties at all. We would return true if we changed friction or
+    // something
+    return 0;
+}
+////};
 
 // -----------------------------------------------------------------------------
 // constructor:
@@ -180,7 +218,7 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
     bounciness_ = 0.0; // bt default
     friction_ = 0.5; // bt default
     rollingFriction_ = 0.5;// not bt default, but more practical, so that round things don't roll forever.
-
+    constraint_ = 0;
     //gContactAddedCallback = btCollisionCallback2;
         
     collisionObj_ = new btBoxShape( btVector3(0.5,0.5,0.5) );
@@ -216,13 +254,16 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
 
     //    sceneManager_->dynamicsWorld_->addCollisionObject(body_);
 
-
-
+    body_->setSleepingThresholds( 1.6, 2.5 ); //?
+    body_->setDeactivationTime(0.8);
 
     /////////////////////
     //// NNOT IF IT STARTS AS NOT DYNAMIC
-sceneManager_->dynamicsWorld_->addRigidBody(body_);
+    sceneManager_->dynamicsWorld_->addRigidBody(body_);
     ////////////////////
+
+    filterContacts_ = false;
+    contactCallback_ = 0; //new btContactCallback( *body_, *this );
 
     this->setInteractionMode(GroupNode::DRAG);
 }
@@ -248,20 +289,47 @@ void CollisionShape::callbackUpdate(osg::NodeVisitor* nv)
     // the user is not currently manipulating the object.
     if (spinApp::Instance().getContext()->isServer())
     {
+
+        /* {
+                btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
+                myMotionState->getWorldTransform( currentTransform_ );
+                std::cout << getID() << " transform C = " << stringify(asOsgVec3( currentTransform_.getOrigin()))<< std::endl;
+                }*/
+
+
         if (isDynamic_ && (mass_!=0) && body_->isInWorld() && body_->isActive() )
         {
-            btScalar m[16];
 
+            ////   printf( "velocities: %f, %f, %i\n", body_->getLinearVelocity().length2(), body_->getAngularVelocity().length2(), body_->getLinearVelocity().length2() == 0);
+            //  printf("getActivationState = %i\n", body_->getActivationState() );
+            // btContactCallback cb( *body_, *this );
+            if (contactCallback_) {
+                //printf("\n%s **************\n", this->getID().c_str());
+                if ( filterContacts_ ) contactCallback_->hit = false;
+                else contactCallback_->prevHit = false;
+                sceneManager_->dynamicsWorld_->contactTest( body_, *contactCallback_ );
+                contactCallback_->prevHit = contactCallback_->hit;
+            }
+            /*{
+                btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
+                myMotionState->getWorldTransform( currentTransform_ );
+                std::cout << getID() << " transform D = " << stringify(asOsgVec3( currentTransform_.getOrigin()))<< std::endl;
+                }*/
+
+            btScalar m[16];
             btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
             myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
-
             osg::Matrixf mat(m);
+
             /* printf("\n%s\n", getID().c_str());
             printf("CollisionShape::callbackUpdate setTranslation(%f, %f, %f)\n", mat.getTrans().x(),mat.getTrans().y(),mat.getTrans().z());
             printf("                               setOrientationQuat(%f, %f, %f, %f)\n", mat.getRotate().x(), mat.getRotate().y(), mat.getRotate().z(), mat.getRotate().w() );*/
+            //   std::cout << getID();
+            //   printf("ShapeNode::setTranslation %f %f %f\n", mat.getTrans().x(),mat.getTrans().y(),mat.getTrans().z() );
             ShapeNode::setTranslation(mat.getTrans().x(),mat.getTrans().y(),mat.getTrans().z());
             ShapeNode::setOrientationQuat(  mat.getRotate().x(), mat.getRotate().y(), mat.getRotate().z(), mat.getRotate().w() );
             myMotionState->getWorldTransform( currentTransform_ );
+            //  std::cout << getID() << " transform E = " << stringify( asOsgVec3(currentTransform_.getOrigin()))<< std::endl;
         }
     }
 
@@ -335,7 +403,7 @@ void CollisionShape::setShape( shapeType t )
         collisionObj_ = new btSphereShape( AS_UNIT_SCALE * 0.5 );
         break;
     case CYLINDER:
-        collisionObj_ = new btCylinderShape( AS_UNIT_SCALE * btVector3(0.25,0.5,0.25) );
+        collisionObj_ = new btCylinderShapeZ( AS_UNIT_SCALE * btVector3(0.25,0.25,0.5) );
         break;
     case CAPSULE:
         collisionObj_ = new btCapsuleShape( AS_UNIT_SCALE * 0.25, AS_UNIT_SCALE );
@@ -377,6 +445,64 @@ void CollisionShape::setShape( shapeType t )
 	BROADCAST(this, "si", "setShape", (int) shape);
 }
 
+// -----------------------------------------------------------------------------
+
+static btTriangleIndexVertexArray* osgGeom2Bullet( osg::Geometry* geom )
+{
+    osg::Vec3Array* vert = (osg::Vec3Array*) geom->getVertexArray();
+    osg::PrimitiveSet* ps =  geom->getPrimitiveSet(0);
+    if ( !ps ) {
+        printf( "no primitiveset\n" );
+        return 0;
+    }
+    osg::DrawElementsUInt* de = (osg::DrawElementsUInt*) ps->getDrawElements();
+
+	btTriangleIndexVertexArray* btmesh =
+        new btTriangleIndexVertexArray( de->getNumIndices(), (int*)de->getDataPointer(), sizeof(unsigned int),//!!!!!!!!!!!! bad int types
+                                        vert->getNumElements(), (btScalar*)vert->getDataPointer(), sizeof(float)*3 );
+
+
+}
+
+void CollisionShape::setModelFromFile( const char* file )
+{
+
+    shape = NONE;
+    drawShape();
+
+    osgDB::Registry::instance()->getDataFilePathList().push_back( osgDB::getFilePath( getAbsolutePath(std::string(file)) ) );
+    std::string modelPath = getRelativePath(std::string(file));
+    osg::Group* model = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
+
+    //if ( !model.valid() ) return;
+    
+    //osg::Stateset* ss = shapeGeode->getOrCreateStateSet();
+    this->getAttachmentNode()->addChild( model );
+
+
+    
+
+    //collisionObj_ = new btGImpactMeshShape( btmesh );
+
+
+   
+
+
+}
+
+// -----------------------------------------------------------------------------
+
+void CollisionShape::setConstraint( ConstraintType ct, float x, float y, float z )
+{
+
+    constraint_ = new btPoint2PointConstraint( *body_, btVector3(x,y,z) );
+
+    //    constraint_->setBreakingImpulseThreshold(10.2);                                
+    
+    sceneManager_->dynamicsWorld_->addConstraint( constraint_ );
+    printf("yea %f %f %f\n",x,y,z);
+}
+
 
 // -----------------------------------------------------------------------------
 
@@ -409,7 +535,25 @@ void CollisionShape::setRollingFriction( float f )
     resetCollisionObj();
     BROADCAST(this, "sf", "setFriction", (float) friction_);
 }
+// -----------------------------------------------------------------------------
 
+void CollisionShape::setReportContacts( int b )
+{
+
+    if ( (!b) == (!contactCallback_) ) return;
+
+    if ( b ) contactCallback_ = new btContactCallback( *body_, *this );
+    else contactCallback_ = 0;
+    BROADCAST(this, "si", "setReportContacts", b);
+}
+
+// -----------------------------------------------------------------------------
+void CollisionShape::setFilterContacts( int b )
+{
+    if ( b == filterContacts_ ) return;
+    filterContacts_ = b;
+    BROADCAST(this, "si", "setFilterContacts", b);
+}
 
 // -----------------------------------------------------------------------------
 
@@ -443,6 +587,7 @@ void CollisionShape::setDynamic(int isDynamic)
         //if ( body_->isInWorld() ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
         body_->setCollisionFlags( 0 );
         //body_->setActivationState(WANTS_DEACTIVATION);
+        ///////////////////////////////////////        //
         body_->activate();
         //sceneManager_->dynamicsWorld_->addRigidBody(body_);
     } else {
@@ -466,8 +611,16 @@ bool CollisionShape::checkCollisions(btTransform tranform)
         if ( !body_->isInWorld() || !body_->getBroadphaseHandle() || !body_->hasContactResponse() ) return false;
         body_->getMotionState()->setWorldTransform(tranform);
         //body_->setWorldTransform(tranform);
-
+        // body_->activate();
         sceneManager_->dynamicsWorld_->updateSingleAabb(body_);
+
+  {
+        btScalar m[16];
+        btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
+        myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+        osg::Matrixf mat(m);
+        std::cout << getID(); printf("checkCollisions %f %f %f\n", mat.getTrans().x(),mat.getTrans().y(),mat.getTrans().z() );
+    }
 
         btContactCallback contactCallback(*body_, *this);
         sceneManager_->dynamicsWorld_->contactTest(body_,contactCallback);
@@ -533,17 +686,42 @@ void CollisionShape::setTranslation (float x, float y, float z)
     std::cout << "done callback for " << stringify(osg::Vec3(x,y,z)) << " collisionOffset: " << stringify(collisionOffset_) << std::endl;
     */
 
+ //bool isInWorld = body_->isInWorld();
+ //   if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
+
     btTransform tmpTransform = currentTransform_;
+    // std::cout << getID() << " transform A = " << stringify(asOsgVec3(currentTransform_.getOrigin())) << std::endl;
     tmpTransform.setOrigin(btVector3(x,y,z));
-    if (checkCollisions(tmpTransform))
+
+    if (checkCollisions(tmpTransform)) {
         ShapeNode::setTranslation(x+collisionOffset_.x(), y+collisionOffset_.y(), z+collisionOffset_.z());
         //ShapeNode::setTranslation(collisionOffset_.x(), collisionOffset_.y(), collisionOffset_.z());
-    else
+        //std::cout << getID() << "setTranslation offset " << stringify(collisionOffset_) << std::endl;
+    } else {
         ShapeNode::setTranslation(x, y, z);
+    }
 
     currentTransform_.setOrigin(asBtVector3(this->getTranslation()));
     body_->getMotionState()->setWorldTransform(currentTransform_);
-    body_->setWorldTransform(currentTransform_);
+    body_->setWorldTransform(currentTransform_);   
+    //body_->activate();
+    sceneManager_->dynamicsWorld_->updateSingleAabb(body_);
+    //if ( isInWorld )  sceneManager_->dynamicsWorld_->addRigidBody(body_);
+
+
+    /*  {
+        btScalar m[16];
+        btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
+        myMotionState->m_graphicsWorldTrans.getOpenGLMatrix(m);
+        osg::Matrixf mat(m);
+        std::cout << getID(); printf("...setTranslation %f %f %f\n", mat.getTrans().x(),mat.getTrans().y(),mat.getTrans().z() );
+    }
+
+
+    btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
+    myMotionState->getWorldTransform( currentTransform_ );
+    std::cout << getID() << " transform B = " << stringify(asOsgVec3( currentTransform_.getOrigin())) << std::endl;
+    */
 
     ///// [Q] should we stop all velocities?
 
@@ -673,7 +851,10 @@ std::vector<lo_message> CollisionShape::getState () const
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setRollingFriction", getRollingFriction());
     ret.push_back(msg);
-
+    
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setReportContacts", getReportContacts());
+    ret.push_back(msg);
 
     return ret;
 }
