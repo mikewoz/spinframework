@@ -70,8 +70,10 @@ public:
 
         virtual bool needsCollision(btBroadphaseProxy* proxy) const;
         virtual btScalar addSingleResult(btManifoldPoint& cp,
-                                         const btCollisionObject* colObj0,int partId0,int index0,
+                                         const btCollisionObject* colObj0,int partId0,int index0, 
                                          const btCollisionObject* colObj1,int partId1,int index1);
+        //const btCollisionObjectWrapper* colObj0,int partId0,int index0,
+        //const btCollisionObjectWrapper* colObj1,int partId1,int index1);
     };
 
 
@@ -94,8 +96,12 @@ public:
         HINGE
     };
 
-    void setConstraint( ConstraintType ct, float x, float y, float z );
-
+    typedef std::map<std::string, btTypedConstraint*> btConstraints;
+    void addConstraint( const char* lbl,  float x, float y, float z );
+    void addConstraint2( const char* lbl, float x, float y, float z,
+                         const char* otherObj, float ox, float oy, float oz );
+    void removeConstraint( const char* label );
+    void wakeup();
     void setBounciness( float f );
     float getBounciness() const { return bounciness_; }
 
@@ -157,6 +163,7 @@ public:
     osg::Vec3 collisionOffset_;
 
 protected:
+    btRigidBody* getBody() { return body_; }
     void resetCollisionObj();
     // virtual void drawShape();
 
@@ -172,7 +179,11 @@ private:
     btScalar bounciness_;
     btScalar friction_;
     btScalar rollingFriction_;
-    btTypedConstraint* constraint_;
+    //btTypedConstraint* constraint_;
+
+
+    btConstraints constraints_;
+
     //btCollisionWorld::ContactResultCallback* contactCallback_;
     btContactCallback* contactCallback_;
     bool filterContacts_;

@@ -56,6 +56,9 @@ static float lastBtHitDepth = 0.0;
 
 extern ContactAddedCallback gContactAddedCallback; 
 
+#define LINEAR_SLEEPING_THRESHOLD 0.05
+#define ANGULAR_SLEEPING_THRESHOLD 0.1
+
 namespace spin
 {
 
@@ -101,14 +104,17 @@ bool CollisionShape::btContactCallback::needsCollision(btBroadphaseProxy* proxy)
 
 //! Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters)
 btScalar CollisionShape::btContactCallback::addSingleResult(btManifoldPoint& cp,
-                                            const btCollisionObject* colObj0,int partId0,int index0,
-                                            const btCollisionObject* colObj1,int partId1,int index1)
+                                                            const btCollisionObject* colObj0,int partId0,int index0,
+                                                            const btCollisionObject* colObj1,int partId1,int index1)
+                                                            // const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,
+                                                            // const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1)
 {
     osg::Vec3 hitPoint;
     osg::Vec3 hitPoint2;
     osg::Vec3 normal;
 
-    //if (colObj0->getCollisionObject()==&body)
+    // const btCollisionObject* colObj0 = colObj0Wrap->getCollisionObject();
+    // const btCollisionObject* colObj1 = colObj1Wrap->getCollisionObject();
     const btCollisionObject* otherObj;
     const btCollisionObject* thisObj;
     if (colObj0==&body) {
@@ -218,7 +224,7 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
     bounciness_ = 0.0; // bt default
     friction_ = 0.5; // bt default
     rollingFriction_ = 0.5;// not bt default, but more practical, so that round things don't roll forever.
-    constraint_ = 0;
+
     //gContactAddedCallback = btCollisionCallback2;
         
     collisionObj_ = new btBoxShape( btVector3(0.5,0.5,0.5) );
@@ -233,12 +239,12 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
     // and only synchronizes 'active' objects
     motionState_ = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));//currentTransform_);
     btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionObj_, localInertia);
-    body_ = new btRigidBody(rbci);//(mass_, myMotionState, collisionObj_, localInertia);
-
-
+    rbci.m_restitution = bounciness_;
+    rbci.m_friction = friction_;
+    //BULLET VERSION >= 2.81 rbci.m_rollingFriction = rollingFriction_;
+    rbci.m_angularDamping = rollingFriction_; // WILL DO FOR NOW
+    body_ = new btRigidBody(rbci);
     body_->setUserPointer(this);
-    //printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
-    // body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
     // body_->setCcdMotionThreshold(0.1);
     // body_->setCcdSweptSphereRadius(0.05);
@@ -248,18 +254,20 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
     //mBody->setCollisionFlags(mBody->getCollisionFlags() |btCollisionObject::CF_NO_CONTACT_RESPONSE));
 
     //body_->setCollisionFlags( body_->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK | btCollisionObject::CF_NO_CONTACT_RESPONSE);
-    body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT ); //| btCollisionObject::CF_NO_CONTACT_RESPONSE);
+    //body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+    //body_->setCollisionFlags( btCollisionObject::CF_NO_CONTACT_RESPONSE );
+    body_->setCollisionFlags( 0 );
     //printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
     //body_->setActivationState( DISABLE_DEACTIVATION );
 
     //    sceneManager_->dynamicsWorld_->addCollisionObject(body_);
-
-    body_->setSleepingThresholds( 1.6, 2.5 ); //?
-    body_->setDeactivationTime(0.8);
+    body_->setSleepingThresholds( LINEAR_SLEEPING_THRESHOLD, ANGULAR_SLEEPING_THRESHOLD );
+    //    body_->setSleepingThresholds( 1.6, 2.5 ); //?
+    // body_->setDeactivationTime(0.8);
 
     /////////////////////
     //// NNOT IF IT STARTS AS NOT DYNAMIC
-    sceneManager_->dynamicsWorld_->addRigidBody(body_);
+    /////////////////////////////sceneManager_->dynamicsWorld_->addRigidBody(body_);
     ////////////////////
 
     filterContacts_ = false;
@@ -271,6 +279,14 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
 // destructor
 CollisionShape::~CollisionShape()
 {
+
+    btTypedConstraint* c;
+    btConstraints::iterator it;
+    for ( it = constraints_.begin(); it != constraints_.end(); it++ ) {
+        c = it->second;
+        sceneManager_->dynamicsWorld_->removeConstraint( c );
+        if ( c ) delete( c );
+    }
 
     sceneManager_->dynamicsWorld_->removeRigidBody(body_);
     delete body_->getMotionState();
@@ -295,13 +311,21 @@ void CollisionShape::callbackUpdate(osg::NodeVisitor* nv)
                 myMotionState->getWorldTransform( currentTransform_ );
                 std::cout << getID() << " transform C = " << stringify(asOsgVec3( currentTransform_.getOrigin()))<< std::endl;
                 }*/
+        /*std::cout << getID() ;
+          printf(" state = %i; time = %f, s %i; k %i; ", body_->getActivationState(), body_->getDeactivationTime(),
+               body_->isStaticObject(), body_->isKinematicObject() );
+        printf( "velocities: %f, %f\n", body_->getLinearVelocity().length2(), body_->getAngularVelocity().length2() );
 
+        if ((body_->getLinearVelocity().length2() < body_->getLinearSleepingThreshold()*body_->getLinearSleepingThreshold()) &&
+            (body_->getAngularVelocity().length2() < body_->getAngularSleepingThreshold()*body_->getAngularSleepingThreshold() )) {
+            std::cout << getID(); printf(" sleeping threshold!!\n");
+            }*/
 
         if (isDynamic_ && (mass_!=0) && body_->isInWorld() && body_->isActive() )
         {
 
-            ////   printf( "velocities: %f, %f, %i\n", body_->getLinearVelocity().length2(), body_->getAngularVelocity().length2(), body_->getLinearVelocity().length2() == 0);
-            //  printf("getActivationState = %i\n", body_->getActivationState() );
+            
+            
             // btContactCallback cb( *body_, *this );
             if (contactCallback_) {
                 //printf("\n%s **************\n", this->getID().c_str());
@@ -368,6 +392,8 @@ void CollisionShape::resetCollisionObj()
     bool isInWorld = body_->isInWorld();
     if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
 
+    delete( body_ );
+
     btVector3 localInertia(0,0,0);
     if (mass_!=0.f) collisionObj_->calculateLocalInertia(mass_, localInertia);
 
@@ -379,8 +405,17 @@ void CollisionShape::resetCollisionObj()
 
     body_ = new btRigidBody(rbci);
     body_->setUserPointer(this);
-    body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
-   
+    body_->setSleepingThresholds( LINEAR_SLEEPING_THRESHOLD, ANGULAR_SLEEPING_THRESHOLD );
+    
+    if ( isDynamic_ ) {
+        if ( mass_ == 0.f )  body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT ); 
+        else body_->setCollisionFlags( 0 );
+    } else {
+        //if ( mass_ == 0.f ) body_->setCollisionFlags( btCollisionObject::CF_NO_CONTACT_RESPONSE );
+        //else body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+        //body_->setCollisionFlags( btCollisionObject::CF_NO_CONTACT_RESPONSE );
+    }
+
     if ( isInWorld )  sceneManager_->dynamicsWorld_->addRigidBody(body_);
 
 }
@@ -492,17 +527,68 @@ void CollisionShape::setModelFromFile( const char* file )
 
 // -----------------------------------------------------------------------------
 
-void CollisionShape::setConstraint( ConstraintType ct, float x, float y, float z )
+void CollisionShape::addConstraint( const char* lbl, float x, float y, float z )
 {
+    removeConstraint( lbl );
+    btTypedConstraint* c = new btPoint2PointConstraint( *body_, btVector3(x,y,z) );
 
-    constraint_ = new btPoint2PointConstraint( *body_, btVector3(x,y,z) );
-
-    //    constraint_->setBreakingImpulseThreshold(10.2);                                
-    
-    sceneManager_->dynamicsWorld_->addConstraint( constraint_ );
+    constraints_[lbl] = c;
+    sceneManager_->dynamicsWorld_->addConstraint( c );
     printf("yea %f %f %f\n",x,y,z);
 }
 
+void CollisionShape::addConstraint2(  const char* lbl, float x, float y, float z,
+                                      const char* otherObj, float ox, float oy, float oz )
+{
+    ReferencedNode* otherNode = sceneManager_->getNode( otherObj );
+    if ( !otherNode ) return;
+
+    CollisionShape* otherShape = dynamic_cast<CollisionShape*>(otherNode);
+    if ( !otherShape ) return;
+    
+    removeConstraint( lbl );
+    btTypedConstraint* c = new btPoint2PointConstraint( *body_, *otherShape->getBody(),
+                                                        btVector3(x,y,z), btVector3(ox,oy,oz) );
+    constraints_[lbl] = c;
+    sceneManager_->dynamicsWorld_->addConstraint( c, true );// true:joined object do not collide with each other
+    printf("yea %f %f %f\n",x,y,z);
+}
+
+void CollisionShape::removeConstraint( const char* lbl )
+{
+
+    btTypedConstraint* c;
+    btConstraints::iterator it = constraints_.find( lbl );
+    if ( it != constraints_.end() ) {
+        c = it->second;
+        sceneManager_->dynamicsWorld_->removeConstraint( c );
+        if ( c ) delete( c );
+    }
+    constraints_.erase( lbl );
+}
+
+// -----------------------------------------------------------------------------
+void CollisionShape::wakeup()
+{
+    if ( !isDynamic_ || !body_->isInWorld() ||
+         !spinApp::Instance().getContext()->isServer() ) return;
+
+    std::cout << getID(); printf("wakeup!\n");
+    body_->activate();
+
+    /*    btTypedConstraint* c;
+    btConstraints::iterator it;
+    for ( it = constraints_.begin(); it != constraints_.end(); it++ ) {
+        printf("constraint [%s]\n", it->first.c_str());
+        c = it->second;
+        btRigidBody& r = c->getRigidBodyB();        
+        if ( !r.isInWorld() ) continue;
+        CollisionShape* cs = (CollisionShape*) r.getUserPointer();
+        if ( !cs ) continue;
+        std::cout << " ... " <<  cs->getID() << std::endl;;
+        if ( cs->isDynamic_ ) r.activate();
+        }*/
+}
 
 // -----------------------------------------------------------------------------
 
@@ -564,7 +650,7 @@ void CollisionShape::setMass (float mass)
     btVector3 localInertia(0, 0, 0);
 
     // rigidbody is dynamic if and only if mass is non zero, otherwise static
-    bool hasMass = (mass_ != 0.f);
+    //bool hasMass = (mass_ != 0.f);
     //if ( hasMass )
     //    collisionObj_->calculateLocalInertia(mass_, localInertia);
     bool isInWorld = body_->isInWorld();
@@ -573,35 +659,52 @@ void CollisionShape::setMass (float mass)
     collisionObj_->calculateLocalInertia(mass_, localInertia);
     body_->setMassProps(mass_, localInertia);
 
+    ///if ( mass_ == 0.0f && isDynamic_ ) body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
+    if ( isDynamic_ ) {
+        if ( mass_ == 0.f )  body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT ); 
+        else body_->setCollisionFlags( 0 );
+    }
+    // else {
+    //     body_->setCollisionFlags( btCollisionObject::CF_NO_CONTACT_RESPONSE );
+    // }
+
     if ( isInWorld )  sceneManager_->dynamicsWorld_->addRigidBody(body_);
 
     BROADCAST(this, "sf", "setMass", getMass());
 }
 
+// -----------------------------------------------------------------------------
 void CollisionShape::setDynamic(int isDynamic)
 {
     if (isDynamic_ == isDynamic) return;
     isDynamic_ = isDynamic;
-    if ( body_->isInWorld() ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
+    ///if ( body_->isInWorld() ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
     if (isDynamic_) {
-        //if ( body_->isInWorld() ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
-        body_->setCollisionFlags( 0 );
-        //body_->setActivationState(WANTS_DEACTIVATION);
-        ///////////////////////////////////////        //
+        //if ( checkCollisions(currentTransform_) )
+        //    ShapeNode::translate(collisionOffset_.x(), collisionOffset_.y(), collisionOffset_.z());
+        std::cout << getID(); printf(" dynamic!\n");
+        if ( mass_ == 0.0f ) body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT ); 
+        else body_->setCollisionFlags( 0 );
+        
+        sceneManager_->dynamicsWorld_->addRigidBody(body_);
         body_->activate();
-        //sceneManager_->dynamicsWorld_->addRigidBody(body_);
     } else {
-        //if ( body_->isInWorld() ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
-        body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT ); //| btCollisionObject::CF_NO_CONTACT_RESPONSE );
-        //body_->setActivationState(DISABLE_DEACTIVATION);
+        sceneManager_->dynamicsWorld_->removeRigidBody(body_);
     }
 
-    sceneManager_->dynamicsWorld_->addRigidBody(body_);
+
+
+    // else {
+    //     body_->setCollisionFlags( btCollisionObject::CF_NO_CONTACT_RESPONSE );
+    // }
+    //if ( !body_->isInWorld() ) 
+
 
     //printf("%s: getCollisionFlags = 0x%x\n", getID().c_str(), body_->getCollisionFlags()  );
     BROADCAST(this, "si", "setDynamic", getDynamic());
 }
 
+// -----------------------------------------------------------------------------
 bool CollisionShape::checkCollisions(btTransform tranform)
 {
     collisionOffset_ = osg::Vec3(0.0,0.0,0.0);
@@ -612,6 +715,7 @@ bool CollisionShape::checkCollisions(btTransform tranform)
         body_->getMotionState()->setWorldTransform(tranform);
         //body_->setWorldTransform(tranform);
         // body_->activate();
+        if ( isDynamic_ ) body_->activate();
         sceneManager_->dynamicsWorld_->updateSingleAabb(body_);
 
   {
@@ -632,6 +736,7 @@ bool CollisionShape::checkCollisions(btTransform tranform)
     return false;
 }
 
+// -----------------------------------------------------------------------------
 void CollisionShape::setTranslation (float x, float y, float z)
 {
     //printf("CollisionShape::setTranslation(%f, %f ,%f)\n", x, y, z);
@@ -693,7 +798,7 @@ void CollisionShape::setTranslation (float x, float y, float z)
     // std::cout << getID() << " transform A = " << stringify(asOsgVec3(currentTransform_.getOrigin())) << std::endl;
     tmpTransform.setOrigin(btVector3(x,y,z));
 
-    if (checkCollisions(tmpTransform)) {
+    if ( isDynamic_ && checkCollisions(tmpTransform) ) {
         ShapeNode::setTranslation(x+collisionOffset_.x(), y+collisionOffset_.y(), z+collisionOffset_.z());
         //ShapeNode::setTranslation(collisionOffset_.x(), collisionOffset_.y(), collisionOffset_.z());
         //std::cout << getID() << "setTranslation offset " << stringify(collisionOffset_) << std::endl;
@@ -704,8 +809,10 @@ void CollisionShape::setTranslation (float x, float y, float z)
     currentTransform_.setOrigin(asBtVector3(this->getTranslation()));
     body_->getMotionState()->setWorldTransform(currentTransform_);
     body_->setWorldTransform(currentTransform_);   
-    //body_->activate();
-    sceneManager_->dynamicsWorld_->updateSingleAabb(body_);
+    if ( isDynamic_ ) {
+        body_->activate();
+        sceneManager_->dynamicsWorld_->updateSingleAabb(body_);
+    }
     //if ( isInWorld )  sceneManager_->dynamicsWorld_->addRigidBody(body_);
 
 
@@ -750,8 +857,7 @@ void CollisionShape::setOrientationQuat(float x, float y, float z, float w)
 {
     btTransform tmpTransform = currentTransform_;
     tmpTransform.setRotation(btQuaternion(x,y,z,w));
-    if (checkCollisions(tmpTransform))
-    {
+    if ( isDynamic_ && checkCollisions(tmpTransform) ) {
         ShapeNode::translate(collisionOffset_.x(), collisionOffset_.y(), collisionOffset_.z());
     }
 
@@ -760,6 +866,7 @@ void CollisionShape::setOrientationQuat(float x, float y, float z, float w)
     currentTransform_.setRotation(quat);
     body_->getMotionState()->setWorldTransform(currentTransform_);
     body_->setWorldTransform(currentTransform_);
+    if ( isDynamic_ ) body_->activate();
 }
 
 void CollisionShape::setOrientation(float pitch, float roll, float yaw)
@@ -769,8 +876,7 @@ void CollisionShape::setOrientation(float pitch, float roll, float yaw)
                                 osg::DegreesToRadians(yaw), osg::Vec3d(0,0,1));
     btTransform tmpTransform = currentTransform_;
     tmpTransform.setRotation(asBtQuaternion(newQ));
-    if (checkCollisions(tmpTransform))
-    {
+    if ( isDynamic_ && checkCollisions(tmpTransform) ) {
         ShapeNode::translate(collisionOffset_.x(), collisionOffset_.y(), collisionOffset_.z());
     }
 
@@ -786,6 +892,7 @@ void CollisionShape::setOrientation(float pitch, float roll, float yaw)
 
     body_->getMotionState()->setWorldTransform(currentTransform_);
     body_->setWorldTransform(currentTransform_);
+    if ( isDynamic_ ) body_->activate();
 }
 
 void CollisionShape::setScale(float x, float y, float z)
@@ -853,7 +960,7 @@ std::vector<lo_message> CollisionShape::getState () const
     ret.push_back(msg);
     
     msg = lo_message_new();
-    lo_message_add(msg, "sf", "setReportContacts", getReportContacts());
+    lo_message_add(msg, "si", "setReportContacts", getReportContacts());
     ret.push_back(msg);
 
     return ret;

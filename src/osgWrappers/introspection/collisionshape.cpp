@@ -50,6 +50,8 @@ BEGIN_ENUM_REFLECTOR(spin::CollisionShape::ConstraintType)
 	I_EnumLabel(spin::CollisionShape::HINGE);
 END_REFLECTOR
 
+TYPE_NAME_ALIAS(std::map< std::string COMMA  btTypedConstraint * >, spin::CollisionShape::btConstraints)
+
 BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	I_DeclaringFile("collisionshape.h");
 	I_BaseType(spin::ShapeNode);
@@ -77,9 +79,24 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          __void__setModelFromFile__C5_char_P1,
 	          "",
 	          "");
-	I_Method4(void, setConstraint, IN, spin::CollisionShape::ConstraintType, ct, IN, float, x, IN, float, y, IN, float, z,
+	I_Method4(void, addConstraint, IN, const char *, lbl, IN, float, x, IN, float, y, IN, float, z,
 	          Properties::NON_VIRTUAL,
-	          __void__setConstraint__ConstraintType__float__float__float,
+	          __void__addConstraint__C5_char_P1__float__float__float,
+	          "",
+	          "");
+	I_Method8(void, addConstraint2, IN, const char *, lbl, IN, float, x, IN, float, y, IN, float, z, IN, const char *, otherObj, IN, float, ox, IN, float, oy, IN, float, oz,
+	          Properties::NON_VIRTUAL,
+	          __void__addConstraint2__C5_char_P1__float__float__float__C5_char_P1__float__float__float,
+	          "",
+	          "");
+	I_Method1(void, removeConstraint, IN, const char *, label,
+	          Properties::NON_VIRTUAL,
+	          __void__removeConstraint__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(void, wakeup,
+	          Properties::NON_VIRTUAL,
+	          __void__wakeup,
 	          "",
 	          "");
 	I_Method1(void, setBounciness, IN, float, f,
@@ -187,6 +204,12 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_ProtectedMethod0(btRigidBody *, getBody,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __btRigidBody_P1__getBody,
+	                   "",
+	                   "");
 	I_ProtectedMethod0(void, resetCollisionObj,
 	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
@@ -225,4 +248,6 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	                 0);
 	I_PublicMemberProperty(osg::Vec3, collisionOffset_);
 END_REFLECTOR
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  btTypedConstraint * >)
 
