@@ -533,7 +533,7 @@ void CollisionShape::addConstraint( const char* lbl, float x, float y, float z )
     btTypedConstraint* c = new btPoint2PointConstraint( *body_, btVector3(x,y,z) );
 
     constraints_[lbl] = c;
-    sceneManager_->dynamicsWorld_->addConstraint( c );
+    if ( isDynamic_ ) sceneManager_->dynamicsWorld_->addConstraint( c );
     printf("yea %f %f %f\n",x,y,z);
 }
 
@@ -550,7 +550,7 @@ void CollisionShape::addConstraint2(  const char* lbl, float x, float y, float z
     btTypedConstraint* c = new btPoint2PointConstraint( *body_, *otherShape->getBody(),
                                                         btVector3(x,y,z), btVector3(ox,oy,oz) );
     constraints_[lbl] = c;
-    sceneManager_->dynamicsWorld_->addConstraint( c, true );// true:joined object do not collide with each other
+    if ( isDynamic_ ) sceneManager_->dynamicsWorld_->addConstraint( c, true );// true:joined object do not collide with each other
     printf("yea %f %f %f\n",x,y,z);
 }
 
@@ -687,9 +687,30 @@ void CollisionShape::setDynamic(int isDynamic)
         else body_->setCollisionFlags( 0 );
         
         sceneManager_->dynamicsWorld_->addRigidBody(body_);
+
+        btTypedConstraint* c;
+        btConstraints::iterator it;
+        for ( it = constraints_.begin(); it != constraints_.end(); it++ ) {
+            c = it->second;
+            if ( c ) sceneManager_->dynamicsWorld_->addConstraint( c, true );
+        }
+
         body_->activate();
+
     } else {
+
+
+        btTypedConstraint* c;
+        btConstraints::iterator it;
+        for ( it = constraints_.begin(); it != constraints_.end(); it++ ) {
+            c = it->second;
+            if ( c ) sceneManager_->dynamicsWorld_->removeConstraint( c );
+        }
+
         sceneManager_->dynamicsWorld_->removeRigidBody(body_);
+
+
+
     }
 
 
