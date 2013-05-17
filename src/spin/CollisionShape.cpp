@@ -38,10 +38,13 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
-
+#include <osgDB/WriteFile>
 #include <osgDB/ReadFile>
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
+
+#include <bullet/BulletCollision/Gimpact/btGImpactShape.h>
+
 #include "collisionshape.h"
 #include "spinapp.h"
 #include "spinbasecontext.h"
@@ -120,7 +123,7 @@ btScalar CollisionShape::btContactCallback::addSingleResult(btManifoldPoint& cp,
     if (colObj0==&body) {
         hitPoint = asOsgVec3( cp.m_localPointA );
         hitPoint2 = asOsgVec3( cp.m_localPointB );
-        normal = -asOsgVec3( cp.m_normalWorldOnB );
+        normal = -asOsgVec3( cp.m_normalWorldOnB );// there is no m_normalWorldOnA
         thisObj = colObj0;
         otherObj = colObj1;
     } else {
@@ -145,8 +148,8 @@ btScalar CollisionShape::btContactCallback::addSingleResult(btManifoldPoint& cp,
     prevHitPoint2 = hitPoint2;
     prevObj = otherObj;
     
-    CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
-    CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
+    CollisionShape *n0 = (CollisionShape*)(thisObj->getUserPointer());
+    CollisionShape *n1 = (CollisionShape*)(otherObj->getUserPointer());
     //CollisionShape *n0 = (CollisionShape*)(colObj0->getCollisionObject()->getUserPointer());
     //CollisionShape *n1 = (CollisionShape*)(colObj1->getCollisionObject()->getUserPointer());
 
@@ -198,10 +201,15 @@ btScalar CollisionShape::btContactCallback::addSingleResult(btManifoldPoint& cp,
 
     osg::Vec3 newT = node_.getTranslation() + (normal * depth);// + (normal * 0.00001);
 
+
+    btScalar impulse = cp.getAppliedImpulse();
+
     if (depth != lastBtHitDepth)
-        {
-            BROADCAST(n0, "ssfff", "collide", n1->getID().c_str(), normal.x(), normal.y(), normal.z());
-        }
+    {
+        BROADCAST( n0, "ssfffffff", "collide", n1->getID().c_str(),
+                   hitPoint.x(), hitPoint.y(), hitPoint.z(),
+                   normal.x(), normal.y(), normal.z(), impulse );
+    }
 
     lastBtHitDepth = depth;
 
@@ -272,7 +280,7 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
 
     filterContacts_ = false;
     contactCallback_ = 0; //new btContactCallback( *body_, *this );
-
+    modelGeometry_ = 0;
     this->setInteractionMode(GroupNode::DRAG);
 }
 
@@ -393,6 +401,7 @@ void CollisionShape::resetCollisionObj()
     if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
 
     delete( body_ );
+    if ( !collisionObj_ ) return;
 
     btVector3 localInertia(0,0,0);
     if (mass_!=0.f) collisionObj_->calculateLocalInertia(mass_, localInertia);
@@ -434,6 +443,13 @@ void CollisionShape::setShape( shapeType t )
     if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
 
     switch (t) {
+    case NONE:
+        isInWorld = false;
+        if (collisionObj_) delete collisionObj_;
+        break;
+    case MODEL:
+        printf("model!\n");
+        break;
     case SPHERE:
         collisionObj_ = new btSphereShape( AS_UNIT_SCALE * 0.5 );
         break;
@@ -463,7 +479,7 @@ void CollisionShape::setShape( shapeType t )
     rbci.m_restitution = bounciness_;
     rbci.m_friction = friction_;
     body_ = new btRigidBody(rbci);
-   
+
 
 
     body_->setUserPointer(this);
@@ -471,58 +487,127 @@ void CollisionShape::setShape( shapeType t )
     body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
     //printf("getCollisionFlags = 0x%x\n", body_->getCollisionFlags()  );
     */
+    if ( shape != MODEL && modelGeometry_.get() ) modelGeometry_.release();
+   
+	drawShape();
+
+    if ( modelGeometry_.get() && shape == MODEL && shapeGeode.get() ) {
+        printf("yes\n");
+        //if (!shapeGeode) shapeGeode = new osg::Geode();
+        shapeGeode->addDrawable( modelGeometry_ );
+        //if ( !this->getAttachmentNode()->containsNode(shapeGeode.get()) )
+        //    this->getAttachmentNode()->addChild(shapeGeode.get());
+		//shapeGeode->setName(this->getID() + ".shapeGeode");
+		//optimizer.optimize(shapeGeode.get());
+    }
 
     resetCollisionObj();
-	drawShape();
+
 
     if ( isInWorld )  sceneManager_->dynamicsWorld_->addRigidBody(body_);
 
-	BROADCAST(this, "si", "setShape", (int) shape);
+    if ( !broadcastLock_ ) BROADCAST(this, "si", "setShape", (int) shape);
 }
 
 // -----------------------------------------------------------------------------
 
-static btTriangleIndexVertexArray* osgGeom2Bullet( osg::Geometry* geom )
+static btCollisionShape* osgGeom2Bullet( osg::Geometry* geom )
 {
+    printf("h\n");
     osg::Vec3Array* vert = (osg::Vec3Array*) geom->getVertexArray();
+    printf("he\n");
     osg::PrimitiveSet* ps =  geom->getPrimitiveSet(0);
     if ( !ps ) {
         printf( "no primitiveset\n" );
         return 0;
     }
+    printf("hey\n");
+
     osg::DrawElementsUInt* de = (osg::DrawElementsUInt*) ps->getDrawElements();
 
+    printf("osgGeom2Bullet... %i %i\n",  de->getNumIndices(), vert->getNumElements());
+    
+    int* index = (int*)malloc( de->getNumIndices()*sizeof(int));
+    for ( size_t i = 0; i < de->getNumIndices(); i++ )
+        index[i] = (*de)[i];
+    
+    btScalar* vertss = (btScalar*)malloc( vert->getNumElements()*sizeof(btScalar)*3 );
+    for ( size_t i = 0; i < vert->getNumElements(); i++ ) {
+        vertss[i*3+0] = (*vert)[i].x();
+        vertss[i*3+1] = (*vert)[i].y();
+        vertss[i*3+2] = (*vert)[i].z();
+    }
+
+    printf("heyy\n");
+    /*
 	btTriangleIndexVertexArray* btmesh =
-        new btTriangleIndexVertexArray( de->getNumIndices(), (int*)de->getDataPointer(), sizeof(unsigned int),//!!!!!!!!!!!! bad int types
-                                        vert->getNumElements(), (btScalar*)vert->getDataPointer(), sizeof(float)*3 );
+        new btTriangleIndexVertexArray( de->getNumIndices()/3,
+                                        //(int*)de->getDataPointer(),
+                                        &index[0],
+                                        //3*sizeof(unsigned int),//!!!!!!!!!!!! bad int types
+                                        3*sizeof(int),
+                                        vert->getNumElements(),
+                                        &vertss[0],//(btScalar*)vert->getDataPointer(),
+                                        sizeof(btScalar)*3 );
+    printf("heyyy\n");
+    btVector3 aabbMin(-1000,-1000,-1000),aabbMax(1000,1000,1000);
+    bool useQuantizedAabbCompression = true;
+    printf("heyyyy\n");*/
+    btCollisionShape* trimeshShape;
+    trimeshShape = new btConvexHullShape( &vertss[0], vert->getNumElements(), sizeof(btScalar)*3 );
+        //new btBvhTriangleMeshShape( btmesh, useQuantizedAabbCompression, aabbMin, aabbMax ); 
 
-
+    // new btGIMPACTMeshData(m_indexVertexArrays);  
+    //trimeshShape = new btGImpactMeshShape( btmesh );
+    printf("heyyyyy\n");
+    return trimeshShape;
 }
 
 void CollisionShape::setModelFromFile( const char* file )
 {
 
-    shape = NONE;
-    drawShape();
-
+    printf("yo\n");
+        
     osgDB::Registry::instance()->getDataFilePathList().push_back( osgDB::getFilePath( getAbsolutePath(std::string(file)) ) );
     std::string modelPath = getRelativePath(std::string(file));
-    osg::Group* model = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
-
+    osg::Group* group = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
     //if ( !model.valid() ) return;
     
     //osg::Stateset* ss = shapeGeode->getOrCreateStateSet();
-    this->getAttachmentNode()->addChild( model );
+       printf("yoo\n");
 
+    osg::Geode* geode;
+    osg::Geometry* geom;
+    for ( size_t i = 0; i < group->getNumChildren(); i++ ) {
+        geode = dynamic_cast<osg::Geode*>( group->getChild(i) );
+        if ( !geode ) continue;
+        geom = geode->getDrawable(0)->asGeometry();
+        if ( geom ) break;
+    }
 
+    if ( !geom ) return;
+    printf("yooo\n");
     
+    osg::Vec4Array* c = dynamic_cast<osg::Vec4Array*>( geom->getColorArray() );
+    if ( c ) {
+        if ( c->getNumElements() == 1 ) (*c)[0].set( _color.r(), _color.g(), _color.b(), _color.a() );
+    } else {
+        c = new osg::Vec4Array();
+        (*c).push_back( _color );
+    }
 
-    //collisionObj_ = new btGImpactMeshShape( btmesh );
+    collisionObj_ = osgGeom2Bullet( geom );
+    
+	osg::TessellationHints* hints = new osg::TessellationHints;
+    hints->setDetailRatio(detailRatio_);
+    modelGeometry_ =// new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.5), hints);
+        geom;
+    setBroadcastLock( true );
+    setShape( MODEL );
+    setBroadcastLock( false );
+    //osgDB::writeNodeFile( *this->getAttachmentNode(), "bouse.osg" );
 
-
-   
-
-
+    BROADCAST(this, "ss", "setModelFromFile", file);
 }
 
 // -----------------------------------------------------------------------------
@@ -551,7 +636,7 @@ void CollisionShape::addConstraint2(  const char* lbl, float x, float y, float z
                                                         btVector3(x,y,z), btVector3(ox,oy,oz) );
     constraints_[lbl] = c;
     if ( isDynamic_ ) sceneManager_->dynamicsWorld_->addConstraint( c, true );// true:joined object do not collide with each other
-    printf("yea %f %f %f\n",x,y,z);
+
 }
 
 void CollisionShape::removeConstraint( const char* lbl )
@@ -682,7 +767,7 @@ void CollisionShape::setDynamic(int isDynamic)
     if (isDynamic_) {
         //if ( checkCollisions(currentTransform_) )
         //    ShapeNode::translate(collisionOffset_.x(), collisionOffset_.y(), collisionOffset_.z());
-        std::cout << getID(); printf(" dynamic!\n");
+        //std::cout << getID(); printf(" dynamic!\n");
         if ( mass_ == 0.0f ) body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT ); 
         else body_->setCollisionFlags( 0 );
         

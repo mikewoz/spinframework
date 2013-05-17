@@ -89,7 +89,8 @@ public:
         CAPSULE,
         CONE,
         PLANE,
-        DISC
+        DISC,
+        MODEL
     };
     enum billboardType { 	RELATIVE,	/*!< No billboarding set. */
 							POINT_EYE,  /*!< Billboarding from any angle. */

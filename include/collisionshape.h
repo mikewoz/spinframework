@@ -86,6 +86,7 @@ public:
     virtual void callbackUpdate(osg::NodeVisitor* nv);
     virtual void debug();
     
+    //void setVelocity();
 
     void setShape( shapeType t);
     void setModelFromFile( const char* file );
@@ -171,7 +172,8 @@ protected:
     btCollisionShape *collisionObj_;
     btDefaultMotionState* motionState_;
     btTransform currentTransform_;
-
+    //osg::ref_ptr<osg::Geometry> modelGeometry_;
+    osg::ref_ptr<osg::Drawable> modelGeometry_;
 private:
 
     bool isDynamic_;

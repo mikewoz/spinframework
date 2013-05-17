@@ -930,6 +930,13 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
         sceneManager->setGravity(x,y,z);
     }
+    else if ((theMethod == "setWind") && (argc==4))
+    {
+        float x = (float) lo_hires_val((lo_type)types[1], argv[1]);
+        float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
+        float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
+        sceneManager->setWind(x,y,z);
+    }
     else if ((theMethod == "setUpdateRate") && (argc==2))
         sceneManager->setUpdateRate((float)lo_hires_val((lo_type)types[1], argv[1]));
     else if ((theMethod == "setNotifyLevel") && (argc==2))
