@@ -61,6 +61,7 @@
 #include "tinyxml.h"
 
 #ifdef WITH_BULLET
+#include <LinearMath/btVector3.h>
 class btCollisionWorld;
 class btDynamicsWorld;
 #endif
@@ -295,6 +296,8 @@ class SceneManager
          */
         void setGravity(float x, float y, float z);
         
+        void setWind(float x, float y, float z);
+
         /**
          * Sets the update delay for the physics engine (in seconds). The
          * default is 0.02 seconds (ie, 50hz).
@@ -306,6 +309,8 @@ class SceneManager
         bool lastColState;
         void detectCollision( bool& lastColState, btCollisionWorld* cw );
         btDynamicsWorld *dynamicsWorld_;
+        btVector3 wind_;
+        bool windy_;
 #endif
 
     private:
@@ -319,7 +324,7 @@ class SceneManager
         ReferencedStateSetMap stateMap;
         
         
-        
+
         float dynamicsUpdateRate_; // in seconds
         osg::Timer_t lastTick_;
 };

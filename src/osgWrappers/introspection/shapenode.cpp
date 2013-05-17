@@ -31,6 +31,7 @@ BEGIN_ENUM_REFLECTOR(spin::ShapeNode::shapeType)
 	I_EnumLabel(spin::ShapeNode::CONE);
 	I_EnumLabel(spin::ShapeNode::PLANE);
 	I_EnumLabel(spin::ShapeNode::DISC);
+	I_EnumLabel(spin::ShapeNode::MODEL);
 END_REFLECTOR
 
 BEGIN_ENUM_REFLECTOR(spin::ShapeNode::billboardType)
@@ -172,6 +173,7 @@ BEGIN_OBJECT_REFLECTOR(spin::ShapeNode)
 	I_PublicMemberProperty(int, renderBin);
 	I_PublicMemberProperty(int, lightingEnabled);
 	I_PublicMemberProperty(osg::ref_ptr< osg::Geode >, shapeGeode);
+	I_PublicMemberProperty(osg::ref_ptr< osg::ShapeDrawable >, _shapeDrawable);
 	I_PublicMemberProperty(osgUtil::Optimizer, optimizer);
 END_REFLECTOR
 

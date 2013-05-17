@@ -96,20 +96,16 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     spacing_ = 1.0;
     randomCoeff_ = 0.0;
     pointSize_ = 1.0;
-    
     voxelSize_ = 0.01f;
     distCrop_ = osg::Vec2(0.0,10.0);
+    modulatePointSize_ = 0;
     
 #ifdef WITH_PCL
-	#ifdef WITH_SHARED_VIDEO
+	#ifdef WITH_SHAREDVIDEO
 	//shmReader_ = 0;
 	#endif
     grabber_ = 0;
-    #if PCL_VERSION_HIGHER_THAN_1_6
     decoder_ = new pcl::io::OctreePointCloudCompression< pcl::PointXYZRGBA >();
-    #else
-	decoder_ = new pcl::octree::PointCloudCompression< pcl::PointXYZRGBA >();
-    #endif
 #endif
     
 }
@@ -124,7 +120,7 @@ PointCloud::~PointCloud()
         grabber_ = 0;
     }
     
-	#ifdef WITH_SHARED_VIDEO
+	#ifdef WITH_SHAREDVIDEO
     if (shmPointCloud_.get())
     {
         shmIsRunning = false;
@@ -188,7 +184,7 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 // -----------------------------------------------------------------------------
 #ifdef WITH_PCL
 
-#ifdef WITH_SHARED_VIDEO 
+#ifdef WITH_SHAREDVIDEO
 //void PointCloud::shmCallback (
 //         shmdata_any_reader_t *reader,
 //         void *shmbuf,
@@ -253,14 +249,14 @@ void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::Cons
         lastTick = tick;
     }
 	*/
-    
+
     // If the redraw flag is set, our geometry is about to be destroyed anyway,
     // so let's just exit and wait. The cloud needs to exist before we can
     // update it.
     if (redrawFlag_) return;
         
     applyFilters(rawCloud);
-
+    
     // Set the flag so that we update during the next traversal:
     updateFlag_ = true;
 }
@@ -345,6 +341,31 @@ void PointCloud::getColor(unsigned int i, osg::Vec4& color)
     color.set((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f);
 }
 
+float PointCloud::computeDistanceFromCamera()
+{
+    if (spinApp::Instance().getContext()->isServer()) return -1.0f;
+    
+    osg::Node::ParentList pl = spinApp::Instance().sceneManager_->rootNode->getParents();
+
+    if ( pl.size() == 0 ) return -1.0f;
+
+    osg::Camera* cam = 0;
+
+    for ( size_t i = 0; i < pl.size(); i++ ) {
+        cam = dynamic_cast<osg::Camera*>( pl[i] );
+        if ( cam ) break;
+    }
+
+    if ( !cam ) return -1.0f;
+
+    osg::Vec3f eye, a, b;
+    cam->getViewMatrixAsLookAt( eye, a, b );
+    printf( "eye = %f %f %f\n", eye.x(), eye.y(), eye.z() );
+    return ( eye - center_ ).length();
+
+}
+
+
 void PointCloud::updatePoints()
 {
     if (spinApp::Instance().getContext()->isServer()) return;
@@ -405,7 +426,7 @@ void PointCloud::updatePoints()
                 geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,cloud_->points.size()));
                 
                 osg::Point *point = new osg::Point();
-                point->setSize(pointSize_*2);
+                point->setSize(pointSize_*2.0f); // 2?
                 cloudGeode_->getOrCreateStateSet()->setAttribute(point);
 
                 break;
@@ -419,14 +440,28 @@ void PointCloud::updatePoints()
     else if ((drawMode_==LIGHTPOINTS) && lightPointNode_.valid() && lightPointNode_->getNumLightPoints())
     {        
         unsigned int i=0;
+        center_.set(0,0,0);
         for (; i<cloud_->points.size(); i++)
         {
             osgSim::LightPoint& lp = lightPointNode_->getLightPoint(i);
             lp._on = true;
             this->getColor(i, lp._color);
             this->getPos(i, lp._position);
+            center_ += lp._position;            
             lp._radius = pointSize_/1000.0;
         }
+
+        if ( cloud_->points.size() ) {
+            center_ /= (float)cloud_->points.size();
+            float invDist = 1.0f;
+            if ( modulatePointSize_ ) invDist = 1.0f / computeDistanceFromCamera();
+            float rad = invDist * pointSize_ / 1000.0;
+            //printf( "LIGHTPOINTS center_ = %f %f %f, nb points = %u,\ninvdist = %f, rad = %f\n",
+            //        center_.x(), center_.y(), center_.z(), cloud_->points.size(), invDist, rad );
+            for (i=0; i<cloud_->points.size(); i++)  lightPointNode_->getLightPoint(i)._radius = rad;
+        }
+        
+
         for (; i<maxPoints_; i++)
         {
             // deactivate any filtered out light points (recall, we reserve the
@@ -601,7 +636,7 @@ void PointCloud::setURI(const char* filename)
         grabber_->stop();
         grabber_ = 0;
     }
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 	//if (shmReader_)
 	//{
 	//	shmdata_any_reader_close(shmReader_);
@@ -629,7 +664,7 @@ void PointCloud::setURI(const char* filename)
 		std::string shmPath = path_.substr(6);
 		std::cout << "Connecting to shmdata path: " << shmPath << std::endl;
 		
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 		//shmReader_ = shmdata_any_reader_init();
 		//if (1)//(verbose)
 		//	shmdata_any_reader_set_debug(shmReader_, SHMDATA_ENABLE_DEBUG);
@@ -657,7 +692,7 @@ void PointCloud::setURI(const char* filename)
                     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
                     shmPointCloud_->getCloud(cloudOut);
 
-                    std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+                    //std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
     		        applyFilters(cloudOut);
 
                     updateFlag_ = true;
@@ -712,11 +747,7 @@ void PointCloud::setURI(const char* filename)
             framerate_ = 0;
             success = true;
         }
-        #if PCL_VERSION_HIGHER_THAN_1_6
         catch (pcl::PCLException e)
-        #else
-        catch (pcl::PCLIOException e)
-        #endif
         {
             std::cout << "[PointCloud]: Error connecting to Kinect; perhaps it is already being used? ... " << e.detailedMessage() << std::endl;
         }
@@ -733,11 +764,7 @@ void PointCloud::setURI(const char* filename)
             if (ext=="cpc")
             {
                 std::stringstream compressedData;
-                #if PCL_VERSION_HIGHER_THAN_1_6
                 pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA>();
-                #else
-                pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::octree::PointCloudCompression<pcl::PointXYZRGBA>();
-                #endif
                 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr tmpCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
 
                 std::ifstream readCompressedFile(absPath.c_str());
@@ -944,7 +971,14 @@ void PointCloud::setColorMode (ColorMode mode)
         updateFlag_ = true;
 	}
 }
-
+void PointCloud::setModulatePointSize (int a)
+{
+    if ( modulatePointSize_ == (bool)a ) return;
+    printf("setModulatePointSize %i\n", a);
+    modulatePointSize_ = a;
+	BROADCAST(this, "si", "setModulatePointSize", getModulatePointSize());
+    updateFlag_ = true;
+}
 // -----------------------------------------------------------------------------
 std::vector<lo_message> PointCloud::getState () const
 {
@@ -988,6 +1022,10 @@ std::vector<lo_message> PointCloud::getState () const
  
     msg = lo_message_new();
     lo_message_add(msg, "si", "setColorMode", getColorMode());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setModulatePointSize", getModulatePointSize());
     ret.push_back(msg);
     
     msg = lo_message_new();

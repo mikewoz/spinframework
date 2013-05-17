@@ -89,7 +89,8 @@ public:
         CAPSULE,
         CONE,
         PLANE,
-        DISC
+        DISC,
+        MODEL
     };
     enum billboardType { 	RELATIVE,	/*!< No billboarding set. */
 							POINT_EYE,  /*!< Billboarding from any angle. */
@@ -194,7 +195,7 @@ public:
     //osg::ref_ptr<osg::Image> textureImage; // store textureImage so we don't waste time in the callback
 
     osg::ref_ptr<osg::Geode> shapeGeode;
-
+    osg::ref_ptr<osg::ShapeDrawable> _shapeDrawable;
     osgUtil::Optimizer optimizer;
 
 protected:

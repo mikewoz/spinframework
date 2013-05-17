@@ -41,6 +41,7 @@
 
 #include "config.h"
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <pthread.h>
@@ -171,7 +172,7 @@ void spinBaseContext::debugPrint()
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     std::cout << "  sharedvideo enabled?\t\tYES" << std::endl;
 #else
     std::cout << "  sharedvideo enabled?\t\tNO" << std::endl;
@@ -345,8 +346,11 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
     //pthread_join(pthreadID, NULL); // if not DETACHED thread
 
     // wait until the thread gets into it's loop before returning:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (! running )
-        usleep(10);
+        nanosleep(&nap, NULL);
 
     return true;
 }
@@ -362,8 +366,11 @@ void spinBaseContext::stop()
     }
 
     // wait here until the thread has really exited:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (isRunning())
-        usleep(10);
+        nanosleep(&nap, NULL);
 
 }
 
@@ -922,6 +929,13 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
         float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
         sceneManager->setGravity(x,y,z);
+    }
+    else if ((theMethod == "setWind") && (argc==4))
+    {
+        float x = (float) lo_hires_val((lo_type)types[1], argv[1]);
+        float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
+        float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
+        sceneManager->setWind(x,y,z);
     }
     else if ((theMethod == "setUpdateRate") && (argc==2))
         sceneManager->setUpdateRate((float)lo_hires_val((lo_type)types[1], argv[1]));

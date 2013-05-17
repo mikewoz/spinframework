@@ -167,7 +167,11 @@ int main(int argc, char **argv)
     try {	
         while (server.isRunning())
         {
-            sleep(1);
+            timespec nap;
+            nap.tv_sec = 0;
+            nap.tv_nsec = 1e9;
+            nanosleep(&nap, NULL);
+            //sleep(1);
             // loop until a quit message is received (TODO)
         }
     }
@@ -177,7 +181,11 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    usleep(100);
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e5;
+    nanosleep(&nap, NULL);
+    //usleep(100);
     std::cout << "spinserver exited normally." << std::endl;
 
     return 0;

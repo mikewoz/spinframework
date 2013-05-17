@@ -368,6 +368,7 @@ SceneManager::SceneManager(std::string id)
     //btBroadphaseInterface* broadphase = new btDbvtBroadphase();
     dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
     dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
+    ////dynamicsWorld_->setForceUpdateAllAabbs(false);
 
     // This callback is a global method of checking collisions after every
     // pyhsics step. We register a global callback using gContactAddedCallback,
@@ -380,7 +381,8 @@ SceneManager::SceneManager(std::string id)
     {
         //gContactAddedCallback = btCollisionCallback;
     }
-
+    wind_ = btVector3(0,0,0);
+    windy_ = false;
 
 #endif
 
@@ -1565,7 +1567,7 @@ void SceneManager::update()
     osg::Timer_t tick = osg::Timer::instance()->tick();
     double dt =osg::Timer::instance()->delta_s(lastTick_,tick);
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     // it's possible that a SharedVideoTexture is in the sceneManager, but not
     // currently applied on any geometry. In this canse, it will not be be
     // seen in the update traversal of the scene graph, and it's updateCallback
@@ -1611,10 +1613,21 @@ void SceneManager::update()
         // only do on server side?
         if (spinApp::Instance().getContext()->isServer())
         {
+
+            if ( windy_ ) {
+                for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+                    btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+                    btRigidBody* body = btRigidBody::upcast(obj);
+                    if(!body->isStaticObject()) {
+                        body->applyCentralForce(wind_);
+                    }
+                }
+            }
+
             //dynamicsWorld_->performDiscreteCollisionDetection();
             //printf("stepSimulation %f\n", dt);
             dynamicsWorld_->stepSimulation(dt);//, 7, 0.0004);
-            //dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            dynamicsWorld_->updateAabbs(); // <- is this necessary?
         }
     }
 #endif
@@ -2290,6 +2303,27 @@ void SceneManager::setGravity(float x, float y, float z)
 {
 #ifdef WITH_BULLET
     dynamicsWorld_->setGravity(btVector3(x, y, z));
+#endif
+}
+
+// -----------------------------------------------------------------------------
+void SceneManager::setWind(float x, float y, float z)
+{
+#ifdef WITH_BULLET
+    if ( x == 0.0f && y == 0.0f && z == 0.0f ) windy_ = false;
+    else windy_ = true;
+    wind_ = btVector3(x,y,z);
+    /*    printf("setWind %f %f %f\n",x,y,z);
+    for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+        btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+        btRigidBody* body = btRigidBody::upcast(obj);
+        if(!body->isStaticObject()) {
+            body->applyCentralForce(btVector3(x, y, z));
+            body->activate();
+            printf("setWind force applied\n");
+        }
+    }
+    printf("\n");*/
 #endif
 }
 
