@@ -129,6 +129,11 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          __float__getRollingFriction,
 	          "",
 	          "");
+	I_MethodWithDefaults3(void, reportContact, IN, btManifoldPoint &, cp, , IN, const btCollisionObject *, otherObj, , IN, bool, swap, false,
+	                      Properties::NON_VIRTUAL,
+	                      __void__reportContact__btManifoldPoint_R1__C5_btCollisionObject_P1__bool,
+	                      "",
+	                      "");
 	I_Method1(void, setReportContacts, IN, int, b,
 	          Properties::NON_VIRTUAL,
 	          __void__setReportContacts__int,

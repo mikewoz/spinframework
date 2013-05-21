@@ -204,6 +204,10 @@ btScalar CollisionShape::btContactCallback::addSingleResult(btManifoldPoint& cp,
 
     btScalar impulse = cp.getAppliedImpulse();
 
+    printf("collide 0x%p %s, %f %f %f, %f %f %f, %f\n", &cp, n1->getID().c_str(),
+           hitPoint.x(), hitPoint.y(), hitPoint.z(),
+           normal.x(), normal.y(), normal.z(), cp.m_appliedImpulse);
+
     if (depth != lastBtHitDepth)
     {
         BROADCAST( n0, "ssfffffff", "collide", n1->getID().c_str(),
@@ -278,6 +282,11 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
     /////////////////////////////sceneManager_->dynamicsWorld_->addRigidBody(body_);
     ////////////////////
 
+    hit_ = false;
+    prevHit_ = false;
+    prevHitDepth_ = 1000000;
+
+    reportContacts_ = false;
     filterContacts_ = false;
     contactCallback_ = 0; //new btContactCallback( *body_, *this );
     modelGeometry_ = 0;
@@ -331,17 +340,15 @@ void CollisionShape::callbackUpdate(osg::NodeVisitor* nv)
 
         if (isDynamic_ && (mass_!=0) && body_->isInWorld() && body_->isActive() )
         {
+            // if (contactCallback_) {
+            //     //printf("\n%s **************\n", this->getID().c_str());
+            //     if ( filterContacts_ ) contactCallback_->hit = false;
+            //     else contactCallback_->prevHit = false;
+            //     sceneManager_->dynamicsWorld_->contactTest( body_, *contactCallback_ );
+            //     contactCallback_->prevHit = contactCallback_->hit;
+            // }
 
-            
-            
-            // btContactCallback cb( *body_, *this );
-            if (contactCallback_) {
-                //printf("\n%s **************\n", this->getID().c_str());
-                if ( filterContacts_ ) contactCallback_->hit = false;
-                else contactCallback_->prevHit = false;
-                sceneManager_->dynamicsWorld_->contactTest( body_, *contactCallback_ );
-                contactCallback_->prevHit = contactCallback_->hit;
-            }
+
             /*{
                 btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
                 myMotionState->getWorldTransform( currentTransform_ );
@@ -492,7 +499,7 @@ void CollisionShape::setShape( shapeType t )
 	drawShape();
 
     if ( modelGeometry_.get() && shape == MODEL && shapeGeode.get() ) {
-        printf("yes\n");
+
         //if (!shapeGeode) shapeGeode = new osg::Geode();
         shapeGeode->addDrawable( modelGeometry_ );
         //if ( !this->getAttachmentNode()->containsNode(shapeGeode.get()) )
@@ -513,19 +520,16 @@ void CollisionShape::setShape( shapeType t )
 
 static btCollisionShape* osgGeom2Bullet( osg::Geometry* geom )
 {
-    printf("h\n");
     osg::Vec3Array* vert = (osg::Vec3Array*) geom->getVertexArray();
-    printf("he\n");
     osg::PrimitiveSet* ps =  geom->getPrimitiveSet(0);
     if ( !ps ) {
         printf( "no primitiveset\n" );
         return 0;
     }
-    printf("hey\n");
 
     osg::DrawElementsUInt* de = (osg::DrawElementsUInt*) ps->getDrawElements();
 
-    printf("osgGeom2Bullet... %i %i\n",  de->getNumIndices(), vert->getNumElements());
+    //printf("osgGeom2Bullet... %i %i\n",  de->getNumIndices(), vert->getNumElements());
     
     int* index = (int*)malloc( de->getNumIndices()*sizeof(int));
     for ( size_t i = 0; i < de->getNumIndices(); i++ )
@@ -537,8 +541,6 @@ static btCollisionShape* osgGeom2Bullet( osg::Geometry* geom )
         vertss[i*3+1] = (*vert)[i].y();
         vertss[i*3+2] = (*vert)[i].z();
     }
-
-    printf("heyy\n");
     /*
 	btTriangleIndexVertexArray* btmesh =
         new btTriangleIndexVertexArray( de->getNumIndices()/3,
@@ -559,23 +561,17 @@ static btCollisionShape* osgGeom2Bullet( osg::Geometry* geom )
 
     // new btGIMPACTMeshData(m_indexVertexArrays);  
     //trimeshShape = new btGImpactMeshShape( btmesh );
-    printf("heyyyyy\n");
+
     return trimeshShape;
 }
 
 void CollisionShape::setModelFromFile( const char* file )
 {
-
-    printf("yo\n");
         
     osgDB::Registry::instance()->getDataFilePathList().push_back( osgDB::getFilePath( getAbsolutePath(std::string(file)) ) );
     std::string modelPath = getRelativePath(std::string(file));
     osg::Group* group = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
-    //if ( !model.valid() ) return;
     
-    //osg::Stateset* ss = shapeGeode->getOrCreateStateSet();
-       printf("yoo\n");
-
     osg::Geode* geode;
     osg::Geometry* geom;
     for ( size_t i = 0; i < group->getNumChildren(); i++ ) {
@@ -586,7 +582,6 @@ void CollisionShape::setModelFromFile( const char* file )
     }
 
     if ( !geom ) return;
-    printf("yooo\n");
     
     osg::Vec4Array* c = dynamic_cast<osg::Vec4Array*>( geom->getColorArray() );
     if ( c ) {
@@ -708,13 +703,67 @@ void CollisionShape::setRollingFriction( float f )
 }
 // -----------------------------------------------------------------------------
 
+void CollisionShape::reportContact( btManifoldPoint& cp, const btCollisionObject* otherObj, bool swap )
+{
+    if ( !reportContacts_ ) return;
+
+    if ( !filterContacts_ ) prevHit_ = false;
+
+    hit_ = true;
+
+    if ( prevHit_ && otherObj == prevHitObj_ ) {
+        //printf("prevHit\n");
+        return;
+    } 
+    osg::Vec3 hitPoint;
+    osg::Vec3 normal;
+
+    if ( swap ) {
+        hitPoint = asOsgVec3( cp.m_localPointB );
+        normal = asOsgVec3( cp.m_normalWorldOnB );
+    } else {
+        hitPoint = asOsgVec3( cp.m_localPointA );
+        normal = -asOsgVec3( cp.m_normalWorldOnB );// there is no m_normalWorldOnA
+    }
+
+    float depth = cp.getDistance();
+    prevHitObj_ = otherObj;   
+    
+    btScalar impulse = cp.getAppliedImpulse();
+
+    CollisionShape *n1 = (CollisionShape*)(otherObj->getUserPointer());
+    if ( !n1 ) return;
+
+    if ( depth != prevHitDepth_ ) {
+        // printf( "%s collide %s, %f %f %f, %f %f %f, %f\n",
+        //         getID().c_str(), n1->getID().c_str(),
+        //         hitPoint.x(), hitPoint.y(), hitPoint.z(),
+        //         normal.x(), normal.y(), normal.z(), impulse );
+
+
+        BROADCAST( this, "ssfffffff", "collide", n1->getID().c_str(),
+                   hitPoint.x(), hitPoint.y(), hitPoint.z(),
+                   normal.x(), normal.y(), normal.z(), impulse );
+
+        prevHitDepth_ = depth;
+    }
+
+}
+
+
+// -----------------------------------------------------------------------------
+
 void CollisionShape::setReportContacts( int b )
 {
 
-    if ( (!b) == (!contactCallback_) ) return;
+    // if ( (!b) == (!contactCallback_) ) return;
 
-    if ( b ) contactCallback_ = new btContactCallback( *body_, *this );
-    else contactCallback_ = 0;
+    // if ( b ) contactCallback_ = new btContactCallback( *body_, *this );
+    // else contactCallback_ = 0;
+
+    if ( b == reportContacts_ ) return;
+    reportContacts_ = b;    
+
     BROADCAST(this, "si", "setReportContacts", b);
 }
 

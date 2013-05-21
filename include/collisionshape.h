@@ -112,6 +112,8 @@ public:
     void setRollingFriction( float f );
     float getRollingFriction() const { return rollingFriction_; }
 
+    void reportContact( btManifoldPoint& cp, const btCollisionObject* otherObj, bool swap = false );
+
     void setReportContacts( int b );
     int getReportContacts() const { return (contactCallback_ != 0); }
 
@@ -188,8 +190,17 @@ private:
 
     //btCollisionWorld::ContactResultCallback* contactCallback_;
     btContactCallback* contactCallback_;
+    bool reportContacts_;
     bool filterContacts_;
     osg::Timer_t lastTick_;
+
+
+    //osg::Vec3 prevHitPoint;
+    //osg::Vec3 prevHitPoint2;
+    float prevHitDepth_;
+    const btCollisionObject* prevHitObj_;
+    bool hit_, prevHit_;
+
 
 };
 

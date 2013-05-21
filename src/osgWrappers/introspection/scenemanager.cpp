@@ -372,6 +372,8 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_PublicMemberProperty(osg::ref_ptr< osgDB::SharedStateManager >, sharedStateManager);
 	I_PublicMemberProperty(bool, lastColState);
 	I_PublicMemberProperty(btDynamicsWorld *, dynamicsWorld_);
+	I_PublicMemberProperty(btVector3, wind_);
+	I_PublicMemberProperty(bool, windy_);
 END_REFLECTOR
 
 STD_MAP_REFLECTOR(std::map< std::string COMMA  lo_address >)
