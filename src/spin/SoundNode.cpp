@@ -182,6 +182,7 @@ void SoundNode::setRadius (float f)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
+        printf("setRadius %f", f);
         spatOSCSource->setRadius(this->getRadius());
     }
 #endif
@@ -192,7 +193,7 @@ void SoundNode::setTransitionFactor (float f)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        spatOSCSource->setTransitionFactor(f);
+        spatOSCSource->setTransitionRadiusFactor(f);
     }
 #endif
 }
