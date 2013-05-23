@@ -455,7 +455,7 @@ void CollisionShape::setShape( shapeType t )
         if (collisionObj_) delete collisionObj_;
         break;
     case MODEL:
-        printf("model!\n");
+        //printf("model!\n");
         break;
     case SPHERE:
         collisionObj_ = new btSphereShape( AS_UNIT_SCALE * 0.5 );
@@ -589,6 +589,8 @@ void CollisionShape::setModelFromFile( const char* file )
     } else {
         c = new osg::Vec4Array();
         (*c).push_back( _color );
+        geom->setColorArray(c);
+        geom->setColorBinding(osg::Geometry::BIND_OVERALL);
     }
 
     collisionObj_ = osgGeom2Bullet( geom );
