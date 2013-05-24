@@ -176,6 +176,18 @@ void SoundNode::setOrientationQuat (float x, float y, float z, float w)
 #endif
 }
 
+void SoundNode::setActive (int b)
+{
+    DSPNode::setActive(b);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        printf("setActive %f", b);
+        spatOSCSource->setActive((bool)this->getActive());
+    }
+#endif
+}
+
 void SoundNode::setRadius (float f)
 {
     DSPNode::setRadius(f);
@@ -281,6 +293,10 @@ void SoundNode::setConnectionParam (const char* sinkNodeID, const char* method, 
         else if (std::string(method)=="setRolloffFactor")
         {
             conn->setRolloffFactor(value);
+        }
+        else if (std::string(method)=="setMaxGainClip")
+        {
+            conn->setMaxGainClip(value);
         }
         else if (std::string(method)=="setConnectionMute")
         {

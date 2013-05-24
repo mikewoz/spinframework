@@ -78,6 +78,7 @@ class SoundNode : public DSPNode
         virtual void setOrientation (float p, float r, float y);
         virtual void setOrientationQuat (float x, float y, float z, float w);
         virtual void setRadius (float f);
+        virtual void setActive (int f);
         virtual void setTransitionFactor (float f);
         virtual void setURI (const char *uri);
         virtual void setDirectivity(const char* horizPattern, const char* vertPattern);
