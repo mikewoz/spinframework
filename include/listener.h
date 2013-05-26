@@ -82,7 +82,8 @@ class Listener : public DSPNode
         virtual void setOrientation (float p, float r, float y);
         virtual void setOrientationQuat (float x, float y, float z, float w);
         virtual void setURI (const char *uri);
-        
+        virtual void sendEvent (const char *types, lo_arg **argv, int argc );
+    
     private:
 
 #ifdef WITH_SPATOSC

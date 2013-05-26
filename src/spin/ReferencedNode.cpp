@@ -539,6 +539,13 @@ void ReferencedNode::setParam (const char *paramName, float paramValue)
     BROADCAST(this, "ssf", "setParam", paramName, paramValue);
 }
 
+void ReferencedNode::sendEvent (const char *types, lo_arg **argv, int argc )
+{
+    // std::cout << "ERROR: ReferencedNode::sendEvent CALLED" << std::endl;
+    0; // action only defined in subclasses
+}
+
+    
 // -----------------------------------------------------------------------------
 
 void ReferencedNode::setStateSetFromFile(const char* filename)

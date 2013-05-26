@@ -265,6 +265,7 @@ public:
 
     virtual void setParam (const char *paramName, const char *paramValue);
     virtual void setParam (const char *paramName, float paramValue);
+    virtual void sendEvent (const char *types, lo_arg **argv, int argc );
 
     void setStateSetFromFile (const char* filename);
     void setStateSet         (const char* s);

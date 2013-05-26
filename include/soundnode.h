@@ -85,6 +85,7 @@ class SoundNode : public DSPNode
         virtual void connect (const char* sinkNodeID);
         virtual void disconnect (const char* sinkNodeID);
         virtual void setConnectionParam (const char* sinkNodeID, const char* method, float value);
+        virtual void sendEvent (const char *types, lo_arg **argv, int argc );
 
         /**
          * For each subclass of ReferencedNode, we override the getState()

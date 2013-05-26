@@ -425,6 +425,19 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     spinApp &spin = spinApp::Instance();
 
+    if (theMethod == "event")
+    {
+        
+        ReferencedNode *n = dynamic_cast<ReferencedNode*>(s->s_thing);
+        if (n)
+        {
+            if (argc > 1)
+            {
+                //std::cout << "spinBaseContext matched node message for: " << s->s_name << " method: " << theMethod << std::endl;
+                n->sendEvent(types+1, argv+1, argc-1);
+            }
+        }
+    }
 
     if (theMethod == "parentList")
     {
