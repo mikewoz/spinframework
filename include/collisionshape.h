@@ -46,6 +46,8 @@
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 
+#define MIN_COLLISION_LIFETIME 10
+#define MAX_COLLISION_LIFETIME 200
 
 namespace spin
 {
@@ -76,7 +78,8 @@ public:
         //const btCollisionObjectWrapper* colObj1,int partId1,int index1);
     };
 
-
+    typedef std::map<std::string, int> Colliders;
+    Colliders colliders_;
 
 
 
@@ -171,7 +174,7 @@ protected:
     // virtual void drawShape();
 
     btRigidBody* body_;
-    btCollisionShape *collisionObj_;
+    btCollisionShape *collisionShp_;
     btDefaultMotionState* motionState_;
     btTransform currentTransform_;
     //osg::ref_ptr<osg::Geometry> modelGeometry_;

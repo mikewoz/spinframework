@@ -1623,7 +1623,12 @@ void SceneManager::update()
                     btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
                     btRigidBody* body = btRigidBody::upcast(obj);
                     if(!body->isStaticObject()) {
-                        body->applyCentralForce(wind_);
+
+                        CollisionShape *cs = (CollisionShape*)(body->getUserPointer());
+                        if ( cs && cs->getDynamic() ) {
+                            body->activate();
+                            body->applyCentralForce(wind_);
+                        }
                     }
                 }
             }

@@ -239,18 +239,18 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
 
     //gContactAddedCallback = btCollisionCallback2;
         
-    collisionObj_ = new btBoxShape( btVector3(0.5,0.5,0.5) );
+    collisionShp_ = new btBoxShape( btVector3(0.5,0.5,0.5) );
 
     currentTransform_.setIdentity();
 
     btVector3 localInertia(0,0,0);
-    if (mass_!=0.f) collisionObj_->calculateLocalInertia(mass_, localInertia);
+    if (mass_!=0.f) collisionShp_->calculateLocalInertia(mass_, localInertia);
 
 
     // using motionstate is recommended, it provides interpolation capabilities,
     // and only synchronizes 'active' objects
     motionState_ = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));//currentTransform_);
-    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionObj_, localInertia);
+    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionShp_, localInertia);
     rbci.m_restitution = bounciness_;
     rbci.m_friction = friction_;
     //BULLET VERSION >= 2.81 rbci.m_rollingFriction = rollingFriction_;
@@ -287,7 +287,7 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
     prevHitDepth_ = 1000000;
 
     reportContacts_ = false;
-    filterContacts_ = false;
+    filterContacts_ = true;
     contactCallback_ = 0; //new btContactCallback( *body_, *this );
     modelGeometry_ = 0;
     this->setInteractionMode(GroupNode::DRAG);
@@ -322,6 +322,20 @@ void CollisionShape::callbackUpdate(osg::NodeVisitor* nv)
     // the user is not currently manipulating the object.
     if (spinApp::Instance().getContext()->isServer())
     {
+        //printf("callbackUpdate %s ---\n", getID().c_str());
+
+        // prevHit_ = hit_;
+        // hit_ = false;
+        
+        Colliders::iterator it;
+        for ( it = colliders_.begin(); it != colliders_.end(); it++ ) {
+            it->second++;
+            //printf(" -- %s: %i\n", it->first.c_str(), it->second );
+            if ( it->second > MAX_COLLISION_LIFETIME ) colliders_.erase( it->first );
+        }
+
+
+
 
         /* {
                 btDefaultMotionState* myMotionState = (btDefaultMotionState*) body_->getMotionState();
@@ -408,12 +422,12 @@ void CollisionShape::resetCollisionObj()
     if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
 
     delete( body_ );
-    if ( !collisionObj_ ) return;
+    if ( !collisionShp_ ) return;
 
     btVector3 localInertia(0,0,0);
-    if (mass_!=0.f) collisionObj_->calculateLocalInertia(mass_, localInertia);
+    if (mass_!=0.f) collisionShp_->calculateLocalInertia(mass_, localInertia);
 
-    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionObj_, localInertia);
+    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionShp_, localInertia);
     rbci.m_restitution = bounciness_;
     rbci.m_friction = friction_;
     //BULLET VERSION >= 2.81 rbci.m_rollingFriction = rollingFriction_;
@@ -452,37 +466,37 @@ void CollisionShape::setShape( shapeType t )
     switch (t) {
     case NONE:
         isInWorld = false;
-        if (collisionObj_) delete collisionObj_;
+        if (collisionShp_) delete collisionShp_;
         break;
     case MODEL:
         //printf("model!\n");
         break;
     case SPHERE:
-        collisionObj_ = new btSphereShape( AS_UNIT_SCALE * 0.5 );
+        collisionShp_ = new btSphereShape( AS_UNIT_SCALE * 0.5 );
         break;
     case CYLINDER:
-        collisionObj_ = new btCylinderShapeZ( AS_UNIT_SCALE * btVector3(0.25,0.25,0.5) );
+        collisionShp_ = new btCylinderShapeZ( AS_UNIT_SCALE * btVector3(0.25,0.25,0.5) );
         break;
     case CAPSULE:
-        collisionObj_ = new btCapsuleShape( AS_UNIT_SCALE * 0.25, AS_UNIT_SCALE );
+        collisionShp_ = new btCapsuleShape( AS_UNIT_SCALE * 0.25, AS_UNIT_SCALE );
         break;
     case CONE:
-        collisionObj_ = new btConeShape( AS_UNIT_SCALE * 0.25, AS_UNIT_SCALE );
+        collisionShp_ = new btConeShape( AS_UNIT_SCALE * 0.25, AS_UNIT_SCALE );
         break;
     case PLANE:
-        collisionObj_ = new btStaticPlaneShape( btVector3(0, 1, 0), 0 ); // 'createPlane' makes a y=0 plane.
+        collisionShp_ = new btStaticPlaneShape( btVector3(0, 1, 0), 0 ); // 'createPlane' makes a y=0 plane.
         break;
     case BOX:
     default:
-        collisionObj_ = new btBoxShape( AS_UNIT_SCALE * btVector3(0.5,0.5,0.5) );
+        collisionShp_ = new btBoxShape( AS_UNIT_SCALE * btVector3(0.5,0.5,0.5) );
         break;
     }
 
     /* btVector3 localInertia(0,0,0);
-    if (mass_!=0.f) collisionObj_->calculateLocalInertia(mass_, localInertia);
+    if (mass_!=0.f) collisionShp_->calculateLocalInertia(mass_, localInertia);
 
     ///////recycle old.motionState_ = new btDefaultMotionState(btTransform(btQuaternion(0,0,0,1),btVector3(0,0,0)));//currentTransform_);
-    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionObj_, localInertia);
+    btRigidBody::btRigidBodyConstructionInfo rbci(mass_, motionState_, collisionShp_, localInertia);
     rbci.m_restitution = bounciness_;
     rbci.m_friction = friction_;
     body_ = new btRigidBody(rbci);
@@ -593,7 +607,7 @@ void CollisionShape::setModelFromFile( const char* file )
         geom->setColorBinding(osg::Geometry::BIND_OVERALL);
     }
 
-    collisionObj_ = osgGeom2Bullet( geom );
+    collisionShp_ = osgGeom2Bullet( geom );
     
 	osg::TessellationHints* hints = new osg::TessellationHints;
     hints->setDetailRatio(detailRatio_);
@@ -709,14 +723,29 @@ void CollisionShape::reportContact( btManifoldPoint& cp, const btCollisionObject
 {
     if ( !reportContacts_ ) return;
 
-    if ( !filterContacts_ ) prevHit_ = false;
+    CollisionShape *cs = (CollisionShape*)(otherObj->getUserPointer());
+    if ( !cs ) return;
 
-    hit_ = true;
-
-    if ( prevHit_ && otherObj == prevHitObj_ ) {
-        //printf("prevHit\n");
-        return;
+    if ( filterContacts_ ) {
+        Colliders::iterator it = colliders_.find(cs->getID());
+        if ( it != colliders_.end() && it->second < MIN_COLLISION_LIFETIME ) {
+            it->second = 0;
+            //printf("prevented hit on %s", it->first.c_str());
+            return;
+        }
     } 
+
+    // else {
+    //         prevHit_ = false;
+    //     } 
+
+    //     hit_ = true;
+
+    // if ( prevHit_ && otherObj == prevHitObj_ ) {
+    //     //printf("prevHit\n");
+    //     return;
+    // } 
+
     osg::Vec3 hitPoint;
     osg::Vec3 normal;
 
@@ -733,22 +762,27 @@ void CollisionShape::reportContact( btManifoldPoint& cp, const btCollisionObject
     
     btScalar impulse = cp.getAppliedImpulse();
 
-    CollisionShape *n1 = (CollisionShape*)(otherObj->getUserPointer());
-    if ( !n1 ) return;
 
-    if ( depth != prevHitDepth_ ) {
-        // printf( "%s collide %s, %f %f %f, %f %f %f, %f\n",
-        //         getID().c_str(), n1->getID().c_str(),
-        //         hitPoint.x(), hitPoint.y(), hitPoint.z(),
-        //         normal.x(), normal.y(), normal.z(), impulse );
+    colliders_[cs->getID()] = 0;
+
+    //if ( depth != prevHitDepth_ ) {
+        
+    // printf( "%s collide %s, %f %f %f, %f %f %f, %f\n",
+    //          getID().c_str(), cs->getID().c_str(),
+    //          hitPoint.x(), hitPoint.y(), hitPoint.z(),
+    //          normal.x(), normal.y(), normal.z(), impulse );
 
 
-        BROADCAST( this, "ssfffffff", "collide", n1->getID().c_str(),
-                   hitPoint.x(), hitPoint.y(), hitPoint.z(),
-                   normal.x(), normal.y(), normal.z(), impulse );
+    BROADCAST( this, "ssfffffff", "collide", cs->getID().c_str(),
+               hitPoint.x(), hitPoint.y(), hitPoint.z(),
+               normal.x(), normal.y(), normal.z(), impulse );
 
-        prevHitDepth_ = depth;
-    }
+    //prevHitDepth_ = depth;
+
+    //setColor( 1.0f-_color.r(), 1.0f-_color.g(), 1.0f-_color.b(), _color.a() );
+
+
+    
 
 }
 
@@ -788,11 +822,11 @@ void CollisionShape::setMass (float mass)
     // rigidbody is dynamic if and only if mass is non zero, otherwise static
     //bool hasMass = (mass_ != 0.f);
     //if ( hasMass )
-    //    collisionObj_->calculateLocalInertia(mass_, localInertia);
+    //    collisionShp_->calculateLocalInertia(mass_, localInertia);
     bool isInWorld = body_->isInWorld();
     if ( isInWorld ) sceneManager_->dynamicsWorld_->removeRigidBody(body_);
 
-    collisionObj_->calculateLocalInertia(mass_, localInertia);
+    collisionShp_->calculateLocalInertia(mass_, localInertia);
     body_->setMassProps(mass_, localInertia);
 
     ///if ( mass_ == 0.0f && isDynamic_ ) body_->setCollisionFlags( btCollisionObject::CF_KINEMATIC_OBJECT );
@@ -1063,7 +1097,7 @@ void CollisionShape::setScale(float x, float y, float z)
     //currentTransform_ = asBtTransform(mainTransform->getMatrix());
     //body_->getMotionState()->setWorldTransform(currentTransform_);
     if ( shape != ShapeNode::PLANE )
-        collisionObj_->setLocalScaling(asBtVector3(this->getScale()));
+        collisionShp_->setLocalScaling(asBtVector3(this->getScale()));
 }
 
 void CollisionShape::setManipulatorMatrix
