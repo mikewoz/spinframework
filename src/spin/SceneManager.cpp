@@ -1627,7 +1627,7 @@ void SceneManager::update()
                         CollisionShape *cs = (CollisionShape*)(body->getUserPointer());
                         if ( cs && cs->getDynamic() ) {
                             body->activate();
-                            body->applyCentralForce(wind_);
+                            body->applyCentralForce( wind_ * (btScalar)cs->getWindFactor() );
                         }
                     }
                 }

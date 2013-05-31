@@ -282,10 +282,10 @@ CollisionShape::CollisionShape (SceneManager *sceneManager, const char* initID) 
     /////////////////////////////sceneManager_->dynamicsWorld_->addRigidBody(body_);
     ////////////////////
 
-    hit_ = false;
-    prevHit_ = false;
-    prevHitDepth_ = 1000000;
-
+    // hit_ = false;
+    // prevHit_ = false;
+    // prevHitDepth_ = 1000000;
+    windFactor_ = 1.0f;
     reportContacts_ = false;
     filterContacts_ = true;
     contactCallback_ = 0; //new btContactCallback( *body_, *this );
@@ -630,7 +630,7 @@ void CollisionShape::addConstraint( const char* lbl, float x, float y, float z )
 
     constraints_[lbl] = c;
     if ( isDynamic_ ) sceneManager_->dynamicsWorld_->addConstraint( c );
-    printf("yea %f %f %f\n",x,y,z);
+    //printf("yea %f %f %f\n",x,y,z);
 }
 
 void CollisionShape::addConstraint2(  const char* lbl, float x, float y, float z,
@@ -716,6 +716,15 @@ void CollisionShape::setRollingFriction( float f )
     rollingFriction_ = f;
     resetCollisionObj();
     BROADCAST(this, "sf", "setFriction", (float) friction_);
+}// -----------------------------------------------------------------------------
+
+void CollisionShape::setWindFactor( float f )
+{
+    if ( windFactor_ == (btScalar)f ) return;
+    //printf("setRollingFriction %f\n", f);
+    windFactor_ = f;
+    
+    BROADCAST(this, "sf", "setWindFactor", (float) windFactor_);
 }
 // -----------------------------------------------------------------------------
 
@@ -758,7 +767,7 @@ void CollisionShape::reportContact( btManifoldPoint& cp, const btCollisionObject
     }
 
     float depth = cp.getDistance();
-    prevHitObj_ = otherObj;   
+    //prevHitObj_ = otherObj;   
     
     btScalar impulse = cp.getAppliedImpulse();
 
@@ -1144,6 +1153,10 @@ std::vector<lo_message> CollisionShape::getState () const
 
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setFriction", getFriction());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "sf", "setWindFactor", getWindFactor());
     ret.push_back(msg);
 
     msg = lo_message_new();

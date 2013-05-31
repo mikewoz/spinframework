@@ -115,6 +115,9 @@ public:
     void setRollingFriction( float f );
     float getRollingFriction() const { return rollingFriction_; }
 
+    void setWindFactor( float f );
+    float getWindFactor() const { return windFactor_; }
+
     void reportContact( btManifoldPoint& cp, const btCollisionObject* otherObj, bool swap = false );
 
     void setReportContacts( int b );
@@ -187,7 +190,7 @@ private:
     btScalar friction_;
     btScalar rollingFriction_;
     //btTypedConstraint* constraint_;
-
+    btScalar windFactor_;
 
     btConstraints constraints_;
 
@@ -200,9 +203,9 @@ private:
 
     //osg::Vec3 prevHitPoint;
     //osg::Vec3 prevHitPoint2;
-    float prevHitDepth_;
-    const btCollisionObject* prevHitObj_;
-    bool hit_, prevHit_;
+    /* float prevHitDepth_; */
+    /* const btCollisionObject* prevHitObj_; */
+    /* bool hit_, prevHit_; */
 
 
 };
