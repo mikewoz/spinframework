@@ -12,6 +12,7 @@
 
 #include <collisionshape.h>
 #include <scenemanager.h>
+#include <shapenode.h>
 
 // Must undefine IN and OUT macros defined in Windows headers
 #ifdef IN
@@ -20,6 +21,36 @@
 #ifdef OUT
 #undef OUT
 #endif
+
+BEGIN_VALUE_REFLECTOR(spin::CollisionShape::btContactCallback)
+	I_DeclaringFile("collisionshape.h");
+	I_Constructor2(IN, btRigidBody &, tgtBody, IN, spin::CollisionShape &, node,
+	               ____btContactCallback__btRigidBody_R1__CollisionShape_R1,
+	               "Constructor, pass whatever context you want to have available when processing contacts. ",
+	               "You may also want to set m_collisionFilterGroup and m_collisionFilterMask (supplied by the superclass) for needsCollision() ");
+	I_Method1(bool, needsCollision, IN, btBroadphaseProxy *, proxy,
+	          Properties::VIRTUAL,
+	          __bool__needsCollision__btBroadphaseProxy_P1,
+	          "If you don't want to consider collisions where the bodies are joined by a constraint, override needsCollision: ",
+	          "However, if you use a btCollisionObject for body instead of a btRigidBody, then this is unnecessary—checkCollideWithOverride isn't available ");
+	I_Method7(btScalar, addSingleResult, IN, btManifoldPoint &, cp, IN, const btCollisionObject *, colObj0, IN, int, partId0, IN, int, index0, IN, const btCollisionObject *, colObj1, IN, int, partId1, IN, int, index1,
+	          Properties::VIRTUAL,
+	          __btScalar__addSingleResult__btManifoldPoint_R1__C5_btCollisionObject_P1__int__int__C5_btCollisionObject_P1__int__int,
+	          "Called with each contact for your own processing (e.g. test if contacts fall in within sensor parameters) ",
+	          "");
+	I_PublicMemberProperty(osg::Vec3, prevHitPoint);
+	I_PublicMemberProperty(osg::Vec3, prevHitPoint2);
+	I_PublicMemberProperty(bool, hit);
+	I_PublicMemberProperty(bool, prevHit);
+END_REFLECTOR
+
+BEGIN_ENUM_REFLECTOR(spin::CollisionShape::ConstraintType)
+	I_DeclaringFile("collisionshape.h");
+	I_EnumLabel(spin::CollisionShape::POINT_2_POINT);
+	I_EnumLabel(spin::CollisionShape::HINGE);
+END_REFLECTOR
+
+TYPE_NAME_ALIAS(std::map< std::string COMMA  btTypedConstraint * >, spin::CollisionShape::btConstraints)
 
 BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	I_DeclaringFile("collisionshape.h");
@@ -38,6 +69,91 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          __void__debug,
 	          "",
 	          "Print debug information about the node to standard out (when running in console mode). It may be possible to redirect this to a text box for GUI logs. ");
+	I_Method1(void, setShape, IN, spin::ShapeNode::shapeType, t,
+	          Properties::NON_VIRTUAL,
+	          __void__setShape__shapeType,
+	          "",
+	          "Sets the shape this ShapeNode should have, identified by its number. ");
+	I_Method1(void, setModelFromFile, IN, const char *, file,
+	          Properties::NON_VIRTUAL,
+	          __void__setModelFromFile__C5_char_P1,
+	          "",
+	          "");
+	I_Method4(void, addConstraint, IN, const char *, lbl, IN, float, x, IN, float, y, IN, float, z,
+	          Properties::NON_VIRTUAL,
+	          __void__addConstraint__C5_char_P1__float__float__float,
+	          "",
+	          "");
+	I_Method8(void, addConstraint2, IN, const char *, lbl, IN, float, x, IN, float, y, IN, float, z, IN, const char *, otherObj, IN, float, ox, IN, float, oy, IN, float, oz,
+	          Properties::NON_VIRTUAL,
+	          __void__addConstraint2__C5_char_P1__float__float__float__C5_char_P1__float__float__float,
+	          "",
+	          "");
+	I_Method1(void, removeConstraint, IN, const char *, label,
+	          Properties::NON_VIRTUAL,
+	          __void__removeConstraint__C5_char_P1,
+	          "",
+	          "");
+	I_Method0(void, wakeup,
+	          Properties::NON_VIRTUAL,
+	          __void__wakeup,
+	          "",
+	          "");
+	I_Method1(void, setBounciness, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setBounciness__float,
+	          "",
+	          "");
+	I_Method0(float, getBounciness,
+	          Properties::NON_VIRTUAL,
+	          __float__getBounciness,
+	          "",
+	          "");
+	I_Method1(void, setFriction, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setFriction__float,
+	          "",
+	          "");
+	I_Method0(float, getFriction,
+	          Properties::NON_VIRTUAL,
+	          __float__getFriction,
+	          "",
+	          "");
+	I_Method1(void, setRollingFriction, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setRollingFriction__float,
+	          "",
+	          "");
+	I_Method0(float, getRollingFriction,
+	          Properties::NON_VIRTUAL,
+	          __float__getRollingFriction,
+	          "",
+	          "");
+	I_MethodWithDefaults3(void, reportContact, IN, btManifoldPoint &, cp, , IN, const btCollisionObject *, otherObj, , IN, bool, swap, false,
+	                      Properties::NON_VIRTUAL,
+	                      __void__reportContact__btManifoldPoint_R1__C5_btCollisionObject_P1__bool,
+	                      "",
+	                      "");
+	I_Method1(void, setReportContacts, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setReportContacts__int,
+	          "",
+	          "");
+	I_Method0(int, getReportContacts,
+	          Properties::NON_VIRTUAL,
+	          __int__getReportContacts,
+	          "",
+	          "");
+	I_Method1(void, setFilterContacts, IN, int, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setFilterContacts__int,
+	          "",
+	          "");
+	I_Method0(int, getFilterContacts,
+	          Properties::NON_VIRTUAL,
+	          __int__getFilterContacts,
+	          "",
+	          "");
 	I_Method1(void, setMass, IN, float, mass,
 	          Properties::NON_VIRTUAL,
 	          __void__setMass__float,
@@ -93,21 +209,50 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	I_ProtectedMethod0(void, drawShape,
-	                   Properties::VIRTUAL,
+	I_ProtectedMethod0(btRigidBody *, getBody,
+	                   Properties::NON_VIRTUAL,
 	                   Properties::NON_CONST,
-	                   __void__drawShape,
+	                   __btRigidBody_P1__getBody,
 	                   "",
 	                   "");
+	I_ProtectedMethod0(void, resetCollisionObj,
+	                   Properties::NON_VIRTUAL,
+	                   Properties::NON_CONST,
+	                   __void__resetCollisionObj,
+	                   "",
+	                   "");
+	I_SimpleProperty(float, Bounciness, 
+	                 __float__getBounciness, 
+	                 __void__setBounciness__float);
 	I_SimpleProperty(int, Dynamic, 
 	                 __int__getDynamic, 
 	                 __void__setDynamic__int);
+	I_SimpleProperty(int, FilterContacts, 
+	                 __int__getFilterContacts, 
+	                 __void__setFilterContacts__int);
+	I_SimpleProperty(float, Friction, 
+	                 __float__getFriction, 
+	                 __void__setFriction__float);
 	I_SimpleProperty(float, Mass, 
 	                 __float__getMass, 
 	                 __void__setMass__float);
+	I_SimpleProperty(const char *, ModelFromFile, 
+	                 0, 
+	                 __void__setModelFromFile__C5_char_P1);
+	I_SimpleProperty(int, ReportContacts, 
+	                 __int__getReportContacts, 
+	                 __void__setReportContacts__int);
+	I_SimpleProperty(float, RollingFriction, 
+	                 __float__getRollingFriction, 
+	                 __void__setRollingFriction__float);
+	I_SimpleProperty(spin::ShapeNode::shapeType, Shape, 
+	                 0, 
+	                 __void__setShape__shapeType);
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
 	I_PublicMemberProperty(osg::Vec3, collisionOffset_);
 END_REFLECTOR
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  btTypedConstraint * >)
 

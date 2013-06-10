@@ -286,6 +286,11 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__refreshSubscribers__C5_std_mapT1_std_stringComma_lo_address__R1,
 	          "",
 	          "The refreshSubscribers method results in a publication of all nodelists to the given TCP subscribers. Then, the full node state is published to the subscribers, for ALL nodes. ");
+	I_Method1(void, setShadows, IN, bool, b,
+	          Properties::NON_VIRTUAL,
+	          __void__setShadows__bool,
+	          "",
+	          "Enable the shadow system ");
 	I_Method1(void, setShadowSoftness, IN, float, f,
 	          Properties::NON_VIRTUAL,
 	          __void__setShadowSoftness__float,
@@ -311,6 +316,11 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	          __void__setGravity__float__float__float,
 	          "",
 	          "Set the gravity vector for the physics engine (only used by some nodes). ");
+	I_Method3(void, setWind, IN, float, x, IN, float, y, IN, float, z,
+	          Properties::NON_VIRTUAL,
+	          __void__setWind__float__float__float,
+	          "",
+	          "");
 	I_Method1(void, setUpdateRate, IN, float, seconds,
 	          Properties::NON_VIRTUAL,
 	          __void__setUpdateRate__float,
@@ -342,6 +352,9 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_SimpleProperty(float, ShadowSoftness, 
 	                 0, 
 	                 __void__setShadowSoftness__float);
+	I_SimpleProperty(bool, Shadows, 
+	                 0, 
+	                 __void__setShadows__bool);
 	I_SimpleProperty(float, UpdateRate, 
 	                 0, 
 	                 __void__setUpdateRate__float);
@@ -359,6 +372,8 @@ BEGIN_VALUE_REFLECTOR(spin::SceneManager)
 	I_PublicMemberProperty(osg::ref_ptr< osgDB::SharedStateManager >, sharedStateManager);
 	I_PublicMemberProperty(bool, lastColState);
 	I_PublicMemberProperty(btDynamicsWorld *, dynamicsWorld_);
+	I_PublicMemberProperty(btVector3, wind_);
+	I_PublicMemberProperty(bool, windy_);
 END_REFLECTOR
 
 STD_MAP_REFLECTOR(std::map< std::string COMMA  lo_address >)

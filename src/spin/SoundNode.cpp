@@ -176,12 +176,25 @@ void SoundNode::setOrientationQuat (float x, float y, float z, float w)
 #endif
 }
 
+void SoundNode::setActive (int b)
+{
+    DSPNode::setActive(b);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        printf("setActive %f", b);
+        spatOSCSource->setActive((bool)this->getActive());
+    }
+#endif
+}
+
 void SoundNode::setRadius (float f)
 {
     DSPNode::setRadius(f);
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
+        printf("setRadius %f", f);
         spatOSCSource->setRadius(this->getRadius());
     }
 #endif
@@ -192,7 +205,7 @@ void SoundNode::setTransitionFactor (float f)
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
-        spatOSCSource->setTransitionFactor(f);
+        spatOSCSource->setTransitionRadiusFactor(f);
     }
 #endif
 }
@@ -281,6 +294,10 @@ void SoundNode::setConnectionParam (const char* sinkNodeID, const char* method, 
         {
             conn->setRolloffFactor(value);
         }
+        else if (std::string(method)=="setMaxGainClip")
+        {
+            conn->setMaxGainClip(value);
+        }
         else if (std::string(method)=="setConnectionMute")
         {
             if ((bool)value)
@@ -292,6 +309,49 @@ void SoundNode::setConnectionParam (const char* sinkNodeID, const char* method, 
 #endif
 }
 
+void SoundNode::sendEvent (const char *types, lo_arg **argv, int argc )
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        std::string node = this->getID();
+        std::string key;
+        std::vector<std::string> value;
+        
+        // first item should be the key string, followd by any corresponing items
+        if (! lo_is_numerical_type((lo_type)types[0]))
+        {
+            key = (const char*) argv[0];
+
+        }
+        else
+        {
+            std::cerr << "ERROR: SoundNode::sendEvent 1st item must be a key <string> " <<  std::endl;
+            return;
+        }
+                
+        for (int i = 1; i < argc; i++)
+        {
+            if (lo_is_numerical_type((lo_type) types[i]))
+            {
+                std::ostringstream os;
+                os << (float) lo_hires_val((lo_type) types[i], argv[i]);
+                value.push_back(os.str());
+            }
+            else 
+            {
+                value.push_back((const char*) argv[i] );
+            }
+        }
+        // std::cout << "SoundNode::sendEvent CALLED for node:  " << this->getID() <<  "with key: " << key << std::endl;
+        spatOSCSource->sendEvent(key, value);
+        
+    // for( std::vector<std::string>::const_iterator i = value.begin(); i != value.end(); ++i)
+    //   std::cout << *i << ' ' << std::endl;
+
+    }
+#endif
+}
 
 
 std::vector<lo_message> SoundNode::getState () const

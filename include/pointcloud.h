@@ -119,6 +119,7 @@ public:
     osg::Vec4f getColor(unsigned int i);
     void getColor(unsigned int i, osg::Vec4& color);
 
+    float computeDistanceFromCamera();
     virtual void updatePoints();
     virtual void draw();
 #endif
@@ -130,7 +131,7 @@ public:
     void setPointSize    (float pointsize);
     void setColor        (float red, float green, float blue, float alpha);
     void setColorMode    (ColorMode mode);
-
+    void setModulatePointSize(int a);
     /**
      * Set the voxelSize for the pcl::VoxelGrid filter, which downsamples points
      * to the nearest voxel in a 3D voxel grid. Think about a voxel grid as a
@@ -156,7 +157,7 @@ public:
     int getColorMode()      const { return (int)this->colorMode_; };
     float getFilterSize()   const { return this->voxelSize_; };
     osg::Vec2 getDistCrop() const { return this->distCrop_; };
-
+    int getModulatePointSize() const { return (int)modulatePointSize_; }
     virtual std::vector<lo_message> getState() const;
     
 
@@ -167,11 +168,7 @@ private:
     pcl::Grabber* grabber_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_;
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOrig_; // in the case of a file
-    #if PCL_VERSION_HIGHER_THAN_1_6
     pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *decoder_;
-    #else
-	pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *decoder_;
-    #endif
 #endif
 
 #ifdef WITH_SHAREDVIDEO
@@ -198,10 +195,11 @@ private:
     float randomCoeff_;
     float pointSize_;
     osg::Vec4 color_;
+    osg::Vec3 center_;
     ColorMode colorMode_;
     float voxelSize_;
     osg::Vec2 distCrop_;
-    
+    bool modulatePointSize_;
     bool redrawFlag_;
     bool updateFlag_;
     

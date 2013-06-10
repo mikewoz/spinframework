@@ -126,10 +126,10 @@ osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height
         // create simple 2D texture
         texture->setTextureSize(tex_width, tex_height);
         texture->setResizeNonPowerOfTwoHint(false);
-        texture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
-        texture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
-        texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::REPEAT);
-        texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::REPEAT);
+        texture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR_MIPMAP_LINEAR);
+        texture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR_MIPMAP_LINEAR);
+        texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_EDGE);
+        texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_EDGE);
         texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
     }
     else
@@ -137,8 +137,8 @@ osg::Texture* CompositeViewer::createRenderTexture(int tex_width, int tex_height
         // create a cubemap
         texture->setTextureSize(tex_width, tex_height);
         texture->setResizeNonPowerOfTwoHint(false);
-        texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
-        texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+        texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+        texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
         texture->setWrap(osg::Texture::WRAP_S,osg::Texture::CLAMP_TO_EDGE);
         texture->setWrap(osg::Texture::WRAP_T,osg::Texture::CLAMP_TO_EDGE);
         texture->setWrap(osg::Texture::WRAP_R,osg::Texture::CLAMP_TO_EDGE);
@@ -198,6 +198,7 @@ void CompositeViewer::setupCamera()
             // set viewport
             //lCamera->setViewport(lCamera->getViewport()); // Useful ??
             lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+            lCamera->setCullingMode(osg::CullSettings::NO_CULLING);
             //camera->setProjectionMatrixAsPerspective(20.0, vp->width()/vp->height(), 0.1, 100.0);
 
             // tell the camera to use OpenGL frame buffer object where supported.
@@ -243,12 +244,26 @@ void CompositeViewer::setupCamera()
             lCamera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
             lCamera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
 
+            // We need to get the current attachment parameters
+            //osg::Camera::BufferAttachmentMap attachmentMap = lCamera->getBufferAttachmentMap();
+            //osg::Camera::Attachment* attachment = &(attachmentMap[osg::Camera::COLOR_BUFFER]);
+            //bool mipmapGeneration = attachment->_mipMapGeneration;
+            //unsigned int multisampleSamples = attachment->_multisampleSamples;
+            //unsigned int multisampleColorSamples = attachment->_multisampleColorSamples;
+
             // Attach the textures to the color and depth buffers
+            //lCamera->detach(osg::Camera::COLOR_BUFFER);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+            //lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4, 0, 0, mipmapGeneration, multisampleSamples, multisampleColorSamples);
+
             lCamera->detach(osg::Camera::COLOR_BUFFER);
             lCamera->attach(osg::Camera::COLOR_BUFFER0, colorTexture1);
             lCamera->attach(osg::Camera::COLOR_BUFFER1, colorTexture2);
             lCamera->attach(osg::Camera::COLOR_BUFFER2, colorTexture3);
             lCamera->attach(osg::Camera::COLOR_BUFFER3, colorTexture4);
+
             lCamera->attach(osg::Camera::DEPTH_BUFFER, depthTexture);
         }
     }
@@ -832,8 +847,8 @@ void makeDomeView(osg::GraphicsContext *gc, osg::GraphicsContext::Traits *traits
 
     texture->setTextureSize(textureSize, textureSize);
     texture->setInternalFormat(GL_RGB);
-    texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
-    texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+    texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR);
+    texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);
     texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
     texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
     texture->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE);

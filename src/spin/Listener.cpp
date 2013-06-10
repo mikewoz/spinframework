@@ -196,5 +196,46 @@ std::vector<lo_message> Listener::getState () const
 	return ret;
 }
 
+void Listener::sendEvent (const char *types, lo_arg **argv, int argc )
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        std::string node = this->getID();
+        std::string key;
+        std::vector<std::string> value;
+        
+        // first item should be the key string, followd by any corresponing items
+        if (! lo_is_numerical_type((lo_type)types[0]))
+        {
+            key = (const char*) argv[0];
+            
+        }
+        else
+        {
+            std::cerr << "ERROR: Listener::sendEvent 1st item must be a key <string> " <<  std::endl;
+            return;
+        }
+        
+        for (int i = 1; i < argc; i++)
+        {
+            if (lo_is_numerical_type((lo_type) types[i]))
+            {
+                std::ostringstream os;
+                os << (float) lo_hires_val((lo_type) types[i], argv[i]);
+                value.push_back(os.str());
+            }
+            else
+            {
+                value.push_back((const char*) argv[i] );
+            }
+        }
+        // std::cout << "Listener::sendEvent CALLED for node:  " << this->getID() <<  "with key: " << key << std::endl;
+        spatOSCListener->sendEvent(key, value);
+    }
+#endif
+}
+
+    
 } // end of namespace spin
 

@@ -114,39 +114,46 @@ void AttractorNode::callbackUpdate(osg::NodeVisitor* nv)
         osg::Quat thisQuat = thisMat.getRotate();
         osg::Vec3 thisDir = thisQuat * osg::Y_AXIS;
 
-        // now cycle through each target and apply the force:
+
         targetVector::iterator t;
+
+        if (spinApp::Instance().getContext()->isServer())
+        {
+            bool lock = false;
+            printf("delta_s = %f\n", osg::Timer::instance()->delta_s(lastUpdate_,tick));
+            // if the target does computation on the client side, don't let
+            // the server broadcast any messages:
+            if (computationMode_==CLIENT_SIDE)
+            {    
+                //(*t)->setBroadcastLock(true);
+                lock = true;
+            }                
+            // on the server-side, we want to throttle network messages, so
+            // only  allow broadcasting of messages if a threshold amount of
+            // time has passed:
+            else if (osg::Timer::instance()->delta_s(lastUpdate_,tick) > maxUpdateDelta)
+            {
+                //(*t)->setBroadcastLock(false);
+                lock = false;
+                lastUpdate_ = tick;
+                printf("BROADCAST\n");
+            }
+            else 
+            {
+                lock = true;
+                //(*t)->setBroadcastLock(true);
+            }
+            
+            for (t = targets_.begin(); t != targets_.end(); t++)
+            {
+                (*t)->setBroadcastLock(lock);
+            }        
+
+        }
+
+        // now cycle through each target and apply the force:        
         for (t = targets_.begin(); t != targets_.end(); t++)
         {
-        
-            // Decide whether messages should be broadcasted from the target
-            // during this update:
-            if (spinApp::Instance().getContext()->isServer())
-            {
-                // if the target does computation on the client side, don't let
-                // the server broadcast any messages:
-                if (computationMode_==CLIENT_SIDE)
-                {
-                    (*t)->setBroadcastLock(true);
-                }
-                
-                // on the server-side, we want to throttle network messages, so
-                // only  allow broadcasting of messages if a threshold amount of
-                // time has passed:
-                else if (osg::Timer::instance()->delta_s(lastUpdate_,tick) > maxUpdateDelta)
-                {
-                    (*t)->setBroadcastLock(false);
-                    lastUpdate_ = tick;
-                }
-                else 
-                {
-                    (*t)->setBroadcastLock(true);
-                }
-            }
-        
-        
-        
-        
             osg::Quat forceOrientation;
 
             osg::Matrixd targetMat = osg::computeLocalToWorld((*t)->currentNodePath_);
@@ -180,11 +187,6 @@ void AttractorNode::callbackUpdate(osg::NodeVisitor* nv)
 
             delta.normalize();
 
-            /*
-            if (force_ > 0) delta = forceOrientation * osg::Y_AXIS;
-            else delta = forceOrientation * -osg::Y_AXIS;
-            */
-
             // We now apply the force, scaling by amount of time,
             // and distance/angular decay factors:
             delta *= fabs(force_) * dt * distanceScalar * angularScalar;
@@ -201,7 +203,7 @@ void AttractorNode::callbackUpdate(osg::NodeVisitor* nv)
             {
                 if (mode_ == AttractorNode::EXTRINSIC)
                 {
-                    (*t)->translate( delta.x(), delta.y(), delta.z() );
+                    (*t)->translate( delta.x(), delta.y(), delta.z() );                    
                 }
                 else
                 {

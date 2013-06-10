@@ -82,9 +82,24 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          __osg_Vec3__getPos__unsigned_int,
 	          "",
 	          "");
+	I_Method2(void, getPos, IN, unsigned int, i, IN, osg::Vec3 &, point,
+	          Properties::NON_VIRTUAL,
+	          __void__getPos__unsigned_int__osg_Vec3_R1,
+	          "",
+	          "");
 	I_Method1(osg::Vec4f, getColor, IN, unsigned int, i,
 	          Properties::NON_VIRTUAL,
 	          __osg_Vec4f__getColor__unsigned_int,
+	          "",
+	          "");
+	I_Method2(void, getColor, IN, unsigned int, i, IN, osg::Vec4 &, color,
+	          Properties::NON_VIRTUAL,
+	          __void__getColor__unsigned_int__osg_Vec4_R1,
+	          "",
+	          "");
+	I_Method0(float, computeDistanceFromCamera,
+	          Properties::NON_VIRTUAL,
+	          __float__computeDistanceFromCamera,
 	          "",
 	          "");
 	I_Method0(void, updatePoints,
@@ -130,6 +145,11 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	I_Method1(void, setColorMode, IN, spin::PointCloud::ColorMode, mode,
 	          Properties::NON_VIRTUAL,
 	          __void__setColorMode__ColorMode,
+	          "",
+	          "");
+	I_Method1(void, setModulatePointSize, IN, int, a,
+	          Properties::NON_VIRTUAL,
+	          __void__setModulatePointSize__int,
 	          "",
 	          "");
 	I_Method1(void, setVoxelSize, IN, float, voxelSize,
@@ -187,15 +207,16 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	          __osg_Vec2__getDistCrop,
 	          "",
 	          "");
+	I_Method0(int, getModulatePointSize,
+	          Properties::NON_VIRTUAL,
+	          __int__getModulatePointSize,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
-	//I_StaticMethod7(void, shmCallback, IN, shmdata_any_reader_t *, reader, IN, void *, shmbuf, IN, void *, data, IN, int, data_size, IN, unsigned long long, timestamp, IN, const char *, type_description, IN, void *, user_data,
-	//                __void__shmCallback__shmdata_any_reader_t_P1__void_P1__void_P1__int__unsigned_long_long__C5_char_P1__void_P1_S,
-	//                "",
-	//                "");
 	I_SimpleProperty(osg::Vec4, Color, 
 	                 __osg_Vec4__getColor, 
 	                 0);
@@ -214,6 +235,9 @@ BEGIN_OBJECT_REFLECTOR(spin::PointCloud)
 	I_SimpleProperty(float, FilterSize, 
 	                 __float__getFilterSize, 
 	                 0);
+	I_SimpleProperty(int, ModulatePointSize, 
+	                 __int__getModulatePointSize, 
+	                 __void__setModulatePointSize__int);
 	I_SimpleProperty(float, PointSize, 
 	                 __float__getPointSize, 
 	                 __void__setPointSize__float);

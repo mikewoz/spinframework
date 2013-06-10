@@ -366,8 +366,13 @@ SceneManager::SceneManager(std::string id)
     //btAxisSweep3
     btBroadphaseInterface *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
     //btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);    
     dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
+
+    //btContactSolverInfo& csi = dynamicsWorld_->getSolverInfo();
+    //csi.m_solverMode = 
+
+    ////dynamicsWorld_->setForceUpdateAllAabbs(false);
 
     // This callback is a global method of checking collisions after every
     // pyhsics step. We register a global callback using gContactAddedCallback,
@@ -380,7 +385,8 @@ SceneManager::SceneManager(std::string id)
     {
         //gContactAddedCallback = btCollisionCallback;
     }
-
+    wind_ = btVector3(0,0,0);
+    windy_ = false;
 
 #endif
 
@@ -1611,10 +1617,59 @@ void SceneManager::update()
         // only do on server side?
         if (spinApp::Instance().getContext()->isServer())
         {
+
+            if ( windy_ ) {
+                for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+                    btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+                    btRigidBody* body = btRigidBody::upcast(obj);
+                    if(!body->isStaticObject()) {
+
+                        CollisionShape *cs = (CollisionShape*)(body->getUserPointer());
+                        if ( cs && cs->getDynamic() ) {
+                            body->activate();
+                            body->applyCentralForce( wind_ * (btScalar)cs->getWindFactor() );
+                        }
+                    }
+                }
+            }
+
             //dynamicsWorld_->performDiscreteCollisionDetection();
             //printf("stepSimulation %f\n", dt);
             dynamicsWorld_->stepSimulation(dt);//, 7, 0.0004);
-            //dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            int numManifolds = dynamicsWorld_->getDispatcher()->getNumManifolds();
+            //if (numManifolds) printf("-----------------------\n");
+            for (int i=0;i<numManifolds;i++) {
+                btPersistentManifold* contactManifold =  dynamicsWorld_->getDispatcher()->getManifoldByIndexInternal(i);
+                btRigidBody* ob0 = static_cast<btRigidBody*>(contactManifold->getBody0());
+                btRigidBody* ob1 = static_cast<btRigidBody*>(contactManifold->getBody1());
+                CollisionShape *n0 = (CollisionShape*)ob0->getUserPointer();
+                CollisionShape *n1 = (CollisionShape*)ob1->getUserPointer();
+
+                if ( !n0 || !n1 ) continue;
+
+                // May be there is contact obA and obB
+                int numContacts = contactManifold->getNumContacts();
+                for (int j=0;j<numContacts;j++) {
+                    btManifoldPoint& pt = contactManifold->getContactPoint(j);
+                    
+                    if ( pt.getDistance() < 0.f &&
+                         pt.getAppliedImpulse() > 0.f ) {
+                        // printf( "got contact 0x%p %s:%s %f %f %i\n", &pt,
+                        //         n0->getID().c_str(), n1->getID().c_str(),
+                        //         pt.getDistance(), pt.getAppliedImpulse(), pt.m_lifeTime );
+                    
+
+                        n0->reportContact( pt, ob1 );
+                        n1->reportContact( pt, ob0, true );
+                        // One contact point is inside of another object
+                        // But some contacts are ignored
+                    }
+                }
+            }
+
+
+
         }
     }
 #endif
@@ -2290,6 +2345,27 @@ void SceneManager::setGravity(float x, float y, float z)
 {
 #ifdef WITH_BULLET
     dynamicsWorld_->setGravity(btVector3(x, y, z));
+#endif
+}
+
+// -----------------------------------------------------------------------------
+void SceneManager::setWind(float x, float y, float z)
+{
+#ifdef WITH_BULLET
+    if ( x == 0.0f && y == 0.0f && z == 0.0f ) windy_ = false;
+    else windy_ = true;
+    wind_ = btVector3(x,y,z);
+    /*    printf("setWind %f %f %f\n",x,y,z);
+    for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+        btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+        btRigidBody* body = btRigidBody::upcast(obj);
+        if(!body->isStaticObject()) {
+            body->applyCentralForce(btVector3(x, y, z));
+            body->activate();
+            printf("setWind force applied\n");
+        }
+    }
+    printf("\n");*/
 #endif
 }
 
