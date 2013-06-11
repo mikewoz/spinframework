@@ -99,6 +99,7 @@ BEGIN_VALUE_REFLECTOR(spin::CompositeViewer)
 	I_PublicMemberProperty(std::vector< MotionBlurRendering * >, mMBlurPPUs);
 	I_PublicMemberProperty(std::vector< OutlineRendering * >, mOutlinePPUs);
 	I_PublicMemberProperty(std::vector< MaskRendering * >, mMaskPPUs);
+	I_PublicMemberProperty(std::vector< ShaderRendering * >, mShaderPPUs);
 END_REFLECTOR
 
 BEGIN_VALUE_REFLECTOR(spin::CustomResizeHandler)
