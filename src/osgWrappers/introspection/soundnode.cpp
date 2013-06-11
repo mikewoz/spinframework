@@ -73,6 +73,11 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          __void__setRadius__float,
 	          "",
 	          "");
+	I_Method1(void, setActive, IN, int, i,
+	          Properties::VIRTUAL,
+	          __void__setActive__int,
+	          "",
+	          "Activate or deactivate the DSP processing ");
 	I_Method1(void, setTransitionFactor, IN, float, f,
 	          Properties::VIRTUAL,
 	          __void__setTransitionFactor__float,
@@ -103,11 +108,19 @@ BEGIN_OBJECT_REFLECTOR(spin::SoundNode)
 	          __void__setConnectionParam__C5_char_P1__C5_char_P1__float,
 	          "",
 	          "");
+	I_Method3(void, sendEvent, IN, const char *, types, IN, lo_arg **, argv, IN, int, argc,
+	          Properties::VIRTUAL,
+	          __void__sendEvent__C5_char_P1__lo_arg_P1P1__int,
+	          "",
+	          "");
 	I_Method0(std::vector< lo_message >, getState,
 	          Properties::VIRTUAL,
 	          __std_vectorT1_lo_message___getState,
 	          "",
 	          "For each subclass of ReferencedNode, we override the getState() method to fill the vector with the correct set of methods for this particular node ");
+	I_SimpleProperty(int, Active, 
+	                 0, 
+	                 __void__setActive__int);
 	I_SimpleProperty(float, Radius, 
 	                 0, 
 	                 __void__setRadius__float);
