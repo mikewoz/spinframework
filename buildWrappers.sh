@@ -21,7 +21,7 @@ type -P genwrapper &>/dev/null || { echo "genwrapper is not installed; please in
 doxygen ./doxygen_config
 
 rm include/*.h~
-genwrapper -d . doxygen | doxygen -
+#genwrapper -d . doxygen | doxygen -
 genwrapper -v QUIET -c genwrapper.conf doxygen .
 #genwrapper -v DEBUG -c genwrapper.conf doxygen .
 rm -rf src/osgWrappers/introspection/home
