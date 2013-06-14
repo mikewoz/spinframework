@@ -62,6 +62,8 @@ src/osgWrappers/introspection/motionblurppu.cpp
 src/osgWrappers/introspection/osgParticleUtil.cpp
 src/osgWrappers/introspection/spinservercontext.cpp
 src/osgWrappers/introspection/spinapp.cpp
+src/osgWrappers/introspection/shaderppu.cpp
+src/osgWrappers/introspection/shmpointcloud.cpp
 spinframework-*.*.*
 doxyfile
 doxyfile.stamp
