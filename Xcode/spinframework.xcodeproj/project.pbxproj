@@ -3119,8 +3119,8 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/usr/local/include,
-					"/usr/local/include/spatosc-0.3",
-					"/usr/local/include/shmdata-0.6",
+					"/usr/local/include/spatosc-0.4",
+					"/usr/local/include/shmdata-0.8",
 					"/usr/local/include/cppintrospection-3.0",
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
@@ -3170,8 +3170,8 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/usr/local/include,
-					"/usr/local/include/spatosc-0.3",
-					"/usr/local/include/shmdata-0.6",
+					"/usr/local/include/spatosc-0.4",
+					"/usr/local/include/shmdata-0.8",
 					"/usr/local/include/cppintrospection-3.0",
 					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
@@ -3491,7 +3491,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUGGING_SYMBOLS = YES;
@@ -3517,7 +3516,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
