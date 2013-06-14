@@ -586,6 +586,11 @@ void CollisionShape::setModelFromFile( const char* file )
     std::string modelPath = getRelativePath(std::string(file));
     osg::Group* group = (osg::Group*)(osgDB::readNodeFile( getAbsolutePath(modelPath).c_str() ));
     
+    if (!group) {
+        printf("loading of file [%s] failed!\n", modelPath.c_str());
+        return;
+    }
+
     osg::Geode* geode;
     osg::Geometry* geom;
     for ( size_t i = 0; i < group->getNumChildren(); i++ ) {
