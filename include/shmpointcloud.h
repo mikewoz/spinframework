@@ -26,7 +26,7 @@
 #include <pcl/point_types.h>
 #include <pcl/compression/octree_pointcloud_compression.h>
 
-#include <boost/shared_ptr.hpp>
+//#include <boost/shared_ptr.hpp>
 
 #include "config.h"
 #include "shmdata/any-data-reader.h"
@@ -254,9 +254,12 @@ class ShmPointCloud
         //std::shared_ptr<NetworkPointCloudCompression<T>> _networkPointCloudEncoder;
         //std::shared_ptr<PointCloudBlob<T>> _blober;
         
-        boost::shared_ptr< NetworkPointCloudCompression<T> > _networkPointCloudEncoder;
-        boost::shared_ptr< PointCloudBlob<T> > _blober;
-        
+        //boost::shared_ptr< NetworkPointCloudCompression<T> > _networkPointCloudEncoder;
+        //boost::shared_ptr< PointCloudBlob<T> > _blober;
+       
+        NetworkPointCloudCompression<T> *_networkPointCloudEncoder;
+        PointCloudBlob<T> *_blober;
+ 
         static void onData(shmdata_any_reader_t* reader, void* shmbuf, void* data, int data_size, unsigned long long timestamp,
             const char* type_description, void* user_data);
 };
@@ -270,8 +273,10 @@ ShmPointCloud<T>::ShmPointCloud(const char* filename, const bool isWriter) :
 {
     _cloud.reset(new pcl::PointCloud<T>());
 
-    _networkPointCloudEncoder.reset(new NetworkPointCloudCompression<T>());
-    _blober.reset(new PointCloudBlob<T>());
+    //_networkPointCloudEncoder.reset(new NetworkPointCloudCompression<T>());
+    //_blober.reset(new PointCloudBlob<T>());
+    _networkPointCloudEncoder = new NetworkPointCloudCompression<T>();
+    _blober = new PointCloudBlob<T>();
 
     _filename = string(filename);
 
@@ -322,9 +327,15 @@ void ShmPointCloud<T>::setCompression(compression_Profiles_e compressionProfile,
                                       bool doVoxelGridDownDownSampling, const unsigned int iFrameRate,
                                       bool doColorEncoding, const unsigned char colorBitResolution)
 {
-    _networkPointCloudEncoder.reset(new NetworkPointCloudCompression<T>(compressionProfile, showStatistics, pointResolution,
+/*
+   _networkPointCloudEncoder.reset(new NetworkPointCloudCompression<T>(compressionProfile, showStatistics, pointResolution,
                                                                         octreeResolution, doVoxelGridDownDownSampling, iFrameRate,
                                                                         doColorEncoding, colorBitResolution));
+*/
+    if (_networkPointCloudEncoder) delete _networkPointCloudEncoder;
+    _networkPointCloudEncoder = new NetworkPointCloudCompression<T>(compressionProfile, showStatistics, pointResolution,
+                                                                        octreeResolution, doVoxelGridDownDownSampling, iFrameRate,
+                                                                        doColorEncoding, colorBitResolution);
 }
 
 /*************/
