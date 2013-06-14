@@ -191,7 +191,7 @@
  * <tt>sudo make install</tt><br><br>
  * <b>spatosc:</b><br>
  * <tt>cd ~/src</tt><br>
- * <tt>git clone git@github.com:sat-metalab/spatosc.git</tt></b>
+ * <tt>git clone git@github.com:sat-metalab/spatosc.git</tt>
  * <tt>cd spatosc</tt><br>
  * <tt>git checkout develop</tt><br>
  * <tt>./one_step_build.sh</tt><br>
@@ -987,33 +987,33 @@
  * essentially turns off the automatic connection to network channels, requiring
  * the user to connect manually. This could be useful in a situation where
  * several spinservers are operating on the same network.
- * - --http-port <port> : sets a local port from which messages can be sent to
+ * - --http-port \<port\> : sets a local port from which messages can be sent to
  * your spinserver. This is used for building controls for SPIN into a webpage.
  * The default is port 9980.
- * - --recv-tcp-msg <port> : sets the port where spinserver listens to TCP
+ * - --recv-tcp-msg \<port\> : sets the port where spinserver listens to TCP
  * messages. Subscription requests from client computers and from your own
  * spinserver will come here by default. It is also possible to send scene
  * events here for increased reliability, though by default they use UDP and a
  * different port. The default port is 54322.
- * - --recv-udp-msg <host> <port> : sets the port address where spinserver
+ * - --recv-udp-msg \<host\> \<port\> : sets the port address where spinserver
  * listens for UDP messages from clients. The majority of messages are sent this
  * way by default, for example, the creation and manipulation of objects in the
  * scene. This argument may be repeated to assign multiple hosts and ports. The
  * default values are host 239.0.0.1 and port 54323).
- * - --scene-id <name> : to change the name of the session from default to
+ * - --scene-id \<name\> : to change the name of the session from default to
  * something else. In this way it is possible to run multiple SPIN sessions on
  * the same network.
- * - --send-udp-msg <host> <port> : sets the address/port for UDP multicast of
+ * - --send-udp-msg \<host\> \<port\> : sets the address/port for UDP multicast of
  * scene events, or this argument may be repeated for several unicast
  * connections. This is used to change the port where spinserver listens for its
  * commands. (default: 239.0.0.1 54324)
- * - --send-udp-sync <host> <port> : sets the address/port for timecode sync
+ * - --send-udp-sync \<host\> \<port\> : sets the address/port for timecode sync
  * messages. This allows all connected machines to be synchronized in time. In
  * this way, the contents of the scene will be roughly the same for all
  * participants at the same time. However, it does not account for network lag.
- * - --spatosc <translator> <URL> enables SPIN's internal spatOSC scene.
+ * - --spatosc \<translator\> \<URL\> enables SPIN's internal spatOSC scene.
  * Example: --spatosc BasicTranslator osc.tcp://localhost:18033
- * - --ttl <number> sets the TTL (time to live) for multicast packets in order
+ * - --ttl \<number\> sets the TTL (time to live) for multicast packets in order
  * to hop across routers (default 1).
  * - --version displays the version number and exits spinserver.
  * 
@@ -1026,9 +1026,9 @@
  * - -h or -help : displays information about the command line arguments
  * (roughly similar to the list below)
  *
- * - --clipping <near far> : sets fixed clipping planes (the minimum and maximum
+ * - --clipping \<near far\> : sets fixed clipping planes (the minimum and maximum
  * distance from the camera at which objects will be rendered).
- * - --config <filename> : provides a configuration file to customize the setup
+ * - --config \<filename\> : provides a configuration file to customize the setup
  * of multiple windows/cameras.
  * - --disable-camera-controls : disables the mouse-based camera controls for
  * this user. This is helpful when using a mouse picker (the mouse selects and
@@ -1038,38 +1038,38 @@
  * network.
  * - --enable-mouse-picker : enables the mouse picker and sends events to the
  * server.
- * - --frustum <x y z a b c> : TO BE UPDATED
- * - --recv-tcp-msg <host> <port> : sets the desired receiving address/port when
+ * - --frustum \<x y z a b c\> : TO BE UPDATED
+ * - --recv-tcp-msg \<host\> \<port\> : sets the desired receiving address/port when
  * subscribing for TCP with spinserver (default 54325).
- * - --recv-udp-msg <host> <port> : sets the receiving address/port for UDP
+ * - --recv-udp-msg \<host\> \<port\> : sets the receiving address/port for UDP
  * messages from the server. The address can be a multicast address, or
  * 'localhost.' This is where you will receive update messages about the SPIN
  * scene (default 54323).
- * - --recv-udp-sync <adresss> <port> : sets the address/port for timecode sync.
+ * - --recv-udp-sync \<adresss\> \<port\> : sets the address/port for timecode sync.
  * This is where you receive messages that keep your viewer synchronized in time
  * with the server and the other participants in a scene (default 239.0.0.1 54321).
- * - --scene-id <name> : is important for making sure the viewer connects to the
+ * - --scene-id \<name\> : is important for making sure the viewer connects to the
  * appropriate spinserver. Scene name is "default" by default.
- * - --screen <num> : sets which screen to display on, in the case of multiple
+ * - --screen \<num\> : sets which screen to display on, in the case of multiple
  * monitors on one computer (default: all of them).
- * - --send-tcp-msg <host> <port> : allows you to manually set the address/port
+ * - --send-tcp-msg \<host\> \<port\> : allows you to manually set the address/port
  * through which to send TCP messages to a spinserver and can be used to connect
  * to SPIN sessions that are not on the same local network, i.e. across the
  * ocean (default localhost 54322).
- * - --send-udp-msg <host> <port> : is used to specify the port through
+ * - --send-udp-msg \<host\> \<port\> : is used to specify the port through
  * which we will send UDP messages to the spinserver, for the same reasons as in
  * the entry above (it is non-local). This port is used the most often. It is
  * less reliable but creates considerably less network traffic. Events with
  * really high occurrence, such as the movement of an object in the scene, are
  * handled this way by default.
- * - --spatosc <translator> <URL> : enables SPIN's internal spatOSC scene.
+ * - --spatosc \<translator\> \<URL\> : enables SPIN's internal spatOSC scene.
  * example: --spatosc BasicTranslator osc.tcp://localhost:18033
- * - --ttl <number> : is used to set the TTL (time to live) for multicast
+ * - --ttl \<number\> : is used to set the TTL (time to live) for multicast
  * packets in order to hop across routers (default 1).
- * - --user-id <uniqueID> : is used to specify a User ID for this viewer, which
+ * - --user-id \<uniqueID\> : is used to specify a User ID for this viewer, which
  * by default would be the name of the computer.
  * - --version : displays the version number and then exits spinviewer.
- * - --window <x y w h> : sets the position (w,y) and size (w, h) of the view
+ * - --window \<x y w h\> : sets the position (w,y) and size (w, h) of the view
  * window (deafult 50 50 640 480).
  *
  * <br>

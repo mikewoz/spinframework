@@ -205,16 +205,16 @@ class spinBaseContext
         /**
          * Callback for messages sent to a node in the scene graph.
          *
-         * Messages to node should have an OSC address in the form /SPIN/<scene ID>/<node ID>
+         * Messages to node should have an OSC address in the form /SPIN/\<scene ID\>/\<node ID\>
          * Their first argument is the name of the method to call.
          *
          * Methods to manage Python scripts for a node:
-         * - addCronScript <label> <path> <frequency>
-         * - addEventScript <label> <event> <path> [*args...]
-         * - enableCronScript <label>
-         * - removeCronScript <label>
-         * - enableEventScript <label>
-         * - removeEventScript <label>
+         * - addCronScript \<label\> \<path\> \<frequency\>
+         * - addEventScript \<label\> \<event\> \<path\> [*args...]
+         * - enableCronScript \<label\>
+         * - removeCronScript \<label\>
+         * - enableEventScript \<label\>
+         * - removeEventScript \<label\>
          *
          * We use C++ introspection to figure out the other methods that can be called for a given node.
          */
@@ -223,7 +223,7 @@ class spinBaseContext
         /**
          * Callback for the OSC message to the whole scene.
          *
-         * The address of the OSC messages sent to the scene are in the form /SPIN/<scene ID> <method name> [args...]
+         * The address of the OSC messages sent to the scene are in the form /SPIN/\<scene ID\> \<method name\> [args...]
          *
          * They are used mostly to delete all nodes from a scene, or to ask the server to refresh the information about all nodes. It's also possible to save the current scene graph to an XML file, and to load a previously saved XML file.
          *
