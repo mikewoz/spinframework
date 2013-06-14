@@ -47,7 +47,7 @@ libSPINwrappers_la_CPPFLAGS = \
     -I$(top_srcdir)/src/tinyxml
 
 if SHAREDVIDEO
-libSPINwrappers_la_CPPFLAGS += -std=gnu++0x
+#libSPINwrappers_la_CPPFLAGS += -std=gnu++0x
 endif
 
 if BULLET

@@ -15,21 +15,24 @@
 #ifndef SHMPOINTCLOUD_H
 #define SHMPOINTCLOUD_H
 
-#include <chrono>
+//#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <mutex>
+//#include <mutex>
 #include <sstream>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/compression/octree_pointcloud_compression.h>
 
+#include <boost/shared_ptr.hpp>
+
 #include "config.h"
 #include "shmdata/any-data-reader.h"
 #include "shmdata/any-data-writer.h"
 
+static pthread_mutex_t shmMutex = PTHREAD_MUTEX_INITIALIZER;
 
 using namespace std;
 using namespace pcl;
@@ -236,11 +239,15 @@ class ShmPointCloud
         char* _dataBuffer;
         unsigned int _dataBufferSize;
 
-        mutable std::mutex _mutex;
+        //mutable std::mutex _mutex;
 
-        std::shared_ptr<NetworkPointCloudCompression<T>> _networkPointCloudEncoder;
-        std::shared_ptr<PointCloudBlob<T>> _blober;
 
+        //std::shared_ptr<NetworkPointCloudCompression<T>> _networkPointCloudEncoder;
+        //std::shared_ptr<PointCloudBlob<T>> _blober;
+        
+        boost::shared_ptr< NetworkPointCloudCompression<T> > _networkPointCloudEncoder;
+        boost::shared_ptr< PointCloudBlob<T> > _blober;
+        
         static void onData(shmdata_any_reader_t* reader, void* shmbuf, void* data, int data_size, unsigned long long timestamp,
             const char* type_description, void* user_data);
 };
@@ -315,9 +322,11 @@ void ShmPointCloud<T>::setCompression(compression_Profiles_e compressionProfile,
 template <typename T>
 unsigned long long ShmPointCloud<T>::getCloud(cloudPtr &cloud) const
 {
-    std::lock_guard<std::mutex> lock(_mutex);
+    //std::lock_guard<std::mutex> lock(_mutex);
+    pthread_mutex_lock(&shmMutex);
     cloud = _cloud;
     _updated = false;
+    pthread_mutex_unlock(&shmMutex);
     return _timestamp;
 }
 
@@ -358,8 +367,10 @@ void ShmPointCloud<T>::setCloud(const cloudPtr &cloud, const bool compress, cons
     unsigned long long currentTime;
     if (timestamp == 0)
     {
-        auto now = chrono::high_resolution_clock::now();
-        currentTime = chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
+        time_t seconds = time(NULL);
+        currentTime = seconds*1000;
+        //auto now = chrono::high_resolution_clock::now();
+        //currentTime = chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
     }
     else
     {
@@ -398,8 +409,11 @@ void ShmPointCloud<T>::setCloud(const cloudPtr &cloud, const bool compress, cons
         shmdata_any_writer_push_data(_writer, blob, dataSize, 0, NULL, NULL);
     }
 
-    auto now = chrono::high_resolution_clock::now();
-    currentTime = chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
+    //auto now = chrono::high_resolution_clock::now();
+    //currentTime = chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
+    time_t seconds = time(NULL);
+    currentTime = seconds*1000;
+
 }
 
 /*************/
@@ -409,7 +423,8 @@ void ShmPointCloud<T>::onData(shmdata_any_reader_t* reader, void* shmbuf, void* 
 {
     ShmPointCloud* context = static_cast<ShmPointCloud*>(user_data);
 
-    std::lock_guard<std::mutex> lock(context->_mutex);
+    //std::lock_guard<std::mutex> lock(context->_mutex);
+    pthread_mutex_lock(&shmMutex);
 
     cloudPtr cloudOut(new pcl::PointCloud<T>());
 
@@ -431,6 +446,7 @@ void ShmPointCloud<T>::onData(shmdata_any_reader_t* reader, void* shmbuf, void* 
     }
     else
     {
+        pthread_mutex_unlock(&shmMutex);
         return;
     }
 
@@ -438,6 +454,8 @@ void ShmPointCloud<T>::onData(shmdata_any_reader_t* reader, void* shmbuf, void* 
     context->_updated = true;
 
     shmdata_any_reader_free(shmbuf);
+
+    pthread_mutex_unlock(&shmMutex);
 }
 
 #endif // SHMPOINTCLOUD_H

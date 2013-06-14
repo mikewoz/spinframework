@@ -78,10 +78,10 @@ namespace spin
 // constructor:
 PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(this->getID() + ".PointCloud");
-	this->setNodeType("PointCloud");
+    this->setName(this->getID() + ".PointCloud");
+    this->setNodeType("PointCloud");
 
-	drawMode_ = POINTS;
+    drawMode_ = POINTS;
     
     updateFlag_ = false;
     redrawFlag_ = false;
@@ -101,9 +101,6 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     modulatePointSize_ = 0;
     
 #ifdef WITH_PCL
-	#ifdef WITH_SHAREDVIDEO
-	//shmReader_ = 0;
-	#endif
     grabber_ = 0;
     decoder_ = new pcl::io::OctreePointCloudCompression< pcl::PointXYZRGBA >();
 #endif
@@ -119,14 +116,14 @@ PointCloud::~PointCloud()
         grabber_->stop();
         grabber_ = 0;
     }
-    
-	#ifdef WITH_SHAREDVIDEO
-    if (shmPointCloud_.get())
+#ifdef WITH_SHAREDVIDEO
+    shmIsRunning = false;
+    if (shmThreadID_ != 0)
     {
-        shmIsRunning = false;
-        shmThread_->join();
+        pthread_join(shmThreadID_, NULL);
+        shmThreadID_ = 0;
     }
-    #endif
+#endif
 #endif
 }
 // -----------------------------------------------------------------------------
@@ -607,6 +604,41 @@ void PointCloud::draw()
     this->getAttachmentNode()->addChild(cloudGroup_.get());
 }
 
+#ifdef WITH_SHAREDVIDEO
+// here are some typedef'd function pointers which allow us to pass a member
+// function pointer instead of the traditional static thread function when
+// we call pthread_create:
+typedef void* (PointCloud::*shmThreadPtr)(void*);
+typedef void* (*PthreadPtr)(void*);
+
+// and here is the actual member thread function
+void *PointCloud::shmThread(void*)
+{
+    struct timespec sleepTime;
+    sleepTime.tv_sec = 0;
+    sleepTime.tv_nsec = 1e5;
+
+    shmIsRunning = true;
+    while (shmIsRunning)
+    {
+        if (shmPointCloud_->isUpdated())
+        {
+            pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
+            shmPointCloud_->getCloud(cloudOut);
+
+            //std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+            applyFilters(cloudOut);
+
+            updateFlag_ = true;
+        }
+        nanosleep(&sleepTime, NULL);
+    }
+
+    delete shmPointCloud_;
+    return 0;
+}
+#endif
+
 #endif
 
 
@@ -636,12 +668,17 @@ void PointCloud::setURI(const char* filename)
         grabber_->stop();
         grabber_ = 0;
     }
+
 #ifdef WITH_SHAREDVIDEO
-	//if (shmReader_)
-	//{
-	//	shmdata_any_reader_close(shmReader_);
-	//	shmReader_ = 0;
-	//}
+    if (shmIsRunning)
+    {
+        shmIsRunning = false;
+        if (shmThreadID_ != 0)
+        {
+            pthread_join(shmThreadID_, NULL);
+            shmThreadID_ = 0;
+        }
+    }
 #endif
 	
     cloudOrig_.reset();
@@ -658,55 +695,42 @@ void PointCloud::setURI(const char* filename)
         return;
     }
 
-	else if (std::string(path_).find("shm://") != std::string::npos)
-	{
+    else if (std::string(path_).find("shm://") != std::string::npos)
+    {
+        maxPoints_ = 76800;
 		
-		std::string shmPath = path_.substr(6);
-		std::cout << "Connecting to shmdata path: " << shmPath << std::endl;
-		
+        std::string shmPath = path_.substr(6);
+        std::cout << "Connecting to shmdata path: " << shmPath << std::endl;
+
 #ifdef WITH_SHAREDVIDEO
-		//shmReader_ = shmdata_any_reader_init();
-		//if (1)//(verbose)
-		//	shmdata_any_reader_set_debug(shmReader_, SHMDATA_ENABLE_DEBUG);
-		//else
-		//	shmdata_any_reader_set_debug(shmReader_, SHMDATA_DISABLE_DEBUG);
+        
+        //shmPointCloud_.reset(new ShmPointCloud<pcl::PointXYZRGBA>(shmPath.c_str(), false));
+        shmPointCloud_ = new ShmPointCloud<pcl::PointXYZRGBA>(shmPath.c_str(), false);
 
-		//shmdata_any_reader_set_on_data_handler(shmReader_, &PointCloud::shmCallback, this);
-  		//shmdata_any_reader_set_data_type(shmReader_, "application/x-pcd-compressed");
-  		//shmdata_any_reader_start(shmReader_, shmPath.c_str());
-
-        shmPointCloud_.reset(new ShmPointCloud<pcl::PointXYZRGBA>(shmPath.c_str(), false));
-
-        // We create a thread to handle the clouds from the shmData
-        shmIsRunning = true;
-        shmThread_.reset(new std::thread([&] ()
+        // create a thread to handle the clouds from the shmData
+        shmThreadPtr t = &PointCloud::shmThread;
+        PthreadPtr p = *(PthreadPtr*)&t;
+        
+        success = true;
+        if (pthread_attr_init(&shmThreadAttr_) < 0)
         {
-            struct timespec sleepTime;
-            sleepTime.tv_sec = 0;
-            sleepTime.tv_nsec = 1e5;
-
-            while (shmIsRunning)
-            {
-                if (shmPointCloud_->isUpdated())
-                {
-                    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
-                    shmPointCloud_->getCloud(cloudOut);
-
-                    //std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
-    		        applyFilters(cloudOut);
-
-                    updateFlag_ = true;
-                }
-
-                nanosleep(&sleepTime, NULL);
-            }
-        } ));
+            std::cout << "PointCloud: could not prepare shmThread" << std::endl;
+            success = false;
+        }
+        if (pthread_attr_setdetachstate(&shmThreadAttr_, PTHREAD_CREATE_JOINABLE) < 0)
+        {
+            std::cout << "PointCloud: could not set state for shmThread" << std::endl;
+            success = false;
+        }
+        if (pthread_create( &shmThreadID_, &shmThreadAttr_, p, this) < 0)
+        {
+            std::cout << "PointCloud: could not create shmThread" << std::endl;
+            success = false;
+        }
 
 #endif
+    }
 
-		maxPoints_ = 76800;
-		success = true;
-	}
     else if (std::string(path_).find("kinect://") != std::string::npos)
     {
         // Kinect or any other dynamic point cloud needs to reserve a maximum

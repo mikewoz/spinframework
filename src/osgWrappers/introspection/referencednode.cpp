@@ -169,6 +169,11 @@ BEGIN_VALUE_REFLECTOR(spin::ReferencedNode)
 	          __void__setParam__C5_char_P1__float,
 	          "",
 	          "");
+	I_Method3(void, sendEvent, IN, const char *, types, IN, lo_arg **, argv, IN, int, argc,
+	          Properties::VIRTUAL,
+	          __void__sendEvent__C5_char_P1__lo_arg_P1P1__int,
+	          "",
+	          "");
 	I_Method1(void, setStateSetFromFile, IN, const char *, filename,
 	          Properties::NON_VIRTUAL,
 	          __void__setStateSetFromFile__C5_char_P1,

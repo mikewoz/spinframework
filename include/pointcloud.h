@@ -46,7 +46,7 @@
 
 #include <memory>
 #ifdef WITH_SHAREDVIDEO
-#include <thread>
+//#include <thread>
 #endif
 
 #include <osg/PositionAttitudeTransform>
@@ -83,6 +83,8 @@ namespace spin
  * data
  */
 
+
+
 class PointCloud : public GroupNode
 {
 
@@ -109,6 +111,8 @@ public:
     //     int data_size,
     //     unsigned long long timestamp,
     //     const char *type_description, void *user_data);
+
+    void *shmThread(void*);
 #endif
 	
     void grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &cloud);
@@ -172,9 +176,11 @@ private:
 #endif
 
 #ifdef WITH_SHAREDVIDEO
-	//shmdata_any_reader_t *shmReader_;
-    std::shared_ptr<ShmPointCloud<pcl::PointXYZRGBA>> shmPointCloud_;
-    std::shared_ptr<std::thread> shmThread_;
+    //std::shared_ptr<ShmPointCloud<pcl::PointXYZRGBA>> shmPointCloud_;
+    //std::shared_ptr<std::thread> shmThread_;
+    ShmPointCloud<pcl::PointXYZRGBA> *shmPointCloud_;
+    pthread_t shmThreadID_;
+    pthread_attr_t shmThreadAttr_;
     bool shmIsRunning;
 #endif
 	

@@ -50,6 +50,8 @@ BEGIN_ENUM_REFLECTOR(spin::CollisionShape::ConstraintType)
 	I_EnumLabel(spin::CollisionShape::HINGE);
 END_REFLECTOR
 
+TYPE_NAME_ALIAS(std::map< std::string COMMA  int >, spin::CollisionShape::Colliders)
+
 TYPE_NAME_ALIAS(std::map< std::string COMMA  btTypedConstraint * >, spin::CollisionShape::btConstraints)
 
 BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
@@ -127,6 +129,16 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	I_Method0(float, getRollingFriction,
 	          Properties::NON_VIRTUAL,
 	          __float__getRollingFriction,
+	          "",
+	          "");
+	I_Method1(void, setWindFactor, IN, float, f,
+	          Properties::NON_VIRTUAL,
+	          __void__setWindFactor__float,
+	          "",
+	          "");
+	I_Method0(float, getWindFactor,
+	          Properties::NON_VIRTUAL,
+	          __float__getWindFactor,
 	          "",
 	          "");
 	I_MethodWithDefaults3(void, reportContact, IN, btManifoldPoint &, cp, , IN, const btCollisionObject *, otherObj, , IN, bool, swap, false,
@@ -251,8 +263,14 @@ BEGIN_OBJECT_REFLECTOR(spin::CollisionShape)
 	I_SimpleProperty(std::vector< lo_message >, State, 
 	                 __std_vectorT1_lo_message___getState, 
 	                 0);
+	I_SimpleProperty(float, WindFactor, 
+	                 __float__getWindFactor, 
+	                 __void__setWindFactor__float);
+	I_PublicMemberProperty(spin::CollisionShape::Colliders, colliders_);
 	I_PublicMemberProperty(osg::Vec3, collisionOffset_);
 END_REFLECTOR
 
 STD_MAP_REFLECTOR(std::map< std::string COMMA  btTypedConstraint * >)
+
+STD_MAP_REFLECTOR(std::map< std::string COMMA  int >)
 
