@@ -259,7 +259,7 @@ else
     have_poco=false
 fi
 
-PKG_CHECK_MODULES(SPATOSC, spatosc-0.4, have_spatosc=true, have_spatosc=false)
+PKG_CHECK_MODULES(SPATOSC, spatosc-0.6, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
     AC_MSG_WARN([missing package: libspatosc-dev])
 else
