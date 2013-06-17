@@ -65,7 +65,7 @@ On Ubuntu GNU/Linux Precise LTS 12.04::
     sudo apt-get -y install libpoco-dev
     sudo apt-get -y install ffmpeg
     sudo apt-get -y install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
-    sudo apt-get -y install libshmdata-0.6-dev
+    sudo apt-get -y install libshmdata-0.8-dev
     sudo apt-get -y install libpcl-1.6-all
     sudo apt-get -y install libtinyxml-dev
 
@@ -109,5 +109,5 @@ Linking to SPIN
 ---------------
 To build a C++ that is linked to the SPIN library, use the following flags::
 
-  `pkg-config --libs --cflags spin-0.3 cppintrospection-3.0` -I/usr/include/python2.7
+  `pkg-config --libs --cflags spin-1.0 cppintrospection-3.0` -I/usr/include/python2.7
 
