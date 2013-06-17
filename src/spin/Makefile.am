@@ -106,11 +106,13 @@ libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/animationnode.h \
     $(top_srcdir)/include/attractornode.h \
     $(top_srcdir)/include/compositeviewer.h \
+    $(top_srcdir)/include/config.h \
     $(top_srcdir)/include/constraintsnode.h \
     $(top_srcdir)/include/contour.h \
-    $(top_srcdir)/include/dspnode.h \
+    $(top_srcdir)/include/dofppu.h \
     $(top_srcdir)/include/draggertrackball.h \
     $(top_srcdir)/include/draggerwith3axes.h \
+    $(top_srcdir)/include/dspnode.h \
     $(top_srcdir)/include/eventhandler.h \
     $(top_srcdir)/include/eventtypes.h \
     $(top_srcdir)/include/fog.h \
@@ -118,14 +120,23 @@ libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/gridnode.h \
     $(top_srcdir)/include/groupnode.h \
     $(top_srcdir)/include/imagetexture.h \
-    $(top_srcdir)/include/kinectcloud.h \
-    $(top_srcdir)/include/lodnode.h \
+    $(top_srcdir)/include/introspect_helpers.h \
+    $(top_srcdir)/include/libloutil.h \
     $(top_srcdir)/include/lightsource.h \
     $(top_srcdir)/include/listener.h \
+    $(top_srcdir)/include/lodnode.h \
+    $(top_srcdir)/include/mainpage.h \
+    $(top_srcdir)/include/maskppu.h \
     $(top_srcdir)/include/menu3d.h \
     $(top_srcdir)/include/modelnode.h \
+    $(top_srcdir)/include/motionblurppu.h \
+    $(top_srcdir)/include/nodevisitors.h \
+    $(top_srcdir)/include/oscparser.h \
+    $(top_srcdir)/include/osgutil.h \
+    $(top_srcdir)/include/outlineppu.h \
     $(top_srcdir)/include/particlesystem.h \
     $(top_srcdir)/include/particlesystemutil.h \
+    $(top_srcdir)/include/pocoutil.h \
     $(top_srcdir)/include/pointcloud.h \
     $(top_srcdir)/include/pointernode.h \
     $(top_srcdir)/include/raynode.h \
@@ -134,29 +145,13 @@ libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/reporternode.h \
     $(top_srcdir)/include/scenemanager.h \
     $(top_srcdir)/include/shader.h \
+    $(top_srcdir)/include/shaderppu.h \
     $(top_srcdir)/include/shaderutil.h \
     $(top_srcdir)/include/shapenode.h \
     $(top_srcdir)/include/sharedvideotexture.h \
+    $(top_srcdir)/include/shmpointcloud.h \
     $(top_srcdir)/include/soundnode.h \
     $(top_srcdir)/include/soundspace.h \
-    $(top_srcdir)/include/switchnode.h \
-    $(top_srcdir)/include/syphontexture.h \
-    $(top_srcdir)/include/textnode.h \
-    $(top_srcdir)/include/usernode.h \
-    $(top_srcdir)/include/videotexture.h \
-    $(top_srcdir)/include/viewermanipulator.h \
-    $(top_srcdir)/include/config.h \
-    $(top_srcdir)/include/dofppu.h \
-    $(top_srcdir)/include/introspect_helpers.h \
-    $(top_srcdir)/include/libloutil.h \
-    $(top_srcdir)/include/mainpage.h \
-    $(top_srcdir)/include/maskppu.h \
-    $(top_srcdir)/include/motionblurppu.h \
-    $(top_srcdir)/include/nodevisitors.h \
-    $(top_srcdir)/include/oscparser.h \
-    $(top_srcdir)/include/osgutil.h \
-    $(top_srcdir)/include/outlineppu.h \
-    $(top_srcdir)/include/pocoutil.h \
     $(top_srcdir)/include/spinapp.h \
     $(top_srcdir)/include/spinbasecontext.h \
     $(top_srcdir)/include/spinclientcontext.h \
@@ -167,8 +162,12 @@ libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
     $(top_srcdir)/include/spinutil.h \
     $(top_srcdir)/include/spinwx.h \
     $(top_srcdir)/include/ssaoppu.h \
-    $(top_srcdir)/include/util.h \
-    $(top_srcdir)/include/videosize.h
+    $(top_srcdir)/include/switchnode.h \
+    $(top_srcdir)/include/syphontexture.h \
+    $(top_srcdir)/include/textnode.h \
+    $(top_srcdir)/include/usernode.h \
+    $(top_srcdir)/include/videotexture.h \
+    $(top_srcdir)/include/viewermanipulator.h
 
 if HAVE_PYTHON
 spinframework_la_LDFLAGS = -module

@@ -1,9 +1,9 @@
 // TODO: add prefix to those - again?
-#include <spinUtil.h>
-#include <spinApp.h>
-#include <spinClientContext.h>
-#include <spinServerContext.h>
-#include <ShapeNode.h>
+#include <spinutil.h>
+#include <spinapp.h>
+#include <spinclientcontext.h>
+#include <spinservercontext.h>
+#include <shapenode.h>
 
 #include <iostream>
 #include <cstdlib>
