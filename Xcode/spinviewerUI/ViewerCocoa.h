@@ -50,7 +50,7 @@
 
 
 #import <Cocoa/Cocoa.h>
-#include "spinClientContext.h"
+#include "spinclientcontext.h"
 
 namespace osgViewer
 {

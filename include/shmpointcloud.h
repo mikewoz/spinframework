@@ -88,21 +88,12 @@ void NetworkPointCloudCompression<PointT, LeafT, BranchT, OctreeT>::decodeNetwor
     try
     {
         this->decodePointCloud(compressedTreeDataIn_arg, tempCloud);
-#if IS_OSX
-        if (this->frameID_ == prevValidFrame_+1 || this->iFrame_ == true)
-        {
-            validFrame_ = tempCloud;
-            prevValidFrame_ = this->frameID_;
-            firstFrame_ = false;
-        }
-#else
         if (this->frame_ID_ == prevValidFrame_+1 || this->i_frame_ == true)
         {
             validFrame_ = tempCloud;
             prevValidFrame_ = this->frame_ID_;
             firstFrame_ = false;
         }
-#endif
     }
     catch (...)
     {

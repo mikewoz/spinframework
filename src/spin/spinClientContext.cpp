@@ -275,7 +275,7 @@ void *spinClientContext::spinClientThread(void *arg)
 #ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
-    std::string cmd = "sys.path.append('" + spin.sceneManager_->resourcesPath + "/scripts')";
+    std::string cmd = "sys.path.append('" + spin.getResourcesPath() + "/scripts')";
 
     spin.execPython(cmd);
     spin.execPython("import spin");

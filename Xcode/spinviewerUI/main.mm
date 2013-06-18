@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
      
     // Manually load libSPIN in order to have the RTLD_GLOBAL flag for the
     // externs and singleton? Do we need to do this?
-    NSString *dylibPath = [[[NSBundle mainBundle] privateFrameworksPath] stringByAppendingPathComponent:@"libSPIN.dylib"];
+    NSString *dylibPath = [[[NSBundle mainBundle] privateFrameworksPath] stringByAppendingPathComponent:@"libspinframework-1.0.0.dylib"];
     const char *libPath = [[dylibPath stringByResolvingSymlinksInPath] cStringUsingEncoding:NSUTF8StringEncoding];
     void *dl = dlopen(libPath, RTLD_NOW|RTLD_GLOBAL);
     const char *dlErr = dlerror();
@@ -63,6 +63,9 @@ int main(int argc, char *argv[])
     }
     
     spin::spinApp &spin = spin::spinApp::Instance();
+    
+    // set relative resources path within .app bundle
+    spin::spinApp::Instance().setResourcesPath("../Resources");
     
     SpinViewerAppDelegate *delegate = [[SpinViewerAppDelegate alloc] init];
     [NSApplication sharedApplication];

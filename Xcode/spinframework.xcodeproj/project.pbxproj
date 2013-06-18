@@ -122,56 +122,10 @@
 		1C1EF4FF1648465600838809 /* libtinyxml.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C1EF4FA164843EB00838809 /* libtinyxml.dylib */; };
 		1C1EF5001648465700838809 /* libtinyxml.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C1EF4FA164843EB00838809 /* libtinyxml.dylib */; };
 		1C25F51314E57CD2007F97E5 /* pointcloud.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C25F51214E57CD2007F97E5 /* pointcloud.h */; };
-		1C2C700A163F01D10017F484 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
-		1C2C700B163F01D20017F484 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
-		1C2C700C163F01D20017F484 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
-		1C2C700D163F01D30017F484 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
-		1C2C700E163F01D30017F484 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
-		1C2C7010163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
-		1C2C7011163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
-		1C2C7012163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
-		1C2C7013163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
-		1C2C7014163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
-		1C2C7015163F02180017F484 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
-		1C2C7016163F02180017F484 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
-		1C2C7017163F02190017F484 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
-		1C2C7018163F021A0017F484 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
-		1C2C7019163F021A0017F484 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
-		1C2C701A163F024E0017F484 /* libboost_filesystem-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
-		1C2C701B163F024E0017F484 /* libboost_thread-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
-		1C2C701C163F024E0017F484 /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
-		1C2C701D163F027F0017F484 /* libboost_filesystem-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
-		1C2C701E163F027F0017F484 /* libboost_thread-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
-		1C2C701F163F027F0017F484 /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
-		1C2C7022163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
-		1C2C7023163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
-		1C2C7024163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
-		1C2C7025163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
-		1C2C7026163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
-		1C2C7027163F02EF0017F484 /* libboost_iostreams-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
-		1C2C7028163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
-		1C2C7029163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
-		1C2C702A163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
-		1C2C702B163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
-		1C2C702C163F03060017F484 /* libboost_date_time-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
-		1C2C702D163F03060017F484 /* libboost_iostreams-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
-		1C2C702E163F030C0017F484 /* libboost_date_time-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
-		1C2C702F163F030C0017F484 /* libboost_iostreams-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
-		1C2C7031163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
-		1C2C7032163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
-		1C2C7033163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
-		1C2C7034163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
-		1C2C7035163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
-		1C2C7036163F0DB80017F484 /* libboost_chrono-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
-		1C2C7037163F0DCD0017F484 /* libboost_chrono-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
 		1C2C7043163F19450017F484 /* libOpenNI.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7041163F19450017F484 /* libOpenNI.dylib */; };
 		1C2C7044163F19450017F484 /* libOpenNI.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7041163F19450017F484 /* libOpenNI.dylib */; };
 		1C2C7045163F19590017F484 /* libOpenNI.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7041163F19450017F484 /* libOpenNI.dylib */; };
 		1C2C7046163F19600017F484 /* libOpenNI.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7041163F19450017F484 /* libOpenNI.dylib */; };
-		1C2C705D163F1ECD0017F484 /* libflann_cpp.1.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C705C163F1ECD0017F484 /* libflann_cpp.1.7.dylib */; };
-		1C2C705E163F1ECD0017F484 /* libflann_cpp.1.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C705C163F1ECD0017F484 /* libflann_cpp.1.7.dylib */; };
-		1C2C7060163F1EE90017F484 /* libflann_cpp.1.7.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C705C163F1ECD0017F484 /* libflann_cpp.1.7.dylib */; };
-		1C2C7061163F1EF00017F484 /* libflann_cpp.1.7.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C705C163F1ECD0017F484 /* libflann_cpp.1.7.dylib */; };
 		1C2C7068163F21470017F484 /* liblo.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; };
 		1C2C7069163F21470017F484 /* liblo.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; };
 		1C2C706A163F21480017F484 /* liblo.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; };
@@ -189,8 +143,6 @@
 		1C34AE4914DB4A3B001DF418 /* GeometryNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C34AE4814DB4A3B001DF418 /* GeometryNode.cpp */; };
 		1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
-		1C34AE5414DCFBA1001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */; };
-		1C34AE5514DCFBA9001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */; };
 		1C386CB014BD3DF60065851F /* AnimationNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8614BD3DF60065851F /* AnimationNode.cpp */; };
 		1C386CB114BD3DF60065851F /* AttractorNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8714BD3DF60065851F /* AttractorNode.cpp */; };
 		1C386CB214BD3DF60065851F /* ConstraintsNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C386C8814BD3DF60065851F /* ConstraintsNode.cpp */; };
@@ -308,7 +260,7 @@
 		1C7EDA08165170910071459B /* libpcl_common.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9AC1651705B0071459B /* libpcl_common.1.7.0.dylib */; };
 		1C7EDA09165170910071459B /* libpcl_filters.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9AE1651705B0071459B /* libpcl_filters.1.7.0.dylib */; };
 		1C7EDA0A165170910071459B /* libpcl_io_ply.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9B01651705B0071459B /* libpcl_io_ply.1.7.0.dylib */; };
-		1C7EDA0B165170910071459B /* libpcl_io.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9B11651705B0071459B /* libpcl_io.1.7.0.dylib */; };
+		1C7EDA0B165170910071459B /* libpcl_io.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9B11651705B0071459B /* libpcl_io.1.7.0.dylib */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1C7EDA0C165170910071459B /* libpcl_kdtree.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9B21651705B0071459B /* libpcl_kdtree.1.7.0.dylib */; };
 		1C7EDA0D165170910071459B /* libpcl_octree.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9B41651705B0071459B /* libpcl_octree.1.7.0.dylib */; };
 		1C7EDA0E165170910071459B /* libpcl_sample_consensus.1.7.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7ED9B61651705B0071459B /* libpcl_sample_consensus.1.7.0.dylib */; };
@@ -647,7 +599,6 @@
 		1C87601914C9BE3200A46EBC /* spinserver.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FCA14C9BE3200A46EBC /* spinserver.png */; };
 		1C87601A14C9BE3200A46EBC /* spinviewer.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FCB14C9BE3200A46EBC /* spinviewer.png */; };
 		1C87601B14C9BE3200A46EBC /* spinviewer.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C875FCB14C9BE3200A46EBC /* spinviewer.png */; };
-		1C87601D14CA65DA00A46EBC /* libSPIN.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1C90C15914CBB35000C929AE /* icon_fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C15814CBB35000C929AE /* icon_fullscreen.png */; };
 		1C90C15A14CBB35000C929AE /* icon_fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C15814CBB35000C929AE /* icon_fullscreen.png */; };
 		1C90C15F14CBB89C00C929AE /* spinCocoaWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1C90C15E14CBB89C00C929AE /* spinCocoaWrapper.mm */; };
@@ -655,20 +606,12 @@
 		1C90C16214CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C16114CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png */; };
 		1C90C16314CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png in Resources */ = {isa = PBXBuildFile; fileRef = 1C90C16114CBBFA800C929AE /* icon_toolbar_refresh_subscribers.png */; };
 		1C90C16F14CCCD0100C929AE /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
-		1C94DEC214BFEC2D006394AD /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
-		1C94DEC814BFEC2E006394AD /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
 		1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C94DED114C00250006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C94DED314C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C94DED414C00252006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
 		1C94DED514C00548006394AD /* libcppintrospection-3.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DECF14C00242006394AD /* libcppintrospection-3.0.0.dylib */; };
-		1C94DEDF14C0BEF6006394AD /* libSPIN.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
-		1C9C082C14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */; };
-		1C9C082D14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */; };
-		1C9C082E14D07661006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */; };
-		1C9C082F14D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */; };
-		1C9C083014D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */; };
 		1CA24C2D14BE52B50023DD8B /* spin.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F114BE361B00DCA0B7 /* spin.icns */; };
 		1CA24C9114BE5AAA0023DD8B /* liblo.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
 		1CA24C9A14BE5AAC0023DD8B /* liblo.7.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CA24C2714BE514E0023DD8B /* liblo.7.dylib */; };
@@ -742,8 +685,6 @@
 		1CA24DD314BE2892007A9C31 /* switchnode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24D9F14BE2892007A9C31 /* switchnode.h */; };
 		1CA24DD414BE2892007A9C31 /* textnode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24DA014BE2892007A9C31 /* textnode.h */; };
 		1CA24DD514BE2892007A9C31 /* usernode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24DA114BE2892007A9C31 /* usernode.h */; };
-		1CA24DD614BE2892007A9C31 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24DA214BE2892007A9C31 /* util.h */; };
-		1CA24DD714BE2892007A9C31 /* videosize.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24DA314BE2892007A9C31 /* videosize.h */; };
 		1CA24DD814BE2892007A9C31 /* videotexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24DA414BE2892007A9C31 /* videotexture.h */; };
 		1CA24DD914BE2892007A9C31 /* viewermanipulator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CA24DA514BE2892007A9C31 /* viewermanipulator.h */; };
 		1CA24DF714BE2D3C007A9C31 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C9EE82C14BE2725000976A6 /* Cocoa.framework */; };
@@ -761,11 +702,9 @@
 		1CCCA0E714BE334D00DCA0B7 /* ViewerCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0E614BE334D00DCA0B7 /* ViewerCocoa.mm */; };
 		1CCCA0ED14BE34D000DCA0B7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0EB14BE34D000DCA0B7 /* Localizable.strings */; };
 		1CCCA0EF14BE353100DCA0B7 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CCCA0EE14BE353100DCA0B7 /* OpenGL.framework */; };
-		1CCCA0F014BE353500DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1CCCA0F414BE36CF00DCA0B7 /* spinViewer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F314BE36CE00DCA0B7 /* spinViewer.icns */; };
 		1CCCA0F614BE389B00DCA0B7 /* spinViewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA0F514BE389B00DCA0B7 /* spinViewer.cpp */; };
 		1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
-		1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C386C7D14BD3CBD0065851F /* libSPIN.dylib */; };
 		1CD065FA160780CE00D2DBE2 /* lodnode.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CD065F9160780CE00D2DBE2 /* lodnode.h */; };
 		1CD065FD160780E500D2DBE2 /* LODNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD065FC160780E500D2DBE2 /* LODNode.cpp */; };
 		1CD065FF160787F000D2DBE2 /* LODNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CD065FE160787F000D2DBE2 /* LODNode.cpp */; };
@@ -779,6 +718,75 @@
 		1CDDB28F1551AE2800A45ADA /* SyphonTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */; };
 		1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
 		1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */; };
+		1CE5B22B1770022F00AD3AC7 /* libspinframework-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B22A1770022F00AD3AC7 /* libspinframework-1.0.0.dylib */; };
+		1CE5B22C1770022F00AD3AC7 /* libspinframework-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B22A1770022F00AD3AC7 /* libspinframework-1.0.0.dylib */; };
+		1CE5B2311770041D00AD3AC7 /* libflann_cpp.1.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2301770041D00AD3AC7 /* libflann_cpp.1.8.dylib */; };
+		1CE5B2321770041D00AD3AC7 /* libflann_cpp.1.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2301770041D00AD3AC7 /* libflann_cpp.1.8.dylib */; };
+		1CE5B2331770062200AD3AC7 /* libspinframework-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B22A1770022F00AD3AC7 /* libspinframework-1.0.0.dylib */; };
+		1CE5B2341770063F00AD3AC7 /* libspinframework-1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B22A1770022F00AD3AC7 /* libspinframework-1.0.0.dylib */; };
+		1CE5B26817700C3600AD3AC7 /* libboost_filesystem-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
+		1CE5B26917700C3600AD3AC7 /* libboost_chrono-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
+		1CE5B26A17700C3600AD3AC7 /* libboost_thread-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
+		1CE5B26B17700C3600AD3AC7 /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
+		1CE5B26C17700C3600AD3AC7 /* libboost_date_time-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
+		1CE5B26D17700C3600AD3AC7 /* libboost_iostreams-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
+		1CE5B26E17700C3600AD3AC7 /* libboost_python-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
+		1CE5B27617700C4C00AD3AC7 /* libboost_filesystem-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
+		1CE5B27717700C4C00AD3AC7 /* libboost_chrono-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
+		1CE5B27817700C4C00AD3AC7 /* libboost_thread-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
+		1CE5B27917700C4C00AD3AC7 /* libboost_system-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
+		1CE5B27A17700C4C00AD3AC7 /* libboost_date_time-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
+		1CE5B27B17700C4C00AD3AC7 /* libboost_iostreams-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
+		1CE5B27C17700C4C00AD3AC7 /* libboost_python-mt.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
+		1CE5B27D17700D5800AD3AC7 /* libflann_cpp.1.8.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2301770041D00AD3AC7 /* libflann_cpp.1.8.dylib */; };
+		1CE5B27E17700D6A00AD3AC7 /* libflann_cpp.1.8.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2301770041D00AD3AC7 /* libflann_cpp.1.8.dylib */; };
+		1CE5B28C177010ED00AD3AC7 /* GStreamer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B28B177010ED00AD3AC7 /* GStreamer.framework */; };
+		1CE5B28D177010ED00AD3AC7 /* GStreamer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B28B177010ED00AD3AC7 /* GStreamer.framework */; };
+		1CE5B28E177010ED00AD3AC7 /* GStreamer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B28B177010ED00AD3AC7 /* GStreamer.framework */; };
+		1CE5B28F177010ED00AD3AC7 /* GStreamer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B28B177010ED00AD3AC7 /* GStreamer.framework */; };
+		1CE5B290177010ED00AD3AC7 /* GStreamer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B28B177010ED00AD3AC7 /* GStreamer.framework */; };
+		1CE5B2931770281000AD3AC7 /* libboost_filesystem-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C87601E14CA6E8C00A46EBC /* libboost_filesystem-mt.dylib */; };
+		1CE5B2941770281000AD3AC7 /* libboost_chrono-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */; };
+		1CE5B2951770281000AD3AC7 /* libboost_thread-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C700F163F020E0017F484 /* libboost_thread-mt.dylib */; };
+		1CE5B2961770281000AD3AC7 /* libboost_system-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEBE14BFEC07006394AD /* libboost_system-mt.dylib */; };
+		1CE5B2971770281000AD3AC7 /* libboost_date_time-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */; };
+		1CE5B2981770281000AD3AC7 /* libboost_iostreams-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */; };
+		1CE5B2991770281000AD3AC7 /* libboost_python-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */; };
+		1CE5B2A21770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */; };
+		1CE5B2A31770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */; };
+		1CE5B2A41770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */; };
+		1CE5B2A51770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */; };
+		1CE5B2A61770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */; };
+		1CE5B2A71770303F00AD3AC7 /* libspatosc-0.6.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */; };
+		1CE5B2A81770304600AD3AC7 /* libspatosc-0.6.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */; };
+		1CE5B2AF1770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */; };
+		1CE5B2B01770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */; };
+		1CE5B2B11770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */; };
+		1CE5B2B21770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */; };
+		1CE5B2B31770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */; };
+		1CE5B2B41770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */; };
+		1CE5B2B51770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */; };
+		1CE5B2B61770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */; };
+		1CE5B2B71770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */; };
+		1CE5B2B81770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */; };
+		1CE5B2B91770AC3200AD3AC7 /* libshmdata-any-0.8.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */; };
+		1CE5B2BA1770AC3500AD3AC7 /* libshmdata-osg-0.8.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */; };
+		1CE5B2BB1770AC3B00AD3AC7 /* libshmdata-any-0.8.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */; };
+		1CE5B2BC1770AC3E00AD3AC7 /* libshmdata-osg-0.8.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */; };
+		1CE5B2C21770AE7100AD3AC7 /* libosgTerrain.93.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C7EDBCD16518EDB0071459B /* libosgTerrain.93.dylib */; };
+		1CE5B2C31770AF6B00AD3AC7 /* libosgTerrain.93.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C7EDBCD16518EDB0071459B /* libosgTerrain.93.dylib */; };
+		1CE5B2C41770AF7900AD3AC7 /* libosgTerrain.93.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C7EDBCD16518EDB0071459B /* libosgTerrain.93.dylib */; };
+		1CE5B2C51770B05000AD3AC7 /* libosgWidget.93.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C7EDBD216518EDB0071459B /* libosgWidget.93.dylib */; };
+		1CE5B2C61770B05600AD3AC7 /* libosgWidget.93.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C7EDBD216518EDB0071459B /* libosgWidget.93.dylib */; };
+		1CE5B2C71770B08000AD3AC7 /* libosgVolume.93.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C7EDBD116518EDB0071459B /* libosgVolume.93.dylib */; };
+		1CE5B2C81770B08600AD3AC7 /* libosgVolume.93.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1C7EDBD116518EDB0071459B /* libosgVolume.93.dylib */; };
+		1CE5B2D01770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */; };
+		1CE5B2D11770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */; };
+		1CE5B2D21770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */; };
+		1CE5B2D31770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */; };
+		1CE5B2D41770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */; };
+		1CE5B2D51770B29E00AD3AC7 /* libshmdata-0.8.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */; };
+		1CE5B2D61770B2A400AD3AC7 /* libshmdata-0.8.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */; };
 		1CF94951151CD40500628872 /* particlesystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1CF94950151CD40500628872 /* particlesystem.h */; };
 		1CF94954151CD41F00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94953151CD41F00628872 /* ParticleSystem.cpp */; };
 		1CF94956151CD43C00628872 /* ParticleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1CF94955151CD43C00628872 /* ParticleSystem.cpp */; };
@@ -961,7 +969,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1C87601D14CA65DA00A46EBC /* libSPIN.dylib in CopyFiles */,
+				1CE5B2331770062200AD3AC7 /* libspinframework-1.0.0.dylib in CopyFiles */,
+				1CE5B2A81770304600AD3AC7 /* libspatosc-0.6.0.dylib in CopyFiles */,
 				1C7EDBC116518E9B0071459B /* libOpenThreads.12.dylib in CopyFiles */,
 				1C7EDC2E16518F100071459B /* libosg.93.dylib in CopyFiles */,
 				1C7EDC2F16518F100071459B /* libosgAnimation.93.dylib in CopyFiles */,
@@ -972,20 +981,16 @@
 				1C7EDC3416518F100071459B /* libosgParticle.93.dylib in CopyFiles */,
 				1C7EDC3516518F100071459B /* libosgShadow.93.dylib in CopyFiles */,
 				1C7EDC3E16518F3B0071459B /* libosgSim.93.dylib in CopyFiles */,
+				1CE5B2C41770AF7900AD3AC7 /* libosgTerrain.93.dylib in CopyFiles */,
 				1C7EDC3616518F100071459B /* libosgText.93.dylib in CopyFiles */,
 				1C7EDC3716518F100071459B /* libosgUtil.93.dylib in CopyFiles */,
 				1C7EDC3816518F100071459B /* libosgViewer.93.dylib in CopyFiles */,
+				1CE5B2C71770B08000AD3AC7 /* libosgVolume.93.dylib in CopyFiles */,
+				1CE5B2C61770B05600AD3AC7 /* libosgWidget.93.dylib in CopyFiles */,
 				1C2C706C163F21C20017F484 /* liblo.7.dylib in CopyFiles */,
-				1C34AE5414DCFBA1001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */,
 				1C1EF4FD1648441200838809 /* libtinyxml.dylib in CopyFiles */,
 				1C7267AC14EEF48A00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C875F3C14C8EF4200A46EBC /* libcppintrospection-3.0.0.dylib in CopyFiles */,
-				1C2C701A163F024E0017F484 /* libboost_filesystem-mt.dylib in CopyFiles */,
-				1C2C701B163F024E0017F484 /* libboost_thread-mt.dylib in CopyFiles */,
-				1C2C701C163F024E0017F484 /* libboost_system-mt.dylib in CopyFiles */,
-				1C2C702E163F030C0017F484 /* libboost_date_time-mt.dylib in CopyFiles */,
-				1C2C702F163F030C0017F484 /* libboost_iostreams-mt.dylib in CopyFiles */,
-				1C2C7037163F0DCD0017F484 /* libboost_chrono-mt.dylib in CopyFiles */,
 				1C0A70E815B773290032484A /* libBulletCollision.2.80.dylib in CopyFiles */,
 				1C0A70E915B773290032484A /* libBulletDynamics.2.80.dylib in CopyFiles */,
 				1C0A70EA15B773290032484A /* libBulletSoftBody.2.80.dylib in CopyFiles */,
@@ -994,8 +999,8 @@
 				1C3BDC831635AA2B00E65E8D /* libPocoNet.12.dylib in CopyFiles */,
 				1C3BDC841635AA2B00E65E8D /* libPocoUtil.12.dylib in CopyFiles */,
 				1C3BDC851635AA2B00E65E8D /* libPocoXML.12.dylib in CopyFiles */,
-				1C2C7060163F1EE90017F484 /* libflann_cpp.1.7.dylib in CopyFiles */,
 				1C2C7045163F19590017F484 /* libOpenNI.dylib in CopyFiles */,
+				1CE5B27D17700D5800AD3AC7 /* libflann_cpp.1.8.dylib in CopyFiles */,
 				1C7EDA361651755F0071459B /* libpcl_common.1.7.0.dylib in CopyFiles */,
 				1C7EDA371651755F0071459B /* libpcl_filters.1.7.0.dylib in CopyFiles */,
 				1C7EDA381651755F0071459B /* libpcl_io_ply.1.7.0.dylib in CopyFiles */,
@@ -1005,6 +1010,16 @@
 				1C7EDA3C1651755F0071459B /* libpcl_sample_consensus.1.7.0.dylib in CopyFiles */,
 				1C7EDA3D1651755F0071459B /* libpcl_search.1.7.0.dylib in CopyFiles */,
 				1C7EDBB81651874F0071459B /* libpng15.15.dylib in CopyFiles */,
+				1CE5B27617700C4C00AD3AC7 /* libboost_filesystem-mt.dylib in CopyFiles */,
+				1CE5B27717700C4C00AD3AC7 /* libboost_chrono-mt.dylib in CopyFiles */,
+				1CE5B27817700C4C00AD3AC7 /* libboost_thread-mt.dylib in CopyFiles */,
+				1CE5B27917700C4C00AD3AC7 /* libboost_system-mt.dylib in CopyFiles */,
+				1CE5B27A17700C4C00AD3AC7 /* libboost_date_time-mt.dylib in CopyFiles */,
+				1CE5B27B17700C4C00AD3AC7 /* libboost_iostreams-mt.dylib in CopyFiles */,
+				1CE5B27C17700C4C00AD3AC7 /* libboost_python-mt.dylib in CopyFiles */,
+				1CE5B2D61770B2A400AD3AC7 /* libshmdata-0.8.4.dylib in CopyFiles */,
+				1CE5B2B91770AC3200AD3AC7 /* libshmdata-any-0.8.4.dylib in CopyFiles */,
+				1CE5B2BA1770AC3500AD3AC7 /* libshmdata-osg-0.8.4.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1102,7 +1117,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				1C94DEDF14C0BEF6006394AD /* libSPIN.dylib in CopyFiles */,
+				1CE5B2341770063F00AD3AC7 /* libspinframework-1.0.0.dylib in CopyFiles */,
+				1CE5B2A71770303F00AD3AC7 /* libspatosc-0.6.0.dylib in CopyFiles */,
 				1C7EDBC216518EA00071459B /* libOpenThreads.12.dylib in CopyFiles */,
 				1C7EDC2316518F0B0071459B /* libosg.93.dylib in CopyFiles */,
 				1C7EDC2416518F0B0071459B /* libosgAnimation.93.dylib in CopyFiles */,
@@ -1113,19 +1129,15 @@
 				1C7EDC2916518F0B0071459B /* libosgParticle.93.dylib in CopyFiles */,
 				1C7EDC2A16518F0B0071459B /* libosgShadow.93.dylib in CopyFiles */,
 				1C7EDC3F16518F400071459B /* libosgSim.93.dylib in CopyFiles */,
+				1CE5B2C31770AF6B00AD3AC7 /* libosgTerrain.93.dylib in CopyFiles */,
 				1C7EDC2B16518F0B0071459B /* libosgText.93.dylib in CopyFiles */,
 				1C7EDC2C16518F0B0071459B /* libosgUtil.93.dylib in CopyFiles */,
 				1C7EDC2D16518F0B0071459B /* libosgViewer.93.dylib in CopyFiles */,
+				1CE5B2C81770B08600AD3AC7 /* libosgVolume.93.dylib in CopyFiles */,
+				1CE5B2C51770B05000AD3AC7 /* libosgWidget.93.dylib in CopyFiles */,
 				1C2C706D163F21C90017F484 /* liblo.7.dylib in CopyFiles */,
 				1C1EF4FE1648441A00838809 /* libtinyxml.dylib in CopyFiles */,
 				1C94DED514C00548006394AD /* libcppintrospection-3.0.0.dylib in CopyFiles */,
-				1C34AE5514DCFBA9001DF418 /* libspatosc-0.3.0.dylib in CopyFiles */,
-				1C2C701D163F027F0017F484 /* libboost_filesystem-mt.dylib in CopyFiles */,
-				1C2C701E163F027F0017F484 /* libboost_thread-mt.dylib in CopyFiles */,
-				1C2C701F163F027F0017F484 /* libboost_system-mt.dylib in CopyFiles */,
-				1C2C702C163F03060017F484 /* libboost_date_time-mt.dylib in CopyFiles */,
-				1C2C702D163F03060017F484 /* libboost_iostreams-mt.dylib in CopyFiles */,
-				1C2C7036163F0DB80017F484 /* libboost_chrono-mt.dylib in CopyFiles */,
 				1C7267AB14EEF46E00E3FFAE /* libusb-1.0.0.dylib in CopyFiles */,
 				1C0A70EC15B7732F0032484A /* libBulletCollision.2.80.dylib in CopyFiles */,
 				1C0A70ED15B7732F0032484A /* libBulletDynamics.2.80.dylib in CopyFiles */,
@@ -1135,8 +1147,8 @@
 				1C3BDC8B1635AA3E00E65E8D /* libPocoNet.12.dylib in CopyFiles */,
 				1C3BDC8C1635AA3E00E65E8D /* libPocoUtil.12.dylib in CopyFiles */,
 				1C3BDC8D1635AA3E00E65E8D /* libPocoXML.12.dylib in CopyFiles */,
-				1C2C7061163F1EF00017F484 /* libflann_cpp.1.7.dylib in CopyFiles */,
 				1C2C7046163F19600017F484 /* libOpenNI.dylib in CopyFiles */,
+				1CE5B27E17700D6A00AD3AC7 /* libflann_cpp.1.8.dylib in CopyFiles */,
 				1C7EDA3E165175670071459B /* libpcl_common.1.7.0.dylib in CopyFiles */,
 				1C7EDA3F165175670071459B /* libpcl_filters.1.7.0.dylib in CopyFiles */,
 				1C7EDA40165175670071459B /* libpcl_io_ply.1.7.0.dylib in CopyFiles */,
@@ -1146,6 +1158,16 @@
 				1C7EDA44165175670071459B /* libpcl_sample_consensus.1.7.0.dylib in CopyFiles */,
 				1C7EDA45165175670071459B /* libpcl_search.1.7.0.dylib in CopyFiles */,
 				1C7EDBB9165187590071459B /* libpng15.15.dylib in CopyFiles */,
+				1CE5B26817700C3600AD3AC7 /* libboost_filesystem-mt.dylib in CopyFiles */,
+				1CE5B26917700C3600AD3AC7 /* libboost_chrono-mt.dylib in CopyFiles */,
+				1CE5B26A17700C3600AD3AC7 /* libboost_thread-mt.dylib in CopyFiles */,
+				1CE5B26B17700C3600AD3AC7 /* libboost_system-mt.dylib in CopyFiles */,
+				1CE5B26C17700C3600AD3AC7 /* libboost_date_time-mt.dylib in CopyFiles */,
+				1CE5B26D17700C3600AD3AC7 /* libboost_iostreams-mt.dylib in CopyFiles */,
+				1CE5B26E17700C3600AD3AC7 /* libboost_python-mt.dylib in CopyFiles */,
+				1CE5B2D51770B29E00AD3AC7 /* libshmdata-0.8.4.dylib in CopyFiles */,
+				1CE5B2BB1770AC3B00AD3AC7 /* libshmdata-any-0.8.4.dylib in CopyFiles */,
+				1CE5B2BC1770AC3E00AD3AC7 /* libshmdata-osg-0.8.4.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1229,7 +1251,6 @@
 		1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_iostreams-mt.dylib"; path = "../../../../../opt/local/lib/libboost_iostreams-mt.dylib"; sourceTree = "<group>"; };
 		1C2C7030163F0D940017F484 /* libboost_chrono-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_chrono-mt.dylib"; path = "../../../../../opt/local/lib/libboost_chrono-mt.dylib"; sourceTree = "<group>"; };
 		1C2C7041163F19450017F484 /* libOpenNI.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpenNI.dylib; path = /usr/local/lib/libOpenNI.dylib; sourceTree = "<absolute>"; };
-		1C2C705C163F1ECD0017F484 /* libflann_cpp.1.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libflann_cpp.1.7.dylib; path = /opt/local/lib/libflann_cpp.1.7.dylib; sourceTree = "<absolute>"; };
 		1C329CAC15BA0680002F845C /* spinServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = spinServer.cpp; path = ../src/spin/spinServer.cpp; sourceTree = SOURCE_ROOT; };
 		1C329CAE15BEF306002F845C /* pocoUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pocoUtil.cpp; path = ../src/spin/pocoUtil.cpp; sourceTree = "<group>"; };
 		1C329CB015BEF740002F845C /* pocoutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pocoutil.h; path = ../include/pocoutil.h; sourceTree = "<group>"; };
@@ -1293,7 +1314,6 @@
 		1C7ED9AC1651705B0071459B /* libpcl_common.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_common.1.7.0.dylib; path = ../../../../../usr/local/lib/libpcl_common.1.7.0.dylib; sourceTree = "<group>"; };
 		1C7ED9AD1651705B0071459B /* libpcl_features.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_features.1.7.0.dylib; path = ../../../../../usr/local/lib/libpcl_features.1.7.0.dylib; sourceTree = "<group>"; };
 		1C7ED9AE1651705B0071459B /* libpcl_filters.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_filters.1.7.0.dylib; path = ../../../../../usr/local/lib/libpcl_filters.1.7.0.dylib; sourceTree = "<group>"; };
-		1C7ED9AF1651705B0071459B /* libpcl_geometry.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_geometry.1.7.0.dylib; path = ../../../../../usr/local/lib/libpcl_geometry.1.7.0.dylib; sourceTree = "<group>"; };
 		1C7ED9B01651705B0071459B /* libpcl_io_ply.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_io_ply.1.7.0.dylib; path = ../../../../../usr/local/lib/libpcl_io_ply.1.7.0.dylib; sourceTree = "<group>"; };
 		1C7ED9B11651705B0071459B /* libpcl_io.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_io.1.7.0.dylib; path = ../../../../../usr/local/lib/libpcl_io.1.7.0.dylib; sourceTree = "<group>"; };
 		1C7ED9B21651705B0071459B /* libpcl_kdtree.1.7.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpcl_kdtree.1.7.0.dylib; path = ../../../../../usr/local/lib/libpcl_kdtree.1.7.0.dylib; sourceTree = "<group>"; };
@@ -1450,7 +1470,6 @@
 		1C9EE83014BE2725000976A6 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		1C9EE83114BE2725000976A6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1CA24C2714BE514E0023DD8B /* liblo.7.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblo.7.dylib; path = /opt/local/lib/liblo.7.dylib; sourceTree = "<absolute>"; };
-		1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libspatosc-0.3.0.dylib"; path = "/usr/local/lib/libspatosc-0.3.0.dylib"; sourceTree = "<absolute>"; };
 		1CA24D3A14BE2875007A9C31 /* AnimationNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnimationNode.cpp; path = ../src/osgWrappers/introspection/AnimationNode.cpp; sourceTree = "<group>"; };
 		1CA24D3B14BE2875007A9C31 /* AttractorNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AttractorNode.cpp; path = ../src/osgWrappers/introspection/AttractorNode.cpp; sourceTree = "<group>"; };
 		1CA24D3C14BE2875007A9C31 /* ConstraintsNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ConstraintsNode.cpp; path = ../src/osgWrappers/introspection/ConstraintsNode.cpp; sourceTree = "<group>"; };
@@ -1521,8 +1540,6 @@
 		1CA24D9F14BE2892007A9C31 /* switchnode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = switchnode.h; path = ../include/switchnode.h; sourceTree = "<group>"; };
 		1CA24DA014BE2892007A9C31 /* textnode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textnode.h; path = ../include/textnode.h; sourceTree = "<group>"; };
 		1CA24DA114BE2892007A9C31 /* usernode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = usernode.h; path = ../include/usernode.h; sourceTree = "<group>"; };
-		1CA24DA214BE2892007A9C31 /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = ../include/util.h; sourceTree = "<group>"; };
-		1CA24DA314BE2892007A9C31 /* videosize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = videosize.h; path = ../include/videosize.h; sourceTree = "<group>"; };
 		1CA24DA414BE2892007A9C31 /* videotexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = videotexture.h; path = ../include/videotexture.h; sourceTree = "<group>"; };
 		1CA24DA514BE2892007A9C31 /* viewermanipulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = viewermanipulator.h; path = ../include/viewermanipulator.h; sourceTree = "<group>"; };
 		1CA24DF514BE2D3C007A9C31 /* SPIN Server.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SPIN Server.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1537,7 +1554,6 @@
 		1CA4611B165AE40C003F1CF4 /* SpinViewerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpinViewerAppDelegate.h; sourceTree = "<group>"; };
 		1CA4611C165AE40C003F1CF4 /* SpinViewerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpinViewerAppDelegate.m; sourceTree = "<group>"; };
 		1CBD882715E5A8B8007ABACE /* particlesystemutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = particlesystemutil.h; path = ../include/particlesystemutil.h; sourceTree = "<group>"; };
-		1CC5D51515505575009C63A5 /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Syphon.framework; path = ../../../Library/Developer/Frameworks/Syphon.framework; sourceTree = "<group>"; };
 		1CCCA0BF14BE315400DCA0B7 /* spinviewer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = spinviewer; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0CD14BE31AB00DCA0B7 /* SPIN Viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SPIN Viewer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1CCCA0D214BE31AB00DCA0B7 /* spinviewerUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "spinviewerUI-Info.plist"; sourceTree = "<group>"; };
@@ -1563,6 +1579,13 @@
 		1CDDB28A1551AD7300A45ADA /* SyphonTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SyphonTexture.cpp; path = ../src/spin/SyphonTexture.cpp; sourceTree = "<group>"; };
 		1CDDB28C1551AD8500A45ADA /* syphontexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syphontexture.h; path = ../include/syphontexture.h; sourceTree = "<group>"; };
 		1CDDB28E1551AE2800A45ADA /* SyphonTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SyphonTexture.cpp; path = ../src/osgWrappers/introspection/SyphonTexture.cpp; sourceTree = "<group>"; };
+		1CE5B22A1770022F00AD3AC7 /* libspinframework-1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libspinframework-1.0.0.dylib"; path = "../../../../../usr/local/lib/libspinframework-1.0.0.dylib"; sourceTree = "<group>"; };
+		1CE5B2301770041D00AD3AC7 /* libflann_cpp.1.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libflann_cpp.1.8.dylib; path = ../../../../../opt/local/lib/libflann_cpp.1.8.dylib; sourceTree = "<group>"; };
+		1CE5B28B177010ED00AD3AC7 /* GStreamer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GStreamer.framework; path = ../../../../../Library/Frameworks/GStreamer.framework; sourceTree = "<group>"; };
+		1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libspatosc-0.6.0.dylib"; path = "../../../../../usr/local/lib/libspatosc-0.6.0.dylib"; sourceTree = "<group>"; };
+		1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libshmdata-any-0.8.4.dylib"; path = "../../../../../usr/local/lib/libshmdata-any-0.8.4.dylib"; sourceTree = "<group>"; };
+		1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libshmdata-osg-0.8.4.dylib"; path = "../../../../../usr/local/lib/libshmdata-osg-0.8.4.dylib"; sourceTree = "<group>"; };
+		1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libshmdata-0.8.4.dylib"; path = "../../../../../usr/local/lib/libshmdata-0.8.4.dylib"; sourceTree = "<group>"; };
 		1CF94950151CD40500628872 /* particlesystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = particlesystem.h; path = ../include/particlesystem.h; sourceTree = "<group>"; };
 		1CF94953151CD41F00628872 /* ParticleSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleSystem.cpp; path = ../src/spin/ParticleSystem.cpp; sourceTree = "<group>"; };
 		1CF94955151CD43C00628872 /* ParticleSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParticleSystem.cpp; path = ../src/osgWrappers/introspection/ParticleSystem.cpp; sourceTree = "<group>"; };
@@ -1575,7 +1598,6 @@
 			files = (
 				1C90C16F14CCCD0100C929AE /* libusb-1.0.0.dylib in Frameworks */,
 				1C94DED014C00243006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1C9C083014D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C068AC215754B7300BC6207 /* OpenGL.framework in Frameworks */,
 				1C068AC315754B7800BC6207 /* AGL.framework in Frameworks */,
 				1C0A70D415B7730B0032484A /* libBulletCollision.2.80.dylib in Frameworks */,
@@ -1586,12 +1608,6 @@
 				1C329CB815BF119E002F845C /* libPocoNet.12.dylib in Frameworks */,
 				1C329CB915BF119E002F845C /* libPocoUtil.12.dylib in Frameworks */,
 				1C329CBA15BF119E002F845C /* libPocoXML.12.dylib in Frameworks */,
-				1C2C700A163F01D10017F484 /* libboost_system-mt.dylib in Frameworks */,
-				1C2C7010163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */,
-				1C2C7015163F02180017F484 /* libboost_filesystem-mt.dylib in Frameworks */,
-				1C2C7022163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */,
-				1C2C7027163F02EF0017F484 /* libboost_iostreams-mt.dylib in Frameworks */,
-				1C2C7031163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */,
 				1C2C7068163F21470017F484 /* liblo.7.dylib in Frameworks */,
 				1C1EF4FB164843EB00838809 /* libtinyxml.dylib in Frameworks */,
 				1C7ED9E81651708E0071459B /* libpcl_common.1.7.0.dylib in Frameworks */,
@@ -1616,6 +1632,18 @@
 				1C7EDC0F16518EDD0071459B /* libosgUtil.93.dylib in Frameworks */,
 				1C7EDC1416518EDD0071459B /* libosgViewer.93.dylib in Frameworks */,
 				1C7EDC3916518F2C0071459B /* libosgSim.93.dylib in Frameworks */,
+				1CE5B28C177010ED00AD3AC7 /* GStreamer.framework in Frameworks */,
+				1CE5B2931770281000AD3AC7 /* libboost_filesystem-mt.dylib in Frameworks */,
+				1CE5B2941770281000AD3AC7 /* libboost_chrono-mt.dylib in Frameworks */,
+				1CE5B2951770281000AD3AC7 /* libboost_thread-mt.dylib in Frameworks */,
+				1CE5B2961770281000AD3AC7 /* libboost_system-mt.dylib in Frameworks */,
+				1CE5B2971770281000AD3AC7 /* libboost_date_time-mt.dylib in Frameworks */,
+				1CE5B2981770281000AD3AC7 /* libboost_iostreams-mt.dylib in Frameworks */,
+				1CE5B2991770281000AD3AC7 /* libboost_python-mt.dylib in Frameworks */,
+				1CE5B2A21770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */,
+				1CE5B2AF1770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */,
+				1CE5B2B41770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */,
+				1CE5B2D01770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1624,10 +1652,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1C57789614BD702A00632E46 /* libSPIN.dylib in Frameworks */,
-				1C94DEC214BFEC2D006394AD /* libboost_python-mt.dylib in Frameworks */,
 				1C94DED114C00250006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1CE3AD1B14CF7F16007E722D /* libusb-1.0.0.dylib in Frameworks */,
-				1C9C082F14D07662006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C3BDC52163597D200E65E8D /* libBulletCollision.2.80.dylib in Frameworks */,
 				1C3BDC55163597DA00E65E8D /* libBulletDynamics.2.80.dylib in Frameworks */,
 				1C3BDC57163597DE00E65E8D /* libBulletSoftBody.2.80.dylib in Frameworks */,
@@ -1636,12 +1662,6 @@
 				1C3BDC6216359C2D00E65E8D /* libPocoNet.12.dylib in Frameworks */,
 				1C3BDC6316359C2D00E65E8D /* libPocoUtil.12.dylib in Frameworks */,
 				1C3BDC6416359C2D00E65E8D /* libPocoXML.12.dylib in Frameworks */,
-				1C2C700B163F01D20017F484 /* libboost_system-mt.dylib in Frameworks */,
-				1C2C7011163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */,
-				1C2C7016163F02180017F484 /* libboost_filesystem-mt.dylib in Frameworks */,
-				1C2C7023163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */,
-				1C2C7028163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */,
-				1C2C7032163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */,
 				1C2C7069163F21470017F484 /* liblo.7.dylib in Frameworks */,
 				1C1EF4FF1648465600838809 /* libtinyxml.dylib in Frameworks */,
 				1C7ED9F01651708F0071459B /* libpcl_common.1.7.0.dylib in Frameworks */,
@@ -1666,6 +1686,11 @@
 				1C7EDC1016518EDD0071459B /* libosgUtil.93.dylib in Frameworks */,
 				1C7EDC1516518EDD0071459B /* libosgViewer.93.dylib in Frameworks */,
 				1C7EDC3A16518F2C0071459B /* libosgSim.93.dylib in Frameworks */,
+				1CE5B28D177010ED00AD3AC7 /* GStreamer.framework in Frameworks */,
+				1CE5B2A31770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */,
+				1CE5B2B01770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */,
+				1CE5B2B51770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */,
+				1CE5B2D11770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1673,11 +1698,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1CCCA0F814BE46B000DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1CA24DF714BE2D3C007A9C31 /* Cocoa.framework in Frameworks */,
 				1CA24C9114BE5AAA0023DD8B /* liblo.7.dylib in Frameworks */,
 				1C94DED214C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1C9C082E14D07661006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5214DCFB6E001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0A70D615B7730B0032484A /* libBulletCollision.2.80.dylib in Frameworks */,
 				1C0A70DB15B7730B0032484A /* libBulletDynamics.2.80.dylib in Frameworks */,
@@ -1687,14 +1710,7 @@
 				1C3BDC6516359C2D00E65E8D /* libPocoNet.12.dylib in Frameworks */,
 				1C3BDC6616359C2D00E65E8D /* libPocoUtil.12.dylib in Frameworks */,
 				1C3BDC6716359C2D00E65E8D /* libPocoXML.12.dylib in Frameworks */,
-				1C2C700C163F01D20017F484 /* libboost_system-mt.dylib in Frameworks */,
-				1C2C7012163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */,
-				1C2C7017163F02190017F484 /* libboost_filesystem-mt.dylib in Frameworks */,
-				1C2C7024163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */,
-				1C2C7029163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */,
-				1C2C7033163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */,
 				1C2C7043163F19450017F484 /* libOpenNI.dylib in Frameworks */,
-				1C2C705D163F1ECD0017F484 /* libflann_cpp.1.7.dylib in Frameworks */,
 				1C7ED9F8165170900071459B /* libpcl_common.1.7.0.dylib in Frameworks */,
 				1C7ED9F9165170900071459B /* libpcl_filters.1.7.0.dylib in Frameworks */,
 				1C7ED9FA165170900071459B /* libpcl_io_ply.1.7.0.dylib in Frameworks */,
@@ -1717,6 +1733,13 @@
 				1C7EDC1116518EDD0071459B /* libosgUtil.93.dylib in Frameworks */,
 				1C7EDC1616518EDD0071459B /* libosgViewer.93.dylib in Frameworks */,
 				1C7EDC3B16518F2C0071459B /* libosgSim.93.dylib in Frameworks */,
+				1CE5B22B1770022F00AD3AC7 /* libspinframework-1.0.0.dylib in Frameworks */,
+				1CE5B2311770041D00AD3AC7 /* libflann_cpp.1.8.dylib in Frameworks */,
+				1CE5B28E177010ED00AD3AC7 /* GStreamer.framework in Frameworks */,
+				1CE5B2A41770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */,
+				1CE5B2B11770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */,
+				1CE5B2B61770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */,
+				1CE5B2D21770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1725,10 +1748,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1CCCA0F714BE469D00DCA0B7 /* libSPIN.dylib in Frameworks */,
-				1C94DEC814BFEC2E006394AD /* libboost_python-mt.dylib in Frameworks */,
 				1C94DED314C00251006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
 				1CE3AD1C14CF7F17007E722D /* libusb-1.0.0.dylib in Frameworks */,
-				1C9C082D14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C3BDC53163597D200E65E8D /* libBulletCollision.2.80.dylib in Frameworks */,
 				1C3BDC54163597D900E65E8D /* libBulletDynamics.2.80.dylib in Frameworks */,
 				1C3BDC56163597DD00E65E8D /* libBulletSoftBody.2.80.dylib in Frameworks */,
@@ -1737,12 +1758,6 @@
 				1C3BDC6816359C2E00E65E8D /* libPocoNet.12.dylib in Frameworks */,
 				1C3BDC6916359C2E00E65E8D /* libPocoUtil.12.dylib in Frameworks */,
 				1C3BDC6A16359C2E00E65E8D /* libPocoXML.12.dylib in Frameworks */,
-				1C2C700D163F01D30017F484 /* libboost_system-mt.dylib in Frameworks */,
-				1C2C7013163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */,
-				1C2C7018163F021A0017F484 /* libboost_filesystem-mt.dylib in Frameworks */,
-				1C2C7025163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */,
-				1C2C702A163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */,
-				1C2C7034163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */,
 				1C2C706A163F21480017F484 /* liblo.7.dylib in Frameworks */,
 				1C1EF5001648465700838809 /* libtinyxml.dylib in Frameworks */,
 				1C7EDA00165170900071459B /* libpcl_common.1.7.0.dylib in Frameworks */,
@@ -1767,6 +1782,11 @@
 				1C7EDC1216518EDD0071459B /* libosgUtil.93.dylib in Frameworks */,
 				1C7EDC1716518EDD0071459B /* libosgViewer.93.dylib in Frameworks */,
 				1C7EDC3C16518F2D0071459B /* libosgSim.93.dylib in Frameworks */,
+				1CE5B28F177010ED00AD3AC7 /* GStreamer.framework in Frameworks */,
+				1CE5B2A51770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */,
+				1CE5B2B21770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */,
+				1CE5B2B71770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */,
+				1CE5B2D31770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1778,11 +1798,9 @@
 				1C7EDC4316519E0B0071459B /* CoreGraphics.framework in Frameworks */,
 				1C7EDC4116519DE80071459B /* ImageIO.framework in Frameworks */,
 				1CA24C9A14BE5AAC0023DD8B /* liblo.7.dylib in Frameworks */,
-				1CCCA0F014BE353500DCA0B7 /* libSPIN.dylib in Frameworks */,
 				1CCCA0EF14BE353100DCA0B7 /* OpenGL.framework in Frameworks */,
 				1CCCA0CF14BE31AB00DCA0B7 /* Cocoa.framework in Frameworks */,
 				1C94DED414C00252006394AD /* libcppintrospection-3.0.0.dylib in Frameworks */,
-				1C9C082C14D07660006ABC85 /* libspatosc-0.3.0.dylib in Frameworks */,
 				1C34AE5314DCFB6F001DF418 /* libusb-1.0.0.dylib in Frameworks */,
 				1C0A70D815B7730B0032484A /* libBulletCollision.2.80.dylib in Frameworks */,
 				1C0A70DD15B7730B0032484A /* libBulletDynamics.2.80.dylib in Frameworks */,
@@ -1792,14 +1810,7 @@
 				1C3BDC6B16359C2F00E65E8D /* libPocoNet.12.dylib in Frameworks */,
 				1C3BDC6C16359C2F00E65E8D /* libPocoUtil.12.dylib in Frameworks */,
 				1C3BDC6D16359C2F00E65E8D /* libPocoXML.12.dylib in Frameworks */,
-				1C2C700E163F01D30017F484 /* libboost_system-mt.dylib in Frameworks */,
-				1C2C7014163F020E0017F484 /* libboost_thread-mt.dylib in Frameworks */,
-				1C2C7019163F021A0017F484 /* libboost_filesystem-mt.dylib in Frameworks */,
-				1C2C7026163F02EF0017F484 /* libboost_date_time-mt.dylib in Frameworks */,
-				1C2C702B163F02F00017F484 /* libboost_iostreams-mt.dylib in Frameworks */,
-				1C2C7035163F0D950017F484 /* libboost_chrono-mt.dylib in Frameworks */,
 				1C2C7044163F19450017F484 /* libOpenNI.dylib in Frameworks */,
-				1C2C705E163F1ECD0017F484 /* libflann_cpp.1.7.dylib in Frameworks */,
 				1C7EDA08165170910071459B /* libpcl_common.1.7.0.dylib in Frameworks */,
 				1C7EDA09165170910071459B /* libpcl_filters.1.7.0.dylib in Frameworks */,
 				1C7EDA0A165170910071459B /* libpcl_io_ply.1.7.0.dylib in Frameworks */,
@@ -1818,10 +1829,18 @@
 				1C7EDBF016518EDC0071459B /* libosgManipulator.93.dylib in Frameworks */,
 				1C7EDBF516518EDC0071459B /* libosgParticle.93.dylib in Frameworks */,
 				1C7EDBFF16518EDC0071459B /* libosgShadow.93.dylib in Frameworks */,
+				1CE5B2C21770AE7100AD3AC7 /* libosgTerrain.93.dylib in Frameworks */,
 				1C7EDC0E16518EDD0071459B /* libosgText.93.dylib in Frameworks */,
 				1C7EDC1316518EDD0071459B /* libosgUtil.93.dylib in Frameworks */,
 				1C7EDC1816518EDD0071459B /* libosgViewer.93.dylib in Frameworks */,
 				1C7EDC3D16518F2D0071459B /* libosgSim.93.dylib in Frameworks */,
+				1CE5B22C1770022F00AD3AC7 /* libspinframework-1.0.0.dylib in Frameworks */,
+				1CE5B2321770041D00AD3AC7 /* libflann_cpp.1.8.dylib in Frameworks */,
+				1CE5B290177010ED00AD3AC7 /* GStreamer.framework in Frameworks */,
+				1CE5B2A61770302E00AD3AC7 /* libspatosc-0.6.0.dylib in Frameworks */,
+				1CE5B2B31770AC2400AD3AC7 /* libshmdata-any-0.8.4.dylib in Frameworks */,
+				1CE5B2B81770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib in Frameworks */,
+				1CE5B2D41770B28D00AD3AC7 /* libshmdata-0.8.4.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2053,8 +2072,6 @@
 				1CDDB28C1551AD8500A45ADA /* syphontexture.h */,
 				1CA24DA014BE2892007A9C31 /* textnode.h */,
 				1CA24DA114BE2892007A9C31 /* usernode.h */,
-				1CA24DA214BE2892007A9C31 /* util.h */,
-				1CA24DA314BE2892007A9C31 /* videosize.h */,
 				1CA24DA414BE2892007A9C31 /* videotexture.h */,
 				1CA24DA514BE2892007A9C31 /* viewermanipulator.h */,
 			);
@@ -2116,7 +2133,6 @@
 				1C7ED9AC1651705B0071459B /* libpcl_common.1.7.0.dylib */,
 				1C7ED9AD1651705B0071459B /* libpcl_features.1.7.0.dylib */,
 				1C7ED9AE1651705B0071459B /* libpcl_filters.1.7.0.dylib */,
-				1C7ED9AF1651705B0071459B /* libpcl_geometry.1.7.0.dylib */,
 				1C7ED9B01651705B0071459B /* libpcl_io_ply.1.7.0.dylib */,
 				1C7ED9B11651705B0071459B /* libpcl_io.1.7.0.dylib */,
 				1C7ED9B21651705B0071459B /* libpcl_kdtree.1.7.0.dylib */,
@@ -2264,15 +2280,16 @@
 		1C9EE82B14BE2725000976A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1CE5B28B177010ED00AD3AC7 /* GStreamer.framework */,
 				1C7EDA491651782A0071459B /* osg-3.1.3 */,
 				1C329CB215BF1159002F845C /* Poco */,
 				1CD941291543BD9B0075A81C /* bullet */,
 				1C7ED9AB16516FB80071459B /* pcl-1.7 */,
-				1CA24C4214BE56A30023DD8B /* libspatosc-0.3.0.dylib */,
 				1CA24C2714BE514E0023DD8B /* liblo.7.dylib */,
-				1C2C705C163F1ECD0017F484 /* libflann_cpp.1.7.dylib */,
+				1CE5B2301770041D00AD3AC7 /* libflann_cpp.1.8.dylib */,
 				1C34AE4A14DC4EC8001DF418 /* libjasper.1.0.0.dylib */,
 				1C90C16E14CCCD0100C929AE /* libusb-1.0.0.dylib */,
+				1CE5B22A1770022F00AD3AC7 /* libspinframework-1.0.0.dylib */,
 				1C2C7041163F19450017F484 /* libOpenNI.dylib */,
 				1C1EF4FA164843EB00838809 /* libtinyxml.dylib */,
 				1C94DE9D14BF929F006394AD /* Python */,
@@ -2284,7 +2301,10 @@
 				1C2C7020163F02EF0017F484 /* libboost_date_time-mt.dylib */,
 				1C2C7021163F02EF0017F484 /* libboost_iostreams-mt.dylib */,
 				1C94DEB914BFEBAA006394AD /* libboost_python-mt.dylib */,
-				1CC5D51515505575009C63A5 /* Syphon.framework */,
+				1CE5B2A11770302E00AD3AC7 /* libspatosc-0.6.0.dylib */,
+				1CE5B2CF1770B28C00AD3AC7 /* libshmdata-0.8.4.dylib */,
+				1CE5B2AD1770AC2300AD3AC7 /* libshmdata-any-0.8.4.dylib */,
+				1CE5B2AE1770AC2400AD3AC7 /* libshmdata-osg-0.8.4.dylib */,
 				1C7EDC4416519E310071459B /* ApplicationServices.framework */,
 				1C7EDC4216519E0A0071459B /* CoreGraphics.framework */,
 				1C7EDC4016519DE70071459B /* ImageIO.framework */,
@@ -2459,8 +2479,6 @@
 				1CA24DD314BE2892007A9C31 /* switchnode.h in Headers */,
 				1CA24DD414BE2892007A9C31 /* textnode.h in Headers */,
 				1CA24DD514BE2892007A9C31 /* usernode.h in Headers */,
-				1CA24DD614BE2892007A9C31 /* util.h in Headers */,
-				1CA24DD714BE2892007A9C31 /* videosize.h in Headers */,
 				1CA24DD814BE2892007A9C31 /* videotexture.h in Headers */,
 				1CA24DD914BE2892007A9C31 /* viewermanipulator.h in Headers */,
 				1C34AE4514DB32A8001DF418 /* geometrynode.h in Headers */,
@@ -2767,7 +2785,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\n\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem-mt.dylib libboost_system-mt.dylib libboost_python-mt.dylib libboost_thread-mt.dylib libboost_chrono-mt.dylib libboost_date_time-mt.dylib libboost_iostreams-mt.dylib libusb-1.0.0.dylib libBulletCollision.2.80.dylib libBulletDynamics.2.80.dylib libBulletSoftBody.2.80.dylib libLinearMath.2.80.dylib libPocoFoundation.12.dylib libPocoNet.12.dylib libPocoUtil.12.dylib libPocoXML.12.dylib libusb-1.0.0.dylib libOpenNI.dylib libflann_cpp.1.7.dylib libpng15.15.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.93.dylib libosgAnimation.93.dylib libosgDB.93.dylib libosgFX.93.dylib libosgGA.93.dylib libosgManipulator.93.dylib libosgParticle.93.dylib libosgPresentation.93.dylib libosgShadow.93.dylib libosgSim.93.dylib libosgTerrain.93.dylib libosgText.93.dylib libosgUtil.93.dylib libosgViewer.93.dylib libosgVolume.93.dylib libosgWidget.93.dylib\"\nPCL_LIBS=\"libpcl_common libpcl_io libpcl_io_ply libpcl_filters libpcl_octree libpcl_kdtree libpcl_sample_consensus libpcl_search\"\nPCL_LIBS_W_EXTENSION=( $PCL_LIBS )\nPCL_LIBS_W_EXTENSION=( \"${PCL_LIBS_W_EXTENSION[@]/%/.1.7.0.dylib}\" )\necho \"PCL_LIBS_W_EXTENSION=$PCL_LIBS_W_EXTENSION\"\n\n#special cases (where names or versions change):\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n#install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ninstall_name_tool -change ../../Bin/Release/libOpenNI.dylib $REL_PATH/libOpenNI.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n\n\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\n# special case for PCL which truncates the version number for some reason:\nfor LIB in $PCL_LIBS\ndo\n  install_name_tool -change ${LIB}.1.7.dylib $REL_PATH/${LIB}.1.7.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n  #install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$LIBPATH/${LIB}.1.6.0.dylib\"\n\n  for i in $PCL_LIBS\n  do\n    install_name_tool -change ${i}.1.7.dylib $REL_PATH/${i}.1.7.0.dylib \"${LIBPATH}/${LIB}.1.7.0.dylib\"\n  done\ndone\n\n\n\n\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\n\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS} ${PCL_LIBS_W_EXTENSION[@]}\"\n#LIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN ${LIBPATH}/${LIB}:\"\n  for i in `otool -L \"${LIBPATH}/${LIB}\"`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename \"${i}\"`\n      #cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/${LIB}\"\n      #echo \"COMMAND: $cmd\"\n      #`${cmd}`\n      `install_name_tool -change ${i} @rpath/$file \"${LIBPATH}/${LIB}\"`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls \"${PLUGINPATH}\"`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L \"${PLUGINPATH}/${LIB}\"`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      #cmd=\"install_name_tool -change ${x} @rpath/${x} ${PLUGINPATH}/${LIB}\"\n      #echo \"COMMAND: $cmd\"\n      #`$cmd`\n      `install_name_tool -change ${x} @rpath/${x} \"${PLUGINPATH}/${LIB}\"`\n    fi\n  done\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\n\n\nUSR_LIBS=\"libspinframework-1.0.0.dylib libspatosc-0.6.0.dylib  libcppintrospection-3.0.0.dylib libshmdata-0.8.4.dylib libshmdata-any-0.8.4.dylib libshmdata-osg-0.8.4.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem-mt.dylib libboost_system-mt.dylib libboost_python-mt.dylib libboost_thread-mt.dylib libboost_chrono-mt.dylib libboost_date_time-mt.dylib libboost_iostreams-mt.dylib libusb-1.0.0.dylib libBulletCollision.2.80.dylib libBulletDynamics.2.80.dylib libBulletSoftBody.2.80.dylib libLinearMath.2.80.dylib libPocoFoundation.12.dylib libPocoNet.12.dylib libPocoUtil.12.dylib libPocoXML.12.dylib libusb-1.0.0.dylib libOpenNI.dylib libflann_cpp.1.8.dylib libpng15.15.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.93.dylib libosgAnimation.93.dylib libosgDB.93.dylib libosgFX.93.dylib libosgGA.93.dylib libosgManipulator.93.dylib libosgParticle.93.dylib libosgPresentation.93.dylib libosgShadow.93.dylib libosgSim.93.dylib libosgTerrain.93.dylib libosgText.93.dylib libosgUtil.93.dylib libosgViewer.93.dylib libosgVolume.93.dylib libosgWidget.93.dylib\"\nPCL_LIBS=\"libpcl_common libpcl_io libpcl_io_ply libpcl_filters libpcl_octree libpcl_kdtree libpcl_sample_consensus libpcl_search\"\nPCL_LIBS_W_EXTENSION=( $PCL_LIBS )\nPCL_LIBS_W_EXTENSION=( \"${PCL_LIBS_W_EXTENSION[@]/%/.1.7.0.dylib}\" )\necho \"PCL_LIBS_W_EXTENSION=$PCL_LIBS_W_EXTENSION\"\n\n#special cases (where names or versions change):\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n#install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ninstall_name_tool -change ../../Bin/Release/libOpenNI.dylib $REL_PATH/libOpenNI.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n\n\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\n# special case for PCL which truncates the version number for some reason:\nfor LIB in $PCL_LIBS\ndo\n  install_name_tool -change ${LIB}.1.7.dylib $REL_PATH/${LIB}.1.7.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n  #install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$LIBPATH/${LIB}.1.6.0.dylib\"\n\n  install_name_tool -change ${LIB}.1.7.dylib $REL_PATH/${LIB}.1.7.0.dylib \"${LIBPATH}/libspinframework-1.0.0.dylib\"\n\n\n  for i in $PCL_LIBS\n  do\n    install_name_tool -change ${i}.1.7.dylib $REL_PATH/${i}.1.7.0.dylib \"${LIBPATH}/${LIB}.1.7.0.dylib\"\n  done\ndone\n\n\n\n\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\n\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS} ${PCL_LIBS_W_EXTENSION[@]}\"\n#LIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN ${LIBPATH}/${LIB}:\"\n  for i in `otool -L \"${LIBPATH}/${LIB}\"`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      if [[ $i =~ \"/Library/Frameworks\" ]]\n      then\n        echo \"skipping Framework library: ${i}\"\n      else\n        file=`basename \"${i}\"`\n        #cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/${LIB}\"\n        #echo \"COMMAND: $cmd\"\n        #`${cmd}`\n        `install_name_tool -change ${i} @rpath/$file \"${LIBPATH}/${LIB}\"`\n      fi\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls \"${PLUGINPATH}\"`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L \"${PLUGINPATH}/${LIB}\"`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      #cmd=\"install_name_tool -change ${x} @rpath/${x} ${PLUGINPATH}/${LIB}\"\n      #echo \"COMMAND: $cmd\"\n      #`$cmd`\n      `install_name_tool -change ${x} @rpath/${x} \"${PLUGINPATH}/${LIB}\"`\n    fi\n  done\ndone";
 		};
 		1C87601C14CA023600A46EBC /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2808,7 +2826,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "REL_PATH=\"@rpath\"\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\n\n\nUSR_LIBS=\"libSPIN.dylib libspatosc-0.3.0.dylib  libcppintrospection-3.0.0.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem-mt.dylib libboost_system-mt.dylib libboost_python-mt.dylib libboost_thread-mt.dylib libboost_chrono-mt.dylib libboost_date_time-mt.dylib libboost_iostreams-mt.dylib libusb-1.0.0.dylib libBulletCollision.2.80.dylib libBulletDynamics.2.80.dylib libBulletSoftBody.2.80.dylib libLinearMath.2.80.dylib libPocoFoundation.12.dylib libPocoNet.12.dylib libPocoUtil.12.dylib libPocoXML.12.dylib libusb-1.0.0.dylib libOpenNI.dylib libflann_cpp.1.7.dylib libpng15.15.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.93.dylib libosgAnimation.93.dylib libosgDB.93.dylib libosgFX.93.dylib libosgGA.93.dylib libosgManipulator.93.dylib libosgParticle.93.dylib libosgPresentation.93.dylib libosgShadow.93.dylib libosgSim.93.dylib libosgTerrain.93.dylib libosgText.93.dylib libosgUtil.93.dylib libosgViewer.93.dylib libosgVolume.93.dylib libosgWidget.93.dylib\"\nPCL_LIBS=\"libpcl_common libpcl_io libpcl_io_ply libpcl_filters libpcl_octree libpcl_kdtree libpcl_sample_consensus libpcl_search\"\nPCL_LIBS_W_EXTENSION=( $PCL_LIBS )\nPCL_LIBS_W_EXTENSION=( \"${PCL_LIBS_W_EXTENSION[@]/%/.1.7.0.dylib}\" )\necho \"PCL_LIBS_W_EXTENSION=$PCL_LIBS_W_EXTENSION\"\n\n#special cases (where names or versions change):\ninstall_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n#install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ninstall_name_tool -change ../../Bin/Release/libOpenNI.dylib $REL_PATH/libOpenNI.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n\n\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\n# special case for PCL which truncates the version number for some reason:\nfor LIB in $PCL_LIBS\ndo\n  install_name_tool -change ${LIB}.1.7.dylib $REL_PATH/${LIB}.1.7.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n  #install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$LIBPATH/${LIB}.1.6.0.dylib\"\n\n  for i in $PCL_LIBS\n  do\n    install_name_tool -change ${i}.1.7.dylib $REL_PATH/${i}.1.7.0.dylib \"${LIBPATH}/${LIB}.1.7.0.dylib\"\n  done\ndone\n\n\n\n\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\n\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS} ${PCL_LIBS_W_EXTENSION[@]}\"\n#LIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN ${LIBPATH}/${LIB}:\"\n  for i in `otool -L \"${LIBPATH}/${LIB}\"`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      file=`basename \"${i}\"`\n      #cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/${LIB}\"\n      #echo \"COMMAND: $cmd\"\n      #`${cmd}`\n      `install_name_tool -change ${i} @rpath/$file \"${LIBPATH}/${LIB}\"`\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls \"${PLUGINPATH}\"`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L \"${PLUGINPATH}/${LIB}\"`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      #cmd=\"install_name_tool -change ${x} @rpath/${x} ${PLUGINPATH}/${LIB}\"\n      #echo \"COMMAND: $cmd\"\n      #`$cmd`\n      `install_name_tool -change ${x} @rpath/${x} \"${PLUGINPATH}/${LIB}\"`\n    fi\n  done\ndone";
+			shellScript = "REL_PATH=\"@rpath\"\nLIBPATH=$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH\nPLUGINPATH=$TARGET_BUILD_DIR/$PLUGINS_FOLDER_PATH\n\n\nUSR_LIBS=\"libspinframework-1.0.0.dylib libspatosc-0.6.0.dylib  libcppintrospection-3.0.0.dylib libshmdata-0.8.4.dylib libshmdata-any-0.8.4.dylib libshmdata-osg-0.8.4.dylib\"\nOPT_LIBS=\"liblo.7.dylib libboost_filesystem-mt.dylib libboost_system-mt.dylib libboost_python-mt.dylib libboost_thread-mt.dylib libboost_chrono-mt.dylib libboost_date_time-mt.dylib libboost_iostreams-mt.dylib libusb-1.0.0.dylib libBulletCollision.2.80.dylib libBulletDynamics.2.80.dylib libBulletSoftBody.2.80.dylib libLinearMath.2.80.dylib libPocoFoundation.12.dylib libPocoNet.12.dylib libPocoUtil.12.dylib libPocoXML.12.dylib libusb-1.0.0.dylib libOpenNI.dylib libflann_cpp.1.8.dylib libpng15.15.dylib\"\nNO_PATH_LIBS=\"libfreenect.0.0.1.dylib libOpenThreads.12.dylib libosg.93.dylib libosgAnimation.93.dylib libosgDB.93.dylib libosgFX.93.dylib libosgGA.93.dylib libosgManipulator.93.dylib libosgParticle.93.dylib libosgPresentation.93.dylib libosgShadow.93.dylib libosgSim.93.dylib libosgTerrain.93.dylib libosgText.93.dylib libosgUtil.93.dylib libosgViewer.93.dylib libosgVolume.93.dylib libosgWidget.93.dylib\"\nPCL_LIBS=\"libpcl_common libpcl_io libpcl_io_ply libpcl_filters libpcl_octree libpcl_kdtree libpcl_sample_consensus libpcl_search\"\nPCL_LIBS_W_EXTENSION=( $PCL_LIBS )\nPCL_LIBS_W_EXTENSION=( \"${PCL_LIBS_W_EXTENSION[@]/%/.1.7.0.dylib}\" )\necho \"PCL_LIBS_W_EXTENSION=$PCL_LIBS_W_EXTENSION\"\n\n#special cases (where names or versions change):\n#install_name_tool -change libfreenect.0.0.dylib $REL_PATH/libfreenect.0.0.1.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n#install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ninstall_name_tool -change ../../Bin/Release/libOpenNI.dylib $REL_PATH/libOpenNI.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n\n\n\nfor i in $USR_LIBS\ndo\ninstall_name_tool -change /usr/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $OPT_LIBS\ndo\ninstall_name_tool -change /opt/local/lib/${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\nfor i in $NO_PATH_LIBS\ndo\ninstall_name_tool -change ${i} $REL_PATH/${i} \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\ndone\n\n# special case for PCL which truncates the version number for some reason:\nfor LIB in $PCL_LIBS\ndo\n  install_name_tool -change ${LIB}.1.7.dylib $REL_PATH/${LIB}.1.7.0.dylib \"$TARGET_BUILD_DIR/$EXECUTABLE_PATH\"\n  #install_name_tool -change /opt/local/lib/llvm-gcc42/libgomp.1.dylib $REL_PATH/libgomp.1.0.0.dylib \"$LIBPATH/${LIB}.1.6.0.dylib\"\n\n  install_name_tool -change ${LIB}.1.7.dylib $REL_PATH/${LIB}.1.7.0.dylib \"${LIBPATH}/libspinframework-1.0.0.dylib\"\n\n  for i in $PCL_LIBS\n  do\n    install_name_tool -change ${i}.1.7.dylib $REL_PATH/${i}.1.7.0.dylib \"${LIBPATH}/${LIB}.1.7.0.dylib\"\n  done\n\ndone\n\n\n\n\n\n# for EVERY dylib (made by autotools) in /usr/local or /opt/local, we need to set the dependency library paths to @rpath so we find the dependencies in the app bundle instead of the filesystem\n\nLIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS} ${PCL_LIBS_W_EXTENSION[@]}\"\n#LIBS=\"${USR_LIBS} ${OPT_LIBS} ${NO_PATH_LIBS}\"\nREGEX=\"/usr/local/lib|/opt/local/lib.*dylib|lib.*dylib\"\nfor LIB in $LIBS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN ${LIBPATH}/${LIB}:\"\n  file=`basename \"${LIB}\"`\n  for i in `otool -L \"${LIBPATH}/${LIB}\"`\n  do\n    if [[ $i =~ $REGEX ]]\n    then\n      if [[ $i =~ \"/Library/Frameworks\" ]]\n      then\n        echo \"skipping Framework library: ${i}\"\n      else\n        file=`basename \"${i}\"`\n        #cmd=\"install_name_tool -change ${i} @rpath/$file ${LIBPATH}/${LIB}\"\n        #echo \"COMMAND: $cmd\"\n        #`${cmd}`\n        `install_name_tool -change ${i} @rpath/$file \"${LIBPATH}/${LIB}\"`\n      fi\n    fi\n  done\ndone\necho \"\"\n\n# Fix @rpath in OSG Plugins:\nOSG_PLUGINS=`ls \"${PLUGINPATH}\"`\nfor LIB in $OSG_PLUGINS\ndo\n  echo \"----------------------------------------\"\n  echo \"-- FIXING RPATH IN OSG PLUGIN $LIB:\"\n  REGEX=\"^libOpenThreads.*|^libosg.*dylib\"\n  for x in `otool -L \"${PLUGINPATH}/${LIB}\"`\n  do\n    if [[ $x =~ $REGEX ]]\n    then\n      #cmd=\"install_name_tool -change ${x} @rpath/${x} ${PLUGINPATH}/${LIB}\"\n      #echo \"COMMAND: $cmd\"\n      #`$cmd`\n      `install_name_tool -change ${x} @rpath/${x} \"${PLUGINPATH}/${LIB}\"`\n    fi\n  done\ndone";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3099,7 +3117,10 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = /opt/local/Library/Frameworks;
+				FRAMEWORK_SEARCH_PATHS = (
+					/opt/local/Library/Frameworks,
+					/Library/Frameworks,
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -3119,10 +3140,9 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/usr/local/include,
-					"/usr/local/include/spatosc-0.4",
+					"/usr/local/include/spatosc-0.6",
 					"/usr/local/include/shmdata-0.8",
 					"/usr/local/include/cppintrospection-3.0",
-					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
 					"/usr/local/include/pcl-1.7",
 					/opt/local/include/bullet,
@@ -3136,7 +3156,6 @@
 					/usr/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
 					"-DWITH_POCO",
@@ -3161,7 +3180,10 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = /opt/local/Library/Frameworks;
+				FRAMEWORK_SEARCH_PATHS = (
+					/opt/local/Library/Frameworks,
+					/Library/Frameworks,
+				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
@@ -3170,10 +3192,9 @@
 				HEADER_SEARCH_PATHS = (
 					/opt/local/include,
 					/usr/local/include,
-					"/usr/local/include/spatosc-0.4",
+					"/usr/local/include/spatosc-0.6",
 					"/usr/local/include/shmdata-0.8",
 					"/usr/local/include/cppintrospection-3.0",
-					/usr/local/include/libfreenect,
 					/opt/local/include/eigen3,
 					"/usr/local/include/pcl-1.7",
 					/opt/local/include/bullet,
@@ -3187,7 +3208,6 @@
 					/usr/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DWITH_SPATOSC",
 					"-DWITH_POCO",
@@ -3490,7 +3510,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUGGING_SYMBOLS = YES;
@@ -3507,6 +3526,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PATH = "/opt/local/bin:/usr/local/bin:/usr/bin:$(SRCROOT)/../utils:/bin";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -3515,7 +3535,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -3524,6 +3543,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PATH = "/opt/local/bin:/usr/local/bin:/usr/bin:$(SRCROOT)/../utils:/bin";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
     //using namespace spin;
     spin::spinServerContext server;
     
-    
-    
+    // set relative resources path within .app bundle
+    spin::spinApp::Instance().setResourcesPath("../Resources");
     
     return NSApplicationMain(argc, (const char **)argv);
 }
