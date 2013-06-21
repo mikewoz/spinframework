@@ -1,19 +1,28 @@
 SPIN Framework release notes
 ============================
 
-2012-??-?? : spinframework 0.3.26
+2013-06-18 : spinframework 1.0.0
 ---------------------------------
-This release is in the development series 0.3 that has an unstable API. 
-
-It is a release candidate for the 0.4 series.
+This is a stable release of SPIN that marks the start of the 1.x series. 
 
 New Features:
 
-* none
+* Improved physics (wind, joints, support for loading of models)
+* libshmdata and Switcher is now the predominant video texturing method. FFMPEG is left as a possibility but is now deprecated and will be removed for the next release
+* Added proper animation parsing in ModelNode to handle the 3 different types of animations (osg::Switch, osg::Sequence, and osgAnimation); now all are controlled with one transparent API
+* Now requires SpatOSC 0.6, allowing events to be propagated
+* Added setColor to group nodes and switches
+* PointCloud support now requires PCL 1.7+
+* Improved dome rendering configuration
+* Added setDetailRatio method to ShapeNode, and reduced default detail for shapes to be more efficient
+* Panoscope support: added rotation parameter to spherical renderer and changed the viewport so it stretches according to the aspect ratio of the display
 
 Bugs fixed:
 
-* none
+* Fixed motion blur
+* Many fixes to TextNode
+* Fixed billboards in the dome
+* Many other bugs fixed
 
 
 2012-10-16 : spinframework 0.3.24

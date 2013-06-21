@@ -163,7 +163,7 @@ void spinBaseContext::debugPrint()
 {
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager_->resourcesPath << std::endl;
+    std::cout << "  Resources path:\t\t" << spinApp::Instance().getResourcesPath() << std::endl;
     std::cout << "  SPIN version:\t\t\t" << PACKAGE_VERSION << "" << std::endl;
     std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC

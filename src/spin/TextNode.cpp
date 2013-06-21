@@ -618,7 +618,7 @@ void TextNode::setFont (const char *s)
         this->font_ = string(s);
         /*
 		pthread_mutex_lock(&sceneMutex);
-		textLabel_->setFont( sceneManager_->resourcesPath + "/fonts/" + font_ );
+		textLabel_->setFont( spinApp::Instance().getResourcesPath() + "/fonts/" + font_ );
 		pthread_mutex_unlock(&sceneMutex);
 		//drawText();
         */
@@ -916,7 +916,7 @@ void TextNode::updateText()
 		textLabel_->setCharacterSize(characterSize_);
 
 		//textLabel_->setFont(0); // inbuilt font (small)
-		//textLabel_->setFont( sceneManager_->resourcesPath + "/fonts/" + font_ );
+		//textLabel_->setFont( spinApp::Instance().getResourcesPath() + "/fonts/" + font_ );
 #ifdef OSG_MIN_VERSION_REQUIRED
 #if OSG_MIN_VERSION_REQUIRED(3,0,0)
 		textLabel_->setFont( font_ );

@@ -15,9 +15,9 @@ AC_PREREQ([2.61])
 # After the release:
 # - increase spin_micro_version to the next odd number
 # - increase spin_interface_version to the next odd number
-m4_define([spin_major_version], [0])
-m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [25])
+m4_define([spin_major_version], [1])
+m4_define([spin_minor_version], [0])
+m4_define([spin_micro_version], [1])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -27,7 +27,7 @@ m4_define([spin_release_status],
 m4_define([spin_version], [spin_major_version.spin_minor_version.spin_micro_version])
 
 # change this only when breaking the API
-m4_define([spin_api_version], [0.3])
+m4_define([spin_api_version], [1.0])
 
 # increase the interface age by 1 for each release; if the API changes,
 # set to 0. interface_age and binary_age are used to create the soname

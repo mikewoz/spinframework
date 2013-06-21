@@ -244,8 +244,6 @@ class SceneManager
         bool createConnectionsFromXML(TiXmlElement *XMLnode);
         bool loadXML(const char *filename);
 
-        std::string resourcesPath;
-
         osg::ref_ptr<osgDB::SharedStateManager> sharedStateManager;
 
         /**

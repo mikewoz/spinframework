@@ -176,8 +176,6 @@ SceneManager::SceneManager(std::string id)
     std::cout << "creating sceneManager with id: " << id << std::endl;
     std::cout << std::flush;
 
-    resourcesPath = "../Resources";
-
     this->sceneID = id;
 
     graphicalMode = false;
@@ -185,37 +183,6 @@ SceneManager::SceneManager(std::string id)
     // initialize storage vectors:
     nodeMap.clear();
     stateMap.clear();
-
-    // Set resourcesPath:
-#ifdef OSX_COCOA
-    resourcesPath = "../Resources";
-#else
-    std::string currentDir = getenv("PWD");
-    //std::string currentDir = get_current_dir_name(); // requires #include <unistd.h>
-    if ((currentDir.length() > 8) && (currentDir.substr(currentDir.length() - 9)) == std::string("/src/spin"))
-    {
-        resourcesPath = "../Resources";
-    }
-    else
-    {
-        // FIXME: this path should be replaced by PACKAGE_DATA/PACKAGE_NAME, not hard-coded
-        resourcesPath = "/usr/local/share/spinframework";
-    }
-#endif
-
-    // get user defined env variable OSG_FILE_PATH
-    osgDB::Registry::instance()->initDataFilePathList();
-
-    // add all default resources paths to osg's file path list
-    osgDB::FilePathList fpl = osgDB::getDataFilePathList();
-    fpl.push_back( resourcesPath );
-    fpl.push_back( resourcesPath + "/scripts/");
-    fpl.push_back( resourcesPath + "/fonts/");
-    fpl.push_back( resourcesPath + "/images/");
-    fpl.push_back( resourcesPath + "/models/");
-    fpl.push_back( resourcesPath + "/shaders/");
-    osgDB::setDataFilePathList( fpl );
-
 
     //std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;

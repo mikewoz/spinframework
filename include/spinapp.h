@@ -188,6 +188,9 @@ public:
         bool hasAudioRenderer;
 
         SceneManager *sceneManager_;
+    
+        void setResourcesPath(const std::string &s) { resourcesPath_ = s; }
+        std::string getResourcesPath() const { return resourcesPath_; }
         
         void setUserID(const std::string &id) { userID_ = id; }
         std::string getUserID() const { return userID_; }
@@ -195,6 +198,8 @@ public:
     private:
     
         std::string userID_;
+        std::string resourcesPath_;
+    
         void sendBundle(const std::string &OSCpath, std::vector<lo_message> msgs, lo_address txAddr = 0);
 
         // singleton constructors & desctructor (hidden):

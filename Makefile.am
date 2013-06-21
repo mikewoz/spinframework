@@ -10,6 +10,7 @@ SUBDIRS = \
     tests
 
 EXTRA_DIST = \
+    buildWrappers.sh \
     LICENSE \
     README \
     NEWS

@@ -136,15 +136,15 @@
 
 #include "config.h"
 
-#include "ViewerManipulator.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinClientContext.h"
-#include "spinServerContext.h"
-#include "osgUtil.h"
-#include "GroupNode.h"
-#include "SceneManager.h"
-#include "ShapeNode.h"
+#include "viewermanipulator.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinclientcontext.h"
+#include "spinservercontext.h"
+#include "osgutil.h"
+#include "groupnode.h"
+#include "scenemanager.h"
+#include "shapenode.h"
 
 #include <osgDB/Registry>
 #include <osgDB/FileNameUtils>
@@ -450,7 +450,6 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     std::cout << std::flush;
     
     
-    //spin::spinApp::Instance();
     
     if (!spinListener.start())
 	{

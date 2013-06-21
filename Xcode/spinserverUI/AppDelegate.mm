@@ -41,10 +41,10 @@
 
 
 #import "AppDelegate.h"
-#include "spinApp.h"
-#include "spinUtil.h"
-#include "SceneManager.h"
-#include "spinServerContext.h"
+#include "spinapp.h"
+#include "spinutil.h"
+#include "scenemanager.h"
+#include "spinservercontext.h"
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>
 #endif
@@ -117,6 +117,7 @@
         if (arguments.errors()) arguments.writeErrorMessages(std::cout);
 
     }
+    
 
     // *************************************************************************
     // for now, hardcode one spatosc translator in the scene:
