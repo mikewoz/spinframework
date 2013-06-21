@@ -41,7 +41,6 @@
 
 #include <string>
 #include <iostream>
-#include <boost/filesystem.hpp>
 
 #include <osgViewer/CompositeViewer>
 #include <osgViewer/View>
@@ -57,19 +56,16 @@
 #include <osgDB/ReadFile>
 #include <osg/Timer>
 
-#include <boost/algorithm/string.hpp>
-
 #include "config.h"
-#include "ViewerManipulator.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinClientContext.h"
-#include "osgUtil.h"
-#include "GroupNode.h"
-#include "SceneManager.h"
-#include "ShapeNode.h"
-
-#include "CompositeViewer.h"
+#include "viewermanipulator.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinclientcontext.h"
+#include "osgutil.h"
+#include "groupnode.h"
+#include "scenemanager.h"
+#include "shapenode.h"
+#include "compositeviewer.h"
 
 #ifdef HAVE_SPNAV_H
 #include "spnav.h"
@@ -81,6 +77,10 @@
 //#define SPIN_SCALAR 0.01
 #define VELOCITY_SCALAR 0.004
 #define SPIN_SCALAR 0.007
+
+#define DISPLAY_FPS_TERMINAL 1
+#define DISPLAY_FPS_WINDOW 2
+#define DISPLAY_FPS_LOG 3
 
 extern pthread_mutex_t sceneMutex;
 
@@ -99,6 +99,7 @@ int run(int argc, char **argv)
     bool mblur = false;
     bool outline = false;
     bool mask = false;
+    bool shader = false;
     float speedScaleValue = 1.0;
     float moving = false;
 
@@ -120,6 +121,13 @@ int run(int argc, char **argv)
 
     std::string camConfig;
     std::string sceneID = spin.getSceneID();
+
+    int displayFps = 0;
+    double displayFpsFreq = 1.0;
+    std::string displayFpsWhere = "";
+    int displayFpsNb = 0;
+    osgViewer::Viewer* fpsViewer = 0;
+    osgText::Text* fpsWindowText = 0;
 
     //osg::setNotifyLevel(osg::INFO);
 
@@ -151,9 +159,10 @@ int run(int argc, char **argv)
     arguments.getApplicationUsage()->addCommandLineOption("--dof", "Enables depth of field effect");
     arguments.getApplicationUsage()->addCommandLineOption("--ssao", "Enables screen space ambient occlusion effect");
     arguments.getApplicationUsage()->addCommandLineOption("--mblur", "Enables motion blur effect");
-    arguments.getApplicationUsage()->addCommandLineOption("--outline", "Enables the outline effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--outline <filename>", "Enables the outline effect");
+    arguments.getApplicationUsage()->addCommandLineOption("--shader", "Activates an additionnal PPU shader, to specify through OSC messaging");
     arguments.getApplicationUsage()->addCommandLineOption("--mask", "Enables the masking effect (from a secondary camera render)");
-
+    arguments.getApplicationUsage()->addCommandLineOption("--display-fps < [terminal|window|log] t >", "Display the framerate on the terminal, in a window or in the server's logs.  The fps is refreshed every t seconds.");
     // *************************************************************************
     // PARSE ARGS:
 
@@ -182,6 +191,7 @@ int run(int argc, char **argv)
     if (arguments.read("--mblur")) mblur=true;
     if (arguments.read("--outline")) outline=true;
     if (arguments.read("--mask")) mask=true;
+    if (arguments.read("--shader")) shader=true;
     while (arguments.read("--window",x,y,width,height)) {}
     while (arguments.read("--screen",screen)) {}
     while (arguments.read("--framerate",maxFrameRate)) {}
@@ -189,12 +199,19 @@ int run(int argc, char **argv)
     if (arguments.read("--disable-camera-controls")) mover=false;
     if (arguments.read("--grid")) grid=true;
 
+    while( arguments.read("--display-fps", displayFpsWhere , displayFpsFreq ) ) {}
+
+    //displayFps = DISPLAY_FPS_TERMINAL; }
+    //while( arguments.read("--display-fps" , displayFpsFreq ) ) { displayFps = DISPLAY_FPS_WINDOW; }
+
     if (arguments.read("--cache"))
     {
         osgDB::ReaderWriter::Options* options = new osgDB::ReaderWriter::Options();
         options->setObjectCacheHint(osgDB::ReaderWriter::Options::CACHE_ALL);
         osgDB::Registry::instance()->setOptions(options);
     }
+
+ 
 
 
     // *************************************************************************
@@ -212,6 +229,64 @@ int run(int argc, char **argv)
     viewer.setThreadingModel(osgViewer::CompositeViewer::CullDrawThreadPerContext);
 
     viewer.getUsage(*arguments.getApplicationUsage());
+
+    // *************************************************************************
+    // display fps
+
+    if ( displayFpsWhere == "terminal" ) {
+        displayFps = DISPLAY_FPS_TERMINAL;
+        //printf("terminal!, %f\n", displayFpsFreq);
+        
+    } else if ( displayFpsWhere == "window" ) {
+        int fpsw = 150;
+        int fpsh = 50;
+        displayFps = DISPLAY_FPS_WINDOW;
+        //printf("window!, %f\n", displayFpsFreq);
+
+        fpsViewer = new osgViewer::Viewer();
+        fpsViewer->setUpViewInWindow(0,0,fpsw,fpsh);
+
+        osg::Camera* camera = fpsViewer->getCamera();
+        camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+        camera->setProjectionMatrixAsOrtho2D(0,fpsw,0,fpsh);
+        camera->setViewMatrix(osg::Matrix::identity());
+        //camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+        //camera->addChild(createHUDText());
+        camera->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+
+
+        osgText::Font* font = osgText::readFontFile("arial.ttf");
+        osg::Vec4 layoutColor(1.0f,1.0f,1.0f,1.0f);
+        float layoutCharacterSize = 30.0f;    
+                     
+        fpsWindowText = new osgText::Text;
+        fpsWindowText->setFont(font);
+        fpsWindowText->setColor(layoutColor);
+        fpsWindowText->setCharacterSize(layoutCharacterSize);
+        //fpsWindowText->setPosition(osg::Vec3(50, 15, 0));
+        fpsWindowText->setPosition(osg::Vec3(fpsw/2, fpsh/2, 0));
+        fpsWindowText->setLayout(osgText::Text::LEFT_TO_RIGHT);
+        fpsWindowText->setAlignment(osgText::Text::CENTER_CENTER);
+        //fpsWindowText->setAlignment(osgText::Text::LEFT_TOP);
+        fpsWindowText->setFontResolution(30,30);
+        //fpsWindowText->setDrawMode(osgText::Text::TEXT|osgText::Text::ALIGNMENT|osgText::Text::BOUNDINGBOX);
+        fpsWindowText->setText("FPS");
+        osg::Geode* g = new osg::Geode();
+        g->addDrawable( fpsWindowText );
+        
+        fpsViewer->setSceneData( g );
+        fpsViewer->realize();
+        fpsViewer->frame();
+    } else if ( displayFpsWhere == "log" ) {
+        displayFps = DISPLAY_FPS_LOG;
+    } else {
+        displayFps = 0;
+    }
+
+    if ( displayFps ) viewer.getViewerStats()->collectStats( "frame_rate", true );
+
+
+
 
     // *************************************************************************
     // multisampling / antialiasing:
@@ -336,7 +411,7 @@ int run(int argc, char **argv)
         view->addEventHandler(new osgViewer::ThreadingHandler);
         view->addEventHandler(new osgViewer::WindowSizeHandler);
 
-        if (dof || ssao || mblur || outline || mask)
+        if (dof || ssao || mblur || outline || mask || shader)
         {
             view->addEventHandler(new CustomResizeHandler(&viewer));
         }
@@ -394,7 +469,6 @@ int run(int argc, char **argv)
 
     // ***************************************************************************
     // debug print camera info
-
     if (0)
     {
         std::cout << std::endl << "CAMERA DEBUG PRINT:" << std::endl;
@@ -403,7 +477,7 @@ int run(int argc, char **argv)
         viewer.getCameras(cameras);
 
         osg::Vec3d eye, center, up;
-        double left, right, bottom, top, zNear, zFar;
+        double left, right, bottom, top, zNear, zFar, fovy, aspectRatio;
 
         if (manipulator.valid())
         {
@@ -418,19 +492,32 @@ int run(int argc, char **argv)
             std::cout << "   clear color:      (" << v4.x() << "," << v4.y() << "," << v4.z() << "," << v4.w() << ")" << std::endl;
 
             (*iter)->getProjectionMatrixAsFrustum (left, right, bottom, top, zNear, zFar);
-            std::cout << "   Frustum:          " << left << "," << right << "," << top << "," << bottom << "  clip: " << zNear << "-" << zFar << std::endl;
+            std::cout << "   Proj as Frustum:  " << left << "," << right << "," << top << "," << bottom << "  clip: " << zNear << "-" << zFar << std::endl;
+
+            (*iter)->getProjectionMatrixAsPerspective(fovy, aspectRatio, zNear, zFar);
+            std::cout << "   Proj as Perspect: fovy=" << fovy << ", aspectRatio=" << aspectRatio << ", clip: " << zNear << "-" << zFar << std::endl;
+
+            (*iter)->getProjectionMatrixAsOrtho(left, right, bottom, top, zNear, zFar);
+            std::cout << "   Proj as Ortho:    " << left << "," << right << "," << top << "," << bottom << "  clip: " << zNear << "-" << zFar << std::endl;
+
+
 
             (*iter)->getViewMatrixAsLookAt (eye, center, up);
             std::cout << "   Camera LookAt:    eye=(" << eye.x() << "," << eye.y() << "," << eye.z() << ") center=(" << center.x() << "," << center.y() << "," << center.z() << ") up=(" << up.x() << "," << up.y() << "," << up.z() << ")" << std::endl;
 
             const osg::Viewport *viewport = (*iter)->getViewport();
             if (viewport)
-                std::cout << "   Camera viewport:    " << viewport->x() << "," << viewport->y() << " " << viewport->width() << "x" << viewport->height() << std::endl;
+                std::cout << "   Camera viewport:  pos=(" << viewport->x() << "," << viewport->y() << ") size=" << viewport->width() << "x" << viewport->height() << std::endl;
             else
-                std::cout << "   Camera viewport:    INVALID" << std::endl;
+                std::cout << "   Camera viewport:  INVALID" << std::endl;
 
-            osg::View *v = (*iter)->getView();
-            std::cout << "   view numSlaves:   " << v->getNumSlaves() << std::endl;
+            //osg::View *v = (*iter)->getView();
+            //std::cout << "   view numSlaves:   " << v->getNumSlaves() << std::endl;
+        }
+        for (unsigned int i=0; i<viewer.getNumViews(); i++)
+        {
+            osg::View *v = viewer.getView(i);
+            std::cout << "View " << v->getName() << " has " << v->getNumSlaves() << " slaves" << std::endl;
 
             for (unsigned int slaveNum=0; slaveNum<v->getNumSlaves(); slaveNum++)
             {
@@ -518,7 +605,7 @@ int run(int argc, char **argv)
     //std::cout << "Starting viewer (threading = " << viewer.getThreadingModel() << ")" << std::endl;
     std::cout << "\nspinviewer is READY" << std::endl;
 
-    if (dof || ssao || mblur || outline || mask)
+    if (dof || ssao || mblur || outline || mask || shader)
     {
         unsigned int lEffects = 0x0000;
         if(dof)
@@ -531,6 +618,8 @@ int run(int argc, char **argv)
             lEffects |= PPU_OUTLINE;
         if(mask)
             lEffects |= PPU_MASK;
+        if(shader)
+            lEffects |= PPU_SHADER;
 
         //viewer.frame();
         viewer.viewerInit(); // TODO: move this in a better place
@@ -574,6 +663,8 @@ int run(int argc, char **argv)
         spin.sceneManager_->worldNode->getOrCreateStateSet()->setAttribute(clamp, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
     }*/
 
+
+
     // program loop:
     while(not viewer.done())
     {
@@ -608,9 +699,8 @@ int run(int argc, char **argv)
             else
             {
                 if (dt >= minFrameTime)
-                {
-                                    viewer.frame();
-
+                    {
+                        viewer.frame();
 /*
                     // poll the space navigator:
                     viewer.updateSpaceNavigator();
@@ -635,6 +725,23 @@ int run(int argc, char **argv)
                 if (sleepTime > 100) sleepTime = 100;
 
                 if (!recv) OpenThreads::Thread::microSleep(sleepTime);
+            }
+
+            if ( displayFps && viewer.getViewerFrameStamp()->getReferenceTime() > displayFpsFreq * displayFpsNb ) {
+                double d;
+                viewer.getViewerStats()->getAveragedAttribute( "Frame rate", d );
+                if ( displayFps == DISPLAY_FPS_TERMINAL ) {
+                    printf( "Frame rate: %f               \r", d );
+                    fflush( stdout );
+                } else if ( displayFps == DISPLAY_FPS_WINDOW ) {                    
+                    std::ostringstream oss;
+                    oss << d;
+                    fpsWindowText->setText( oss.str() );
+                    fpsViewer->frame();
+                } else { // displayFps == DISPLAY_FPS_LOG
+                    spin.NodeMessage( spin.getUserID().c_str(), "si", "FPS", (int)d, SPIN_ARGS_END );
+                }
+                displayFpsNb++;
             }
 
             // ***** END
@@ -673,50 +780,9 @@ int run(int argc, char **argv)
 // *****************************************************************************
 int main(int argc, char **argv)
 {
-    /*
     // *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
-    std::vector<char*> newArgs;
-    if (argc == 1)
-    {
-        try
-        {
-            using namespace boost::filesystem;
-
-            if (exists(SPIN_DIRECTORY+"/args"))
-            {
-                std::stringstream ss;
-                ss << std::ifstream( (SPIN_DIRECTORY+"/args").c_str() ).rdbuf();
-
-                // executable path is always the first argument:
-                newArgs.push_back(argv[0]);
-
-                std::string token;
-                while (ss >> token)
-                {
-                    char *arg = new char[token.size() + 1];
-                    copy(token.begin(), token.end(), arg);
-                    arg[token.size()] = '\0';
-                    newArgs.push_back(arg);
-                }
-                newArgs.push_back(0); // needs to end with a null item
-
-                argc = (int)newArgs.size()-1;
-                argv = &newArgs[0];
-            }
-        }
-        catch ( const boost::filesystem::filesystem_error& e )
-        {
-            std::cout << "Warning: cannot read arguments from " << SPIN_DIRECTORY+"/args. Reason: " << e.what() << std::endl;
-        }
-    }
-     */
-
-
-    // *************************************************************************
-    // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     std::vector<char*> newArgs = spin::getUserArgs();
     if ((argc==1) && (newArgs.size() > 1))
     {

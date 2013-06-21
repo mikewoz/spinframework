@@ -45,10 +45,10 @@
 #include <osg/Image>
 
 #include <iostream>
-#include "SharedVideoTexture.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "sharedvideotexture.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 using namespace std;
 
@@ -70,7 +70,7 @@ namespace spin
     //img->setOrigin(osg::Image::BOTTOM_LEFT); 
 
     // setup texture:
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     reader_.setDebug (true);
     tex = reader_.getTexture ();
 #else
@@ -136,7 +136,7 @@ namespace spin
   // update callback
   void SharedVideoTexture::updateCallback()
   {
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     reader_.updateImage();
 #endif
 
@@ -158,7 +158,7 @@ namespace spin
         BROADCAST(this, "ss", "setTextureID", getTextureID());
       }
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
    if (sceneManager_->isGraphical())
       {
 	//start the shmdata
@@ -194,7 +194,7 @@ namespace spin
     std::cout << "   Texture ID: " << getTextureID() << std::endl;
     std::cout << "   Path: " << getPath() << std::endl;
     std::cout << "   Render bin: " << getRenderBin() << std::endl;
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     if (sceneManager_->isGraphical())
       std::cout << "   width/height: " << reader_.getWidth() << "x" << reader_.getHeight() << std::endl;
 #endif  
@@ -207,7 +207,7 @@ namespace spin
   // *****************************************************************************
   // The rest of this stuff is only valid if we are using the shmdata library
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
 
   void SharedVideoTexture::play()
   {

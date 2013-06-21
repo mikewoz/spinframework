@@ -1,5 +1,5 @@
 import spin
-import libSPINPyWrap
+import spinframework
 import math
 
 
@@ -36,18 +36,18 @@ class Script( spin.ScriptBase ):
         self.applyEvent(eventMethod, eventArgs, 0) # cascadeEvents = 0... actually do the translation, don't redo hotspot.run
 
         #print "am I in the box?", self.box
-        ret = libSPINPyWrap.callback(self._nodeID, "getTranslation", [], 0)
+        ret = spinframework.callback(self._nodeID, "getTranslation", [], 0)
         x,y,z = ret.getVector()
 
         if isInside(x, y, z, self.box):
             if not self.inbox:
                 print "IN the box!"
-                libSPINPyWrap.callback(self._nodeID, "setScale", [self.scale, self.scale, self.scale], 0)
+                spinframework.callback(self._nodeID, "setScale", [self.scale, self.scale, self.scale], 0)
             self.inbox = True
         else:
             if self.inbox:
                 print "OUT of the box!"
-                libSPINPyWrap.callback(self._nodeID, "setScale", self.normalScale, 0)
+                spinframework.callback(self._nodeID, "setScale", self.normalScale, 0)
             self.inbox = False
 
 print "hotspot module loaded."

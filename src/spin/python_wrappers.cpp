@@ -73,9 +73,9 @@
 #include <cppintrospection/Attributes>
 #include <cppintrospection/ExtendedTypeInfo>
 #include <cppintrospection/variant_cast>
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "SceneManager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "scenemanager.h"
 
 using namespace boost::python;
 
@@ -384,7 +384,7 @@ double time_n()
 /**
  * Please document this.
  */
-BOOST_PYTHON_MODULE(libSPINPyWrap)
+BOOST_PYTHON_MODULE(spinframework)
 {
     def("callback", &SceneManagerCallback_script);
     def("time_s", &time_s);

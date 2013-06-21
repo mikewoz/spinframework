@@ -48,12 +48,12 @@
 #include <osg/BlendColor>
 #include <osg/BlendEquation>
 
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "ReferencedNode.h"
-#include "SwitchNode.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "referencednode.h"
+#include "switchnode.h"
 
 #include <cppintrospection/Value>
 #include <cppintrospection/Type>
@@ -175,6 +175,8 @@ void ReferencedNode::attachTo (const char* parentID)
 
     osg::ref_ptr<ReferencedNode> newParentNode = sceneManager_->getNode(parentID);
 
+    if ( newParentNode.get() == this ) return;
+
     if (newParentNode.valid())
     {
         if (! (newParentNode->getAttachmentNode()->containsNode(this)))
@@ -211,7 +213,17 @@ void ReferencedNode::attachTo (const char* parentID)
 
 void ReferencedNode::detachFrom(const char* parentID)
 {
-    if (getID()=="world") return;
+    if (getID()=="world")
+    {
+        if (sceneManager_->worldNode->containsNode(this))
+        {
+            sceneManager_->worldNode->removeChild(this);
+        }
+    
+        BROADCAST(this, "ss", "detachFrom", "world");
+        spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "detach", this->getID().c_str(), "world", SPIN_ARGS_END);
+        return;
+    }
 
     // detach from all parents if the "*" wildcard is specified:
     if (std::string(parentID)=="*")
@@ -431,6 +443,9 @@ void ReferencedNode::setAlpha (float alpha)
     if (subgraphAlpha_ == alpha)
         return;
 
+    bool newlyTransparent = false;
+    if ( subgraphAlpha_ >= 1.0 && alpha < 1.0 ) newlyTransparent = true;
+
     subgraphAlpha_ = alpha;
     if (subgraphAlpha_ < 0.0)
         subgraphAlpha_ = 0.0;
@@ -438,24 +453,37 @@ void ReferencedNode::setAlpha (float alpha)
         subgraphAlpha_ = 1.0;
 
     osg::StateSet *ss = this->getOrCreateStateSet();
-    ss->setDataVariance(osg::Object::DYNAMIC);
 
-    // turn on blending and tell OSG to sort meshes before displaying them
-    ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-    ss->setMode(GL_BLEND, osg::StateAttribute::ON);
+    if ( newlyTransparent ) {
+        ss->setDataVariance(osg::Object::DYNAMIC);
 
-    osg::BlendFunc *blendFunc = new osg::BlendFunc();
-    osg::BlendColor *blendColor= new osg::BlendColor(osg::Vec4(1, 1, 1, subgraphAlpha_));
+        // turn on blending and tell OSG to sort meshes before displaying them
+        ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+        ss->setMode(GL_BLEND, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-    blendFunc->setDataVariance(osg::Object::DYNAMIC);
-    blendColor->setDataVariance(osg::Object::DYNAMIC);
+        osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::CONSTANT_ALPHA,
+                                                        osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA );
 
-    blendFunc->setSource(osg::BlendFunc::CONSTANT_ALPHA);
-    blendFunc->setDestination(osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA);
-    ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
-    ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+        // osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::SRC_ALPHA,
+        //                                                 osg::BlendFunc::ONE_MINUS_SRC_ALPHA );
 
-    this->osg::Group::setStateSet(ss);
+        osg::BlendColor *blendColor = new osg::BlendColor(osg::Vec4(subgraphAlpha_,subgraphAlpha_,subgraphAlpha_,subgraphAlpha_));
+
+        blendFunc->setDataVariance(osg::Object::DYNAMIC);
+        blendColor->setDataVariance(osg::Object::DYNAMIC);
+        ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+        ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+    } else {
+        osg::BlendColor *bc = dynamic_cast<osg::BlendColor*>( ss->getAttribute( osg::StateAttribute::BLENDCOLOR ) );
+        bc->setConstantColor( osg::Vec4(subgraphAlpha_,subgraphAlpha_,subgraphAlpha_,subgraphAlpha_) );
+        ss->setAttributeAndModes( bc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON ); // needed?
+    }
+
+
+
+    // ss->setAttributeAndModes(new osg::BlendEquation(),
+    //                          osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE); 
+    //    this->osg::Group::setStateSet(ss);
 
     /*
     osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
@@ -474,13 +502,15 @@ void ReferencedNode::setAlpha (float alpha)
     */
 
     std::cout << "set alpha for " << this->id_->s_name << " to " << subgraphAlpha_ << std::endl;
+    
+    BROADCAST(this, "sf", "setAlpha", subgraphAlpha_);
+
 }
 
 void ReferencedNode::setCastShadows(int b)
 {
     castShadows_ = (bool)b;
     
-    /*
     // if the castShadow flag is set, ensure to add it to the nodemask
     if (castShadows_)
     {
@@ -491,9 +521,8 @@ void ReferencedNode::setCastShadows(int b)
         // if castShadows flag is false, remove the bit from the nodemask:
         osg::Node::setNodeMask(getNodeMask() & ~CAST_SHADOW_NODE_MASK);
     }
-    */
     
-    this->setNodeMask(getNodeMask());
+    //this->setNodeMask(getNodeMask());
     BROADCAST(this, "si", "setCastShadows", (int)b);
 }
 
@@ -510,6 +539,13 @@ void ReferencedNode::setParam (const char *paramName, float paramValue)
     BROADCAST(this, "ssf", "setParam", paramName, paramValue);
 }
 
+void ReferencedNode::sendEvent (const char *types, lo_arg **argv, int argc )
+{
+    // std::cout << "ERROR: ReferencedNode::sendEvent CALLED" << std::endl;
+    0; // action only defined in subclasses
+}
+
+    
 // -----------------------------------------------------------------------------
 
 void ReferencedNode::setStateSetFromFile(const char* filename)

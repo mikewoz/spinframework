@@ -53,12 +53,12 @@
 
 #include <iostream>
 
-#include "SceneManager.h"
-#include "Shader.h"
-#include "ShaderUtil.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "scenemanager.h"
+#include "shader.h"
+#include "shaderutil.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -575,6 +575,7 @@ void Shader::loadGLSLShader(std::string path)
     {
         // let's check if the user just passed the base file name (without an extention)
         vertSuccess = loadShaderSource( vertShader, path+".vert" );
+        geomSuccess = loadShaderSource( vertShader, path+".geom" );
         fragSuccess = loadShaderSource( fragShader, path+".frag" );
     }
 

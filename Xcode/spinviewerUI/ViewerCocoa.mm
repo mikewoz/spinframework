@@ -134,25 +134,17 @@
 
 // stuff needed for SPIN:
 
-//#include <string>
-//#include <iostream>
-//#include <boost/filesystem.hpp>
-//#include <boost/filesystem/operations.hpp>
-//#include <boost/filesystem/exception.hpp>
-//#include <boost/algorithm/string.hpp>
-//#include <boost/python.hpp>
-//#include <Python.h>
 #include "config.h"
 
-#include "ViewerManipulator.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinClientContext.h"
-#include "spinServerContext.h"
-#include "osgUtil.h"
-#include "GroupNode.h"
-#include "SceneManager.h"
-#include "ShapeNode.h"
+#include "viewermanipulator.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinclientcontext.h"
+#include "spinservercontext.h"
+#include "osgutil.h"
+#include "groupnode.h"
+#include "scenemanager.h"
+#include "shapenode.h"
 
 #include <osgDB/Registry>
 #include <osgDB/FileNameUtils>
@@ -325,21 +317,25 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     osg::setNotifyLevel(osg::DEBUG_FP);
     
     
-    //osgDB::FileNameList allPlugins = osgDB::Registry::instance()->listAllAvailablePlugins();
+    ///osgDB::FileNameList allPlugins = osgDB::Registry::instance()->listAllAvailablePlugins();
 
     
     // Set the plugin path so that our osgdb_* plugins can be found in the app
     // bundle:
     
-    //NSString *pluginPath = [[NSBundle mainBundle] builtInPlugInsPath];
-    //NSLog(@"Adding plugin path: %@",  pluginPath);
-    //osgDB::Registry::instance()->setLibraryFilePathList(std::string([pluginPath UTF8String])+":"+std::string([pluginPath UTF8String])+"/osgPlugins-2.9.8");
+    NSString *pluginsPath = [[NSBundle mainBundle] builtInPlugInsPath];
+
+    std::string bundlePath = [[[[NSBundle mainBundle] bundlePath] stringByReplacingOccurrencesOfString:@" " withString:@"\\ "] UTF8String];
     
-    std::string bundlePath = [[[NSBundle mainBundle] bundlePath] UTF8String];
+    
+    NSLog(@"bundlePath: %s", bundlePath.c_str());
     osgDB::FilePathList osgLibPaths;
+    osgLibPaths.push_back([pluginsPath UTF8String]);
     osgLibPaths.push_back(bundlePath);
     osgLibPaths.push_back(bundlePath+"/Contents/PlugIns");
-    osgLibPaths.push_back(bundlePath+"/Contents/PlugIns/osgPlugins-3.1.1");
+    osgLibPaths.push_back("../PlugIns");
+    osgLibPaths.push_back("PlugIns");
+    //osgLibPaths.push_back(bundlePath+"/Contents/PlugIns/osgPlugins-3.1.1");
     //osgLibPaths.push_back("/usr/local/lib/osgPlugins-"+std::string(osgGetVersion()));
     //osgLibPaths.push_back("/opt/local/lib/osgPlugins-"+std::string(osgGetVersion()));
     osgDB::Registry::instance()->setLibraryFilePathList(osgLibPaths);
@@ -348,13 +344,13 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     //setenv("OSG_LIBRARY_PATH", (std::string([pluginPath UTF8String])+":"+std::string([pluginPath UTF8String])+"/osgPlugins-2.9.8").c_str(), 1);
     //setenv("OSG_LIBRARY_PATH", (std::string([pluginPath UTF8String])+":"+std::string([pluginPath UTF8String])+"/osgPlugins-2.9.8").c_str(), 1);
     
-    /*
+    
     osgDB::FilePathList osgLibPaths2 = osgDB::Registry::instance()->getLibraryFilePathList();
     std::cout << "getLibraryFilePathList:";      
     for(osgDB::FilePathList::iterator i=osgLibPaths2.begin(); i!=osgLibPaths2.end(); ++i)
         std::cout<<" "<<(*i);
     std::cout<<std::endl;
-     */
+     
     
     //std::cout << "DYLD_LIBRARY_PATH=" << getenv("DYLD_LIBRARY_PATH") << std::endl;
     //std::cout << "OSG_LIBRARY_PATH=" << getenv("OSG_LIBRARY_PATH") << std::endl;
@@ -412,7 +408,7 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     
 	// *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     int argc;
     char **argv;
     std::vector<char*> newArgs = spin::getUserArgs();
@@ -454,7 +450,6 @@ static void Internal_SetAlpha(NSBitmapImageRep *imageRep, unsigned char alpha_va
     std::cout << std::flush;
     
     
-    //spin::spinApp::Instance();
     
     if (!spinListener.start())
 	{

@@ -39,16 +39,16 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
-#include "spinClientContext.h"
-#include "spinApp.h"
-#include "SceneManager.h"
-#include "spinDefaults.h"
-#include "EventHandler.h"
+#include "spinclientcontext.h"
+#include "spinapp.h"
+#include "scenemanager.h"
+#include "spindefaults.h"
+#include "eventhandler.h"
 
 namespace spin
 {
@@ -159,7 +159,6 @@ void spinClientContext::createServers()
 {
     std::vector<lo_server>::iterator servIter;
 
-    using boost::lexical_cast;
     using std::string;
 
     /*
@@ -205,7 +204,7 @@ void spinClientContext::createServers()
             std::string addr(lo_address_get_hostname(lo_syncAddr));
             lo_address_free(lo_syncAddr);
             lo_syncServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+            lo_syncAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_syncServ)).c_str());
         }
     } else {
         lo_syncServ = lo_server_new(lo_address_get_port(lo_syncAddr), oscParser_error);
@@ -216,7 +215,7 @@ void spinClientContext::createServers()
             std::string addr(lo_address_get_hostname(lo_syncAddr));
             lo_address_free(lo_syncAddr);
             lo_syncServ = lo_server_new(NULL, oscParser_error);
-            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+            lo_syncAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_syncServ)).c_str());
         }
     }
     lo_server_add_method(lo_syncServ, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
@@ -276,7 +275,7 @@ void *spinClientContext::spinClientThread(void *arg)
 #ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
-    std::string cmd = "sys.path.append('" + spin.sceneManager_->resourcesPath + "/scripts')";
+    std::string cmd = "sys.path.append('" + spin.getResourcesPath() + "/scripts')";
 
     spin.execPython(cmd);
     spin.execPython("import spin");
@@ -304,7 +303,12 @@ void *spinClientContext::spinClientThread(void *arg)
         int recv = context->pollUpdates();
 
         if (recv == 0)
-            usleep(10);
+        {
+            timespec nap;
+            nap.tv_sec = 0;
+            nap.tv_nsec = 1e4;
+            nanosleep(&nap, NULL);
+        }
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();

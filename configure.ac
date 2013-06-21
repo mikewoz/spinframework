@@ -15,9 +15,9 @@ AC_PREREQ([2.61])
 # After the release:
 # - increase spin_micro_version to the next odd number
 # - increase spin_interface_version to the next odd number
-m4_define([spin_major_version], [0])
-m4_define([spin_minor_version], [3])
-m4_define([spin_micro_version], [24])
+m4_define([spin_major_version], [1])
+m4_define([spin_minor_version], [0])
+m4_define([spin_micro_version], [0])
 
 m4_define([spin_release_status],
           [m4_if(m4_eval(spin_micro_version % 2), [1], [git],
@@ -27,7 +27,7 @@ m4_define([spin_release_status],
 m4_define([spin_version], [spin_major_version.spin_minor_version.spin_micro_version])
 
 # change this only when breaking the API
-m4_define([spin_api_version], [0.3])
+m4_define([spin_api_version], [1.0])
 
 # increase the interface age by 1 for each release; if the API changes,
 # set to 0. interface_age and binary_age are used to create the soname
@@ -114,10 +114,14 @@ fi
 case "$host" in *-darwin* | *-macos10*)
   #AC_LANG_DEFINES_PROVIDED # remove autogen.sh warnings on OSX
   AM_CONDITIONAL([HAVE_OSX], true)
+  AC_DEFINE([IS_OSX],[1],[Easy flag to tell us if this is OSX])
   LIBTOOL="glibtool"
   SRCDIR=`pwd`
   #LIBTOOL="libtool"
   CPPFLAGS="$CPPFLAGS -D__Darwin"
+  #CPPFLAGS="$CPPFLAGS -D__Darwin -fpermissive"
+  #CXXFLAGS=" -std=c++0x -stdlib=libc++"
+  #CXX="clang++"
   LDFLAGS="-undefined dynamic_lookup -Wl,-headerpad_max_install_names"
   if test -d /opt/local ; then
     CPPFLAGS="$CPPFLAGS -I/usr/local/include -I/opt/local/include"
@@ -144,7 +148,7 @@ esac
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:$PKG_CONFIG_PATH:$PWD/pkgconfig
 
 
-CXXFLAGS+=" -Wall -Wextra -Wfatal-errors"
+CXXFLAGS+=" -Wall -Wextra -Wfatal-errors "
 LDFLAGS="$LDFLAGS -L/usr/local/lib -L/usr/local/lib64"
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -169,6 +173,15 @@ AC_CHECK_HEADERS([arpa/inet.h stddef.h stdlib.h string.h sys/time.h])
 AC_FUNC_ERROR_AT_LINE
 AC_CHECK_FUNCS([gettimeofday memmove mkdir setenv sqrt strchr strpbrk uname])
 
+case "$host" in *-darwin* | *-macos*)
+TINYXML_LIBS=-ltinyxml
+;;
+*)
+PKG_CHECK_MODULES(TINYXML, tinyxml >= 2.0.0, [], AC_MSG_ERROR(TinyXML 2.0.0 or greater is required. Please see README))
+;;
+esac
+AC_SUBST([TINYXML_LIBS])
+
 # Method to disable Python (note the negative: DISable)
 AC_ARG_ENABLE([python],
     AS_HELP_STRING([--enable-python], [Enables the Python interpreter within SPIN (enabled by default)]),
@@ -178,7 +191,6 @@ if test "x$enable_python" != xtrue; then
 AC_DEFINE([DISABLE_PYTHON],[1],[Disables python interpreter and thus all behaviours scripts in SPIN]) AC_MSG_NOTICE([Disabled Python scripts])
 fi
 AM_CONDITIONAL(HAVE_PYTHON, test "x$enable_python" = xtrue)
-
 
 if test "x$enable_python" = xtrue; then
 
@@ -199,13 +211,13 @@ case "$host" in *-darwin* | *-macos10*)
 esac
 fi
 
-BOOST_REQUIRE([1.35])
-BOOST_REGEX
-BOOST_SYSTEM
-BOOST_FILESYSTEM
+#BOOST_REGEX
+#BOOST_SYSTEM
+#BOOST_FILESYSTEM
 #BOOST_THREAD
-BOOST_PROGRAM_OPTIONS
+#BOOST_PROGRAM_OPTIONS
 if test "x$enable_python" = xtrue; then
+BOOST_REQUIRE([1.35])
 BOOST_PYTHON
 fi
 
@@ -224,14 +236,18 @@ PKG_CHECK_MODULES(LIBLO, liblo, , AC_MSG_ERROR([missing liblo]))
 #        [AC_MSG_WARN([missing Scenic shared_video library])])
 
 
-PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.6 shmdata-any-0.6, have_sharedvideo=true, have_sharedvideo=false)
-if test "x${have_sharedvideo}" = "xfalse" ; then
-    AC_MSG_WARN([missing package: libshmdata-0.6-dev ])
-else
-    AC_DEFINE([WITH_SHARED_VIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
+AC_ARG_ENABLE([sharedvideo], AS_HELP_STRING([--disable-sharedvideo], [Disable shmdata library]))
+AS_IF([test "x$enable_sharedvideo" != "xno"], [
+  PKG_CHECK_MODULES(SHAREDVIDEO, shmdata-osg-0.8 shmdata-any-0.8, have_sharedvideo=true, have_sharedvideo=false)
+  if test "x${have_sharedvideo}" = "xfalse" ; then
+    AC_MSG_WARN([missing package: libshmdata-0.8-dev ])
+  else
+    AC_DEFINE([WITH_SHAREDVIDEO],[],[A flag that compiles additional features for use with the shmdata library]) AC_MSG_NOTICE([Using shmdata library for sharing video streams])
     AC_MSG_NOTICE([SHAREDVIDEO_CFLAGS:    ${SHAREDVIDEO_CFLAGS}])
     AC_MSG_NOTICE([SHAREDVIDEO_LIBS:      ${SHAREDVIDEO_LIBS}])
-fi
+  fi
+])
+AM_CONDITIONAL(SHAREDVIDEO, test -n "$SHAREDVIDEO_LIBS")
 
 AC_CHECK_LIB([PocoFoundation],[main],[have_poco=true] [POCO_LIBS="-lPocoUtil -lPocoNet -lPocoXML -lPocoFoundation"], AC_MSG_WARN([missing Poco]))
 if test "x${have_poco}" = "xtrue" ; then
@@ -243,7 +259,7 @@ else
     have_poco=false
 fi
 
-PKG_CHECK_MODULES(SPATOSC, spatosc-0.4, have_spatosc=true, have_spatosc=false)
+PKG_CHECK_MODULES(SPATOSC, spatosc-0.6, have_spatosc=true, have_spatosc=false)
 if test "x${have_spatosc}" = "xfalse" ; then
     AC_MSG_WARN([missing package: libspatosc-dev])
 else
@@ -263,9 +279,7 @@ fi
 AM_CONDITIONAL(BULLET, test -n "$BULLET_LIBS")
 
 dnl PCL
-dnl FIXME: the line below is evil but required in order to get -lflann working
-#export PKG_CONFIG_PATH=$PWD
-PCL_PKGS="pcl_common-1.6 pcl_io-1.6 pcl_filters-1.6 pcl_octree-1.6"
+PCL_PKGS="pcl_common-1.7 pcl_filters-1.7 pcl_io-1.7 pcl_kdtree-1.7 pcl_octree-1.7 pcl_sample_consensus-1.7 pcl_search-1.7"
 PKG_CHECK_MODULES(PCL, ${PCL_PKGS}, have_pcl=true, have_pcl=false)
 if test "x${have_pcl}" = "xfalse" ; then
     AC_MSG_WARN([missing packages: ${PCL_PKGS} (PointCloudLibrary)])
@@ -299,12 +313,13 @@ if test "x$with_editor" = xyes; then
     fi
 fi
 
+#        src/tinyxml/Makefile 
 AC_CONFIG_FILES([
         Makefile 
         doxyfile
         src/Makefile 
-        src/tinyxml/Makefile 
         src/osgPPU/Makefile 
+        src/osgWrappers/generator/Makefile 
         src/osgWrappers/introspection/Makefile 
         src/spin/Makefile
         src/Resources/Makefile
@@ -319,7 +334,7 @@ AC_CONFIG_FILES([
         src/lodifier/Makefile
         man/Makefile 
         tests/Makefile
-        spin-${SPIN_API_VERSION}.pc:spin.pc.in
+        spinframework-${SPIN_API_VERSION}.pc:spin.pc.in
         completion/Makefile
         ])
 

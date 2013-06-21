@@ -44,16 +44,14 @@
 #include <osg/Geometry>
 #include <osg/Billboard>
 
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
-#include "GeometryNode.h"
-#include "SceneManager.h"
-
-
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "SharedVideoTexture.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
+#include "geometrynode.h"
+#include "scenemanager.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "sharedvideotexture.h"
 
 extern pthread_mutex_t sceneMutex;
 

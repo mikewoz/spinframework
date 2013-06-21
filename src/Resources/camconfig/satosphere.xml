@@ -11,12 +11,14 @@
         <supportsResize>true</supportsResize>
         <camera id="domeCamera">
             <spherical>true</spherical>
-            <collar>0.95</collar>
+            <collar>0.975</collar>
             <radius>1.0</radius>
+            <crop>0</crop>
             <textureSize>1024</textureSize>
             <viewport>0% 0% 100% 100%</viewport>
             <clearColor>0.5 0.5 0.5 1.0</clearColor>
             <clipping>0.001 1000.0</clipping>
+            <rotation>0</rotation>
         </camera>
     </window>
 </camConfig>

@@ -41,11 +41,11 @@
 
 #include "config.h"
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <pthread.h>
 #include <signal.h>
-#include <boost/lexical_cast.hpp>
 
 #include <osgDB/Registry>
 #include <cppintrospection/Type>
@@ -53,8 +53,6 @@
 #include <osgUtil/Optimizer>
 #include <osg/Version>
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
 #ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
 #endif
@@ -62,15 +60,15 @@
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
-#include "SceneManager.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "spinClientContext.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinLog.h"
-#include "nodeVisitors.h"
-#include "spinDefaults.h"
+#include "scenemanager.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "spinclientcontext.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinlog.h"
+#include "nodevisitors.h"
+#include "spindefaults.h"
 
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>
@@ -165,7 +163,7 @@ void spinBaseContext::debugPrint()
 {
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager_->resourcesPath << std::endl;
+    std::cout << "  Resources path:\t\t" << spinApp::Instance().getResourcesPath() << std::endl;
     std::cout << "  SPIN version:\t\t\t" << PACKAGE_VERSION << "" << std::endl;
     std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC
@@ -174,7 +172,7 @@ void spinBaseContext::debugPrint()
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     std::cout << "  sharedvideo enabled?\t\tYES" << std::endl;
 #else
     std::cout << "  sharedvideo enabled?\t\tNO" << std::endl;
@@ -348,8 +346,11 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
     //pthread_join(pthreadID, NULL); // if not DETACHED thread
 
     // wait until the thread gets into it's loop before returning:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (! running )
-        usleep(10);
+        nanosleep(&nap, NULL);
 
     return true;
 }
@@ -365,8 +366,11 @@ void spinBaseContext::stop()
     }
 
     // wait here until the thread has really exited:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (isRunning())
-        usleep(10);
+        nanosleep(&nap, NULL);
 
 }
 
@@ -421,6 +425,19 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     spinApp &spin = spinApp::Instance();
 
+    if (theMethod == "event")
+    {
+        
+        ReferencedNode *n = dynamic_cast<ReferencedNode*>(s->s_thing);
+        if (n)
+        {
+            if (argc > 1)
+            {
+                //std::cout << "spinBaseContext matched node message for: " << s->s_name << " method: " << theMethod << std::endl;
+                n->sendEvent(types+1, argv+1, argc-1);
+            }
+        }
+    }
 
     if (theMethod == "parentList")
     {
@@ -875,7 +892,10 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         }
     }
     else if ((theMethod == "exportScene") && (argc==3))
+    {
         sceneManager->exportScene((char*) argv[1], (char*) argv[2]);
+        spin.BroadcastSceneMessage("sss", "exportScene", (char*) argv[1], (char*) argv[2], SPIN_ARGS_END);
+    }
     else if ((theMethod == "load") && (argc==2))
         sceneManager->loadXML((char*) argv[1]);
     else if ((theMethod == "save") && (argc==2))
@@ -898,6 +918,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "setShadows") && (argc==2))
+        sceneManager->setShadows((bool) lo_hires_val((lo_type)types[1], argv[1]));
     else if ((theMethod == "setShadowSoftness") && (argc==2))
     {
         sceneManager->setShadowSoftness((float) lo_hires_val((lo_type)types[1], argv[1]));
@@ -920,6 +942,13 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
         float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
         sceneManager->setGravity(x,y,z);
+    }
+    else if ((theMethod == "setWind") && (argc==4))
+    {
+        float x = (float) lo_hires_val((lo_type)types[1], argv[1]);
+        float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
+        float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
+        sceneManager->setWind(x,y,z);
     }
     else if ((theMethod == "setUpdateRate") && (argc==2))
         sceneManager->setUpdateRate((float)lo_hires_val((lo_type)types[1], argv[1]));
@@ -1079,7 +1108,6 @@ void spinBaseContext::oscParser_error(int num, const char *msg, const char *path
 
 void spinBaseContext::createServers()
 {
-    using boost::lexical_cast;
     using std::string;
 
     lo_tcpRxServer_ = lo_server_new_with_proto(tcpPort_.c_str(), LO_TCP, oscParser_error);
@@ -1109,7 +1137,7 @@ void spinBaseContext::createServers()
                 std::string addr(lo_address_get_hostname(*it));
                 tmpServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
                 lo_address_free(*it);
-                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+                (*it) = lo_address_new(addr.c_str(), stringify(lo_server_get_port(tmpServ)).c_str());
             }
         }
         else
@@ -1121,7 +1149,7 @@ void spinBaseContext::createServers()
                 tmpServ = lo_server_new(NULL, oscParser_error);
                 std::string addr(lo_address_get_hostname(*it));
                 lo_address_free(*it);
-                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+                (*it) = lo_address_new(addr.c_str(), stringify(lo_server_get_port(tmpServ)).c_str());
             }
         }
         lo_rxServs_.push_back(tmpServ);
@@ -1138,7 +1166,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
     } 
     else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
@@ -1151,7 +1179,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new(NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
         int sock = lo_server_get_socket_fd(lo_infoServ_);
         int sockopt = 1;
@@ -1167,7 +1195,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new(NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
     }
 }

@@ -39,11 +39,11 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "Menu3D.h"
-#include "spinApp.h"
-#include "osgUtil.h"
-#include "spinBaseContext.h"
-#include "SceneManager.h"
+#include "menu3d.h"
+#include "spinapp.h"
+#include "osgutil.h"
+#include "spinbasecontext.h"
+#include "scenemanager.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -134,7 +134,10 @@ void Menu3D::addItem (const char *itemText)
 	n->setBillboard(billboardType_);
 	n->setInteractionMode(GroupNode::SELECT);
 	n->setText(itemText);
-	n->attachTo(this->getID().c_str());
+    n->setAlignment( osgText::TextBase::CENTER_CENTER );
+    n->detachFrom("world");
+    n->attachTo(this->getID().c_str());
+	//n->setParent(this->getID().c_str());
 
 	// add it to the list:
 	items_.push_back(n);
@@ -375,6 +378,8 @@ void Menu3D::setColor (float r, float g, float b, float a)
     {
     	if ((*i).valid()) (*i)->setColor(r, g, b, a);
     }
+
+    BROADCAST(this, "sffff", "setColor", r,g,b,a);
 }
 
 // -----------------------------------------------------------------------------

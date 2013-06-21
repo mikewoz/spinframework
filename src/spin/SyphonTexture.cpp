@@ -50,10 +50,10 @@
 
 #include <iostream>
 
-#include "SceneManager.h"
-#include "SyphonTexture.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "scenemanager.h"
+#include "syphontexture.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 namespace spin
 {

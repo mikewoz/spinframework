@@ -48,10 +48,10 @@
 
 #include <osg/Version>
 #include <osgDB/Registry>
+#include <osgDB/FileNameUtils>
+#include <osgDB/FileUtils>
 #include <cppintrospection/Type>
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
 #ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
 #endif
@@ -59,14 +59,14 @@
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
-#include "spinApp.h"
-#include "spinDefaults.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "spinUtil.h"
-#include "spinLog.h"
-#include "nodeVisitors.h"
+#include "spinapp.h"
+#include "spindefaults.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "spinutil.h"
+#include "spinlog.h"
+#include "nodevisitors.h"
 
 #ifdef WITH_SPATOSC
 #include <spatosc/scene.h>
@@ -87,8 +87,7 @@ spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(sp
     setenv("DYLD_LIBRARY_PATH", "@executable_path/../libs", 1);
 #endif
 */
-  
-   
+
     osgDB::FilePathList osgLibPaths;
     osgLibPaths.push_back("/opt/local/lib/osgPlugins-"+std::string(osgGetVersion()));
     osgLibPaths.push_back("/usr/lib/osgPlugins-"+std::string(osgGetVersion()));
@@ -97,24 +96,46 @@ spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(sp
     osgLibPaths.push_back("/usr/local/lib64/osgPlugins-"+std::string(osgGetVersion()));
     osgDB::Registry::instance()->setLibraryFilePathList(osgLibPaths);
 
+    // Set resourcesPath:
+    
+    // FIXME: this path should be replaced by PACKAGE_DATA/PACKAGE_NAME, not hard-coded
+    resourcesPath_ = "/usr/local/share/spinframework";
 
- 
-    // Load the SPIN library:
-    /*
-    osgDB::Registry *reg = osgDB::Registry::instance();
-    if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPIN")))
+    // for debugging, we'd like to use the local resources
+    if (getenv("PWD"))
     {
-        std::cout << "Error: Could not load libSPIN" << std::endl;
-    } else {
-    	std::cout << "Successfully loaded libSPIN" << std::endl;
+        std::string currentDir = getenv("PWD");
+        if ((currentDir.length() > 8) && (currentDir.substr(currentDir.length() - 9)) == std::string("/src/spin"))
+        {
+            resourcesPath_ = "../Resources";
+        }
     }
 
-    if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit("libSPINwrappers")))
+    // get user defined env variable OSG_FILE_PATH
+    osgDB::Registry::instance()->initDataFilePathList();
+
+    // add all default resources paths to osg's file path list
+    osgDB::FilePathList fpl = osgDB::getDataFilePathList();
+    fpl.push_back( resourcesPath_ );
+    fpl.push_back( resourcesPath_ + "/scripts/");
+    fpl.push_back( resourcesPath_ + "/fonts/");
+    fpl.push_back( resourcesPath_ + "/images/");
+    fpl.push_back( resourcesPath_ + "/models/");
+    fpl.push_back( resourcesPath_ + "/shaders/");
+    osgDB::setDataFilePathList( fpl );
+
+
+    /*
+    // Load the SPIN library:
+    std::string libname = "libspinframework-1.0.0";
+    osgDB::Registry *reg = osgDB::Registry::instance();
+    if (!osgDB::DynamicLibrary::loadLibrary(reg->createLibraryNameForNodeKit(libname)))
     {
-        std::cout << "Error: Could not load libSPINwrappers" << std::endl;
+        std::cout << "Error: Could not load " << libname << std::endl;
+    } else {
+        std::cout << "Successfully loaded " << libname << std::endl;
     }
     */
-
 
     // Make sure that our OSG nodekit is loaded (by checking for existence of
     // the ReferencedNode node type):
@@ -149,23 +170,15 @@ spinApp::spinApp() : hasAudioRenderer(false), userID_(getHostname()), sceneID(sp
         exit(1);
     }
 
-
-    //sceneID = "default";
-
-    // check if local user directory exists, otherwise make it:
-    try
+    // create local user directory (create it if doesn't exist):
+    if (!osgDB::makeDirectory(SPIN_DIRECTORY))
     {
-        using namespace boost::filesystem;
-
-        if (!exists(SPIN_DIRECTORY))
-        {
-            create_directory(path(SPIN_DIRECTORY));
-            create_directory(path(SPIN_DIRECTORY+"/log"));
-        }
+        std::cout << "ERROR: Could not create data folder for SPIN at: " << SPIN_DIRECTORY << std::endl;
+        exit(1);
     }
-    catch ( const boost::filesystem::filesystem_error& e )
+    if (!osgDB::makeDirectory(SPIN_DIRECTORY+"/log"))
     {
-        std::cout << "ERROR: " << e.what() << std::endl;
+        std::cout << "ERROR: Could not create log folder for SPIN at: " << SPIN_DIRECTORY+"/log" << std::endl;
         exit(1);
     }
 
@@ -266,6 +279,7 @@ bool spinApp::initPython()
 
     try {
         Py_Initialize();
+        PyEval_InitThreads();
         _pyMainModule = boost::python::import("__main__");
         _pyNamespace = _pyMainModule.attr("__dict__");
 
@@ -276,12 +290,12 @@ bool spinApp::initPython()
         //exec("sys.path.append('/usr/local/lib')", _pyNamespace, _pyNamespace);
 
 
-        exec(std::string("sys.path.append('" + sceneManager_->resourcesPath+  "')").c_str(), _pyNamespace, _pyNamespace);
+        exec(std::string("sys.path.append('" + resourcesPath_ +  "')").c_str(), _pyNamespace, _pyNamespace);
 
         //exec("print sys.path", _pyNamespace, _pyNamespace);
 
         //exec("import spin", _pyNamespace, _pyNamespace);
-        exec("import libSPINPyWrap", _pyNamespace, _pyNamespace);
+        exec("import spinframework", _pyNamespace, _pyNamespace);
 
     } catch (boost::python::error_already_set const & ) {
         std::cout << "sc: Python error: " << std::endl;

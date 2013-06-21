@@ -15,13 +15,18 @@ fi
 PATH=${PATH}:${GENWRAPPER_PATH}
 echo "PATH=${PATH}"
 
-type -P genwrapper &>/dev/null || { echo "genwrapper is not installed; please install before proceeding." >&2; exit 1; }
+command -v genwrapper >/dev/null 2>&1 || { echo "genwrapper is not installed; please install cppintrospection before proceeding." >&2; exit 1; }
 
 #make -C ${GENWRAPPER_PATH}
 doxygen ./doxygen_config
 
-rm include/*.h~
-genwrapper -d . doxygen | doxygen -
+# check if there are any temp headers and remove them
+# (the check is silent, so if none exist, there will not be a warning)
+if ls include/*.h~ > /dev/null 2>&1; then
+  rm include/*.h~
+fi
+
+#genwrapper -d . doxygen | doxygen -
 genwrapper -v QUIET -c genwrapper.conf doxygen .
 #genwrapper -v DEBUG -c genwrapper.conf doxygen .
 rm -rf src/osgWrappers/introspection/home

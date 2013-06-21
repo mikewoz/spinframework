@@ -1,6 +1,6 @@
 # Order of compilation really matters:
 SUBDIRS = \
-    tinyxml \
+    osgWrappers/generator \
     osgWrappers/introspection \
     osgPPU \
     spin \

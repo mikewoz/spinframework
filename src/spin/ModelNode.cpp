@@ -59,16 +59,16 @@
 #include <osg/BoundingBox>
 #include <osg/ImageStream>
 
-#include "ModelNode.h"
-#include "osgUtil.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "nodeVisitors.h"
+#include "modelnode.h"
+#include "osgutil.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "nodevisitors.h"
 
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "SharedVideoTexture.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "sharedvideotexture.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -134,6 +134,30 @@ void ModelNode::updateNodePath(bool updateChildren)
     updateChildNodePaths();
 }
 
+
+void ModelNode::debug()
+{
+    GroupNode::debug();
+    listAnimations();
+}
+
+void ModelNode::listAnimations()
+{
+    for (AnimationList::const_iterator animIter = _animationList.begin(); animIter != _animationList.end(); ++animIter )
+    {
+        std::cout << "  " << animIter->first << " [";
+        if (animIter->second->_animation.valid()) std::cout << "type=ANIMATION";
+        else if (animIter->second->_switch.valid()) std::cout << "type=SWITCH";
+        else if (animIter->second->_sequence.valid()) std::cout << "type=SEQUENCE";
+        else std::cout << "type=INVALID" << std::endl;
+        if (animIter->second->_loopMode==ModelNodeAnimation::LOOP) std::cout << ", loopMode=LOOP";
+        else if (animIter->second->_loopMode==ModelNodeAnimation::SWING) std::cout << ", loopMode=SWING";
+        else if (animIter->second->_loopMode==ModelNodeAnimation::NO_LOOPING) std::cout << ", loopMode=NO_LOOPING";
+        std::cout << ", playing=" << animIter->second->_playState;
+        std::cout << ", index=" << animIter->second->_index;
+        std::cout << std::endl;
+    }
+}
 
 // ===================================================================
 // ======================== SET METHODS: =============================
@@ -242,42 +266,127 @@ void ModelNode::setRenderBin (int i)
     BROADCAST(this, "si", "setRenderBin", _renderBin);
 }
 
-void ModelNode::setPlaying (int index, int playstate)
+void ModelNode::setPlaying (const char* animName, int playstate)
 {
-    _playState[index] = playstate;
+    std::string animNameStr = std::string(animName);
 
-    if (sequencer[index].valid())
+    ModelNodeAnimation *anim = _animationList[std::string(animName)];
+    if (anim)
     {
-        osg::Sequence::SequenceMode mode = sequencer[index]->getMode();
-        std::cout << "about to set mode to "<<_playState[index] << ", old="<<mode<<std::endl;
+        anim->_playState = playstate;
+        
+        if (anim->_type == ModelNodeAnimation::ANIMATION)
+        {
+            if (playstate)
+                animationManager->playAnimation(anim->_animation.get());
+            else
+                animationManager->stopAnimation(anim->_animation.get());
+        }
+        else if (anim->_sequence.valid())
+        {
+            anim->_sequence->setMode((osg::Sequence::SequenceMode)anim->_playState);
+            
+            //std::cout << "osgSequence mode: " << anim->_sequence->getMode() << ", duration: " << anim->_sequence->getNumFrames()<< ", speed: " << anim->_sequence->getSpeed() << ", lastFrameTime: " << anim->_sequence->getLastFrameTime() <<std::endl;
+        }
+        else if (anim->_switch.valid())
+        {
+            std::cout << animName << " is a switch node (cannot be played)" << std::endl;
+        }
 
-        sequencer[index]->setMode((osg::Sequence::SequenceMode)_playState[index]);
-
-
-        std::cout << "osgSequence mode: " << sequencer[index]->getMode() << ", duration: " << sequencer[index]->getNumFrames()<< ", speed: " << sequencer[index]->getSpeed() << ", lastFrameTime: " << sequencer[index]->getLastFrameTime() <<std::endl;
     }
-    else std::cout << "Warning: Model '" << this->getID() << "' has no Sequence for index " << index << std::endl;
+    else
+    {
+        std::cout << "Could not find animation named '" << animName << "' in model '" << this->getID() << "'" <<std::endl;
+    }
 
-    BROADCAST(this, "sii", "setPlaying", index, _playState[index]);
+    // broadcast even if we didn't find the animation name:
+    BROADCAST(this, "ssi", "setPlaying", animName, playstate);
 }
 
-void ModelNode::setKeyframe (int index, float keyframe)
+void ModelNode::setAnimationIndex (const char* animName, float index)
 {
-    _keyframe[index] = keyframe;
+    std::string animNameStr = std::string(animName);
 
-    if (switcher[index].valid())
+    ModelNodeAnimation *anim = _animationList[std::string(animName)];
+    if (anim)
     {
-        for (unsigned j = 1; j < switcher[index]->getNumChildren(); j++)
-            switcher[index]->setValue(j, false);
-        switcher[index]->setValue((int)(switcher[index]->getNumChildren()*_keyframe[index]), true);
+        anim->_index = index;
+    
+        if (anim->_animation.valid())
+        {
+            std::cout << animName << " is an osgAnimation node (cannot seek to index)" << std::endl;
+        }
+        else if (anim->_sequence.valid())
+        {
+            anim->_sequence->setValue((int)(anim->_sequence->getNumChildren()*index));
+        }
+        else if (anim->_switch.valid())
+        {
+            for (unsigned j = 1; j < anim->_switch->getNumChildren(); j++)
+                anim->_switch->setValue(j, false);
+            anim->_switch->setValue((int)(anim->_switch->getNumChildren()*index), true);
+        }
+
+    }
+    else
+    {
+        std::cout << "Could not find animation named '" << animName << "' in model '" << this->getID() << "'" <<std::endl;
     }
 
-    else if (sequencer[index].valid())
+    // broadcast even if we didn't find the animation name:
+    BROADCAST(this, "ssf", "setAnimationIndex", animName, index);
+}
+
+
+void ModelNode::setAnimationLoopMode (const char* animName, int mode)
+{
+    std::string animNameStr = std::string(animName);
+
+    ModelNodeAnimation *anim = _animationList[std::string(animName)];
+    if (anim)
     {
-        sequencer[index]->setValue((int)(sequencer[index]->getNumChildren()*_keyframe[index]));
+        anim->_loopMode = (ModelNodeAnimation::AnimationLoopMode)mode;
+    
+        if (anim->_animation.valid())
+        {
+            if (anim->_loopMode==ModelNodeAnimation::NO_LOOPING)
+                anim->_animation->setPlayMode(osgAnimation::Animation::ONCE);
+            else if (anim->_loopMode==ModelNodeAnimation::SWING)
+                anim->_animation->setPlayMode(osgAnimation::Animation::PPONG);
+            else
+                anim->_animation->setPlayMode(osgAnimation::Animation::LOOP);
+        }
+        else if (anim->_sequence.valid())
+        {
+            if (anim->_loopMode==ModelNodeAnimation::NO_LOOPING)
+            {
+                anim->_sequence->setLoopMode(osg::Sequence::LOOP);
+                anim->_sequence->setNumRepeats(1);
+            }
+            else if (anim->_loopMode==ModelNodeAnimation::SWING)
+            {
+                anim->_sequence->setLoopMode(osg::Sequence::SWING);
+                anim->_sequence->setNumRepeats(-1);
+            }
+            else
+            {
+                anim->_sequence->setLoopMode(osg::Sequence::LOOP);
+                anim->_sequence->setNumRepeats(-1);
+            }
+        }
+        else if (anim->_switch.valid())
+        {
+            // no op?
+        }
+
+    }
+    else
+    {
+        std::cout << "Could not find animation named '" << animName << "' in model '" << this->getID() << "'" <<std::endl;
     }
 
-    BROADCAST(this, "sif", "setKeyframe", index, _keyframe[index]);
+    // broadcast even if we didn't find the animation name:
+    BROADCAST(this, "ssi", "setAnimationLoopMode", animName, mode);
 }
 
 void ModelNode::setStateSet (int i, const char *replacement)
@@ -358,24 +467,19 @@ void ModelNode::drawModel()
 
         _modelAttachmentNode->removeChild(model.get());
 
+        _animationList.clear();
+        if (animationManager.valid())
+        {
+            model->setUpdateCallback(NULL);
+            animationManager = NULL;
+        }
+        
         model = NULL;
         _centroid->setPosition(osg::Vec3(0.0,0.0,0.0));
         _statesetList.clear();
         _statesetList.push_back(stateset_);
         _ssDrawableList.clear();
         _ssNodeList.clear();
-
-        //if (sceneManager_->sharedStateManager.valid()) sceneManager_->sharedStateManager->prune();
-
-
-        for (int i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
-        {
-            // re-initialize:
-            switcher[i] = NULL;
-            sequencer[i] = NULL;
-            animationMode[i] = OFF;
-            _keyframe[i] = 0;
-        }
     }
 
     bool ignoreOnThisHost = (not spinApp::Instance().getContext()->isServer() and (this->getContext()==getHostname()));
@@ -390,63 +494,59 @@ void ModelNode::drawModel()
         if (model.valid())
         {
 
-
             // *****************************************************************
-
-
-            /*
-            // This is a better way to do this:
-            NodeList foundNodes;
-            NodeSearcher nodeSearcher(foundNodes);
-            nodeSearcher.search(model.get(), "OSG_Switch");
-            if (foundNodes.size())
-                std::cout << "found " << foundNodes.size() << " switch nodes" << std::endl;
-
-            int count = 0;
-            for (NodeList::iterator itr=foundNodes.begin(); itr!=foundNodes.end(); ++itr)
+            SwitchNodeList switchNodes;
+            SwitchNodeFinder switchNodeFinder(switchNodes);
+            model->accept(switchNodeFinder);
+            for (SwitchNodeList::iterator sw=switchNodes.begin(); sw!=switchNodes.end(); ++sw)
             {
-
-
+                std::cout << "Found animation [type=SWITCH]: " << (*sw)->getName() << " with " << (*sw)->getNumChildren() << " frames" << std::endl;
+                
+                _animationList[(*sw)->getName()] = new ModelNodeAnimation();
+                _animationList[(*sw)->getName()]->_type = ModelNodeAnimation::SWITCH;
+                _animationList[(*sw)->getName()]->_switch = (*sw);
+                // initialize so only first frame is visible:
+                (*sw)->setValue(0, true);
+                for (int j=1; j<(*sw)->getNumChildren(); j++) (*sw)->setValue(j, false);
             }
-            */
-
-            SearchVisitor searchVisitor;
-            char buf[16];
-            for (int i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
+            
+            SequenceNodeList sequenceNodes;
+            SequenceNodeFinder sequenceNodeFinder(sequenceNodes);
+            model->accept(sequenceNodeFinder);
+            for (SequenceNodeList::iterator seq=sequenceNodes.begin(); seq!=sequenceNodes.end(); ++seq)
             {
-
-                sprintf( buf, "%02d", i );
-
-                // Check if there are multiple states available from a osg::Switch
-                // note: from 3DS exporter, switch nodes are called: OSG_Switch01, etc.
-                searchVisitor.searchNode(model.get(), "OSG_Switch"+std::string(buf));
-
-                switcher[i] = searchVisitor.getSwitchNode();
-                if (switcher[i].valid())
-                {
-                    std::cout << "found OSG_Switch" << buf << " with " << switcher[i]->getNumChildren() << " frames" << std::endl;
-                    animationMode[i] = SWITCH;
-                    // initialize so only first frame is visible:
-                    switcher[i]->setValue(0, true);
-                    for (int j=1; j<switcher[i]->getNumChildren(); j++) switcher[i]->setValue(j, false);
-
-                }
-
-                // Check if there is an osg::Sequence node.
-                searchVisitor.searchNode(model.get(), "OSG_Sequence"+std::string(buf));
-                sequencer[i] = searchVisitor.getSequenceNode();
-                if (sequencer[i].valid())
-                {
-                    std::cout << "found OSG_Sequence" << buf << " with " << sequencer[i]->getNumChildren() << " frames" << std::endl;
-                    sequencer[i]->setDataVariance(osg::Object::DYNAMIC);
-                    animationMode[i] = SEQUENCE;
-                    sequencer[i]->setValue(0);
-                    //sequencer[i]->setMode(osg::Sequence::PAUSE);
-                    //sequencer[i]->setMode(osg::Sequence::START);
-                }
-
+                std::cout << "Found animation [type=SEQUENCE]: " << (*seq)->getName() << " with " << (*seq)->getNumChildren() << " frames" << std::endl;
+                    
+                _animationList[(*seq)->getName()] = new ModelNodeAnimation();
+                _animationList[(*seq)->getName()]->_type = ModelNodeAnimation::SEQUENCE;
+                _animationList[(*seq)->getName()]->_sequence = (*seq);
+                (*seq)->setDataVariance(osg::Object::DYNAMIC);
+                (*seq)->setValue(0);
             }
-
+            
+            // *****************************************************************
+            // search for special animations (osgAnimation)
+            
+            AnimationManagerFinder animFinder;
+            model->accept(animFinder);
+            if (animFinder._am)
+            {
+                animationManager = animFinder._am;
+                model->setUpdateCallback(animationManager.get());
+                
+                for (osgAnimation::AnimationList::const_iterator it = animationManager->getAnimationList().begin(); it != animationManager->getAnimationList().end(); ++it)
+                {
+                    std::cout << "Found animation [type=ANIMATION]: " << (*it)->getName() << std::endl;
+                    
+                    _animationList[(*it)->getName()] = new ModelNodeAnimation();
+                    _animationList[(*it)->getName()]->_type = ModelNodeAnimation::ANIMATION;
+                    _animationList[(*it)->getName()]->_animation = (*it);
+                    
+                     _animationList[(*it)->getName()]->_loopMode = ModelNodeAnimation::LOOP;
+                    (*it)->setPlayMode(osgAnimation::Animation::LOOP);
+                }
+            }
+            
             // *****************************************************************
             // search for special "billboard" nodes
 
@@ -624,20 +724,21 @@ std::vector<lo_message> ModelNode::getState () const
     lo_message_add(msg, "si", "setLighting", getLighting());
     ret.push_back(msg);
 
-    for (i=0; i<MODELNODE_NUM_ANIM_CONTROLS; i++)
+    for (AnimationList::const_iterator animIter = _animationList.begin(); animIter != _animationList.end(); ++animIter )
     {
-        if (switcher[i].valid() || sequencer[i].valid())
-        {
-            msg = lo_message_new();
-            lo_message_add(msg, "sii", "setPlaying", i, _playState[i]);
-            ret.push_back(msg);
+        msg = lo_message_new();
+        lo_message_add(msg, "ssf", "setAnimationIndex", animIter->first.c_str(), animIter->second->_index);
+        ret.push_back(msg);
+        
+        msg = lo_message_new();
+        lo_message_add(msg, "ssi", "setAnimationLoopMode", animIter->first.c_str(), (int)animIter->second->_loopMode);
+        ret.push_back(msg);
 
-            msg = lo_message_new();
-            lo_message_add(msg, "sif", "setKeyframe", i, _keyframe[i]);
-            ret.push_back(msg);
-        }
+        msg = lo_message_new();
+        lo_message_add(msg, "ssi", "setPlaying", animIter->first.c_str(), animIter->second->_playState);
+        ret.push_back(msg);
     }
-
+    
     msg = lo_message_new();
     lo_message_add(msg, "si", "setRenderBin", getRenderBin());
     ret.push_back(msg);

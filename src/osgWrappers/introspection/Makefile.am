@@ -4,36 +4,36 @@ noinst_LTLIBRARIES = libSPINwrappers.la
 # please keep those in alphabetical order:
 # We only need to wrap the childs of ReferencedNode and ReferencedStateSet:
 libSPINwrappers_la_SOURCES = \
-    AnimationNode.cpp \
-    AttractorNode.cpp \
-    ConstraintsNode.cpp \
-    Contour.cpp \
-    DSPNode.cpp \
-    Fog.cpp \
-    GeometryNode.cpp \
-    GridNode.cpp \
-    GroupNode.cpp \
-    ImageTexture.cpp \
-    LightSource.cpp \
-    Listener.cpp \
-    LODNode.cpp \
-    Menu3D.cpp \
-    ModelNode.cpp \
-    ParticleSystem.cpp \
-    PointerNode.cpp \
-    RayNode.cpp \
-    ReferencedNode.cpp \
-    ReferencedStateSet.cpp \
-    ReporterNode.cpp \
-    Shader.cpp \
-    ShapeNode.cpp \
-    SharedVideoTexture.cpp \
-    SoundNode.cpp \
-    SoundSpace.cpp \
-    SwitchNode.cpp \
-    TextNode.cpp \
-    UserNode.cpp \
-    VideoTexture.cpp
+    animationnode.cpp \
+    attractornode.cpp \
+    constraintsnode.cpp \
+    contour.cpp \
+    dspnode.cpp \
+    fog.cpp \
+    geometrynode.cpp \
+    gridnode.cpp \
+    groupnode.cpp \
+    imagetexture.cpp \
+    lightsource.cpp \
+    listener.cpp \
+    lodnode.cpp \
+    menu3d.cpp \
+    modelnode.cpp \
+    particlesystem.cpp \
+    pointernode.cpp \
+    raynode.cpp \
+    referencednode.cpp \
+    referencedstateset.cpp \
+    reporternode.cpp \
+    shader.cpp \
+    shapenode.cpp \
+    sharedvideotexture.cpp \
+    soundnode.cpp \
+    soundspace.cpp \
+    switchnode.cpp \
+    textnode.cpp \
+    usernode.cpp \
+    videotexture.cpp
 
 libSPINwrappers_la_CPPFLAGS = \
     $(BOOST_CPPFLAGS) \
@@ -46,15 +46,19 @@ libSPINwrappers_la_CPPFLAGS = \
     -I$(top_srcdir)/src/spin \
     -I$(top_srcdir)/src/tinyxml
 
+if SHAREDVIDEO
+#libSPINwrappers_la_CPPFLAGS += -std=gnu++0x
+endif
 
 if BULLET
 libSPINwrappers_la_CPPFLAGS += $(BULLET_CFLAGS)
-libSPINwrappers_la_SOURCES += CollisionShape.cpp
+libSPINwrappers_la_SOURCES += collisionshape.cpp
 endif
 
 if PCL
-libSPINwrappers_la_CPPFLAGS += $(PCL_CFLAGS)
-libSPINwrappers_la_SOURCES += PointCloud.cpp
+libSPINwrappers_la_CPPFLAGS += $(PCL_CFLAGS) \
+    -I/usr/include/ni
+libSPINwrappers_la_SOURCES += pointcloud.cpp
 endif
 
 

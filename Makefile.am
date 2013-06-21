@@ -10,6 +10,7 @@ SUBDIRS = \
     tests
 
 EXTRA_DIST = \
+    buildWrappers.sh \
     LICENSE \
     README \
     NEWS
@@ -27,8 +28,6 @@ apps:
 	echo ">>>>>>>>>>>>>>>>>>>>> Generating OSX App Bundles <<<<<<<<<<<<<<<<<<<<<"; \
 	$(MAKE) -C src/spin spinviewer.app
 
-INCLUDES = src/tinyxml
-
 html-local: htmldoc
 htmldoc:
 	@if [ -z `which doxygen` ]; then echo "No Doxygen!"; else doxygen; fi
@@ -36,5 +35,5 @@ htmldoc:
 # pkg-config file:
 DISTCLEANFILES = spin.pc
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = spin-@SPIN_API_VERSION@.pc
+pkgconfig_DATA = spinframework-@SPIN_API_VERSION@.pc
 

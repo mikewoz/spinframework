@@ -39,18 +39,19 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 
-#include "spinApp.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "spinLog.h"
-#include "nodeVisitors.h"
-#include "spinDefaults.h"
+#include "spinapp.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "spinlog.h"
+#include "nodevisitors.h"
+#include "spindefaults.h"
 
 #ifdef WITH_POCO
-#include "pocoUtil.h"
+#include "pocoutil.h"
 #endif
 
 extern pthread_mutex_t sceneMutex;
@@ -288,7 +289,7 @@ void *spinServerContext::spinServerThread(void *arg)
 #ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
-    std::string cmd = "sys.path.append('" + spin.sceneManager_->resourcesPath + "/scripts')";
+    std::string cmd = "sys.path.append('" + spin.getResourcesPath() + "/scripts')";
 
     spin.execPython(cmd);
     spin.execPython("import spin");
@@ -382,7 +383,12 @@ void *spinServerContext::spinServerThread(void *arg)
         //
 
         if (recv == 0)
-        	usleep(1000);
+        {
+            timespec nap;
+            nap.tv_sec = 0;
+            nap.tv_nsec = 1e6;
+            nanosleep(&nap, NULL);
+        }
     }
     
     // send disconnect message to clients that that they don't have to wait
@@ -420,7 +426,11 @@ void *spinServerContext::syncThread(void * /*arg*/)
     while (spin.getContext()->isRunning())
     {
         //usleep(1000000 * 0.25); // 1/4 second sleep
-        usleep(1000000 * 0.5); // 1/2 second sleep
+        //usleep(1000000 * 0.5); // 1/2 second sleep
+        timespec nap;
+        nap.tv_sec = 0;
+        nap.tv_nsec = 5e8;
+        nanosleep(&nap, NULL);
 
         frameTick = timer->tick();
 

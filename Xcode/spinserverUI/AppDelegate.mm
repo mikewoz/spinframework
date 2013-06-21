@@ -41,10 +41,10 @@
 
 
 #import "AppDelegate.h"
-#include "spinApp.h"
-#include "spinUtil.h"
-#include "SceneManager.h"
-#include "spinServerContext.h"
+#include "spinapp.h"
+#include "spinutil.h"
+#include "scenemanager.h"
+#include "spinservercontext.h"
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>
 #endif
@@ -65,6 +65,10 @@
     server.stop();
 }
 
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication {
+    return YES;
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     //[textView setFont:[NSFont fo
@@ -80,7 +84,7 @@
     
 	// *************************************************************************
     // If no command line arguments were passed, check if there is an args file
-    // at ~/.spinFramework/args and override argc and argv with those:
+    // at ~/.spinframework/args and override argc and argv with those:
     std::vector<char*> newArgs = spin::getUserArgs();
     if (newArgs.size() > 1)
     {
@@ -113,6 +117,7 @@
         if (arguments.errors()) arguments.writeErrorMessages(std::cout);
 
     }
+    
 
     // *************************************************************************
     // for now, hardcode one spatosc translator in the scene:

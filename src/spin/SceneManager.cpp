@@ -40,24 +40,24 @@
 // -----------------------------------------------------------------------------
 
 
-#include "SceneManager.h"
-#include "DSPNode.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "ReferencedNode.h"
-#include "spinUtil.h"
-#include "osgUtil.h"
-#include "spinApp.h"
+#include "scenemanager.h"
+#include "dspnode.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "referencednode.h"
+#include "spinutil.h"
+#include "osgutil.h"
+#include "spinapp.h"
 
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "Shader.h"
-#include "ShapeNode.h"
-#include "ModelNode.h"
-#include "SharedVideoTexture.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "shader.h"
+#include "shapenode.h"
+#include "modelnode.h"
+#include "sharedvideotexture.h"
 
-#include "nodeVisitors.h"
-#include "spinLog.h"
+#include "nodevisitors.h"
+#include "spinlog.h"
 
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
@@ -103,8 +103,8 @@ extern pthread_mutex_t sceneMutex;
 
 #ifdef WITH_BULLET
 #include <btBulletDynamicsCommon.h>
-#include "bulletUtil.h"
-#include "CollisionShape.h"
+#include "bulletutil.h"
+#include "collisionshape.h"
 
 extern ContactAddedCallback gContactAddedCallback;
 
@@ -176,8 +176,6 @@ SceneManager::SceneManager(std::string id)
     std::cout << "creating sceneManager with id: " << id << std::endl;
     std::cout << std::flush;
 
-    resourcesPath = "../Resources";
-
     this->sceneID = id;
 
     graphicalMode = false;
@@ -185,37 +183,6 @@ SceneManager::SceneManager(std::string id)
     // initialize storage vectors:
     nodeMap.clear();
     stateMap.clear();
-
-    // Set resourcesPath:
-#ifdef OSX_COCOA
-    resourcesPath = "../Resources";
-#else
-    std::string currentDir = getenv("PWD");
-    //std::string currentDir = get_current_dir_name(); // requires #include <unistd.h>
-    if ((currentDir.length() > 8) && (currentDir.substr(currentDir.length() - 9)) == std::string("/src/spin"))
-    {
-        resourcesPath = "../Resources";
-    }
-    else
-    {
-        // FIXME: this path should be replaced by PACKAGE_DATA/PACKAGE_NAME, not hard-coded
-        resourcesPath = "/usr/local/share/spinFramework";
-    }
-#endif
-
-    // get user defined env variable OSG_FILE_PATH
-    osgDB::Registry::instance()->initDataFilePathList();
-
-    // add all default resources paths to osg's file path list
-    osgDB::FilePathList fpl = osgDB::getDataFilePathList();
-    fpl.push_back( resourcesPath );
-    fpl.push_back( resourcesPath + "/scripts/");
-    fpl.push_back( resourcesPath + "/fonts/");
-    fpl.push_back( resourcesPath + "/images/");
-    fpl.push_back( resourcesPath + "/models/");
-    fpl.push_back( resourcesPath + "/shaders/");
-    osgDB::setDataFilePathList( fpl );
-
 
     //std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
@@ -303,48 +270,7 @@ SceneManager::SceneManager(std::string id)
     worldNode->setNodeMask( 0xffffffff );
     worldStateSet_ = gensym("NULL");
 
-
-    // shadow scene:
-
-    osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot = new osgShadow::ShadowedScene;
-    shadowRoot->setName("shadowRoot");
-    shadowRoot->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
-    shadowRoot->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
-
-    // soft shadows:
-
-    softShadowMap_ = new osgShadow::SoftShadowMap;
-    softShadowMap_->setTextureSize( osg::Vec2s(2048, 2048) );
-    shadowRoot->setShadowTechnique( softShadowMap_.get() );
-
-
-    // can use a view-dependent shadow map to improve efficiency over regular
-    // osgShadow::ShadowMap, since shadow interactors will only be rendered if
-    // they and their assumed shadows are visible in the view frustum.
-    /*
-    osg::ref_ptr<osgShadow::ViewDependentShadowMap> vdsm = new osgShadow::ViewDependentShadowMap;
-    //vdsm->setShadowMapProjectionHint(osgShadow::ViewDependentShadowMap::ORTHOGRAPHIC_SHADOW_MAP);
-    //vdsm->setBaseShadowTextureUnit( 1 );
-    shadowRoot->setShadowTechnique( vdsm.get() );
-    */
-
-    //
-    /*
-    int mapcount = 3;
-    osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm = new osgShadow::ParallelSplitShadowMap(NULL,mapcount);
-    pssm->setTextureResolution(1024);
-    //pssm->setDebugColorOn();
-    //pssm->setMinNearDistanceForSplits(minNearSplit);
-    //pssm->setMaxFarDistance(maxfardist);
-    //pssm->setMoveVCamBehindRCamFactor(moveVCamFactor);
-    shadowRoot->setShadowTechnique(pssm.get());
-    */
-
-
-    //rootNode->addChild(worldNode.get());
-    rootNode->addChild(shadowRoot.get());
-    shadowRoot->addChild( worldNode.get() );
-
+    rootNode->addChild(worldNode.get());
 
     for (int i = 0; i < OSG_NUM_LIGHTS; i++)
     {
@@ -407,8 +333,13 @@ SceneManager::SceneManager(std::string id)
     //btAxisSweep3
     btBroadphaseInterface *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
     //btBroadphaseInterface* broadphase = new btDbvtBroadphase();
-    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);    
     dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
+
+    //btContactSolverInfo& csi = dynamicsWorld_->getSolverInfo();
+    //csi.m_solverMode = 
+
+    ////dynamicsWorld_->setForceUpdateAllAabbs(false);
 
     // This callback is a global method of checking collisions after every
     // pyhsics step. We register a global callback using gContactAddedCallback,
@@ -421,7 +352,8 @@ SceneManager::SceneManager(std::string id)
     {
         //gContactAddedCallback = btCollisionCallback;
     }
-
+    wind_ = btVector3(0,0,0);
+    windy_ = false;
 
 #endif
 
@@ -1606,7 +1538,7 @@ void SceneManager::update()
     osg::Timer_t tick = osg::Timer::instance()->tick();
     double dt =osg::Timer::instance()->delta_s(lastTick_,tick);
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     // it's possible that a SharedVideoTexture is in the sceneManager, but not
     // currently applied on any geometry. In this canse, it will not be be
     // seen in the update traversal of the scene graph, and it's updateCallback
@@ -1652,10 +1584,59 @@ void SceneManager::update()
         // only do on server side?
         if (spinApp::Instance().getContext()->isServer())
         {
+
+            if ( windy_ ) {
+                for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+                    btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+                    btRigidBody* body = btRigidBody::upcast(obj);
+                    if(!body->isStaticObject()) {
+
+                        CollisionShape *cs = (CollisionShape*)(body->getUserPointer());
+                        if ( cs && cs->getDynamic() ) {
+                            body->activate();
+                            body->applyCentralForce( wind_ * (btScalar)cs->getWindFactor() );
+                        }
+                    }
+                }
+            }
+
             //dynamicsWorld_->performDiscreteCollisionDetection();
             //printf("stepSimulation %f\n", dt);
             dynamicsWorld_->stepSimulation(dt);//, 7, 0.0004);
-            //dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            int numManifolds = dynamicsWorld_->getDispatcher()->getNumManifolds();
+            //if (numManifolds) printf("-----------------------\n");
+            for (int i=0;i<numManifolds;i++) {
+                btPersistentManifold* contactManifold =  dynamicsWorld_->getDispatcher()->getManifoldByIndexInternal(i);
+                btRigidBody* ob0 = static_cast<btRigidBody*>(contactManifold->getBody0());
+                btRigidBody* ob1 = static_cast<btRigidBody*>(contactManifold->getBody1());
+                CollisionShape *n0 = (CollisionShape*)ob0->getUserPointer();
+                CollisionShape *n1 = (CollisionShape*)ob1->getUserPointer();
+
+                if ( !n0 || !n1 ) continue;
+
+                // May be there is contact obA and obB
+                int numContacts = contactManifold->getNumContacts();
+                for (int j=0;j<numContacts;j++) {
+                    btManifoldPoint& pt = contactManifold->getContactPoint(j);
+                    
+                    if ( pt.getDistance() < 0.f &&
+                         pt.getAppliedImpulse() > 0.f ) {
+                        // printf( "got contact 0x%p %s:%s %f %f %i\n", &pt,
+                        //         n0->getID().c_str(), n1->getID().c_str(),
+                        //         pt.getDistance(), pt.getAppliedImpulse(), pt.m_lifeTime );
+                    
+
+                        n0->reportContact( pt, ob1 );
+                        n1->reportContact( pt, ob0, true );
+                        // One contact point is inside of another object
+                        // But some contacts are ignored
+                    }
+                }
+            }
+
+
+
         }
     }
 #endif
@@ -1666,6 +1647,8 @@ void SceneManager::update()
 // save scene as .osg
 void SceneManager::exportScene (const char *nodeID, const char *filename)
 {
+    if (spinApp::Instance().getContext()->isServer()) return;
+    
     std::string fullPath = std::string(filename);
     if (fullPath.substr(fullPath.size()-4) != ".osg")
         fullPath += ".osg";
@@ -2208,36 +2191,148 @@ bool SceneManager::loadXML(const char *s)
 
 // -----------------------------------------------------------------------------
 
+void SceneManager::setShadows(bool b)
+{
+    if (shadowRoot_.valid() && !b)
+    {
+        std::cout << "Disabling shadows" << std::endl;
+    
+        // destroy shadowRoot and re-assign parent
+        
+        pthread_mutex_lock(&sceneMutex);
+        
+        rootNode->removeChild(shadowRoot_.get());
+        shadowRoot_->removeChild(worldNode.get());
+        
+        if (!rootNode->containsNode(worldNode.get()))
+            rootNode->addChild(worldNode.get());
+        
+        shadowRoot_ = NULL;
+        
+        pthread_mutex_unlock(&sceneMutex);
+    }
+    
+    else if (!shadowRoot_.valid() && b)
+    {
+        std::cout << "Enabling shadows" << std::endl;
+        
+        shadowRoot_ = new osgShadow::ShadowedScene;
+        shadowRoot_->setName("shadowRoot");
+        shadowRoot_->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
+        shadowRoot_->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
+        
+        /*
+        osgShadow::ShadowSettings *shadowSettings;
+        shadowSettings->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
+        shadowSettings->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
+        shadowRoot_->setShadowSettings(shadowSettings);
+        */
+        
+        // soft shadows:
+        softShadowMap_ = new osgShadow::SoftShadowMap;
+        softShadowMap_->setTextureSize( osg::Vec2s(2048, 2048) );
+        //softShadowMap_->setTextureUnit(1);
+        shadowRoot_->setShadowTechnique( softShadowMap_.get() );
+
+        // can use a view-dependent shadow map to improve efficiency over regular
+        // osgShadow::ShadowMap, since shadow interactors will only be rendered if
+        // they and their assumed shadows are visible in the view frustum.
+        /*
+        osg::ref_ptr<osgShadow::ViewDependentShadowMap> vdsm = new osgShadow::ViewDependentShadowMap;
+        //vdsm->setShadowMapProjectionHint(osgShadow::ViewDependentShadowMap::ORTHOGRAPHIC_SHADOW_MAP);
+        //vdsm->setBaseShadowTextureUnit( 1 );
+        shadowRoot_->setShadowTechnique( vdsm.get() );
+        */
+
+        //
+        /*
+        int mapcount = 3;
+        osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm = new osgShadow::ParallelSplitShadowMap(NULL,mapcount);
+        pssm->setTextureResolution(1024);
+        //pssm->setDebugColorOn();
+        //pssm->setMinNearDistanceForSplits(minNearSplit);
+        //pssm->setMaxFarDistance(maxfardist);
+        //pssm->setMoveVCamBehindRCamFactor(moveVCamFactor);
+        shadowRoot_->setShadowTechnique(pssm.get());
+        */
+        
+        // ADD SHADOW ROOT TO SCENE:
+        pthread_mutex_lock(&sceneMutex);
+        
+        if (rootNode->containsNode(worldNode.get()))
+            rootNode->removeChild(worldNode.get());
+        
+        rootNode->addChild(shadowRoot_.get());
+        shadowRoot_->addChild( worldNode.get() );
+        
+        pthread_mutex_unlock(&sceneMutex);
+    }
+    
+    spinApp::Instance().BroadcastSceneMessage("si", "setShadows", (int)b, SPIN_ARGS_END);
+}
+
 void SceneManager::setShadowSoftness(float f)
 {
-    softShadowMap_->setSoftnessWidth(f);
-    spinApp::Instance().BroadcastSceneMessage("sf", "setShadowSoftness", f, SPIN_ARGS_END);
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setSoftnessWidth(f);
+        spinApp::Instance().BroadcastSceneMessage("sf", "setShadowSoftness", f, SPIN_ARGS_END);
+    }
 }
 
 void SceneManager::setShadowJitter(float f)
 {
-    softShadowMap_->setJitteringScale(f);
-    spinApp::Instance().BroadcastSceneMessage("sf", "setShadowJitter", f, SPIN_ARGS_END);
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setJitteringScale(f);
+        spinApp::Instance().BroadcastSceneMessage("sf", "setShadowJitter", f, SPIN_ARGS_END);
+    }
 }
 
 void SceneManager::setShadowBias(float f)
 {
-    softShadowMap_->setBias(f);
-    spinApp::Instance().BroadcastSceneMessage("sf", "setShadowBias", f, SPIN_ARGS_END);
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setBias(f);
+        spinApp::Instance().BroadcastSceneMessage("sf", "setShadowBias", f, SPIN_ARGS_END);
+    }
 }
 
 void SceneManager::setShadowAmbientBias(float x, float y)
 {
-    softShadowMap_->setAmbientBias(osg::Vec2(x,y));
-    spinApp::Instance().BroadcastSceneMessage("sff", "setShadowAmbientBias", x, y, SPIN_ARGS_END);
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setAmbientBias(osg::Vec2(x,y));
+        spinApp::Instance().BroadcastSceneMessage("sff", "setShadowAmbientBias", x, y, SPIN_ARGS_END);
+    }
 }
-
 
 // -----------------------------------------------------------------------------
 void SceneManager::setGravity(float x, float y, float z)
 {
 #ifdef WITH_BULLET
     dynamicsWorld_->setGravity(btVector3(x, y, z));
+#endif
+}
+
+// -----------------------------------------------------------------------------
+void SceneManager::setWind(float x, float y, float z)
+{
+#ifdef WITH_BULLET
+    if ( x == 0.0f && y == 0.0f && z == 0.0f ) windy_ = false;
+    else windy_ = true;
+    wind_ = btVector3(x,y,z);
+    /*    printf("setWind %f %f %f\n",x,y,z);
+    for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+        btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+        btRigidBody* body = btRigidBody::upcast(obj);
+        if(!body->isStaticObject()) {
+            body->applyCentralForce(btVector3(x, y, z));
+            body->activate();
+            printf("setWind force applied\n");
+        }
+    }
+    printf("\n");*/
 #endif
 }
 

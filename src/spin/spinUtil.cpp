@@ -52,7 +52,8 @@
 #include <osgDB/ReadFile>
 #include <osgDB/FileNameUtils>
 #include <osgDB/FileUtils>
-#include "spinUtil.h"
+
+#include "spinutil.h"
 
 
 namespace spin

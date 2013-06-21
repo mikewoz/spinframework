@@ -1,5 +1,5 @@
 import spin
-import libSPINPyWrap
+import spinframework
 import math
 
 __spin_behavior_class__ = "Script"
@@ -22,6 +22,6 @@ class Script( spin.ScriptBase ):
         y = self.radius * math.sin(self.angle);
 
         #cascadeEvents = 1: setTranslation can trigger more event scripts! like hotspot.py
-        libSPINPyWrap.callback(self._nodeID, "setTranslation", [x, y, 0.0], 1)
+        spinframework.callback(self._nodeID, "setTranslation", [x, y, 0.0], 1)
 
 print "orbit module loaded."

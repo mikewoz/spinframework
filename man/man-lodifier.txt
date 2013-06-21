@@ -1,0 +1,9 @@
+[SYNOPSIS]
+lodifier [options] <scene(s) to load>
+
+[REPORTING BUGS]
+https://sourceforge.net/apps/trac/spinframework/
+
+[SEE ALSO]
+spinviewer (1), spinserver (1), spindocgenerator (1)
+
