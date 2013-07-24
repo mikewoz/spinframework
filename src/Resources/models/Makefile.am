@@ -1,4 +1,4 @@
-modelsdir = $(datadir)/spinFramework/models
+modelsdir = $(datadir)/spinframework/models
 models_DATA = \
 cube.osg \
 domeGrid.obj \

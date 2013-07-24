@@ -14,8 +14,9 @@ uniform float osgppu_ViewportHeight;
 
 uniform float radius;
 
-varying float sigma2;
+varying float invSigma2;
 varying float c;
+varying float inputTexelWidth;
 
 const float epsilon = 0.0001;
 
@@ -23,7 +24,6 @@ void main(void)
 {
     vec4 lColor = vec4(0.0);
     float lTotalWeight = 0.0;
-    float lInputTexTexelWidth = 1.0 / osgppu_ViewportWidth;
 
     // Get the blur value at the pixel level
     float lBlur = texture2D(texBlurMap, gl_TexCoord[0].st).r;
@@ -36,8 +36,8 @@ void main(void)
     {
         for(float i=-lRadius; i<lRadius; i+=1.0)
         {
-            float lWeight = c*exp(-(i*i)/sigma2);
-            vec2 lPixCoords = gl_TexCoord[0].st + vec2(i*lInputTexTexelWidth, 0);
+            float lWeight = c*exp(-(i*i)*invSigma2);
+            vec2 lPixCoords = gl_TexCoord[0].st + vec2(i*inputTexelWidth, 0);
             
             // Radius of the blur created by the current offset pixel
             float lPixBlurRadius = radius * texture2D(texBlurMap, lPixCoords).r;

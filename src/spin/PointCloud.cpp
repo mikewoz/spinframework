@@ -39,6 +39,7 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+
 #include "config.h"
 
 
@@ -54,22 +55,13 @@
 #include <osgSim/LightPointNode>
 #include <osgDB/FileNameUtils>
 
-#ifdef WITH_PCL
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
-#include <pcl/io/openni_grabber.h>
-#include <pcl/common/time.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/compression/octree_pointcloud_compression.h>
-#endif
+#include "pointcloud.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
 
-#include "PointCloud.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
-
+using namespace std;
 
 //using namespace std;
 extern pthread_mutex_t sceneMutex;
@@ -86,10 +78,10 @@ namespace spin
 // constructor:
 PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupNode(sceneManager, initID)
 {
-	this->setName(this->getID() + ".PointCloud");
-	this->setNodeType("PointCloud");
+    this->setName(this->getID() + ".PointCloud");
+    this->setNodeType("PointCloud");
 
-	drawMode_ = POINTS;
+    drawMode_ = POINTS;
     
     updateFlag_ = false;
     redrawFlag_ = false;
@@ -104,12 +96,13 @@ PointCloud::PointCloud (SceneManager *sceneManager, const char* initID) : GroupN
     spacing_ = 1.0;
     randomCoeff_ = 0.0;
     pointSize_ = 1.0;
-    
     voxelSize_ = 0.01f;
     distCrop_ = osg::Vec2(0.0,10.0);
+    modulatePointSize_ = 0;
     
 #ifdef WITH_PCL
     grabber_ = 0;
+    decoder_ = new pcl::io::OctreePointCloudCompression< pcl::PointXYZRGBA >();
 #endif
     
 }
@@ -123,6 +116,14 @@ PointCloud::~PointCloud()
         grabber_->stop();
         grabber_ = 0;
     }
+#ifdef WITH_SHAREDVIDEO
+    shmIsRunning = false;
+    if (shmThreadID_ != 0)
+    {
+        pthread_join(shmThreadID_, NULL);
+        shmThreadID_ = 0;
+    }
+#endif
 #endif
 }
 // -----------------------------------------------------------------------------
@@ -169,6 +170,8 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
         this->updatePoints();
         updateFlag_ = false;
     }
+
+
 #endif
     
     GroupNode::callbackUpdate(nv);
@@ -177,60 +180,79 @@ void PointCloud::callbackUpdate(osg::NodeVisitor* nv)
 
 // -----------------------------------------------------------------------------
 #ifdef WITH_PCL
+
+#ifdef WITH_SHAREDVIDEO
+//void PointCloud::shmCallback (
+//         shmdata_any_reader_t *reader,
+//         void *shmbuf,
+//         void *data,
+//         int data_size,
+//         unsigned long long timestamp,
+//         const char *type_description, void *user_data)
+//{
+//
+//	PointCloud *node = (PointCloud*)(user_data);
+//
+//	pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
+//	
+// 	// stringstream to store compressed point cloud
+//	std::stringstream compressedData;
+//	compressedData.write ((const char *) data, data_size);
+//	
+//  	// decode:
+//	node->decoder_->decodePointCloud(compressedData,cloudOut);
+//
+//	std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+//	
+//	// update stored pointcloud:
+//	{
+//		// Just write the pointcloud to our local instance:
+//		/*
+//		boost::mutex::scoped_lock lock (grabberMutex);
+//		node->cloud_.swap(cloudOut);
+//		*/
+//		
+//		// OR call applyFilters:
+//		node->applyFilters(cloudOut);
+//	}
+//
+//	// TODO: we should only set updateFlag_ here and try to draw only once
+//	// when we get the first frame, right? Unless, the shm data can change size?
+//	//node->redrawFlag_ = true;
+//	node->updateFlag_ = true;
+//	
+//	shmdata_any_reader_free (shmbuf);
+//}
+#endif
+
 //#if PCL_MAJOR_VERSION>1 && PCL_MINOR_VERSION>5
 void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
 //#else
 //void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr &rawCloud)
 //#endif
 {
-
-
+	
     // DEBUG INFO
+	/*
     static unsigned count = 0;
     static osg::Timer_t lastTick = osg::Timer::instance()->tick();
     if (++count == 30)
     {
         osg::Timer_t tick = osg::Timer::instance()->tick();
         framerate_ = count / osg::Timer::instance()->delta_s(lastTick,tick);
-        //float center = rawCloud->points[(rawCloud->width >> 1) * (rawCloud->height + 1)].z;
-        
-        //std::cout << rawCloud->points.size() << " points. Distance of center pixel=" << center << "mm. Average framerate: " << framerate_ << " Hz" <<  std::endl;
+        float center = rawCloud->points[(rawCloud->width >> 1) * (rawCloud->height + 1)].z;
+        std::cout << rawCloud->points.size() << " points. Distance of center pixel=" << center << "mm. Average framerate: " << framerate_ << " Hz" <<  std::endl;
         count = 0;
         lastTick = tick;
     }
-    
+	*/
+
     // If the redraw flag is set, our geometry is about to be destroyed anyway,
     // so let's just exit and wait. The cloud needs to exist before we can
     // update it.
     if (redrawFlag_) return;
-    
-    
+        
     applyFilters(rawCloud);
-    /*
-    // First apply crop filter along depth (z) axis:
-    
-    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
-    pcl::PassThrough<pcl::PointXYZRGBA> pass;
-    pass.setInputCloud(rawCloud);
-    pass.setFilterFieldName ("z");
-    pass.setFilterLimits (distCrop_.x(), distCrop_.y());
-    //pass.setFilterLimitsNegative (true);
-    pass.filter(*cloudFiltered);
-    
-    // Now we apply a VoxelGrid filter to reduce the number of points
-    
-    pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
-    pcl::VoxelGrid<pcl::PointXYZRGBA> sor;
-    sor.setInputCloud(cloudFiltered);
-    sor.setLeafSize(voxelSize_, voxelSize_, voxelSize_);
-    sor.filter(*cloud);
-    
-    // now set out member pointer with a mutex
-    {
-        boost::mutex::scoped_lock lock (grabberMutex);
-        cloud_.swap(cloud);
-    }
-    */
     
     // Set the flag so that we update during the next traversal:
     updateFlag_ = true;
@@ -238,9 +260,7 @@ void PointCloud::grabberCallback (const pcl::PointCloud<pcl::PointXYZRGBA>::Cons
 
 void PointCloud::applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr &rawCloud)
 {
-            
-    // First apply crop filter along depth (z) axis:
-    
+    // First apply crop filter along depth (z) axis:   
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZRGBA>);
     pcl::PassThrough<pcl::PointXYZRGBA> pass;
     pass.setInputCloud(rawCloud);
@@ -250,7 +270,6 @@ void PointCloud::applyFilters(const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr
     pass.filter(*cloudFiltered);
     
     // Now we apply a VoxelGrid filter to reduce the number of points
-    
     if (voxelSize_>0)
     {
         pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
@@ -277,6 +296,13 @@ osg::Vec3 PointCloud::getPos(unsigned int i)
     return osg::Vec3 (cloud_->points[i].x*spacing_, cloud_->points[i].y*spacing_, cloud_->points[i].z*spacing_) + randomVec3()*randomCoeff_;
 }
 
+void PointCloud::getPos(unsigned int i, osg::Vec3& point)
+{
+    point.set(cloud_->points[i].x*spacing_, cloud_->points[i].y*spacing_, cloud_->points[i].z*spacing_);
+    if (randomCoeff_ > 0.f)
+        point += randomVec3()*randomCoeff_;
+}
+
 osg::Vec4f PointCloud::getColor(unsigned int i)
 {
     if (colorMode_==OVERRIDE) return color_;
@@ -294,11 +320,54 @@ osg::Vec4f PointCloud::getColor(unsigned int i)
     return osg::Vec4f ((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f);
 }
 
+void PointCloud::getColor(unsigned int i, osg::Vec4& color)
+{
+    if (colorMode_==OVERRIDE)
+        color = color_;
+
+    uint32_t rgba_val_;
+    memcpy(&rgba_val_, &(cloud_->points[i].rgba), sizeof(uint32_t));
+    
+    uint32_t red,green,blue;
+    blue=rgba_val_ & 0x000000ff;
+    rgba_val_ = rgba_val_ >> 8;
+    green=rgba_val_ & 0x000000ff;
+    rgba_val_ = rgba_val_ >> 8;
+    red=rgba_val_ & 0x000000ff;
+
+    color.set((float)red/255.0f, (float)green/255.0f, (float)blue/255.0f,1.0f);
+}
+
+float PointCloud::computeDistanceFromCamera()
+{
+    if (spinApp::Instance().getContext()->isServer()) return -1.0f;
+    
+    osg::Node::ParentList pl = spinApp::Instance().sceneManager_->rootNode->getParents();
+
+    if ( pl.size() == 0 ) return -1.0f;
+
+    osg::Camera* cam = 0;
+
+    for ( size_t i = 0; i < pl.size(); i++ ) {
+        cam = dynamic_cast<osg::Camera*>( pl[i] );
+        if ( cam ) break;
+    }
+
+    if ( !cam ) return -1.0f;
+
+    osg::Vec3f eye, a, b;
+    cam->getViewMatrixAsLookAt( eye, a, b );
+    printf( "eye = %f %f %f\n", eye.x(), eye.y(), eye.z() );
+    return ( eye - center_ ).length();
+
+}
+
+
 void PointCloud::updatePoints()
 {
     if (spinApp::Instance().getContext()->isServer()) return;
     if (redrawFlag_ || !cloud_) return;
-    
+
     boost::mutex::scoped_lock lock(grabberMutex);
     
     //std::cout << "doing update. cloudsize=" << cloud_->points.size() << " maxsize=" << maxPoints_ << std::endl;
@@ -311,12 +380,15 @@ void PointCloud::updatePoints()
         osg::Vec3Array* verts = new osg::Vec3Array();
         osg::Vec4Array* colors = new osg::Vec4Array();
         
+        verts->resize(cloud_->points.size());
+        colors->resize(cloud_->points.size());
+
         for (unsigned int i=0; i<cloud_->points.size(); i++)
         {
-            verts->push_back(this->getPos(i));
-            colors->push_back(this->getColor(i));
+            this->getPos(i, (*verts)[i]);
+            this->getColor(i, (*colors)[i]);
         }
-        
+
         osg::Geometry *geom = new osg::Geometry();
         switch (drawMode_)
         {
@@ -351,7 +423,7 @@ void PointCloud::updatePoints()
                 geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,cloud_->points.size()));
                 
                 osg::Point *point = new osg::Point();
-                point->setSize(pointSize_*2);
+                point->setSize(pointSize_*2.0f); // 2?
                 cloudGeode_->getOrCreateStateSet()->setAttribute(point);
 
                 break;
@@ -360,20 +432,33 @@ void PointCloud::updatePoints()
         geom->setColorArray(colors);
         geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
         cloudGeode_->addDrawable( geom );
-        
     }
     
     else if ((drawMode_==LIGHTPOINTS) && lightPointNode_.valid() && lightPointNode_->getNumLightPoints())
     {        
         unsigned int i=0;
+        center_.set(0,0,0);
         for (; i<cloud_->points.size(); i++)
         {
             osgSim::LightPoint& lp = lightPointNode_->getLightPoint(i);
             lp._on = true;
-            lp._color = this->getColor(i);
-            lp._position = this->getPos(i);
+            this->getColor(i, lp._color);
+            this->getPos(i, lp._position);
+            center_ += lp._position;            
             lp._radius = pointSize_/1000.0;
         }
+
+        if ( cloud_->points.size() ) {
+            center_ /= (float)cloud_->points.size();
+            float invDist = 1.0f;
+            if ( modulatePointSize_ ) invDist = 1.0f / computeDistanceFromCamera();
+            float rad = invDist * pointSize_ / 1000.0;
+            //printf( "LIGHTPOINTS center_ = %f %f %f, nb points = %u,\ninvdist = %f, rad = %f\n",
+            //        center_.x(), center_.y(), center_.z(), cloud_->points.size(), invDist, rad );
+            for (i=0; i<cloud_->points.size(); i++)  lightPointNode_->getLightPoint(i)._radius = rad;
+        }
+        
+
         for (; i<maxPoints_; i++)
         {
             // deactivate any filtered out light points (recall, we reserve the
@@ -433,7 +518,6 @@ void PointCloud::draw()
         if (cloudGeode_.valid()) cloudGeode_ = NULL;
         xforms_.clear();
     }
-    
     
     if (maxPoints_<=0) return;
 
@@ -496,7 +580,6 @@ void PointCloud::draw()
     else if (drawMode_ == SQUARES)
     {
         // TODO: Billboarded planes
-    
     }
     */
     
@@ -520,6 +603,41 @@ void PointCloud::draw()
     
     this->getAttachmentNode()->addChild(cloudGroup_.get());
 }
+
+#ifdef WITH_SHAREDVIDEO
+// here are some typedef'd function pointers which allow us to pass a member
+// function pointer instead of the traditional static thread function when
+// we call pthread_create:
+typedef void* (PointCloud::*shmThreadPtr)(void*);
+typedef void* (*PthreadPtr)(void*);
+
+// and here is the actual member thread function
+void *PointCloud::shmThread(void*)
+{
+    struct timespec sleepTime;
+    sleepTime.tv_sec = 0;
+    sleepTime.tv_nsec = 1e5;
+
+    shmIsRunning = true;
+    while (shmIsRunning)
+    {
+        if (shmPointCloud_->isUpdated())
+        {
+            pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloudOut(new pcl::PointCloud<pcl::PointXYZRGBA>());
+            shmPointCloud_->getCloud(cloudOut);
+
+            //std::cout << "shmCallback got " << cloudOut->points.size() << " points" << std::endl;
+            applyFilters(cloudOut);
+
+            updateFlag_ = true;
+        }
+        nanosleep(&sleepTime, NULL);
+    }
+
+    delete shmPointCloud_;
+    return 0;
+}
+#endif
 
 #endif
 
@@ -550,6 +668,19 @@ void PointCloud::setURI(const char* filename)
         grabber_->stop();
         grabber_ = 0;
     }
+
+#ifdef WITH_SHAREDVIDEO
+    if (shmIsRunning)
+    {
+        shmIsRunning = false;
+        if (shmThreadID_ != 0)
+        {
+            pthread_join(shmThreadID_, NULL);
+            shmThreadID_ = 0;
+        }
+    }
+#endif
+	
     cloudOrig_.reset();
             
     path_ = filename;
@@ -563,7 +694,43 @@ void PointCloud::setURI(const char* filename)
         // do nothing
         return;
     }
-    
+
+    else if (std::string(path_).find("shm://") != std::string::npos)
+    {
+        maxPoints_ = 76800;
+		
+        std::string shmPath = path_.substr(6);
+        std::cout << "Connecting to shmdata path: " << shmPath << std::endl;
+
+#ifdef WITH_SHAREDVIDEO
+        
+        //shmPointCloud_.reset(new ShmPointCloud<pcl::PointXYZRGBA>(shmPath.c_str(), false));
+        shmPointCloud_ = new ShmPointCloud<pcl::PointXYZRGBA>(shmPath.c_str(), false);
+
+        // create a thread to handle the clouds from the shmData
+        shmThreadPtr t = &PointCloud::shmThread;
+        PthreadPtr p = *(PthreadPtr*)&t;
+        
+        success = true;
+        if (pthread_attr_init(&shmThreadAttr_) < 0)
+        {
+            std::cout << "PointCloud: could not prepare shmThread" << std::endl;
+            success = false;
+        }
+        if (pthread_attr_setdetachstate(&shmThreadAttr_, PTHREAD_CREATE_JOINABLE) < 0)
+        {
+            std::cout << "PointCloud: could not set state for shmThread" << std::endl;
+            success = false;
+        }
+        if (pthread_create( &shmThreadID_, &shmThreadAttr_, p, this) < 0)
+        {
+            std::cout << "PointCloud: could not create shmThread" << std::endl;
+            success = false;
+        }
+
+#endif
+    }
+
     else if (std::string(path_).find("kinect://") != std::string::npos)
     {
         // Kinect or any other dynamic point cloud needs to reserve a maximum
@@ -604,7 +771,7 @@ void PointCloud::setURI(const char* filename)
             framerate_ = 0;
             success = true;
         }
-        catch (pcl::PCLIOException e)
+        catch (pcl::PCLException e)
         {
             std::cout << "[PointCloud]: Error connecting to Kinect; perhaps it is already being used? ... " << e.detailedMessage() << std::endl;
         }
@@ -621,7 +788,7 @@ void PointCloud::setURI(const char* filename)
             if (ext=="cpc")
             {
                 std::stringstream compressedData;
-                pcl::octree::PointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::octree::PointCloudCompression<pcl::PointXYZRGBA>();
+                pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA> *pointCloudDecoder = new pcl::io::OctreePointCloudCompression<pcl::PointXYZRGBA>();
                 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr tmpCloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
 
                 std::ifstream readCompressedFile(absPath.c_str());
@@ -828,7 +995,14 @@ void PointCloud::setColorMode (ColorMode mode)
         updateFlag_ = true;
 	}
 }
-
+void PointCloud::setModulatePointSize (int a)
+{
+    if ( modulatePointSize_ == (bool)a ) return;
+    printf("setModulatePointSize %i\n", a);
+    modulatePointSize_ = a;
+	BROADCAST(this, "si", "setModulatePointSize", getModulatePointSize());
+    updateFlag_ = true;
+}
 // -----------------------------------------------------------------------------
 std::vector<lo_message> PointCloud::getState () const
 {
@@ -872,6 +1046,10 @@ std::vector<lo_message> PointCloud::getState () const
  
     msg = lo_message_new();
     lo_message_add(msg, "si", "setColorMode", getColorMode());
+    ret.push_back(msg);
+
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setModulatePointSize", getModulatePointSize());
     ret.push_back(msg);
     
     msg = lo_message_new();

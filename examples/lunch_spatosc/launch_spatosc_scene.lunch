@@ -1,0 +1,15 @@
+#!/usr/bin/env lunch
+
+add_command("spinserver --spatosc BasicTranslator osc.udp://localhost:18031 --spatosc BasicTranslator osc.udp://localhost:18032 --spatosc SceneContentTranslator osc.tcp://localhost:18033", sleep_after=2.0)
+add_command("spinviewer")
+add_command("osc-receive -p 18031")
+add_command("osc-receive -p 18032")
+add_command("osc-receive -T -p 18033")
+
+add_command("osc-send osc.udp://localhost:54324 /SPIN/default ,sss createNode grid GridNode", respawn=False)
+add_command("osc-send osc.udp://localhost:54324 /SPIN/default ,sss createNode sound SoundNode", respawn=False)
+add_command("osc-send osc.udp://localhost:54324 /SPIN/default ,sss createNode listener Listener", respawn=False)
+add_command("osc-send osc.udp://localhost:54324 /SPIN/default/sound ,sfff setTranslation 1 2 3", respawn=False)
+add_command("osc-send osc.udp://localhost:54324 /SPIN/default ,s debug", respawn=False)
+add_command("osc-send osc.udp://localhost:54324 /SPIN/default ,ss debug spatosc", respawn=False)
+

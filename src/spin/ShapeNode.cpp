@@ -44,16 +44,16 @@
 #include <osg/Geometry>
 #include <osg/Billboard>
 
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "osgUtil.h"
-#include "ShapeNode.h"
-#include "SceneManager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "osgutil.h"
+#include "shapenode.h"
+#include "scenemanager.h"
 
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "SharedVideoTexture.h"
-#include "ShaderUtil.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "sharedvideotexture.h"
+#include "shaderutil.h"
 
 extern pthread_mutex_t sceneMutex;
 
@@ -75,6 +75,7 @@ ShapeNode::ShapeNode (SceneManager *sceneManager, const char* initID) : GroupNod
 	renderBin = -1;
 	lightingEnabled = -1;
     singleSided_ = false;
+    detailRatio_ = 1.0;
     
     // quick shader test:
     if (0)
@@ -122,7 +123,6 @@ void ShapeNode::setShape (shapeType t)
 	else shape = t;
 
 	//std::cout << "GOT NEW SHAPE MESSAGE: " << s << std::endl;
-
 	drawShape();
 
 	BROADCAST(this, "si", "setShape", (int) shape);
@@ -143,13 +143,22 @@ void ShapeNode::setBillboard (billboardType t)
 void ShapeNode::setColor (float r, float g, float b, float a)
 {
 	osg::Vec4 newColor = osg::Vec4(r,g,b,a);
-
 	if (_color != newColor)
 	{
 		_color = newColor;
-	
-		drawShape();
-	
+
+        if ( _shapeDrawable.get() ) {
+            _shapeDrawable->setColor( _color );
+
+        } else if ( shapeGeode->getDrawable(0)->asGeometry() ) {            
+            osg::Vec4Array* c = dynamic_cast<osg::Vec4Array*>( shapeGeode->getDrawable(0)->asGeometry()->getColorArray() );
+            if (c) {
+                (*c)[0].set(r,g,b,a);  // might be pure evil.
+                shapeGeode->getDrawable(0)->dirtyDisplayList();
+            } else drawShape();
+        }
+        else drawShape();  
+        
 		BROADCAST(this, "sffff", "setColor", r, g, b, a);
 	}
 }
@@ -237,6 +246,12 @@ void ShapeNode::setSingleSided (int singleSided)
     BROADCAST(this, "si", "setSingleSided", getSingleSided());
 }
 
+void ShapeNode::setDetailRatio (float detailRatio)
+{
+    detailRatio_ = detailRatio;
+    drawShape();
+    BROADCAST(this, "sf", "setDetailRatio", getDetailRatio());
+}
 
 // ===================================================================
 void ShapeNode::drawShape()
@@ -268,7 +283,7 @@ void ShapeNode::drawShape()
 	if (shape and drawOnThisHost)
 	{
 		osg::TessellationHints* hints = new osg::TessellationHints;
-		hints->setDetailRatio(GENERIC_SHAPE_RESOLUTION);
+		hints->setDetailRatio(detailRatio_);
 
 		if (billboard)
 		{
@@ -292,44 +307,53 @@ void ShapeNode::drawShape()
 			shapeGeode = new osg::Geode();
 		}
 
-
+        //shapeGeode->removeDrawable( _shapeDrawable.release() );
+        _shapeDrawable.release();
 
 		if (shape==PLANE) // OSG doesn't support planes
-		{
-			shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
+        {
+            shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
+			//if ( shapeGeode->getNumDrawables() == 0 ) shapeGeode->addDrawable(createPlane(AS_UNIT_SCALE * .5, _color));
+            //else shapeGeode->setDrawable(0, createPlane(AS_UNIT_SCALE * .5, _color));
 		}
         else if (shape==DISC)
         {
             shapeGeode->addDrawable(createCone(0, AS_UNIT_SCALE * .5, _color));
+            //if ( shapeGeode->getNumDrawables() == 0 ) shapeGeode->addDrawable(createCone(0, AS_UNIT_SCALE * .5, _color));
+            //else shapeGeode->setDrawable(0, createCone(0, AS_UNIT_SCALE * .5, _color));
         }
-		else {
-			osg::ShapeDrawable *shapeDrawable;
-			if (shape==SPHERE)
-			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.5), hints);
-			}
-			else if (shape==BOX)
-			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE), hints);
-			}
-			else if (shape==CYLINDER)
-			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
-			}
-			else if (shape==CAPSULE)
-			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Capsule(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
-			}
-			else if (shape==CONE)
-			{
-				shapeDrawable = new osg::ShapeDrawable(new osg::Cone(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
-			}
-			else {
-				return;
-			}
-			shapeGeode->addDrawable(shapeDrawable);
-			shapeDrawable->setColor(_color);
+		else if (shape==SPHERE)
+		{
+			_shapeDrawable = new osg::ShapeDrawable(new osg::Sphere(osg::Vec3(0.0f,0.0f,0.0f),AS_UNIT_SCALE*.5), hints);
 		}
+		else if (shape==BOX)
+		{
+			_shapeDrawable = new osg::ShapeDrawable(new osg::Box(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE), hints);
+		}
+		else if (shape==CYLINDER)
+		{
+			_shapeDrawable = new osg::ShapeDrawable(new osg::Cylinder(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
+		}
+		else if (shape==CAPSULE)
+		{
+			_shapeDrawable = new osg::ShapeDrawable(new osg::Capsule(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
+		}
+		else if (shape==CONE)
+		{
+			_shapeDrawable = new osg::ShapeDrawable(new osg::Cone(osg::Vec3(0.0f,0.0f,0.0f), AS_UNIT_SCALE*.25,AS_UNIT_SCALE), hints);
+		}
+		else {
+			//return;
+		}         
+		
+
+        if ( _shapeDrawable.get() ) {
+            shapeGeode->addDrawable( _shapeDrawable );
+			//if ( shapeGeode->getNumDrawables() == 0 ) shapeGeode->addDrawable( _shapeDrawable );
+            //else shapeGeode->setDrawable( 0, _shapeDrawable );
+
+			_shapeDrawable->setColor(_color);
+        }
 
 
 

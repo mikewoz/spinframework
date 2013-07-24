@@ -48,12 +48,12 @@
 #include <osg/BlendColor>
 #include <osg/BlendEquation>
 
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "ReferencedNode.h"
-#include "SwitchNode.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "referencednode.h"
+#include "switchnode.h"
 
 #include <cppintrospection/Value>
 #include <cppintrospection/Type>
@@ -82,6 +82,7 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, const char *initID) 
 
     scheduleForDeletion_ = false;
     subgraphAlpha_ = 1.0;
+    castShadows_ = false;
 
     // When children are attached to this, they get added to the attachmentNode:
     attachmentNode_ = this;
@@ -97,7 +98,8 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, const char *initID) 
 
     // set initial nodepath:
     currentNodePath_.clear();
-    
+
+    // set nodemask (see spinUtil.h for more info)
     if (this->getID()=="world")
     {
         this->setNodeMask(INTERACTIVE_NODE_MASK);
@@ -105,11 +107,11 @@ ReferencedNode::ReferencedNode (SceneManager *sceneManager, const char *initID) 
     else
     {
         registerNode(sceneManager);
-        this->setNodeMask(GEOMETRIC_NODE_MASK); // nodemask info in spinUtil.h
+        this->setNodeMask(GEOMETRIC_NODE_MASK);
         attachTo("world");
     }
-    
-    
+
+
 }
 
 // ***********************************************************
@@ -124,11 +126,16 @@ ReferencedNode::~ReferencedNode()
         std::vector<lo_server>::iterator it;
         for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
         {
-        	lo_server_del_method((*it), oscPattern.c_str(), NULL);
+            lo_server_del_method((*it), oscPattern.c_str(), NULL);
         }
-		lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
+        lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_, oscPattern.c_str(), NULL);
     }
     id_->s_thing = 0;
+}
+
+std::string ReferencedNode::getOSCPath() const
+{
+    return std::string("/SPIN/" + spinApp::Instance().getSceneID()+"/"+ getID());
 }
 
 void ReferencedNode::registerNode(SceneManager *s)
@@ -140,19 +147,19 @@ void ReferencedNode::registerNode(SceneManager *s)
     std::vector<lo_server>::iterator it;
     for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
     {
-    	lo_server_add_method((*it),
-	                         oscPattern.c_str(),
-	                         NULL,
-	                         spinBaseContext::nodeCallback,
-	                         (void*)id_);
+        lo_server_add_method((*it),
+                             oscPattern.c_str(),
+                             NULL,
+                             spinBaseContext::nodeCallback,
+                             (void*)id_);
     }
 
-	// and with the TCP receiver in the server case:
-	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
-	                     oscPattern.c_str(),
-	                     NULL,
-	                     spinBaseContext::nodeCallback,
-	                     (void*)id_);
+    // and with the TCP receiver in the server case:
+    lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+                         oscPattern.c_str(),
+                         NULL,
+                         spinBaseContext::nodeCallback,
+                         (void*)id_);
 
 }
 
@@ -165,8 +172,10 @@ void ReferencedNode::attachTo (const char* parentID)
 {
     if ((getID()=="world") || (std::string(parentID) == "NULL"))
         return;
-    
+
     osg::ref_ptr<ReferencedNode> newParentNode = sceneManager_->getNode(parentID);
+
+    if ( newParentNode.get() == this ) return;
 
     if (newParentNode.valid())
     {
@@ -196,14 +205,25 @@ void ReferencedNode::attachTo (const char* parentID)
             // send a parentChange message to clients who are only listening to scene
             // messages (ie, they are not filtering every single node message).
             // TODO: do this via TCP?
-            SCENE_MSG("ssss", "graphChange", "attach", this->getID().c_str(), parentID);
+            spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "attach", this->getID().c_str(), parentID, SPIN_ARGS_END);
+
         }
     }
 }
 
 void ReferencedNode::detachFrom(const char* parentID)
 {
-    if (getID()=="world") return;
+    if (getID()=="world")
+    {
+        if (sceneManager_->worldNode->containsNode(this))
+        {
+            sceneManager_->worldNode->removeChild(this);
+        }
+    
+        BROADCAST(this, "ss", "detachFrom", "world");
+        spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "detach", this->getID().c_str(), "world", SPIN_ARGS_END);
+        return;
+    }
 
     // detach from all parents if the "*" wildcard is specified:
     if (std::string(parentID)=="*")
@@ -211,7 +231,7 @@ void ReferencedNode::detachFrom(const char* parentID)
         while (parentNodes_.size())
         {
             std::string pID = parentNodes_[0]->getID();
-            
+
             if (parentNodes_[0]->attachmentNode_->containsNode(this))
             {
                 pthread_mutex_lock(&sceneMutex);
@@ -219,14 +239,15 @@ void ReferencedNode::detachFrom(const char* parentID)
                 pthread_mutex_unlock(&sceneMutex);
             }
             parentNodes_.erase(parentNodes_.begin());
-            
+
             BROADCAST(this, "ss", "detachFrom", pID.c_str());
-            SCENE_MSG("ssss", "graphChange", "detach", this->getID().c_str(), pID.c_str());
+            spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "detach", this->getID().c_str(), pID.c_str(), SPIN_ARGS_END);
+
         }
-        
+
         this->updateNodePath();
     }
-    
+
     // otherwise find the parent node and detach this from that parent:
     else
     {
@@ -239,7 +260,7 @@ void ReferencedNode::detachFrom(const char* parentID)
                 pNode->attachmentNode_->removeChild(this);
                 pthread_mutex_unlock(&sceneMutex);
             }
-            
+
             // remove from parent list:
             nodeListType::iterator iter;
             for (iter=parentNodes_.begin(); iter!=parentNodes_.end(); ++iter)
@@ -250,11 +271,12 @@ void ReferencedNode::detachFrom(const char* parentID)
                     break;
                 }
             }
-            
+
             this->updateNodePath();
-            
+
             BROADCAST(this, "ss", "detachFrom", parentID);
-            SCENE_MSG("ssss", "graphChange", "detach", this->getID().c_str(), parentID);
+            spinApp::Instance().BroadcastSceneMessage("ssss", "graphChange", "detach", this->getID().c_str(), parentID, SPIN_ARGS_END);
+
         }
     }
 }
@@ -268,7 +290,7 @@ bool ReferencedNode::inGraph()
         // if the parent is world, then this node is surely in the scene:
         if ((*iter)->getID() == "world")
             return true;
-            
+
         // if the parent is a switch node, check if it is in the scene, but only
         // if this node is enabled:
         SwitchNode *sw = dynamic_cast<SwitchNode*>((*iter).get());
@@ -277,7 +299,7 @@ bool ReferencedNode::inGraph()
             if ( (sw->isEnabled(this)) && (sw->inGraph()) )
                 return sw->inGraph();
         }
-        
+
         // for all other nodes, if the parent is in the scene, so are we:
         else if ((*iter)->inGraph())
             return true;
@@ -344,7 +366,7 @@ void ReferencedNode::updateNodePath(bool updateChildren)
     currentNodePath_.push_back(this);
 
     // Now update NodePaths for all children if the updateChildren flag is set.
-    // For some derived nodes, they may want to control how they control the 
+    // For some derived nodes, they may want to control how they control the
     // update of children (eg, only after their nodepath is added).
     if (updateChildren)
         updateChildNodePaths();
@@ -401,7 +423,7 @@ void ReferencedNode::setParent (const char* newvalue)
     // from any existing parents, then we call attachTo.
     //
     // NOTE: if the node is attached to many places, some of the detachFrom
-    // broadcasts might get lost (due to UDP), so for extra redundancy, we 
+    // broadcasts might get lost (due to UDP), so for extra redundancy, we
     // will also broadcast the setParent message and hope that the client gets
     // it and calls an extra detachFrom("*") locally.
 
@@ -418,52 +440,90 @@ void ReferencedNode::setContext (const char *newvalue)
 
 void ReferencedNode::setAlpha (float alpha)
 {
-	if (subgraphAlpha_ == alpha)
+    if (subgraphAlpha_ == alpha)
         return;
 
-	subgraphAlpha_ = alpha;
-	if (subgraphAlpha_ < 0.0)
+    bool newlyTransparent = false;
+    if ( subgraphAlpha_ >= 1.0 && alpha < 1.0 ) newlyTransparent = true;
+
+    subgraphAlpha_ = alpha;
+    if (subgraphAlpha_ < 0.0)
         subgraphAlpha_ = 0.0;
-	else if (subgraphAlpha_ > 1.0)
+    else if (subgraphAlpha_ > 1.0)
         subgraphAlpha_ = 1.0;
 
-	osg::StateSet *ss = this->getOrCreateStateSet();
-	ss->setDataVariance(osg::Object::DYNAMIC);
+    osg::StateSet *ss = this->getOrCreateStateSet();
 
-    // turn on blending and tell OSG to sort meshes before displaying them
-    ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-    ss->setMode(GL_BLEND, osg::StateAttribute::ON);
+    if ( newlyTransparent ) {
+        ss->setDataVariance(osg::Object::DYNAMIC);
 
-	osg::BlendFunc *blendFunc = new osg::BlendFunc();
-	osg::BlendColor *blendColor= new osg::BlendColor(osg::Vec4(1, 1, 1, subgraphAlpha_));
+        // turn on blending and tell OSG to sort meshes before displaying them
+        ss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+        ss->setMode(GL_BLEND, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-	blendFunc->setDataVariance(osg::Object::DYNAMIC);
-	blendColor->setDataVariance(osg::Object::DYNAMIC);
+        osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::CONSTANT_ALPHA,
+                                                        osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA );
 
-	blendFunc->setSource(osg::BlendFunc::CONSTANT_ALPHA);
-	blendFunc->setDestination(osg::BlendFunc::ONE_MINUS_CONSTANT_ALPHA);
-	ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
-	ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+        // osg::BlendFunc *blendFunc = new osg::BlendFunc( osg::BlendFunc::SRC_ALPHA,
+        //                                                 osg::BlendFunc::ONE_MINUS_SRC_ALPHA );
 
-	this->osg::Group::setStateSet(ss);
+        osg::BlendColor *blendColor = new osg::BlendColor(osg::Vec4(subgraphAlpha_,subgraphAlpha_,subgraphAlpha_,subgraphAlpha_));
+
+        blendFunc->setDataVariance(osg::Object::DYNAMIC);
+        blendColor->setDataVariance(osg::Object::DYNAMIC);
+        ss->setAttributeAndModes(blendFunc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+        ss->setAttributeAndModes(blendColor, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+    } else {
+        osg::BlendColor *bc = dynamic_cast<osg::BlendColor*>( ss->getAttribute( osg::StateAttribute::BLENDCOLOR ) );
+        bc->setConstantColor( osg::Vec4(subgraphAlpha_,subgraphAlpha_,subgraphAlpha_,subgraphAlpha_) );
+        ss->setAttributeAndModes( bc, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON ); // needed?
+    }
+
+
+
+    // ss->setAttributeAndModes(new osg::BlendEquation(),
+    //                          osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE); 
+    //    this->osg::Group::setStateSet(ss);
 
     /*
     osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
     blendEquation->setDataVariance(osg::Object::DYNAMIC);
 
-	//blendEquation->setEquation(osg::BlendEquation::FUNC_ADD);
-	//blendEquation->setEquation(osg::BlendEquation::FUNC_SUBTRACT);
-	//blendEquation->setEquation(osg::BlendEquation::FUNC_REVERSE_SUBTRACT);
-	//blendEquation->setEquation(osg::BlendEquation::RGBA_MIN);
-	//blendEquation->setEquation(osg::BlendEquation::RGBA_MAX);
-	blendEquation->setEquation(osg::BlendEquation::ALPHA_MIN);
-	//blendEquation->setEquation(osg::BlendEquation::ALPHA_MAX);
-	//blendEquation->setEquation(osg::BlendEquation::LOGIC_OP);
+    //blendEquation->setEquation(osg::BlendEquation::FUNC_ADD);
+    //blendEquation->setEquation(osg::BlendEquation::FUNC_SUBTRACT);
+    //blendEquation->setEquation(osg::BlendEquation::FUNC_REVERSE_SUBTRACT);
+    //blendEquation->setEquation(osg::BlendEquation::RGBA_MIN);
+    //blendEquation->setEquation(osg::BlendEquation::RGBA_MAX);
+    blendEquation->setEquation(osg::BlendEquation::ALPHA_MIN);
+    //blendEquation->setEquation(osg::BlendEquation::ALPHA_MAX);
+    //blendEquation->setEquation(osg::BlendEquation::LOGIC_OP);
 
     ss->setAttributeAndModes(blendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     */
 
-	std::cout << "set alpha for " << this->id_->s_name << " to " << subgraphAlpha_ << std::endl;
+    std::cout << "set alpha for " << this->id_->s_name << " to " << subgraphAlpha_ << std::endl;
+    
+    BROADCAST(this, "sf", "setAlpha", subgraphAlpha_);
+
+}
+
+void ReferencedNode::setCastShadows(int b)
+{
+    castShadows_ = (bool)b;
+    
+    // if the castShadow flag is set, ensure to add it to the nodemask
+    if (castShadows_)
+    {
+        osg::Node::setNodeMask(getNodeMask() | CAST_SHADOW_NODE_MASK);
+    }
+    else if (getNodeMask() | CAST_SHADOW_NODE_MASK)
+    {
+        // if castShadows flag is false, remove the bit from the nodemask:
+        osg::Node::setNodeMask(getNodeMask() & ~CAST_SHADOW_NODE_MASK);
+    }
+    
+    //this->setNodeMask(getNodeMask());
+    BROADCAST(this, "si", "setCastShadows", (int)b);
 }
 
 void ReferencedNode::setParam (const char *paramName, const char *paramValue)
@@ -479,40 +539,47 @@ void ReferencedNode::setParam (const char *paramName, float paramValue)
     BROADCAST(this, "ssf", "setParam", paramName, paramValue);
 }
 
+void ReferencedNode::sendEvent (const char *types, lo_arg **argv, int argc )
+{
+    // std::cout << "ERROR: ReferencedNode::sendEvent CALLED" << std::endl;
+    0; // action only defined in subclasses
+}
+
+    
 // -----------------------------------------------------------------------------
 
 void ReferencedNode::setStateSetFromFile(const char* filename)
 {
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(filename);
-	if (ss.valid())
-	{
-		if (ss->getIDSymbol() == stateset_) return; // we're already using that stateset
-		stateset_ = ss->getIDSymbol();
-		updateStateSet();
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
+    osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->createStateSet(filename);
+    if (ss.valid())
+    {
+        if (ss->getIDSymbol() == stateset_) return; // we're already using that stateset
+        stateset_ = ss->getIDSymbol();
+        updateStateSet();
+        BROADCAST(this, "ss", "setStateSet", getStateSet());
+    }
 }
 
 void ReferencedNode::setStateSet (const char* s)
 {
-	if (gensym(s)==stateset_) return;
+    if (gensym(s)==stateset_) return;
 
-	osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->getStateSet(s);
-	if (ss.valid())
-	{
-		stateset_ = ss->getIDSymbol();
-		
-		BROADCAST(this, "ss", "setStateSet", getStateSet());
-	}
-    
+    osg::ref_ptr<ReferencedStateSet> ss = sceneManager_->getStateSet(s);
+    if (ss.valid())
+    {
+        stateset_ = ss->getIDSymbol();
+
+        BROADCAST(this, "ss", "setStateSet", getStateSet());
+    }
+
     updateStateSet();
 }
 
 void ReferencedNode::updateStateSet()
 {
-	osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
-	if (ss.valid()) osg::Group::setStateSet( ss.get() );
-    
+    osg::ref_ptr<ReferencedStateSet> ss = dynamic_cast<ReferencedStateSet*>(stateset_->s_thing);
+    if (ss.valid()) osg::Group::setStateSet( ss.get() );
+
     // if not valid, create a new (empty) stateset (ie, clear the previous state)
     else osg::Group::setStateSet(new osg::StateSet());
 }
@@ -535,7 +602,7 @@ void ReferencedNode::debug()
     {
         std::cout << "   -> " << (*itr)->getName() << std::endl;
     }
-    
+
     const osg::BoundingSphere& bs = this->getBound();
     std::cout << "   Subgraph centroid: " << stringify(bs.center()) << std::endl;
     std::cout << "   Subgraph radius: " << bs.radius() << std::endl;
@@ -577,6 +644,7 @@ void ReferencedNode::debug()
             std::cout << "      " << (*childIter)->getID() << std::endl;
         }
     }
+    printf("   nodeMask %u (0x%04x)\n", this->getNodeMask(), this->getNodeMask());
     BROADCAST(this, "s", "debug");
 }
 
@@ -592,7 +660,7 @@ std::vector<lo_message> ReferencedNode::getState() const
         lo_message_add(msg, "ss", "attachTo", this->getParentID(i).c_str());
         ret.push_back(msg);
     }
-    
+
     msg = lo_message_new();
     lo_message_add(msg, "ss", "setContext", this->getContext());
     ret.push_back(msg);
@@ -600,7 +668,11 @@ std::vector<lo_message> ReferencedNode::getState() const
     msg = lo_message_new();
     lo_message_add(msg, "sf", "setAlpha", this->getAlpha());
     ret.push_back(msg);
-
+        
+    msg = lo_message_new();
+    lo_message_add(msg, "si", "setCastShadows", this->getCastShadows());
+    ret.push_back(msg);
+    
     stringParamType::const_iterator stringIter;
     for (stringIter = stringParams_.begin(); stringIter != stringParams_.end(); stringIter++ )
     {
@@ -661,10 +733,10 @@ void ReferencedNode::stateDump()
         lo_message_add_string(msg, this->getParentID(i).c_str());
     }
     stateBundle.push_back(msg);
-    
+
     spinApp::Instance().NodeBundle(this->getID(), stateBundle);
 }
- 
+
 
 void ReferencedNode::stateDump(lo_address txAddr)
 {
@@ -677,7 +749,7 @@ void ReferencedNode::stateDump(lo_address txAddr)
         lo_message_add_string(msg, this->getParentID(i).c_str());
     }
     stateBundle.push_back(msg);
-    
+
     spinApp::Instance().NodeBundle(this->getID(), stateBundle, txAddr);
 }
 
@@ -685,7 +757,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
                                     double freq, const std::string& params )
 {
 #ifndef DISABLE_PYTHON
-    
+
    // do we already have a script with the same label?
     CronScriptList::iterator it;
     it = _cronScriptList.find(std::string(label));
@@ -695,7 +767,12 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
 
-    std::string sf = osgDB::findDataFile( scriptPath );
+    std::string sf = osgDB::findDataFile( getAbsolutePath(scriptPath) );
+    if ( sf.empty() ) {
+        std::cout << "script file '" << getAbsolutePath(scriptPath) << "' not found." << std::endl;
+        return false;
+    }
+
     std::cout << "Loading script: " << sf << std::endl;
 
     boost::python::object s, p;
@@ -706,7 +783,7 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
     std::string pyModule, pyScript, pyClassName;
 
     CronScript* cs = new CronScript;
-    cs->path = scriptPath;
+    cs->path = sf;
     cs->serverSide = serverSide;
     cs->params = params;
     cs->freq = freq;
@@ -752,26 +829,26 @@ bool ReferencedNode::addCronScript( bool serverSide, const std::string& label, c
 
         _cronScriptList.insert( std::pair<const std::string, CronScript*>( std::string(label), cs ) );
 
-    } 
-    catch ( boost::python::error_already_set const & ) 
+    }
+    catch ( boost::python::error_already_set const & )
     {
         std::cout << "Python error: " << std::endl;
         PyErr_Print();
         PyErr_Clear();
         return false;
-    } 
-    catch ( std::exception& e ) 
+    }
+    catch ( std::exception& e )
     {
         std::cout << "Python error: " << e.what() << std::endl;
         return false;
     }
-    catch(...) 
+    catch(...)
     {                        // catch all other exceptions
         std::cout << "Python error... Caught... something??\n";
         return false;
     }
     return true;
-    
+
 #else
     std::cout << "Python interpreter is disabled. Could not addCronScript to " << getNodeType() << ": " << getID() << std::endl;
     return false;
@@ -789,7 +866,7 @@ bool ReferencedNode::callCronScripts()
 
     try
     {
-        for (CronScriptList::iterator it = _cronScriptList.begin(); it != _cronScriptList.end(); it++) 
+        for (CronScriptList::iterator it = _cronScriptList.begin(); it != _cronScriptList.end(); it++)
         {
             if (! it->second )
                 continue;
@@ -878,8 +955,11 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     spinApp &spin = spinApp::Instance();
     osg::Timer* timer = osg::Timer::instance();
 
-    std::string sf = osgDB::findDataFile( scriptPath );
-    std::cout << "Loading script: " << sf << std::endl;
+    std::string sf = osgDB::findDataFile( getAbsolutePath(scriptPath) );
+    if ( sf.empty() ) {
+        std::cout << "script file '" << getAbsolutePath(scriptPath) << "' not found." << std::endl;
+        return false;
+    }
 
     boost::python::object s, p;
     char cmd[512];
@@ -887,7 +967,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     std::string pyModule, pyScript;
 
     EventScript* es = new EventScript;
-    es->path = scriptPath;
+    es->path = sf;
     es->serverSide = serverSide;
     es->params = params;
     es->eventName = eventName;
@@ -949,7 +1029,7 @@ bool ReferencedNode::addEventScript( bool serverSide, const std::string& label, 
     }
 
     return true;
-    
+
 #else
     std::cout << "Python interpreter is disabled. Could not addEventScript to " << getNodeType() << ": " << id_->s_name << std::endl;
     return false;
@@ -991,7 +1071,7 @@ bool ReferencedNode::callEventScript( const std::string& eventName,
                     if ( *argt == typeid(int) )
                     {
                         argList.append( cppintrospection::variant_cast<int>(args[i]) );
-                    } 
+                    }
                     else if ( *argt == typeid(float) )
                     {
                         argList.append( cppintrospection::variant_cast<float>(args[i]) );
@@ -1044,7 +1124,7 @@ bool ReferencedNode::callEventScript( const std::string& eventName,
         }
     }
     return eventScriptCalled;
-    
+
 #else
     return false;
 #endif
@@ -1084,6 +1164,23 @@ bool ReferencedNode::removeEventScript(const char* label)
         return true;
     }
     return false;
+}
+
+
+void ReferencedNode::setNodeMask( osg::Node::NodeMask nm )
+{
+    // if the castShadow flag is set, ensure to add it to the nodemask
+    if (castShadows_)
+    {
+        osg::Node::setNodeMask(nm | CAST_SHADOW_NODE_MASK);
+    }
+    else
+    {
+        osg::Node::setNodeMask(nm);
+    }
+    
+    //printf("NODE[%s] : setNodeMask %u (0x%04x)\n", getID().c_str(), getNodeMask(), getNodeMask());
+    BROADCAST(this, "si", "setNodeMask", nm );
 }
 
 } // end of namespace spin

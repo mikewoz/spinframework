@@ -8,27 +8,29 @@ AM_CPPFLAGS = \
     $(SHAREDVIDEO_CFLAGS) \
     $(SPATOSC_CFLAGS) \
     $(BULLET_CFLAGS) \
+    $(TINYXML_CFLAGS) \
     -I$(top_srcdir)/include \
     -I$(top_srcdir)/src \
-    -I$(top_srcdir)/src/tinyxml \
     -I$(top_srcdir)/src/osgPPU
 
+if SHAREDVIDEO
+#AM_CPPFLAGS += -std=gnu++0x
+endif
 
 #AM_CPPFLAGS = $(all_includes) -I$(top_srcdir)/src/tinyxml -I/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6 -isysroot / -fno-strict-aliasing -fno-common -dynamic -DNDEBUG -fwrapv -O3 -Wall
 
 # use lib_LTLIBRARIES to build a shared lib:
-lib_LTLIBRARIES = libspin-@SPIN_API_VERSION@.la
+lib_LTLIBRARIES = libspinframework-@SPIN_API_VERSION@.la
 
 if HAVE_PYTHON
-python_LTLIBRARIES = libSPINPyWrap.la
+python_LTLIBRARIES = spinframework.la
 endif
 
-libspin_@SPIN_API_VERSION@_la_LIBADD = \
+libspinframework_@SPIN_API_VERSION@_la_LIBADD = \
     $(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la \
-    $(top_builddir)/src/osgPPU/libosgPPU.la \
-    $(top_builddir)/src/tinyxml/libtinyxml.la
+    $(top_builddir)/src/osgPPU/libosgPPU.la
 
-libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
+libspinframework_@SPIN_API_VERSION@_la_LDFLAGS = \
     -export-dynamic \
     -version-info $(SPIN_LT_VERSION) \
     $(BOOST_SYSTEM_LIBS) \
@@ -44,12 +46,12 @@ libspin_@SPIN_API_VERSION@_la_LDFLAGS = \
     $(SHAREDVIDEO_LIBS) \
     $(SPATOSC_LIBS) \
     $(SPNAV_LIBS) \
+    $(TINYXML_LIBS) \
     $(POCO_LIBS)
-    
-#	$(BOOST_THREAD_LIBS) 
 
 # please keep those in alphabetical order:
-libspin_@SPIN_API_VERSION@_la_SOURCES = \
+# Warning: bullet-specific files are not listed here!
+libspinframework_@SPIN_API_VERSION@_la_SOURCES = \
     AnimationNode.cpp \
     AttractorNode.cpp \
     ConstraintsNode.cpp \
@@ -68,8 +70,7 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     libloUtil.cpp \
     LightSource.cpp \
     Listener.cpp \
-    MeasurementNode.cpp \
-    MediaManager.cpp \
+    LODNode.cpp \
     Menu3D.cpp \
     ModelNode.cpp \
     nodeVisitors.cpp \
@@ -86,7 +87,6 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     ShaderUtil.cpp \
     ShapeNode.cpp \
     SharedVideoTexture.cpp \
-    SoundConnection.cpp \
     SoundNode.cpp \
     SoundSpace.cpp \
     spinApp.cpp \
@@ -100,78 +100,84 @@ libspin_@SPIN_API_VERSION@_la_SOURCES = \
     VideoTexture.cpp \
     ViewerManipulator.cpp
 
-libspin_@SPIN_API_VERSION@_la_includedir = $(includedir)/spin-$(SPIN_API_VERSION)/spin
-libspin_@SPIN_API_VERSION@_la_include_HEADERS = \
-    $(top_srcdir)/include/AnimationNode.h \
-    $(top_srcdir)/include/AttractorNode.h \
+libspinframework_@SPIN_API_VERSION@_la_includedir = $(includedir)/spinframework-$(SPIN_API_VERSION)/spin
+# Warning: bullet-specific files are not listed here!
+libspinframework_@SPIN_API_VERSION@_la_include_HEADERS = \
+    $(top_srcdir)/include/animationnode.h \
+    $(top_srcdir)/include/attractornode.h \
+    $(top_srcdir)/include/compositeviewer.h \
     $(top_srcdir)/include/config.h \
-    $(top_srcdir)/include/CompositeViewer.h \
-    $(top_srcdir)/include/ConstraintsNode.h \
-    $(top_srcdir)/include/Contour.h \
-    $(top_srcdir)/include/DraggerTrackball.h \
-    $(top_srcdir)/include/DraggerWith3Axes.h \
-    $(top_srcdir)/include/DSPNode.h \
-    $(top_srcdir)/include/EventHandler.h \
-    $(top_srcdir)/include/EventTypes.h \
-    $(top_srcdir)/include/Fog.h \
-    $(top_srcdir)/include/GeometryNode.h \
-    $(top_srcdir)/include/GridNode.h \
-    $(top_srcdir)/include/GroupNode.h \
-    $(top_srcdir)/include/ImageTexture.h \
+    $(top_srcdir)/include/constraintsnode.h \
+    $(top_srcdir)/include/contour.h \
+    $(top_srcdir)/include/dofppu.h \
+    $(top_srcdir)/include/draggertrackball.h \
+    $(top_srcdir)/include/draggerwith3axes.h \
+    $(top_srcdir)/include/dspnode.h \
+    $(top_srcdir)/include/eventhandler.h \
+    $(top_srcdir)/include/eventtypes.h \
+    $(top_srcdir)/include/fog.h \
+    $(top_srcdir)/include/geometrynode.h \
+    $(top_srcdir)/include/gridnode.h \
+    $(top_srcdir)/include/groupnode.h \
+    $(top_srcdir)/include/imagetexture.h \
     $(top_srcdir)/include/introspect_helpers.h \
-    $(top_srcdir)/include/libloUtil.h \
-    $(top_srcdir)/include/LightSource.h \
-    $(top_srcdir)/include/Listener.h \
+    $(top_srcdir)/include/libloutil.h \
+    $(top_srcdir)/include/lightsource.h \
+    $(top_srcdir)/include/listener.h \
+    $(top_srcdir)/include/lodnode.h \
     $(top_srcdir)/include/mainpage.h \
-    $(top_srcdir)/include/MeasurementNode.h \
-    $(top_srcdir)/include/MediaManager.h \
-    $(top_srcdir)/include/Menu3D.h \
-    $(top_srcdir)/include/ModelNode.h \
-    $(top_srcdir)/include/nodeVisitors.h \
-    $(top_srcdir)/include/oscParser.h \
-    $(top_srcdir)/include/osgUtil.h \
-    $(top_srcdir)/include/ParticleSystem.h \
-    $(top_srcdir)/include/ParticleSystemUtil.h \
-    $(top_srcdir)/include/pocoUtil.h \
-    $(top_srcdir)/include/PointerNode.h \
-    $(top_srcdir)/include/RayNode.h \
-    $(top_srcdir)/include/ReferencedNode.h \
-    $(top_srcdir)/include/ReferencedStateSet.h \
-    $(top_srcdir)/include/ReporterNode.h \
-    $(top_srcdir)/include/SceneManager.h \
-    $(top_srcdir)/include/Shader.h \
-    $(top_srcdir)/include/ShaderUtil.h \
-    $(top_srcdir)/include/ShapeNode.h \
-    $(top_srcdir)/include/SharedVideoTexture.h \
-    $(top_srcdir)/include/SoundConnection.h \
-    $(top_srcdir)/include/SoundNode.h \
-    $(top_srcdir)/include/SoundSpace.h \
-    $(top_srcdir)/include/spinApp.h \
-    $(top_srcdir)/include/spinBaseContext.h \
-    $(top_srcdir)/include/spinClientContext.h \
-    $(top_srcdir)/include/spinDefaults.h \
-    $(top_srcdir)/include/spinLog.h \
-    $(top_srcdir)/include/spinLogWX.h \
-    $(top_srcdir)/include/spinServerContext.h \
-    $(top_srcdir)/include/spinUtil.h \
-    $(top_srcdir)/include/spinWX.h \
-    $(top_srcdir)/include/SwitchNode.h \
-    $(top_srcdir)/include/TextNode.h \
-    $(top_srcdir)/include/UserNode.h \
-    $(top_srcdir)/include/VideoTexture.h \
-    $(top_srcdir)/include/ViewerManipulator.h \
-    $(top_srcdir)/src/tinyxml/tinystr.h \
-    $(top_srcdir)/src/tinyxml/tinyxml.h
-
-# $(top_srcdir)/include/videoSize.h
+    $(top_srcdir)/include/maskppu.h \
+    $(top_srcdir)/include/menu3d.h \
+    $(top_srcdir)/include/modelnode.h \
+    $(top_srcdir)/include/motionblurppu.h \
+    $(top_srcdir)/include/nodevisitors.h \
+    $(top_srcdir)/include/oscparser.h \
+    $(top_srcdir)/include/osgutil.h \
+    $(top_srcdir)/include/outlineppu.h \
+    $(top_srcdir)/include/particlesystem.h \
+    $(top_srcdir)/include/particlesystemutil.h \
+    $(top_srcdir)/include/pocoutil.h \
+    $(top_srcdir)/include/pointcloud.h \
+    $(top_srcdir)/include/pointernode.h \
+    $(top_srcdir)/include/raynode.h \
+    $(top_srcdir)/include/referencednode.h \
+    $(top_srcdir)/include/referencedstateset.h \
+    $(top_srcdir)/include/reporternode.h \
+    $(top_srcdir)/include/scenemanager.h \
+    $(top_srcdir)/include/shader.h \
+    $(top_srcdir)/include/shaderppu.h \
+    $(top_srcdir)/include/shaderutil.h \
+    $(top_srcdir)/include/shapenode.h \
+    $(top_srcdir)/include/sharedvideotexture.h \
+    $(top_srcdir)/include/shmpointcloud.h \
+    $(top_srcdir)/include/soundnode.h \
+    $(top_srcdir)/include/soundspace.h \
+    $(top_srcdir)/include/spinapp.h \
+    $(top_srcdir)/include/spinbasecontext.h \
+    $(top_srcdir)/include/spinclientcontext.h \
+    $(top_srcdir)/include/spindefaults.h \
+    $(top_srcdir)/include/spinlog.h \
+    $(top_srcdir)/include/spinlogwx.h \
+    $(top_srcdir)/include/spinservercontext.h \
+    $(top_srcdir)/include/spinutil.h \
+    $(top_srcdir)/include/spinwx.h \
+    $(top_srcdir)/include/ssaoppu.h \
+    $(top_srcdir)/include/switchnode.h \
+    $(top_srcdir)/include/syphontexture.h \
+    $(top_srcdir)/include/textnode.h \
+    $(top_srcdir)/include/usernode.h \
+    $(top_srcdir)/include/videotexture.h \
+    $(top_srcdir)/include/viewermanipulator.h
 
 if HAVE_PYTHON
-libSPINPyWrap_la_SOURCES = python_wrappers.cpp
-#libSPINPyWrap_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
-libSPINPyWrap_la_LIBADD = libspin-@SPIN_API_VERSION@.la \
+spinframework_la_LDFLAGS = -module
+spinframework_la_SOURCES = python_wrappers.cpp
+#spinframework_la_LDFLAGS = -shrext ".so" # python expects .so on OSX
+spinframework_la_LIBADD = libspinframework-@SPIN_API_VERSION@.la \
 	$(top_builddir)/src/osgWrappers/introspection/libSPINwrappers.la
 
-libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
+
+spinframeworkdir = `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0)'`
 # `python -c 'from distutils import sysconfig; print sysconfig.get_python_lib(1,0,"${exec_prefix}")'`
 
 # On OSX, we need the python module to have a .so extension, but the -shrext option
@@ -180,7 +186,7 @@ libSPINPyWrapdir = `python -c 'from distutils import sysconfig; print sysconfig.
 # do this only for OSX?
 if HAVE_OSX
 install-exec-hook:
-	cd $(libSPINPyWrapdir) && $(LN_S) -f libSPINPyWrap.dylib libSPINPyWrap.so
+	cd $(spinframeworkdir) && $(LN_S) -f spinframework.dylib spinframework.so
 endif
 
 # #$(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
@@ -190,34 +196,37 @@ endif
 if BULLET
 AM_CPPFLAGS += \
     $(BULLET_CFLAGS) 
-libspin_@SPIN_API_VERSION@_la_SOURCES += \
+libspinframework_@SPIN_API_VERSION@_la_SOURCES += \
     CollisionShape.cpp\
     bulletUtil.cpp
-libspin_@SPIN_API_VERSION@_la_LDFLAGS += \
+libspinframework_@SPIN_API_VERSION@_la_LDFLAGS += \
     $(BULLET_LIBS)
-libspin_@SPIN_API_VERSION@_la_include_HEADERS += \
-    $(top_srcdir)/include/bulletUtil.h \
-    $(top_srcdir)/include/CollisionShape.h
+libspinframework_@SPIN_API_VERSION@_la_include_HEADERS += \
+    $(top_srcdir)/include/bulletutil.h \
+    $(top_srcdir)/include/collisionshape.h
 endif
 
 if PCL
-AM_CPPFLAGS += $(PCL_CFLAGS)  
-libspin_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
-libspin_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
-libspin_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/PointCloud.h
+AM_CPPFLAGS += $(PCL_CFLAGS) \
+    -I/usr/include/ni
+libspinframework_@SPIN_API_VERSION@_la_SOURCES += PointCloud.cpp
+#the following fixes the bugy pc file in libflann
+#libspinframework_@SPIN_API_VERSION@_la_LDFLAGS += $(PCL_LIBS)
+libspinframework_@SPIN_API_VERSION@_la_LDFLAGS += -lpcl_io -lOpenNI -lusb-1.0 -lpcl_filters -lpcl_sample_consensus -lpcl_search -lpcl_kdtree -lflann_cpp -lpcl_octree -lpcl_common
+libspinframework_@SPIN_API_VERSION@_la_include_HEADERS += $(top_srcdir)/include/pointcloud.h
 endif
 
 
 bin_PROGRAMS = spinserver spinviewer spindocgenerator
 
 spinserver_SOURCES = spinServer.cpp
-spinserver_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
+spinserver_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS) $(TINYXML_LIBS)
 
 spinviewer_SOURCES = spinViewer.cpp
-spinviewer_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(SPNAV_LIBS)
+spinviewer_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(SPNAV_LIBS) $(TINYXML_LIBS)
 
 spindocgenerator_SOURCES = docGenerator.cpp
-spindocgenerator_LDADD = libspin-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS)
+spindocgenerator_LDADD = libspinframework-@SPIN_API_VERSION@.la $(OPENTHREADS_LIBS) $(OSG_LIBS) $(CPPINTROSPECTION_LIBS) $(PYTHON_LDFLAGS) $(LIBLO_LIBS) $(BOOST_PROGRAM_OPTIONS_LIBS) $(BOOST_SYSTEM_LIBS) $(BOOST_FILESYSTEM_LIBS) $(POCO_LIBS) $(SPNAV_LIBS) $(TINYXML_LIBS)
 
 ###############################################################################
 # CUSTOM targets:

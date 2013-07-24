@@ -1,5 +1,5 @@
 # spinviewer.png and spinserver.png are the icons for ../desktopentries on Gnome and KDE
-imagesdir = $(datadir)/spinFramework/images
+imagesdir = $(datadir)/spinframework/images
 images_DATA = logo_SPIN_v2_512px.png spin_48x48.png \
               spinserver.png spinviewer.png spin.icns spinViewer.icns \
 			  smoke.rgb spark03.png ssao_noise.png \

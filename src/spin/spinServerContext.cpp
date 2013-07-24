@@ -39,20 +39,19 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 
-#include "spinApp.h"
-#include "spinServerContext.h"
-#include "SceneManager.h"
-#include "spinLog.h"
-#include "nodeVisitors.h"
-#include "spinDefaults.h"
-
-#include "SoundConnection.h" // for TCP wildcard check
+#include "spinapp.h"
+#include "spinservercontext.h"
+#include "scenemanager.h"
+#include "spinlog.h"
+#include "nodevisitors.h"
+#include "spindefaults.h"
 
 #ifdef WITH_POCO
-#include "pocoUtil.h"
+#include "pocoutil.h"
 #endif
 
 extern pthread_mutex_t sceneMutex;
@@ -113,6 +112,11 @@ void spinServerContext::debugPrint()
         std::cout << "  Auto-clean users:\t\tENABLED" << std::endl;
     else
         std::cout << "  Auto-clean users:\t\tDISABLED" << std::endl;
+
+    if (reliableBroadcast_)
+        std::cout << "  Reliable Broadcast:\t\tENABLED" << std::endl;
+    else
+        std::cout << "  Reliable Broadcast:\t\tDISABLED" << std::endl;
 
     if (tcpClientAddrs_.size())
     {
@@ -192,6 +196,19 @@ int spinServerContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     return 1;
 }
 
+void spinServerContext::setReliableBroadcast(bool b)
+{
+    // First, make sure that this message goes out reliability to all clients:
+    std::map<std::string,lo_address>::iterator addrIter;
+    for (addrIter=tcpClientAddrs_.begin(); addrIter!=tcpClientAddrs_.end(); ++addrIter)
+    {
+        lo_send(addrIter->second, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "si", "setReliableBroadcast", b);
+    }
+    
+    // Then set the flag for subsequent messages:
+    spinBaseContext::setReliableBroadcast(b);
+}
+
 
 
 // *****************************************************************************
@@ -241,7 +258,7 @@ void spinServerContext::createServers()
     // oscCallback_debug() will match any path and args:
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
+            lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
     }
 #endif
 
@@ -254,7 +271,7 @@ void spinServerContext::createServers()
     // add scene callback
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter), std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
+            lo_server_add_method((*servIter), std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
     			NULL, sceneCallback, NULL);
     }
 
@@ -272,7 +289,7 @@ void *spinServerContext::spinServerThread(void *arg)
 #ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
-    std::string cmd = "sys.path.append('" + spin.sceneManager_->resourcesPath + "/scripts')";
+    std::string cmd = "sys.path.append('" + spin.getResourcesPath() + "/scripts')";
 
     spin.execPython(cmd);
     spin.execPython("import spin");
@@ -302,7 +319,7 @@ void *spinServerContext::spinServerThread(void *arg)
 #endif
 
     std::string myIP = getMyIPaddress();
-    osg::Timer_t lastTick = osg::Timer::instance()->tick();
+    osg::Timer_t lastTick = osg::Timer::instance()->tick() - 9999999; // force first tick to be old
     osg::Timer_t frameTick = lastTick;
 
     // convert ports to integers for sending:
@@ -335,7 +352,7 @@ void *spinServerContext::spinServerThread(void *arg)
                              lo_address_get_hostname(context->lo_txAddrs_[0]), // server multicasting group
                              i_txPort,  // server multicast port
                              i_syncPort, // server multicast port for sync (timecode)
-                             LO_ARGS_END);
+                             SPIN_ARGS_END);
 
             lastTick = frameTick;
         }
@@ -366,8 +383,23 @@ void *spinServerContext::spinServerThread(void *arg)
         //
 
         if (recv == 0)
-        	usleep(1000);
+        {
+            timespec nap;
+            nap.tv_sec = 0;
+            nap.tv_nsec = 1e6;
+            nanosleep(&nap, NULL);
+        }
     }
+    
+    // send disconnect message to clients that that they don't have to wait
+    // until pings end:
+    //spin.BroadcastSceneMessage("s", "disconnect", SPIN_ARGS_END);
+    std::vector<lo_address>::iterator addrIter;
+    for (addrIter = context->lo_txAddrs_.begin(); addrIter != context->lo_txAddrs_.end(); ++addrIter)
+    {
+        lo_send((*addrIter), std::string("/SPIN/"+spin.getSceneID()).c_str(), "s", "disconnect");
+    }
+    
     context->running = false;
     if (context->syncThreadID != 0)
        pthread_join(context->syncThreadID, NULL);
@@ -394,7 +426,11 @@ void *spinServerContext::syncThread(void * /*arg*/)
     while (spin.getContext()->isRunning())
     {
         //usleep(1000000 * 0.25); // 1/4 second sleep
-        usleep(1000000 * 0.5); // 1/2 second sleep
+        //usleep(1000000 * 0.5); // 1/2 second sleep
+        timespec nap;
+        nap.tv_sec = 0;
+        nap.tv_nsec = 5e8;
+        nanosleep(&nap, NULL);
 
         frameTick = timer->tick();
 
@@ -474,26 +510,22 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 
         // send a message to the new client to indicate that subscription
         // request was successful:
-        //SCENE_MSG("si", "subscribed", 1);
-        lo_send(context->tcpClientAddrs_[clientID], ("/SPIN/"+spinApp::Instance().getSceneID()).c_str(), "si", "subscribed", 1, LO_ARGS_END);
+        lo_send(context->tcpClientAddrs_[clientID], ("/SPIN/"+spinApp::Instance().getSceneID()).c_str(), "si", "subscribed", 1, SPIN_ARGS_END);
     }
 
     else if (method == "optimize")
     {
-    	// TODO: we should really have a SCENE_MSG in spinApp that takes a
-    	// txaddr as an argument. For now, we are just using the bundle message
-    	std::map<std::string, lo_address>::const_iterator client;
+        std::map<std::string, lo_address>::const_iterator client;
         for (client = context->tcpClientAddrs_.begin();
              client != context->tcpClientAddrs_.end();
              ++client)
         {
-        	std::vector<lo_message> msgs;
-        	lo_message msg = lo_message_new();
-        	lo_message_add(msg, "ss", "optimize", reinterpret_cast<const char*>(argv[1]));
-        	msgs.push_back(msg);
-			spinApp::Instance().SceneBundle(msgs, client->second);
+            std::vector<lo_message> msgs;
+            lo_message msg = lo_message_new();
+            lo_message_add(msg, "ss", "optimize", reinterpret_cast<const char*>(argv[1]));
+            msgs.push_back(msg);
+            spinApp::Instance().SceneBundle(msgs, client->second);
         }
-
     }
 
     else if (method == "getState")
@@ -513,7 +545,7 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
     }
 
 	// WE DON'T NEED TO DO ANYHING MORE. WE REGISTER WITH THE TCP SERVER NOW...
-	// FOR THE SCENE, AND EACH NODE, STATESET, AND SOUNDCONNECTION
+	// FOR THE SCENE, AND EACH NODE AND STATESET
 	
 	
     // any other scene message just gets forwarded to the generic (UDP)
@@ -540,7 +572,7 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 
 		
 		// WE DON'T NEED TO DO THIS ANYMORE. WE REGISTER THE TCP CALLBACK WITH
-		// EACH NODE, STATESET, AND SOUNDCONNECTION
+		// EACH NODE AND STATESET
 		
 		// The nodeString might have a wildcard, so here we call the method on
 		// any nodes (or statesets) that match:
@@ -553,19 +585,6 @@ int spinServerContext::tcpCallback(const char * path, const char *types, lo_arg 
 			spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) (*iter));
 		}
 
-
-		// connections are different:
-		std::vector<SoundConnection*> conns = spinApp::Instance().sceneManager_->getConnections();
-		
-		std::vector<SoundConnection*>::iterator cIter;
-		for ( cIter=conns.begin(); cIter!=conns.end(); ++cIter )
-		{
-			if (wildcardMatch(nodeString.c_str(), (*cIter)->getID().c_str()))
-			{
-				std::cout << " ... matched connection: " << (*cIter)->getID() << std::endl;
-				spinBaseContext::connectionCallback(path, types, argv, argc, (void*) data, (void*) (*iter));
-			}
-		}
 		*/
 
 	}

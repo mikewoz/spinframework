@@ -1,4 +1,4 @@
-#include "EventHandler.h"
+#include "eventhandler.h"
 //#include "spinApp.h"
 //#include "spinBaseContext.h"
 

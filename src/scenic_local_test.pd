@@ -1,0 +1,135 @@
+#N canvas 897 82 776 415 10;
+#X obj 55 54 widget-spinConnect \$0;
+#X obj 34 96 cnv 15 24 24 empty empty 1 4 12 1 24 -99865 -262144 0
+;
+#X obj 34 127 cnv 15 24 24 empty empty 2 4 12 1 24 -99865 -262144 0
+;
+#X obj 34 201 cnv 15 24 24 empty empty 3 4 12 1 24 -99865 -262144 0
+;
+#X obj 34 267 cnv 15 24 24 empty empty 4 4 12 1 24 -99865 -262144 0
+;
+#X text 392 46 This demo shows a remote video feed mapped onto a spinning
+cube. It requires Scenic (http://svn.sat.qc.ca/trac/scenic) and SPIN
+must be built with the --enable-scenic option. Currently \, only supported
+in Linux.;
+#X text 68 206 start a scenic receiver on the same machine as spinViewer:
+;
+#X text 73 223 milhouse -r --disable-audio --videosink sharedvideosink
+--shared-video-id /tmp/shvid_foo --width 720 --height 543;
+#X text 69 159 milhouse -s --videosource videotestsrc --disable-audio
+--width 720 --height 543;
+#X text 67 130 start a scenic (since version 0.8) sender on a remote
+machine with arbitrary image resolution. Eg:;
+#X text 69 100 start spinServer and spinViewer (since version 0.4)
+;
+#X obj 55 12 loadbang1;
+#X obj 66 267 bng 45 250 50 0 empty empty empty 17 7 0 10 -4034 -1
+-1;
+#X text 117 271 INITIAL SCENE SET-UP;
+#X obj 267 290 hsl 128 15 1 40 0 0 screenScaler empty SCREEN_SCALE
+-2 -8 0 10 -262144 -1 -1 0 1;
+#N canvas 25 98 853 687 scenic_init 0;
+#X text 289 591 specify the shared video path (accoring to your receiver
+id);
+#X msg 7 578 /shvid setTextureID /tmp/scenic_local_preview_213.215.35.68_10000
+;
+#X msg 7 306 createNode light-ambient LightSource \, /light-ambient
+setVisible 1 \, /light-ambient setCutoff 100 \, /light-ambient setAmbient
+1 1 1 0 \, /light-ambient setDiffuse 0 0 0 0 \, /light-ambient setSpecular
+0 0 0 0 \, /light-ambient setAttenuation 0.2;
+#X text 364 312 create nice ambient lighting for the scene.;
+#X obj 7 553 s \$0-to-SPIN;
+#X msg 76 421 /shvid pause;
+#X msg 76 441 /shvid play;
+#X msg 76 401 /shvid debug;
+#X text 161 399 print debug (including width and height);
+#X text 161 420 pause writing frames into the texture;
+#X text 160 441 enable writing frame into the texture;
+#X obj 7 31 inlet;
+#X text 198 470 print debug (including width and height);
+#X text 197 489 pause writing frames into the texture;
+#X text 190 509 enable writing frame into the texture;
+#X msg 76 471 /remoteshvid debug;
+#X msg 76 491 /remoteshvid pause;
+#X msg 76 511 /remoteshvid play;
+#X text 403 162 create a plane which displays the video stream from
+the remote scenic session (using local address for test).;
+#X msg 106 74 createNode shp ShapeNode \, /shp setShape 6 \, /shp setTranslation
+-1 3 0.5 \, /shp setScale 0.9 1 0.6 \, createStateSet shvid SharedVideoTexture
+\, /shvid setTextureID /tmp/scenic_local_preview_127.0.0.1_5002 \,
+/shp setStateSet shvid;
+#X text 472 82 create a plane which displays the local video stream
+from the scenic session.;
+#X obj 524 339 r screenScaler;
+#X floatatom 631 356 5 0 0 0 - - -;
+#X obj 526 369 t f f f f f;
+#X obj 668 400 * -0.5;
+#X obj 668 421 - 0.25;
+#X obj 616 400 * 0.5;
+#X obj 616 421 + 0.25;
+#X msg 615 452 /remoteshp setTranslation \$1 3 0.5;
+#X obj 522 558 s \$0-to-SPIN;
+#X msg 637 482 /shp setTranslation \$1 3 0.5;
+#X obj 470 393 * 0.9;
+#X obj 509 393 * 0.6;
+#X obj 470 419 pack 0 0;
+#X msg 470 515 /shp setScale \$1 0 \$2 \, /remoteshp setScale \$1 0
+\$2;
+#X obj 670 608 spin.toCamera \$0;
+#X floatatom 771 579 5 0 0 0 - - -;
+#X msg 609 635 debug;
+#X msg 664 546 setTranslation 0 \$1 0.5;
+#X obj 778 410 -3;
+#X obj 778 386 * -2;
+#X msg 38 155 createNode remoteshp ShapeNode \, /remoteshp setTranslation
+1 3 0.5 \, /remoteshp setScale 0.9 1 0.6 \, /remoteshp setShape 6 \,
+createStateSet remoteshvid SharedVideoTexture \, /remoteshvid setTextureID
+/tmp/shvid_foo \, /remoteshp setStateSet remoteshvid \, createNode
+txt1 TextNode \, /txt1 setText SENDING \, /txt1 setTranslation -0.2
+3 0.7 \, /txt1 setParent shp \, createNode txt2 TextNode \, /txt2 setText
+RECEIVING \, /txt2 setTranslation -0.2 3 0.7 \, /txt2 setParent remoteshp
+;
+#X obj 7 57 t b b b b;
+#X obj 491 276 1;
+#X connect 2 0 4 0;
+#X connect 5 0 4 0;
+#X connect 6 0 4 0;
+#X connect 7 0 4 0;
+#X connect 11 0 42 0;
+#X connect 15 0 4 0;
+#X connect 16 0 4 0;
+#X connect 17 0 4 0;
+#X connect 19 0 4 0;
+#X connect 21 0 22 0;
+#X connect 21 0 23 0;
+#X connect 23 0 31 0;
+#X connect 23 1 32 0;
+#X connect 23 2 26 0;
+#X connect 23 3 24 0;
+#X connect 23 4 40 0;
+#X connect 24 0 25 0;
+#X connect 25 0 30 0;
+#X connect 26 0 27 0;
+#X connect 27 0 28 0;
+#X connect 28 0 29 0;
+#X connect 30 0 29 0;
+#X connect 31 0 33 0;
+#X connect 32 0 33 1;
+#X connect 33 0 34 0;
+#X connect 34 0 29 0;
+#X connect 37 0 35 0;
+#X connect 38 0 35 0;
+#X connect 38 0 36 0;
+#X connect 39 0 38 0;
+#X connect 40 0 39 0;
+#X connect 41 0 4 0;
+#X connect 42 0 2 0;
+#X connect 42 1 43 0;
+#X connect 42 2 19 0;
+#X connect 42 2 41 0;
+#X connect 43 0 23 0;
+#X restore 66 320 pd scenic_init;
+#X msg 55 32 default;
+#X connect 11 0 16 0;
+#X connect 12 0 15 0;
+#X connect 16 0 0 0;

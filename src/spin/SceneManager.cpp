@@ -40,25 +40,24 @@
 // -----------------------------------------------------------------------------
 
 
-#include "SceneManager.h"
-#include "DSPNode.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "ReferencedNode.h"
-#include "SoundConnection.h"
-#include "spinUtil.h"
-#include "osgUtil.h"
-#include "spinApp.h"
+#include "scenemanager.h"
+#include "dspnode.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "referencednode.h"
+#include "spinutil.h"
+#include "osgutil.h"
+#include "spinapp.h"
 
-#include "ImageTexture.h"
-#include "VideoTexture.h"
-#include "Shader.h"
-#include "ShapeNode.h"
-#include "ModelNode.h"
-#include "SharedVideoTexture.h"
+#include "imagetexture.h"
+#include "videotexture.h"
+#include "shader.h"
+#include "shapenode.h"
+#include "modelnode.h"
+#include "sharedvideotexture.h"
 
-#include "nodeVisitors.h"
-#include "spinLog.h"
+#include "nodevisitors.h"
+#include "spinlog.h"
 
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
@@ -70,6 +69,15 @@
 #include <osgDB/FileNameUtils>
 #include <osgDB/Registry>
 #include <osgUtil/Optimizer>
+
+#include <osgShadow/ShadowedScene>
+//#include <osgShadow/ShadowVolume>
+//#include <osgShadow/ShadowTexture>
+//#include <osgShadow/ShadowMap>
+#include <osgShadow/SoftShadowMap>
+#include <osgShadow/ParallelSplitShadowMap>
+//#include <osgShadow/LightSpacePerspectiveShadowMap>
+//#include <osgShadow/StandardShadowMap>
 
 #include <cppintrospection/Reflection>
 #include <cppintrospection/Type>
@@ -95,8 +103,8 @@ extern pthread_mutex_t sceneMutex;
 
 #ifdef WITH_BULLET
 #include <btBulletDynamicsCommon.h>
-#include "bulletUtil.h"
-#include "CollisionShape.h"
+#include "bulletutil.h"
+#include "collisionshape.h"
 
 extern ContactAddedCallback gContactAddedCallback;
 
@@ -113,37 +121,37 @@ bool btCollisionCallback(btManifoldPoint& cp,
                         int index1)
 {
     using namespace spin;
-    
+
     if (!colObj0->isStaticObject() && colObj0->isActive())
     {
         CollisionShape *n0 = (CollisionShape*)(colObj0->getUserPointer());
         CollisionShape *n1 = (CollisionShape*)(colObj1->getUserPointer());
-    
+
         // world hit point:
         osg::Vec3 hitPoint0 = asOsgVec3( cp.getPositionWorldOnA() );
         osg::Vec3 hitPoint1 = asOsgVec3( cp.getPositionWorldOnB() );
-        
+
         // returns a unit vector:
         osg::Vec3 normal = asOsgVec3( cp.m_normalWorldOnB );
-    
+
         // penetration depth
-        float depth = cp.getDistance(); 
-        
+        float depth = cp.getDistance();
+
 
         if (depth != lastBtHitDepth)
         {
             //std::cout << "Hit between " << n0->getID() << " and " << n1->getID() << " at: pos0) " << stringify(hitPoint0) << " pos1)" << stringify(hitPoint1) << ", normal: " << stringify(normal) << ", depth="<< depth << std::endl;
-            
+
             // TODO: collide message is usually ssfff: collide nodeID incidence(x,y,z). The following provides just the surface normal, which is wrong:
             BROADCAST(n0, "ssfff", "collide", n1->getID().c_str(), normal.x(), normal.y(), normal.z());
-            
+
             // We need to move the nodes so that they are not colliding any more.
             // We just move along the normal by depth, and add a little extra for
             // good measure:
             osg::Vec3 offset = (normal * -depth);// + (normal * 0.00001);
             n0->translate(offset.x(), offset.y(), offset.z());
         } //else std::cout << "skipping duplicate hit" << std::endl;
-        
+
         lastBtHitDepth = depth;
     }
 
@@ -162,53 +170,19 @@ namespace spin
 {
 
 // constructors:
-
 //SceneManager::SceneManager(const std::string &id)
 SceneManager::SceneManager(std::string id)
 {
     std::cout << "creating sceneManager with id: " << id << std::endl;
     std::cout << std::flush;
-    
-	resourcesPath = "../Resources";
 
-	this->sceneID = id;
+    this->sceneID = id;
 
     graphicalMode = false;
 
     // initialize storage vectors:
     nodeMap.clear();
     stateMap.clear();
-
-    // Set resourcesPath:
-#ifdef OSX_COCOA
-    resourcesPath = "../Resources";
-#else
-    std::string currentDir = getenv("PWD");
-    //std::string currentDir = get_current_dir_name(); // requires #include <unistd.h>
-    if ((currentDir.length() > 8) && (currentDir.substr(currentDir.length() - 9)) == std::string("/src/spin"))
-    {
-        resourcesPath = "../Resources";
-    }
-    else
-    {
-        // FIXME: this path should be replaced by PACKAGE_DATA/PACKAGE_NAME, not hard-coded
-        resourcesPath = "/usr/local/share/spinFramework";
-    }
-#endif
-
-    // get user defined env variable OSG_FILE_PATH
-    osgDB::Registry::instance()->initDataFilePathList();
-
-    // add all default resources paths to osg's file path list
-    osgDB::FilePathList fpl = osgDB::getDataFilePathList();
-    fpl.push_back( resourcesPath );
-    fpl.push_back( resourcesPath + "/scripts/");
-    fpl.push_back( resourcesPath + "/fonts/");
-    fpl.push_back( resourcesPath + "/images/");
-    fpl.push_back( resourcesPath + "/models/");
-    fpl.push_back( resourcesPath + "/shaders/");
-    osgDB::setDataFilePathList( fpl );
-
 
     //std::cout << "  SceneManager ID:\t\t" << id << std::endl;
     //std::cout << "  SceneManager receiving on:\t" << addr << ", port: " << port << std::endl;
@@ -286,15 +260,17 @@ SceneManager::SceneManager(std::string id)
     }
     */
 
-    // create some initial nodeS:
+    // create some initial nodes:
     rootNode = new osg::ClearNode();
     rootNode->setName("root");
+
     //worldNode = new osg::ClearNode();
     //worldNode->setName("world");
     worldNode = new ReferencedNode(this, "world");
-    rootNode->addChild(worldNode.get());
-    
+    worldNode->setNodeMask( 0xffffffff );
     worldStateSet_ = gensym("NULL");
+
+    rootNode->addChild(worldNode.get());
 
     for (int i = 0; i < OSG_NUM_LIGHTS; i++)
     {
@@ -314,7 +290,7 @@ SceneManager::SceneManager(std::string id)
     // we use the osgDB::SharedStateManager:
 
     sharedStateManager = new osgDB::SharedStateManager;
-	
+
     sharedStateManager = osgDB::Registry::instance()->getOrCreateSharedStateManager();
     if (sharedStateManager.valid())
     {
@@ -323,7 +299,7 @@ SceneManager::SceneManager(std::string id)
     } else {
         std::cout << "ERROR: Could not create sharedStateManager" << std::endl;
     }
-	
+
 
     // then, when a node is created:
     //      osgDB::Registry::instance()->getSharedStateManager()->share(node);
@@ -348,18 +324,24 @@ SceneManager::SceneManager(std::string id)
     btDefaultCollisionConfiguration *collisionConfiguration = new btDefaultCollisionConfiguration();
     btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
     btSequentialImpulseConstraintSolver *solver = new btSequentialImpulseConstraintSolver;
-    
+
     // TODO: update based on bounds of OSG scene
     btVector3 worldAabbMin(-100, -100, -100);
     btVector3 worldAabbMax(100, 100, 100);
     //const int maxProxies = 32766;
     const int maxProxies = 1000;
-    btAxisSweep3 *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+    //btAxisSweep3
+    btBroadphaseInterface *broadphase = new btAxisSweep3(worldAabbMin, worldAabbMax, maxProxies);
+    //btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);    
+    dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
 
-    dynamicsWorld_ = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+    //btContactSolverInfo& csi = dynamicsWorld_->getSolverInfo();
+    //csi.m_solverMode = 
 
+    ////dynamicsWorld_->setForceUpdateAllAabbs(false);
 
-    // This callback is a global method of checking collisions after every 
+    // This callback is a global method of checking collisions after every
     // pyhsics step. We register a global callback using gContactAddedCallback,
     // but the problem is that all objects move actually be moved first, which
     // means that they will move and then need to be moved back (this results in
@@ -370,9 +352,9 @@ SceneManager::SceneManager(std::string id)
     {
         //gContactAddedCallback = btCollisionCallback;
     }
-    
-    dynamicsWorld_->setGravity(btVector3(0, 0, -10.0));
-        
+    wind_ = btVector3(0,0,0);
+    windy_ = false;
+
 #endif
 
 
@@ -384,7 +366,7 @@ SceneManager::SceneManager(std::string id)
 // destructor
 SceneManager::~SceneManager()
 {
-	// TODO
+    // TODO
 }
 
 void SceneManager::registerStateSet(ReferencedStateSet *s)
@@ -396,14 +378,14 @@ void SceneManager::registerStateSet(ReferencedStateSet *s)
     std::vector<lo_server>::iterator it;
     for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
     {
-    	lo_server_add_method((*it), oscPattern.c_str(), NULL,
+        lo_server_add_method((*it), oscPattern.c_str(), NULL,
             spinBaseContext::nodeCallback, (void*)s->getIDSymbol());
     }
-	lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
-	                     oscPattern.c_str(), NULL,
-	                     spinBaseContext::nodeCallback, (void*)s->getIDSymbol());
-    SCENE_MSG("sss", "registerState", s->getID().c_str(), s->getClassType().c_str());
-    SCENE_MSG_TCP("sss", "registerState", s->getID().c_str(), s->getClassType().c_str());
+    lo_server_add_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+                         oscPattern.c_str(), NULL,
+                         spinBaseContext::nodeCallback, (void*)s->getIDSymbol());
+
+    spinApp::Instance().BroadcastSceneMessage("sss", "registerState", s->getID().c_str(), s->getClassType().c_str(), SPIN_ARGS_END);
     sendNodeList("*");
 }
 
@@ -413,16 +395,15 @@ void SceneManager::unregisterStateSet(ReferencedStateSet *s)
     std::vector<lo_server>::iterator it;
     for (it = spinApp::Instance().getContext()->lo_rxServs_.begin(); it != spinApp::Instance().getContext()->lo_rxServs_.end(); ++it)
     {
-    	lo_server_del_method((*it), oscPattern.c_str(), NULL);
+        lo_server_del_method((*it), oscPattern.c_str(), NULL);
     }
-	lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
-	                     oscPattern.c_str(), NULL);
+    lo_server_del_method(spinApp::Instance().getContext()->lo_tcpRxServer_,
+                         oscPattern.c_str(), NULL);
     ReferencedStateSetList::iterator itr;
     itr = std::find( stateMap[s->getClassType()].begin(), stateMap[s->getClassType()].end(), s );
     if ( itr != stateMap[s->getClassType()].end() ) stateMap[s->getClassType()].erase(itr);
 
-    SCENE_MSG("ss", "unregisterState", s->getID().c_str());
-    SCENE_MSG_TCP("ss", "unregisterState", s->getID().c_str());
+    spinApp::Instance().BroadcastSceneMessage("ss", "unregisterState", s->getID().c_str(), SPIN_ARGS_END);
 
     sendNodeList("*");
 }
@@ -431,20 +412,20 @@ void SceneManager::sendNodeTypes(lo_address txAddr)
 {
     if (! spinApp::Instance().getContext()->isServer())
         return;
-    
+
     if (nodeMap.size())
     {
         std::vector<lo_message> msgs;
         lo_message msg = lo_message_new();;
         lo_message_add_string(msg, "nodeTypes" );
-        
+
         nodeMapType::iterator it;
         for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
         {
             lo_message_add_string(msg, (*it).first.c_str() );
         }
         msgs.push_back(msg);
-        
+
         // we use SceneBundle even though there is only one message because
         // we need to be able to send via TCP
         spinApp::Instance().SceneBundle(msgs, txAddr);
@@ -452,7 +433,7 @@ void SceneManager::sendNodeTypes(lo_address txAddr)
 }
 
 void SceneManager::sendStateTypes(lo_address txAddr)
-{    
+{
     if (! spinApp::Instance().getContext()->isServer())
         return;
 
@@ -461,21 +442,21 @@ void SceneManager::sendStateTypes(lo_address txAddr)
         std::vector<lo_message> msgs;
         lo_message msg = lo_message_new();;
         lo_message_add_string(msg, "stateTypes" );
-        
+
         ReferencedStateSetMap::iterator it;
         for (it = stateMap.begin(); it != stateMap.end(); ++it)
         {
             lo_message_add_string(msg, (*it).first.c_str() );
         }
         msgs.push_back(msg);
-        
+
         spinApp::Instance().SceneBundle(msgs, txAddr);
     }
 }
 
 void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
 {
-	if (! spinApp::Instance().getContext()->isServer())
+    if (! spinApp::Instance().getContext()->isServer())
         return;
 
     std::string OSCpath = "/SPIN/" + sceneID;
@@ -544,96 +525,64 @@ void SceneManager::sendNodeList(std::string typeFilter, lo_address txAddr)
                 msgs.push_back(msg);
             }
         }
-        // remember to send connections as well
-        sendConnectionList(txAddr);
     }
     // just send a list for the desired type:
-    else 
+    else
     {
-        if (typeFilter == "SoundConnection")
-            sendConnectionList(txAddr);
-        else
         {
+            nodeMapType::iterator it;
+            nodeListType::iterator iter;
+            it = nodeMap.find(typeFilter);
+            if (it != nodeMap.end())
             {
-                nodeMapType::iterator it;
-                nodeListType::iterator iter;
-                it = nodeMap.find(typeFilter);
-                if (it != nodeMap.end())
+                msg = lo_message_new();
+
+                lo_message_add_string(msg, "nodeList" );
+                lo_message_add_string(msg, (*it).first.c_str() );
+                if ( (*it).second.size() )
                 {
-                    msg = lo_message_new();
-
-                    lo_message_add_string(msg, "nodeList" );
-                    lo_message_add_string(msg, (*it).first.c_str() );
-                    if ( (*it).second.size() )
+                    for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
                     {
-                        for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                        {
-                            lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
-                        }
+                        lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
                     }
-                    else 
-                        lo_message_add_string(msg, "NULL");
-                    msgs.push_back(msg);
                 }
-            }
-            {
-                ReferencedStateSetMap::iterator it;
-                ReferencedStateSetList::iterator iter;
-                it = stateMap.find(typeFilter);
-                if (it != stateMap.end())
-                {
-                    msg = lo_message_new();
-
-                    lo_message_add_string(msg, "stateList" );
-                    lo_message_add_string(msg, (*it).first.c_str() );
-                    if ((*it).second.size())
-                    {
-                        for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                            lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
-                    }
-                    else
-                        lo_message_add_string(msg, "NULL");
-
-                    msgs.push_back(msg);
-                }
+                else
+                    lo_message_add_string(msg, "NULL");
+                msgs.push_back(msg);
             }
         }
+        {
+            ReferencedStateSetMap::iterator it;
+            ReferencedStateSetList::iterator iter;
+            it = stateMap.find(typeFilter);
+            if (it != stateMap.end())
+            {
+                msg = lo_message_new();
+
+                lo_message_add_string(msg, "stateList" );
+                lo_message_add_string(msg, (*it).first.c_str() );
+                if ((*it).second.size())
+                {
+                    for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
+                        lo_message_add_string(msg, (char*) (*iter)->getID().c_str() );
+                }
+                else
+                    lo_message_add_string(msg, "NULL");
+
+                msgs.push_back(msg);
+            }
+        }
+
     }
 
     spinApp::Instance().SceneBundle(msgs, txAddr);
-}
-
-void SceneManager::sendConnectionList(lo_address txAddr)
-{
-    // need to manually send soundConnections, since they are not in the nodeMap
-    lo_message msg = lo_message_new();
-    lo_message_add_string(msg, "nodeList" );
-    lo_message_add_string(msg, "SoundConnection" );
-
-    std::vector<SoundConnection*> connections = getConnections();
-
-    if (connections.size())
-    {
-        for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); iter++)
-            lo_message_add_string(msg, (*iter)->getID().c_str() );
-    } else 
-        lo_message_add_string(msg, "NULL" );
-
-    if (txAddr == 0)
-    {
-        SCENE_LO_MSG(msg);
-    }
-    else
-    {
-        SCENE_LO_MSG_TCP(msg, txAddr);
-    }
 }
 
 void SceneManager::debugContext()
 {
     std::cout << "\n\n--------------------------------------------------------------------------------" << std::endl;
     std::cout << "-- SPIN CONTEXT DEBUG:" << std::endl;
-	
+
     spinApp::Instance().getContext()->debugPrint();
 }
 
@@ -757,16 +706,10 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         return NULL;
     }
 
-    // ignore SoundConnection messages (these should be created by
-    // the DSPNode::connect() method
-    if (nodeType == "SoundConnection")
-        return NULL;
-
     // Let's broadcast a createNode message BEFORE we actually do the creation.
     // Thus, if some messages are sent during instantiation, at least clients
     // will already have a placeholder for the node.
-    SCENE_MSG("sss", "createNode", id, type);
-    SCENE_MSG_TCP("sss", "createNode", id, type);
+    spinApp::Instance().BroadcastSceneMessage("sss", "createNode", id, type, SPIN_ARGS_END);
 
     // check if a node with that name already exists:
     osg::ref_ptr<ReferencedNode> n = dynamic_cast<ReferencedNode*>(nodeID->s_thing);
@@ -789,8 +732,8 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
        const cppintrospection::TypeMap &allTypes = cppintrospection::Reflection::getTypes();
        for (cppintrospection::TypeMap::const_iterator it = allTypes.begin (); it != allTypes.end (); ++it)
        {
-		   if ((*it).second->isDefined())
-       			std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
+           if ((*it).second->isDefined())
+                std::cout << ((*it).second)->getName() << " isAtomic? " << ((*it).second)->isAtomic() << std::endl;
        }
      */
 
@@ -886,8 +829,7 @@ ReferencedNode* SceneManager::createNode(const char *id, const char *type)
         nodeMap[n->getNodeType()].push_back(n);
 
         // broadcast (only if this is the server):
-        SCENE_MSG("sss", "createNode", id, type);
-        SCENE_MSG_TCP("sss", "createNode", id, type);
+        spinApp::Instance().BroadcastSceneMessage("sss", "createNode", id, type, SPIN_ARGS_END);
         sendNodeList(type);
         return n.get();
     }
@@ -933,7 +875,7 @@ ReferencedNode* SceneManager::getNode(const char *id, const char *type)
 */
 
     ReferencedNode *n = dynamic_cast<ReferencedNode*>(gensym(id)->s_thing);
-    
+
     if (n)
     {
         if (n->getNodeType() == std::string(type))
@@ -1017,8 +959,8 @@ ReferencedStateSet* SceneManager::createStateSet(const char *id, const char *typ
         std::cout << "created new state: " << id << " of type " << type << std::endl;
         registerStateSet(n.get());
         // broadcast (only if this is the server):
-        SCENE_MSG("sss", "createStateSet", id, type);
-        SCENE_MSG_TCP("sss", "createStateSet", id, type);
+        spinApp::Instance().BroadcastSceneMessage("sss", "createStateSet", id, type, SPIN_ARGS_END);
+
         sendNodeList("type");
         return n.get();
     }
@@ -1041,7 +983,7 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 
     // go through all existing statesets and see if any have fname as the
     // source for the image/video in question
-    
+
     // mikewoz: 2012-04-20: I commented this out, because someone may want
     // to load a texture multiple times ... and this doesn't make sense anymore
     // with shaders. It's not correct to assume that every stateset has the
@@ -1129,191 +1071,135 @@ ReferencedStateSet* SceneManager::createStateSet(const char *fname)
 void SceneManager::setWorldStateSet(const char *s)
 {
     worldNode->setStateSet(s);
-
-    /*
-    if (std::string(s)=="NULL")
-    {
-        worldNode->setStateSet(new osg::StateSet());
-        SCENE_MSG("ss", "setWorldStateSet", "NULL");
-    }
-    else
-    {
-        ReferencedStateSet *ss = getStateSet(s);
-        if (ss)
-        {
-            if (ss->getIDSymbol() == worldStateSet_)
-                return; // we're already using that stateset
-        
-            worldStateSet_ = ss->getIDSymbol();
-            worldNode->setStateSet(ss);
-            SCENE_MSG("ss", "setWorldStateSet", s);
-        }
-	}
-    */
 }
 
 std::vector<ReferencedNode*> SceneManager::findNodes(const char *pattern)
 {
-	std::vector<ReferencedNode*> matches;
+    std::vector<ReferencedNode*> matches;
 
-	// first, check if the patterns does in fact have a wildcard. If not, we can
-	// assume the pattern is a node name:
-	std::string patternStr = std::string(pattern);
-	if (patternStr.find_first_of("*?") != std::string::npos)
-	{
+    // first, check if the patterns does in fact have a wildcard. If not, we can
+    // assume the pattern is a node name:
+    std::string patternStr = std::string(pattern);
+    if (patternStr.find_first_of("*?") != std::string::npos)
+    {
         ReferencedNode* test = getNode(pattern);
-		if (test) matches.push_back(test);
-	}
-
-	// otherwise, we have to go through the entire list of nodes
-	// and match with the id:
-	else
-	{
-		// nodes:
-		nodeMapType::iterator nIt;
-		nodeListType::iterator nIter;
-		for (nIt = nodeMap.begin(); nIt != nodeMap.end(); ++nIt)
-		{
-		    for (nIter = (*nIt).second.begin(); nIter != (*nIt).second.end(); ++nIter)
-		    {
-				if (wildcardMatch(pattern, (*nIter)->getID().c_str()))
-				{
-					matches.push_back(*nIter);
-				}
-		    }
-		}
+        if (test) matches.push_back(test);
     }
-	return matches;
+
+    // otherwise, we have to go through the entire list of nodes
+    // and match with the id:
+    else
+    {
+        // nodes:
+        nodeMapType::iterator nIt;
+        nodeListType::iterator nIter;
+        for (nIt = nodeMap.begin(); nIt != nodeMap.end(); ++nIt)
+        {
+            for (nIter = (*nIt).second.begin(); nIter != (*nIt).second.end(); ++nIter)
+            {
+                if (wildcardMatch(pattern, (*nIter)->getID().c_str()))
+                {
+                    matches.push_back(*nIter);
+                }
+            }
+        }
+    }
+    return matches;
 }
 
 
 std::vector<ReferencedStateSet*> SceneManager::findStateSets(const char *pattern)
 {
-	std::vector<ReferencedStateSet*> matches;
+    std::vector<ReferencedStateSet*> matches;
 
-	// first, check if the patterns does in fact have a wildcard. If not, we can
-	// assume the pattern is a stateset name:
-	std::string patternStr = std::string(pattern);
-	if (patternStr.find_first_of("*?") != std::string::npos)
-	{
+    // first, check if the patterns does in fact have a wildcard. If not, we can
+    // assume the pattern is a stateset name:
+    std::string patternStr = std::string(pattern);
+    if (patternStr.find_first_of("*?") != std::string::npos)
+    {
         ReferencedStateSet* test = getStateSet(pattern);
-		if (test) matches.push_back(test);
-	}
+        if (test) matches.push_back(test);
+    }
 
-	// otherwise, we have to go through the entire list of statesets
-	// and match with the id:
-	else
-	{
-		// statesets:
-		ReferencedStateSetMap::iterator sIt;
-		ReferencedStateSetList::iterator sIter;
-		for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
-		{
-		    for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
-		    {
-				if (wildcardMatch(pattern, (*sIter)->getID().c_str()))
-				{
-					matches.push_back(*sIter);		
-			    }
-			}
-		}
-	}
-	return matches;
+    // otherwise, we have to go through the entire list of statesets
+    // and match with the id:
+    else
+    {
+        // statesets:
+        ReferencedStateSetMap::iterator sIt;
+        ReferencedStateSetList::iterator sIter;
+        for ( sIt=stateMap.begin(); sIt!=stateMap.end(); ++sIt )
+        {
+            for (sIter = (*sIt).second.begin(); sIter != (*sIt).second.end(); ++sIter)
+            {
+                if (wildcardMatch(pattern, (*sIter)->getID().c_str()))
+                {
+                    matches.push_back(*sIter);
+                }
+            }
+        }
+    }
+    return matches;
 }
 
 
 /*
 nodeListType SceneManager::findNodes(const char *pattern)
 {
-	nodeListType matches;
+    nodeListType matches;
     nodeMapType::iterator it;
-	nodeListType::iterator iter;
-	
-	patternStr = std::string(pattern);
-	if (patternStr.find_first_of("*?") != std::string::npos)
-	{
-		matches.push_back(getNode(patternStr));	
-	}
+    nodeListType::iterator iter;
 
-	else
-	{
-		for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
-		{
-		    for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
-		    {
-				if (wildcardMatch(pattern, (*iter)->getID().c_str())
-					matches.push_back(*iter);		
-		    }
-		}
-	}
-	
-	return matches;
+    patternStr = std::string(pattern);
+    if (patternStr.find_first_of("*?") != std::string::npos)
+    {
+        matches.push_back(getNode(patternStr));
+    }
+
+    else
+    {
+        for (it = nodeMap.begin(); it != nodeMap.end(); ++it)
+        {
+            for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+            {
+                if (wildcardMatch(pattern, (*iter)->getID().c_str())
+                    matches.push_back(*iter);
+            }
+        }
+    }
+
+    return matches;
 }
 
 ReferencedStateSetList SceneManager::findStateSets(const char *pattern)
 {
-	ReferencedStateSetList matches;
+    ReferencedStateSetList matches;
     ReferencedStateSetMap::iterator it;
     ReferencedStateSetList::iterator iter;
 
-	patternStr = std::string(pattern);
-	if (patternStr.find_first_of("*?") != std::string::npos)
-	{
-		// no wildcards, just return getNode(pattern)
-		matches.push_back(getStateSet(patternStr));
-	}
-
-	else
-	{
-	
-		for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
-		{
-		    for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
-		    {
-				if (wildcardMatch(pattern, (*iter)->getID().c_str())
-					matches.push_back(*iter);		
-		    }
-		}
-	}
-
-	return matches;
-}
-*/
-
-std::vector<SoundConnection*> SceneManager::getConnections()
-{
-    std::vector<SoundConnection*> allConnections;
-
-    nodeMapType::iterator it;
-    nodeListType::iterator iter;
-    for (it = nodeMap.begin(); it != nodeMap.end(); it++)
+    patternStr = std::string(pattern);
+    if (patternStr.find_first_of("*?") != std::string::npos)
     {
-        std::string nodeType = (*it).first;
+        // no wildcards, just return getNode(pattern)
+        matches.push_back(getStateSet(patternStr));
+    }
 
-        const cppintrospection::Type &t = introspector::getType(nodeType);
-        if (t.isDefined())
+    else
+    {
+
+        for ( it=stateMap.begin(); it!=stateMap.end(); ++it )
         {
-            // check if the nodeType is a subclass of DSPNode:
-            if (t.getBaseType(0).getName() == "DSPNode")
+            for (iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
             {
-                for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                {
-                    osg::ref_ptr<DSPNode> dspNode = dynamic_cast<DSPNode*>((*iter).get());
-
-                    if ((*iter).valid())
-                    {
-                        std::vector<SoundConnection*>::iterator connIter;
-                        for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
-                        {
-                            allConnections.push_back((*connIter));
-                        }
-                    } // bad dsp node
-                }
+                if (wildcardMatch(pattern, (*iter)->getID().c_str())
+                    matches.push_back(*iter);
             }
         }
     }
-    return allConnections;
+
+    return matches;
 }
+*/
 
 void SceneManager::deleteNode(const char *id)
 {
@@ -1336,16 +1222,15 @@ void SceneManager::deleteNode(const char *id)
         }
 
         doDelete(n);
-        SCENE_MSG("ss", "deleteNode", id);
-        SCENE_MSG_TCP("ss", "deleteNode", id);
+        spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", id, SPIN_ARGS_END);
+
 
     }
     else if (ReferencedStateSet *s = getStateSet(id))
     {
-		doDelete(s);
+        doDelete(s);
         sendNodeList("*");
-        SCENE_MSG("ss", "deleteNode", id);
-        SCENE_MSG_TCP("ss", "deleteNode", id);
+        spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", id, SPIN_ARGS_END);
     }
     else
         std::cout << "ERROR: tried to delete " << id << ", but no node or state by that name exists." << std::endl;
@@ -1371,13 +1256,12 @@ void SceneManager::deleteGraph(const char *id)
         {
             std::string childID = (*childIter)->getID();
             doDelete(*childIter);
-            SCENE_MSG("ss", "deleteNode", childID.c_str());
-            SCENE_MSG_TCP("ss", "deleteNode", childID.c_str());
+            spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", childID.c_str(), SPIN_ARGS_END);
+
         }
 
         doDelete(n);
-        SCENE_MSG("ss", "deleteNode", id);
-        SCENE_MSG_TCP("ss", "deleteNode", id);
+        spinApp::Instance().BroadcastSceneMessage("ss", "deleteNode", id, SPIN_ARGS_END);
     }
     else
         std::cout << "ERROR: tried to deleteGraph " << id << ", but that node does not exist." << std::endl;
@@ -1422,7 +1306,7 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
     // now force the actual delete by nulling this referenced pointer. At that
     // time, the destructor for the node should be called.
     n = NULL;
-    
+
     // IMPORTANT: There is one node that will never be destroyed this way: the
     // userNode in spinApp. This stays there no matter what since there is a
     // ref_ptr that maintains a reference count in spinApp.
@@ -1433,19 +1317,19 @@ void SceneManager::doDelete(ReferencedNode *nodeToDelete)
 
 void SceneManager::doDelete(ReferencedStateSet *s)
 {
-	// hold on to a referenced pointer, while we remove all others
+    // hold on to a referenced pointer, while we remove all others
     osg::ref_ptr<ReferencedStateSet> ss = s;
-	// remove from the scene
-	s->removeFromScene();
-	// clear the stateset
-	s->clear();
-	// unregister from sceneManager (this removes it from the stateMap storage):
-	unregisterStateSet(s);
-	// by nulling the ref_ptr in s_thing, we will remove the last reference to
-	// the stateset (other than the one in local scope)
-	s->getIDSymbol()->s_thing = 0;
-	// now force the actual delete by nulling this referenced pointer.
-	ss = NULL; // destructor is called
+    // remove from the scene
+    s->removeFromScene();
+    // clear the stateset
+    s->clear();
+    // unregister from sceneManager (this removes it from the stateMap storage):
+    unregisterStateSet(s);
+    // by nulling the ref_ptr in s_thing, we will remove the last reference to
+    // the stateset (other than the one in local scope)
+    s->getIDSymbol()->s_thing = 0;
+    // now force the actual delete by nulling this referenced pointer.
+    ss = NULL; // destructor is called
 }
 
 void SceneManager::clear()
@@ -1519,22 +1403,16 @@ void SceneManager::clear()
     }
      */
 
-    /*
-       ClearSceneVisitor visitor;
-       worldNode->accept(visitor);
-     */
-     
-    SCENE_MSG("s", "clear");
-    SCENE_MSG_TCP("s", "clear");
+    spinApp::Instance().BroadcastSceneMessage("s", "clear", SPIN_ARGS_END);
     sendNodeList("*");
 
 #ifdef WITH_SPATOSC
-	if (spinApp::Instance().hasAudioRenderer)
-	{
-	    spinApp::Instance().audioScene->deleteAllNodes();
-	}
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spinApp::Instance().audioScene->deleteAllNodes();
+    }
 #endif
-    
+
     std::cout << "Cleared scene." << std::endl;
 }
 
@@ -1544,9 +1422,8 @@ void SceneManager::clearUsers()
     {
         deleteGraph(nodeMap[std::string("UserNode")][0]->getID().c_str());
     }
-    SCENE_MSG("s", "clearUsers");
-    SCENE_MSG_TCP("s", "clearUsers");
-    sendNodeList("*");
+    spinApp::Instance().BroadcastSceneMessage("s", "clearUsers", SPIN_ARGS_END);
+sendNodeList("*");
     std::cout << "Cleared all users." << std::endl;
 }
 
@@ -1559,21 +1436,20 @@ void SceneManager::clearStates()
     {
         while ((iter=(*it).second.begin()) != (*it).second.end())
         {
-			doDelete((*iter).get());
-			/*
-			//osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*iter)->s_thing);
-			// removeFromScene will remove all of OSG's references, leavind the
-			// referenced count at just one (ie, the one in our stateMap)
-			if ((*iter).valid()) (*iter)->removeFromScene();
+            doDelete((*iter).get());
+            /*
+            //osg::ref_ptr<ReferencedStateSet> s = dynamic_cast<ReferencedStateSet*>((*iter)->s_thing);
+            // removeFromScene will remove all of OSG's references, leavind the
+            // referenced count at just one (ie, the one in our stateMap)
+            if ((*iter).valid()) (*iter)->removeFromScene();
 
-			// as soon as we erase it, OSG will call the stateset destructor
-			(*it).second.erase(iter);
-			*/
+            // as soon as we erase it, OSG will call the stateset destructor
+            (*it).second.erase(iter);
+            */
         }
     }
-    
-    SCENE_MSG("s", "clearStates");
-    SCENE_MSG_TCP("s", "clearStates");
+
+    spinApp::Instance().BroadcastSceneMessage("s", "clearStates", SPIN_ARGS_END);
 
     // TODO: separate sendNodeList to sendStateList as well
     sendNodeList("*");
@@ -1607,30 +1483,21 @@ void SceneManager::refreshAll()
         }
     }
 
-    // must do connections manually:
-    std::vector<SoundConnection*> connections = getConnections();
-    for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
-    {
-        (*iter)->stateDump();
-    }
-    
 #ifdef WITH_SPATOSC
-	if (spinApp::Instance().hasAudioRenderer)
-	{
-	    spinApp::Instance().audioScene->forceRefresh();
-	}
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        spinApp::Instance().audioScene->forceRefresh();
+    }
 #endif
 
-
     // Announce that a refresh has been completed
-    SCENE_MSG("s", "refresh");
-    SCENE_MSG_TCP("s", "refresh");
+    spinApp::Instance().BroadcastSceneMessage("s", "refresh", SPIN_ARGS_END);
 }
 
 void SceneManager::refreshSubscribers(const std::map<std::string, lo_address> &clients)
 {
-    for (std::map<std::string, lo_address>::const_iterator client = clients.begin(); 
-            client != clients.end(); 
+    for (std::map<std::string, lo_address>::const_iterator client = clients.begin();
+            client != clients.end();
             ++client)
     {
         // TODO: just send to subscribers
@@ -1655,36 +1522,8 @@ void SceneManager::refreshSubscribers(const std::map<std::string, lo_address> &c
                     (*sIter)->stateDump(client->second);
             }
         }
-
-        // must do connections manually:
-        std::vector<SoundConnection*> connections = getConnections();
-        for (std::vector<SoundConnection*>::iterator iter = connections.begin(); iter != connections.end(); ++iter)
-            (*iter)->stateDump(client->second);
     }
 }
-
-// *****************************************************************************
-// This function returns a pointer to an SoundConnection object
-/*
-   SoundConnection* SceneManager::getConnection(char *from, char *to)
-   {
-   vector<SoundConnection*>::iterator iter;
-
-   osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>( getNode(from) );
-   osg::ref_ptr<DSPNode> snkNode = dynamic_cast<DSPNode*>( getNode(to) );
-
-   if ( srcNode.valid() && snkNode.valid() ) {
-   for (iter = srcNode->connectTO.begin(); iter != srcNode->connectTO.end(); iter++)
-   {
-   if ((*iter)->sink->id == snkNode->id) return (*iter);
-   }
-   }
-
-// SoundConnection not found:
-return NULL;
-
-}
- */
 
 // *****************************************************************************
 // Here is where we change the graph (ie, attach nodes to their new parents,
@@ -1699,7 +1538,7 @@ void SceneManager::update()
     osg::Timer_t tick = osg::Timer::instance()->tick();
     double dt =osg::Timer::instance()->delta_s(lastTick_,tick);
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     // it's possible that a SharedVideoTexture is in the sceneManager, but not
     // currently applied on any geometry. In this canse, it will not be be
     // seen in the update traversal of the scene graph, and it's updateCallback
@@ -1715,39 +1554,89 @@ void SceneManager::update()
     }
 #endif
 
-    
-	if (spinApp::Instance().getContext()->isServer())
+
+    if (spinApp::Instance().getContext()->isServer())
     {
         spinServerContext *spinserv = dynamic_cast<spinServerContext*>(spinApp::Instance().getContext());
         if (spinserv->shouldAutoClean())
-	    {
-		    // check if any UserNodes have stopped pinging, and remove them
+        {
+            // check if any UserNodes have stopped pinging, and remove them
             // (and their subgraph) if necessary:
 
-		    nodeListType::iterator iter;
-	        for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
-	        {
-			    if ((*iter)->scheduleForDeletion_)
-			    {
-				    // this user stopped pinging, so we should remove him
+            nodeListType::iterator iter;
+            for (iter = nodeMap[std::string("UserNode")].begin(); iter != nodeMap[std::string("UserNode")].end(); )
+            {
+                if ((*iter)->scheduleForDeletion_)
+                {
+                    // this user stopped pinging, so we should remove him
                     // from the subgraph.
-				    spinApp::Instance().sceneManager_->deleteGraph((*iter)->getID().c_str());
-			    }
+                    spinApp::Instance().sceneManager_->deleteGraph((*iter)->getID().c_str());
+                }
                 else
                     iter++;
-	        }
-	    }
+            }
+        }
     }
-    
+
 #ifdef WITH_BULLET
     if (1)//(dt >= dynamicsUpdateRate_)
     {
         // only do on server side?
         if (spinApp::Instance().getContext()->isServer())
         {
+
+            if ( windy_ ) {
+                for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+                    btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+                    btRigidBody* body = btRigidBody::upcast(obj);
+                    if(!body->isStaticObject()) {
+
+                        CollisionShape *cs = (CollisionShape*)(body->getUserPointer());
+                        if ( cs && cs->getDynamic() ) {
+                            body->activate();
+                            body->applyCentralForce( wind_ * (btScalar)cs->getWindFactor() );
+                        }
+                    }
+                }
+            }
+
             //dynamicsWorld_->performDiscreteCollisionDetection();
-            dynamicsWorld_->stepSimulation(dt);
+            //printf("stepSimulation %f\n", dt);
+            dynamicsWorld_->stepSimulation(dt);//, 7, 0.0004);
             dynamicsWorld_->updateAabbs(); // <- is this necessary?
+            int numManifolds = dynamicsWorld_->getDispatcher()->getNumManifolds();
+            //if (numManifolds) printf("-----------------------\n");
+            for (int i=0;i<numManifolds;i++) {
+                btPersistentManifold* contactManifold =  dynamicsWorld_->getDispatcher()->getManifoldByIndexInternal(i);
+                btRigidBody* ob0 = static_cast<btRigidBody*>(contactManifold->getBody0());
+                btRigidBody* ob1 = static_cast<btRigidBody*>(contactManifold->getBody1());
+                CollisionShape *n0 = (CollisionShape*)ob0->getUserPointer();
+                CollisionShape *n1 = (CollisionShape*)ob1->getUserPointer();
+
+                if ( !n0 || !n1 ) continue;
+
+                // May be there is contact obA and obB
+                int numContacts = contactManifold->getNumContacts();
+                for (int j=0;j<numContacts;j++) {
+                    btManifoldPoint& pt = contactManifold->getContactPoint(j);
+                    
+                    if ( pt.getDistance() < 0.f &&
+                         pt.getAppliedImpulse() > 0.f ) {
+                        // printf( "got contact 0x%p %s:%s %f %f %i\n", &pt,
+                        //         n0->getID().c_str(), n1->getID().c_str(),
+                        //         pt.getDistance(), pt.getAppliedImpulse(), pt.m_lifeTime );
+                    
+
+                        n0->reportContact( pt, ob1 );
+                        n1->reportContact( pt, ob0, true );
+                        // One contact point is inside of another object
+                        // But some contacts are ignored
+                    }
+                }
+            }
+
+
+
         }
     }
 #endif
@@ -1758,6 +1647,8 @@ void SceneManager::update()
 // save scene as .osg
 void SceneManager::exportScene (const char *nodeID, const char *filename)
 {
+    if (spinApp::Instance().getContext()->isServer()) return;
+    
     std::string fullPath = std::string(filename);
     if (fullPath.substr(fullPath.size()-4) != ".osg")
         fullPath += ".osg";
@@ -1848,7 +1739,7 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers, bool w
         if (!children.empty())
         {
             output << "<subgraph>\n";
-            
+
             std::vector<ReferencedNode*>::iterator childIter;
             for (childIter = children.begin(); childIter != children.end(); childIter++)
             {
@@ -1863,100 +1754,42 @@ std::string SceneManager::getNodeAsXML(ReferencedNode *n, bool withUsers, bool w
     return output.str();
 }
 
-
-std::string SceneManager::getConnectionsAsXML()
-{
-    std::ostringstream output("");
-    output << "<connections>\n";
-
-    // go through all DSPNodes (actually, all nodes that are subclasses of
-    // DSPNode), and save the connection info at end of file:
-
-    nodeMapType::iterator it;
-    nodeListType::iterator iter;
-    for (it = nodeMap.begin(); it != nodeMap.end(); it++)
-    {
-        std::string nodeType = (*it).first;
-        const cppintrospection::Type &t = introspector::getType(nodeType);
-        if (t.isDefined())
-        {
-            // check if the nodeType is a subclass of DSPNode:
-            if (t.getBaseType(0).getName() == introspector::prependNamespace("DSPNode"))
-            {
-                for (iter = (*it).second.begin(); iter != (*it).second.end(); iter++)
-                {
-                    osg::ref_ptr<DSPNode> dspNode = dynamic_cast<DSPNode*>((*iter).get());
-                    if ((*iter).valid())
-                    {
-                        std::vector<SoundConnection*>::iterator connIter;
-                        for (connIter = dspNode->connectTO.begin(); connIter != dspNode->connectTO.end(); connIter++)
-                        {
-                            // open tag for this node:
-                            output << "<SoundConnection id=" << (*connIter)->getID() << ">\n";
-                            output << getStateAsXML((*connIter)->getState());
-                            // close tag
-                            output << "</SoundConnection>";
-                        }
-                    } //else std::cout << "bad dspnode: " << (*iter)->getID() << std::endl;
-                }
-            }
-        }
-    }
-    output << "</connections>\n";
-    return output.str();
-}
-
-/*
-   std::string SceneManager::getConnectionsAsXML(ReferencedNode *n)
-   {
-// just give connections for the node in question (and all children
-
-ostringstream output("");
-output << "<connection>\n";
-
-
-
-output << "</connection>\n";
-return output.str();
-}
- */
-
 std::vector<t_symbol*> SceneManager::getSavableStateSets(ReferencedNode *n, bool withUsers)
 {
-	std::vector<t_symbol*> statesetsToSave;
+    std::vector<t_symbol*> statesetsToSave;
 
-	// we ignore UserNodes, and their entire subgraphs:
-	if (! withUsers && (n->getNodeType() == "UserNode"))
-		return statesetsToSave;
+    // we ignore UserNodes, and their entire subgraphs:
+    if (! withUsers && (n->getNodeType() == "UserNode"))
+        return statesetsToSave;
 
-	// check for children:
+    // check for children:
     std::vector<ReferencedNode*> children = n->getChildren();
-	std::vector<ReferencedNode*>::iterator childIter;
-	for (childIter = children.begin(); childIter != children.end(); ++childIter)
-	{
-		statesetsToSave = getSavableStateSets(*childIter, withUsers);
-	}
+    std::vector<ReferencedNode*>::iterator childIter;
+    for (childIter = children.begin(); childIter != children.end(); ++childIter)
+    {
+        statesetsToSave = getSavableStateSets(*childIter, withUsers);
+    }
 
-	if (n->getNodeType() == "ModelNode")
-	{
-		ModelNode *mdl = dynamic_cast<ModelNode*>(n);
-		if (mdl)
-		{
-			statesetsToSave.insert( statesetsToSave.begin(), mdl->_statesetList.begin(), mdl->_statesetList.end());
-		}
-	}    
+    if (n->getNodeType() == "ModelNode")
+    {
+        ModelNode *mdl = dynamic_cast<ModelNode*>(n);
+        if (mdl)
+        {
+            statesetsToSave.insert( statesetsToSave.begin(), mdl->_statesetList.begin(), mdl->_statesetList.end());
+        }
+    }
     else
     {
         GroupNode *grp = dynamic_cast<GroupNode*>(n);
-		if (grp)
-		{
+        if (grp)
+        {
             t_symbol *ss = grp->getStateSetSymbol();
             if (ss->s_thing)
                 statesetsToSave.push_back(ss);
-		}
+        }
     }
-    
-	return statesetsToSave;
+
+    return statesetsToSave;
 }
 
 // *****************************************************************************
@@ -2007,13 +1840,13 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
     output << "<statesets>\n";
     for (sIt = statesetsToSave.begin(); sIt != statesetsToSave.end(); ++sIt)
     {
-    	ReferencedStateSet *ss = dynamic_cast<ReferencedStateSet*>((*sIt)->s_thing);
-    	if (ss)
-    	{
-    		output << "<" << ss->getClassType() << " id=" << ss->getID() << ">\n";
-			output << getStateAsXML( ss->getState() );
-			output << "</" << ss->getClassType() << ">\n";
-    	}
+        ReferencedStateSet *ss = dynamic_cast<ReferencedStateSet*>((*sIt)->s_thing);
+        if (ss)
+        {
+            output << "<" << ss->getClassType() << " id=" << ss->getID() << ">\n";
+            output << getStateAsXML( ss->getState() );
+            output << "</" << ss->getClassType() << ">\n";
+        }
     }
     output << "</statesets>\n";
 
@@ -2033,7 +1866,6 @@ bool SceneManager::saveXML(const char *s, bool withUsers)
         }
     }
     output << "</spinScene>\n";
-    output << getConnectionsAsXML();
 
     // now write to file:
     TiXmlDocument outfile( filename.c_str() );
@@ -2308,112 +2140,6 @@ bool SceneManager::createStateSetFromXML(TiXmlElement *XMLnode)
     return true;
 }
 
-bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
-{
-    // NOTE: This assumes all nodes have already been created, but will create
-    //       connections if they do not exist.
-    TiXmlElement *child;
-    if (XMLnode->Value() == std::string("SoundConnection"))
-    {
-        //std::cout << "found <SoundConnection>: " << XMLnode->Attribute("id") << std::endl;
-        //std::cout << "src: " << XMLnode->FirstChild("src")->FirstChild()->Value() << std::endl;
-        //std::cout << "snk: " << XMLnode->FirstChild("snk")->FirstChild()->Value() << std::endl;
-
-        osg::ref_ptr<ReferencedNode> n = getNode(XMLnode->FirstChild("src")->FirstChild()->Value());
-        char *snkName = (char*)XMLnode->FirstChild("snk")->FirstChild()->Value();
-
-        if (! n.valid())
-            return false;
-
-        // we can call the connect() method again, to ensure the connection is actually made:
-        osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>(n.get());
-        srcNode->connect(snkName);
-
-        // check if it exists now (it might not, if the sink didn't exist)
-        SoundConnection *conn = srcNode->getConnection(snkName);
-
-        if (! conn)
-            return false;
-
-        // now we have it, so we can go through the rest of the xml children
-        // and update the connection's parameters:
-
-        for (child = XMLnode->FirstChildElement(); child; child = child->NextSiblingElement() )
-        {
-            //std::cout << "child = " << child->Value() << ", value = " << child->FirstChild()->Value() << std::endl;
-
-            // we know that each method takes exactly one float arg:
-            float f;
-            if (child->Value() == std::string("setThru"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setThru(f);
-            }
-            else if (child->Value() == std::string("setDistanceEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setDistanceEffect(f);
-            }
-            else if (child->Value() == std::string("setRolloffEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setRolloffEffect(f);
-            }
-            else if (child->Value() == std::string("setDopplerEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setDopplerEffect(f);
-            }
-            else if (child->Value() == std::string("setDiffractionEffect"))
-            {
-                if (fromString<float>(f, child->FirstChild()->Value()))
-                    conn->setDiffractionEffect(f);
-            }
-        }
-    }
-    return false;
-}
-
-/*
-   bool SceneManager::createConnectionsFromXML(TiXmlElement *XMLnode)
-   {
-
-// NOTE: this assumes all nodes have already been created
-
-TiXmlElement *child1, *child2;
-
-for ( child1 = XMLnode->FirstChildElement(); child1; child1 = child1->NextSiblingElement() )
-{
-// first check children:
-if (child1->Value() == string("subgraph"))
-{
-for (child2 = child1->FirstChildElement(); child2; child2 = child2->NextSiblingElement() )
-{
-createConnectionsFromXML(child2);
-}
-}
-
-// now if this node has a "connect" message,
-else if (child1->Value() == string("connect"))
-{
-// don't care about nodeType (should be SoundNode or SoundSpace)
-//char *nodeType = (char*) XMLnode->Value();
-
-if (XMLnode->Attribute("id"))
-{
-osg::ref_ptr<ReferencedNode> n = getNode((char*) XMLnode->Attribute("id"));
-if (n.valid())
-{
-osg::ref_ptr<DSPNode> srcNode = dynamic_cast<DSPNode*>(n.get());
-if (srcNode.valid()) srcNode->connect((char*)child1->FirstChild()->Value());
-}
-}
-}
-
-} // for ( child1
-}
- */
-
 bool SceneManager::loadXML(const char *s)
 {
     // convert filename into valid path:
@@ -2457,28 +2183,156 @@ bool SceneManager::loadXML(const char *s)
         createNodeFromXML(child);
     }
 
-    // Now see if there is a <connections> tag:
-    if (root = doc.FirstChild("connections"))
-    {
-        // go through the file again, making sure that connections get created:
-        for (child = root->FirstChildElement(); child; child = child->NextSiblingElement())
-        {
-            createConnectionsFromXML(child);
-        }
-    }
-
     this->update();
 
     std::cout << "Successfully loaded scene from " << filename << std::endl;
     return true;
 }
 
+// -----------------------------------------------------------------------------
 
-// *****************************************************************************
+void SceneManager::setShadows(bool b)
+{
+    if (shadowRoot_.valid() && !b)
+    {
+        std::cout << "Disabling shadows" << std::endl;
+    
+        // destroy shadowRoot and re-assign parent
+        
+        pthread_mutex_lock(&sceneMutex);
+        
+        rootNode->removeChild(shadowRoot_.get());
+        shadowRoot_->removeChild(worldNode.get());
+        
+        if (!rootNode->containsNode(worldNode.get()))
+            rootNode->addChild(worldNode.get());
+        
+        shadowRoot_ = NULL;
+        
+        pthread_mutex_unlock(&sceneMutex);
+    }
+    
+    else if (!shadowRoot_.valid() && b)
+    {
+        std::cout << "Enabling shadows" << std::endl;
+        
+        shadowRoot_ = new osgShadow::ShadowedScene;
+        shadowRoot_->setName("shadowRoot");
+        shadowRoot_->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
+        shadowRoot_->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
+        
+        /*
+        osgShadow::ShadowSettings *shadowSettings;
+        shadowSettings->setReceivesShadowTraversalMask( RECEIVE_SHADOW_NODE_MASK );
+        shadowSettings->setCastsShadowTraversalMask( CAST_SHADOW_NODE_MASK );
+        shadowRoot_->setShadowSettings(shadowSettings);
+        */
+        
+        // soft shadows:
+        softShadowMap_ = new osgShadow::SoftShadowMap;
+        softShadowMap_->setTextureSize( osg::Vec2s(2048, 2048) );
+        //softShadowMap_->setTextureUnit(1);
+        shadowRoot_->setShadowTechnique( softShadowMap_.get() );
+
+        // can use a view-dependent shadow map to improve efficiency over regular
+        // osgShadow::ShadowMap, since shadow interactors will only be rendered if
+        // they and their assumed shadows are visible in the view frustum.
+        /*
+        osg::ref_ptr<osgShadow::ViewDependentShadowMap> vdsm = new osgShadow::ViewDependentShadowMap;
+        //vdsm->setShadowMapProjectionHint(osgShadow::ViewDependentShadowMap::ORTHOGRAPHIC_SHADOW_MAP);
+        //vdsm->setBaseShadowTextureUnit( 1 );
+        shadowRoot_->setShadowTechnique( vdsm.get() );
+        */
+
+        //
+        /*
+        int mapcount = 3;
+        osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm = new osgShadow::ParallelSplitShadowMap(NULL,mapcount);
+        pssm->setTextureResolution(1024);
+        //pssm->setDebugColorOn();
+        //pssm->setMinNearDistanceForSplits(minNearSplit);
+        //pssm->setMaxFarDistance(maxfardist);
+        //pssm->setMoveVCamBehindRCamFactor(moveVCamFactor);
+        shadowRoot_->setShadowTechnique(pssm.get());
+        */
+        
+        // ADD SHADOW ROOT TO SCENE:
+        pthread_mutex_lock(&sceneMutex);
+        
+        if (rootNode->containsNode(worldNode.get()))
+            rootNode->removeChild(worldNode.get());
+        
+        rootNode->addChild(shadowRoot_.get());
+        shadowRoot_->addChild( worldNode.get() );
+        
+        pthread_mutex_unlock(&sceneMutex);
+    }
+    
+    spinApp::Instance().BroadcastSceneMessage("si", "setShadows", (int)b, SPIN_ARGS_END);
+}
+
+void SceneManager::setShadowSoftness(float f)
+{
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setSoftnessWidth(f);
+        spinApp::Instance().BroadcastSceneMessage("sf", "setShadowSoftness", f, SPIN_ARGS_END);
+    }
+}
+
+void SceneManager::setShadowJitter(float f)
+{
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setJitteringScale(f);
+        spinApp::Instance().BroadcastSceneMessage("sf", "setShadowJitter", f, SPIN_ARGS_END);
+    }
+}
+
+void SceneManager::setShadowBias(float f)
+{
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setBias(f);
+        spinApp::Instance().BroadcastSceneMessage("sf", "setShadowBias", f, SPIN_ARGS_END);
+    }
+}
+
+void SceneManager::setShadowAmbientBias(float x, float y)
+{
+    if (softShadowMap_.valid())
+    {
+        softShadowMap_->setAmbientBias(osg::Vec2(x,y));
+        spinApp::Instance().BroadcastSceneMessage("sff", "setShadowAmbientBias", x, y, SPIN_ARGS_END);
+    }
+}
+
+// -----------------------------------------------------------------------------
 void SceneManager::setGravity(float x, float y, float z)
 {
 #ifdef WITH_BULLET
     dynamicsWorld_->setGravity(btVector3(x, y, z));
+#endif
+}
+
+// -----------------------------------------------------------------------------
+void SceneManager::setWind(float x, float y, float z)
+{
+#ifdef WITH_BULLET
+    if ( x == 0.0f && y == 0.0f && z == 0.0f ) windy_ = false;
+    else windy_ = true;
+    wind_ = btVector3(x,y,z);
+    /*    printf("setWind %f %f %f\n",x,y,z);
+    for (int i = 0; i < dynamicsWorld_->getNumCollisionObjects(); i++) {
+        btCollisionObject* obj = dynamicsWorld_->getCollisionObjectArray()[i];
+        btRigidBody* body = btRigidBody::upcast(obj);
+        if(!body->isStaticObject()) {
+            body->applyCentralForce(btVector3(x, y, z));
+            body->activate();
+            printf("setWind force applied\n");
+        }
+    }
+    printf("\n");*/
 #endif
 }
 

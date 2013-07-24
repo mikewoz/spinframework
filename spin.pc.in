@@ -7,6 +7,6 @@ Name: spin
 Description: Spatial Interaction Framework
 URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
-Requires.private: liblo >= 0.26 openthreads spatosc-0.3
-Libs: -L${libdir} -lspin-@SPIN_API_VERSION@
-Cflags: -I${includedir}/spin-@SPIN_API_VERSION@
+Requires.private: liblo >= 0.26 openthreads spatosc-0.6
+Libs: -L${libdir} -lspinframework-@SPIN_API_VERSION@
+Cflags: -I${includedir}/spinframework-@SPIN_API_VERSION@

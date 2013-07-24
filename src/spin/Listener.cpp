@@ -39,10 +39,10 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
-#include "Listener.h"
-#include "SceneManager.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "listener.h"
+#include "scenemanager.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>
@@ -87,6 +87,21 @@ Listener::~Listener()
     
 }
 // ===================================================================
+void Listener::debug()
+{
+    DSPNode::debug();
+    
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        std::cout << "-------------" << std::endl;
+        std::cout << "SpatOSC data:" << std::endl;
+        spatOSCListener->debugPrint();
+    }
+#endif
+    
+}
+
 void Listener::callbackUpdate(osg::NodeVisitor* nv)
 {
     // need to first call the superclass update method (specifically, GroupNode)
@@ -96,7 +111,7 @@ void Listener::callbackUpdate(osg::NodeVisitor* nv)
 
 bool Listener::dumpGlobals(bool forced)
 {
-    DSPNode::dumpGlobals();
+    DSPNode::dumpGlobals(forced);
 #ifdef WITH_SPATOSC
     if (spinApp::Instance().hasAudioRenderer)
     {
@@ -133,6 +148,34 @@ void Listener::setParam (const char *paramName, float paramValue)
 #endif
 }
 
+void Listener::setTranslation (float x, float y, float z)
+{
+    GroupNode::setTranslation(x,y,z);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+        this->dumpGlobals(true);
+#endif
+
+}
+
+void Listener::setOrientation (float p, float r, float y)
+{
+    GroupNode::setOrientation(p,r,y);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+        this->dumpGlobals(true);
+#endif
+}
+
+void Listener::setOrientationQuat (float x, float y, float z, float w)
+{
+    GroupNode::setOrientationQuat(x,y,z,w);
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+        this->dumpGlobals(true);
+#endif
+}
+
 void Listener::setURI (const char *uri)
 {
     DSPNode::setURI(uri);
@@ -153,5 +196,46 @@ std::vector<lo_message> Listener::getState () const
 	return ret;
 }
 
+void Listener::sendEvent (const char *types, lo_arg **argv, int argc )
+{
+#ifdef WITH_SPATOSC
+    if (spinApp::Instance().hasAudioRenderer)
+    {
+        std::string node = this->getID();
+        std::string key;
+        std::vector<std::string> value;
+        
+        // first item should be the key string, followd by any corresponing items
+        if (! lo_is_numerical_type((lo_type)types[0]))
+        {
+            key = (const char*) argv[0];
+            
+        }
+        else
+        {
+            std::cerr << "ERROR: Listener::sendEvent 1st item must be a key <string> " <<  std::endl;
+            return;
+        }
+        
+        for (int i = 1; i < argc; i++)
+        {
+            if (lo_is_numerical_type((lo_type) types[i]))
+            {
+                std::ostringstream os;
+                os << (float) lo_hires_val((lo_type) types[i], argv[i]);
+                value.push_back(os.str());
+            }
+            else
+            {
+                value.push_back((const char*) argv[i] );
+            }
+        }
+        // std::cout << "Listener::sendEvent CALLED for node:  " << this->getID() <<  "with key: " << key << std::endl;
+        spatOSCListener->sendEvent(key, value);
+    }
+#endif
+}
+
+    
 } // end of namespace spin
 

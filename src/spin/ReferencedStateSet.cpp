@@ -43,11 +43,11 @@
 #include <osg/StateAttribute>
 #include <iostream>
 
-#include "spinApp.h"
-#include "spinBaseContext.h"
-#include "SceneManager.h"
-#include "ReferencedStateSet.h"
-#include "ShaderUtil.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
+#include "scenemanager.h"
+#include "referencedstateset.h"
+#include "shaderutil.h"
 
 extern pthread_mutex_t sceneMutex;
 

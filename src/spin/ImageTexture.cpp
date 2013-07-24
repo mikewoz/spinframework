@@ -50,10 +50,10 @@
 
 #include <iostream>
 
-#include "SceneManager.h"
-#include "ImageTexture.h"
-#include "spinApp.h"
-#include "spinBaseContext.h"
+#include "scenemanager.h"
+#include "imagetexture.h"
+#include "spinapp.h"
+#include "spinbasecontext.h"
 
 extern pthread_mutex_t sceneMutex;
 

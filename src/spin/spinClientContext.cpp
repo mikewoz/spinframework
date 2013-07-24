@@ -39,22 +39,22 @@
 //  along with SPIN Framework. If not, see <http://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------------------
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
-#include "spinClientContext.h"
-#include "spinApp.h"
-#include "SceneManager.h"
-#include "spinDefaults.h"
-#include "EventHandler.h"
+#include "spinclientcontext.h"
+#include "spinapp.h"
+#include "scenemanager.h"
+#include "spindefaults.h"
+#include "eventhandler.h"
 
 namespace spin
 {
 
 
-spinClientContext::spinClientContext() : 
+spinClientContext::spinClientContext() :
     lo_syncServ(NULL),
     doSubscribe_(true)
 {
@@ -108,9 +108,9 @@ void spinClientContext::addCommandLineOptions(osg::ArgumentParser *arguments)
 
     arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-msg <host> <port>", "Set the receiving address/port for UDP messages from the server. The address can be a multicast address, or 'localhost'. (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(CLIENT_RX_UDP_PORT) + ")");
     arguments->getApplicationUsage()->addCommandLineOption("--send-udp-msg <host> <port>", "Specify the address/port of the server's UDP channel. This is where we stream high-throughput scene events, such as position updates (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SERVER_RX_UDP_PORT) + ")");
-	arguments->getApplicationUsage()->addCommandLineOption("--send-tcp-msg <host> <port>", "Specify the address/port of the server's TCP channel. This is wwhere we send subscription requests, and scene events that require reliable transmission (Default: localhost " + std::string(SERVER_TCP_PORT) + ")");
-	arguments->getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <host> <port>", "Set the desired receiving address/port when subscribing for TCP with the server. ie, spinserver will connect back to this port once we have subscribed (Default: " + std::string(CLIENT_TCP_PORT) + ")");
-	arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-sync <address> <port>", "Set the address/port for timecode (sync) messages (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SYNC_UDP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--send-tcp-msg <host> <port>", "Specify the address/port of the server's TCP channel. This is wwhere we send subscription requests, and scene events that require reliable transmission (Default: localhost " + std::string(SERVER_TCP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--recv-tcp-msg <host> <port>", "Set the desired receiving address/port when subscribing for TCP with the server. ie, spinserver will connect back to this port once we have subscribed (Default: " + std::string(CLIENT_TCP_PORT) + ")");
+    arguments->getApplicationUsage()->addCommandLineOption("--recv-udp-sync <address> <port>", "Set the address/port for timecode (sync) messages (Default: " + std::string(MULTICAST_GROUP) + " " + std::string(SYNC_UDP_PORT) + ")");
     arguments->getApplicationUsage()->addCommandLineOption("--ttl <number>", "Set the TTL (time to live) for multicast packets in order to hop across routers (Default: 1)");
 
 }
@@ -120,31 +120,31 @@ int spinClientContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
     if (!spinBaseContext::parseCommandLineOptions(arguments))
         return 0;
 
-	bool passed_addrs = false;
+    bool passed_addrs = false;
     std::string addr, port;
 
     while (arguments->read("--send-udp-msg", addr, port)) {
-		if (!passed_addrs) this->lo_txAddrs_.clear();
-		this->lo_txAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
-		passed_addrs = true;
-	}
+        if (!passed_addrs) this->lo_txAddrs_.clear();
+        this->lo_txAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
+        passed_addrs = true;
+    }
 
-	passed_addrs = false;
-	while (arguments->read("--recv-udp-msg", addr, port)) {
-		if (!passed_addrs) this->lo_rxAddrs_.clear();
-		this->lo_rxAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
-		passed_addrs = true;
-	}
+    passed_addrs = false;
+    while (arguments->read("--recv-udp-msg", addr, port)) {
+        if (!passed_addrs) this->lo_rxAddrs_.clear();
+        this->lo_rxAddrs_.push_back(lo_address_new(addr.c_str(), port.c_str()));
+        passed_addrs = true;
+    }
 
-	arguments->read("--recv-tcp-msg", this->recv_tcp_addr, this->tcpPort_);
-	
+    arguments->read("--recv-tcp-msg", this->recv_tcp_addr, this->tcpPort_);
+
     while (arguments->read("--send-tcp-msg", addr, port)){
         lo_serverTCPAddr = lo_address_new_with_proto(LO_TCP, addr.c_str(), port.c_str());
     }
 
-	while (arguments->read("--send-udp-sync", addr, port)) {
-		this->lo_syncAddr = lo_address_new(addr.c_str(), port.c_str());
-	}
+    while (arguments->read("--send-udp-sync", addr, port)) {
+        this->lo_syncAddr = lo_address_new(addr.c_str(), port.c_str());
+    }
 
     int ttl=1;
     while (arguments->read("--ttl", ttl)) {
@@ -157,9 +157,8 @@ int spinClientContext::parseCommandLineOptions(osg::ArgumentParser *arguments)
 // FIXME: Push this up to base context
 void spinClientContext::createServers()
 {
-	std::vector<lo_server>::iterator servIter;
+    std::vector<lo_server>::iterator servIter;
 
-    using boost::lexical_cast;
     using std::string;
 
     /*
@@ -177,16 +176,19 @@ void spinClientContext::createServers()
 
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
+            lo_server_add_method((*servIter), NULL, NULL, debugCallback, NULL);
     }
 #endif
 
     lo_server_add_method(lo_infoServ_, NULL, NULL, infoCallback, this);
     lo_server_add_method(lo_tcpRxServer_, NULL, NULL, tcpCallback, this);
 
+    // register sceneCallback for all receivers and for the one TCP subscription
+    // receiver as well:
+    lo_server_add_method(lo_tcpRxServer_, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), NULL, sceneCallback, this);
     for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
     {
-    	lo_server_add_method((*servIter),
+            lo_server_add_method((*servIter),
             std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
             NULL, sceneCallback, NULL);
     }
@@ -197,40 +199,70 @@ void spinClientContext::createServers()
         lo_syncServ = lo_server_new_multicast(lo_address_get_hostname(lo_syncAddr), lo_address_get_port(lo_syncAddr), oscParser_error);
         if (lo_syncServ == 0)
         {
-            std::cerr << "Sync server creation on port " << lo_address_get_port(lo_syncAddr) << 
+            std::cerr << "Sync server creation on port " << lo_address_get_port(lo_syncAddr) <<
                 " failed, trying a random port" << std::endl;
             std::string addr(lo_address_get_hostname(lo_syncAddr));
             lo_address_free(lo_syncAddr);
             lo_syncServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+            lo_syncAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_syncServ)).c_str());
         }
     } else {
         lo_syncServ = lo_server_new(lo_address_get_port(lo_syncAddr), oscParser_error);
         if (lo_syncServ == 0)
         {
-            std::cerr << "Sync server creation on port " << lo_address_get_port(lo_syncAddr) << 
+            std::cerr << "Sync server creation on port " << lo_address_get_port(lo_syncAddr) <<
                 " failed, trying a random port" << std::endl;
             std::string addr(lo_address_get_hostname(lo_syncAddr));
             lo_address_free(lo_syncAddr);
             lo_syncServ = lo_server_new(NULL, oscParser_error);
-            lo_syncAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_syncServ)).c_str());
+            lo_syncAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_syncServ)).c_str());
         }
     }
-    lo_server_add_method(lo_syncServ, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), 
+    lo_server_add_method(lo_syncServ, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(),
             NULL, syncCallback, NULL);
 }
 
 int spinClientContext::pollUpdates()
 {
-	static const int TIMEOUT = 0;
-	int recv = 0; // bytes received (note: might not be accurate for TCP)
-    for (std::vector<lo_server>::iterator it = lo_rxServs_.begin(); it != lo_rxServs_.end(); ++it)
-    	recv += lo_server_recv_noblock((*it), TIMEOUT);
-	recv += lo_server_recv_noblock(lo_syncServ, TIMEOUT);
-	recv += lo_server_recv_noblock(lo_infoServ_, TIMEOUT);
-	recv += lo_server_recv_noblock(lo_tcpRxServer_, TIMEOUT);
+    static const int TIMEOUT = 0;
+    int recv = 0; // bytes received (note: might not be accurate for TCP)
+    if (!reliableBroadcast_)
+    {
+        for (std::vector<lo_server>::iterator it = lo_rxServs_.begin(); it != lo_rxServs_.end(); ++it)
+        {
+            recv += lo_server_recv_noblock((*it), TIMEOUT);
+        }
+    }
+    recv += lo_server_recv_noblock(lo_syncServ, TIMEOUT);
+    recv += lo_server_recv_noblock(lo_infoServ_, TIMEOUT);
+    recv += lo_server_recv_noblock(lo_tcpRxServer_, TIMEOUT);
 
-	return recv;
+    return recv;
+}
+
+void spinClientContext::setReliableBroadcast(bool b)
+{
+    // On the client-side, we disable UDP polling when reliableBroadcast is
+    // enabled so we don't get double messages. This means that our UDP socket
+    // buffers are getting filled without anyone reading them. If we switch off
+    // reliableBroadcast, we will read a bunch of old messages stuck in the buffer
+    // so here we go through and force a recv() on all UDP sockets, and just
+    // throw away the data.
+    if (!b)
+    {
+        char buffer[128];
+        std::vector<lo_server>::iterator servIter;
+        for (servIter = lo_rxServs_.begin(); servIter != lo_rxServs_.end(); ++servIter)
+        {
+            while (int n = recv(lo_server_get_socket_fd(*servIter), buffer, sizeof(buffer), MSG_DONTWAIT))
+            {
+                if (n<=0) break;
+            }
+        }
+    }
+
+    // Then we set the flag:
+    spinBaseContext::setReliableBroadcast(b);
 }
 
 void *spinClientContext::spinClientThread(void *arg)
@@ -243,16 +275,16 @@ void *spinClientContext::spinClientThread(void *arg)
 #ifndef DISABLE_PYTHON
     if ( !spin.initPython() )
         printf("Python initialization failed.\n");
-    std::string cmd = "sys.path.append('" + spin.sceneManager_->resourcesPath + "/scripts')";
-    
+    std::string cmd = "sys.path.append('" + spin.getResourcesPath() + "/scripts')";
+
     spin.execPython(cmd);
     spin.execPython("import spin");
 #endif
-    
+
     osg::Timer_t lastTick = osg::Timer::instance()->tick();
     osg::Timer_t frameTick = lastTick;
 
-    
+
     context->running = true;
 
     // registerUser needs the context to be running (since it sends messages)
@@ -260,7 +292,7 @@ void *spinClientContext::spinClientThread(void *arg)
 
 
     context->debugPrint();
-    
+
 
     // TIMEOUT in liblo was 10; We set it to zero, and sleep only if there are
     // no received messages. ie, if there are messages, we eat them as fast as
@@ -269,15 +301,20 @@ void *spinClientContext::spinClientThread(void *arg)
     while (!spinBaseContext::signalStop)
     {
         int recv = context->pollUpdates();
-        
+
         if (recv == 0)
-        	usleep(10);
+        {
+            timespec nap;
+            nap.tv_sec = 0;
+            nap.tv_nsec = 1e4;
+            nanosleep(&nap, NULL);
+        }
 
         // just send a ping so the server knows we are still here
         frameTick = osg::Timer::instance()->tick();
         if (osg::Timer::instance()->delta_s(lastTick,frameTick) > 5) // every 5 seconds
         {
-        	spin.NodeMessage(spin.getUserID().c_str(), "s", "ping", LO_ARGS_END);
+            spin.NodeMessage(spin.getUserID().c_str(), "s", "ping", SPIN_ARGS_END);
             lastTick = frameTick;
         }
     }
@@ -296,6 +333,7 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
     osg::Timer* timer = osg::Timer::instance();
 
     osg::Timer_t masterTick, slaveTick, off, startTick;
+    double masterTickMS; // in milliseconds
 
     // the incoming message should look like this: /SPIN/default sync 234.723
 
@@ -311,15 +349,19 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
     if (theMethod != "sync") return 1;
 
     if (lo_is_numerical_type((lo_type)types[1])) {
-        masterTick = (osg::Timer_t) lo_hires_val((lo_type)types[1], argv[1]);
-        //std::cout << "MASTERTICK = " << masterTick << std::endl;
+        //masterTick = (osg::Timer_t) lo_hires_val((lo_type)types[1], argv[1]);
+        masterTickMS = (double) lo_hires_val((lo_type)types[1], argv[1]);
+        masterTick = (osg::Timer_t)(0.001 * masterTickMS / timer->getSecondsPerTick());
+        //std::cout << "MASTERTICK = " << masterTickMS << ", " << masterTick << std::endl;
+
 
         startTick = spin.getSyncStart();
         if (startTick == 0) {
-            ///printf("setSyncStart....\n");
+            //printf("setSyncStart....\n");
             startTick = timer->tick() - masterTick;
             timer->setStartTick(startTick);
             spin.setSyncStart(startTick);
+            return 0;
         }
 
         slaveTick = timer->tick() - startTick;
@@ -327,19 +369,15 @@ int spinClientContext::syncCallback(const char * /*path*/, const char *types, lo
         if (slaveTick > masterTick) { // EARLY!
             off = slaveTick - masterTick;
             startTick += off * 0.1;  /////SYNC_CONVERGE_FACTOR
-            timer->setStartTick(startTick);
-            spin.setSyncStart(startTick);// useless?
-
         } else if (slaveTick < masterTick) { // WE'RE LATE!
             off = masterTick - slaveTick;
             startTick -= off * 0.1;
-            timer->setStartTick(startTick);
-            spin.setSyncStart(startTick);
-
         }
+        timer->setStartTick(startTick);
+        spin.setSyncStart(startTick);
 
-        //std::cout << "start = " <<  startTick << " m=" <<  masterTick << " s=" << slaveTick << " o=" <<  off << std::endl;
-        //std::cout << "got new sync time: " << timer->time_s() << std::endl;
+        // std::cout << "start = " <<  startTick << " m=" <<  masterTick << " s=" << slaveTick << " o=" <<  off << std::endl;
+        // std::cout << "got new sync time: " << timer->time_s() << std::endl;
     }
 
     return 1;
@@ -352,7 +390,7 @@ int spinClientContext::infoCallback(const char * /*path*/, const char * /*types*
         lo_arg ** argv, int argc, void * /*data*/, void * user_data)
 {
     spinClientContext *context = static_cast<spinClientContext*>(user_data);
-    
+
     // TODO: we should not even create the server if doDiscovery is disabled,
     // but then we need a setter method which adds/removes the server and
     // callback if the user changes this.
@@ -458,7 +496,7 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
         lo_arg **argv, int argc, void *data, void *user_data)
 {
     spinClientContext *context = static_cast<spinClientContext*>(user_data);
-    
+
     // WARNING: tcpCallback is registered to match ANY path, so we must manually
     // check if it is within the /SPIN namespace, and if it matches the sceneID:
 
@@ -471,8 +509,8 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
 
     if ((spinToken!="SPIN") || (sceneID!=spinApp::Instance().getSceneID()))
     {
-    	std::cout << "Warning: server is ignoring TCP message: " << path << std::endl;
-    	return 1;
+        std::cout << "Warning: server is ignoring TCP message: " << path << std::endl;
+        return 1;
     }
 
     // get the method (argv[0]):
@@ -489,23 +527,23 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
     }
 
 
-	// It's a valid message, so we just forward it to the regular OSC callback
+    // It's a valid message, so we just forward it to the regular OSC callback
     // methods:
 /*
     if (nodeID.empty())
     {
-    	// scene message:
+        // scene message:
         spinBaseContext::sceneCallback(path, types, argv, argc, (void*) data, (void*) user_data);
     }
     else
     {
-    	// node message:
-	    ReferencedNode* n = spinApp::Instance().sceneManager_->getNode(nodeID);
-	    if (n)
-	    {
-	    	spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
-	    }
-	}
+        // node message:
+        ReferencedNode* n = spinApp::Instance().sceneManager_->getNode(nodeID);
+        if (n)
+        {
+            spinBaseContext::nodeCallback(path, types, argv, argc, (void*) data, (void*) n->id);
+        }
+    }
 */
 
 
@@ -514,9 +552,9 @@ int spinClientContext::tcpCallback(const char *path, const char *types,
 
 void spinClientContext::subscribe()
 {
-	// Tthis should also be called whenever client gets a UserRefresh...
-	// the idea is that if the server crashed and came back online, it sends a
-	// userRefresh message and the client can re-subscribe.
+    // Tthis should also be called whenever client gets a UserRefresh...
+    // the idea is that if the server crashed and came back online, it sends a
+    // userRefresh message and the client can re-subscribe.
 
     if (!lo_tcpRxServer_)
     {
@@ -524,14 +562,14 @@ void spinClientContext::subscribe()
         return;
     }
 
-	std::stringstream sstr;
-	// convert to port number to string
-	sstr << lo_server_get_port(lo_tcpRxServer_);
+    std::stringstream sstr;
+    // convert to port number to string
+    sstr << lo_server_get_port(lo_tcpRxServer_);
 
-	lo_send(lo_serverTCPAddr, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "ssss",
-			"subscribe", spinApp::Instance().getUserID().c_str(),
-			recv_tcp_addr.c_str(),
-			sstr.str().c_str());
+    lo_send(lo_serverTCPAddr, std::string("/SPIN/" + spinApp::Instance().getSceneID()).c_str(), "ssss",
+            "subscribe", spinApp::Instance().getUserID().c_str(),
+            recv_tcp_addr.c_str(),
+            sstr.str().c_str());
 
     // TODO: the server should send a message to confirm the subscription, and
     // doSubscribe_ should only be set to false then. Otherwise, it's possible

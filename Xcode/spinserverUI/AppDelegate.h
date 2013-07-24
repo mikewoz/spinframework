@@ -42,7 +42,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Foundation/NSFileHandle.h>
 //#import "spinCocoaWrapper.h"
-#include "spinServerContext.h"
+#include "spinservercontext.h"
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 {

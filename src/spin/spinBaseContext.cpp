@@ -41,11 +41,11 @@
 
 #include "config.h"
 
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <pthread.h>
 #include <signal.h>
-#include <boost/lexical_cast.hpp>
 
 #include <osgDB/Registry>
 #include <cppintrospection/Type>
@@ -53,8 +53,6 @@
 #include <osgUtil/Optimizer>
 #include <osg/Version>
 
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
 #ifndef DISABLE_PYTHON
 #include <boost/python.hpp>
 #endif
@@ -62,16 +60,15 @@
 #include <lo/lo.h>
 #include <lo/lo_lowlevel.h>
 
-#include "SceneManager.h"
-#include "spinBaseContext.h"
-#include "spinServerContext.h"
-#include "spinClientContext.h"
-#include "spinUtil.h"
-#include "spinApp.h"
-#include "spinLog.h"
-#include "nodeVisitors.h"
-#include "SoundConnection.h"
-#include "spinDefaults.h"
+#include "scenemanager.h"
+#include "spinbasecontext.h"
+#include "spinservercontext.h"
+#include "spinclientcontext.h"
+#include "spinutil.h"
+#include "spinapp.h"
+#include "spinlog.h"
+#include "nodevisitors.h"
+#include "spindefaults.h"
 
 #ifdef WITH_SPATOSC
 #include <spatosc/spatosc.h>
@@ -91,9 +88,6 @@ namespace spin
  * be a public class member, but we have sigHandler, which should be used
  * instead
  */
-//namespace {
-//    volatile bool signalStop;
-//}
 volatile bool spinBaseContext::signalStop = false;
 
 spinBaseContext::spinBaseContext() :
@@ -104,7 +98,8 @@ spinBaseContext::spinBaseContext() :
     pthreadID(0),
     doDiscovery_(true),
     autoPorts_(true),
-    running(false)
+    running(false),
+    reliableBroadcast_(false)
 {
     using namespace spin_defaults;
     
@@ -168,7 +163,7 @@ void spinBaseContext::debugPrint()
 {
     std::cout << "\nSPIN context information:" << std::endl;
     std::cout << "  SceneManager ID:\t\t" << spinApp::Instance().getSceneID() << std::endl;
-    std::cout << "  Resources path:\t\t" << spinApp::Instance().sceneManager_->resourcesPath << std::endl;
+    std::cout << "  Resources path:\t\t" << spinApp::Instance().getResourcesPath() << std::endl;
     std::cout << "  SPIN version:\t\t\t" << PACKAGE_VERSION << "" << std::endl;
     std::cout << "  OSG version:\t\t\t" << osgGetVersion() << "" << std::endl;
 #ifdef WITH_SPATOSC
@@ -177,7 +172,7 @@ void spinBaseContext::debugPrint()
     std::cout << "  SpatOSC version:\t\tDISABLED" << std::endl;
 #endif
 
-#ifdef WITH_SHARED_VIDEO
+#ifdef WITH_SHAREDVIDEO
     std::cout << "  sharedvideo enabled?\t\tYES" << std::endl;
 #else
     std::cout << "  sharedvideo enabled?\t\tNO" << std::endl;
@@ -292,7 +287,12 @@ void spinBaseContext::setTTL(int ttl)
     lo_address_set_ttl(lo_infoAddr, ttl);
     lo_address_set_ttl(lo_syncAddr, ttl);
 }
-    
+
+void spinBaseContext::setReliableBroadcast(bool b)
+{
+    reliableBroadcast_=b;
+}
+
 void spinBaseContext::addInfoHandler(EventHandler *obs)
 {
     infoHandlers.push_back(obs);
@@ -346,8 +346,11 @@ bool spinBaseContext::startThread( void *(*threadFunction) (void*) )
     //pthread_join(pthreadID, NULL); // if not DETACHED thread
 
     // wait until the thread gets into it's loop before returning:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (! running )
-        usleep(10);
+        nanosleep(&nap, NULL);
 
     return true;
 }
@@ -363,67 +366,12 @@ void spinBaseContext::stop()
     }
 
     // wait here until the thread has really exited:
+    timespec nap;
+    nap.tv_sec = 0;
+    nap.tv_nsec = 1e4;
     while (isRunning())
-        usleep(10);
+        nanosleep(&nap, NULL);
 
-}
-
-int spinBaseContext::connectionCallback(const char *path, 
-        const char *types, 
-        lo_arg **argv, 
-        int argc, 
-        void * /*data*/, 
-        void *user_data)
-{
-    std::string idStr;
-    std::string theMethod;
-
-    // make sure there is at least one argument (ie, a method to call):
-    if (! argc)
-        return 1;
-
-    // get the method (argv[0]):
-    if (lo_is_string_type((lo_type) types[0]))
-    {
-        theMethod = std::string((char *) argv[0]);
-    }
-    else
-        return 1;
-
-    // get the instance of the connection:
-    SoundConnection *conn = (SoundConnection*) user_data;
-    if (! conn)
-    {
-        std::cout << "oscParser: Could not find connection: " << idStr << std::endl;
-        return 1;
-    }
-
-    // TODO: replace method call with osg::Introspection
-
-    if (theMethod == "stateDump")
-        conn->stateDump();
-    else if (theMethod == "debug")
-        conn->debug();
-    else if ((argc==2) && (lo_is_numerical_type((lo_type) types[1])))
-    {
-        float value = lo_hires_val((lo_type) types[1], argv[1]);
-
-        if (theMethod == "setThru")
-            conn->setThru((bool) value);
-        else if (theMethod == "setDistanceEffect")
-            conn->setDistanceEffect(value);
-        else if (theMethod == "setRolloffEffect")
-            conn->setRolloffEffect(value);
-        else if (theMethod == "setDopplerEffect")
-            conn->setDopplerEffect(value);
-        else if (theMethod == "setDiffractionEffect")
-            conn->setDiffractionEffect(value);
-        else
-            std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-    }
-    else
-        std::cout << "Unknown OSC command: " << path << " " << theMethod << " (with " << argc-1 << " args)" << std::endl;
-    return 1;
 }
 
 int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **argv, int argc, void * /*data*/, void *user_data)
@@ -477,6 +425,19 @@ int spinBaseContext::nodeCallback(const char *path, const char *types, lo_arg **
 
     spinApp &spin = spinApp::Instance();
 
+    if (theMethod == "event")
+    {
+        
+        ReferencedNode *n = dynamic_cast<ReferencedNode*>(s->s_thing);
+        if (n)
+        {
+            if (argc > 1)
+            {
+                //std::cout << "spinBaseContext matched node message for: " << s->s_name << " method: " << theMethod << std::endl;
+                n->sendEvent(types+1, argv+1, argc-1);
+            }
+        }
+    }
 
     if (theMethod == "parentList")
     {
@@ -822,8 +783,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         theMethod = std::string((char *)argv[0]);
     else
         return 1;
-
-    //pthread_mutex_lock(&sceneMutex);
+    
 
     // note that args start at argv[1] now:
     if (theMethod == "debug")
@@ -842,21 +802,26 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             else if (debugType=="spatosc")
             {
                 #ifdef WITH_SPATOSC
-                if (spinApp::Instance().hasAudioRenderer)
-                    spinApp::Instance().audioScene->debugPrint();
+                if (spin.hasAudioRenderer)
+                    spin.audioScene->debugPrint();
                 else
                     std::cout << "SpatOSC not enabled for this SPIN application" << std::endl;
                 #endif
             }
 
             // forward debug message to all clients:
-            SCENE_MSG("ss", "debug", (const char*)argv[1]);
+            spin.BroadcastSceneMessage("ss", "debug", (const char*)argv[1], SPIN_ARGS_END);
+
         }
         else
         {
             sceneManager->debug();
-            SCENE_MSG("s", "debug");
+            spin.BroadcastSceneMessage("s", "debug", SPIN_ARGS_END);
         }
+    }
+    else if ((theMethod == "setReliableBroadcast") && (argc==2))
+    {
+        spin.getContext()->setReliableBroadcast((bool)lo_hires_val((lo_type)types[1], argv[1]));
     }
     else if (theMethod == "clear")
         sceneManager->clear();
@@ -868,11 +833,11 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
     {
         if (spin.getContext()->isServer())
         {
-            SCENE_MSG("s", "userRefresh");
+            spin.BroadcastSceneMessage("s", "userRefresh", SPIN_ARGS_END);
         }
         else
         {
-            spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", LO_ARGS_END);
+            spin.SceneMessage("sss", "createNode", spin.getUserID().c_str(), "UserNode", SPIN_ARGS_END);
             
             // In the case of a client, we also need to check if the current 
             // userNode is actually attached. The deleteNode / clear / whatever
@@ -927,7 +892,10 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         }
     }
     else if ((theMethod == "exportScene") && (argc==3))
+    {
         sceneManager->exportScene((char*) argv[1], (char*) argv[2]);
+        spin.BroadcastSceneMessage("sss", "exportScene", (char*) argv[1], (char*) argv[2], SPIN_ARGS_END);
+    }
     else if ((theMethod == "load") && (argc==2))
         sceneManager->loadXML((char*) argv[1]);
     else if ((theMethod == "save") && (argc==2))
@@ -950,12 +918,37 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
         sceneManager->deleteNode((char*) argv[1]);
     else if ((theMethod == "deleteGraph") && (argc==2))
         sceneManager->deleteGraph((char*) argv[1]);
+    else if ((theMethod == "setShadows") && (argc==2))
+        sceneManager->setShadows((bool) lo_hires_val((lo_type)types[1], argv[1]));
+    else if ((theMethod == "setShadowSoftness") && (argc==2))
+    {
+        sceneManager->setShadowSoftness((float) lo_hires_val((lo_type)types[1], argv[1]));
+    }
+    else if ((theMethod == "setShadowJitter") && (argc==2))
+    {
+        sceneManager->setShadowJitter((float) lo_hires_val((lo_type)types[1], argv[1]));
+    }
+    else if ((theMethod == "setShadowBias") && (argc==2))
+    {
+        sceneManager->setShadowBias((float) lo_hires_val((lo_type)types[1], argv[1]));
+    }
+    else if ((theMethod == "setShadowAmbientBias") && (argc==3))
+    {
+        sceneManager->setShadowAmbientBias((float) lo_hires_val((lo_type)types[1], argv[1]), (float) lo_hires_val((lo_type)types[2], argv[2]));
+    }
     else if ((theMethod == "setGravity") && (argc==4))
     {
         float x = (float) lo_hires_val((lo_type)types[1], argv[1]);
         float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
         float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
         sceneManager->setGravity(x,y,z);
+    }
+    else if ((theMethod == "setWind") && (argc==4))
+    {
+        float x = (float) lo_hires_val((lo_type)types[1], argv[1]);
+        float y = (float) lo_hires_val((lo_type)types[2], argv[2]);
+        float z = (float) lo_hires_val((lo_type)types[3], argv[3]);
+        sceneManager->setWind(x,y,z);
     }
     else if ((theMethod == "setUpdateRate") && (argc==2))
         sceneManager->setUpdateRate((float)lo_hires_val((lo_type)types[1], argv[1]));
@@ -967,7 +960,7 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             osg::setNotifyLevel((osg::NotifySeverity)lvl);
             std::cout << "setNotifyLevel " << osg::getNotifyLevel() << std::endl;
         }
-        SCENE_MSG("si", "setNotifyLevel", (int)osg::getNotifyLevel());
+        spin.BroadcastSceneMessage("si", "setNotifyLevel", (int)osg::getNotifyLevel(), SPIN_ARGS_END);
     }
     else if ((theMethod == "optimize") && (argc==2))
     {
@@ -986,7 +979,8 @@ int spinBaseContext::sceneCallback(const char *path, const char *types, lo_arg *
             optimizer.optimize(sceneManager->worldNode.get());
             pthread_mutex_unlock(&sceneMutex); 
         }
-        SCENE_MSG("ss", "optimize", (char*)argv[1]);
+        spin.BroadcastSceneMessage("ss", "optimize", (char*)argv[1], SPIN_ARGS_END);
+
     }
     else if (theMethod == "spatosc")
     {
@@ -1114,7 +1108,6 @@ void spinBaseContext::oscParser_error(int num, const char *msg, const char *path
 
 void spinBaseContext::createServers()
 {
-    using boost::lexical_cast;
     using std::string;
 
     lo_tcpRxServer_ = lo_server_new_with_proto(tcpPort_.c_str(), LO_TCP, oscParser_error);
@@ -1144,7 +1137,7 @@ void spinBaseContext::createServers()
                 std::string addr(lo_address_get_hostname(*it));
                 tmpServ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
                 lo_address_free(*it);
-                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+                (*it) = lo_address_new(addr.c_str(), stringify(lo_server_get_port(tmpServ)).c_str());
             }
         }
         else
@@ -1156,7 +1149,7 @@ void spinBaseContext::createServers()
                 tmpServ = lo_server_new(NULL, oscParser_error);
                 std::string addr(lo_address_get_hostname(*it));
                 lo_address_free(*it);
-                (*it) = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(tmpServ)).c_str());
+                (*it) = lo_address_new(addr.c_str(), stringify(lo_server_get_port(tmpServ)).c_str());
             }
         }
         lo_rxServs_.push_back(tmpServ);
@@ -1173,7 +1166,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new_multicast(addr.c_str(), NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
     } 
     else if (isBroadcastAddress(lo_address_get_hostname(lo_infoAddr)))
@@ -1186,7 +1179,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new(NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
         int sock = lo_server_get_socket_fd(lo_infoServ_);
         int sockopt = 1;
@@ -1202,7 +1195,7 @@ void spinBaseContext::createServers()
             std::string addr(lo_address_get_hostname(lo_infoAddr));
             lo_address_free(lo_infoAddr);
             lo_infoServ_ = lo_server_new(NULL, oscParser_error);
-            lo_infoAddr = lo_address_new(addr.c_str(), lexical_cast<string>(lo_server_get_port(lo_infoServ_)).c_str());
+            lo_infoAddr = lo_address_new(addr.c_str(), stringify(lo_server_get_port(lo_infoServ_)).c_str());
         }
     }
 }

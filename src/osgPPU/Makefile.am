@@ -27,3 +27,28 @@ UnitTexture.cpp \
 Utility.cpp \
 Visitor.cpp
 
+EXTRA_DIST = \
+	BarrierNode.h \
+	Camera.h \
+	ColorAttribute.h \
+	Export.h \
+	Processor.h \
+	ShaderAttribute.h \
+	UnitBypass.h \
+	UnitCameraAttachmentBypass.h \
+	UnitCamera.h \
+	UnitDepthbufferBypass.h \
+	Unit.h \
+	UnitInHistoryOut.h \
+	UnitInMipmapOut.h \
+	UnitInOut.h \
+	UnitInOutModule.h \
+	UnitInOutRepeat.h \
+	UnitInResampleOut.h \
+	UnitMipmapInMipmapOut.h \
+	UnitOutCapture.h \
+	UnitOut.h \
+	UnitText.h \
+	UnitTexture.h \
+	Utility.h \
+	Visitor.h

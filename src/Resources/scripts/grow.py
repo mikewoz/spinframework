@@ -1,5 +1,5 @@
 import spin
-import libSPINPyWrap
+import spinframework
 import math
 
 __spin_behavior_class__ = "Script"
@@ -15,6 +15,6 @@ class Script( spin.ScriptBase ):
     def run(self, eventMethod, eventArgs): 
         print "grow.run( ", eventMethod, eventArgs, " )"
         self.scale += 0.1
-        libSPINPyWrap.callback(self._nodeID, "setScale", [self.scale, self.scale, self.scale], 0)
+        spinframework.callback(self._nodeID, "setScale", [self.scale, self.scale, self.scale], 0)
 
 print "grow module loaded."
